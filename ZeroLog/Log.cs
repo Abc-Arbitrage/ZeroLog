@@ -17,7 +17,7 @@ namespace ZeroLog
         public Log()
         {
             _encoding = Encoding.Default;
-            _pool = new ObjectPool<LogEvent>(() => new LogEvent(this), 100);
+            _pool = new ObjectPool<LogEvent>(() => new LogEvent(), 100);
             Task.Run(() => WriteToAppenders());
         }
 
@@ -98,7 +98,8 @@ namespace ZeroLog
         private LogEvent GetLogEventFor(Level level)
         {
             var logEvent = _pool.Allocate();
-            logEvent.SetLevel(level);
+            // TODO: Separate Log and LogManager so there is only one queue/pool but many Log instances
+            logEvent.Initialize(level, this);
             return logEvent;
         }
 
