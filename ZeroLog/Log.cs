@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Text;
 using System.Text.Formatting;
 using System.Threading.Tasks;
@@ -11,7 +12,7 @@ namespace ZeroLog
         private readonly ConcurrentQueue<LogEvent> _queue = new ConcurrentQueue<LogEvent>();
         private readonly ObjectPool<LogEvent> _pool;
         private readonly IAppender[] _appenders;
-        private Encoding _encoding;
+        private readonly Encoding _encoding;
 
         public Log()
         {
@@ -26,22 +27,35 @@ namespace ZeroLog
             byte[] destination = new byte[1024];
             while (true)
             {
-                LogEvent logEvent;
-                if (_queue.TryDequeue(out logEvent))
+                try
                 {
-                    logEvent.WriteToStringBuffer(stringBuffer);
-                    int bytesWritten;
-                    fixed (byte* dest = destination)
-                        bytesWritten = stringBuffer.CopyTo(dest, 0, stringBuffer.Count, _encoding);
+                    TryToProcessQueue(stringBuffer, destination);
+                }
+                catch (Exception ex)
+                {
+                    // TODO: how can we distinguish between exceptions that occur during shutdown and normal operation
+                    Console.WriteLine(ex);
+                }
+            }
+        }
 
-                    _pool.Free(logEvent);
+        private unsafe void TryToProcessQueue(StringBuffer stringBuffer, byte[] destination)
+        {
+            LogEvent logEvent;
+            if (_queue.TryDequeue(out logEvent))
+            {
+                logEvent.WriteToStringBuffer(stringBuffer);
+                int bytesWritten;
+                fixed (byte* dest = destination)
+                    bytesWritten = stringBuffer.CopyTo(dest, 0, stringBuffer.Count, _encoding);
 
-                    // Write to appenders
-                    foreach (var appender in _appenders)
-                    {
-                        var stream = appender.GetStream();
-                        stream.Write(destination, 0, bytesWritten);
-                    }
+                _pool.Free(logEvent);
+
+                // Write to appenders
+                foreach (var appender in _appenders)
+                {
+                    var stream = appender.GetStream();
+                    stream.Write(destination, 0, bytesWritten);
                 }
             }
         }
