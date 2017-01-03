@@ -167,7 +167,7 @@ namespace ZeroLog
         {
             EnsureRemainingBytes(1 + sizeof(Guid));
 
-            _buffer[_position++] = (byte)ArgumentType.Decimal;
+            _buffer[_position++] = (byte)ArgumentType.Guid;
 
             fixed (byte* p = _buffer)
                 *(Guid*)(p + _position) = g;
@@ -195,7 +195,7 @@ namespace ZeroLog
         {
             EnsureRemainingBytes(1 + sizeof(long));
 
-            _buffer[_position++] = (byte)ArgumentType.DateTime;
+            _buffer[_position++] = (byte)ArgumentType.TimeSpan;
 
             fixed (byte* p = _buffer)
                 *(long*)(p + _position) = ts.Ticks;
