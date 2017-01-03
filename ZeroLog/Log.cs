@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Text;
+using System.Text.Formatting;
 using System.Threading.Tasks;
 using Roslyn.Utilities;
 
@@ -19,7 +20,7 @@ namespace ZeroLog
             Task.Run(() => WriteToAppenders());
         }
 
-        private void WriteToAppenders()
+        private unsafe void WriteToAppenders()
         {
             var stringBuffer = new StringBuffer();
             byte[] destination = new byte[1024];
@@ -29,7 +30,10 @@ namespace ZeroLog
                 if (_queue.TryDequeue(out logEvent))
                 {
                     logEvent.WriteToStringBuffer(stringBuffer);
-                    var bytesWritten = stringBuffer.CopyTo(destination, 0, stringBuffer.Count, _encoding);
+                    int bytesWritten;
+                    fixed (byte* dest = destination)
+                        bytesWritten = stringBuffer.CopyTo(dest, 0, stringBuffer.Count, _encoding);
+
                     _pool.Free(logEvent);
 
                     // Write to appenders

@@ -32,6 +32,9 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="StringFormatter">
+      <HintPath>..\lib\StringFormatter.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -50,7 +53,6 @@
     <Compile Include="LogEvent.cs" />
     <Compile Include="ObjectPool.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="StringBuffer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
