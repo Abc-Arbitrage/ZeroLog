@@ -210,10 +210,114 @@ namespace ZeroLog
             _log.Enqueue(this);
         }
 
-        public void WriteToStringBuffer(StringBuffer formatted)
+        public void WriteToStringBuffer(StringBuffer stringBuffer)
         {
-            // Process _buffer
-            
+            var read = 0;
+            var nextStringIndex = 0;
+
+            while (read < _position)
+            {
+                var argumentType = (ArgumentType)_buffer[read++];
+
+                switch (argumentType)
+                {
+                    case ArgumentType.String:
+                        stringBuffer.Append(_strings[nextStringIndex++]);
+                        break;
+
+                    case ArgumentType.BooleanTrue:
+                        stringBuffer.Append(true);
+                        break;
+
+                    case ArgumentType.BooleanFalse:
+                        stringBuffer.Append(false);
+                        break;
+
+                    case ArgumentType.Byte:
+                        stringBuffer.Append(_buffer[read++], StringView.Empty);
+                        break;
+
+                    case ArgumentType.Char:
+                        stringBuffer.Append(BitConverter.ToChar(_buffer, read));
+                        read += sizeof(char);
+                        break;
+
+                    case ArgumentType.Int16:
+                        stringBuffer.Append(BitConverter.ToInt16(_buffer, read), StringView.Empty);
+                        read += sizeof(short);
+                        break;
+
+                    case ArgumentType.Int32:
+                        stringBuffer.Append(BitConverter.ToInt32(_buffer, read), StringView.Empty);
+                        read += sizeof(int);
+                        break;
+
+                    case ArgumentType.Int64:
+                        stringBuffer.Append(BitConverter.ToInt64(_buffer, read), StringView.Empty);
+                        read += sizeof(long);
+                        break;
+
+                    case ArgumentType.Single:
+                        stringBuffer.Append(BitConverter.ToSingle(_buffer, read), StringView.Empty);
+                        read += sizeof(float);
+                        break;
+
+                    case ArgumentType.Double:
+                        stringBuffer.Append(BitConverter.ToDouble(_buffer, read), StringView.Empty);
+                        read += sizeof(double);
+                        break;
+
+                    case ArgumentType.Decimal:
+                        stringBuffer.Append(ReadDecimal(read), StringView.Empty);
+                        read += sizeof(decimal);
+                        break;
+
+                    case ArgumentType.Guid:
+                        var guid = ReadGuid(read);
+                        read += sizeof(Guid);
+                        throw new NotImplementedException(); //TODO
+
+                    case ArgumentType.DateTime:
+                        var dateTime = ReadDateTime(read); //TODO
+                        read += sizeof(ulong);
+                        throw new NotImplementedException();
+
+                    case ArgumentType.TimeSpan:
+                        var timeSpan = ReadTimeSpan(read);
+                        read += sizeof(long);
+                        throw new NotImplementedException(); //TODO
+
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+
+        }
+
+        private decimal ReadDecimal(int position)
+        {
+            fixed (byte* pbyte = _buffer)
+                return *(decimal*)(pbyte + position);
+        }
+
+        private Guid ReadGuid(int position)
+        {
+            fixed (byte* pbyte = _buffer)
+                return *(Guid*)(pbyte + position);
+        }
+
+        private DateTime ReadDateTime(int position)
+        {
+            var dateData = BitConverter.ToUInt64(_buffer, position);
+            var ticks = (long)(dateData & 0x3FFFFFFFFFFFFFFF);
+            var kind = (DateTimeKind)(dateData & 0xC000000000000000);
+            return new DateTime(ticks, kind); 
+        }
+
+        private TimeSpan ReadTimeSpan(int position)
+        {
+            var ticks = BitConverter.ToInt64(_buffer, position);
+            return new TimeSpan(ticks);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

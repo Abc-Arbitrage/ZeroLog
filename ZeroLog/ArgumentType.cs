@@ -1,3 +1,5 @@
+using System;
+
 namespace ZeroLog
 {
     enum ArgumentType : byte
