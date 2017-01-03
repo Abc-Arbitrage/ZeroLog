@@ -1,64 +1,24 @@
-﻿using System;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Text;
-using System.Text.Formatting;
-using System.Threading.Tasks;
 using Roslyn.Utilities;
 
 namespace ZeroLog
 {
     public class Log
     {
+        private readonly LogManager _logManager;
         private readonly ConcurrentQueue<LogEvent> _queue = new ConcurrentQueue<LogEvent>();
         private readonly ObjectPool<LogEvent> _pool;
         private readonly IAppender[] _appenders;
         private readonly Encoding _encoding;
 
-        public Log()
+        internal Log(LogManager logManager, string name)
         {
-            _encoding = Encoding.Default;
-            _pool = new ObjectPool<LogEvent>(() => new LogEvent(), 100);
-            Task.Run(() => WriteToAppenders());
+            _logManager = logManager;
+            Name = name;
         }
 
-        private unsafe void WriteToAppenders()
-        {
-            var stringBuffer = new StringBuffer();
-            byte[] destination = new byte[1024];
-            while (true)
-            {
-                try
-                {
-                    TryToProcessQueue(stringBuffer, destination);
-                }
-                catch (Exception ex)
-                {
-                    // TODO: how can we distinguish between exceptions that occur during shutdown and normal operation
-                    Console.WriteLine(ex);
-                }
-            }
-        }
-
-        private unsafe void TryToProcessQueue(StringBuffer stringBuffer, byte[] destination)
-        {
-            LogEvent logEvent;
-            if (_queue.TryDequeue(out logEvent))
-            {
-                logEvent.WriteToStringBuffer(stringBuffer);
-                int bytesWritten;
-                fixed (byte* dest = destination)
-                    bytesWritten = stringBuffer.CopyTo(dest, 0, stringBuffer.Count, _encoding);
-
-                _pool.Free(logEvent);
-
-                // Write to appenders
-                foreach (var appender in _appenders)
-                {
-                    var stream = appender.GetStream();
-                    stream.Write(destination, 0, bytesWritten);
-                }
-            }
-        }
+        internal string Name { get; }
 
         public LogEvent Fatal()
         {
@@ -97,7 +57,7 @@ namespace ZeroLog
 
         private LogEvent GetLogEventFor(Level level)
         {
-            var logEvent = _pool.Allocate();
+            var logEvent = _logManager.AllocateLogEvent();
             // TODO: Separate Log and LogManager so there is only one queue/pool but many Log instances
             logEvent.Initialize(level, this);
             return logEvent;
@@ -105,7 +65,7 @@ namespace ZeroLog
 
         internal void Enqueue(LogEvent logEvent)
         {
-            _queue.Enqueue(logEvent);
+            _logManager.Enqueue(logEvent);
         }
     }
 }

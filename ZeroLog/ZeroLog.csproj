@@ -51,6 +51,7 @@
     <Compile Include="Level.cs" />
     <Compile Include="Log.cs" />
     <Compile Include="LogEvent.cs" />
+    <Compile Include="LogManager.cs" />
     <Compile Include="ObjectPool.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

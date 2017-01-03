@@ -135,11 +135,5 @@ namespace ZeroLog.Tests
 
             Assert.AreEqual("AbCFalseTrue128£12345-128999999999999999999123.456789.012345.67890", _output.ToString());
         }
-
-        [Test]
-        public void should_do_this()
-        {
-            Guid.NewGuid().ToString()
-        }
     }
 }
