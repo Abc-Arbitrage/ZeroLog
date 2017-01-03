@@ -3,19 +3,18 @@ namespace ZeroLog
     enum ArgumentType : byte
     {
         String,
-        Char,
+        BooleanTrue,
+        BooleanFalse,
         Byte,
-        Boolean,
-        Int8,
+        Char,
         Int16,
         Int32,
         Int64,
         Single,
-        Float,
         Double,
-        // TODO: Implement custom formatters for this
+        Decimal,
         Guid,
         DateTime,
-        TimeSpan
+        TimeSpan,
     }
 }
