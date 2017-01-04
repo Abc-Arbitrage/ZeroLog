@@ -34,3 +34,4 @@ _ReSharper*/
 *.vsp
 *.vspx
 packages/*
+.vs/*
