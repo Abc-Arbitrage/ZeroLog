@@ -58,7 +58,6 @@ namespace ZeroLog
         private LogEvent GetLogEventFor(Level level)
         {
             var logEvent = _logManager.AllocateLogEvent();
-            // TODO: Separate Log and LogManager so there is only one queue/pool but many Log instances
             logEvent.Initialize(level, this);
             return logEvent;
         }

@@ -1,13 +1,11 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Text.Formatting;
 using System.Threading;
 
 namespace ZeroLog.Appenders
 {
-    public class DateAndSizeRollingFileAppender : AppenderBase, IAppender
+    public class DateAndSizeRollingFileAppender : AppenderBase
     {
         private readonly object _lock = new object();
         private DateTime _currentDateTime = DateTime.UtcNow;

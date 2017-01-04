@@ -20,11 +20,11 @@ namespace ZeroLog
         private bool _isRunning = true;
         private readonly byte[] _newlineBytes;
 
-        private LogManager(IEnumerable<IAppender> appenders, Level level = Level.Finest)
+        private LogManager(IEnumerable<IAppender> appenders, int size, Level level = Level.Finest)
         {
             _encoding = Encoding.Default;
             _queue = new ConcurrentQueue<LogEvent>();
-            _pool = new ObjectPool<LogEvent>(() => new LogEvent(level), 1024);
+            _pool = new ObjectPool<LogEvent>(() => new LogEvent(level), size);
 
             foreach (var appender in appenders)
             {
@@ -36,12 +36,12 @@ namespace ZeroLog
             _writeTask = Task.Run(() => WriteToAppenders());
         }
 
-        public static LogManager Initialize(IEnumerable<IAppender> appenders)
+        public static LogManager Initialize(IEnumerable<IAppender> appenders, int size = 1024)
         {
             if (_logManager != null)
                 throw new ApplicationException("LogManager is already initialized");
 
-            _logManager = new LogManager(appenders);
+            _logManager = new LogManager(appenders, size);
             return _logManager;
         }
 
@@ -49,6 +49,9 @@ namespace ZeroLog
         {
             var logManager = _logManager;
             _logManager = null;
+
+            if (logManager == null)
+                return;
 
             logManager._isRunning = false;
             // TODO: shutdown all the logs
@@ -104,6 +107,8 @@ namespace ZeroLog
                 int bytesWritten;
                 fixed (byte* dest = destination)
                     bytesWritten = stringBuffer.CopyTo(dest, 0, stringBuffer.Count, _encoding);
+
+                stringBuffer.Clear();
 
                 // Write to appenders
                 foreach (var appender in _appenders)

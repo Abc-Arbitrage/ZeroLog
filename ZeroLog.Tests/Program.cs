@@ -5,7 +5,15 @@
         public static void Main(string [] args)
         {
             IntegrationTests test = new IntegrationTests();
-            test.should_test_console();
+            test.SetUp();
+            try
+            {
+                test.should_not_allocate();
+            }
+            finally
+            {
+                test.Teardown();
+            }
         }
     }
 }
