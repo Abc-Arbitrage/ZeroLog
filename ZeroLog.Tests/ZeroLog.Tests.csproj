@@ -54,6 +54,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Appenders\DateAndSizeRollingFileAppenderTests.cs" />
     <Compile Include="IntegrationTests.cs" />
     <Compile Include="LogEventTests.cs" />
     <Compile Include="LogManagerTests.cs" />
@@ -69,8 +70,6 @@
       <Name>ZeroLog</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Appenders\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
