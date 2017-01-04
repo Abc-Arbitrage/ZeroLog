@@ -20,15 +20,20 @@ namespace ZeroLog
         private bool _isRunning = true;
         private readonly byte[] _newlineBytes;
 
-        private LogManager()
+        private LogManager(IEnumerable<IAppender> appenders)
         {
             _encoding = Encoding.Default;
             _queue = new ConcurrentQueue<LogEvent>();
             _pool = new ObjectPool<LogEvent>(() => new LogEvent(), 1024);
-            _appenders = new List<IAppender>();
+
+            foreach (var appender in appenders)
+            {
+                appender.SetEncoding(_encoding);
+            }
+
+            _appenders = new List<IAppender>(appenders);
 
             _writeTask = Task.Run(() => WriteToAppenders());
-            _newlineBytes = _encoding.GetBytes(Environment.NewLine);
         }
 
         public static LogManager Initialize(IEnumerable<IAppender> appenders)
@@ -36,8 +41,7 @@ namespace ZeroLog
             if (_logManager != null)
                 throw new ApplicationException("LogManager is already initialized");
 
-            _logManager = new LogManager();
-            _logManager._appenders.AddRange(appenders);
+            _logManager = new LogManager(appenders);
             return _logManager;
         }
 
@@ -85,6 +89,7 @@ namespace ZeroLog
                 {
                     // TODO: how can we distinguish between exceptions that occur during shutdown and normal operation
                     Console.WriteLine(ex);
+                    throw;
                 }
             }
         }
@@ -94,22 +99,19 @@ namespace ZeroLog
             LogEvent logEvent;
             if (_queue.TryDequeue(out logEvent))
             {
+                // Write format only once
                 logEvent.WriteToStringBuffer(stringBuffer);
                 int bytesWritten;
                 fixed (byte* dest = destination)
                     bytesWritten = stringBuffer.CopyTo(dest, 0, stringBuffer.Count, _encoding);
 
-                _pool.Free(logEvent);
-
-                _newlineBytes.CopyTo(destination, bytesWritten);
-                bytesWritten += _newlineBytes.Length;
-
                 // Write to appenders
                 foreach (var appender in _appenders)
                 {
-                    var stream = appender.GetStream();
-                    stream.Write(destination, 0, bytesWritten);
+                    appender.WriteEvent(logEvent, destination, bytesWritten);
                 }
+
+                _pool.Free(logEvent);
             }
         }
     }

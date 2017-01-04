@@ -1,9 +1,11 @@
 using System.IO;
+using System.Text;
 
 namespace ZeroLog
 {
     public interface IAppender
     {
-        Stream GetStream();
+        void WriteEvent(LogEvent logEvent, byte[] messageBytes, int messageLength);
+        void SetEncoding(Encoding encoding);
     }
 }

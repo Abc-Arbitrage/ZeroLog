@@ -46,6 +46,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Appenders\ConsoleAppender.cs" />
+    <Compile Include="Appenders\FileApender.cs" />
+    <Compile Include="Appenders\DateAndSizeRollingFileAppender.cs" />
     <Compile Include="ArgumentType.cs" />
     <Compile Include="ConcurrentQueue.cs" />
     <Compile Include="IAppender.cs" />
