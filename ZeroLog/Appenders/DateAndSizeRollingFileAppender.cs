@@ -2,21 +2,20 @@
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.Formatting;
 using System.Threading;
 
 namespace ZeroLog.Appenders
 {
-    public class DateAndSizeRollingFileAppender : IAppender
+    public class DateAndSizeRollingFileAppender : AppenderBase, IAppender
     {
         private readonly object _lock = new object();
-        private byte[] _newlineBytes;
         private DateTime _currentDateTime = DateTime.UtcNow;
         private int _currentFileSize;
         private string _currentFilename;
         private string _directory;
         private int _rollingFileNumber;
         private Stream _stream;
-        private Encoding _encoding;
 
         /// <summary>
         ///     Gets or sets if the appender should always call <see cref="M:System.IO.TextWriter.Flush" /> on the
@@ -46,24 +45,27 @@ namespace ZeroLog.Appenders
         /// <summary>
         ///     Initialises a new instance of the class.
         /// </summary>
-        public DateAndSizeRollingFileAppender(string filenameRoot, string extension = null)
+        public DateAndSizeRollingFileAppender(string filenameRoot, int maxFileSizeInBytes = 200 * 1024 * 1024, string extension = "log")
         {
             FilenameRoot = filenameRoot;
-            MaxFileSizeInBytes = 200 * 1024 * 1024;
-            FilenameExtension = extension ?? "log";
+            MaxFileSizeInBytes = maxFileSizeInBytes;
+            FilenameExtension = extension;
+
             Open();
         }
 
-        public void WriteEvent(LogEvent logEvent, byte[] messageBytes, int messageLength)
+        public override void WriteEvent(LogEvent logEvent, byte[] messageBytes, int messageLength)
         {
             var stream = _stream;
             if (stream != null)
             {
                 if (messageLength + 1 >= messageBytes.Length)
                     throw new ApplicationException($"{nameof(messageBytes)} must be big enough to also contain the new line characters");
+                
+                WritePrefix(stream, logEvent);
 
-                _newlineBytes.CopyTo(messageBytes, messageLength);
-                messageLength += _newlineBytes.Length;
+                NewlineBytes.CopyTo(messageBytes, messageLength);
+                messageLength += NewlineBytes.Length;
 
                 stream.Write(messageBytes, 0, messageLength);
 
@@ -73,12 +75,6 @@ namespace ZeroLog.Appenders
                 _currentFileSize = (int)stream.Length;
                 CheckRollFile();
             }
-        }
-        
-        public void SetEncoding(Encoding encoding)
-        {
-            _encoding = encoding;
-            _newlineBytes = encoding.GetBytes(Environment.NewLine);
         }
 
         private void Open()

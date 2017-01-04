@@ -30,12 +30,20 @@ namespace ZeroLog.Tests.Appenders
         public void should_log_to_file()
         {
             var bytes = new byte[256];
-
             var message = "Test log message";
             var byteLength = Encoding.Default.GetBytes(message, 0, message.Length, bytes, 0);
-            _appender.WriteEvent(new LogEvent(Level.Info), bytes, byteLength);
+            var logEvent = new LogEvent(Level.Info);
+            logEvent.Initialize(Level.Info, new Log(null, "TestLog"));
+            _appender.WriteEvent(logEvent, bytes, byteLength);
             _appender.Flush();
             
+            var written = GetLastLine();
+
+            Check.That(written).IsEqualTo("%date{HH:mm:ss.fff} - Info - TestLog || " + message);
+        }
+
+        private string GetLastLine()
+        {
             var reader = new StreamReader(File.Open(_appender.CurrentFileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite));
             string written = null;
 
@@ -43,8 +51,7 @@ namespace ZeroLog.Tests.Appenders
             {
                 written = reader.ReadLine();
             }
-
-            Check.That(written).IsEqualTo(message);
+            return written;
         }
     }
 }

@@ -17,7 +17,6 @@ namespace ZeroLog
         private Log _log;
         private DateTime _timeStamp;
         private int _threadId;
-        private Level _level;
         private int _position = 0;
         private Level _activeLevel;
 
@@ -26,10 +25,13 @@ namespace ZeroLog
             _activeLevel = level;
         }
 
+        public Level Level { get; private set; }
+        public string Name => _log.Name;
+
         internal void Initialize(Level level, Log log)
         {
             _timeStamp = DateTime.UtcNow;
-            _level = level;
+            Level = level;
             _log = log;
             _strings.Clear();
             _position = 0;

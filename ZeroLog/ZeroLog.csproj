@@ -45,6 +45,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Appenders\AppenderBase.cs" />
     <Compile Include="Appenders\ConsoleAppender.cs" />
     <Compile Include="Appenders\DateAndSizeRollingFileAppender.cs" />
     <Compile Include="ArgumentType.cs" />

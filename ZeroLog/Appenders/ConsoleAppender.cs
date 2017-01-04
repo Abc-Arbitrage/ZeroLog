@@ -4,29 +4,23 @@ using System.Text;
 
 namespace ZeroLog.Appenders
 {
-    public class ConsoleAppender : IAppender
+    public class ConsoleAppender : AppenderBase
     {
         private readonly Stream _output;
-        private byte[] _newlineBytes;
-        private Encoding _encoding;
 
         public ConsoleAppender()
         {
             _output = Console.OpenStandardOutput();
         }
 
-        public void WriteEvent(LogEvent logEvent, byte[] messageBytes, int messageLength)
+        public override void WriteEvent(LogEvent logEvent, byte[] messageBytes, int messageLength)
         {
-            _newlineBytes.CopyTo(messageBytes, messageLength);
-            messageLength += _newlineBytes.Length;
+            WritePrefix(_output, logEvent);
+
+            NewlineBytes.CopyTo(messageBytes, messageLength);
+            messageLength += NewlineBytes.Length;
 
             _output.Write(messageBytes, 0, messageLength);
-        }
-
-        public void SetEncoding(Encoding encoding)
-        {
-            _encoding = encoding;
-            _newlineBytes = encoding.GetBytes(Environment.NewLine);
         }
     }
 }
