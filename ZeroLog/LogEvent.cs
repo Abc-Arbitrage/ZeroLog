@@ -18,9 +18,11 @@ namespace ZeroLog
         private int _threadId;
         private Level _level;
         private int _position = 0;
-        
-        public LogEvent()
+        private Level _activeLevel;
+
+        public LogEvent(Level level)
         {
+            _activeLevel = level;
         }
 
         internal void Initialize(Level level, Log log)

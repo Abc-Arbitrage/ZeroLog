@@ -20,11 +20,11 @@ namespace ZeroLog
         private bool _isRunning = true;
         private readonly byte[] _newlineBytes;
 
-        private LogManager(IEnumerable<IAppender> appenders)
+        private LogManager(IEnumerable<IAppender> appenders, Level level = Level.Finest)
         {
             _encoding = Encoding.Default;
             _queue = new ConcurrentQueue<LogEvent>();
-            _pool = new ObjectPool<LogEvent>(() => new LogEvent(), 1024);
+            _pool = new ObjectPool<LogEvent>(() => new LogEvent(level), 1024);
 
             foreach (var appender in appenders)
             {

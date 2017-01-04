@@ -13,7 +13,7 @@ namespace ZeroLog.Tests
         [SetUp]
         public void SetUp()
         {
-            _logEvent = new LogEvent();
+            _logEvent = new LogEvent(Level.Finest);
             _output = new StringBuffer(128) { Culture = CultureInfo.InvariantCulture };
         }
 
