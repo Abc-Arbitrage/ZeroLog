@@ -4,7 +4,7 @@ using Roslyn.Utilities;
 
 namespace ZeroLog
 {
-    public class Log
+    public partial class Log
     {
         private readonly LogManager _logManager;
         private readonly ConcurrentQueue<LogEvent> _queue = new ConcurrentQueue<LogEvent>();

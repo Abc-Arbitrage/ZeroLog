@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text.Formatting;
 using System.Threading;
@@ -214,12 +215,12 @@ namespace ZeroLog
 
         public void WriteToStringBuffer(StringBuffer stringBuffer)
         {
-            var read = 0;
+            var readBytes = 0;
             var nextStringIndex = 0;
 
-            while (read < _position)
+            while (readBytes < _position)
             {
-                var argumentType = (ArgumentType)_buffer[read++];
+                var argumentType = (ArgumentType)_buffer[readBytes++];
 
                 switch (argumentType)
                 {
@@ -236,57 +237,57 @@ namespace ZeroLog
                         break;
 
                     case ArgumentType.Byte:
-                        stringBuffer.Append(_buffer[read++], StringView.Empty);
+                        stringBuffer.Append(_buffer[readBytes++], StringView.Empty);
                         break;
 
                     case ArgumentType.Char:
-                        stringBuffer.Append(BitConverter.ToChar(_buffer, read));
-                        read += sizeof(char);
+                        stringBuffer.Append(BitConverter.ToChar(_buffer, readBytes));
+                        readBytes += sizeof(char);
                         break;
 
                     case ArgumentType.Int16:
-                        stringBuffer.Append(BitConverter.ToInt16(_buffer, read), StringView.Empty);
-                        read += sizeof(short);
+                        stringBuffer.Append(BitConverter.ToInt16(_buffer, readBytes), StringView.Empty);
+                        readBytes += sizeof(short);
                         break;
 
                     case ArgumentType.Int32:
-                        stringBuffer.Append(BitConverter.ToInt32(_buffer, read), StringView.Empty);
-                        read += sizeof(int);
+                        stringBuffer.Append(BitConverter.ToInt32(_buffer, readBytes), StringView.Empty);
+                        readBytes += sizeof(int);
                         break;
 
                     case ArgumentType.Int64:
-                        stringBuffer.Append(BitConverter.ToInt64(_buffer, read), StringView.Empty);
-                        read += sizeof(long);
+                        stringBuffer.Append(BitConverter.ToInt64(_buffer, readBytes), StringView.Empty);
+                        readBytes += sizeof(long);
                         break;
 
                     case ArgumentType.Single:
-                        stringBuffer.Append(BitConverter.ToSingle(_buffer, read), StringView.Empty);
-                        read += sizeof(float);
+                        stringBuffer.Append(BitConverter.ToSingle(_buffer, readBytes), StringView.Empty);
+                        readBytes += sizeof(float);
                         break;
 
                     case ArgumentType.Double:
-                        stringBuffer.Append(BitConverter.ToDouble(_buffer, read), StringView.Empty);
-                        read += sizeof(double);
+                        stringBuffer.Append(BitConverter.ToDouble(_buffer, readBytes), StringView.Empty);
+                        readBytes += sizeof(double);
                         break;
 
                     case ArgumentType.Decimal:
-                        stringBuffer.Append(ReadDecimal(read), StringView.Empty);
-                        read += sizeof(decimal);
+                        stringBuffer.Append(ReadDecimal(readBytes), StringView.Empty);
+                        readBytes += sizeof(decimal);
                         break;
 
                     case ArgumentType.Guid:
-                        var guid = ReadGuid(read);
-                        read += sizeof(Guid);
+                        var guid = ReadGuid(readBytes);
+                        readBytes += sizeof(Guid);
                         throw new NotImplementedException(); //TODO
 
                     case ArgumentType.DateTime:
-                        var dateTime = ReadDateTime(read); //TODO
-                        read += sizeof(ulong);
+                        var dateTime = ReadDateTime(readBytes); //TODO
+                        readBytes += sizeof(ulong);
                         throw new NotImplementedException();
 
                     case ArgumentType.TimeSpan:
-                        var timeSpan = ReadTimeSpan(read);
-                        read += sizeof(long);
+                        var timeSpan = ReadTimeSpan(readBytes);
+                        readBytes += sizeof(long);
                         throw new NotImplementedException(); //TODO
 
                     default:
@@ -294,6 +295,7 @@ namespace ZeroLog
                 }
             }
 
+            Debug.Assert(readBytes == _position, "Buffer over-read");
         }
 
         private decimal ReadDecimal(int position)

@@ -1,0 +1,38 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ assembly name="$(TargetPath)" #>
+<#@ output extension=".cs" #>
+
+namespace ZeroLog
+{
+	partial class Log
+	{
+		<# for(int i = 1; i <= 8; i++)
+		{
+			var simpleName = "Arg" + i;
+			var genericParams = "<T0";
+			
+			for (int j = 1; j < i; j++)
+			{
+				genericParams += ", T" + j;
+			}
+
+			genericParams += ">";
+
+			foreach (var levelName in Enum.GetNames(typeof(ZeroLog.Level)))
+            {
+		#>
+		
+		public void <#=levelName#>Format<#=genericParams#>(string format, T0 arg0<#for(int j = 1; j < i; j++) { #>, T<#=j#> arg<#=j#><#}#>)
+		{
+        }
+	
+		<#
+			}
+        }
+		#>
+	}
+}

@@ -53,6 +53,11 @@
     <Compile Include="IAppender.cs" />
     <Compile Include="Level.cs" />
     <Compile Include="Log.cs" />
+    <Compile Include="Log1.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Log.tt</DependentUpon>
+    </Compile>
     <Compile Include="LogEvent.cs" />
     <Compile Include="LogManager.cs" />
     <Compile Include="ObjectPool.cs" />
@@ -60,6 +65,15 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Log.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Log1.cs</LastGenOutput>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
