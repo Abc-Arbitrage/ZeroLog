@@ -16,7 +16,9 @@ namespace ZeroLog
         private readonly ObjectPool<LogEvent> _pool;
         private readonly Encoding _encoding;
         private readonly List<IAppender> _appenders;
-        private bool _isRunning;
+        private readonly Task _writeTask;
+        private bool _isRunning = true;
+        private readonly byte[] _newlineBytes;
 
         private LogManager()
         {
@@ -25,7 +27,8 @@ namespace ZeroLog
             _pool = new ObjectPool<LogEvent>(() => new LogEvent(), 1024);
             _appenders = new List<IAppender>();
 
-            Task.Run(() => WriteToAppenders());
+            _writeTask = Task.Run(() => WriteToAppenders());
+            _newlineBytes = _encoding.GetBytes(Environment.NewLine);
         }
 
         public static LogManager Initialize(IEnumerable<IAppender> appenders)
@@ -44,6 +47,9 @@ namespace ZeroLog
             _logManager = null;
 
             logManager._isRunning = false;
+            // TODO: shutdown all the logs
+
+            logManager._writeTask.Wait(1000);
         }
 
         public static Log GetLogger(Type type)
@@ -69,7 +75,7 @@ namespace ZeroLog
         {
             var stringBuffer = new StringBuffer();
             byte[] destination = new byte[1024];
-            while (_isRunning)
+            while ( _isRunning)
             {
                 try
                 {
@@ -94,6 +100,9 @@ namespace ZeroLog
                     bytesWritten = stringBuffer.CopyTo(dest, 0, stringBuffer.Count, _encoding);
 
                 _pool.Free(logEvent);
+
+                _newlineBytes.CopyTo(destination, bytesWritten);
+                bytesWritten += _newlineBytes.Length;
 
                 // Write to appenders
                 foreach (var appender in _appenders)

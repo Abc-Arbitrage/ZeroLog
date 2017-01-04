@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{F2405E3E-69ED-4BA5-A862-CF920B612B16}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ZeroLog.Tests</RootNamespace>
     <AssemblyName>ZeroLog.Tests</AssemblyName>
@@ -29,6 +29,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>ZeroLog.Tests.Program</StartupObject>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="NFluent, Version=1.3.1.0, Culture=neutral, PublicKeyToken=18828b37b84b1437, processorArchitecture=MSIL">
       <HintPath>..\packages\NFluent.1.3.1.0\lib\net40\NFluent.dll</HintPath>
@@ -51,8 +54,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IntegrationTests.cs" />
     <Compile Include="LogEventTests.cs" />
     <Compile Include="LogManagerTests.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -63,6 +68,9 @@
       <Project>{34665A87-497B-4C4E-928E-1DFBEB3F7441}</Project>
       <Name>ZeroLog</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Appenders\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
