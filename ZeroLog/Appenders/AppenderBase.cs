@@ -23,7 +23,7 @@ namespace ZeroLog.Appenders
             _stringBuffer.Clear();
             _stringBuffer.Append("%date{HH:mm:ss.fff}"); // TODO: implement date formatting in StringFormatter
             _stringBuffer.Append(" - ");
-            _stringBuffer.Append(logEvent.Level.ToString()); // TODO: Use enum cache
+            _stringBuffer.Append(LevelStringCache.GetLevelString(logEvent.Level));
             _stringBuffer.Append(" - ");
             _stringBuffer.Append(logEvent.Name);
             _stringBuffer.Append(" || ");

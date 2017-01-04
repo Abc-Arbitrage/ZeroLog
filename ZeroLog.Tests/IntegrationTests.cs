@@ -36,14 +36,13 @@ namespace ZeroLog.Tests
 
             GC.Collect(2, GCCollectionMode.Forced, true);
             var gcCount = GC.CollectionCount(0);
-//            Console.ReadKey();
 
             var timer = Stopwatch.StartNew();
 
             var logger = LogManager.GetLogger(typeof(IntegrationTests));
             for (int k = 0; k < count; k++)
             {
-                Thread.Sleep(0);
+                Thread.Sleep(1);
                 logger.Info().Append("Hello").Log();
             }
             LogManager.Shutdown();

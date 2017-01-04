@@ -52,6 +52,7 @@
     <Compile Include="ConcurrentQueue.cs" />
     <Compile Include="IAppender.cs" />
     <Compile Include="Level.cs" />
+    <Compile Include="LevelStringCache.cs" />
     <Compile Include="Log.cs" />
     <Compile Include="Log1.cs">
       <AutoGen>True</AutoGen>
