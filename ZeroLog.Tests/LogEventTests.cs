@@ -9,11 +9,13 @@ namespace ZeroLog.Tests
     {
         private LogEvent _logEvent;
         private StringBuffer _output;
+        private BufferSegmentProvider _bufferSegmentProvider;
 
         [SetUp]
         public void SetUp()
         {
-            _logEvent = new LogEvent(Level.Finest);
+            _bufferSegmentProvider = new BufferSegmentProvider(1024, 1024);
+            _logEvent = new LogEvent(Level.Finest, _bufferSegmentProvider.GetSegment());
             _output = new StringBuffer(128) { Culture = CultureInfo.InvariantCulture };
         }
 

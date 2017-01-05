@@ -30,10 +30,12 @@ namespace ZeroLog
 		{
 			var logEvent = GetLogEventFor(Level.<#=levelName#>);
 			logEvent.AppendFormat(format);
-			<#for(int j = 0; j < i; j++){#>logEvent.AppendGenericInlined(arg<#=j#>);
+			
+			<#for(int j = 0; j < i; j++){#>
+				logEvent.AppendGeneric(arg<#=j#>);
 			<#}#>
 			
-			logEvent.Log();
+			// logEvent.Log();
         }
 <#}}#>
 		

@@ -19,12 +19,14 @@ namespace ZeroLog
         private readonly Task _writeTask;
         private bool _isRunning = true;
         private readonly byte[] _newlineBytes;
+        private readonly BufferSegmentProvider _bufferSegmentProvider;
 
         private LogManager(IEnumerable<IAppender> appenders, int size, Level level = Level.Finest)
         {
             _encoding = Encoding.Default;
             _queue = new ConcurrentQueue<LogEvent>();
-            _pool = new ObjectPool<LogEvent>(() => new LogEvent(level), size);
+            _bufferSegmentProvider = new BufferSegmentProvider(size * 128, 128);
+            _pool = new ObjectPool<LogEvent>(() => new LogEvent(level, _bufferSegmentProvider.GetSegment()), size);
 
             foreach (var appender in appenders)
             {

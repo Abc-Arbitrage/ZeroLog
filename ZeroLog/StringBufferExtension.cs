@@ -6,14 +6,15 @@ namespace ZeroLog
 {
     public static unsafe class StringBufferExtension
     {
-        public static int AppendFrom(this StringBuffer stringBuffer, byte[] buffer, int offset, StringView format, List<string> strings, List<int> offsets)
+        public static int AppendFrom(this StringBuffer stringBuffer, byte* dataPointer, StringView format, List<string> strings, List<IntPtr> argPointers)
         {
-            var argumentType = (ArgumentType)buffer[offset++];
+            var argumentType = *(ArgumentType*)dataPointer;
+            dataPointer += sizeof(byte);
 
             switch (argumentType)
             {
                 case ArgumentType.String:
-                    var stringIndex = buffer[offset];
+                    var stringIndex = *dataPointer;
                     stringBuffer.Append(strings[stringIndex]);
                     return 2 * sizeof(byte);
 
@@ -26,55 +27,55 @@ namespace ZeroLog
                     return sizeof(byte);
 
                 case ArgumentType.Byte:
-                    stringBuffer.Append(buffer[offset], StringView.Empty);
+                    stringBuffer.Append(*dataPointer, StringView.Empty);
                     return 2 * sizeof(byte);
 
                 case ArgumentType.Char:
-                    stringBuffer.Append(BitConverter.ToChar(buffer, offset));
+                    stringBuffer.Append(*(char*)dataPointer);
                     return sizeof(byte) + sizeof(char);
 
                 case ArgumentType.Int16:
-                    stringBuffer.Append(BitConverter.ToInt16(buffer, offset), format);
+                    stringBuffer.Append(*(short*)dataPointer, format);
                     return sizeof(byte) + sizeof(short);
 
                 case ArgumentType.Int32:
-                    stringBuffer.Append(BitConverter.ToInt32(buffer, offset), format);
+                    stringBuffer.Append(*(int*)dataPointer, format);
                     return sizeof(byte) + sizeof(int);
 
                 case ArgumentType.Int64:
-                    stringBuffer.Append(BitConverter.ToInt64(buffer, offset), format);
+                    stringBuffer.Append(*(long*)dataPointer, format);
                     return sizeof(byte) + sizeof(long);
 
                 case ArgumentType.Single:
-                    stringBuffer.Append(BitConverter.ToSingle(buffer, offset), format);
+                    stringBuffer.Append(*(float*)dataPointer, format);
                     return sizeof(byte) + sizeof(float);
 
                 case ArgumentType.Double:
-                    stringBuffer.Append(BitConverter.ToDouble(buffer, offset), format);
+                    stringBuffer.Append(*(double*)dataPointer, format);
                     return sizeof(byte) + sizeof(double);
 
                 case ArgumentType.Decimal:
-                    stringBuffer.Append(ReadDecimal(buffer, offset), format);
+                    stringBuffer.Append(*(decimal*)dataPointer, format);
                     return sizeof(byte) + sizeof(decimal);
 
                 case ArgumentType.Guid:
-                    var guid = ReadGuid(buffer, offset);
+                    var guid = ReadGuid(dataPointer);
                     throw new NotImplementedException(); //TODO
                 //return sizeof(byte) + sizeof(Guid);
 
                 case ArgumentType.DateTime:
-                    var dateTime = ReadDateTime(buffer, offset);
+                    var dateTime = ReadDateTime(dataPointer);
                     throw new NotImplementedException(); //TODO
                 //return sizeof(byte) + sizeof(ulong);
 
                 case ArgumentType.TimeSpan:
-                    var timeSpan = ReadTimeSpan(buffer, offset);
+                    var timeSpan = ReadTimeSpan(dataPointer);
                     throw new NotImplementedException(); //TODO
                 //return sizeof(byte) + sizeof(long);
 
                 case ArgumentType.Format:
-                    var argSet = new ArgSet(buffer, strings, offsets);
-                    var formatIndex = buffer[offset];
+                    var argSet = new ArgSet(argPointers, strings);
+                    var formatIndex = *dataPointer;
                     stringBuffer.AppendArgSet(strings[formatIndex], ref argSet);
                     return int.MaxValue; //TODO compute total argument size
 
@@ -83,29 +84,22 @@ namespace ZeroLog
             }
         }
 
-        private static decimal ReadDecimal(byte[] buffer, int offset)
+        private static Guid ReadGuid(byte* buffer)
         {
-            fixed (byte* pbyte = buffer)
-                return *(decimal*)(pbyte + offset);
+            return *(Guid*)buffer;
         }
 
-        private static Guid ReadGuid(byte[] buffer, int offset)
+        private static DateTime ReadDateTime(byte* buffer)
         {
-            fixed (byte* pbyte = buffer)
-                return *(Guid*)(pbyte + offset);
-        }
-
-        private static DateTime ReadDateTime(byte[] buffer, int offset)
-        {
-            var dateData = BitConverter.ToUInt64(buffer, offset);
+            var dateData = *(ulong*)buffer;
             var ticks = (long)(dateData & 0x3FFFFFFFFFFFFFFF);
             var kind = (DateTimeKind)(dateData & 0xC000000000000000);
             return new DateTime(ticks, kind);
         }
 
-        private static TimeSpan ReadTimeSpan(byte[] buffer, int offset)
+        private static TimeSpan ReadTimeSpan(byte* buffer)
         {
-            var ticks = BitConverter.ToInt64(buffer, offset);
+            var ticks = *(long*)buffer;
             return new TimeSpan(ticks);
         }
     }
