@@ -1,5 +1,8 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
+using System.Runtime.CompilerServices;
 using System.Text;
+using Microsoft.Win32.SafeHandles;
 using Roslyn.Utilities;
 
 namespace ZeroLog

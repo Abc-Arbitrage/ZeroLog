@@ -14,6 +14,7 @@ namespace ZeroLog
 
         private readonly byte[] _buffer = new byte[_bufferSize];
         private readonly List<string> _strings = new List<string>(_stringCapacity);
+        private readonly List<int> _offsets = new List<int>(_stringCapacity);
         private Log _log;
         private DateTime _timeStamp;
         private int _threadId;
@@ -38,19 +39,232 @@ namespace ZeroLog
             _threadId = Thread.CurrentThread.ManagedThreadId;
         }
 
+        internal void AppendFormat(string format)
+        {
+            EnsureRemainingBytesAndStoreOffset(1);
+
+            _buffer[_position++] = (byte)ArgumentType.Format;
+            _buffer[_position++] = (byte)_strings.Count;
+            _strings.Add(format);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal void AppendGeneric<T>(T arg)
+        {
+            if (typeof(T) == typeof(string))
+                Append((string)(object)arg);
+
+            else if (typeof(T) == typeof(bool))
+                Append((bool)(object)arg);
+
+            else if (typeof(T) == typeof(byte))
+                Append((byte)(object)arg);
+
+            else if (typeof(T) == typeof(char))
+                Append((char)(object)arg);
+
+            else if (typeof(T) == typeof(short))
+                Append((short)(object)arg);
+
+            else if (typeof(T) == typeof(int))
+                Append((int)(object)arg);
+
+            else if (typeof(T) == typeof(long))
+                Append((long)(object)arg);
+
+            else if (typeof(T) == typeof(float))
+                Append((float)(object)arg);
+
+            else if (typeof(T) == typeof(double))
+                Append((double)(object)arg);
+
+            else if (typeof(T) == typeof(decimal))
+                Append((decimal)(object)arg);
+
+            else if (typeof(T) == typeof(Guid))
+                Append((Guid)(object)arg);
+
+            else if (typeof(T) == typeof(DateTime))
+                Append((DateTime)(object)arg);
+
+            else if (typeof(T) == typeof(TimeSpan))
+                Append((TimeSpan)(object)arg);
+
+            else
+                throw new NotSupportedException($"Type {typeof(T)} is not supported ");
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal void AppendGenericInlined<T>(T arg)
+        {
+            if (typeof(T) == typeof(string))
+            {
+                EnsureRemainingBytesAndStoreOffset(1);
+
+                _buffer[_position++] = (byte)ArgumentType.String;
+                _buffer[_position++] = (byte)_strings.Count;
+                _strings.Add((string)(object)arg);
+            }
+
+            else if (typeof(T) == typeof(bool))
+            {
+                EnsureRemainingBytesAndStoreOffset(1);
+
+                if ((bool)(object)arg)
+                    _buffer[_position++] = (byte)ArgumentType.BooleanTrue;
+                else
+                    _buffer[_position++] = (byte)ArgumentType.BooleanFalse;
+            }
+
+            else if (typeof(T) == typeof(byte))
+            {
+                EnsureRemainingBytesAndStoreOffset(1 + sizeof(byte));
+
+                _buffer[_position++] = (byte)ArgumentType.Byte;
+                _buffer[_position++] = (byte)(object)arg;
+            }
+
+            else if (typeof(T) == typeof(char))
+            {
+                EnsureRemainingBytesAndStoreOffset(1 + sizeof(char));
+
+                _buffer[_position++] = (byte)ArgumentType.Char;
+
+                fixed (byte* p = _buffer)
+                    *(char*)(p + _position) = (char)(object)arg;
+
+                _position += sizeof(char);
+            }
+
+            else if (typeof(T) == typeof(short))
+            {
+                EnsureRemainingBytesAndStoreOffset(1 + sizeof(short));
+
+                _buffer[_position++] = (byte)ArgumentType.Int16;
+
+                fixed (byte* p = _buffer)
+                    *(short*)(p + _position) = (short)(object)arg;
+
+                _position += sizeof(short);
+            }
+
+            else if (typeof(T) == typeof(int))
+            {
+                EnsureRemainingBytesAndStoreOffset(1 + sizeof(int));
+
+                _buffer[_position++] = (byte)ArgumentType.Int32;
+
+                fixed (byte* p = _buffer)
+                    *(int*)(p + _position) = (int)(object)arg;
+
+                _position += sizeof(int);
+            }
+
+            else if (typeof(T) == typeof(long))
+            {
+                EnsureRemainingBytesAndStoreOffset(1 + sizeof(long));
+
+                _buffer[_position++] = (byte)ArgumentType.Int64;
+
+                fixed (byte* p = _buffer)
+                    *(long*)(p + _position) = (long)(object)arg;
+
+                _position += sizeof(long);
+            }
+
+            else if (typeof(T) == typeof(float))
+            {
+                EnsureRemainingBytesAndStoreOffset(1 + sizeof(float));
+
+                _buffer[_position++] = (byte)ArgumentType.Single;
+
+                fixed (byte* p = _buffer)
+                    *(float*)(p + _position) = (float)(object)arg;
+
+                _position += sizeof(float);
+            }
+
+            else if (typeof(T) == typeof(double))
+            {
+                EnsureRemainingBytesAndStoreOffset(1 + sizeof(double));
+
+                _buffer[_position++] = (byte)ArgumentType.Double;
+
+                fixed (byte* p = _buffer)
+                    *(double*)(p + _position) = (double)(object)arg;
+
+                _position += sizeof(double);
+            }
+
+            else if (typeof(T) == typeof(decimal))
+            {
+                EnsureRemainingBytesAndStoreOffset(1 + sizeof(decimal));
+
+                _buffer[_position++] = (byte)ArgumentType.Decimal;
+
+                fixed (byte* p = _buffer)
+                    *(decimal*)(p + _position) = (decimal)(object)arg;
+
+                _position += sizeof(decimal);
+            }
+
+            else if (typeof(T) == typeof(Guid))
+            {
+                EnsureRemainingBytesAndStoreOffset(1 + sizeof(Guid));
+
+                _buffer[_position++] = (byte)ArgumentType.Guid;
+
+                fixed (byte* p = _buffer)
+                    *(Guid*)(p + _position) = (Guid)(object)arg;
+
+                _position += sizeof(Guid);
+            }
+
+            else if (typeof(T) == typeof(DateTime))
+            {
+                DateTime dt = (DateTime)(object)arg;
+                EnsureRemainingBytesAndStoreOffset(1 + sizeof(ulong));
+
+                _buffer[_position++] = (byte)ArgumentType.DateTime;
+
+                fixed (byte* p = _buffer)
+                    *(ulong*)(p + _position) = (ulong)dt.Ticks | ((ulong)dt.Kind << 62);
+
+                _position += sizeof(ulong);
+            }
+
+            else if (typeof(T) == typeof(TimeSpan))
+            {
+                EnsureRemainingBytesAndStoreOffset(1 + sizeof(long));
+
+                _buffer[_position++] = (byte)ArgumentType.TimeSpan;
+
+                fixed (byte* p = _buffer)
+                    *(long*)(p + _position) = ((TimeSpan)(object)arg).Ticks;
+
+                _position += sizeof(long);
+            }
+
+            else
+                throw new NotSupportedException($"Type {typeof(T)} is not supported ");
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public LogEvent Append(string s)
         {
-            EnsureRemainingBytes(1);
+            EnsureRemainingBytesAndStoreOffset(1);
 
             _buffer[_position++] = (byte)ArgumentType.String;
+            _buffer[_position++] = (byte)_strings.Count;
             _strings.Add(s);
-
+            
             return this;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public LogEvent Append(bool b)
         {
-            EnsureRemainingBytes(1);
+            EnsureRemainingBytesAndStoreOffset(1);
 
             if (b)
                 _buffer[_position++] = (byte)ArgumentType.BooleanTrue;
@@ -60,9 +274,10 @@ namespace ZeroLog
             return this;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public LogEvent Append(byte b)
         {
-            EnsureRemainingBytes(1 + sizeof(byte));
+            EnsureRemainingBytesAndStoreOffset(1 + sizeof(byte));
 
             _buffer[_position++] = (byte)ArgumentType.Byte;
             _buffer[_position++] = b;
@@ -70,9 +285,10 @@ namespace ZeroLog
             return this;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public LogEvent Append(char c)
         {
-            EnsureRemainingBytes(1 + sizeof(char));
+            EnsureRemainingBytesAndStoreOffset(1 + sizeof(char));
 
             _buffer[_position++] = (byte)ArgumentType.Char;
 
@@ -84,9 +300,10 @@ namespace ZeroLog
             return this;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public LogEvent Append(short s)
         {
-            EnsureRemainingBytes(1 + sizeof(short));
+            EnsureRemainingBytesAndStoreOffset(1 + sizeof(short));
 
             _buffer[_position++] = (byte)ArgumentType.Int16;
 
@@ -98,9 +315,10 @@ namespace ZeroLog
             return this;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public LogEvent Append(int i)
         {
-            EnsureRemainingBytes(1 + sizeof(int));
+            EnsureRemainingBytesAndStoreOffset(1 + sizeof(int));
 
             _buffer[_position++] = (byte)ArgumentType.Int32;
 
@@ -112,9 +330,10 @@ namespace ZeroLog
             return this;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public LogEvent Append(long l)
         {
-            EnsureRemainingBytes(1 + sizeof(long));
+            EnsureRemainingBytesAndStoreOffset(1 + sizeof(long));
 
             _buffer[_position++] = (byte)ArgumentType.Int64;
 
@@ -126,9 +345,10 @@ namespace ZeroLog
             return this;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public LogEvent Append(float f)
         {
-            EnsureRemainingBytes(1 + sizeof(float));
+            EnsureRemainingBytesAndStoreOffset(1 + sizeof(float));
 
             _buffer[_position++] = (byte)ArgumentType.Single;
 
@@ -140,9 +360,10 @@ namespace ZeroLog
             return this;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public LogEvent Append(double d)
         {
-            EnsureRemainingBytes(1 + sizeof(double));
+            EnsureRemainingBytesAndStoreOffset(1 + sizeof(double));
 
             _buffer[_position++] = (byte)ArgumentType.Double;
 
@@ -154,9 +375,10 @@ namespace ZeroLog
             return this;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public LogEvent Append(decimal d)
         {
-            EnsureRemainingBytes(1 + sizeof(decimal));
+            EnsureRemainingBytesAndStoreOffset(1 + sizeof(decimal));
 
             _buffer[_position++] = (byte)ArgumentType.Decimal;
 
@@ -168,9 +390,10 @@ namespace ZeroLog
             return this;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public LogEvent Append(Guid g)
         {
-            EnsureRemainingBytes(1 + sizeof(Guid));
+            EnsureRemainingBytesAndStoreOffset(1 + sizeof(Guid));
 
             _buffer[_position++] = (byte)ArgumentType.Guid;
 
@@ -182,9 +405,10 @@ namespace ZeroLog
             return this;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public LogEvent Append(DateTime dt)
         {
-            EnsureRemainingBytes(1 + sizeof(ulong));
+            EnsureRemainingBytesAndStoreOffset(1 + sizeof(ulong));
 
             _buffer[_position++] = (byte)ArgumentType.DateTime;
 
@@ -196,9 +420,10 @@ namespace ZeroLog
             return this;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public LogEvent Append(TimeSpan ts)
         {
-            EnsureRemainingBytes(1 + sizeof(long));
+            EnsureRemainingBytesAndStoreOffset(1 + sizeof(long));
 
             _buffer[_position++] = (byte)ArgumentType.TimeSpan;
 
@@ -217,120 +442,20 @@ namespace ZeroLog
 
         public void WriteToStringBuffer(StringBuffer stringBuffer)
         {
-            var readBytes = 0;
-            var nextStringIndex = 0;
+            var offset = 0;
+            while (offset < _position)
+                offset += stringBuffer.AppendFrom(_buffer, offset, StringView.Empty, _strings);
 
-            while (readBytes < _position)
-            {
-                var argumentType = (ArgumentType)_buffer[readBytes++];
-
-                switch (argumentType)
-                {
-                    case ArgumentType.String:
-                        stringBuffer.Append(_strings[nextStringIndex++]);
-                        break;
-
-                    case ArgumentType.BooleanTrue:
-                        stringBuffer.Append(true);
-                        break;
-
-                    case ArgumentType.BooleanFalse:
-                        stringBuffer.Append(false);
-                        break;
-
-                    case ArgumentType.Byte:
-                        stringBuffer.Append(_buffer[readBytes++], StringView.Empty);
-                        break;
-
-                    case ArgumentType.Char:
-                        stringBuffer.Append(BitConverter.ToChar(_buffer, readBytes));
-                        readBytes += sizeof(char);
-                        break;
-
-                    case ArgumentType.Int16:
-                        stringBuffer.Append(BitConverter.ToInt16(_buffer, readBytes), StringView.Empty);
-                        readBytes += sizeof(short);
-                        break;
-
-                    case ArgumentType.Int32:
-                        stringBuffer.Append(BitConverter.ToInt32(_buffer, readBytes), StringView.Empty);
-                        readBytes += sizeof(int);
-                        break;
-
-                    case ArgumentType.Int64:
-                        stringBuffer.Append(BitConverter.ToInt64(_buffer, readBytes), StringView.Empty);
-                        readBytes += sizeof(long);
-                        break;
-
-                    case ArgumentType.Single:
-                        stringBuffer.Append(BitConverter.ToSingle(_buffer, readBytes), StringView.Empty);
-                        readBytes += sizeof(float);
-                        break;
-
-                    case ArgumentType.Double:
-                        stringBuffer.Append(BitConverter.ToDouble(_buffer, readBytes), StringView.Empty);
-                        readBytes += sizeof(double);
-                        break;
-
-                    case ArgumentType.Decimal:
-                        stringBuffer.Append(ReadDecimal(readBytes), StringView.Empty);
-                        readBytes += sizeof(decimal);
-                        break;
-
-                    case ArgumentType.Guid:
-                        var guid = ReadGuid(readBytes);
-                        readBytes += sizeof(Guid);
-                        throw new NotImplementedException(); //TODO
-
-                    case ArgumentType.DateTime:
-                        var dateTime = ReadDateTime(readBytes); //TODO
-                        readBytes += sizeof(ulong);
-                        throw new NotImplementedException();
-
-                    case ArgumentType.TimeSpan:
-                        var timeSpan = ReadTimeSpan(readBytes);
-                        readBytes += sizeof(long);
-                        throw new NotImplementedException(); //TODO
-
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-            }
-
-            Debug.Assert(readBytes == _position, "Buffer over-read");
-        }
-
-        private decimal ReadDecimal(int position)
-        {
-            fixed (byte* pbyte = _buffer)
-                return *(decimal*)(pbyte + position);
-        }
-
-        private Guid ReadGuid(int position)
-        {
-            fixed (byte* pbyte = _buffer)
-                return *(Guid*)(pbyte + position);
-        }
-
-        private DateTime ReadDateTime(int position)
-        {
-            var dateData = BitConverter.ToUInt64(_buffer, position);
-            var ticks = (long)(dateData & 0x3FFFFFFFFFFFFFFF);
-            var kind = (DateTimeKind)(dateData & 0xC000000000000000);
-            return new DateTime(ticks, kind); 
-        }
-
-        private TimeSpan ReadTimeSpan(int position)
-        {
-            var ticks = BitConverter.ToInt64(_buffer, position);
-            return new TimeSpan(ticks);
+            Debug.Assert(offset == _position, "Buffer over-read");
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void EnsureRemainingBytes(int count)
+        private void EnsureRemainingBytesAndStoreOffset(int count)
         {
             if (_position + count > _bufferSize)
                 throw new Exception("Buffer is full");
+
+            _offsets.Add(_position);
         }
     }
 }

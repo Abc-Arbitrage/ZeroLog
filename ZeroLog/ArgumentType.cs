@@ -18,5 +18,7 @@ namespace ZeroLog
         Guid,
         DateTime,
         TimeSpan,
+
+        Format,
     }
 }

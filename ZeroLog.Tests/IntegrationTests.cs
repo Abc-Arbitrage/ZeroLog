@@ -30,6 +30,22 @@ namespace ZeroLog.Tests
         }
 
         [Test]
+        public void should_test_append()
+        {
+            var logger = LogManager.GetLogger(typeof(IntegrationTests));
+
+            var sw = Stopwatch.StartNew();
+
+            const int count = 5000000;
+            for (var i = 0; i < count; i++)
+                logger.InfoFormat("{0}", (byte)1, (char)1, (short)2, (float)3, 2.0, "", true, TimeSpan.Zero);
+
+            var throughput = count / sw.Elapsed.TotalSeconds;
+
+            Console.WriteLine($"{throughput:N0}");
+        }
+
+        [Test]
         public void should_not_allocate()
         {
             const int count = 1000000;
@@ -45,6 +61,7 @@ namespace ZeroLog.Tests
                 Thread.Sleep(1);
                 logger.Info().Append("Hello").Log();
             }
+
             LogManager.Shutdown();
             timer.Stop();
             Console.WriteLine("BCL  : {0} us/log", timer.ElapsedMilliseconds * 1000.0 / count);
