@@ -8,7 +8,8 @@ namespace ZeroLog
 		{
 			var logEvent = GetLogEventFor(Level.Fatal);
 			logEvent.AppendFormat(format);
-			logEvent.AppendGenericInlined(arg0);			
+			logEvent.AppendGenericInlined(arg0);
+						
 			logEvent.Log();
         }
 	
@@ -16,7 +17,8 @@ namespace ZeroLog
 		{
 			var logEvent = GetLogEventFor(Level.Error);
 			logEvent.AppendFormat(format);
-			logEvent.AppendGenericInlined(arg0);			
+			logEvent.AppendGenericInlined(arg0);
+						
 			logEvent.Log();
         }
 	
@@ -24,7 +26,8 @@ namespace ZeroLog
 		{
 			var logEvent = GetLogEventFor(Level.Warning);
 			logEvent.AppendFormat(format);
-			logEvent.AppendGenericInlined(arg0);			
+			logEvent.AppendGenericInlined(arg0);
+						
 			logEvent.Log();
         }
 	
@@ -32,7 +35,8 @@ namespace ZeroLog
 		{
 			var logEvent = GetLogEventFor(Level.Info);
 			logEvent.AppendFormat(format);
-			logEvent.AppendGenericInlined(arg0);			
+			logEvent.AppendGenericInlined(arg0);
+						
 			logEvent.Log();
         }
 	
@@ -40,7 +44,8 @@ namespace ZeroLog
 		{
 			var logEvent = GetLogEventFor(Level.Debug);
 			logEvent.AppendFormat(format);
-			logEvent.AppendGenericInlined(arg0);			
+			logEvent.AppendGenericInlined(arg0);
+						
 			logEvent.Log();
         }
 	
@@ -48,7 +53,8 @@ namespace ZeroLog
 		{
 			var logEvent = GetLogEventFor(Level.Verbose);
 			logEvent.AppendFormat(format);
-			logEvent.AppendGenericInlined(arg0);			
+			logEvent.AppendGenericInlined(arg0);
+						
 			logEvent.Log();
         }
 	
@@ -56,7 +62,8 @@ namespace ZeroLog
 		{
 			var logEvent = GetLogEventFor(Level.Finest);
 			logEvent.AppendFormat(format);
-			logEvent.AppendGenericInlined(arg0);			
+			logEvent.AppendGenericInlined(arg0);
+						
 			logEvent.Log();
         }
 	
@@ -64,7 +71,9 @@ namespace ZeroLog
 		{
 			var logEvent = GetLogEventFor(Level.Fatal);
 			logEvent.AppendFormat(format);
-			logEvent.AppendGenericInlined(arg0);logEvent.AppendGenericInlined(arg1);			
+			logEvent.AppendGenericInlined(arg0);
+			logEvent.AppendGenericInlined(arg1);
+						
 			logEvent.Log();
         }
 	
@@ -72,7 +81,9 @@ namespace ZeroLog
 		{
 			var logEvent = GetLogEventFor(Level.Error);
 			logEvent.AppendFormat(format);
-			logEvent.AppendGenericInlined(arg0);logEvent.AppendGenericInlined(arg1);			
+			logEvent.AppendGenericInlined(arg0);
+			logEvent.AppendGenericInlined(arg1);
+						
 			logEvent.Log();
         }
 	
@@ -80,7 +91,9 @@ namespace ZeroLog
 		{
 			var logEvent = GetLogEventFor(Level.Warning);
 			logEvent.AppendFormat(format);
-			logEvent.AppendGenericInlined(arg0);logEvent.AppendGenericInlined(arg1);			
+			logEvent.AppendGenericInlined(arg0);
+			logEvent.AppendGenericInlined(arg1);
+						
 			logEvent.Log();
         }
 	
@@ -88,7 +101,9 @@ namespace ZeroLog
 		{
 			var logEvent = GetLogEventFor(Level.Info);
 			logEvent.AppendFormat(format);
-			logEvent.AppendGenericInlined(arg0);logEvent.AppendGenericInlined(arg1);			
+			logEvent.AppendGenericInlined(arg0);
+			logEvent.AppendGenericInlined(arg1);
+						
 			logEvent.Log();
         }
 	
@@ -96,7 +111,9 @@ namespace ZeroLog
 		{
 			var logEvent = GetLogEventFor(Level.Debug);
 			logEvent.AppendFormat(format);
-			logEvent.AppendGenericInlined(arg0);logEvent.AppendGenericInlined(arg1);			
+			logEvent.AppendGenericInlined(arg0);
+			logEvent.AppendGenericInlined(arg1);
+						
 			logEvent.Log();
         }
 	
@@ -104,7 +121,9 @@ namespace ZeroLog
 		{
 			var logEvent = GetLogEventFor(Level.Verbose);
 			logEvent.AppendFormat(format);
-			logEvent.AppendGenericInlined(arg0);logEvent.AppendGenericInlined(arg1);			
+			logEvent.AppendGenericInlined(arg0);
+			logEvent.AppendGenericInlined(arg1);
+						
 			logEvent.Log();
         }
 	
@@ -112,7 +131,9 @@ namespace ZeroLog
 		{
 			var logEvent = GetLogEventFor(Level.Finest);
 			logEvent.AppendFormat(format);
-			logEvent.AppendGenericInlined(arg0);logEvent.AppendGenericInlined(arg1);			
+			logEvent.AppendGenericInlined(arg0);
+			logEvent.AppendGenericInlined(arg1);
+						
 			logEvent.Log();
         }
 	
@@ -120,7 +141,10 @@ namespace ZeroLog
 		{
 			var logEvent = GetLogEventFor(Level.Fatal);
 			logEvent.AppendFormat(format);
-			logEvent.AppendGenericInlined(arg0);logEvent.AppendGenericInlined(arg1);logEvent.AppendGenericInlined(arg2);			
+			logEvent.AppendGenericInlined(arg0);
+			logEvent.AppendGenericInlined(arg1);
+			logEvent.AppendGenericInlined(arg2);
+						
 			logEvent.Log();
         }
 	
@@ -128,7 +152,10 @@ namespace ZeroLog
 		{
 			var logEvent = GetLogEventFor(Level.Error);
 			logEvent.AppendFormat(format);
-			logEvent.AppendGenericInlined(arg0);logEvent.AppendGenericInlined(arg1);logEvent.AppendGenericInlined(arg2);			
+			logEvent.AppendGenericInlined(arg0);
+			logEvent.AppendGenericInlined(arg1);
+			logEvent.AppendGenericInlined(arg2);
+						
 			logEvent.Log();
         }
 	
@@ -136,7 +163,10 @@ namespace ZeroLog
 		{
 			var logEvent = GetLogEventFor(Level.Warning);
 			logEvent.AppendFormat(format);
-			logEvent.AppendGenericInlined(arg0);logEvent.AppendGenericInlined(arg1);logEvent.AppendGenericInlined(arg2);			
+			logEvent.AppendGenericInlined(arg0);
+			logEvent.AppendGenericInlined(arg1);
+			logEvent.AppendGenericInlined(arg2);
+						
 			logEvent.Log();
         }
 	
@@ -144,7 +174,10 @@ namespace ZeroLog
 		{
 			var logEvent = GetLogEventFor(Level.Info);
 			logEvent.AppendFormat(format);
-			logEvent.AppendGenericInlined(arg0);logEvent.AppendGenericInlined(arg1);logEvent.AppendGenericInlined(arg2);			
+			logEvent.AppendGenericInlined(arg0);
+			logEvent.AppendGenericInlined(arg1);
+			logEvent.AppendGenericInlined(arg2);
+						
 			logEvent.Log();
         }
 	
@@ -152,7 +185,10 @@ namespace ZeroLog
 		{
 			var logEvent = GetLogEventFor(Level.Debug);
 			logEvent.AppendFormat(format);
-			logEvent.AppendGenericInlined(arg0);logEvent.AppendGenericInlined(arg1);logEvent.AppendGenericInlined(arg2);			
+			logEvent.AppendGenericInlined(arg0);
+			logEvent.AppendGenericInlined(arg1);
+			logEvent.AppendGenericInlined(arg2);
+						
 			logEvent.Log();
         }
 	
@@ -160,7 +196,10 @@ namespace ZeroLog
 		{
 			var logEvent = GetLogEventFor(Level.Verbose);
 			logEvent.AppendFormat(format);
-			logEvent.AppendGenericInlined(arg0);logEvent.AppendGenericInlined(arg1);logEvent.AppendGenericInlined(arg2);			
+			logEvent.AppendGenericInlined(arg0);
+			logEvent.AppendGenericInlined(arg1);
+			logEvent.AppendGenericInlined(arg2);
+						
 			logEvent.Log();
         }
 	
@@ -168,7 +207,10 @@ namespace ZeroLog
 		{
 			var logEvent = GetLogEventFor(Level.Finest);
 			logEvent.AppendFormat(format);
-			logEvent.AppendGenericInlined(arg0);logEvent.AppendGenericInlined(arg1);logEvent.AppendGenericInlined(arg2);			
+			logEvent.AppendGenericInlined(arg0);
+			logEvent.AppendGenericInlined(arg1);
+			logEvent.AppendGenericInlined(arg2);
+						
 			logEvent.Log();
         }
 	
@@ -176,7 +218,11 @@ namespace ZeroLog
 		{
 			var logEvent = GetLogEventFor(Level.Fatal);
 			logEvent.AppendFormat(format);
-			logEvent.AppendGenericInlined(arg0);logEvent.AppendGenericInlined(arg1);logEvent.AppendGenericInlined(arg2);logEvent.AppendGenericInlined(arg3);			
+			logEvent.AppendGenericInlined(arg0);
+			logEvent.AppendGenericInlined(arg1);
+			logEvent.AppendGenericInlined(arg2);
+			logEvent.AppendGenericInlined(arg3);
+						
 			logEvent.Log();
         }
 	
@@ -184,7 +230,11 @@ namespace ZeroLog
 		{
 			var logEvent = GetLogEventFor(Level.Error);
 			logEvent.AppendFormat(format);
-			logEvent.AppendGenericInlined(arg0);logEvent.AppendGenericInlined(arg1);logEvent.AppendGenericInlined(arg2);logEvent.AppendGenericInlined(arg3);			
+			logEvent.AppendGenericInlined(arg0);
+			logEvent.AppendGenericInlined(arg1);
+			logEvent.AppendGenericInlined(arg2);
+			logEvent.AppendGenericInlined(arg3);
+						
 			logEvent.Log();
         }
 	
@@ -192,7 +242,11 @@ namespace ZeroLog
 		{
 			var logEvent = GetLogEventFor(Level.Warning);
 			logEvent.AppendFormat(format);
-			logEvent.AppendGenericInlined(arg0);logEvent.AppendGenericInlined(arg1);logEvent.AppendGenericInlined(arg2);logEvent.AppendGenericInlined(arg3);			
+			logEvent.AppendGenericInlined(arg0);
+			logEvent.AppendGenericInlined(arg1);
+			logEvent.AppendGenericInlined(arg2);
+			logEvent.AppendGenericInlined(arg3);
+						
 			logEvent.Log();
         }
 	
@@ -200,7 +254,11 @@ namespace ZeroLog
 		{
 			var logEvent = GetLogEventFor(Level.Info);
 			logEvent.AppendFormat(format);
-			logEvent.AppendGenericInlined(arg0);logEvent.AppendGenericInlined(arg1);logEvent.AppendGenericInlined(arg2);logEvent.AppendGenericInlined(arg3);			
+			logEvent.AppendGenericInlined(arg0);
+			logEvent.AppendGenericInlined(arg1);
+			logEvent.AppendGenericInlined(arg2);
+			logEvent.AppendGenericInlined(arg3);
+						
 			logEvent.Log();
         }
 	
@@ -208,7 +266,11 @@ namespace ZeroLog
 		{
 			var logEvent = GetLogEventFor(Level.Debug);
 			logEvent.AppendFormat(format);
-			logEvent.AppendGenericInlined(arg0);logEvent.AppendGenericInlined(arg1);logEvent.AppendGenericInlined(arg2);logEvent.AppendGenericInlined(arg3);			
+			logEvent.AppendGenericInlined(arg0);
+			logEvent.AppendGenericInlined(arg1);
+			logEvent.AppendGenericInlined(arg2);
+			logEvent.AppendGenericInlined(arg3);
+						
 			logEvent.Log();
         }
 	
@@ -216,7 +278,11 @@ namespace ZeroLog
 		{
 			var logEvent = GetLogEventFor(Level.Verbose);
 			logEvent.AppendFormat(format);
-			logEvent.AppendGenericInlined(arg0);logEvent.AppendGenericInlined(arg1);logEvent.AppendGenericInlined(arg2);logEvent.AppendGenericInlined(arg3);			
+			logEvent.AppendGenericInlined(arg0);
+			logEvent.AppendGenericInlined(arg1);
+			logEvent.AppendGenericInlined(arg2);
+			logEvent.AppendGenericInlined(arg3);
+						
 			logEvent.Log();
         }
 	
@@ -224,7 +290,11 @@ namespace ZeroLog
 		{
 			var logEvent = GetLogEventFor(Level.Finest);
 			logEvent.AppendFormat(format);
-			logEvent.AppendGenericInlined(arg0);logEvent.AppendGenericInlined(arg1);logEvent.AppendGenericInlined(arg2);logEvent.AppendGenericInlined(arg3);			
+			logEvent.AppendGenericInlined(arg0);
+			logEvent.AppendGenericInlined(arg1);
+			logEvent.AppendGenericInlined(arg2);
+			logEvent.AppendGenericInlined(arg3);
+						
 			logEvent.Log();
         }
 	
@@ -232,7 +302,12 @@ namespace ZeroLog
 		{
 			var logEvent = GetLogEventFor(Level.Fatal);
 			logEvent.AppendFormat(format);
-			logEvent.AppendGenericInlined(arg0);logEvent.AppendGenericInlined(arg1);logEvent.AppendGenericInlined(arg2);logEvent.AppendGenericInlined(arg3);logEvent.AppendGenericInlined(arg4);			
+			logEvent.AppendGenericInlined(arg0);
+			logEvent.AppendGenericInlined(arg1);
+			logEvent.AppendGenericInlined(arg2);
+			logEvent.AppendGenericInlined(arg3);
+			logEvent.AppendGenericInlined(arg4);
+						
 			logEvent.Log();
         }
 	
@@ -240,7 +315,12 @@ namespace ZeroLog
 		{
 			var logEvent = GetLogEventFor(Level.Error);
 			logEvent.AppendFormat(format);
-			logEvent.AppendGenericInlined(arg0);logEvent.AppendGenericInlined(arg1);logEvent.AppendGenericInlined(arg2);logEvent.AppendGenericInlined(arg3);logEvent.AppendGenericInlined(arg4);			
+			logEvent.AppendGenericInlined(arg0);
+			logEvent.AppendGenericInlined(arg1);
+			logEvent.AppendGenericInlined(arg2);
+			logEvent.AppendGenericInlined(arg3);
+			logEvent.AppendGenericInlined(arg4);
+						
 			logEvent.Log();
         }
 	
@@ -248,7 +328,12 @@ namespace ZeroLog
 		{
 			var logEvent = GetLogEventFor(Level.Warning);
 			logEvent.AppendFormat(format);
-			logEvent.AppendGenericInlined(arg0);logEvent.AppendGenericInlined(arg1);logEvent.AppendGenericInlined(arg2);logEvent.AppendGenericInlined(arg3);logEvent.AppendGenericInlined(arg4);			
+			logEvent.AppendGenericInlined(arg0);
+			logEvent.AppendGenericInlined(arg1);
+			logEvent.AppendGenericInlined(arg2);
+			logEvent.AppendGenericInlined(arg3);
+			logEvent.AppendGenericInlined(arg4);
+						
 			logEvent.Log();
         }
 	
@@ -256,7 +341,12 @@ namespace ZeroLog
 		{
 			var logEvent = GetLogEventFor(Level.Info);
 			logEvent.AppendFormat(format);
-			logEvent.AppendGenericInlined(arg0);logEvent.AppendGenericInlined(arg1);logEvent.AppendGenericInlined(arg2);logEvent.AppendGenericInlined(arg3);logEvent.AppendGenericInlined(arg4);			
+			logEvent.AppendGenericInlined(arg0);
+			logEvent.AppendGenericInlined(arg1);
+			logEvent.AppendGenericInlined(arg2);
+			logEvent.AppendGenericInlined(arg3);
+			logEvent.AppendGenericInlined(arg4);
+						
 			logEvent.Log();
         }
 	
@@ -264,7 +354,12 @@ namespace ZeroLog
 		{
 			var logEvent = GetLogEventFor(Level.Debug);
 			logEvent.AppendFormat(format);
-			logEvent.AppendGenericInlined(arg0);logEvent.AppendGenericInlined(arg1);logEvent.AppendGenericInlined(arg2);logEvent.AppendGenericInlined(arg3);logEvent.AppendGenericInlined(arg4);			
+			logEvent.AppendGenericInlined(arg0);
+			logEvent.AppendGenericInlined(arg1);
+			logEvent.AppendGenericInlined(arg2);
+			logEvent.AppendGenericInlined(arg3);
+			logEvent.AppendGenericInlined(arg4);
+						
 			logEvent.Log();
         }
 	
@@ -272,7 +367,12 @@ namespace ZeroLog
 		{
 			var logEvent = GetLogEventFor(Level.Verbose);
 			logEvent.AppendFormat(format);
-			logEvent.AppendGenericInlined(arg0);logEvent.AppendGenericInlined(arg1);logEvent.AppendGenericInlined(arg2);logEvent.AppendGenericInlined(arg3);logEvent.AppendGenericInlined(arg4);			
+			logEvent.AppendGenericInlined(arg0);
+			logEvent.AppendGenericInlined(arg1);
+			logEvent.AppendGenericInlined(arg2);
+			logEvent.AppendGenericInlined(arg3);
+			logEvent.AppendGenericInlined(arg4);
+						
 			logEvent.Log();
         }
 	
@@ -280,7 +380,12 @@ namespace ZeroLog
 		{
 			var logEvent = GetLogEventFor(Level.Finest);
 			logEvent.AppendFormat(format);
-			logEvent.AppendGenericInlined(arg0);logEvent.AppendGenericInlined(arg1);logEvent.AppendGenericInlined(arg2);logEvent.AppendGenericInlined(arg3);logEvent.AppendGenericInlined(arg4);			
+			logEvent.AppendGenericInlined(arg0);
+			logEvent.AppendGenericInlined(arg1);
+			logEvent.AppendGenericInlined(arg2);
+			logEvent.AppendGenericInlined(arg3);
+			logEvent.AppendGenericInlined(arg4);
+						
 			logEvent.Log();
         }
 	
@@ -288,7 +393,13 @@ namespace ZeroLog
 		{
 			var logEvent = GetLogEventFor(Level.Fatal);
 			logEvent.AppendFormat(format);
-			logEvent.AppendGenericInlined(arg0);logEvent.AppendGenericInlined(arg1);logEvent.AppendGenericInlined(arg2);logEvent.AppendGenericInlined(arg3);logEvent.AppendGenericInlined(arg4);logEvent.AppendGenericInlined(arg5);			
+			logEvent.AppendGenericInlined(arg0);
+			logEvent.AppendGenericInlined(arg1);
+			logEvent.AppendGenericInlined(arg2);
+			logEvent.AppendGenericInlined(arg3);
+			logEvent.AppendGenericInlined(arg4);
+			logEvent.AppendGenericInlined(arg5);
+						
 			logEvent.Log();
         }
 	
@@ -296,7 +407,13 @@ namespace ZeroLog
 		{
 			var logEvent = GetLogEventFor(Level.Error);
 			logEvent.AppendFormat(format);
-			logEvent.AppendGenericInlined(arg0);logEvent.AppendGenericInlined(arg1);logEvent.AppendGenericInlined(arg2);logEvent.AppendGenericInlined(arg3);logEvent.AppendGenericInlined(arg4);logEvent.AppendGenericInlined(arg5);			
+			logEvent.AppendGenericInlined(arg0);
+			logEvent.AppendGenericInlined(arg1);
+			logEvent.AppendGenericInlined(arg2);
+			logEvent.AppendGenericInlined(arg3);
+			logEvent.AppendGenericInlined(arg4);
+			logEvent.AppendGenericInlined(arg5);
+						
 			logEvent.Log();
         }
 	
@@ -304,7 +421,13 @@ namespace ZeroLog
 		{
 			var logEvent = GetLogEventFor(Level.Warning);
 			logEvent.AppendFormat(format);
-			logEvent.AppendGenericInlined(arg0);logEvent.AppendGenericInlined(arg1);logEvent.AppendGenericInlined(arg2);logEvent.AppendGenericInlined(arg3);logEvent.AppendGenericInlined(arg4);logEvent.AppendGenericInlined(arg5);			
+			logEvent.AppendGenericInlined(arg0);
+			logEvent.AppendGenericInlined(arg1);
+			logEvent.AppendGenericInlined(arg2);
+			logEvent.AppendGenericInlined(arg3);
+			logEvent.AppendGenericInlined(arg4);
+			logEvent.AppendGenericInlined(arg5);
+						
 			logEvent.Log();
         }
 	
@@ -312,7 +435,13 @@ namespace ZeroLog
 		{
 			var logEvent = GetLogEventFor(Level.Info);
 			logEvent.AppendFormat(format);
-			logEvent.AppendGenericInlined(arg0);logEvent.AppendGenericInlined(arg1);logEvent.AppendGenericInlined(arg2);logEvent.AppendGenericInlined(arg3);logEvent.AppendGenericInlined(arg4);logEvent.AppendGenericInlined(arg5);			
+			logEvent.AppendGenericInlined(arg0);
+			logEvent.AppendGenericInlined(arg1);
+			logEvent.AppendGenericInlined(arg2);
+			logEvent.AppendGenericInlined(arg3);
+			logEvent.AppendGenericInlined(arg4);
+			logEvent.AppendGenericInlined(arg5);
+						
 			logEvent.Log();
         }
 	
@@ -320,7 +449,13 @@ namespace ZeroLog
 		{
 			var logEvent = GetLogEventFor(Level.Debug);
 			logEvent.AppendFormat(format);
-			logEvent.AppendGenericInlined(arg0);logEvent.AppendGenericInlined(arg1);logEvent.AppendGenericInlined(arg2);logEvent.AppendGenericInlined(arg3);logEvent.AppendGenericInlined(arg4);logEvent.AppendGenericInlined(arg5);			
+			logEvent.AppendGenericInlined(arg0);
+			logEvent.AppendGenericInlined(arg1);
+			logEvent.AppendGenericInlined(arg2);
+			logEvent.AppendGenericInlined(arg3);
+			logEvent.AppendGenericInlined(arg4);
+			logEvent.AppendGenericInlined(arg5);
+						
 			logEvent.Log();
         }
 	
@@ -328,7 +463,13 @@ namespace ZeroLog
 		{
 			var logEvent = GetLogEventFor(Level.Verbose);
 			logEvent.AppendFormat(format);
-			logEvent.AppendGenericInlined(arg0);logEvent.AppendGenericInlined(arg1);logEvent.AppendGenericInlined(arg2);logEvent.AppendGenericInlined(arg3);logEvent.AppendGenericInlined(arg4);logEvent.AppendGenericInlined(arg5);			
+			logEvent.AppendGenericInlined(arg0);
+			logEvent.AppendGenericInlined(arg1);
+			logEvent.AppendGenericInlined(arg2);
+			logEvent.AppendGenericInlined(arg3);
+			logEvent.AppendGenericInlined(arg4);
+			logEvent.AppendGenericInlined(arg5);
+						
 			logEvent.Log();
         }
 	
@@ -336,7 +477,13 @@ namespace ZeroLog
 		{
 			var logEvent = GetLogEventFor(Level.Finest);
 			logEvent.AppendFormat(format);
-			logEvent.AppendGenericInlined(arg0);logEvent.AppendGenericInlined(arg1);logEvent.AppendGenericInlined(arg2);logEvent.AppendGenericInlined(arg3);logEvent.AppendGenericInlined(arg4);logEvent.AppendGenericInlined(arg5);			
+			logEvent.AppendGenericInlined(arg0);
+			logEvent.AppendGenericInlined(arg1);
+			logEvent.AppendGenericInlined(arg2);
+			logEvent.AppendGenericInlined(arg3);
+			logEvent.AppendGenericInlined(arg4);
+			logEvent.AppendGenericInlined(arg5);
+						
 			logEvent.Log();
         }
 	
@@ -344,7 +491,14 @@ namespace ZeroLog
 		{
 			var logEvent = GetLogEventFor(Level.Fatal);
 			logEvent.AppendFormat(format);
-			logEvent.AppendGenericInlined(arg0);logEvent.AppendGenericInlined(arg1);logEvent.AppendGenericInlined(arg2);logEvent.AppendGenericInlined(arg3);logEvent.AppendGenericInlined(arg4);logEvent.AppendGenericInlined(arg5);logEvent.AppendGenericInlined(arg6);			
+			logEvent.AppendGenericInlined(arg0);
+			logEvent.AppendGenericInlined(arg1);
+			logEvent.AppendGenericInlined(arg2);
+			logEvent.AppendGenericInlined(arg3);
+			logEvent.AppendGenericInlined(arg4);
+			logEvent.AppendGenericInlined(arg5);
+			logEvent.AppendGenericInlined(arg6);
+						
 			logEvent.Log();
         }
 	
@@ -352,7 +506,14 @@ namespace ZeroLog
 		{
 			var logEvent = GetLogEventFor(Level.Error);
 			logEvent.AppendFormat(format);
-			logEvent.AppendGenericInlined(arg0);logEvent.AppendGenericInlined(arg1);logEvent.AppendGenericInlined(arg2);logEvent.AppendGenericInlined(arg3);logEvent.AppendGenericInlined(arg4);logEvent.AppendGenericInlined(arg5);logEvent.AppendGenericInlined(arg6);			
+			logEvent.AppendGenericInlined(arg0);
+			logEvent.AppendGenericInlined(arg1);
+			logEvent.AppendGenericInlined(arg2);
+			logEvent.AppendGenericInlined(arg3);
+			logEvent.AppendGenericInlined(arg4);
+			logEvent.AppendGenericInlined(arg5);
+			logEvent.AppendGenericInlined(arg6);
+						
 			logEvent.Log();
         }
 	
@@ -360,7 +521,14 @@ namespace ZeroLog
 		{
 			var logEvent = GetLogEventFor(Level.Warning);
 			logEvent.AppendFormat(format);
-			logEvent.AppendGenericInlined(arg0);logEvent.AppendGenericInlined(arg1);logEvent.AppendGenericInlined(arg2);logEvent.AppendGenericInlined(arg3);logEvent.AppendGenericInlined(arg4);logEvent.AppendGenericInlined(arg5);logEvent.AppendGenericInlined(arg6);			
+			logEvent.AppendGenericInlined(arg0);
+			logEvent.AppendGenericInlined(arg1);
+			logEvent.AppendGenericInlined(arg2);
+			logEvent.AppendGenericInlined(arg3);
+			logEvent.AppendGenericInlined(arg4);
+			logEvent.AppendGenericInlined(arg5);
+			logEvent.AppendGenericInlined(arg6);
+						
 			logEvent.Log();
         }
 	
@@ -368,7 +536,14 @@ namespace ZeroLog
 		{
 			var logEvent = GetLogEventFor(Level.Info);
 			logEvent.AppendFormat(format);
-			logEvent.AppendGenericInlined(arg0);logEvent.AppendGenericInlined(arg1);logEvent.AppendGenericInlined(arg2);logEvent.AppendGenericInlined(arg3);logEvent.AppendGenericInlined(arg4);logEvent.AppendGenericInlined(arg5);logEvent.AppendGenericInlined(arg6);			
+			logEvent.AppendGenericInlined(arg0);
+			logEvent.AppendGenericInlined(arg1);
+			logEvent.AppendGenericInlined(arg2);
+			logEvent.AppendGenericInlined(arg3);
+			logEvent.AppendGenericInlined(arg4);
+			logEvent.AppendGenericInlined(arg5);
+			logEvent.AppendGenericInlined(arg6);
+						
 			logEvent.Log();
         }
 	
@@ -376,7 +551,14 @@ namespace ZeroLog
 		{
 			var logEvent = GetLogEventFor(Level.Debug);
 			logEvent.AppendFormat(format);
-			logEvent.AppendGenericInlined(arg0);logEvent.AppendGenericInlined(arg1);logEvent.AppendGenericInlined(arg2);logEvent.AppendGenericInlined(arg3);logEvent.AppendGenericInlined(arg4);logEvent.AppendGenericInlined(arg5);logEvent.AppendGenericInlined(arg6);			
+			logEvent.AppendGenericInlined(arg0);
+			logEvent.AppendGenericInlined(arg1);
+			logEvent.AppendGenericInlined(arg2);
+			logEvent.AppendGenericInlined(arg3);
+			logEvent.AppendGenericInlined(arg4);
+			logEvent.AppendGenericInlined(arg5);
+			logEvent.AppendGenericInlined(arg6);
+						
 			logEvent.Log();
         }
 	
@@ -384,7 +566,14 @@ namespace ZeroLog
 		{
 			var logEvent = GetLogEventFor(Level.Verbose);
 			logEvent.AppendFormat(format);
-			logEvent.AppendGenericInlined(arg0);logEvent.AppendGenericInlined(arg1);logEvent.AppendGenericInlined(arg2);logEvent.AppendGenericInlined(arg3);logEvent.AppendGenericInlined(arg4);logEvent.AppendGenericInlined(arg5);logEvent.AppendGenericInlined(arg6);			
+			logEvent.AppendGenericInlined(arg0);
+			logEvent.AppendGenericInlined(arg1);
+			logEvent.AppendGenericInlined(arg2);
+			logEvent.AppendGenericInlined(arg3);
+			logEvent.AppendGenericInlined(arg4);
+			logEvent.AppendGenericInlined(arg5);
+			logEvent.AppendGenericInlined(arg6);
+						
 			logEvent.Log();
         }
 	
@@ -392,7 +581,14 @@ namespace ZeroLog
 		{
 			var logEvent = GetLogEventFor(Level.Finest);
 			logEvent.AppendFormat(format);
-			logEvent.AppendGenericInlined(arg0);logEvent.AppendGenericInlined(arg1);logEvent.AppendGenericInlined(arg2);logEvent.AppendGenericInlined(arg3);logEvent.AppendGenericInlined(arg4);logEvent.AppendGenericInlined(arg5);logEvent.AppendGenericInlined(arg6);			
+			logEvent.AppendGenericInlined(arg0);
+			logEvent.AppendGenericInlined(arg1);
+			logEvent.AppendGenericInlined(arg2);
+			logEvent.AppendGenericInlined(arg3);
+			logEvent.AppendGenericInlined(arg4);
+			logEvent.AppendGenericInlined(arg5);
+			logEvent.AppendGenericInlined(arg6);
+						
 			logEvent.Log();
         }
 	
@@ -400,7 +596,15 @@ namespace ZeroLog
 		{
 			var logEvent = GetLogEventFor(Level.Fatal);
 			logEvent.AppendFormat(format);
-			logEvent.AppendGenericInlined(arg0);logEvent.AppendGenericInlined(arg1);logEvent.AppendGenericInlined(arg2);logEvent.AppendGenericInlined(arg3);logEvent.AppendGenericInlined(arg4);logEvent.AppendGenericInlined(arg5);logEvent.AppendGenericInlined(arg6);logEvent.AppendGenericInlined(arg7);			
+			logEvent.AppendGenericInlined(arg0);
+			logEvent.AppendGenericInlined(arg1);
+			logEvent.AppendGenericInlined(arg2);
+			logEvent.AppendGenericInlined(arg3);
+			logEvent.AppendGenericInlined(arg4);
+			logEvent.AppendGenericInlined(arg5);
+			logEvent.AppendGenericInlined(arg6);
+			logEvent.AppendGenericInlined(arg7);
+						
 			logEvent.Log();
         }
 	
@@ -408,7 +612,15 @@ namespace ZeroLog
 		{
 			var logEvent = GetLogEventFor(Level.Error);
 			logEvent.AppendFormat(format);
-			logEvent.AppendGenericInlined(arg0);logEvent.AppendGenericInlined(arg1);logEvent.AppendGenericInlined(arg2);logEvent.AppendGenericInlined(arg3);logEvent.AppendGenericInlined(arg4);logEvent.AppendGenericInlined(arg5);logEvent.AppendGenericInlined(arg6);logEvent.AppendGenericInlined(arg7);			
+			logEvent.AppendGenericInlined(arg0);
+			logEvent.AppendGenericInlined(arg1);
+			logEvent.AppendGenericInlined(arg2);
+			logEvent.AppendGenericInlined(arg3);
+			logEvent.AppendGenericInlined(arg4);
+			logEvent.AppendGenericInlined(arg5);
+			logEvent.AppendGenericInlined(arg6);
+			logEvent.AppendGenericInlined(arg7);
+						
 			logEvent.Log();
         }
 	
@@ -416,7 +628,15 @@ namespace ZeroLog
 		{
 			var logEvent = GetLogEventFor(Level.Warning);
 			logEvent.AppendFormat(format);
-			logEvent.AppendGenericInlined(arg0);logEvent.AppendGenericInlined(arg1);logEvent.AppendGenericInlined(arg2);logEvent.AppendGenericInlined(arg3);logEvent.AppendGenericInlined(arg4);logEvent.AppendGenericInlined(arg5);logEvent.AppendGenericInlined(arg6);logEvent.AppendGenericInlined(arg7);			
+			logEvent.AppendGenericInlined(arg0);
+			logEvent.AppendGenericInlined(arg1);
+			logEvent.AppendGenericInlined(arg2);
+			logEvent.AppendGenericInlined(arg3);
+			logEvent.AppendGenericInlined(arg4);
+			logEvent.AppendGenericInlined(arg5);
+			logEvent.AppendGenericInlined(arg6);
+			logEvent.AppendGenericInlined(arg7);
+						
 			logEvent.Log();
         }
 	
@@ -424,7 +644,15 @@ namespace ZeroLog
 		{
 			var logEvent = GetLogEventFor(Level.Info);
 			logEvent.AppendFormat(format);
-			logEvent.AppendGenericInlined(arg0);logEvent.AppendGenericInlined(arg1);logEvent.AppendGenericInlined(arg2);logEvent.AppendGenericInlined(arg3);logEvent.AppendGenericInlined(arg4);logEvent.AppendGenericInlined(arg5);logEvent.AppendGenericInlined(arg6);logEvent.AppendGenericInlined(arg7);			
+			logEvent.AppendGenericInlined(arg0);
+			logEvent.AppendGenericInlined(arg1);
+			logEvent.AppendGenericInlined(arg2);
+			logEvent.AppendGenericInlined(arg3);
+			logEvent.AppendGenericInlined(arg4);
+			logEvent.AppendGenericInlined(arg5);
+			logEvent.AppendGenericInlined(arg6);
+			logEvent.AppendGenericInlined(arg7);
+						
 			logEvent.Log();
         }
 	
@@ -432,7 +660,15 @@ namespace ZeroLog
 		{
 			var logEvent = GetLogEventFor(Level.Debug);
 			logEvent.AppendFormat(format);
-			logEvent.AppendGenericInlined(arg0);logEvent.AppendGenericInlined(arg1);logEvent.AppendGenericInlined(arg2);logEvent.AppendGenericInlined(arg3);logEvent.AppendGenericInlined(arg4);logEvent.AppendGenericInlined(arg5);logEvent.AppendGenericInlined(arg6);logEvent.AppendGenericInlined(arg7);			
+			logEvent.AppendGenericInlined(arg0);
+			logEvent.AppendGenericInlined(arg1);
+			logEvent.AppendGenericInlined(arg2);
+			logEvent.AppendGenericInlined(arg3);
+			logEvent.AppendGenericInlined(arg4);
+			logEvent.AppendGenericInlined(arg5);
+			logEvent.AppendGenericInlined(arg6);
+			logEvent.AppendGenericInlined(arg7);
+						
 			logEvent.Log();
         }
 	
@@ -440,7 +676,15 @@ namespace ZeroLog
 		{
 			var logEvent = GetLogEventFor(Level.Verbose);
 			logEvent.AppendFormat(format);
-			logEvent.AppendGenericInlined(arg0);logEvent.AppendGenericInlined(arg1);logEvent.AppendGenericInlined(arg2);logEvent.AppendGenericInlined(arg3);logEvent.AppendGenericInlined(arg4);logEvent.AppendGenericInlined(arg5);logEvent.AppendGenericInlined(arg6);logEvent.AppendGenericInlined(arg7);			
+			logEvent.AppendGenericInlined(arg0);
+			logEvent.AppendGenericInlined(arg1);
+			logEvent.AppendGenericInlined(arg2);
+			logEvent.AppendGenericInlined(arg3);
+			logEvent.AppendGenericInlined(arg4);
+			logEvent.AppendGenericInlined(arg5);
+			logEvent.AppendGenericInlined(arg6);
+			logEvent.AppendGenericInlined(arg7);
+						
 			logEvent.Log();
         }
 	
@@ -448,7 +692,15 @@ namespace ZeroLog
 		{
 			var logEvent = GetLogEventFor(Level.Finest);
 			logEvent.AppendFormat(format);
-			logEvent.AppendGenericInlined(arg0);logEvent.AppendGenericInlined(arg1);logEvent.AppendGenericInlined(arg2);logEvent.AppendGenericInlined(arg3);logEvent.AppendGenericInlined(arg4);logEvent.AppendGenericInlined(arg5);logEvent.AppendGenericInlined(arg6);logEvent.AppendGenericInlined(arg7);			
+			logEvent.AppendGenericInlined(arg0);
+			logEvent.AppendGenericInlined(arg1);
+			logEvent.AppendGenericInlined(arg2);
+			logEvent.AppendGenericInlined(arg3);
+			logEvent.AppendGenericInlined(arg4);
+			logEvent.AppendGenericInlined(arg5);
+			logEvent.AppendGenericInlined(arg6);
+			logEvent.AppendGenericInlined(arg7);
+						
 			logEvent.Log();
         }
 		
