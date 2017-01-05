@@ -21,7 +21,7 @@ namespace ZeroLog.Appenders
         protected unsafe void WritePrefix(Stream stream, LogEvent logEvent)
         {
             _stringBuffer.Clear();
-            _stringBuffer.Append("%date{HH:mm:ss.fff}"); // TODO: implement date formatting in StringFormatter
+            _stringBuffer.AppendFormat("{0}", logEvent.Timestamp.TimeOfDay);
             _stringBuffer.Append(" - ");
             _stringBuffer.Append(LevelStringCache.GetLevelString(logEvent.Level));
             _stringBuffer.Append(" - ");

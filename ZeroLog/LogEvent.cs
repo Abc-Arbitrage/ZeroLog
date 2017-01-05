@@ -16,7 +16,7 @@ namespace ZeroLog
         private readonly List<string> _strings = new List<string>(_stringCapacity);
         private readonly List<int> _offsets = new List<int>(_stringCapacity);
         private Log _log;
-        private DateTime _timeStamp;
+        private DateTime _timestamp;
         private int _threadId;
         private int _position = 0;
         private Level _activeLevel;
@@ -28,10 +28,11 @@ namespace ZeroLog
 
         public Level Level { get; private set; }
         public string Name => _log.Name;
+        public DateTime Timestamp => _timestamp;
 
         internal void Initialize(Level level, Log log)
         {
-            _timeStamp = DateTime.UtcNow;
+            _timestamp = DateTime.UtcNow;
             Level = level;
             _log = log;
             _strings.Clear();
