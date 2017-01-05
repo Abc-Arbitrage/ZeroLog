@@ -13,14 +13,17 @@ namespace ZeroLog
         {
             _argPointers = argPointers;
             _strings = strings;
+            ReadBytes = 0;
         }
 
         public int Count => _argPointers.Count - 1;
 
+        public int ReadBytes { get; private set; }
+
         public void Format(StringBuffer stringBuffer, int index, StringView format)
         {
             var dataPointer = (byte*)_argPointers[index + 1].ToPointer();
-            stringBuffer.AppendFrom(dataPointer, format, _strings, _argPointers);
+            ReadBytes += stringBuffer.Append(dataPointer, format, _strings, _argPointers);
         }
     }
 }

@@ -298,7 +298,7 @@ namespace ZeroLog
             _dataPointer = _startOfBuffer;
             while (_dataPointer < endOfData)
             {
-                _dataPointer += stringBuffer.AppendFrom(_dataPointer, StringView.Empty, _strings, _argPointers);
+                _dataPointer += stringBuffer.Append(_dataPointer, StringView.Empty, _strings, _argPointers);
             }
 
             Debug.Assert(_dataPointer == endOfData, "Buffer over-read");

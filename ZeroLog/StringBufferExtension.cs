@@ -6,7 +6,7 @@ namespace ZeroLog
 {
     public static unsafe class StringBufferExtension
     {
-        public static int AppendFrom(this StringBuffer stringBuffer, byte* dataPointer, StringView format, List<string> strings, List<IntPtr> argPointers)
+        public static int Append(this StringBuffer stringBuffer, byte* dataPointer, StringView format, List<string> strings, List<IntPtr> argPointers)
         {
             var argumentType = *(ArgumentType*)dataPointer;
             dataPointer += sizeof(byte);
@@ -27,7 +27,7 @@ namespace ZeroLog
                     return sizeof(byte);
 
                 case ArgumentType.Byte:
-                    stringBuffer.Append(*dataPointer, StringView.Empty);
+                    stringBuffer.Append(*dataPointer, format);
                     return 2 * sizeof(byte);
 
                 case ArgumentType.Char:
@@ -65,19 +65,18 @@ namespace ZeroLog
 
                 case ArgumentType.DateTime:
                     var dateTime = ReadDateTime(dataPointer);
-                    throw new NotImplementedException(); //TODO
-                //return sizeof(byte) + sizeof(ulong);
+                    stringBuffer.Append(dateTime, format);
+                    return sizeof(byte) + sizeof(ulong);
 
                 case ArgumentType.TimeSpan:
                     var timeSpan = ReadTimeSpan(dataPointer);
-                    throw new NotImplementedException(); //TODO
-                //return sizeof(byte) + sizeof(long);
+                    stringBuffer.Append(timeSpan, format);
+                    return sizeof(byte) + sizeof(long);
 
                 case ArgumentType.Format:
                     var argSet = new ArgSet(argPointers, strings);
-                    var formatIndex = *dataPointer;
-                    stringBuffer.AppendArgSet(strings[formatIndex], ref argSet);
-                    return int.MaxValue; //TODO compute total argument size
+                    stringBuffer.AppendArgSet(strings[*dataPointer], ref argSet);
+                    return 2 * sizeof(byte) + argSet.ReadBytes;
 
                 default:
                     throw new ArgumentOutOfRangeException();

@@ -119,6 +119,24 @@ namespace ZeroLog.Tests
         }
 
         [Test]
+        public void should_append_date_time()
+        {
+            _logEvent.Append(new DateTime(2017, 01, 12, 13, 14, 15));
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreEqual("2017-01-12 13:14:15.000", _output.ToString());
+        }
+
+        [Test]
+        public void should_append_time_span()
+        {
+            _logEvent.Append(new TimeSpan(1, 2, 3, 4, 5));
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreEqual("02:03:04.005", _output.ToString());
+        }
+
+        [Test]
         public void should_append_all_types()
         {
             _logEvent.Append("AbC");
@@ -132,10 +150,12 @@ namespace ZeroLog.Tests
             _logEvent.Append(123.456f);
             _logEvent.Append(789.012d);
             _logEvent.Append(345.67890m);
+            _logEvent.Append(new DateTime(2017, 01, 12, 13, 14, 15));
+            _logEvent.Append(new TimeSpan(1, 2, 3, 4, 5));
 
             _logEvent.WriteToStringBuffer(_output);
 
-            Assert.AreEqual("AbCFalseTrue128£12345-128999999999999999999123.456789.012345.67890", _output.ToString());
+            Assert.AreEqual("AbCFalseTrue128£12345-128999999999999999999123.456789.012345.678902017-01-12 13:14:15.00002:03:04.005", _output.ToString());
         }
 
         [Test]
