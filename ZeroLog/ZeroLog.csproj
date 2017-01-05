@@ -51,6 +51,8 @@
     <Compile Include="Appenders\NullAppender.cs" />
     <Compile Include="ArgSet.cs" />
     <Compile Include="ArgumentType.cs" />
+    <Compile Include="BufferSegment.cs" />
+    <Compile Include="BufferSegmentProvider.cs" />
     <Compile Include="ConcurrentQueue.cs" />
     <Compile Include="IAppender.cs" />
     <Compile Include="Level.cs" />
