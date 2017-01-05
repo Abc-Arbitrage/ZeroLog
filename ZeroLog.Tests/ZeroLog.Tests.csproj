@@ -58,6 +58,7 @@
     <Compile Include="IntegrationTests.cs" />
     <Compile Include="LogEventTests.cs" />
     <Compile Include="LogManagerTests.cs" />
+    <Compile Include="PerformanceTests.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
