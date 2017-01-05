@@ -135,5 +135,18 @@ namespace ZeroLog.Tests
 
             Assert.AreEqual("AbCFalseTrue128£12345-128999999999999999999123.456789.012345.67890", _output.ToString());
         }
+
+        [Test]
+        public void should_append_format()
+        {
+            _logEvent.AppendFormat("{0} {2} {1}");
+            _logEvent.Append(1);
+            _logEvent.Append("3");
+            _logEvent.Append(2);
+
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreEqual("1 2 3", _output.ToString());
+        }
     }
 }

@@ -6,7 +6,7 @@ namespace ZeroLog
 {
     public static unsafe class StringBufferExtension
     {
-        public static int AppendFrom(this StringBuffer stringBuffer, byte[] buffer, int offset, StringView format, List<string> strings)
+        public static int AppendFrom(this StringBuffer stringBuffer, byte[] buffer, int offset, StringView format, List<string> strings, List<int> offsets)
         {
             var argumentType = (ArgumentType)buffer[offset++];
 
@@ -71,6 +71,12 @@ namespace ZeroLog
                     var timeSpan = ReadTimeSpan(buffer, offset);
                     throw new NotImplementedException(); //TODO
                 //return sizeof(byte) + sizeof(long);
+
+                case ArgumentType.Format:
+                    var argSet = new ArgSet(buffer, strings, offsets);
+                    var formatIndex = buffer[offset];
+                    stringBuffer.AppendArgSet(strings[formatIndex], ref argSet);
+                    return int.MaxValue; //TODO compute total argument size
 
                 default:
                     throw new ArgumentOutOfRangeException();

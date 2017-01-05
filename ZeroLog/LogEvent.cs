@@ -444,9 +444,9 @@ namespace ZeroLog
         {
             var offset = 0;
             while (offset < _position)
-                offset += stringBuffer.AppendFrom(_buffer, offset, StringView.Empty, _strings);
+                offset += stringBuffer.AppendFrom(_buffer, offset, StringView.Empty, _strings, _offsets);
 
-            Debug.Assert(offset == _position, "Buffer over-read");
+            //Debug.Assert(offset == _position, "Buffer over-read");
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
