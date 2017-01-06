@@ -41,6 +41,7 @@ namespace ZeroLog.Tests
             for (var i = 0; i < count; i++)
                 logger.InfoFormat("{0}", (byte)1, (char)1, (short)2, (float)3, 2.0, "", true, TimeSpan.Zero);
 
+            LogManager.Shutdown();
             var throughput = count / sw.Elapsed.TotalSeconds;
 
             Console.WriteLine($"Finished test, throughput is: {throughput:N0}");
