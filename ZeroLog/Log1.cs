@@ -1,9 +1,11 @@
-﻿
+﻿using JetBrains.Annotations;
+
 namespace ZeroLog
 {
 	partial class Log
 	{
-			
+		
+		[StringFormatMethod("format")]	
 		public void FatalFormat<T0>(string format, T0 arg0)
 		{
 			var logEvent = GetLogEventFor(Level.Fatal);
@@ -13,7 +15,8 @@ namespace ZeroLog
 						
 			logEvent.Log();
         }
-	
+
+		[StringFormatMethod("format")]	
 		public void ErrorFormat<T0>(string format, T0 arg0)
 		{
 			var logEvent = GetLogEventFor(Level.Error);
@@ -23,7 +26,8 @@ namespace ZeroLog
 						
 			logEvent.Log();
         }
-	
+
+		[StringFormatMethod("format")]	
 		public void WarningFormat<T0>(string format, T0 arg0)
 		{
 			var logEvent = GetLogEventFor(Level.Warning);
@@ -33,7 +37,8 @@ namespace ZeroLog
 						
 			logEvent.Log();
         }
-	
+
+		[StringFormatMethod("format")]	
 		public void InfoFormat<T0>(string format, T0 arg0)
 		{
 			var logEvent = GetLogEventFor(Level.Info);
@@ -43,7 +48,8 @@ namespace ZeroLog
 						
 			logEvent.Log();
         }
-	
+
+		[StringFormatMethod("format")]	
 		public void DebugFormat<T0>(string format, T0 arg0)
 		{
 			var logEvent = GetLogEventFor(Level.Debug);
@@ -53,7 +59,8 @@ namespace ZeroLog
 						
 			logEvent.Log();
         }
-	
+
+		[StringFormatMethod("format")]	
 		public void VerboseFormat<T0>(string format, T0 arg0)
 		{
 			var logEvent = GetLogEventFor(Level.Verbose);
@@ -63,7 +70,8 @@ namespace ZeroLog
 						
 			logEvent.Log();
         }
-	
+
+		[StringFormatMethod("format")]	
 		public void FinestFormat<T0>(string format, T0 arg0)
 		{
 			var logEvent = GetLogEventFor(Level.Finest);
@@ -73,7 +81,8 @@ namespace ZeroLog
 						
 			logEvent.Log();
         }
-	
+
+		[StringFormatMethod("format")]	
 		public void FatalFormat<T0, T1>(string format, T0 arg0, T1 arg1)
 		{
 			var logEvent = GetLogEventFor(Level.Fatal);
@@ -84,7 +93,8 @@ namespace ZeroLog
 						
 			logEvent.Log();
         }
-	
+
+		[StringFormatMethod("format")]	
 		public void ErrorFormat<T0, T1>(string format, T0 arg0, T1 arg1)
 		{
 			var logEvent = GetLogEventFor(Level.Error);
@@ -95,7 +105,8 @@ namespace ZeroLog
 						
 			logEvent.Log();
         }
-	
+
+		[StringFormatMethod("format")]	
 		public void WarningFormat<T0, T1>(string format, T0 arg0, T1 arg1)
 		{
 			var logEvent = GetLogEventFor(Level.Warning);
@@ -106,7 +117,8 @@ namespace ZeroLog
 						
 			logEvent.Log();
         }
-	
+
+		[StringFormatMethod("format")]	
 		public void InfoFormat<T0, T1>(string format, T0 arg0, T1 arg1)
 		{
 			var logEvent = GetLogEventFor(Level.Info);
@@ -117,7 +129,8 @@ namespace ZeroLog
 						
 			logEvent.Log();
         }
-	
+
+		[StringFormatMethod("format")]	
 		public void DebugFormat<T0, T1>(string format, T0 arg0, T1 arg1)
 		{
 			var logEvent = GetLogEventFor(Level.Debug);
@@ -128,7 +141,8 @@ namespace ZeroLog
 						
 			logEvent.Log();
         }
-	
+
+		[StringFormatMethod("format")]	
 		public void VerboseFormat<T0, T1>(string format, T0 arg0, T1 arg1)
 		{
 			var logEvent = GetLogEventFor(Level.Verbose);
@@ -139,7 +153,8 @@ namespace ZeroLog
 						
 			logEvent.Log();
         }
-	
+
+		[StringFormatMethod("format")]	
 		public void FinestFormat<T0, T1>(string format, T0 arg0, T1 arg1)
 		{
 			var logEvent = GetLogEventFor(Level.Finest);
@@ -150,7 +165,8 @@ namespace ZeroLog
 						
 			logEvent.Log();
         }
-	
+
+		[StringFormatMethod("format")]	
 		public void FatalFormat<T0, T1, T2>(string format, T0 arg0, T1 arg1, T2 arg2)
 		{
 			var logEvent = GetLogEventFor(Level.Fatal);
@@ -162,7 +178,8 @@ namespace ZeroLog
 						
 			logEvent.Log();
         }
-	
+
+		[StringFormatMethod("format")]	
 		public void ErrorFormat<T0, T1, T2>(string format, T0 arg0, T1 arg1, T2 arg2)
 		{
 			var logEvent = GetLogEventFor(Level.Error);
@@ -174,7 +191,8 @@ namespace ZeroLog
 						
 			logEvent.Log();
         }
-	
+
+		[StringFormatMethod("format")]	
 		public void WarningFormat<T0, T1, T2>(string format, T0 arg0, T1 arg1, T2 arg2)
 		{
 			var logEvent = GetLogEventFor(Level.Warning);
@@ -186,7 +204,8 @@ namespace ZeroLog
 						
 			logEvent.Log();
         }
-	
+
+		[StringFormatMethod("format")]	
 		public void InfoFormat<T0, T1, T2>(string format, T0 arg0, T1 arg1, T2 arg2)
 		{
 			var logEvent = GetLogEventFor(Level.Info);
@@ -198,7 +217,8 @@ namespace ZeroLog
 						
 			logEvent.Log();
         }
-	
+
+		[StringFormatMethod("format")]	
 		public void DebugFormat<T0, T1, T2>(string format, T0 arg0, T1 arg1, T2 arg2)
 		{
 			var logEvent = GetLogEventFor(Level.Debug);
@@ -210,7 +230,8 @@ namespace ZeroLog
 						
 			logEvent.Log();
         }
-	
+
+		[StringFormatMethod("format")]	
 		public void VerboseFormat<T0, T1, T2>(string format, T0 arg0, T1 arg1, T2 arg2)
 		{
 			var logEvent = GetLogEventFor(Level.Verbose);
@@ -222,7 +243,8 @@ namespace ZeroLog
 						
 			logEvent.Log();
         }
-	
+
+		[StringFormatMethod("format")]	
 		public void FinestFormat<T0, T1, T2>(string format, T0 arg0, T1 arg1, T2 arg2)
 		{
 			var logEvent = GetLogEventFor(Level.Finest);
@@ -234,7 +256,8 @@ namespace ZeroLog
 						
 			logEvent.Log();
         }
-	
+
+		[StringFormatMethod("format")]	
 		public void FatalFormat<T0, T1, T2, T3>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3)
 		{
 			var logEvent = GetLogEventFor(Level.Fatal);
@@ -247,7 +270,8 @@ namespace ZeroLog
 						
 			logEvent.Log();
         }
-	
+
+		[StringFormatMethod("format")]	
 		public void ErrorFormat<T0, T1, T2, T3>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3)
 		{
 			var logEvent = GetLogEventFor(Level.Error);
@@ -260,7 +284,8 @@ namespace ZeroLog
 						
 			logEvent.Log();
         }
-	
+
+		[StringFormatMethod("format")]	
 		public void WarningFormat<T0, T1, T2, T3>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3)
 		{
 			var logEvent = GetLogEventFor(Level.Warning);
@@ -273,7 +298,8 @@ namespace ZeroLog
 						
 			logEvent.Log();
         }
-	
+
+		[StringFormatMethod("format")]	
 		public void InfoFormat<T0, T1, T2, T3>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3)
 		{
 			var logEvent = GetLogEventFor(Level.Info);
@@ -286,7 +312,8 @@ namespace ZeroLog
 						
 			logEvent.Log();
         }
-	
+
+		[StringFormatMethod("format")]	
 		public void DebugFormat<T0, T1, T2, T3>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3)
 		{
 			var logEvent = GetLogEventFor(Level.Debug);
@@ -299,7 +326,8 @@ namespace ZeroLog
 						
 			logEvent.Log();
         }
-	
+
+		[StringFormatMethod("format")]	
 		public void VerboseFormat<T0, T1, T2, T3>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3)
 		{
 			var logEvent = GetLogEventFor(Level.Verbose);
@@ -312,7 +340,8 @@ namespace ZeroLog
 						
 			logEvent.Log();
         }
-	
+
+		[StringFormatMethod("format")]	
 		public void FinestFormat<T0, T1, T2, T3>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3)
 		{
 			var logEvent = GetLogEventFor(Level.Finest);
@@ -325,7 +354,8 @@ namespace ZeroLog
 						
 			logEvent.Log();
         }
-	
+
+		[StringFormatMethod("format")]	
 		public void FatalFormat<T0, T1, T2, T3, T4>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
 		{
 			var logEvent = GetLogEventFor(Level.Fatal);
@@ -339,7 +369,8 @@ namespace ZeroLog
 						
 			logEvent.Log();
         }
-	
+
+		[StringFormatMethod("format")]	
 		public void ErrorFormat<T0, T1, T2, T3, T4>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
 		{
 			var logEvent = GetLogEventFor(Level.Error);
@@ -353,7 +384,8 @@ namespace ZeroLog
 						
 			logEvent.Log();
         }
-	
+
+		[StringFormatMethod("format")]	
 		public void WarningFormat<T0, T1, T2, T3, T4>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
 		{
 			var logEvent = GetLogEventFor(Level.Warning);
@@ -367,7 +399,8 @@ namespace ZeroLog
 						
 			logEvent.Log();
         }
-	
+
+		[StringFormatMethod("format")]	
 		public void InfoFormat<T0, T1, T2, T3, T4>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
 		{
 			var logEvent = GetLogEventFor(Level.Info);
@@ -381,7 +414,8 @@ namespace ZeroLog
 						
 			logEvent.Log();
         }
-	
+
+		[StringFormatMethod("format")]	
 		public void DebugFormat<T0, T1, T2, T3, T4>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
 		{
 			var logEvent = GetLogEventFor(Level.Debug);
@@ -395,7 +429,8 @@ namespace ZeroLog
 						
 			logEvent.Log();
         }
-	
+
+		[StringFormatMethod("format")]	
 		public void VerboseFormat<T0, T1, T2, T3, T4>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
 		{
 			var logEvent = GetLogEventFor(Level.Verbose);
@@ -409,7 +444,8 @@ namespace ZeroLog
 						
 			logEvent.Log();
         }
-	
+
+		[StringFormatMethod("format")]	
 		public void FinestFormat<T0, T1, T2, T3, T4>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
 		{
 			var logEvent = GetLogEventFor(Level.Finest);
@@ -423,7 +459,8 @@ namespace ZeroLog
 						
 			logEvent.Log();
         }
-	
+
+		[StringFormatMethod("format")]	
 		public void FatalFormat<T0, T1, T2, T3, T4, T5>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
 		{
 			var logEvent = GetLogEventFor(Level.Fatal);
@@ -438,7 +475,8 @@ namespace ZeroLog
 						
 			logEvent.Log();
         }
-	
+
+		[StringFormatMethod("format")]	
 		public void ErrorFormat<T0, T1, T2, T3, T4, T5>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
 		{
 			var logEvent = GetLogEventFor(Level.Error);
@@ -453,7 +491,8 @@ namespace ZeroLog
 						
 			logEvent.Log();
         }
-	
+
+		[StringFormatMethod("format")]	
 		public void WarningFormat<T0, T1, T2, T3, T4, T5>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
 		{
 			var logEvent = GetLogEventFor(Level.Warning);
@@ -468,7 +507,8 @@ namespace ZeroLog
 						
 			logEvent.Log();
         }
-	
+
+		[StringFormatMethod("format")]	
 		public void InfoFormat<T0, T1, T2, T3, T4, T5>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
 		{
 			var logEvent = GetLogEventFor(Level.Info);
@@ -483,7 +523,8 @@ namespace ZeroLog
 						
 			logEvent.Log();
         }
-	
+
+		[StringFormatMethod("format")]	
 		public void DebugFormat<T0, T1, T2, T3, T4, T5>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
 		{
 			var logEvent = GetLogEventFor(Level.Debug);
@@ -498,7 +539,8 @@ namespace ZeroLog
 						
 			logEvent.Log();
         }
-	
+
+		[StringFormatMethod("format")]	
 		public void VerboseFormat<T0, T1, T2, T3, T4, T5>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
 		{
 			var logEvent = GetLogEventFor(Level.Verbose);
@@ -513,7 +555,8 @@ namespace ZeroLog
 						
 			logEvent.Log();
         }
-	
+
+		[StringFormatMethod("format")]	
 		public void FinestFormat<T0, T1, T2, T3, T4, T5>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
 		{
 			var logEvent = GetLogEventFor(Level.Finest);
@@ -528,7 +571,8 @@ namespace ZeroLog
 						
 			logEvent.Log();
         }
-	
+
+		[StringFormatMethod("format")]	
 		public void FatalFormat<T0, T1, T2, T3, T4, T5, T6>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
 		{
 			var logEvent = GetLogEventFor(Level.Fatal);
@@ -544,7 +588,8 @@ namespace ZeroLog
 						
 			logEvent.Log();
         }
-	
+
+		[StringFormatMethod("format")]	
 		public void ErrorFormat<T0, T1, T2, T3, T4, T5, T6>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
 		{
 			var logEvent = GetLogEventFor(Level.Error);
@@ -560,7 +605,8 @@ namespace ZeroLog
 						
 			logEvent.Log();
         }
-	
+
+		[StringFormatMethod("format")]	
 		public void WarningFormat<T0, T1, T2, T3, T4, T5, T6>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
 		{
 			var logEvent = GetLogEventFor(Level.Warning);
@@ -576,7 +622,8 @@ namespace ZeroLog
 						
 			logEvent.Log();
         }
-	
+
+		[StringFormatMethod("format")]	
 		public void InfoFormat<T0, T1, T2, T3, T4, T5, T6>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
 		{
 			var logEvent = GetLogEventFor(Level.Info);
@@ -592,7 +639,8 @@ namespace ZeroLog
 						
 			logEvent.Log();
         }
-	
+
+		[StringFormatMethod("format")]	
 		public void DebugFormat<T0, T1, T2, T3, T4, T5, T6>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
 		{
 			var logEvent = GetLogEventFor(Level.Debug);
@@ -608,7 +656,8 @@ namespace ZeroLog
 						
 			logEvent.Log();
         }
-	
+
+		[StringFormatMethod("format")]	
 		public void VerboseFormat<T0, T1, T2, T3, T4, T5, T6>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
 		{
 			var logEvent = GetLogEventFor(Level.Verbose);
@@ -624,7 +673,8 @@ namespace ZeroLog
 						
 			logEvent.Log();
         }
-	
+
+		[StringFormatMethod("format")]	
 		public void FinestFormat<T0, T1, T2, T3, T4, T5, T6>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
 		{
 			var logEvent = GetLogEventFor(Level.Finest);
@@ -640,7 +690,8 @@ namespace ZeroLog
 						
 			logEvent.Log();
         }
-	
+
+		[StringFormatMethod("format")]	
 		public void FatalFormat<T0, T1, T2, T3, T4, T5, T6, T7>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7)
 		{
 			var logEvent = GetLogEventFor(Level.Fatal);
@@ -657,7 +708,8 @@ namespace ZeroLog
 						
 			logEvent.Log();
         }
-	
+
+		[StringFormatMethod("format")]	
 		public void ErrorFormat<T0, T1, T2, T3, T4, T5, T6, T7>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7)
 		{
 			var logEvent = GetLogEventFor(Level.Error);
@@ -674,7 +726,8 @@ namespace ZeroLog
 						
 			logEvent.Log();
         }
-	
+
+		[StringFormatMethod("format")]	
 		public void WarningFormat<T0, T1, T2, T3, T4, T5, T6, T7>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7)
 		{
 			var logEvent = GetLogEventFor(Level.Warning);
@@ -691,7 +744,8 @@ namespace ZeroLog
 						
 			logEvent.Log();
         }
-	
+
+		[StringFormatMethod("format")]	
 		public void InfoFormat<T0, T1, T2, T3, T4, T5, T6, T7>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7)
 		{
 			var logEvent = GetLogEventFor(Level.Info);
@@ -708,7 +762,8 @@ namespace ZeroLog
 						
 			logEvent.Log();
         }
-	
+
+		[StringFormatMethod("format")]	
 		public void DebugFormat<T0, T1, T2, T3, T4, T5, T6, T7>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7)
 		{
 			var logEvent = GetLogEventFor(Level.Debug);
@@ -725,7 +780,8 @@ namespace ZeroLog
 						
 			logEvent.Log();
         }
-	
+
+		[StringFormatMethod("format")]	
 		public void VerboseFormat<T0, T1, T2, T3, T4, T5, T6, T7>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7)
 		{
 			var logEvent = GetLogEventFor(Level.Verbose);
@@ -742,7 +798,8 @@ namespace ZeroLog
 						
 			logEvent.Log();
         }
-	
+
+		[StringFormatMethod("format")]	
 		public void FinestFormat<T0, T1, T2, T3, T4, T5, T6, T7>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7)
 		{
 			var logEvent = GetLogEventFor(Level.Finest);

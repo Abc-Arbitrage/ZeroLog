@@ -5,6 +5,7 @@
 <#@ import namespace="System.Collections.Generic" #>
 <#@ assembly name="$(TargetPath)" #>
 <#@ output extension=".cs" #>
+using JetBrains.Annotations;
 
 namespace ZeroLog
 {
@@ -25,7 +26,8 @@ namespace ZeroLog
 			foreach (var levelName in Enum.GetNames(typeof(ZeroLog.Level)))
             {
 		#>
-	
+
+		[StringFormatMethod("format")]	
 		public void <#=levelName#>Format<#=genericParams#>(string format, T0 arg0<#for(int j = 1; j < i; j++) { #>, T<#=j#> arg<#=j#><#}#>)
 		{
 			var logEvent = GetLogEventFor(Level.<#=levelName#>);
