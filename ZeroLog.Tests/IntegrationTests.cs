@@ -37,7 +37,7 @@ namespace ZeroLog.Tests
             Console.WriteLine("Starting test");
             var sw = Stopwatch.StartNew();
 
-            const int count = 50000000;
+            const int count = 5000000;
             for (var i = 0; i < count; i++)
                 logger.InfoFormat("{0}", (byte)1, (char)1, (short)2, (float)3, 2.0, "", true, TimeSpan.Zero);
 
