@@ -8,14 +8,14 @@ namespace ZeroLog.Appenders
 
         public override void WriteEvent(LogEvent logEvent, byte[] messageBytes, int messageLength)
         {
-            _output.Seek(0, SeekOrigin.Begin);
+            /*_output.Seek(0, SeekOrigin.Begin);
 
             WritePrefix(_output, logEvent);
 
             NewlineBytes.CopyTo(messageBytes, messageLength);
             messageLength += NewlineBytes.Length;
 
-            _output.Write(messageBytes, 0, messageLength);
+            _output.Write(messageBytes, 0, messageLength);*/
         }
     }
 }

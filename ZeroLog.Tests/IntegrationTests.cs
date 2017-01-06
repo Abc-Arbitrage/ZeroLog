@@ -34,15 +34,16 @@ namespace ZeroLog.Tests
         {
             var logger = LogManager.GetLogger(typeof(IntegrationTests));
 
+            Console.WriteLine("Starting test");
             var sw = Stopwatch.StartNew();
 
-            const int count = 5000000;
+            const int count = 50000000;
             for (var i = 0; i < count; i++)
                 logger.InfoFormat("{0}", (byte)1, (char)1, (short)2, (float)3, 2.0, "", true, TimeSpan.Zero);
 
             var throughput = count / sw.Elapsed.TotalSeconds;
 
-            Console.WriteLine($"{throughput:N0}");
+            Console.WriteLine($"Finished test, throughput is: {throughput:N0}");
         }
 
         [Test]
