@@ -13,8 +13,7 @@ namespace ZeroLog.Tests
         [SetUp]
         public void SetUp()
         {
-            LogManager.Initialize(new[] { new ConsoleAppender() }, 100 * 1024);
-            Thread.Sleep(1);
+            LogManager.Initialize(new[] { new NullAppender(),  }, 1 << 14);
         }
 
         [TearDown]
@@ -58,7 +57,7 @@ namespace ZeroLog.Tests
             var logger = LogManager.GetLogger(typeof(IntegrationTests));
             for (int k = 0; k < count; k++)
             {
-                Thread.Sleep(1);
+                Thread.Sleep(10);
                 logger.Info().Append("Hello").Log();
             }
 

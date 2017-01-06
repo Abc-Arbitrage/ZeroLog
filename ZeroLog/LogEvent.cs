@@ -26,6 +26,7 @@ namespace ZeroLog
             _activeLevel = level;
         }
 
+        internal long Sequence { get; set; }
         public Level Level { get; private set; }
         public string Name => _log.Name;
         public DateTime Timestamp => _timestamp;

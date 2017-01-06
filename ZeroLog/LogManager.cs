@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.Formatting;
 using System.Threading.Tasks;
-using Roslyn.Utilities;
+using Disruptor;
+using Disruptor.Dsl;
 
 namespace ZeroLog
 {
@@ -12,19 +12,15 @@ namespace ZeroLog
     {
         private static LogManager _logManager;
 
-        private readonly ConcurrentQueue<LogEvent> _queue;
-        private readonly ObjectPool<LogEvent> _pool;
+        private readonly Disruptor<LogEvent> _disruptor;
         private readonly Encoding _encoding;
         private readonly List<IAppender> _appenders;
-        private readonly Task _writeTask;
         private bool _isRunning = true;
-        private readonly byte[] _newlineBytes;
 
         private LogManager(IEnumerable<IAppender> appenders, int size, Level level = Level.Finest)
         {
             _encoding = Encoding.Default;
-            _queue = new ConcurrentQueue<LogEvent>();
-            _pool = new ObjectPool<LogEvent>(() => new LogEvent(level), size);
+            _disruptor = new Disruptor<LogEvent>(() => new LogEvent(level), size, TaskScheduler.Default);
 
             foreach (var appender in appenders)
             {
@@ -33,7 +29,8 @@ namespace ZeroLog
 
             _appenders = new List<IAppender>(appenders);
 
-            _writeTask = Task.Run(() => WriteToAppenders());
+            _disruptor.HandleEventsWith(new LogEventHandler(_appenders, _encoding));
+            _disruptor.Start();
         }
 
         public static LogManager Initialize(IEnumerable<IAppender> appenders, int size = 1024)
@@ -53,10 +50,9 @@ namespace ZeroLog
             if (logManager == null)
                 return;
 
+            logManager._disruptor.Shutdown(TimeSpan.FromSeconds(1));
             logManager._isRunning = false;
             // TODO: shutdown all the logs
-
-            logManager._writeTask.Wait(1000);
         }
 
         public static Log GetLogger(Type type)
@@ -70,53 +66,57 @@ namespace ZeroLog
 
         internal void Enqueue(LogEvent logEvent)
         {
-            _queue.Enqueue(logEvent);
+            _disruptor.RingBuffer.Publish(logEvent.Sequence);
         }
 
         internal LogEvent AllocateLogEvent()
         {
-            return _pool.Allocate();
-        }
-
-        private void WriteToAppenders()
-        {
-            var stringBuffer = new StringBuffer();
-            byte[] destination = new byte[1024];
-            while ( _isRunning)
+            long sequence;
+            try
             {
-                try
-                {
-                    TryToProcessQueue(stringBuffer, destination);
-                }
-                catch (Exception ex)
-                {
-                    // TODO: how can we distinguish between exceptions that occur during shutdown and normal operation
-                    Console.WriteLine(ex);
-                    throw;
-                }
+                sequence = _disruptor.RingBuffer.TryNext();
             }
+            catch (Exception)
+            {
+                Console.WriteLine($"Could get log event - ring buffer was full");
+                return null;
+            }
+
+            var logEvent = _disruptor.RingBuffer[sequence];
+            logEvent.Sequence = sequence;
+            return logEvent;
         }
 
-        private unsafe void TryToProcessQueue(StringBuffer stringBuffer, byte[] destination)
+        private class LogEventHandler : IEventHandler<LogEvent>
         {
-            LogEvent logEvent;
-            if (_queue.TryDequeue(out logEvent))
-            {
-                // Write format only once
-                logEvent.WriteToStringBuffer(stringBuffer);
-                int bytesWritten;
-                fixed (byte* dest = destination)
-                    bytesWritten = stringBuffer.CopyTo(dest, 0, stringBuffer.Count, _encoding);
+            private readonly List<IAppender> _appenders;
+            private readonly Encoding _encoding;
+            private readonly StringBuffer _stringBuffer;
+            private readonly byte[] _destination;
 
-                stringBuffer.Clear();
+            public LogEventHandler(List<IAppender> appenders, Encoding encoding)
+            {
+                _appenders = appenders;
+                _encoding = encoding;
+
+                _stringBuffer = new StringBuffer();
+                _destination = new byte[1024];
+            }
+
+            public unsafe void OnEvent(LogEvent logEvent, long sequence, bool endOfBatch)
+            {
+                logEvent.WriteToStringBuffer(_stringBuffer);
+                int bytesWritten;
+                fixed (byte* dest = _destination)
+                    bytesWritten = _stringBuffer.CopyTo(dest, 0, _stringBuffer.Count, _encoding);
+
+                _stringBuffer.Clear();
 
                 // Write to appenders
                 foreach (var appender in _appenders)
                 {
-                    appender.WriteEvent(logEvent, destination, bytesWritten);
+                    appender.WriteEvent(logEvent, _destination, bytesWritten);
                 }
-
-                _pool.Free(logEvent);
             }
         }
     }

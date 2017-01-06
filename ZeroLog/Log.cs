@@ -61,7 +61,7 @@ namespace ZeroLog
         private LogEvent GetLogEventFor(Level level)
         {
             var logEvent = _logManager.AllocateLogEvent();
-            logEvent.Initialize(level, this);
+            logEvent?.Initialize(level, this);
             return logEvent;
         }
 

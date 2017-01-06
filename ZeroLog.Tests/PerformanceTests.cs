@@ -15,7 +15,7 @@ namespace ZeroLog.Tests
         public void SetUp()
         {
 //            LogManager.Initialize(new[] { new DateAndSizeRollingFileAppender("PerfTest"), }, 100 * 1024);
-            LogManager.Initialize(new[] { new NullAppender(), }, 100 * 1024);
+            LogManager.Initialize(new[] { new NullAppender(), }, 1 << 14);
             Thread.Sleep(1);
         }
 

@@ -32,6 +32,10 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Disruptor, Version=3.3.5.1, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Disruptor.3.3.5.1\lib\net45\Disruptor.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="StringFormatter">
       <HintPath>..\lib\StringFormatter.dll</HintPath>
     </Reference>
