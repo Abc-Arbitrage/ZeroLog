@@ -59,9 +59,8 @@ namespace ZeroLog
                     return sizeof(byte) + sizeof(decimal);
 
                 case ArgumentType.Guid:
-                    var guid = ReadGuid(dataPointer);
-                    throw new NotImplementedException(); //TODO
-                //return sizeof(byte) + sizeof(Guid);
+                    stringBuffer.Append(*(Guid*)dataPointer, format);
+                    return sizeof(byte) + sizeof(Guid);
 
                 case ArgumentType.DateTime:
                     var dateTime = ReadDateTime(dataPointer);
@@ -81,11 +80,6 @@ namespace ZeroLog
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-        }
-
-        private static Guid ReadGuid(byte* buffer)
-        {
-            return *(Guid*)buffer;
         }
 
         private static DateTime ReadDateTime(byte* buffer)

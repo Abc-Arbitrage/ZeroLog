@@ -119,6 +119,15 @@ namespace ZeroLog.Tests
         }
 
         [Test]
+        public void should_append_guid()
+        {
+            _logEvent.Append(new Guid("129ac124-e588-47e5-9d3d-fa3a4d174e29"));
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreEqual("129ac124-e588-47e5-9d3d-fa3a4d174e29", _output.ToString());
+        }
+
+        [Test]
         public void should_append_date_time()
         {
             _logEvent.Append(new DateTime(2017, 01, 12, 13, 14, 15));
