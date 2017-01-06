@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Threading;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using ZeroLog.Appenders;
 
@@ -11,13 +12,14 @@ namespace ZeroLog.Tests
     public class IntegrationTests
     {
         private PerformanceAppender _performanceAppender;
+        private const int _nbThreads = 4;
         private const int _count = 5 * 1000;
 
         [SetUp]
         public void SetUp()
         {
-            _performanceAppender = new PerformanceAppender(_count);
-            LogManager.Initialize(new[] { _performanceAppender,  }, 1 << 16);
+            _performanceAppender = new PerformanceAppender(_count * _nbThreads);
+            LogManager.Initialize(new[] { _performanceAppender, }, 1 << 16);
             Thread.Sleep(1);
         }
 
@@ -36,17 +38,20 @@ namespace ZeroLog.Tests
         [Test]
         public void should_test_append()
         {
-            var logger = LogManager.GetLogger(typeof(IntegrationTests));
 
             Console.WriteLine("Starting test");
             var sw = Stopwatch.StartNew();
 
-            for (var i = 0; i < _count; i++)
+            Parallel.For(0, _nbThreads, threadId =>
             {
-                logger.InfoFormat("{0}", Stopwatch.GetTimestamp());
-                Thread.Sleep(5);
-            }
-//                logger.InfoFormat("{0}", (byte)1, (char)1, (short)2, (float)3, 2.0, "", true, TimeSpan.Zero);
+                var logger = LogManager.GetLogger(typeof(IntegrationTests).Name + threadId.ToString());
+                for (var i = 0; i < _count; i++)
+                {
+                    logger.InfoFormat("{0}", Stopwatch.GetTimestamp());
+                    Thread.Sleep(5);
+                }
+                //                logger.InfoFormat("{0}", (byte)1, (char)1, (short)2, (float)3, 2.0, "", true, TimeSpan.Zero);
+            });
 
             LogManager.Shutdown();
             var throughput = _count / sw.Elapsed.TotalSeconds;
