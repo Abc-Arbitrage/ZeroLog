@@ -45,16 +45,12 @@ namespace ZeroLog
             _threadId = Thread.CurrentThread.ManagedThreadId;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal void AppendFormat(string format)
         {
-            EnsureRemainingBytesAndStoreOffset(1);
-
-            *_dataPointer = (byte)ArgumentType.Format;
-            _dataPointer += sizeof(byte);
-            *_dataPointer = (byte)_strings.Count;
-            _dataPointer += sizeof(byte);
-
-            _strings.Add(format);
+            EnsureRemainingBytesAndStoreArgPointer(1);
+            AppendArgumentType(ArgumentType.FormatString);
+            AppendString(format);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -106,185 +102,216 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public LogEvent Append(string s)
         {
-            EnsureRemainingBytesAndStoreOffset(1);
-
-            *_dataPointer = (byte)ArgumentType.String;
-            _dataPointer += sizeof(byte);
-
-            *_dataPointer = (byte)_strings.Count;
-            _dataPointer += sizeof(byte);
-
-            _strings.Add(s);
-
+            EnsureRemainingBytesAndStoreArgPointer(1);
+            AppendArgumentType(ArgumentType.String);
+            AppendString(s);
             return this;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public LogEvent Append(bool b)
         {
-            EnsureRemainingBytesAndStoreOffset(1);
-
-            if (b)
-                *_dataPointer = (byte)ArgumentType.BooleanTrue;
-            else
-                *_dataPointer = (byte)ArgumentType.BooleanFalse;
-
-            _dataPointer += sizeof(byte);
+            EnsureRemainingBytesAndStoreArgPointer(1);
+            AppendArgumentType(b ? ArgumentType.BooleanTrue : ArgumentType.BooleanFalse);
             return this;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public LogEvent Append(byte b)
         {
-            EnsureRemainingBytesAndStoreOffset(1 + sizeof(byte));
+            EnsureRemainingBytesAndStoreArgPointer(1 + sizeof(byte));
+            AppendArgumentType(ArgumentType.Byte);
+            AppendByte(b);
+            return this;
+        }
 
-            *_dataPointer = (byte)ArgumentType.Byte;
-            _dataPointer += sizeof(byte);
-
-            *_dataPointer = b;
-            _dataPointer += sizeof(byte);
-
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public LogEvent Append(byte b, string format)
+        {
+            EnsureRemainingBytesAndStoreArgPointer(3 * sizeof(byte));
+            AppendArgumentType(ArgumentType.Byte, true);
+            AppendString(format);
+            AppendByte(b);
             return this;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public LogEvent Append(char c)
         {
-            EnsureRemainingBytesAndStoreOffset(1 + sizeof(char));
-
-            *_dataPointer = (byte)ArgumentType.Char;
-            _dataPointer += sizeof(byte);
-
-            *(char*)_dataPointer = c;
-
-            _dataPointer += sizeof(char);
-
+            EnsureRemainingBytesAndStoreArgPointer(1 + sizeof(char));
+            AppendArgumentType(ArgumentType.Char);
+            AppendChar(c);
             return this;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public LogEvent Append(short s)
         {
-            EnsureRemainingBytesAndStoreOffset(1 + sizeof(short));
+            EnsureRemainingBytesAndStoreArgPointer(1 + sizeof(short));
+            AppendArgumentType(ArgumentType.Int16);
+            AppendShort(s);
+            return this;
+        }
 
-            *_dataPointer = (byte)ArgumentType.Int16;
-            _dataPointer += sizeof(byte);
-
-            *(short*)_dataPointer = s;
-            _dataPointer += sizeof(short);
-
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public LogEvent Append(short s, string format)
+        {
+            EnsureRemainingBytesAndStoreArgPointer(2 * sizeof(byte) + sizeof(short));
+            AppendArgumentType(ArgumentType.Int16, true);
+            AppendString(format);
+            AppendShort(s);
             return this;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public LogEvent Append(int i)
         {
-            EnsureRemainingBytesAndStoreOffset(1 + sizeof(int));
+            EnsureRemainingBytesAndStoreArgPointer(1 + sizeof(int));
+            AppendArgumentType(ArgumentType.Int32);
+            AppendInt(i);
+            return this;
+        }
 
-            *_dataPointer = (byte)ArgumentType.Int32;
-            _dataPointer += sizeof(byte);
-
-            *(int*)_dataPointer = i;
-            _dataPointer += sizeof(int);
-
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public LogEvent Append(int i, string format)
+        {
+            EnsureRemainingBytesAndStoreArgPointer(2 * sizeof(byte) + sizeof(int));
+            AppendArgumentType(ArgumentType.Int32, true);
+            AppendString(format);
+            AppendInt(i);
             return this;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public LogEvent Append(long l)
         {
-            EnsureRemainingBytesAndStoreOffset(1 + sizeof(long));
+            EnsureRemainingBytesAndStoreArgPointer(1 + sizeof(long));
+            AppendArgumentType(ArgumentType.Int64);
+            AppendLong(l);
+            return this;
+        }
 
-            *_dataPointer = (byte)ArgumentType.Int64;
-            _dataPointer += sizeof(byte);
-
-            *(long*)_dataPointer = l;
-            _dataPointer += sizeof(long);
-
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public LogEvent Append(long l, string format)
+        {
+            EnsureRemainingBytesAndStoreArgPointer(2 * sizeof(byte) + sizeof(long));
+            AppendArgumentType(ArgumentType.Int64, true);
+            AppendString(format);
+            AppendLong(l);
             return this;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public LogEvent Append(float f)
         {
-            EnsureRemainingBytesAndStoreOffset(1 + sizeof(float));
+            EnsureRemainingBytesAndStoreArgPointer(1 + sizeof(float));
+            AppendArgumentType(ArgumentType.Single);
+            AppendFloat(f);
+            return this;
+        }
 
-            *_dataPointer = (byte)ArgumentType.Single;
-            _dataPointer += sizeof(byte);
-
-            *(float*)_dataPointer = f;
-            _dataPointer += sizeof(float);
-
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public LogEvent Append(float f, string format)
+        {
+            EnsureRemainingBytesAndStoreArgPointer(2 * sizeof(byte) + sizeof(float));
+            AppendArgumentType(ArgumentType.Single, true);
+            AppendString(format);
+            AppendFloat(f);
             return this;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public LogEvent Append(double d)
         {
-            EnsureRemainingBytesAndStoreOffset(1 + sizeof(double));
+            EnsureRemainingBytesAndStoreArgPointer(1 + sizeof(double));
+            AppendArgumentType(ArgumentType.Double);
+            AppendDouble(d);
+            return this;
+        }
 
-            *_dataPointer = (byte)ArgumentType.Double;
-            _dataPointer += sizeof(byte);
-
-            *(double*)_dataPointer = d;
-            _dataPointer += sizeof(double);
-
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public LogEvent Append(double d, string format)
+        {
+            EnsureRemainingBytesAndStoreArgPointer(2 * sizeof(byte) + sizeof(double));
+            AppendArgumentType(ArgumentType.Double, true);
+            AppendString(format);
+            AppendDouble(d);
             return this;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public LogEvent Append(decimal d)
         {
-            EnsureRemainingBytesAndStoreOffset(1 + sizeof(decimal));
+            EnsureRemainingBytesAndStoreArgPointer(1 + sizeof(decimal));
+            AppendArgumentType(ArgumentType.Decimal);
+            AppendDecimal(d);
+            return this;
+        }
 
-            *_dataPointer = (byte)ArgumentType.Decimal;
-            _dataPointer += sizeof(byte);
-
-            *(decimal*)_dataPointer = d;
-            _dataPointer += sizeof(decimal);
-
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public LogEvent Append(decimal d, string format)
+        {
+            EnsureRemainingBytesAndStoreArgPointer(2 * sizeof(byte) + sizeof(decimal));
+            AppendArgumentType(ArgumentType.Decimal, true);
+            AppendString(format);
+            AppendDecimal(d);
             return this;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public LogEvent Append(Guid g)
         {
-            EnsureRemainingBytesAndStoreOffset(1 + sizeof(Guid));
+            EnsureRemainingBytesAndStoreArgPointer(1 + sizeof(Guid));
+            AppendArgumentType(ArgumentType.Guid);
+            AppendGuid(g);
+            return this;
+        }
 
-            *_dataPointer = (byte)ArgumentType.Guid;
-            _dataPointer += sizeof(byte);
-
-            *(Guid*)_dataPointer = g;
-            _dataPointer += sizeof(Guid);
-
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public LogEvent Append(Guid g, string format)
+        {
+            EnsureRemainingBytesAndStoreArgPointer(2 * sizeof(byte) + sizeof(Guid));
+            AppendArgumentType(ArgumentType.Guid, true);
+            AppendString(format);
+            AppendGuid(g);
             return this;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public LogEvent Append(DateTime dt)
         {
-            EnsureRemainingBytesAndStoreOffset(1 + sizeof(ulong));
-
-            *_dataPointer = (byte)ArgumentType.DateTime;
-            _dataPointer += sizeof(byte);
-
-            *(ulong*)_dataPointer = (ulong)dt.Ticks | ((ulong)dt.Kind << 62);
-            _dataPointer += sizeof(ulong);
-
+            EnsureRemainingBytesAndStoreArgPointer(1 + sizeof(ulong));
+            AppendArgumentType(ArgumentType.DateTime);
+            AppendDateTime(dt);
+            return this;
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public LogEvent Append(DateTime dt, string format)
+        {
+            EnsureRemainingBytesAndStoreArgPointer(2 * sizeof(byte) + sizeof(ulong));
+            AppendArgumentType(ArgumentType.DateTime, true);
+            AppendString(format);
+            AppendDateTime(dt);
             return this;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public LogEvent Append(TimeSpan ts)
         {
-            EnsureRemainingBytesAndStoreOffset(1 + sizeof(long));
+            EnsureRemainingBytesAndStoreArgPointer(1 + sizeof(long));
+            AppendArgumentType(ArgumentType.TimeSpan);
+            AppendTimeSpan(ts);
+            return this;
+        }
 
-            *_dataPointer = (byte)ArgumentType.TimeSpan;
-            _dataPointer += sizeof(byte);
-
-            *(long*)_dataPointer = ts.Ticks;
-            _dataPointer += sizeof(long);
-
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public LogEvent Append(TimeSpan ts, string format)
+        {
+            EnsureRemainingBytesAndStoreArgPointer(2 * sizeof(byte) + sizeof(long));
+            AppendArgumentType(ArgumentType.TimeSpan, true);
+            AppendString(format);
+            AppendTimeSpan(ts);
             return this;
         }
 
@@ -299,19 +326,101 @@ namespace ZeroLog
             _dataPointer = _startOfBuffer;
             while (_dataPointer < endOfData)
             {
-                _dataPointer += stringBuffer.Append(_dataPointer, StringView.Empty, _strings, _argPointers);
+                stringBuffer.Append(ref _dataPointer, StringView.Empty, _strings, _argPointers);
             }
 
             Debug.Assert(_dataPointer == endOfData, "Buffer over-read");
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void EnsureRemainingBytesAndStoreOffset(int count)
+        private void EnsureRemainingBytesAndStoreArgPointer(int requestedBytes)
         {
-            if (_dataPointer + count > _endOfBuffer)
+            if (_dataPointer + requestedBytes > _endOfBuffer)
                 throw new Exception("Buffer is full");
 
             _argPointers.Add(new IntPtr(_dataPointer));
+        }
+
+        private void AppendArgumentType(ArgumentType argumentType, bool withFormatSpecifier = false)
+        {
+            if (withFormatSpecifier)
+                *_dataPointer = (byte)((byte)argumentType | ArgumentTypeMask.FormatSpecifier);
+            else
+                *_dataPointer = (byte)argumentType;
+
+            _dataPointer += sizeof(byte);
+        }
+
+        private void AppendString(string value)
+        {
+            *_dataPointer = (byte)_strings.Count;
+            _dataPointer += sizeof(byte);
+            _strings.Add(value);
+        }
+
+        private void AppendByte(byte b)
+        {
+            *_dataPointer = b;
+            _dataPointer += sizeof(byte);
+        }
+
+        private void AppendChar(char c)
+        {
+            *(char*)_dataPointer = c;
+            _dataPointer += sizeof(char);
+        }
+
+        private void AppendShort(short s)
+        {
+            *(short*)_dataPointer = s;
+            _dataPointer += sizeof(short);
+        }
+
+        private void AppendInt(int i)
+        {
+            *(int*)_dataPointer = i;
+            _dataPointer += sizeof(int);
+        }
+
+        private void AppendLong(long l)
+        {
+            *(long*)_dataPointer = l;
+            _dataPointer += sizeof(long);
+        }
+
+        private void AppendFloat(float f)
+        {
+            *(float*)_dataPointer = f;
+            _dataPointer += sizeof(float);
+        }
+
+        private void AppendDouble(double d)
+        {
+            *(double*)_dataPointer = d;
+            _dataPointer += sizeof(double);
+        }
+
+        private void AppendDecimal(decimal d)
+        {
+            *(decimal*)_dataPointer = d;
+            _dataPointer += sizeof(decimal);
+        }
+
+        private void AppendGuid(Guid g)
+        {
+            *(Guid*)_dataPointer = g;
+            _dataPointer += sizeof(Guid);
+        }
+
+        private void AppendDateTime(DateTime dt)
+        {
+            *(ulong*)_dataPointer = (ulong)dt.Ticks | ((ulong)dt.Kind << 62);
+            _dataPointer += sizeof(ulong);
+        }
+
+        private void AppendTimeSpan(TimeSpan ts)
+        {
+            *(long*)_dataPointer = ts.Ticks;
+            _dataPointer += sizeof(long);
         }
     }
 }

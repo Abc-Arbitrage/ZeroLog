@@ -10,10 +10,14 @@ namespace ZeroLog.Tests
     [Ignore("Manual")]
     public class IntegrationTests
     {
+        private PerformanceAppender _performanceAppender;
+        private const int _count = 500 * 1000;
+
         [SetUp]
         public void SetUp()
         {
-            LogManager.Initialize(new[] { new NullAppender(),  }, 1 << 23);
+            _performanceAppender = new PerformanceAppender(_count);
+            LogManager.Initialize(new[] { _performanceAppender,  }, 1 << 23);
         }
 
         [TearDown]
@@ -36,14 +40,17 @@ namespace ZeroLog.Tests
             Console.WriteLine("Starting test");
             var sw = Stopwatch.StartNew();
 
-            const int count = 5000000;
-            for (var i = 0; i < count; i++)
-                logger.InfoFormat("{0}", (byte)1, (char)1, (short)2, (float)3, 2.0, "", true, TimeSpan.Zero);
+            for (var i = 0; i < _count; i++)
+                logger.InfoFormat("{0}", Stopwatch.GetTimestamp());
+//                logger.InfoFormat("{0}", (byte)1, (char)1, (short)2, (float)3, 2.0, "", true, TimeSpan.Zero);
 
             LogManager.Shutdown();
-            var throughput = count / sw.Elapsed.TotalSeconds;
+            var throughput = _count / sw.Elapsed.TotalSeconds;
 
             Console.WriteLine($"Finished test, throughput is: {throughput:N0}");
+
+            _performanceAppender.PrintTimeTaken();
+            Console.WriteLine("Printed total time taken csv");
         }
 
         [Test]

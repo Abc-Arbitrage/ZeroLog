@@ -1,9 +1,8 @@
-using System;
-
 namespace ZeroLog
 {
-    enum ArgumentType : byte
+    internal enum ArgumentType : byte
     {
+        FormatString,
         String,
         BooleanTrue,
         BooleanFalse,
@@ -18,7 +17,11 @@ namespace ZeroLog
         Guid,
         DateTime,
         TimeSpan,
+    }
 
-        Format,
+    internal static class ArgumentTypeMask
+    {
+        public const byte ArgumentType = 0x7F;
+        public const byte FormatSpecifier = 0x80;
     }
 }
