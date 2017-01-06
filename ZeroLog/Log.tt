@@ -11,35 +11,39 @@ namespace ZeroLog
 {
 	partial class Log
 	{
-		<# for(int i = 1; i <= 8; i++)
-		{
-			var simpleName = "Arg" + i;
-			var genericParams = "<T0";
-			
-			for (int j = 1; j < i; j++)
-			{
-				genericParams += ", T" + j;
-			}
-
-			genericParams += ">";
-
-			foreach (var levelName in Enum.GetNames(typeof(ZeroLog.Level)))
-            {
+		<# foreach (var levelName in Enum.GetNames(typeof(ZeroLog.Level)))
+        {
 		#>
+		
+		public LogEvent <#=levelName#>()
+        {
+            return GetLogEventFor(Level.<#=levelName#>);
+        }
+			<# for(int i = 1; i <= 8; i++)
+			{
+				var simpleName = "Arg" + i;
+				var genericParams = "<T0";
+			
+				for (int j = 1; j < i; j++)
+				{
+					genericParams += ", T" + j;
+				}
+
+				genericParams += ">";
+			#>
 
 		[StringFormatMethod("format")]	
 		public void <#=levelName#>Format<#=genericParams#>(string format, T0 arg0<#for(int j = 1; j < i; j++) { #>, T<#=j#> arg<#=j#><#}#>)
 		{
 			var logEvent = GetLogEventFor(Level.<#=levelName#>);
 			logEvent.AppendFormat(format);
-			
 			<#for(int j = 0; j < i; j++){#>
-				logEvent.AppendGeneric(arg<#=j#>);
+logEvent.AppendGeneric(arg<#=j#>);
 			<#}#>
-			
-			logEvent.Log();
+logEvent.Log();
         }
-<#}}#>
+			<#}
+		}#>
 		
 	}
 }
