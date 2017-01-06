@@ -47,7 +47,11 @@ namespace ZeroLog.Appenders
 
         public void PrintTimeTaken()
         {
-            using (var fileStream = new StreamWriter(File.OpenWrite("total-time.csv")))
+            var totalTimeCsv = "total-time.csv";
+            if (File.Exists(totalTimeCsv))
+                File.Delete(totalTimeCsv);
+
+            using (var fileStream = new StreamWriter(File.OpenWrite(totalTimeCsv)))
             {
                 for (int i = 0; i < _count; i++)
                 {
