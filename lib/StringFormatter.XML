@@ -1,0 +1,435 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>StringFormatter</name>
+    </assembly>
+    <members>
+        <member name="T:System.Text.Formatting.StringBuffer">
+            <summary>
+            A low-allocation version of the built-in <see cref="T:System.Text.StringBuilder"/> type.
+            </summary>
+            <summary>
+            A low-allocation version of the built-in <see cref="T:System.Text.StringBuilder"/> type.
+            </summary>
+        </member>
+        <member name="M:System.Text.Formatting.StringBuffer.AppendFormat``1(System.String,``0)">
+            <summary>
+            Appends the string returned by processing a composite format string, which contains zero or more format items, to this instance. Each format item is replaced by the string representation of a single argument.
+            </summary>
+            <param name="format">A composite format string.</param>
+            <param name="arg0">A value to format.</param>   
+        </member>
+        <member name="M:System.Text.Formatting.StringBuffer.Format``1(System.String,``0)">
+            <summary>
+            Converts the value of objects to strings based on the formats specified and inserts them into another string.
+            </summary>
+            <param name="format">A composite format string.</param>
+            <param name="arg0">A value to format.</param>   
+        </member>
+        <member name="M:System.Text.Formatting.StringBuffer.AppendFormat``2(System.String,``0,``1)">
+            <summary>
+            Appends the string returned by processing a composite format string, which contains zero or more format items, to this instance. Each format item is replaced by the string representation of a single argument.
+            </summary>
+            <param name="format">A composite format string.</param>
+            <param name="arg0">A value to format.</param>
+            <param name="arg1">A value to format.</param>   
+        </member>
+        <member name="M:System.Text.Formatting.StringBuffer.Format``2(System.String,``0,``1)">
+            <summary>
+            Converts the value of objects to strings based on the formats specified and inserts them into another string.
+            </summary>
+            <param name="format">A composite format string.</param>
+            <param name="arg0">A value to format.</param>
+            <param name="arg1">A value to format.</param>   
+        </member>
+        <member name="M:System.Text.Formatting.StringBuffer.AppendFormat``3(System.String,``0,``1,``2)">
+            <summary>
+            Appends the string returned by processing a composite format string, which contains zero or more format items, to this instance. Each format item is replaced by the string representation of a single argument.
+            </summary>
+            <param name="format">A composite format string.</param>
+            <param name="arg0">A value to format.</param>
+            <param name="arg1">A value to format.</param>
+            <param name="arg2">A value to format.</param>   
+        </member>
+        <member name="M:System.Text.Formatting.StringBuffer.Format``3(System.String,``0,``1,``2)">
+            <summary>
+            Converts the value of objects to strings based on the formats specified and inserts them into another string.
+            </summary>
+            <param name="format">A composite format string.</param>
+            <param name="arg0">A value to format.</param>
+            <param name="arg1">A value to format.</param>
+            <param name="arg2">A value to format.</param>   
+        </member>
+        <member name="M:System.Text.Formatting.StringBuffer.AppendFormat``4(System.String,``0,``1,``2,``3)">
+            <summary>
+            Appends the string returned by processing a composite format string, which contains zero or more format items, to this instance. Each format item is replaced by the string representation of a single argument.
+            </summary>
+            <param name="format">A composite format string.</param>
+            <param name="arg0">A value to format.</param>
+            <param name="arg1">A value to format.</param>
+            <param name="arg2">A value to format.</param>
+            <param name="arg3">A value to format.</param>   
+        </member>
+        <member name="M:System.Text.Formatting.StringBuffer.Format``4(System.String,``0,``1,``2,``3)">
+            <summary>
+            Converts the value of objects to strings based on the formats specified and inserts them into another string.
+            </summary>
+            <param name="format">A composite format string.</param>
+            <param name="arg0">A value to format.</param>
+            <param name="arg1">A value to format.</param>
+            <param name="arg2">A value to format.</param>
+            <param name="arg3">A value to format.</param>   
+        </member>
+        <member name="M:System.Text.Formatting.StringBuffer.AppendFormat``5(System.String,``0,``1,``2,``3,``4)">
+            <summary>
+            Appends the string returned by processing a composite format string, which contains zero or more format items, to this instance. Each format item is replaced by the string representation of a single argument.
+            </summary>
+            <param name="format">A composite format string.</param>
+            <param name="arg0">A value to format.</param>
+            <param name="arg1">A value to format.</param>
+            <param name="arg2">A value to format.</param>
+            <param name="arg3">A value to format.</param>
+            <param name="arg4">A value to format.</param>   
+        </member>
+        <member name="M:System.Text.Formatting.StringBuffer.Format``5(System.String,``0,``1,``2,``3,``4)">
+            <summary>
+            Converts the value of objects to strings based on the formats specified and inserts them into another string.
+            </summary>
+            <param name="format">A composite format string.</param>
+            <param name="arg0">A value to format.</param>
+            <param name="arg1">A value to format.</param>
+            <param name="arg2">A value to format.</param>
+            <param name="arg3">A value to format.</param>
+            <param name="arg4">A value to format.</param>   
+        </member>
+        <member name="M:System.Text.Formatting.StringBuffer.AppendFormat``6(System.String,``0,``1,``2,``3,``4,``5)">
+            <summary>
+            Appends the string returned by processing a composite format string, which contains zero or more format items, to this instance. Each format item is replaced by the string representation of a single argument.
+            </summary>
+            <param name="format">A composite format string.</param>
+            <param name="arg0">A value to format.</param>
+            <param name="arg1">A value to format.</param>
+            <param name="arg2">A value to format.</param>
+            <param name="arg3">A value to format.</param>
+            <param name="arg4">A value to format.</param>
+            <param name="arg5">A value to format.</param>   
+        </member>
+        <member name="M:System.Text.Formatting.StringBuffer.Format``6(System.String,``0,``1,``2,``3,``4,``5)">
+            <summary>
+            Converts the value of objects to strings based on the formats specified and inserts them into another string.
+            </summary>
+            <param name="format">A composite format string.</param>
+            <param name="arg0">A value to format.</param>
+            <param name="arg1">A value to format.</param>
+            <param name="arg2">A value to format.</param>
+            <param name="arg3">A value to format.</param>
+            <param name="arg4">A value to format.</param>
+            <param name="arg5">A value to format.</param>   
+        </member>
+        <member name="M:System.Text.Formatting.StringBuffer.AppendFormat``7(System.String,``0,``1,``2,``3,``4,``5,``6)">
+            <summary>
+            Appends the string returned by processing a composite format string, which contains zero or more format items, to this instance. Each format item is replaced by the string representation of a single argument.
+            </summary>
+            <param name="format">A composite format string.</param>
+            <param name="arg0">A value to format.</param>
+            <param name="arg1">A value to format.</param>
+            <param name="arg2">A value to format.</param>
+            <param name="arg3">A value to format.</param>
+            <param name="arg4">A value to format.</param>
+            <param name="arg5">A value to format.</param>
+            <param name="arg6">A value to format.</param>   
+        </member>
+        <member name="M:System.Text.Formatting.StringBuffer.Format``7(System.String,``0,``1,``2,``3,``4,``5,``6)">
+            <summary>
+            Converts the value of objects to strings based on the formats specified and inserts them into another string.
+            </summary>
+            <param name="format">A composite format string.</param>
+            <param name="arg0">A value to format.</param>
+            <param name="arg1">A value to format.</param>
+            <param name="arg2">A value to format.</param>
+            <param name="arg3">A value to format.</param>
+            <param name="arg4">A value to format.</param>
+            <param name="arg5">A value to format.</param>
+            <param name="arg6">A value to format.</param>   
+        </member>
+        <member name="M:System.Text.Formatting.StringBuffer.AppendFormat``8(System.String,``0,``1,``2,``3,``4,``5,``6,``7)">
+            <summary>
+            Appends the string returned by processing a composite format string, which contains zero or more format items, to this instance. Each format item is replaced by the string representation of a single argument.
+            </summary>
+            <param name="format">A composite format string.</param>
+            <param name="arg0">A value to format.</param>
+            <param name="arg1">A value to format.</param>
+            <param name="arg2">A value to format.</param>
+            <param name="arg3">A value to format.</param>
+            <param name="arg4">A value to format.</param>
+            <param name="arg5">A value to format.</param>
+            <param name="arg6">A value to format.</param>
+            <param name="arg7">A value to format.</param>   
+        </member>
+        <member name="M:System.Text.Formatting.StringBuffer.Format``8(System.String,``0,``1,``2,``3,``4,``5,``6,``7)">
+            <summary>
+            Converts the value of objects to strings based on the formats specified and inserts them into another string.
+            </summary>
+            <param name="format">A composite format string.</param>
+            <param name="arg0">A value to format.</param>
+            <param name="arg1">A value to format.</param>
+            <param name="arg2">A value to format.</param>
+            <param name="arg3">A value to format.</param>
+            <param name="arg4">A value to format.</param>
+            <param name="arg5">A value to format.</param>
+            <param name="arg6">A value to format.</param>
+            <param name="arg7">A value to format.</param>   
+        </member>
+        <member name="P:System.Text.Formatting.StringBuffer.Count">
+            <summary>
+            The number of characters in the buffer.
+            </summary>
+        </member>
+        <member name="P:System.Text.Formatting.StringBuffer.Culture">
+            <summary>
+            The culture used to format string data.
+            </summary>
+        </member>
+        <member name="M:System.Text.Formatting.StringBuffer.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:System.Text.Formatting.StringBuffer"/> class.
+            </summary>
+        </member>
+        <member name="M:System.Text.Formatting.StringBuffer.#ctor(System.Int32)">
+            <summary>
+            Initializes a new instance of the <see cref="T:System.Text.Formatting.StringBuffer"/> class.
+            </summary>
+            <param name="capacity">The initial size of the string buffer.</param>
+        </member>
+        <member name="M:System.Text.Formatting.StringBuffer.SetCustomFormatter``1(System.Action{System.Text.Formatting.StringBuffer,``0,System.Text.Formatting.StringView})">
+            <summary>
+            Sets a custom formatter to use when converting instances of a given type to a string.
+            </summary>
+            <typeparam name="T">The type for which to set the formatter.</typeparam>
+            <param name="formatter">A delegate that will be called to format instances of the specified type.</param>
+        </member>
+        <member name="M:System.Text.Formatting.StringBuffer.Clear">
+            <summary>
+            Clears the buffer.
+            </summary>
+        </member>
+        <member name="M:System.Text.Formatting.StringBuffer.CopyTo(System.Int32,System.Char[],System.Int32,System.Int32)">
+            <summary>
+            Copies the contents of the buffer to the given array.
+            </summary>
+            <param name="sourceIndex">The index within the buffer to begin copying.</param>
+            <param name="destination">The destination array.</param>
+            <param name="destinationIndex">The index within the destination array to which to begin copying.</param>
+            <param name="count">The number of characters to copy.</param>
+        </member>
+        <member name="M:System.Text.Formatting.StringBuffer.CopyTo(System.Char*,System.Int32,System.Int32)">
+            <summary>
+            Copies the contents of the buffer to the given array.
+            </summary>
+            <param name="dest">A pointer to the destination array.</param>
+            <param name="sourceIndex">The index within the buffer to begin copying.</param>
+            <param name="count">The number of characters to copy.</param>
+        </member>
+        <member name="M:System.Text.Formatting.StringBuffer.CopyTo(System.Byte*,System.Int32,System.Int32,System.Text.Encoding)">
+            <summary>
+            Copies the contents of the buffer to the given byte array.
+            </summary>
+            <param name="dest">A pointer to the destination byte array.</param>
+            <param name="sourceIndex">The index within the buffer to begin copying.</param>
+            <param name="count">The number of characters to copy.</param>
+            <param name="encoding">The encoding to use to convert characters to bytes.</param>
+            <returns>The number of bytes written to the destination.</returns>
+        </member>
+        <member name="M:System.Text.Formatting.StringBuffer.ToString">
+            <summary>
+            Converts the buffer to a string instance.
+            </summary>
+            <returns>A new string representing the characters currently in the buffer.</returns>
+        </member>
+        <member name="M:System.Text.Formatting.StringBuffer.Append(System.Char)">
+            <summary>
+            Appends a character to the current buffer.
+            </summary>
+            <param name="c">The character to append.</param>
+        </member>
+        <member name="M:System.Text.Formatting.StringBuffer.Append(System.Char,System.Int32)">
+            <summary>
+            Appends a character to the current buffer several times.
+            </summary>
+            <param name="c">The character to append.</param>
+            <param name="count">The number of times to append the character.</param>
+        </member>
+        <member name="M:System.Text.Formatting.StringBuffer.Append(System.String)">
+            <summary>
+            Appends the specified string to the current buffer.
+            </summary>
+            <param name="value">The value to append.</param>
+        </member>
+        <member name="M:System.Text.Formatting.StringBuffer.Append(System.String,System.Int32,System.Int32)">
+            <summary>
+            Appends a string subset to the current buffer.
+            </summary>
+            <param name="value">The string to append.</param>
+            <param name="startIndex">The starting index within the string to begin reading characters.</param>
+            <param name="count">The number of characters to append.</param>
+        </member>
+        <member name="M:System.Text.Formatting.StringBuffer.Append(System.Char[],System.Int32,System.Int32)">
+            <summary>
+            Appends an array of characters to the current buffer.
+            </summary>
+            <param name="values">The characters to append.</param>
+            <param name="startIndex">The starting index within the array to begin reading characters.</param>
+            <param name="count">The number of characters to append.</param>
+        </member>
+        <member name="M:System.Text.Formatting.StringBuffer.Append(System.Char*,System.Int32)">
+            <summary>
+            Appends an array of characters to the current buffer.
+            </summary>
+            <param name="str">A pointer to the array of characters to append.</param>
+            <param name="count">The number of characters to append.</param>
+        </member>
+        <member name="M:System.Text.Formatting.StringBuffer.Append(System.Boolean)">
+            <summary>
+            Appends the specified value as a string to the current buffer.
+            </summary>
+            <param name="value">The value to append.</param>
+        </member>
+        <member name="M:System.Text.Formatting.StringBuffer.Append(System.SByte,System.Text.Formatting.StringView)">
+            <summary>
+            Appends the specified value as a string to the current buffer.
+            </summary>
+            <param name="value">The value to append.</param>
+            <param name="format">A format specifier indicating how to convert <paramref name="value"/> to a string.</param>
+        </member>
+        <member name="M:System.Text.Formatting.StringBuffer.Append(System.Byte,System.Text.Formatting.StringView)">
+            <summary>
+            Appends the specified value as a string to the current buffer.
+            </summary>
+            <param name="value">The value to append.</param>
+            <param name="format">A format specifier indicating how to convert <paramref name="value"/> to a string.</param>
+        </member>
+        <member name="M:System.Text.Formatting.StringBuffer.Append(System.Int16,System.Text.Formatting.StringView)">
+            <summary>
+            Appends the specified value as a string to the current buffer.
+            </summary>
+            <param name="value">The value to append.</param>
+            <param name="format">A format specifier indicating how to convert <paramref name="value"/> to a string.</param>
+        </member>
+        <member name="M:System.Text.Formatting.StringBuffer.Append(System.UInt16,System.Text.Formatting.StringView)">
+            <summary>
+            Appends the specified value as a string to the current buffer.
+            </summary>
+            <param name="value">The value to append.</param>
+            <param name="format">A format specifier indicating how to convert <paramref name="value"/> to a string.</param>
+        </member>
+        <member name="M:System.Text.Formatting.StringBuffer.Append(System.Int32,System.Text.Formatting.StringView)">
+            <summary>
+            Appends the specified value as a string to the current buffer.
+            </summary>
+            <param name="value">The value to append.</param>
+            <param name="format">A format specifier indicating how to convert <paramref name="value"/> to a string.</param>
+        </member>
+        <member name="M:System.Text.Formatting.StringBuffer.Append(System.UInt32,System.Text.Formatting.StringView)">
+            <summary>
+            Appends the specified value as a string to the current buffer.
+            </summary>
+            <param name="value">The value to append.</param>
+            <param name="format">A format specifier indicating how to convert <paramref name="value"/> to a string.</param>
+        </member>
+        <member name="M:System.Text.Formatting.StringBuffer.Append(System.Int64,System.Text.Formatting.StringView)">
+            <summary>
+            Appends the specified value as a string to the current buffer.
+            </summary>
+            <param name="value">The value to append.</param>
+            <param name="format">A format specifier indicating how to convert <paramref name="value"/> to a string.</param>
+        </member>
+        <member name="M:System.Text.Formatting.StringBuffer.Append(System.UInt64,System.Text.Formatting.StringView)">
+            <summary>
+            Appends the specified value as a string to the current buffer.
+            </summary>
+            <param name="value">The value to append.</param>
+            <param name="format">A format specifier indicating how to convert <paramref name="value"/> to a string.</param>
+        </member>
+        <member name="M:System.Text.Formatting.StringBuffer.Append(System.Single,System.Text.Formatting.StringView)">
+            <summary>
+            Appends the specified value as a string to the current buffer.
+            </summary>
+            <param name="value">The value to append.</param>
+            <param name="format">A format specifier indicating how to convert <paramref name="value"/> to a string.</param>
+        </member>
+        <member name="M:System.Text.Formatting.StringBuffer.Append(System.Double,System.Text.Formatting.StringView)">
+            <summary>
+            Appends the specified value as a string to the current buffer.
+            </summary>
+            <param name="value">The value to append.</param>
+            <param name="format">A format specifier indicating how to convert <paramref name="value"/> to a string.</param>
+        </member>
+        <member name="M:System.Text.Formatting.StringBuffer.Append(System.Decimal,System.Text.Formatting.StringView)">
+            <summary>
+            Appends the specified value as a string to the current buffer.
+            </summary>
+            <param name="value">The value to append.</param>
+            <param name="format">A format specifier indicating how to convert <paramref name="value"/> to a string.</param>
+        </member>
+        <member name="M:System.Text.Formatting.StringBuffer.Append(System.DateTime,System.Text.Formatting.StringView)">
+            <summary>
+            Appends the specified value as a string to the current buffer.
+            </summary>
+            <param name="value">The value to append.</param>
+            <param name="format">A format specifier indicating how to convert <paramref name="value"/> to a string.</param>
+        </member>
+        <member name="M:System.Text.Formatting.StringBuffer.Append(System.TimeSpan,System.Text.Formatting.StringView)">
+            <summary>
+            Appends the specified value as a string to the current buffer.
+            </summary>
+            <param name="value">The value to append.</param>
+            <param name="format">A format specifier indicating how to convert <paramref name="value"/> to a string.</param>
+        </member>
+        <member name="M:System.Text.Formatting.StringBuffer.Append(System.Guid,System.Text.Formatting.StringView)">
+            <summary>
+            Appends the specified value as a string to the current buffer.
+            </summary>
+            <param name="value">The value to append.</param>
+            <param name="format">A format specifier indicating how to convert <paramref name="value"/> to a string.</param>
+        </member>
+        <member name="M:System.Text.Formatting.StringBuffer.AppendArgSet``1(System.String,``0@)">
+            <summary>
+            Appends the string returned by processing a composite format string, which contains zero or more format items, to this instance.
+            Each format item is replaced by the string representation of a single argument.
+            </summary>
+            <typeparam name="T">The type of argument set being formatted.</typeparam>
+            <param name="format">A composite format string.</param>
+            <param name="args">The set of args to insert into the format string.</param>
+        </member>
+        <member name="T:System.Text.Formatting.IArgSet">
+            <summary>
+            Specifies an interface for types that act as a set of formatting arguments.
+            </summary>
+        </member>
+        <member name="P:System.Text.Formatting.IArgSet.Count">
+            <summary>
+            The number of arguments in the set.
+            </summary>
+        </member>
+        <member name="M:System.Text.Formatting.IArgSet.Format(System.Text.Formatting.StringBuffer,System.Int32,System.Text.Formatting.StringView)">
+            <summary>
+            Format one of the arguments in the set into the given string buffer.
+            </summary>
+            <param name="buffer">The buffer to which to append the argument.</param>
+            <param name="index">The index of the argument to format.</param>
+            <param name="format">A specifier indicating how the argument should be formatted.</param>
+        </member>
+        <member name="T:System.Text.Formatting.IStringFormattable">
+            <summary>
+            Defines an interface for types that can be formatted into a string buffer.
+            </summary>
+        </member>
+        <member name="M:System.Text.Formatting.IStringFormattable.Format(System.Text.Formatting.StringBuffer,System.Text.Formatting.StringView)">
+            <summary>
+            Format the current instance into the given string buffer.
+            </summary>
+            <param name="buffer">The buffer to which to append.</param>
+            <param name="format">A specifier indicating how the argument should be formatted.</param>
+        </member>
+    </members>
+</doc>
