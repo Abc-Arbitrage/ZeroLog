@@ -60,7 +60,7 @@ namespace ZeroLog
             logManager._isRunning = false;
             // TODO: shutdown all the logs
 
-            logManager._writeTask.Wait(1000);
+            logManager._writeTask.Wait(15000);
         }
 
         public static Log GetLogger(Type type)
