@@ -32,7 +32,8 @@ namespace ZeroLog.Tests.Appenders
             var bytes = new byte[256];
             var message = "Test log message";
             var byteLength = Encoding.Default.GetBytes(message, 0, message.Length, bytes, 0);
-            var logEvent = new LogEvent(Level.Info);
+            var bufferSegmentProvider = new BufferSegmentProvider(1024, 1024);
+            var logEvent = new LogEvent(Level.Info, bufferSegmentProvider.GetSegment());
             logEvent.Initialize(Level.Info, new Log(null, "TestLog"));
             _appender.WriteEvent(logEvent, bytes, byteLength);
             _appender.Flush();

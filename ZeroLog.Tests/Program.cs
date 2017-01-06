@@ -32,7 +32,7 @@ namespace ZeroLog.Tests
             var memo = new Memo();
             var b = (byte)1;
 
-            const int count = 1000000000;
+            const int count = 10*1000*1000;
 
             var start = Environment.TickCount;
             for (int i = 0; i < count; i++)

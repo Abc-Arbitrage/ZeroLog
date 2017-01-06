@@ -20,7 +20,8 @@ namespace ZeroLog
         private LogManager(IEnumerable<IAppender> appenders, int size, Level level = Level.Finest)
         {
             _encoding = Encoding.Default;
-            _disruptor = new Disruptor<LogEvent>(() => new LogEvent(level), size, TaskScheduler.Default);
+            var bufferSegmentProvider = new BufferSegmentProvider(size * 128, 128);
+            _disruptor = new Disruptor<LogEvent>(() => new LogEvent(level, bufferSegmentProvider.GetSegment()), size, TaskScheduler.Default);
 
             foreach (var appender in appenders)
             {

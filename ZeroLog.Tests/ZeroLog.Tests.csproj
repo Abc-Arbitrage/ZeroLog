@@ -20,6 +20,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -28,6 +29,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject>ZeroLog.Tests.Program</StartupObject>
@@ -55,6 +57,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Appenders\DateAndSizeRollingFileAppenderTests.cs" />
+    <Compile Include="BufferSegmentProviderTests.cs" />
     <Compile Include="IntegrationTests.cs" />
     <Compile Include="LogEventTests.cs" />
     <Compile Include="LogManagerTests.cs" />
