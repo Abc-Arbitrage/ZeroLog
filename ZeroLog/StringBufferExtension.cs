@@ -6,76 +6,112 @@ namespace ZeroLog
 {
     public static unsafe class StringBufferExtension
     {
-        public static int Append(this StringBuffer stringBuffer, byte* dataPointer, StringView format, List<string> strings, List<IntPtr> argPointers)
+        public static void Append(this StringBuffer stringBuffer, ref byte* dataPointer, StringView format, List<string> strings, List<IntPtr> argPointers)
         {
-            var argumentType = *(ArgumentType*)dataPointer;
-            dataPointer += sizeof(byte);
+            var argument = *dataPointer;
+            dataPointer += sizeof(ArgumentType);
 
+            var argumentType = (ArgumentType)(argument & ArgumentTypeMask.ArgumentType);
+
+            var hasFormatSpecifier = (argument & ArgumentTypeMask.FormatSpecifier) != 0;
+            if (hasFormatSpecifier)
+            {
+                var formatSpecifier = strings[*dataPointer];
+                dataPointer += sizeof(byte);
+
+                fixed (char* p = formatSpecifier)
+                {
+                    var formatSpecifierView = new StringView(p, formatSpecifier.Length);
+                    AppendArg(stringBuffer, ref dataPointer, argumentType, formatSpecifierView, strings, argPointers);
+                }
+            }
+            else
+            {
+                AppendArg(stringBuffer, ref dataPointer, argumentType, format, strings, argPointers);
+            }
+           
+        }
+
+        private static void AppendArg(StringBuffer stringBuffer, ref byte* argPointer, ArgumentType argumentType, StringView format, List<string> strings, List<IntPtr> argPointers)
+        {
             switch (argumentType)
             {
                 case ArgumentType.String:
-                    var stringIndex = *dataPointer;
+                    var stringIndex = *argPointer;
                     stringBuffer.Append(strings[stringIndex]);
-                    return 2 * sizeof(byte);
+                    argPointer += sizeof(byte);
+                    break;
 
                 case ArgumentType.BooleanTrue:
                     stringBuffer.Append(true);
-                    return sizeof(byte);
+                    break;
 
                 case ArgumentType.BooleanFalse:
                     stringBuffer.Append(false);
-                    return sizeof(byte);
+                    break;
 
                 case ArgumentType.Byte:
-                    stringBuffer.Append(*dataPointer, format);
-                    return 2 * sizeof(byte);
+                    stringBuffer.Append(*argPointer, format);
+                    argPointer += sizeof(byte);
+                    break;
 
                 case ArgumentType.Char:
-                    stringBuffer.Append(*(char*)dataPointer);
-                    return sizeof(byte) + sizeof(char);
+                    stringBuffer.Append(*(char*)argPointer);
+                    argPointer += sizeof(char);
+                    break;
 
                 case ArgumentType.Int16:
-                    stringBuffer.Append(*(short*)dataPointer, format);
-                    return sizeof(byte) + sizeof(short);
+                    stringBuffer.Append(*(short*)argPointer, format);
+                    argPointer += sizeof(short);
+                    break;
 
                 case ArgumentType.Int32:
-                    stringBuffer.Append(*(int*)dataPointer, format);
-                    return sizeof(byte) + sizeof(int);
+                    stringBuffer.Append(*(int*)argPointer, format);
+                    argPointer += sizeof(int);
+                    break;
 
                 case ArgumentType.Int64:
-                    stringBuffer.Append(*(long*)dataPointer, format);
-                    return sizeof(byte) + sizeof(long);
+                    stringBuffer.Append(*(long*)argPointer, format);
+                    argPointer += sizeof(long);
+                    break;
 
                 case ArgumentType.Single:
-                    stringBuffer.Append(*(float*)dataPointer, format);
-                    return sizeof(byte) + sizeof(float);
+                    stringBuffer.Append(*(float*)argPointer, format);
+                    argPointer += sizeof(float);
+                    break;
 
                 case ArgumentType.Double:
-                    stringBuffer.Append(*(double*)dataPointer, format);
-                    return sizeof(byte) + sizeof(double);
+                    stringBuffer.Append(*(double*)argPointer, format);
+                    argPointer += sizeof(double);
+                    break;
 
                 case ArgumentType.Decimal:
-                    stringBuffer.Append(*(decimal*)dataPointer, format);
-                    return sizeof(byte) + sizeof(decimal);
+                    stringBuffer.Append(*(decimal*)argPointer, format);
+                    argPointer += sizeof(decimal);
+                    break;
 
                 case ArgumentType.Guid:
-                    stringBuffer.Append(*(Guid*)dataPointer, format);
-                    return sizeof(byte) + sizeof(Guid);
+                    stringBuffer.Append(*(Guid*)argPointer, format);
+                    argPointer += sizeof(Guid);
+                    break;
 
                 case ArgumentType.DateTime:
-                    var dateTime = ReadDateTime(dataPointer);
+                    var dateTime = ReadDateTime(argPointer);
                     stringBuffer.Append(dateTime, format);
-                    return sizeof(byte) + sizeof(ulong);
+                    argPointer += sizeof(ulong);
+                    break;
 
                 case ArgumentType.TimeSpan:
-                    var timeSpan = ReadTimeSpan(dataPointer);
+                    var timeSpan = ReadTimeSpan(argPointer);
                     stringBuffer.Append(timeSpan, format);
-                    return sizeof(byte) + sizeof(long);
+                    argPointer += sizeof(long);
+                    break;
 
-                case ArgumentType.Format:
+                case ArgumentType.FormatString:
                     var argSet = new ArgSet(argPointers, strings);
-                    stringBuffer.AppendArgSet(strings[*dataPointer], ref argSet);
-                    return 2 * sizeof(byte) + argSet.ReadBytes;
+                    stringBuffer.AppendArgSet(strings[*argPointer], ref argSet);
+                    argPointer += sizeof(byte) + argSet.BytesRead;
+                    break;
 
                 default:
                     throw new ArgumentOutOfRangeException();
