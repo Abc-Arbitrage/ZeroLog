@@ -51,7 +51,7 @@ namespace ZeroLog
             if (logManager == null)
                 return;
 
-            logManager._disruptor.Shutdown(TimeSpan.FromSeconds(1));
+            logManager._disruptor.Shutdown(TimeSpan.FromSeconds(15));
             logManager._isRunning = false;
             // TODO: shutdown all the logs
         }
