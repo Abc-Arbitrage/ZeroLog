@@ -1,19 +1,8 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Runtime.CompilerServices;
-using System.Text;
-using Microsoft.Win32.SafeHandles;
-using Roslyn.Utilities;
-
-namespace ZeroLog
+﻿namespace ZeroLog
 {
     public partial class Log
     {
         private readonly LogManager _logManager;
-        private readonly ConcurrentQueue<LogEvent> _queue = new ConcurrentQueue<LogEvent>();
-        private readonly ObjectPool<LogEvent> _pool;
-        private readonly IAppender[] _appenders;
-        private readonly Encoding _encoding;
 
         internal Log(LogManager logManager, string name)
         {
