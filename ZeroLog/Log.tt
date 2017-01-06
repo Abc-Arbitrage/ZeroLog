@@ -35,7 +35,7 @@ namespace ZeroLog
 				logEvent.AppendGeneric(arg<#=j#>);
 			<#}#>
 			
-			// logEvent.Log();
+			logEvent.Log();
         }
 <#}}#>
 		

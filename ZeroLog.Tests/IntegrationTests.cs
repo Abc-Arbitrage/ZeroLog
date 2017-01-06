@@ -13,7 +13,7 @@ namespace ZeroLog.Tests
         [SetUp]
         public void SetUp()
         {
-            LogManager.Initialize(new[] { new ConsoleAppender() }, 1024);
+            LogManager.Initialize(new[] { new NullAppender(),  }, 1 << 14);
             Thread.Sleep(1);
         }
 
