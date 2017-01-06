@@ -11,13 +11,13 @@ namespace ZeroLog.Tests
     public class IntegrationTests
     {
         private PerformanceAppender _performanceAppender;
-        private const int _count = 500 * 1000;
+        private const int _count = 5 * 1000;
 
         [SetUp]
         public void SetUp()
         {
             _performanceAppender = new PerformanceAppender(_count);
-            LogManager.Initialize(new[] { _performanceAppender,  }, 1 << 23);
+            LogManager.Initialize(new[] { _performanceAppender,  }, 1 << 16);
             Thread.Sleep(1);
         }
 
@@ -42,7 +42,10 @@ namespace ZeroLog.Tests
             var sw = Stopwatch.StartNew();
 
             for (var i = 0; i < _count; i++)
+            {
                 logger.InfoFormat("{0}", Stopwatch.GetTimestamp());
+                Thread.Sleep(5);
+            }
 //                logger.InfoFormat("{0}", (byte)1, (char)1, (short)2, (float)3, 2.0, "", true, TimeSpan.Zero);
 
             LogManager.Shutdown();
