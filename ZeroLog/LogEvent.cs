@@ -61,7 +61,7 @@ namespace ZeroLog
             //   we just mentionned earlier can't occur. That's why we put the test against string at the top.
             // - Casting to "object" then to the desired value type will force the C# compiler to emit boxing and 
             //   unboxing IL opcodes, but the JIT is smart enough to prevent the actual boxing/unboxing from happening.
-             
+
             if (typeof(T) == typeof(string))
                 Append((string)(object)arg);
 
@@ -111,6 +111,16 @@ namespace ZeroLog
             EnsureRemainingBytesAndStoreArgPointer(sizeof(ArgumentType));
             AppendArgumentType(ArgumentType.String);
             AppendString(s);
+            return this;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public LogEvent Append(byte[] bytes, int length)
+        {
+            EnsureRemainingBytesAndStoreArgPointer(sizeof(ArgumentType) + sizeof(byte) + (length * sizeof(byte)));
+            AppendArgumentType(ArgumentType.ByteArray);
+            AppendByte((byte) length);
+            AppendBytes(bytes, length);
             return this;
         }
 
@@ -292,7 +302,7 @@ namespace ZeroLog
             AppendDateTime(dt);
             return this;
         }
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public LogEvent Append(DateTime dt, string format)
         {
@@ -374,6 +384,18 @@ namespace ZeroLog
         {
             *_dataPointer = b;
             _dataPointer += sizeof(byte);
+        }
+
+        private void AppendBytes(byte[] bytes, int length)
+        {
+            fixed (byte* b = bytes)
+            {
+                for (int i = 0; i < length; i++)
+                {
+                    *_dataPointer = *b;
+                    _dataPointer += sizeof(byte);
+                }
+            }
         }
 
         private void AppendChar(char c)
