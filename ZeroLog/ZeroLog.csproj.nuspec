@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>ZeroLog</id>
-    <version>1.0.0.1</version>
+    <version>1.0.0.3</version>
     <authors>Reda Bouallou, Mendel Monteiro-Beckerman, Romain Verdier</authors>
     <owners>mendel.monteiro, Reda, rverdier</owners>
     <licenseUrl>https://github.com/Abc-Arbitrage/ZeroLog/blob/master/LICENSE.md</licenseUrl>
