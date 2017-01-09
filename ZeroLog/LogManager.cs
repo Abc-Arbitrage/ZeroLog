@@ -58,10 +58,15 @@ namespace ZeroLog
 
         public static Log GetLogger(Type type)
         {
+            return GetLogger(type.FullName);
+        }
+
+        public static Log GetLogger(string name)
+        {
             if (_logManager == null)
                 throw new ApplicationException("LogManager is not yet initialized, please call LogManager.Initialize()");
 
-            var log = new Log(_logManager, type.FullName);
+            var log = new Log(_logManager, name);
             return log;
         }
 
