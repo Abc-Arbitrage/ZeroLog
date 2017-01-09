@@ -35,3 +35,4 @@ _ReSharper*/
 *.vspx
 packages/*
 .vs/*
+output/*
