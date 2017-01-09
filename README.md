@@ -5,6 +5,12 @@ ZeroLog is a **zero-allocation .NET logging library**. It uses the excellent for
   It provides basic logging capabilities to be used in latence-sensitive applications, where garbage collections are undesirable. ZeroLog can be used in a complete zero-allocation manner, meaning that after the initialization phase, it will not allocate any managed object on the heap, thus preventing any GC from being triggered.
   
   Since ZeroLog does not aim to replace any existing logging libraries in any kind of application, it won't try to compete on feature set level with more pre-eminent projets like log4net or NLog for example. The focus will remain on performance and allocation free aspects.
+  
+## Disclaimer
+
+>The project is not production ready yet; it's still a work in progress. However, you can already obtain it via Nuget if you want to give it a try. The package is available here:
+
+>https://www.nuget.org/packages/ZeroLog/
 
 ## Internal design
  
@@ -18,10 +24,6 @@ The second goal implies a major design choice: the actual logging is completely 
  Internally, each logging call data (context, log messages, arguments, etc.) will be serialized to a pooled log event, before being enqueued in a concurrent data structure the background logging thread consumes. The logging thread will then format the log messages and append them to the configured appenders.
 
 ## Getting started
-
-ZeroLog is available as a Nuget package:
-
-https://www.nuget.org/packages/ZeroLog/
 
 Before using ZeroLog, you need to initialize the `LogManager`:
 
