@@ -9,6 +9,11 @@ namespace ZeroLog
         {
             return GetLogEventFor(Level.Fatal);
         }
+
+		public void Fatal(string message)
+        {
+            GetLogEventFor(Level.Fatal).Append(message).Log();
+        }
 			
 		[StringFormatMethod("format")]	
 		public void FatalFormat<T0>(string format, T0 arg0)
@@ -113,6 +118,11 @@ namespace ZeroLog
 		public LogEvent Error()
         {
             return GetLogEventFor(Level.Error);
+        }
+
+		public void Error(string message)
+        {
+            GetLogEventFor(Level.Error).Append(message).Log();
         }
 			
 		[StringFormatMethod("format")]	
@@ -219,6 +229,11 @@ namespace ZeroLog
         {
             return GetLogEventFor(Level.Warn);
         }
+
+		public void Warn(string message)
+        {
+            GetLogEventFor(Level.Warn).Append(message).Log();
+        }
 			
 		[StringFormatMethod("format")]	
 		public void WarnFormat<T0>(string format, T0 arg0)
@@ -323,6 +338,11 @@ namespace ZeroLog
 		public LogEvent Info()
         {
             return GetLogEventFor(Level.Info);
+        }
+
+		public void Info(string message)
+        {
+            GetLogEventFor(Level.Info).Append(message).Log();
         }
 			
 		[StringFormatMethod("format")]	
@@ -429,6 +449,11 @@ namespace ZeroLog
         {
             return GetLogEventFor(Level.Debug);
         }
+
+		public void Debug(string message)
+        {
+            GetLogEventFor(Level.Debug).Append(message).Log();
+        }
 			
 		[StringFormatMethod("format")]	
 		public void DebugFormat<T0>(string format, T0 arg0)
@@ -534,6 +559,11 @@ namespace ZeroLog
         {
             return GetLogEventFor(Level.Verbose);
         }
+
+		public void Verbose(string message)
+        {
+            GetLogEventFor(Level.Verbose).Append(message).Log();
+        }
 			
 		[StringFormatMethod("format")]	
 		public void VerboseFormat<T0>(string format, T0 arg0)
@@ -638,6 +668,11 @@ namespace ZeroLog
 		public LogEvent Finest()
         {
             return GetLogEventFor(Level.Finest);
+        }
+
+		public void Finest(string message)
+        {
+            GetLogEventFor(Level.Finest).Append(message).Log();
         }
 			
 		[StringFormatMethod("format")]	
