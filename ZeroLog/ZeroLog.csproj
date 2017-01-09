@@ -32,6 +32,9 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="JetBrains.Annotations, Version=10.2.1.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
+      <HintPath>..\packages\JetBrains.Annotations.10.2.1\lib\net\JetBrains.Annotations.dll</HintPath>
+    </Reference>
     <Reference Include="Disruptor, Version=3.3.5.1, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Disruptor.3.3.5.1\lib\net45\Disruptor.dll</HintPath>
       <Private>True</Private>

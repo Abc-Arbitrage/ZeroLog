@@ -12,41 +12,6 @@
 
         internal string Name { get; }
 
-        public LogEvent Fatal()
-        {
-            return GetLogEventFor(Level.Fatal);
-        }
-
-        public LogEvent Error()
-        {
-            return GetLogEventFor(Level.Error);
-        }
-
-        public LogEvent Warning()
-        {
-            return GetLogEventFor(Level.Warning);
-        }
-
-        public LogEvent Info()
-        {
-            return GetLogEventFor(Level.Info);
-        }
-
-        public LogEvent Debug()
-        {
-            return GetLogEventFor(Level.Debug);
-        }
-
-        public LogEvent Verbose()
-        {
-            return GetLogEventFor(Level.Verbose);
-        }
-
-        public LogEvent Finest()
-        {
-            return GetLogEventFor(Level.Finest);
-        }
-
         private LogEvent GetLogEventFor(Level level)
         {
             var logEvent = _logManager.AllocateLogEvent();

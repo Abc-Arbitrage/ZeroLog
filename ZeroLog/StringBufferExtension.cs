@@ -29,7 +29,6 @@ namespace ZeroLog
             {
                 AppendArg(stringBuffer, ref dataPointer, argumentType, format, strings, argPointers);
             }
-           
         }
 
         private static void AppendArg(StringBuffer stringBuffer, ref byte* argPointer, ArgumentType argumentType, StringView format, List<string> strings, List<IntPtr> argPointers)
@@ -96,15 +95,13 @@ namespace ZeroLog
                     break;
 
                 case ArgumentType.DateTime:
-                    var dateTime = ReadDateTime(argPointer);
+                    var dateTime = ReadDateTime(ref argPointer);
                     stringBuffer.Append(dateTime, format);
-                    argPointer += sizeof(ulong);
                     break;
 
                 case ArgumentType.TimeSpan:
-                    var timeSpan = ReadTimeSpan(argPointer);
+                    var timeSpan = ReadTimeSpan(ref argPointer);
                     stringBuffer.Append(timeSpan, format);
-                    argPointer += sizeof(long);
                     break;
 
                 case ArgumentType.FormatString:
@@ -118,17 +115,21 @@ namespace ZeroLog
             }
         }
 
-        private static DateTime ReadDateTime(byte* buffer)
+        private static DateTime ReadDateTime(ref byte* dataPointer)
         {
-            var dateData = *(ulong*)buffer;
+            var dateData = *(ulong*)dataPointer;
+            dataPointer += sizeof(ulong);
+
             var ticks = (long)(dateData & 0x3FFFFFFFFFFFFFFF);
             var kind = (DateTimeKind)(dateData & 0xC000000000000000);
             return new DateTime(ticks, kind);
         }
 
-        private static TimeSpan ReadTimeSpan(byte* buffer)
+        private static TimeSpan ReadTimeSpan(ref byte* dataPointer)
         {
-            var ticks = *(long*)buffer;
+            var ticks = *(long*)dataPointer;
+            dataPointer += sizeof(long);
+
             return new TimeSpan(ticks);
         }
     }
