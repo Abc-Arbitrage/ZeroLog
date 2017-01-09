@@ -54,6 +54,14 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal void AppendGeneric<T>(T arg)
         {
+            // Some remarks here:
+            // - The JIT knows the type of "arg" at runtime and will be able the remove useless branches for each
+            //   struct specific jitted version of this method.
+            // - Since a jitted version of this method will be shared for all reference types, the optimisation
+            //   we just mentionned earlier can't occur. That's why we put the test against string at the top.
+            // - Casting to "object" then to the desired value type will force the C# compiler to emit boxing and 
+            //   unboxing IL opcodes, but the JIT is smart enough to prevent the actual boxing/unboxing from happening.
+             
             if (typeof(T) == typeof(string))
                 Append((string)(object)arg);
 
