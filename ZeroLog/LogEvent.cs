@@ -109,8 +109,9 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public LogEvent Append(bool b)
         {
-            EnsureRemainingBytesAndStoreArgPointer(sizeof(ArgumentType));
-            AppendArgumentType(b ? ArgumentType.BooleanTrue : ArgumentType.BooleanFalse);
+            EnsureRemainingBytesAndStoreArgPointer(sizeof(ArgumentType) + sizeof(bool));
+            AppendArgumentType(ArgumentType.Boolean);
+            AppendBool(b);
             return this;
         }
 
@@ -353,6 +354,12 @@ namespace ZeroLog
             *_dataPointer = (byte)_strings.Count;
             _dataPointer += sizeof(byte);
             _strings.Add(value);
+        }
+
+        private void AppendBool(bool b)
+        {
+            *(bool*)_dataPointer = b;
+            _dataPointer += sizeof(bool);
         }
 
         private void AppendByte(byte b)

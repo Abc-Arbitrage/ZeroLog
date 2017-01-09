@@ -41,12 +41,9 @@ namespace ZeroLog
                     argPointer += sizeof(byte);
                     break;
 
-                case ArgumentType.BooleanTrue:
-                    stringBuffer.Append(true);
-                    break;
-
-                case ArgumentType.BooleanFalse:
-                    stringBuffer.Append(false);
+                case ArgumentType.Boolean:
+                    stringBuffer.Append(*(bool*)argPointer);
+                    argPointer += sizeof(bool);
                     break;
 
                 case ArgumentType.Byte:

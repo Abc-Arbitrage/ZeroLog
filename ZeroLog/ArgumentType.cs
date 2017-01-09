@@ -4,8 +4,7 @@ namespace ZeroLog
     {
         FormatString,
         String,
-        BooleanTrue,
-        BooleanFalse,
+        Boolean,
         Byte,
         Char,
         Int16,
