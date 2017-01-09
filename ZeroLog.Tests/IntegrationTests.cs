@@ -23,7 +23,8 @@ namespace ZeroLog.Tests
         public void SetUp()
         {
             _performanceAppender = new PerformanceAppender(_count * _nbThreads);
-            LogManager.Initialize(new[] { _performanceAppender, }, _queueSize);
+//            LogManager.Initialize(new[] { _performanceAppender, }, _queueSize);
+            LogManager.Initialize(new[] { new ConsoleAppender(), }, _queueSize);
             for (int i = 0; i < _nbThreads; i++)
             {
                 _enqueueMicros.Add(new double[_count]);
@@ -40,6 +41,12 @@ namespace ZeroLog.Tests
         public void should_test_console()
         {
             LogManager.GetLogger(typeof(IntegrationTests)).Info().Append("Hello").Log();
+            LogManager.GetLogger(typeof(IntegrationTests)).Warning().Append("Hello").Log();
+            LogManager.GetLogger(typeof(IntegrationTests)).Fatal().Append("Hello").Log();
+            LogManager.GetLogger(typeof(IntegrationTests)).Error().Append("Hello").Log();
+            LogManager.GetLogger(typeof(IntegrationTests)).Debug().Append("Hello").Log();
+            LogManager.GetLogger(typeof(IntegrationTests)).Finest().Append("Hello").Log();
+            LogManager.GetLogger(typeof(IntegrationTests)).Verbose().Append("Hello").Log();
         }
 
         [Test]

@@ -14,14 +14,15 @@ namespace ZeroLog.Tests
             test.SetUp();
             try
             {
-                test.should_test_append();
+                test.should_test_console();
             }
             finally
             {
                 test.Teardown();
             }
 
-            Console.ReadLine();
+            Console.WriteLine("Press any key to exit...");
+            Console.ReadKey();
         }
 
         public static void Main2()
