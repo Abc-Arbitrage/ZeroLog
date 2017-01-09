@@ -15,7 +15,7 @@ namespace ZeroLog.Tests
         public void SetUp()
         {
             _bufferSegmentProvider = new BufferSegmentProvider(1024, 1024);
-            _logEvent = new LogEvent(Level.Finest, _bufferSegmentProvider.GetSegment());
+            _logEvent = new LogEvent(_bufferSegmentProvider.GetSegment());
             _output = new StringBuffer(128) { Culture = CultureInfo.InvariantCulture };
         }
 

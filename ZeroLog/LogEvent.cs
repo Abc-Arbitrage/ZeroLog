@@ -16,15 +16,13 @@ namespace ZeroLog
         private Log _log;
         private DateTime _timestamp;
         private int _threadId;
-        private Level _activeLevel;
 
         private readonly byte* _startOfBuffer;
         private readonly byte* _endOfBuffer;
         private byte* _dataPointer;
 
-        public LogEvent(Level level, BufferSegment bufferSegment)
+        public LogEvent(BufferSegment bufferSegment)
         {
-            _activeLevel = level;
             _startOfBuffer = bufferSegment.Data;
             _dataPointer = bufferSegment.Data;
             _endOfBuffer = bufferSegment.Data + bufferSegment.Length;
