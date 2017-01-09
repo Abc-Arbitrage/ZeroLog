@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Text;
 using System.Text.Formatting;
 using NUnit.Framework;
 
@@ -23,6 +24,16 @@ namespace ZeroLog.Tests
         public void should_append_string()
         {
             _logEvent.Append("abc");
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreEqual("abc", _output.ToString());
+        }
+
+        [Test]
+        public void should_append_byte_array()
+        {
+            var bytes = Encoding.Default.GetBytes("abc");
+            _logEvent.Append(bytes, bytes.Length);
             _logEvent.WriteToStringBuffer(_output);
 
             Assert.AreEqual("abc", _output.ToString());

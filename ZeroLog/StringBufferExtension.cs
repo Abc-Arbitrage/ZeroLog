@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Text.Formatting;
 
 namespace ZeroLog
@@ -39,6 +40,13 @@ namespace ZeroLog
                     var stringIndex = *argPointer;
                     stringBuffer.Append(strings[stringIndex]);
                     argPointer += sizeof(byte);
+                    break;
+
+                case ArgumentType.ByteArray:
+                    var length = *argPointer++;
+                    var bytes = argPointer;
+                    
+//                    stringBuffer.Append();
                     break;
 
                 case ArgumentType.Boolean:

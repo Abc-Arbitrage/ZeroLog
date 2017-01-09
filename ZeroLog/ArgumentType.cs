@@ -16,5 +16,6 @@ namespace ZeroLog
         Guid,
         DateTime,
         TimeSpan,
+        ByteArray
     }
 }
