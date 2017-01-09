@@ -7,7 +7,7 @@ namespace ZeroLog.Appenders
     {
         private readonly Stream _output;
 
-        public ConsoleAppender()
+        public ConsoleAppender(string prefixPattern = "%time - %level - %logger || ") : base(prefixPattern)
         {
             _output = Console.OpenStandardOutput();
         }

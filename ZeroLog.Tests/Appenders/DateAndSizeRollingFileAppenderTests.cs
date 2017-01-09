@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Text;
 using System.Threading;
 using NFluent;
@@ -16,7 +15,7 @@ namespace ZeroLog.Tests.Appenders
         [SetUp]
         public void SetUp()
         {
-            _appender = new DateAndSizeRollingFileAppender("TestLog");
+            _appender = new DateAndSizeRollingFileAppender("TestLog", prefixPattern: "%date - %time - %thread - %level - %logger || ");
             _appender.SetEncoding(Encoding.Default);
         }
 
@@ -40,7 +39,7 @@ namespace ZeroLog.Tests.Appenders
             
             var written = GetLastLine();
 
-            Check.That(written).IsEqualTo($"{logEvent.Timestamp.TimeOfDay.ToString(@"hh\:mm\:ss\.fff")} - Info - TestLog || " + message);
+            Check.That(written).IsEqualTo($"{logEvent.Timestamp.Date:yyyy-MM-dd} - {logEvent.Timestamp.TimeOfDay.ToString(@"hh\:mm\:ss\.fff")} - {Thread.CurrentThread.ManagedThreadId} - Info - TestLog || " + message);
         }
 
         private string GetLastLine()

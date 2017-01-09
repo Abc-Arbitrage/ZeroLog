@@ -33,6 +33,7 @@ namespace ZeroLog
         public Level Level { get; private set; }
         public string Name => _log.Name;
         public DateTime Timestamp => _timestamp;
+        public int ThreadId => _threadId;
 
         internal void Initialize(Level level, Log log)
         {
