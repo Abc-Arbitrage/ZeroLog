@@ -2,9 +2,9 @@
 
 ZeroLog is a **zero-allocation .NET logging library**. I uses the excellent formatting library [StringFormatter](https://github.com/MikePopoloski/StringFormatter).
 
-  It provides basic logging capabilities to be used in latence-sensitive applications, where garbage collections are undesirable. ZeroLog can be used in a complete zero-allocation manner, meaning that after the initialization phase, it will not allocate any managed object on the heap, thus preventing any GC to be triggered.
+  It provides basic logging capabilities to be used in latence-sensitive applications, where garbage collections are undesirable. ZeroLog can be used in a complete zero-allocation manner, meaning that after the initialization phase, it will not allocate any managed object on the heap, thus preventing any GC from being triggered.
   
-  Since ZeroLog does not aim to replace any existing logger libraries in any kind of application, it wont try to compete at the feature set level with more proheminent projets like log4net or NLog for example. The focus will remain on performance and allocation free aspects.
+  Since ZeroLog does not aim to replace any existing logging libraries in any kind of application, it won't try to compete on feature set level with more pre-eminent projets like log4net or NLog for example. The focus will remain on performance and allocation free aspects.
 
 ## Internal design
  
@@ -58,7 +58,7 @@ log.Info().Append("Tomorrow (")
 log.InfoFormat("Tomorrow ({0}) will occur in {1} seconds", tomorrow, numberOfSecondsUntilTomorrow);
 ```
 
-Both API can be used in a zero allocation fashion, but not all formatting options are currently supported.
+Both APIs can be used in a zero allocation fashion, but not all formatting options are currently supported (notably for DateTimes, TimeSpans and GUIDs).
 
 ## What's next
 
