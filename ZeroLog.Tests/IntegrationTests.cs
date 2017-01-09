@@ -41,7 +41,7 @@ namespace ZeroLog.Tests
         public void should_test_console()
         {
             LogManager.GetLogger(typeof(IntegrationTests)).Info().Append("Hello").Log();
-            LogManager.GetLogger(typeof(IntegrationTests)).Warning().Append("Hello").Log();
+            LogManager.GetLogger(typeof(IntegrationTests)).Warn().Append("Hello").Log();
             LogManager.GetLogger(typeof(IntegrationTests)).Fatal().Append("Hello").Log();
             LogManager.GetLogger(typeof(IntegrationTests)).Error().Append("Hello").Log();
             LogManager.GetLogger(typeof(IntegrationTests)).Debug().Append("Hello").Log();
