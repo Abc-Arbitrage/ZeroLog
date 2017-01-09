@@ -19,8 +19,8 @@ namespace ZeroLog
         private readonly List<IAppender> _appenders;
         private readonly Task _writeTask;
         private bool _isRunning = true;
-
-        private LogManager(IEnumerable<IAppender> appenders, int size, Level level = Level.Finest)
+        
+        internal LogManager(IEnumerable<IAppender> appenders, int size, Level level = Level.Finest)
         {
             _level = level;
             _encoding = Encoding.Default;
@@ -38,12 +38,12 @@ namespace ZeroLog
             _writeTask = Task.Run(() => WriteToAppenders());
         }
 
-        public static LogManager Initialize(IEnumerable<IAppender> appenders, int size = 1024)
+        public static LogManager Initialize(IEnumerable<IAppender> appenders, int size = 1024, Level level = Level.Finest)
         {
             if (_logManager != null)
                 throw new ApplicationException("LogManager is already initialized");
 
-            _logManager = new LogManager(appenders, size);
+            _logManager = new LogManager(appenders, size, level);
             return _logManager;
         }
 
@@ -60,6 +60,8 @@ namespace ZeroLog
 
             logManager._writeTask.Wait(15000);
         }
+
+        public Level Level => _level;
 
         public static Log GetLogger(Type type)
         {

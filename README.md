@@ -73,6 +73,5 @@ Both APIs can be used in a zero allocation fashion, but not all formatting optio
  - Support for `Exception` arguments
  - Support for `byte[]` arguments
  - Hierarchical loggers
- - `IsDebugEnabled`, `IsInfoEnabled`, etc.
  - XML code documentation for the public API
     

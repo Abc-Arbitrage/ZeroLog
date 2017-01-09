@@ -1,4 +1,6 @@
-﻿namespace ZeroLog
+﻿using System.Collections.Generic;
+
+namespace ZeroLog
 {
     public partial class Log
     {

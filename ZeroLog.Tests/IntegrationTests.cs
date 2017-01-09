@@ -45,8 +45,6 @@ namespace ZeroLog.Tests
             LogManager.GetLogger(typeof(IntegrationTests)).Fatal().Append("Hello").Log();
             LogManager.GetLogger(typeof(IntegrationTests)).Error().Append("Hello").Log();
             LogManager.GetLogger(typeof(IntegrationTests)).Debug().Append("Hello").Log();
-            LogManager.GetLogger(typeof(IntegrationTests)).Finest().Append("Hello").Log();
-            LogManager.GetLogger(typeof(IntegrationTests)).Verbose().Append("Hello").Log();
         }
 
         [Test]
