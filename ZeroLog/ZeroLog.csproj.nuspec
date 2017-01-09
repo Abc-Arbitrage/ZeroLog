@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>ZeroLog</id>
+    <version>1.0.0.0</version>
+    <authors>Reda Bouallou, Mendel Monteiro-Beckerman</authors>
+    <owners>mendel.monteiro Reda</owners>
+    <licenseUrl>https://github.com/Abc-Arbitrage/ZeroLog/blob/master/LICENSE.md</licenseUrl>
+    <projectUrl>https://github.com/Abc-Arbitrage/ZeroLog</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>A zero-allocation .NET logging library</description>
+    <copyright>Copyright (c) 2017 ABC arbitrage</copyright>
+    <tags>logging zero-allocation</tags>
+	<dependencies>
+      <dependency id="JetBrains.Annotations" version="10.2.1" />
+      <dependency id="StringFormatter" version="1.0.0.1" />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="bin\Release\ZeroLog.dll" target="lib\net45" />
+  </files>
+</package>
