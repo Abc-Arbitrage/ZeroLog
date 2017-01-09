@@ -3,11 +3,12 @@
   <metadata>
     <id>ZeroLog</id>
     <version>1.0.0.0</version>
-    <authors>Reda Bouallou, Mendel Monteiro-Beckerman</authors>
-    <owners>mendel.monteiro Reda</owners>
+    <authors>Reda Bouallou, Mendel Monteiro-Beckerman, Romain Verdier</authors>
+    <owners>mendel.monteiro, Reda, rverdier</owners>
     <licenseUrl>https://github.com/Abc-Arbitrage/ZeroLog/blob/master/LICENSE.md</licenseUrl>
     <projectUrl>https://github.com/Abc-Arbitrage/ZeroLog</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
+	<title>A zero-allocation .NET logging library</title>
     <description>A zero-allocation .NET logging library</description>
     <copyright>Copyright (c) 2017 ABC arbitrage</copyright>
     <tags>logging zero-allocation</tags>
