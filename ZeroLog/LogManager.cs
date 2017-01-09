@@ -18,7 +18,7 @@ namespace ZeroLog
         {
             var encoding = Encoding.Default;
             var bufferSegmentProvider = new BufferSegmentProvider(size * 128, 128);
-            _disruptor = new Disruptor<LogEvent>(() => new LogEvent(level, bufferSegmentProvider.GetSegment()), size, TaskScheduler.Default, ProducerType.Multi, new BusySpinWaitStrategy());
+            _disruptor = new Disruptor<LogEvent>(() => new LogEvent(level, bufferSegmentProvider.GetSegment()), size, TaskScheduler.Default, ProducerType.Multi, new BlockingWaitStrategy());
 
             foreach (var appender in appenders)
             {
