@@ -15,14 +15,15 @@ namespace ZeroLog.Tests
     {
         private PerformanceAppender _performanceAppender;
         private const int _nbThreads = 4;
-        private const int _count = 5 * 1000;
+        private const int _queueSize = 1 << 16;
+        private const int _count = _queueSize / _nbThreads;
         private readonly List<double[]> _enqueueMicros = new List<double[]>();
 
         [SetUp]
         public void SetUp()
         {
             _performanceAppender = new PerformanceAppender(_count * _nbThreads);
-            LogManager.Initialize(new[] { _performanceAppender, }, 1 << 16);
+            LogManager.Initialize(new[] { _performanceAppender, }, _queueSize);
             for (int i = 0; i < _nbThreads; i++)
             {
                 _enqueueMicros.Add(new double[_count]);
@@ -56,7 +57,6 @@ namespace ZeroLog.Tests
                     var timestamp = Stopwatch.GetTimestamp();
                     logger.InfoFormat("{0}", timestamp);
                     _enqueueMicros[threadId][i] = ToMicroseconds(Stopwatch.GetTimestamp() - timestamp);
-                    Thread.Sleep(5);
                 }
                 //                logger.InfoFormat("{0}", (byte)1, (char)1, (short)2, (float)3, 2.0, "", true, TimeSpan.Zero);
             });
