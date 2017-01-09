@@ -24,7 +24,7 @@ namespace ZeroLog.Appenders
                 case Level.Error:
                     Console.ForegroundColor = ConsoleColor.Red;
                     break;
-                case Level.Warning:
+                case Level.Warn:
                     Console.ForegroundColor = ConsoleColor.Yellow;
                     break;
                 case Level.Info:

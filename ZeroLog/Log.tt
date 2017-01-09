@@ -11,7 +11,7 @@ namespace ZeroLog
 {
 	partial class Log
 	{
-		<# foreach (var levelName in Enum.GetNames(typeof(ZeroLog.Level)))
+		<# foreach (var levelName in Enum.GetNames(typeof(ZeroLog.Level))) 
         {
 		#>
 		

@@ -4,7 +4,7 @@ namespace ZeroLog
     {
         Fatal,
         Error,
-        Warning,
+        Warn,
         Info,
         Debug,
         Verbose,

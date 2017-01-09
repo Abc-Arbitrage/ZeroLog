@@ -215,24 +215,24 @@ namespace ZeroLog
 			logEvent.Log();
         }
 					
-		public LogEvent Warning()
+		public LogEvent Warn()
         {
-            return GetLogEventFor(Level.Warning);
+            return GetLogEventFor(Level.Warn);
         }
 			
 		[StringFormatMethod("format")]	
-		public void WarningFormat<T0>(string format, T0 arg0)
+		public void WarnFormat<T0>(string format, T0 arg0)
 		{
-			var logEvent = GetLogEventFor(Level.Warning);
+			var logEvent = GetLogEventFor(Level.Warn);
 			logEvent.AppendFormat(format);
 			logEvent.AppendGeneric(arg0);
 			logEvent.Log();
         }
 			
 		[StringFormatMethod("format")]	
-		public void WarningFormat<T0, T1>(string format, T0 arg0, T1 arg1)
+		public void WarnFormat<T0, T1>(string format, T0 arg0, T1 arg1)
 		{
-			var logEvent = GetLogEventFor(Level.Warning);
+			var logEvent = GetLogEventFor(Level.Warn);
 			logEvent.AppendFormat(format);
 			logEvent.AppendGeneric(arg0);
 			logEvent.AppendGeneric(arg1);
@@ -240,9 +240,9 @@ namespace ZeroLog
         }
 			
 		[StringFormatMethod("format")]	
-		public void WarningFormat<T0, T1, T2>(string format, T0 arg0, T1 arg1, T2 arg2)
+		public void WarnFormat<T0, T1, T2>(string format, T0 arg0, T1 arg1, T2 arg2)
 		{
-			var logEvent = GetLogEventFor(Level.Warning);
+			var logEvent = GetLogEventFor(Level.Warn);
 			logEvent.AppendFormat(format);
 			logEvent.AppendGeneric(arg0);
 			logEvent.AppendGeneric(arg1);
@@ -251,9 +251,9 @@ namespace ZeroLog
         }
 			
 		[StringFormatMethod("format")]	
-		public void WarningFormat<T0, T1, T2, T3>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3)
+		public void WarnFormat<T0, T1, T2, T3>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3)
 		{
-			var logEvent = GetLogEventFor(Level.Warning);
+			var logEvent = GetLogEventFor(Level.Warn);
 			logEvent.AppendFormat(format);
 			logEvent.AppendGeneric(arg0);
 			logEvent.AppendGeneric(arg1);
@@ -263,9 +263,9 @@ namespace ZeroLog
         }
 			
 		[StringFormatMethod("format")]	
-		public void WarningFormat<T0, T1, T2, T3, T4>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
+		public void WarnFormat<T0, T1, T2, T3, T4>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
 		{
-			var logEvent = GetLogEventFor(Level.Warning);
+			var logEvent = GetLogEventFor(Level.Warn);
 			logEvent.AppendFormat(format);
 			logEvent.AppendGeneric(arg0);
 			logEvent.AppendGeneric(arg1);
@@ -276,9 +276,9 @@ namespace ZeroLog
         }
 			
 		[StringFormatMethod("format")]	
-		public void WarningFormat<T0, T1, T2, T3, T4, T5>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
+		public void WarnFormat<T0, T1, T2, T3, T4, T5>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
 		{
-			var logEvent = GetLogEventFor(Level.Warning);
+			var logEvent = GetLogEventFor(Level.Warn);
 			logEvent.AppendFormat(format);
 			logEvent.AppendGeneric(arg0);
 			logEvent.AppendGeneric(arg1);
@@ -290,9 +290,9 @@ namespace ZeroLog
         }
 			
 		[StringFormatMethod("format")]	
-		public void WarningFormat<T0, T1, T2, T3, T4, T5, T6>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
+		public void WarnFormat<T0, T1, T2, T3, T4, T5, T6>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
 		{
-			var logEvent = GetLogEventFor(Level.Warning);
+			var logEvent = GetLogEventFor(Level.Warn);
 			logEvent.AppendFormat(format);
 			logEvent.AppendGeneric(arg0);
 			logEvent.AppendGeneric(arg1);
@@ -305,9 +305,9 @@ namespace ZeroLog
         }
 			
 		[StringFormatMethod("format")]	
-		public void WarningFormat<T0, T1, T2, T3, T4, T5, T6, T7>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7)
+		public void WarnFormat<T0, T1, T2, T3, T4, T5, T6, T7>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7)
 		{
-			var logEvent = GetLogEventFor(Level.Warning);
+			var logEvent = GetLogEventFor(Level.Warn);
 			logEvent.AppendFormat(format);
 			logEvent.AppendGeneric(arg0);
 			logEvent.AppendGeneric(arg1);
