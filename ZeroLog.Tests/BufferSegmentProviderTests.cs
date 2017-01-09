@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using NFluent;
 using NUnit.Framework;
 
@@ -10,7 +9,7 @@ namespace ZeroLog.Tests
     public unsafe class BufferSegmentProviderTests
     {
         private BufferSegmentProvider _bufferSegmentProvider;
-        private int _defaultSegmentSize = 8;
+        private readonly int _defaultSegmentSize = 8;
 
         [SetUp]
         public void SetUp()

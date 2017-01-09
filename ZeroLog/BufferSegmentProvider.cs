@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Threading;
 
@@ -7,7 +6,8 @@ namespace ZeroLog
 {
     public class BufferSegmentProvider : IDisposable
     {
-        private readonly List<LargeBuffer> _pinnedBuffers = new List<LargeBuffer>();
+        private readonly LargeBuffer[] _largeBuffers = new LargeBuffer[16384];
+
         private readonly int _largeBufferSize;
         private readonly int _bufferSegmentSize;
 
@@ -18,61 +18,53 @@ namespace ZeroLog
             _largeBufferSize = largeBufferSize;
             _bufferSegmentSize = bufferSegmentSize;
 
-            AllocateLargeBuffer();
+            AllocateLargeBuffer(0);
         }
 
         public int LastSegmentIndex => _segmentIndex;
-        public int LargeBufferCount => _pinnedBuffers.Count;
+        public int LargeBufferCount { get; private set; }
 
         public BufferSegment GetSegment()
         {
-            var nextSegmentIndex = GetNextSegmentIndex();
+            var nextSegmentIndex = Interlocked.Increment(ref _segmentIndex);
 
-            var largeBufferIndex = AllocateLargeBufferIfNeeded(nextSegmentIndex);
+            var largeBuffer = AllocateLargeBufferIfNeeded(nextSegmentIndex);
 
-            var bufferSegmentIndex = nextSegmentIndex - (_largeBufferSize / _bufferSegmentSize * largeBufferIndex);
+            var bufferSegmentIndex = nextSegmentIndex - largeBuffer.FirstSegmentGlobalIndex;
 
             // ReSharper disable once InconsistentlySynchronizedField
-            var bufferSegment = _pinnedBuffers[largeBufferIndex].GetSegment(bufferSegmentIndex * _bufferSegmentSize, _bufferSegmentSize);
+            var bufferSegment = largeBuffer.GetSegment(bufferSegmentIndex * _bufferSegmentSize, _bufferSegmentSize);
 
             return bufferSegment;
         }
 
-        private int AllocateLargeBufferIfNeeded(int segmentIndex)
+        private LargeBuffer AllocateLargeBufferIfNeeded(int segmentIndex)
         {
             var largeBufferIndex = segmentIndex * _bufferSegmentSize / _largeBufferSize;
-            if (largeBufferIndex < _pinnedBuffers.Count)
-                return largeBufferIndex;
 
-            lock (_pinnedBuffers)
+            // ReSharper disable once InconsistentlySynchronizedField
+            if (largeBufferIndex < LargeBufferCount)
+                return _largeBuffers[largeBufferIndex];
+
+            lock (_largeBuffers)
             {
-                if (largeBufferIndex < _pinnedBuffers.Count)
-                    return largeBufferIndex;
+                if (largeBufferIndex < LargeBufferCount)
+                    return _largeBuffers[largeBufferIndex];
 
-                AllocateLargeBuffer();
-                return largeBufferIndex;
+                return AllocateLargeBuffer(segmentIndex);
             }
         }
 
-        private void AllocateLargeBuffer()
+        private LargeBuffer AllocateLargeBuffer(int firstSegmentGlobalIndex)
         {
-            var largeBuffer = new LargeBuffer(_largeBufferSize);
-            _pinnedBuffers.Add(largeBuffer);
-        }
-
-        private int GetNextSegmentIndex()
-        {
-            while (true)
-            {
-                var segmentIndex = Volatile.Read(ref _segmentIndex);
-                if (Interlocked.CompareExchange(ref _segmentIndex, segmentIndex + 1, segmentIndex) == segmentIndex)
-                    return segmentIndex + 1;
-            }
+            var largeBuffer = new LargeBuffer(_largeBufferSize, firstSegmentGlobalIndex);
+            _largeBuffers[LargeBufferCount++] = largeBuffer;
+            return largeBuffer;
         }
 
         public void Dispose()
         {
-            foreach (var pinnedBuffer in _pinnedBuffers)
+            foreach (var pinnedBuffer in _largeBuffers)
             {
                 pinnedBuffer.Dispose();
             }
@@ -80,16 +72,20 @@ namespace ZeroLog
 
         private unsafe class LargeBuffer : IDisposable
         {
+            private readonly int _firstSegmentGlobalIndex;
             private GCHandle _handle;
             private readonly byte[] _buffer;
             private readonly byte* _bufferPointer;
 
-            public LargeBuffer(int size)
+            public LargeBuffer(int size, int firstSegmentGlobalIndex)
             {
+                _firstSegmentGlobalIndex = firstSegmentGlobalIndex;
                 _buffer = new byte[size];
                 _handle = GCHandle.Alloc(_buffer, GCHandleType.Pinned);
                 _bufferPointer = (byte*)_handle.AddrOfPinnedObject().ToPointer();
             }
+
+            public int FirstSegmentGlobalIndex => _firstSegmentGlobalIndex;
 
             public BufferSegment GetSegment(int offset, int length)
             {
