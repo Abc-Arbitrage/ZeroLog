@@ -6,9 +6,9 @@ ZeroLog is a **zero-allocation .NET logging library**. I uses the excellent form
   
   Since ZeroLog does not aim to replace any existing logger libraries in any kind of application, it wont try to compete at the feature set level with more proheminent projets like log4net or NLog for example. The focus will remain on performance and allocation free aspects.
 
-  ## Internal design
+ ## Internal design
   
-  ZeroLog was designed to meet two main objectives:
+ ZeroLog was designed to meet two main objectives:
 
   - Being a **zero allocation library**
   - Doing **as little work as possible in calling threads**
@@ -59,9 +59,8 @@ log.InfoFormat("Tomorrow ({0}) will occur in {1} seconds", tomorrow, numberOfSec
 ```
 
 Both API can be used in a zero allocation fashion, but not all formatting options are currently supported.
- 
 
- ## What's next
+## What's next
 
  Even if ZeroLog is still a very young project, you can begin to use it from now on. However, a lot of things still need to be added:
 
