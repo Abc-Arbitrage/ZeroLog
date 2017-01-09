@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
@@ -14,13 +16,17 @@ namespace ZeroLog.Tests
         private PerformanceAppender _performanceAppender;
         private const int _nbThreads = 4;
         private const int _count = 5 * 1000;
+        private readonly List<double[]> _enqueueMicros = new List<double[]>();
 
         [SetUp]
         public void SetUp()
         {
             _performanceAppender = new PerformanceAppender(_count * _nbThreads);
             LogManager.Initialize(new[] { _performanceAppender, }, 1 << 16);
-            Thread.Sleep(1);
+            for (int i = 0; i < _nbThreads; i++)
+            {
+                _enqueueMicros.Add(new double[_count]);
+            }
         }
 
         [TearDown]
@@ -47,7 +53,9 @@ namespace ZeroLog.Tests
                 var logger = LogManager.GetLogger(typeof(IntegrationTests).Name + threadId.ToString());
                 for (var i = 0; i < _count; i++)
                 {
-                    logger.InfoFormat("{0}", Stopwatch.GetTimestamp());
+                    var timestamp = Stopwatch.GetTimestamp();
+                    logger.InfoFormat("{0}", timestamp);
+                    _enqueueMicros[threadId][i] = ToMicroseconds(Stopwatch.GetTimestamp() - timestamp);
                     Thread.Sleep(5);
                 }
                 //                logger.InfoFormat("{0}", (byte)1, (char)1, (short)2, (float)3, 2.0, "", true, TimeSpan.Zero);
@@ -56,10 +64,24 @@ namespace ZeroLog.Tests
             LogManager.Shutdown();
             var throughput = _count / sw.Elapsed.TotalSeconds;
 
-            Console.WriteLine($"Finished test, throughput is: {throughput:N0}");
+            Console.WriteLine($"Finished test, throughput is: {throughput:N0} msgs/second");
 
             _performanceAppender.PrintTimeTaken();
+
+            var streamWriter = new StreamWriter(new FileStream("write-times.csv", FileMode.Create));
+            foreach (var thread in _enqueueMicros)
+            {
+                foreach (var timeTaken in thread)
+                {
+                    streamWriter.WriteLine(timeTaken);
+                }
+            }
             Console.WriteLine("Printed total time taken csv");
+        }
+
+        private static double ToMicroseconds(long ticks)
+        {
+            return unchecked(ticks * 1000000 / (double)(Stopwatch.Frequency));
         }
 
         [Test]
