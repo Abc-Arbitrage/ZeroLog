@@ -13,24 +13,21 @@ namespace ZeroLog
         private static LogManager _logManager;
 
         private readonly Disruptor<LogEvent> _disruptor;
-        private readonly Encoding _encoding;
-        private readonly List<IAppender> _appenders;
-        private bool _isRunning = true;
 
         private LogManager(IEnumerable<IAppender> appenders, int size, Level level = Level.Finest)
         {
-            _encoding = Encoding.Default;
+            var encoding = Encoding.Default;
             var bufferSegmentProvider = new BufferSegmentProvider(size * 128, 128);
-            _disruptor = new Disruptor<LogEvent>(() => new LogEvent(level, bufferSegmentProvider.GetSegment()), size, TaskScheduler.Default);
+            _disruptor = new Disruptor<LogEvent>(() => new LogEvent(level, bufferSegmentProvider.GetSegment()), size, TaskScheduler.Default, ProducerType.Multi, new BusySpinWaitStrategy());
 
             foreach (var appender in appenders)
             {
-                appender.SetEncoding(_encoding);
+                appender.SetEncoding(encoding);
             }
 
-            _appenders = new List<IAppender>(appenders);
+            var appenders1 = new List<IAppender>(appenders);
 
-            _disruptor.HandleEventsWith(new LogEventHandler(_appenders, _encoding));
+            _disruptor.HandleEventsWith(new LogEventHandler(appenders1, encoding));
             _disruptor.Start();
         }
 
@@ -48,11 +45,7 @@ namespace ZeroLog
             var logManager = _logManager;
             _logManager = null;
 
-            if (logManager == null)
-                return;
-
-            logManager._disruptor.Shutdown(TimeSpan.FromSeconds(15));
-            logManager._isRunning = false;
+            logManager?._disruptor.Shutdown(TimeSpan.FromSeconds(15));
             // TODO: shutdown all the logs
         }
 
