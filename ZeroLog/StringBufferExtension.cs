@@ -44,16 +44,14 @@ namespace ZeroLog
 
                 case ArgumentType.RawString:
                     var rawStringLength = *argPointer++;
-                    var chars = (char*)argPointer;
-                    stringBuffer.Append(chars, rawStringLength);
-                    argPointer += sizeof(byte) + sizeof(char) * rawStringLength;
+                    stringBuffer.Append((char*)argPointer, rawStringLength);
+                    argPointer += sizeof(char) * rawStringLength;
                     break;
 
                 case ArgumentType.AsciiString:
                     var length = *argPointer++;
-                    var bytes = argPointer;
-                    stringBuffer.Append(new AsciiString(bytes, length));
-                    argPointer += sizeof(byte) + length;
+                    stringBuffer.Append(new AsciiString(argPointer, length));
+                    argPointer += length;
                     break;
 
                 case ArgumentType.Boolean:
