@@ -115,7 +115,7 @@ namespace ZeroLog
                 logEvent.WriteToStringBuffer(stringBuffer);
                 int bytesWritten;
                 fixed (byte* dest = destination)
-                    bytesWritten = stringBuffer.CopyTo(dest, 0, stringBuffer.Count, _encoding);
+                    bytesWritten = stringBuffer.CopyTo(dest, destination.Length, 0, stringBuffer.Count, _encoding);
 
                 stringBuffer.Clear();
 

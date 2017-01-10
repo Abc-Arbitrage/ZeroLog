@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Text.Formatting;
 using System.Threading;
 
@@ -115,11 +116,29 @@ namespace ZeroLog
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public LogEvent Append(byte[] bytes, int length, Encoding encoding)
+        {
+            fixed (byte* b = bytes)
+            {
+                var charCount = encoding.GetCharCount(b, length);
+
+                var byteCount = charCount * sizeof(char);
+                EnsureRemainingBytesAndStoreArgPointer(sizeof(ArgumentType) + byteCount);
+                AppendArgumentType(ArgumentType.RawString);
+                AppendByte((byte)charCount);
+
+                encoding.GetChars(b, length, (char*)_dataPointer, charCount);
+                _dataPointer += byteCount;
+            }
+            return this;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public LogEvent AppendAsciiString(byte[] bytes, int length)
         {
             EnsureRemainingBytesAndStoreArgPointer(sizeof(ArgumentType) + sizeof(byte) + (length * sizeof(byte)));
             AppendArgumentType(ArgumentType.AsciiString);
-            AppendByte((byte) length);
+            AppendByte((byte)length);
             AppendBytes(bytes, length);
             return this;
         }
