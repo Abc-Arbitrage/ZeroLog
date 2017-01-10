@@ -71,10 +71,10 @@ namespace ZeroLog.Tests
         [Test]
         public void should_append_guid_with_format()
         {
-            _logEvent.Append(new Guid("129ac124-e588-47e5-9d3d-fa3a4d174e29"), "TODO in StringFormatter");
+            _logEvent.Append(new Guid("129ac124-e588-47e5-9d3d-fa3a4d174e29"), "X");
             _logEvent.WriteToStringBuffer(_output);
 
-            Assert.AreEqual("129ac124-e588-47e5-9d3d-fa3a4d174e29", _output.ToString());
+            Assert.AreEqual("{0x129ac124,0xe588,0x47e5,{0x9d,0x3d,0xfa,0x3a,0x4d,0x17,0x4e,0x29}}", _output.ToString());
         }
 
         [Test]
