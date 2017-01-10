@@ -1,20 +1,17 @@
 ﻿using System;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.CompilerServices;
 
 namespace ZeroLog.Tests
 {
     public class Program
     {
-        public static void Main(string [] args)
+        public static void Main(string[] args)
         {
             var test = new IntegrationTests();
 
             test.SetUp();
             try
             {
-                test.should_test_console();
+                test.should_test_encoding_and_decoding();
             }
             finally
             {
@@ -23,60 +20,6 @@ namespace ZeroLog.Tests
 
             Console.WriteLine("Press any key to exit...");
             Console.ReadKey();
-        }
-
-        public static void Main2()
-        {
-            var method = typeof(Program).GetMethods(BindingFlags.NonPublic | BindingFlags.Static).Single(x => x.Name.Contains("AppendWithBoxing"));
-            Console.WriteLine(method.GetMethodBody().GetILAsByteArray().Length);
-
-            var memo = new Memo();
-            var b = (byte)1;
-
-            const int count = 10*1000*1000;
-
-            var start = Environment.TickCount;
-            for (int i = 0; i < count; i++)
-                AppendWithMakeref(b, memo);
-
-            Console.WriteLine("Using __makeref:  {0} ticks", Environment.TickCount - start);
-
-            start = Environment.TickCount;
-            for (int i = 0; i < count; i++)
-                AppendWithBoxing(b, memo);
-
-            Console.WriteLine("Using boxing: {0} ticks", Environment.TickCount - start);
-
-            Console.WriteLine(memo);
-            Console.ReadLine();
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void AppendWithMakeref<T>(T arg, Memo m)
-        {
-            m.Set(__refvalue(__makeref(arg), byte));
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void AppendWithBoxing<T>(T arg, Memo m)
-        {
-            m.Set((byte)(object)arg);
-        }
-
-
-        private class Memo
-        {
-            private byte _b;
-
-            public void Set(byte b)
-            {
-                _b = b;
-            }
-
-            public override string ToString()
-            {
-                return $"{nameof(_b)}: {_b}";
-            }
         }
     }
 }
