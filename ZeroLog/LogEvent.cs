@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Text.Formatting;
 using System.Threading;
 
@@ -337,13 +338,13 @@ namespace ZeroLog
             _log.Enqueue(this);
         }
 
-        public void WriteToStringBuffer(StringBuffer stringBuffer)
+        public void WriteToStringBuffer(StringBuffer stringBuffer, Encoding encoding)
         {
             var endOfData = _dataPointer;
             _dataPointer = _startOfBuffer;
             while (_dataPointer < endOfData)
             {
-                stringBuffer.Append(ref _dataPointer, StringView.Empty, _strings, _argPointers);
+                stringBuffer.Append(ref _dataPointer, StringView.Empty, _strings, _argPointers, encoding);
             }
 
             Debug.Assert(_dataPointer == endOfData, "Buffer over-read");
