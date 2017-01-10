@@ -122,22 +122,23 @@ namespace ZeroLog
             fixed (byte* b = bytes)
             {
                 var charCount = encoding.GetCharCount(b, length);
-
                 var byteCount = charCount * sizeof(char);
-                EnsureRemainingBytesAndStoreArgPointer(sizeof(ArgumentType) + byteCount);
+
+                EnsureRemainingBytesAndStoreArgPointer(sizeof(ArgumentType) + sizeof(byte) + byteCount);
                 AppendArgumentType(ArgumentType.RawString);
                 AppendByte((byte)charCount);
 
                 encoding.GetChars(b, length, (char*)_dataPointer, charCount);
                 _dataPointer += byteCount;
             }
+
             return this;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public LogEvent AppendAsciiString(byte[] bytes, int length)
         {
-            EnsureRemainingBytesAndStoreArgPointer(sizeof(ArgumentType) + sizeof(byte) + (length * sizeof(byte)));
+            EnsureRemainingBytesAndStoreArgPointer(sizeof(ArgumentType) + sizeof(byte) + length * sizeof(byte));
             AppendArgumentType(ArgumentType.AsciiString);
             AppendByte((byte)length);
             AppendBytes(bytes, length);
