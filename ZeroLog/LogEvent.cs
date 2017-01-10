@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
-using System.Text;
 using System.Text.Formatting;
 using System.Threading;
 
@@ -116,10 +115,10 @@ namespace ZeroLog
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public LogEvent Append(byte[] bytes, int length)
+        public LogEvent AppendAsciiString(byte[] bytes, int length)
         {
             EnsureRemainingBytesAndStoreArgPointer(sizeof(ArgumentType) + sizeof(byte) + (length * sizeof(byte)));
-            AppendArgumentType(ArgumentType.ByteArray);
+            AppendArgumentType(ArgumentType.AsciiString);
             AppendByte((byte) length);
             AppendBytes(bytes, length);
             return this;
@@ -338,13 +337,13 @@ namespace ZeroLog
             _log.Enqueue(this);
         }
 
-        public void WriteToStringBuffer(StringBuffer stringBuffer, Encoding encoding)
+        public void WriteToStringBuffer(StringBuffer stringBuffer)
         {
             var endOfData = _dataPointer;
             _dataPointer = _startOfBuffer;
             while (_dataPointer < endOfData)
             {
-                stringBuffer.Append(ref _dataPointer, StringView.Empty, _strings, _argPointers, encoding);
+                stringBuffer.Append(ref _dataPointer, StringView.Empty, _strings, _argPointers);
             }
 
             Debug.Assert(_dataPointer == endOfData, "Buffer over-read");
@@ -393,7 +392,7 @@ namespace ZeroLog
             {
                 for (int i = 0; i < length; i++)
                 {
-                    *_dataPointer = *b;
+                    *_dataPointer = b[i];
                     _dataPointer += sizeof(byte);
                 }
             }
