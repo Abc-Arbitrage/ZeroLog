@@ -112,7 +112,7 @@ namespace ZeroLog
             if (_queue.TryDequeue(out logEvent))
             {
                 // Write format only once
-                logEvent.WriteToStringBuffer(stringBuffer, _encoding);
+                logEvent.WriteToStringBuffer(stringBuffer);
                 int bytesWritten;
                 fixed (byte* dest = destination)
                     bytesWritten = stringBuffer.CopyTo(dest, 0, stringBuffer.Count, _encoding);

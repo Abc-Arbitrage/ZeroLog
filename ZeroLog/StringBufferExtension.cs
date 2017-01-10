@@ -7,7 +7,7 @@ namespace ZeroLog
 {
     public static unsafe class StringBufferExtension
     {
-        public static void Append(this StringBuffer stringBuffer, ref byte* dataPointer, StringView format, List<string> strings, List<IntPtr> argPointers, Encoding encoding)
+        public static void Append(this StringBuffer stringBuffer, ref byte* dataPointer, StringView format, List<string> strings, List<IntPtr> argPointers)
         {
             var argument = *dataPointer;
             dataPointer += sizeof(ArgumentType);
@@ -23,16 +23,16 @@ namespace ZeroLog
                 fixed (char* p = formatSpecifier)
                 {
                     var formatSpecifierView = new StringView(p, formatSpecifier.Length);
-                    AppendArg(stringBuffer, ref dataPointer, argumentType, formatSpecifierView, strings, argPointers, encoding);
+                    AppendArg(stringBuffer, ref dataPointer, argumentType, formatSpecifierView, strings, argPointers);
                 }
             }
             else
             {
-                AppendArg(stringBuffer, ref dataPointer, argumentType, format, strings, argPointers, encoding);
+                AppendArg(stringBuffer, ref dataPointer, argumentType, format, strings, argPointers);
             }
         }
 
-        private static void AppendArg(StringBuffer stringBuffer, ref byte* argPointer, ArgumentType argumentType, StringView format, List<string> strings, List<IntPtr> argPointers, Encoding encoding)
+        private static void AppendArg(StringBuffer stringBuffer, ref byte* argPointer, ArgumentType argumentType, StringView format, List<string> strings, List<IntPtr> argPointers)
         {
             switch (argumentType)
             {
@@ -42,11 +42,11 @@ namespace ZeroLog
                     argPointer += sizeof(byte);
                     break;
 
-                case ArgumentType.ByteArray:
+                case ArgumentType.AsciiString:
                     var length = *argPointer++;
                     var bytes = argPointer;
-                    throw new NotImplementedException();
-//                    stringBuffer.Append(byteArray, length, encoding);
+                    stringBuffer.Append(new AsciiString(bytes, length));
+                    argPointer += sizeof(byte) + length;
                     break;
 
                 case ArgumentType.Boolean:
