@@ -40,6 +40,7 @@ namespace ZeroLog
             Level = level;
             _log = log;
             _strings.Clear();
+            _argPointers.Clear();
             _dataPointer = _startOfBuffer;
             _threadId = Thread.CurrentThread.ManagedThreadId;
         }
