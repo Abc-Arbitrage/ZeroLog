@@ -60,7 +60,7 @@ log.Info().Append("Tomorrow (")
 log.InfoFormat("Tomorrow ({0}) will occur in {1} seconds", tomorrow, numberOfSecondsUntilTomorrow);
 ```
 
-Both APIs can be used in a zero allocation fashion, but not all formatting options are currently supported (notably for DateTimes, TimeSpans and GUIDs).
+Both APIs can be used in a zero allocation fashion, but not all formatting options are currently supported (notably for DateTimes and TimeSpans).
 
 ## What's next
 
@@ -71,7 +71,7 @@ Both APIs can be used in a zero allocation fashion, but not all formatting optio
  - More appenders
  - Multiple logging (formatting and appending) threads
  - Layout pattern (basic support already available in `DateAndSizeRollingFileAppender`)
- - Support of standard formatting options (some already available; some modifiers not supported for DateTime, Timespan, Guid, etc.) 
+ - Support of standard formatting options (some already available; some modifiers not supported for DateTime and TimeSpan) 
  - Support for `Exception` arguments
  - Support for `byte[]` arguments
  - Hierarchical loggers
