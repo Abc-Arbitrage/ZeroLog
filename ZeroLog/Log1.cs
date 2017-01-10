@@ -1,4 +1,5 @@
 ﻿
+using System;
 using JetBrains.Annotations;
 
 namespace ZeroLog
@@ -12,10 +13,18 @@ namespace ZeroLog
         {
             return GetLogEventFor(Level.Debug);
         }
-
+		
 		public void Debug(string message)
         {
             GetLogEventFor(Level.Debug).Append(message).Log();
+        }
+
+		public void Debug(string message, Exception ex)
+		{
+			var logEvent = GetLogEventFor(Level.Debug);
+			logEvent.Append(message);
+			logEvent.Append(ex.ToString());
+			logEvent.Log();
         }
 			
 		[StringFormatMethod("format")]	
@@ -124,12 +133,21 @@ namespace ZeroLog
         {
             return GetLogEventFor(Level.Info);
         }
-
+		
 		public void Info(string message)
         {
             GetLogEventFor(Level.Info).Append(message).Log();
         }
-			
+
+		public void Info(string message, Exception ex)
+		{
+			var logEvent = GetLogEventFor(Level.Info);
+			logEvent.Append(message);
+			logEvent.Append(ex.ToString());
+			logEvent.Log();
+        }
+
+					
 		[StringFormatMethod("format")]	
 		public void InfoFormat<T0>(string format, T0 arg0)
 		{
@@ -236,12 +254,21 @@ namespace ZeroLog
         {
             return GetLogEventFor(Level.Warn);
         }
-
+		
 		public void Warn(string message)
         {
             GetLogEventFor(Level.Warn).Append(message).Log();
         }
-			
+
+		public void Warn(string message, Exception ex)
+		{
+			var logEvent = GetLogEventFor(Level.Warn);
+			logEvent.Append(message);
+			logEvent.Append(ex.ToString());
+			logEvent.Log();
+        }
+
+					
 		[StringFormatMethod("format")]	
 		public void WarnFormat<T0>(string format, T0 arg0)
 		{
@@ -348,12 +375,21 @@ namespace ZeroLog
         {
             return GetLogEventFor(Level.Error);
         }
-
+		
 		public void Error(string message)
         {
             GetLogEventFor(Level.Error).Append(message).Log();
         }
-			
+
+		public void Error(string message, Exception ex)
+		{
+			var logEvent = GetLogEventFor(Level.Error);
+			logEvent.Append(message);
+			logEvent.Append(ex.ToString());
+			logEvent.Log();
+        }
+
+					
 		[StringFormatMethod("format")]	
 		public void ErrorFormat<T0>(string format, T0 arg0)
 		{
@@ -460,12 +496,21 @@ namespace ZeroLog
         {
             return GetLogEventFor(Level.Fatal);
         }
-
+		
 		public void Fatal(string message)
         {
             GetLogEventFor(Level.Fatal).Append(message).Log();
         }
-			
+
+		public void Fatal(string message, Exception ex)
+		{
+			var logEvent = GetLogEventFor(Level.Fatal);
+			logEvent.Append(message);
+			logEvent.Append(ex.ToString());
+			logEvent.Log();
+        }
+
+					
 		[StringFormatMethod("format")]	
 		public void FatalFormat<T0>(string format, T0 arg0)
 		{
