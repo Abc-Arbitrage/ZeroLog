@@ -37,3 +37,6 @@ packages/*
 .vs/*
 output/*
 src/packages/**
+build/tools/*/
+build/tools/packages.config.md5sum
+build/tools/nuget.exe
