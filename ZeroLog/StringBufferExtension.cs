@@ -7,7 +7,7 @@ namespace ZeroLog
 {
     public static unsafe class StringBufferExtension
     {
-        public static void Append(this StringBuffer stringBuffer, ref byte* dataPointer, StringView format, List<string> strings, List<IntPtr> argPointers)
+        public static void Append(this StringBuffer stringBuffer, ref byte* dataPointer, StringView format, List<string> strings, List<IntPtr> argPointers, Encoding encoding)
         {
             var argument = *dataPointer;
             dataPointer += sizeof(ArgumentType);
@@ -23,16 +23,16 @@ namespace ZeroLog
                 fixed (char* p = formatSpecifier)
                 {
                     var formatSpecifierView = new StringView(p, formatSpecifier.Length);
-                    AppendArg(stringBuffer, ref dataPointer, argumentType, formatSpecifierView, strings, argPointers);
+                    AppendArg(stringBuffer, ref dataPointer, argumentType, formatSpecifierView, strings, argPointers, encoding);
                 }
             }
             else
             {
-                AppendArg(stringBuffer, ref dataPointer, argumentType, format, strings, argPointers);
+                AppendArg(stringBuffer, ref dataPointer, argumentType, format, strings, argPointers, encoding);
             }
         }
 
-        private static void AppendArg(StringBuffer stringBuffer, ref byte* argPointer, ArgumentType argumentType, StringView format, List<string> strings, List<IntPtr> argPointers)
+        private static void AppendArg(StringBuffer stringBuffer, ref byte* argPointer, ArgumentType argumentType, StringView format, List<string> strings, List<IntPtr> argPointers, Encoding encoding)
         {
             switch (argumentType)
             {
@@ -45,8 +45,8 @@ namespace ZeroLog
                 case ArgumentType.ByteArray:
                     var length = *argPointer++;
                     var bytes = argPointer;
-                    
-//                    stringBuffer.Append();
+                    throw new NotImplementedException();
+//                    stringBuffer.Append(byteArray, length, encoding);
                     break;
 
                 case ArgumentType.Boolean:
