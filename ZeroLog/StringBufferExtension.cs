@@ -42,6 +42,13 @@ namespace ZeroLog
                     argPointer += sizeof(byte);
                     break;
 
+                case ArgumentType.RawString:
+                    var rawStringLength = *argPointer++;
+                    var chars = (char*)argPointer;
+                    stringBuffer.Append(chars, rawStringLength);
+                    argPointer += sizeof(byte) + sizeof(char) * rawStringLength;
+                    break;
+
                 case ArgumentType.AsciiString:
                     var length = *argPointer++;
                     var bytes = argPointer;

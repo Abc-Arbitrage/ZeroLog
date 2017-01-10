@@ -16,6 +16,7 @@ namespace ZeroLog
         Guid,
         DateTime,
         TimeSpan,
-        AsciiString
+        AsciiString,
+        RawString
     }
 }

@@ -44,7 +44,7 @@ namespace ZeroLog.Appenders
 
             int bytesWritten;
             fixed (byte* buf = _tempBytes)
-                bytesWritten = _stringBuffer.CopyTo(buf, 0, _stringBuffer.Count, _encoding);
+                bytesWritten = _stringBuffer.CopyTo(buf, _tempBytes.Length, 0, _stringBuffer.Count, _encoding);
 
             stream.Write(_tempBytes, 0, bytesWritten);
         }
