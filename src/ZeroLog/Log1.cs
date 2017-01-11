@@ -7,7 +7,7 @@ namespace ZeroLog
 	partial class Log
 	{
 				
-		public bool IsDebugEnabled => _logManager.Level >= Level.Debug;
+		public bool IsDebugEnabled => Level.Debug >= _logManager.Level;
 
 		public LogEvent Debug()
         {
@@ -26,7 +26,8 @@ namespace ZeroLog
 			logEvent.Append(ex.ToString());
 			logEvent.Log();
         }
-			
+
+					
 		[StringFormatMethod("format")]	
 		public void DebugFormat<T0>(string format, T0 arg0)
 		{
@@ -127,7 +128,7 @@ namespace ZeroLog
 			logEvent.Log();
         }
 					
-		public bool IsInfoEnabled => _logManager.Level >= Level.Info;
+		public bool IsInfoEnabled => Level.Info >= _logManager.Level;
 
 		public LogEvent Info()
         {
@@ -248,7 +249,7 @@ namespace ZeroLog
 			logEvent.Log();
         }
 					
-		public bool IsWarnEnabled => _logManager.Level >= Level.Warn;
+		public bool IsWarnEnabled => Level.Warn >= _logManager.Level;
 
 		public LogEvent Warn()
         {
@@ -369,7 +370,7 @@ namespace ZeroLog
 			logEvent.Log();
         }
 					
-		public bool IsErrorEnabled => _logManager.Level >= Level.Error;
+		public bool IsErrorEnabled => Level.Error >= _logManager.Level;
 
 		public LogEvent Error()
         {
@@ -490,7 +491,7 @@ namespace ZeroLog
 			logEvent.Log();
         }
 					
-		public bool IsFatalEnabled => _logManager.Level >= Level.Fatal;
+		public bool IsFatalEnabled => Level.Fatal >= _logManager.Level;
 
 		public LogEvent Fatal()
         {

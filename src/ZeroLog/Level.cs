@@ -2,12 +2,12 @@ namespace ZeroLog
 {
     public enum Level
     {
-        Fatal,
-        Error,
-        Warn,
-        Info,
-        Debug,
+        Finest,
         Verbose,
-        Finest
+        Debug,
+        Info,
+        Warn,
+        Error,
+        Fatal,
     }
 }

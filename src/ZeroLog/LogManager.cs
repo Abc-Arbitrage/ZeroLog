@@ -10,7 +10,6 @@ namespace ZeroLog
 {
     public class LogManager
     {
-        private readonly Level _level;
         private static LogManager _logManager;
 
         private readonly ConcurrentQueue<LogEvent> _queue;
@@ -22,7 +21,7 @@ namespace ZeroLog
         
         internal LogManager(IEnumerable<IAppender> appenders, int size, Level level = Level.Finest)
         {
-            _level = level;
+            Level = level;
             _encoding = Encoding.Default;
             _queue = new ConcurrentQueue<LogEvent>(new FakeCollection(size));
             var bufferSegmentProvider = new BufferSegmentProvider(size * 128, 128);
@@ -37,6 +36,8 @@ namespace ZeroLog
 
             _writeTask = Task.Run(() => WriteToAppenders());
         }
+
+        public Level Level { get; }
 
         public static LogManager Initialize(IEnumerable<IAppender> appenders, int size = 1024, Level level = Level.Finest)
         {
@@ -60,8 +61,6 @@ namespace ZeroLog
 
             logManager._writeTask.Wait(15000);
         }
-
-        public Level Level => _level;
 
         public static Log GetLogger(Type type)
         {
@@ -123,7 +122,7 @@ namespace ZeroLog
                 foreach (var appender in _appenders)
                 {
                     // TODO: each appender should declare their own level
-                    if (logEvent.Level <= _level)
+                    if (logEvent.Level >= Level)
                         appender.WriteEvent(logEvent, destination, bytesWritten);
                 }
 

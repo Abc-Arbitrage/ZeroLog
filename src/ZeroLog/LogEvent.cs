@@ -15,8 +15,6 @@ namespace ZeroLog
         private readonly List<string> _strings = new List<string>(_stringCapacity);
         private readonly List<IntPtr> _argPointers = new List<IntPtr>(_stringCapacity);
         private Log _log;
-        private DateTime _timestamp;
-        private int _threadId;
 
         private readonly byte* _startOfBuffer;
         private readonly byte* _endOfBuffer;
@@ -30,19 +28,19 @@ namespace ZeroLog
         }
 
         public Level Level { get; private set; }
+        public DateTime Timestamp { get; private set; }
+        public int ThreadId { get; private set; }
         public string Name => _log.Name;
-        public DateTime Timestamp => _timestamp;
-        public int ThreadId => _threadId;
 
         internal void Initialize(Level level, Log log)
         {
-            _timestamp = DateTime.UtcNow;
+            Timestamp = DateTime.UtcNow;
             Level = level;
             _log = log;
             _strings.Clear();
             _argPointers.Clear();
             _dataPointer = _startOfBuffer;
-            _threadId = Thread.CurrentThread.ManagedThreadId;
+            ThreadId = Thread.CurrentThread.ManagedThreadId;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
