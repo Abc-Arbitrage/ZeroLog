@@ -1,4 +1,4 @@
-# ZeroLog
+# ZeroLog [![Build status](https://ci.appveyor.com/api/projects/status/r25x2h7ke5119v18?svg=true)](https://ci.appveyor.com/project/TechABC/zerolog)
 
 ZeroLog is a **zero-allocation .NET logging library**. It uses the excellent formatting library [StringFormatter](https://github.com/MikePopoloski/StringFormatter).
 
