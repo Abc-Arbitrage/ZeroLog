@@ -2,5 +2,5 @@ version: 1.0.{build}
 image: Visual Studio 2015
 build: off
 test_script:
-- ps: build\build.ps1 -Script build\build.cake -Target Test
+- ps: build\build.ps1 -Script build\build.cake -Target Test-All
 deploy: off
