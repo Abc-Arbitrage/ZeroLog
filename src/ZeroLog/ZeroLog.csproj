@@ -79,7 +79,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="ZeroLog.csproj.nuspec" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Log.tt">
