@@ -11,59 +11,59 @@ using JetBrains.Annotations;
 
 namespace ZeroLog
 {
-	partial class Log
-	{
-		<# 
-		var loggableLevelNames = new []{"Debug", "Info", "Warn", "Error", "Fatal" };
-		foreach (var levelName in loggableLevelNames) 
+    partial class Log
+    {
+        <# 
+        var loggableLevelNames = new []{"Debug", "Info", "Warn", "Error", "Fatal" };
+        foreach (var levelName in loggableLevelNames) 
         {
-		#>
-		
-		public bool Is<#=levelName#>Enabled => Level.<#=levelName#> >= _logManager.Level;
+        #>
+        
+        public bool Is<#=levelName#>Enabled => Level.<#=levelName#> >= _logManager.Level;
 
-		public LogEvent <#=levelName#>()
+        public LogEvent <#=levelName#>()
         {
             return GetLogEventFor(Level.<#=levelName#>);
         }
-		
-		public void <#=levelName#>(string message)
+        
+        public void <#=levelName#>(string message)
         {
             GetLogEventFor(Level.<#=levelName#>).Append(message).Log();
         }
 
-		public void <#=levelName#>(string message, Exception ex)
-		{
-			var logEvent = GetLogEventFor(Level.<#=levelName#>);
-			logEvent.Append(message);
-			logEvent.Append(ex.ToString());
-			logEvent.Log();
+        public void <#=levelName#>(string message, Exception ex)
+        {
+            var logEvent = GetLogEventFor(Level.<#=levelName#>);
+            logEvent.Append(message);
+            logEvent.Append(ex.ToString());
+            logEvent.Log();
         }
 
-					<# for(int i = 1; i <= 8; i++)
-			{
-				var simpleName = "Arg" + i;
-				var genericParams = "<T0";
-			
-				for (int j = 1; j < i; j++)
-				{
-					genericParams += ", T" + j;
-				}
+                    <# for(int i = 1; i <= 8; i++)
+            {
+                var simpleName = "Arg" + i;
+                var genericParams = "<T0";
+            
+                for (int j = 1; j < i; j++)
+                {
+                    genericParams += ", T" + j;
+                }
 
-				genericParams += ">";
-			#>
+                genericParams += ">";
+            #>
 
-		[StringFormatMethod("format")]	
-		public void <#=levelName#>Format<#=genericParams#>(string format, T0 arg0<#for(int j = 1; j < i; j++) { #>, T<#=j#> arg<#=j#><#}#>)
-		{
-			var logEvent = GetLogEventFor(Level.<#=levelName#>);
-			logEvent.AppendFormat(format);
-			<#for(int j = 0; j < i; j++){#>
+        [StringFormatMethod("format")]	
+        public void <#=levelName#>Format<#=genericParams#>(string format, T0 arg0<#for(int j = 1; j < i; j++) { #>, T<#=j#> arg<#=j#><#}#>)
+        {
+            var logEvent = GetLogEventFor(Level.<#=levelName#>);
+            logEvent.AppendFormat(format);
+            <#for(int j = 0; j < i; j++){#>
 logEvent.AppendGeneric(arg<#=j#>);
-			<#}#>
+            <#}#>
 logEvent.Log();
         }
-			<#}
-		}#>
-		
-	}
+            <#}
+        }#>
+        
+    }
 }
