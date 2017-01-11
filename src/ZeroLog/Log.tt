@@ -6,6 +6,7 @@
 <#@ assembly name="$(TargetPath)" #>
 <#@ output extension=".cs" #>
 
+using System;
 using JetBrains.Annotations;
 
 namespace ZeroLog
@@ -24,12 +25,21 @@ namespace ZeroLog
         {
             return GetLogEventFor(Level.<#=levelName#>);
         }
-
+		
 		public void <#=levelName#>(string message)
         {
             GetLogEventFor(Level.<#=levelName#>).Append(message).Log();
         }
-			<# for(int i = 1; i <= 8; i++)
+
+		public void <#=levelName#>(string message, Exception ex)
+		{
+			var logEvent = GetLogEventFor(Level.<#=levelName#>);
+			logEvent.Append(message);
+			logEvent.Append(ex.ToString());
+			logEvent.Log();
+        }
+
+					<# for(int i = 1; i <= 8; i++)
 			{
 				var simpleName = "Arg" + i;
 				var genericParams = "<T0";

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Text.Formatting;
 
 namespace ZeroLog
@@ -105,13 +104,13 @@ namespace ZeroLog
                     break;
 
                 case ArgumentType.DateTime:
-                    var dateTime = ReadDateTime(ref argPointer);
-                    stringBuffer.Append(dateTime, format);
+                    stringBuffer.Append(*(DateTime*)argPointer, format);
+                    argPointer += sizeof(DateTime);
                     break;
 
                 case ArgumentType.TimeSpan:
-                    var timeSpan = ReadTimeSpan(ref argPointer);
-                    stringBuffer.Append(timeSpan, format);
+                    stringBuffer.Append(*(TimeSpan*)argPointer, format);
+                    argPointer += sizeof(TimeSpan);
                     break;
 
                 case ArgumentType.FormatString:
@@ -123,24 +122,6 @@ namespace ZeroLog
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-        }
-
-        private static DateTime ReadDateTime(ref byte* dataPointer)
-        {
-            var dateData = *(ulong*)dataPointer;
-            dataPointer += sizeof(ulong);
-
-            var ticks = (long)(dateData & 0x3FFFFFFFFFFFFFFF);
-            var kind = (DateTimeKind)(dateData & 0xC000000000000000);
-            return new DateTime(ticks, kind);
-        }
-
-        private static TimeSpan ReadTimeSpan(ref byte* dataPointer)
-        {
-            var ticks = *(long*)dataPointer;
-            dataPointer += sizeof(long);
-
-            return new TimeSpan(ticks);
         }
     }
 }

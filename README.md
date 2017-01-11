@@ -71,9 +71,7 @@ Both APIs can be used in a zero allocation fashion, but not all formatting optio
  - More appenders
  - Multiple logging (formatting and appending) threads
  - Layout pattern (basic support already available in `DateAndSizeRollingFileAppender`)
- - Support of standard formatting options (some already available; some modifiers not supported for DateTime and TimeSpan) 
- - Support for `Exception` arguments
- - Support for `byte[]` arguments
+ - Support of standard formatting options (some already available; some modifiers not supported for DateTime and TimeSpan)
  - Hierarchical loggers
  - XML code documentation for the public API
     
