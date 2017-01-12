@@ -30,6 +30,19 @@ private void Build(string configuration, string outputDirectoryPath)
 // TASKS
 //////////////////////////////////////////////////////////////////////
 
+Task("UpdateBuildVersionNumber").Does(() =>
+{
+    if(!AppVeyor.IsRunningOnAppVeyor)
+    {
+        Information("Not running under AppVeyor");
+        return;
+    }
+    
+    Information("Running under AppVeyor");
+    var version = System.IO.File.ReadAllText(paths.version) + "$version";
+    Information("Updating AppVeyor build version to "+version);
+    AppVeyor.UpdateBuildVersion(version);
+});
 Task("Clean").Does(() =>
 {
     CleanDirectory(paths.output.build);
@@ -68,22 +81,26 @@ Task("Nuget-Pack").Does(() =>
 //////////////////////////////////////////////////////////////////////
 
 Task("Test-Debug")
+    .IsDependentOn("UpdateBuildVersionNumber")
     .IsDependentOn("Clean")
     .IsDependentOn("Restore-NuGet-Packages")
     .IsDependentOn("Build-Debug")
     .IsDependentOn("Run-Debug-Unit-Tests");
 
 Task("Test-Release")
+    .IsDependentOn("UpdateBuildVersionNumber")
     .IsDependentOn("Clean")
     .IsDependentOn("Restore-NuGet-Packages")
     .IsDependentOn("Build-Release")
     .IsDependentOn("Run-Release-Unit-Tests");
 
 Task("Test-All")
+    .IsDependentOn("UpdateBuildVersionNumber")
     .IsDependentOn("Test-Debug")
     .IsDependentOn("Test-Release");
 
 Task("Nuget")
+    .IsDependentOn("UpdateBuildVersionNumber")
     .IsDependentOn("Test-All")
     .IsDependentOn("Nuget-Pack")
     .Does(() => {
