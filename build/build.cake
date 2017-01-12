@@ -1,4 +1,5 @@
 #tool nuget:?package=NUnit.Runners.Net4&version=2.6.4
+#tool "nuget:?package=GitVersion.CommandLine"
 //////////////////////////////////////////////////////////////////////
 // ARGUMENTS
 //////////////////////////////////////////////////////////////////////
@@ -39,8 +40,10 @@ Task("UpdateBuildVersionNumber").Does(() =>
     }
     
     Information("Running under AppVeyor");
-    var version = System.IO.File.ReadAllText(paths.version) + "$version";
-    Information("Updating AppVeyor build version to "+version);
+    var version = System.IO.File.ReadAllText(paths.version);
+    var gitVersion = GitVersion();
+    var version += "-" + gitVersion.Sha;
+    Information("Updating AppVeyor build version to " + version);
     AppVeyor.UpdateBuildVersion(version);
 });
 Task("Clean").Does(() =>
