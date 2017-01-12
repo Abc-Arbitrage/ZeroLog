@@ -42,7 +42,7 @@ Task("UpdateBuildVersionNumber").Does(() =>
     Information("Running under AppVeyor");
     var version = System.IO.File.ReadAllText(paths.version);
     var gitVersion = GitVersion();
-    var version += "-" + gitVersion.Sha;
+    version += "-" + gitVersion.Sha;
     Information("Updating AppVeyor build version to " + version);
     AppVeyor.UpdateBuildVersion(version);
 });
