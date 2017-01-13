@@ -50,6 +50,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\SharedVersionInfo.cs">
+      <Link>Properties\SharedVersionInfo.cs</Link>
+    </Compile>
     <Compile Include="Appenders\AppenderBase.cs" />
     <Compile Include="Appenders\ConsoleAppender.cs" />
     <Compile Include="Appenders\DateAndSizeRollingFileAppender.cs" />

@@ -17,6 +17,7 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="ZeroLog.dll" target="lib\net45" />
+    <file src="Release\ZeroLog.dll" target="lib\net45" />
+    <file src="Release\ZeroLog.pdb" target="lib\net45" />
   </files>
 </package>

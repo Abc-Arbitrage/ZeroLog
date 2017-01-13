@@ -1,5 +1,6 @@
+#l "scripts/utilities.cake"
 #tool nuget:?package=NUnit.Runners.Net4&version=2.6.4
-#tool "nuget:?package=GitVersion.CommandLine"
+#addin "Cake.FileHelpers"
 //////////////////////////////////////////////////////////////////////
 // ARGUMENTS
 //////////////////////////////////////////////////////////////////////
@@ -7,14 +8,16 @@
 var target = Argument("target", "Default");
 var paths = new {
     solution = MakeAbsolute(File("./../src/ZeroLog.sln")).FullPath,
-    version = MakeAbsolute(File("./../version.txt")).FullPath,
-    assemblyInfo = MakeAbsolute(File("./../src/ZeroLog/Properties/AssemblyInfo.cs")).FullPath,
+    version = MakeAbsolute(File("./../version.yml")).FullPath,
+    assemblyInfo = MakeAbsolute(File("./../src/SharedVersionInfo.cs")).FullPath,
     output = new {
         build = MakeAbsolute(Directory("./../output/build")).FullPath,
         nuget = MakeAbsolute(Directory("./../output/nuget")).FullPath,
     },
     nuspec = MakeAbsolute(File("./ZeroLog.nuspec")).FullPath,
 };
+
+ReadContext(paths.version);
 
 //////////////////////////////////////////////////////////////////////
 // HELPERS
@@ -40,11 +43,8 @@ Task("UpdateBuildVersionNumber").Does(() =>
     }
     
     Information("Running under AppVeyor");
-    var version = System.IO.File.ReadAllText(paths.version);
-    var gitVersion = GitVersion();
-    version += "-" + gitVersion.Sha;
-    Information("Updating AppVeyor build version to " + version);
-    AppVeyor.UpdateBuildVersion(version);
+    Information("Updating AppVeyor build version to " + VersionContext.BuildVersion);
+    AppVeyor.UpdateBuildVersion(VersionContext.BuildVersion);
 });
 Task("Clean").Does(() =>
 {
@@ -53,28 +53,22 @@ Task("Clean").Does(() =>
 });
 Task("Restore-NuGet-Packages").Does(() => NuGetRestore(paths.solution));
 Task("Create-AssemblyInfo").Does(()=>{
-    var version = System.IO.File.ReadAllText(paths.version);
     CreateAssemblyInfo(paths.assemblyInfo, new AssemblyInfoSettings {
-            Title = "ZeroLog",
-            Product = "ZeroLog",
-            Description = "A zero-allocation .NET logging library - https://github.com/Abc-Arbitrage/ZeroLog",
-            Copyright = "Copyright © ABC arbitrage 2017",
-            Company = "ABC arbitrage",
-            Version = version,
-            FileVersion = version,
-            InternalsVisibleTo = new []{ "ZeroLog.Tests" }
+        Version = VersionContext.AssemblyVersion,
+        FileVersion = VersionContext.AssemblyVersion,
+        InformationalVersion = VersionContext.NugetVersion + " Commit: " + VersionContext.Git.Sha
     });
 });
 Task("Build-Debug").Does(() => Build("Debug", paths.output.build));
 Task("Build-Release").Does(() => Build("Release", paths.output.build));
+Task("Clean-AssemblyInfo").Does(() => FileWriteText(paths.assemblyInfo, string.Empty));
 Task("Run-Debug-Unit-Tests").Does(() => NUnit(paths.output.build + "/Debug/*.Tests.exe", new NUnitSettings { Framework = "net-4.6.1", NoResults = true }));
 Task("Run-Release-Unit-Tests").Does(() => NUnit(paths.output.build + "/Release/*.Tests.exe", new NUnitSettings { Framework = "net-4.6.1", NoResults = true }));
 Task("Nuget-Pack").Does(() => 
 {
-    var version = System.IO.File.ReadAllText(paths.version);
     NuGetPack(paths.nuspec, new NuGetPackSettings {
-        Version = version,
-        BasePath = paths.output.build + "/Release",
+        Version = VersionContext.NugetVersion,
+        BasePath = paths.output.build,
         OutputDirectory = paths.output.nuget
     });
 });
@@ -83,35 +77,28 @@ Task("Nuget-Pack").Does(() =>
 // TASK TARGETS
 //////////////////////////////////////////////////////////////////////
 
-Task("Test-Debug")
+Task("Build")
     .IsDependentOn("UpdateBuildVersionNumber")
     .IsDependentOn("Clean")
     .IsDependentOn("Restore-NuGet-Packages")
+    .IsDependentOn("Create-AssemblyInfo")
     .IsDependentOn("Build-Debug")
-    .IsDependentOn("Run-Debug-Unit-Tests");
-
-Task("Test-Release")
-    .IsDependentOn("UpdateBuildVersionNumber")
-    .IsDependentOn("Clean")
-    .IsDependentOn("Restore-NuGet-Packages")
     .IsDependentOn("Build-Release")
+    .IsDependentOn("Clean-AssemblyInfo");
+
+Task("Test")
+    .IsDependentOn("Build")
+    .IsDependentOn("Run-Debug-Unit-Tests")
     .IsDependentOn("Run-Release-Unit-Tests");
 
-Task("Test-All")
-    .IsDependentOn("UpdateBuildVersionNumber")
-    .IsDependentOn("Test-Debug")
-    .IsDependentOn("Test-Release");
-
 Task("Nuget")
-    .IsDependentOn("UpdateBuildVersionNumber")
-    .IsDependentOn("Test-All")
+    .IsDependentOn("Test")
     .IsDependentOn("Nuget-Pack")
     .Does(() => {
-        var version = System.IO.File.ReadAllText(paths.version);
         Information("   Nuget package is now ready at location: {0}.", paths.output.nuget);
         Warning("   Please remember to create and push a tag based on the currently built version.");
         Information("   You can do so by copying/pasting the following commands:");
-        Information("       git tag v{0}", version);
+        Information("       git tag v{0}", VersionContext.NugetVersion);
         Information("       git push origin --tags");
     });
 
