@@ -19,12 +19,12 @@ namespace ZeroLog
         private readonly Task _writeTask;
         private bool _isRunning = true;
         
-        internal LogManager(IEnumerable<IAppender> appenders, int size, Level level = Level.Finest)
+        internal LogManager(IEnumerable<IAppender> appenders, int size, int logEventBufferSize = 128, Level level = Level.Finest)
         {
             Level = level;
             _encoding = Encoding.Default;
             _queue = new ConcurrentQueue<LogEvent>(new FakeCollection(size));
-            var bufferSegmentProvider = new BufferSegmentProvider(size * 128, 128);
+            var bufferSegmentProvider = new BufferSegmentProvider(size * logEventBufferSize, logEventBufferSize);
             _pool = new ObjectPool<LogEvent>(() => new LogEvent(bufferSegmentProvider.GetSegment()), size);
 
             foreach (var appender in appenders)
@@ -39,12 +39,12 @@ namespace ZeroLog
 
         public Level Level { get; }
 
-        public static LogManager Initialize(IEnumerable<IAppender> appenders, int size = 1024, Level level = Level.Finest)
+        public static LogManager Initialize(IEnumerable<IAppender> appenders, int size = 1024, int logEventBufferSize = 128, Level level = Level.Finest)
         {
             if (_logManager != null)
                 throw new ApplicationException("LogManager is already initialized");
 
-            _logManager = new LogManager(appenders, size, level);
+            _logManager = new LogManager(appenders, size, logEventBufferSize, level);
             return _logManager;
         }
 

@@ -16,7 +16,7 @@ namespace ZeroLog.Tests
         [TestCase(Level.Fatal, false, false, false, false, true)]
         public void should_return_if_log_level_is_enabled(Level logLevel, bool isDebug, bool isInfo, bool isWarn, bool isError, bool isFatal)
         {
-            var logManager = new LogManager(new List<IAppender>(), 1, logLevel);
+            var logManager = new LogManager(new List<IAppender>(), 1, 128, logLevel);
             var log = new Log(logManager, "logger");
 
             Check.That(log.IsDebugEnabled).Equals(isDebug);
