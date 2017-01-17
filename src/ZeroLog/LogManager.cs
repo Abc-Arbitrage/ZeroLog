@@ -57,9 +57,12 @@ namespace ZeroLog
                 return;
 
             logManager._isRunning = false;
-            // TODO: shutdown all the logs
-
             logManager._writeTask.Wait(15000);
+
+            foreach (var appender in logManager._appenders)
+            {
+                appender.Close();
+            }
         }
 
         public static Log GetLogger(Type type)

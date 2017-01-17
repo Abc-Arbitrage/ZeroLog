@@ -108,7 +108,7 @@ namespace ZeroLog.Appenders
             CheckRollFile();
         }
 
-        public void Close()
+        public override void Close()
         {
             lock (_lock)
             {

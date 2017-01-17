@@ -31,6 +31,10 @@ namespace ZeroLog.Appenders
         {
         }
 
+        public void Close()
+        {
+        }
+
         private struct MessageReceived
         {
             public readonly byte[] StartTimestampInChars;

@@ -7,5 +7,6 @@ namespace ZeroLog
     {
         void WriteEvent(LogEvent logEvent, byte[] messageBytes, int messageLength);
         void SetEncoding(Encoding encoding);
+        void Close();
     }
 }

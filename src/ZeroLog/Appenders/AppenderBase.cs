@@ -55,6 +55,8 @@ namespace ZeroLog.Appenders
             NewlineBytes = encoding.GetBytes(Environment.NewLine);
         }
 
+        public abstract void Close();
+
         public abstract void WriteEvent(LogEvent logEvent, byte[] messageBytes, int messageLength);
     }
 }
