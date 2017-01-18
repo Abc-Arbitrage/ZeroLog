@@ -144,6 +144,16 @@ namespace ZeroLog
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public unsafe LogEvent AppendAsciiString(byte* bytes, int length)
+        {
+            EnsureRemainingBytesAndStoreArgPointer(sizeof(ArgumentType) + sizeof(byte) + length * sizeof(byte));
+            AppendArgumentType(ArgumentType.AsciiString);
+            AppendByte((byte)length);
+            AppendBytes(bytes, length);
+            return this;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public LogEvent Append(bool b)
         {
             EnsureRemainingBytesAndStoreArgPointer(sizeof(ArgumentType) + sizeof(bool));
@@ -414,6 +424,15 @@ namespace ZeroLog
                     *_dataPointer = b[i];
                     _dataPointer += sizeof(byte);
                 }
+            }
+        }
+
+        private unsafe void AppendBytes(byte* bytes, int length)
+        {
+            for (int i = 0; i < length; i++)
+            {
+                *_dataPointer = bytes[i];
+                _dataPointer += sizeof(byte);
             }
         }
 

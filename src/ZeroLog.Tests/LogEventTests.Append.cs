@@ -94,6 +94,19 @@ namespace ZeroLog.Tests
         }
 
         [Test]
+        public unsafe void should_append_unsafe_byte_array()
+        {
+            var bytes = Encoding.Default.GetBytes("abc");
+            fixed (byte* b = bytes)
+            {
+                _logEvent.AppendAsciiString(b, bytes.Length);
+            }
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreEqual("abc", _output.ToString());
+        }
+
+        [Test]
         public void should_append_true()
         {
             _logEvent.Append(true);
