@@ -53,7 +53,7 @@ namespace ZeroLog
         public static void Shutdown()
         {
             var logManager = _logManager;
-            _logManager = null;
+            _logManager = _defaultLogManager;
 
             if (logManager == null)
                 return;
