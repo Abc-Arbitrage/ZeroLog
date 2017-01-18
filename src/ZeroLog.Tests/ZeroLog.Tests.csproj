@@ -70,6 +70,7 @@
     <Compile Include="PerformanceTests.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UninitialisedLogManagerTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

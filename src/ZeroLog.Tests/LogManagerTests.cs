@@ -26,5 +26,17 @@ namespace ZeroLog.Tests
 
             Check.That(log).IsNotNull();
         }
+
+        [Test]
+        public void should_use_default_null_logger_when_not_initialised()
+        {
+            
+        }
+
+        [Test, ExpectedException]
+        public void should_prevent_initialising_already_initialised_log_manager()
+        {
+            LogManager.Initialize(new IAppender[0]);
+        }
     }
 }

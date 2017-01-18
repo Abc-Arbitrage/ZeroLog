@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Text.Formatting;
 using System.Threading.Tasks;
@@ -10,7 +11,8 @@ namespace ZeroLog
 {
     public class LogManager
     {
-        private static LogManager _logManager;
+        private static readonly LogManager _defaultLogManager = new LogManager(Enumerable.Empty<IAppender>(), 1024);
+        private static LogManager _logManager = _defaultLogManager;
 
         private readonly ConcurrentQueue<LogEvent> _queue;
         private readonly ObjectPool<LogEvent> _pool;
@@ -18,7 +20,7 @@ namespace ZeroLog
         private readonly List<IAppender> _appenders;
         private readonly Task _writeTask;
         private bool _isRunning = true;
-        
+
         internal LogManager(IEnumerable<IAppender> appenders, int size, int logEventBufferSize = 128, Level level = Level.Finest)
         {
             Level = level;
@@ -41,7 +43,7 @@ namespace ZeroLog
 
         public static LogManager Initialize(IEnumerable<IAppender> appenders, int size = 1024, int logEventBufferSize = 128, Level level = Level.Finest)
         {
-            if (_logManager != null)
+            if (_logManager != _defaultLogManager)
                 throw new ApplicationException("LogManager is already initialized");
 
             _logManager = new LogManager(appenders, size, logEventBufferSize, level);
