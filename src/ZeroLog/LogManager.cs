@@ -17,6 +17,7 @@ namespace ZeroLog
         List<IAppender> Appenders { get; }
         LogEvent AllocateLogEvent();
         void Enqueue(LogEvent logEvent);
+        ILog GetNewLog(IInternalLogManager logManager, string name);
     }
 
     public interface ILogManager
@@ -26,7 +27,7 @@ namespace ZeroLog
 
     class LogManager : IInternalLogManager
     {
-        private static readonly LogManager _defaultLogManager = new LogManager(Enumerable.Empty<IAppender>(), 1024);
+        private static readonly IInternalLogManager _defaultLogManager = new NoopLogManager();
         private static IInternalLogManager _logManager = _defaultLogManager;
 
         private readonly ConcurrentQueue<LogEvent> _queue;
@@ -92,13 +93,18 @@ namespace ZeroLog
             if (_logManager == null)
                 throw new ApplicationException("LogManager is not yet initialized, please call LogManager.Initialize()");
 
-            var log = new Log(_logManager, name);
+            var log = _logManager.GetNewLog(_logManager, name);
             return log;
         }
 
         public void Enqueue(LogEvent logEvent)
         {
             _queue.Enqueue(logEvent);
+        }
+
+        public ILog GetNewLog(IInternalLogManager logManager, string name)
+        {
+            return new Log(logManager, name);
         }
 
         public LogEvent AllocateLogEvent()

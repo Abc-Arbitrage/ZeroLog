@@ -78,6 +78,7 @@
     </Compile>
     <Compile Include="LogEvent.cs" />
     <Compile Include="LogManager.cs" />
+    <Compile Include="NoopLogManager.cs" />
     <Compile Include="ObjectPool.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StringBufferExtension.cs" />
