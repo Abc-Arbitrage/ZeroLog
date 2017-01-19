@@ -1,10 +1,10 @@
 ﻿namespace ZeroLog
 {
-    public partial class Log
+    public partial class Log : ILog
     {
-        private readonly LogManager _logManager;
+        private readonly IInternalLogManager _logManager;
 
-        internal Log(LogManager logManager, string name)
+        internal Log(IInternalLogManager logManager, string name)
         {
             _logManager = logManager;
             Name = name;

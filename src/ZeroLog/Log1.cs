@@ -9,7 +9,7 @@ namespace ZeroLog
                 
         public bool IsDebugEnabled => Level.Debug >= _logManager.Level;
 
-        public LogEvent Debug()
+        public ILogEvent Debug()
         {
             return GetLogEventFor(Level.Debug);
         }
@@ -130,7 +130,7 @@ namespace ZeroLog
                     
         public bool IsInfoEnabled => Level.Info >= _logManager.Level;
 
-        public LogEvent Info()
+        public ILogEvent Info()
         {
             return GetLogEventFor(Level.Info);
         }
@@ -251,7 +251,7 @@ namespace ZeroLog
                     
         public bool IsWarnEnabled => Level.Warn >= _logManager.Level;
 
-        public LogEvent Warn()
+        public ILogEvent Warn()
         {
             return GetLogEventFor(Level.Warn);
         }
@@ -372,7 +372,7 @@ namespace ZeroLog
                     
         public bool IsErrorEnabled => Level.Error >= _logManager.Level;
 
-        public LogEvent Error()
+        public ILogEvent Error()
         {
             return GetLogEventFor(Level.Error);
         }
@@ -493,7 +493,7 @@ namespace ZeroLog
                     
         public bool IsFatalEnabled => Level.Fatal >= _logManager.Level;
 
-        public LogEvent Fatal()
+        public ILogEvent Fatal()
         {
             return GetLogEventFor(Level.Fatal);
         }

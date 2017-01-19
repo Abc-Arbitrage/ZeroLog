@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,17 +10,31 @@ using Roslyn.Utilities;
 
 namespace ZeroLog
 {
-    public class LogManager
+    internal interface IInternalLogManager : ILogManager
+    {
+        bool IsRunning { get; set; }
+        Task WriteTask { get; }
+        List<IAppender> Appenders { get; }
+        LogEvent AllocateLogEvent();
+        void Enqueue(LogEvent logEvent);
+    }
+
+    public interface ILogManager
+    {
+        Level Level { get; }
+    }
+
+    class LogManager : IInternalLogManager
     {
         private static readonly LogManager _defaultLogManager = new LogManager(Enumerable.Empty<IAppender>(), 1024);
-        private static LogManager _logManager = _defaultLogManager;
+        private static IInternalLogManager _logManager = _defaultLogManager;
 
         private readonly ConcurrentQueue<LogEvent> _queue;
         private readonly ObjectPool<LogEvent> _pool;
         private readonly Encoding _encoding;
-        private readonly List<IAppender> _appenders;
-        private readonly Task _writeTask;
-        private bool _isRunning = true;
+        public bool IsRunning { get; set; }
+        public Task WriteTask { get; }
+        public List<IAppender> Appenders { get; }
 
         internal LogManager(IEnumerable<IAppender> appenders, int size, int logEventBufferSize = 128, Level level = Level.Finest)
         {
@@ -34,14 +49,14 @@ namespace ZeroLog
                 appender.SetEncoding(_encoding);
             }
 
-            _appenders = new List<IAppender>(appenders);
+            Appenders = new List<IAppender>(appenders);
 
-            _writeTask = Task.Run(() => WriteToAppenders());
+            WriteTask = Task.Run(() => WriteToAppenders());
         }
 
         public Level Level { get; }
 
-        public static LogManager Initialize(IEnumerable<IAppender> appenders, int size = 1024, int logEventBufferSize = 128, Level level = Level.Finest)
+        public static ILogManager Initialize(IEnumerable<IAppender> appenders, int size = 1024, int logEventBufferSize = 128, Level level = Level.Finest)
         {
             if (_logManager != _defaultLogManager)
                 throw new ApplicationException("LogManager is already initialized");
@@ -58,21 +73,21 @@ namespace ZeroLog
             if (logManager == null)
                 return;
 
-            logManager._isRunning = false;
-            logManager._writeTask.Wait(15000);
+            logManager.IsRunning = false;
+            logManager.WriteTask.Wait(15000);
 
-            foreach (var appender in logManager._appenders)
+            foreach (var appender in logManager.Appenders)
             {
                 appender.Close();
             }
         }
 
-        public static Log GetLogger(Type type)
+        public static ILog GetLogger(Type type)
         {
             return GetLogger(type.FullName);
         }
 
-        public static Log GetLogger(string name)
+        public static ILog GetLogger(string name)
         {
             if (_logManager == null)
                 throw new ApplicationException("LogManager is not yet initialized, please call LogManager.Initialize()");
@@ -81,12 +96,12 @@ namespace ZeroLog
             return log;
         }
 
-        internal void Enqueue(LogEvent logEvent)
+        public void Enqueue(LogEvent logEvent)
         {
             _queue.Enqueue(logEvent);
         }
 
-        internal LogEvent AllocateLogEvent()
+        public LogEvent AllocateLogEvent()
         {
             return _pool.Allocate();
         }
@@ -95,7 +110,7 @@ namespace ZeroLog
         {
             var stringBuffer = new StringBuffer();
             var destination = new byte[1024];
-            while (_isRunning || !_queue.IsEmpty)
+            while (IsRunning || !_queue.IsEmpty)
             {
                 try
                 {
@@ -124,7 +139,7 @@ namespace ZeroLog
                 stringBuffer.Clear();
 
                 // Write to appenders
-                foreach (var appender in _appenders)
+                foreach (var appender in Appenders)
                 {
                     // TODO: each appender should declare their own level
                     if (logEvent.Level >= Level)

@@ -21,7 +21,7 @@ namespace ZeroLog
         
         public bool Is<#=levelName#>Enabled => Level.<#=levelName#> >= _logManager.Level;
 
-        public LogEvent <#=levelName#>()
+        public ILogEvent <#=levelName#>()
         {
             return GetLogEventFor(Level.<#=levelName#>);
         }

@@ -66,6 +66,8 @@
     <Compile Include="ConcurrentQueue.cs" />
     <Compile Include="FakeCollection.cs" />
     <Compile Include="IAppender.cs" />
+    <Compile Include="ILog.cs" />
+    <Compile Include="ILogEvent.cs" />
     <Compile Include="Level.cs" />
     <Compile Include="LevelStringCache.cs" />
     <Compile Include="Log.cs" />

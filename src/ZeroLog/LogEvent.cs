@@ -8,7 +8,7 @@ using System.Threading;
 
 namespace ZeroLog
 {
-    public unsafe class LogEvent
+    public unsafe class LogEvent : ILogEvent
     {
         private const int _stringCapacity = 10;
 
