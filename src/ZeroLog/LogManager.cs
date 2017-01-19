@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Text.Formatting;
 using System.Threading.Tasks;
@@ -25,7 +23,7 @@ namespace ZeroLog
         Level Level { get; }
     }
 
-    class LogManager : IInternalLogManager
+    public class LogManager : IInternalLogManager
     {
         private static readonly IInternalLogManager _defaultLogManager = new NoopLogManager();
         private static IInternalLogManager _logManager = _defaultLogManager;
@@ -97,17 +95,17 @@ namespace ZeroLog
             return log;
         }
 
-        public void Enqueue(LogEvent logEvent)
+        void IInternalLogManager.Enqueue(LogEvent logEvent)
         {
             _queue.Enqueue(logEvent);
         }
 
-        public ILog GetNewLog(IInternalLogManager logManager, string name)
+        ILog IInternalLogManager.GetNewLog(IInternalLogManager logManager, string name)
         {
             return new Log(logManager, name);
         }
 
-        public LogEvent AllocateLogEvent()
+        LogEvent IInternalLogManager.AllocateLogEvent()
         {
             return _pool.Allocate();
         }
