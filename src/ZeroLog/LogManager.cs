@@ -10,7 +10,7 @@ namespace ZeroLog
 {
     internal interface IInternalLogManager : ILogManager
     {
-        bool IsRunning { get; set; }
+        bool IsRunning { get; set;  }
         Task WriteTask { get; }
         List<IAppender> Appenders { get; }
         LogEvent AllocateLogEvent();
@@ -50,6 +50,7 @@ namespace ZeroLog
 
             Appenders = new List<IAppender>(appenders);
 
+            IsRunning = true;
             WriteTask = Task.Run(() => WriteToAppenders());
         }
 

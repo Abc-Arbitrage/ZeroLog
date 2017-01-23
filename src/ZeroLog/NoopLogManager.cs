@@ -8,8 +8,8 @@ namespace ZeroLog
 {
     internal class NoopLogManager : IInternalLogManager
     {
-        public Level Level { get; }
-        public bool IsRunning { get; set; }
+        public Level Level { get; } = Level.Finest;
+        public bool IsRunning { get; set; } = true;
         public Task WriteTask { get; }
         public List<IAppender> Appenders { get; }
 
