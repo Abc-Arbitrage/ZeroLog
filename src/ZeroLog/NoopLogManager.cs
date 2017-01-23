@@ -317,6 +317,11 @@ namespace ZeroLog
                 
             }
 
+            public ILogEvent ForLevel(Level level)
+            {
+                return _event;
+            }
+
             private class NoopLogEvent : ILogEvent
             {
                 public Level Level { get; }

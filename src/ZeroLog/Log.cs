@@ -12,6 +12,11 @@
 
         internal string Name { get; }
 
+        public ILogEvent ForLevel(Level level)
+        {
+            return GetLogEventFor(level);
+        }
+
         private LogEvent GetLogEventFor(Level level)
         {
             var logEvent = _logManager.AllocateLogEvent();
