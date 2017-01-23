@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace ZeroLog
 {
@@ -8,7 +9,7 @@ namespace ZeroLog
 
         static LevelStringCache()
         {
-            _levelStrings = Enum.GetNames(typeof(Level));
+            _levelStrings = Enum.GetNames(typeof(Level)).Select(x => x.ToUpperInvariant()).ToArray();
         }
 
         public static string GetLevelString(Level level) => _levelStrings[(byte)level];
