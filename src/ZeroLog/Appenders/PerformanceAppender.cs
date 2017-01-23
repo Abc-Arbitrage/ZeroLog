@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ZeroLog.Appenders
 {
-    public class PerformanceAppender : IAppender
+    class PerformanceAppender : IAppender
     {
         private readonly MessageReceived[] _messages;
         private int _count;
