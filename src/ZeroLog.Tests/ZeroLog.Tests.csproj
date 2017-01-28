@@ -60,6 +60,7 @@
     <Compile Include="..\SharedVersionInfo.cs">
       <Link>Properties\SharedVersionInfo.cs</Link>
     </Compile>
+    <Compile Include="AllocationTests.cs" />
     <Compile Include="Appenders\DateAndSizeRollingFileAppenderTests.cs" />
     <Compile Include="BufferSegmentProviderTests.cs" />
     <Compile Include="IntegrationTests.cs" />
