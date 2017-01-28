@@ -136,9 +136,8 @@ namespace ZeroLog.Tests
             const int count = 1000000;
 
             GC.Collect(2, GCCollectionMode.Forced, true);
-            var gcCount = GC.CollectionCount(0);
-
             var timer = Stopwatch.StartNew();
+            var gcCount = GC.CollectionCount(0);
 
             var logger = LogManager.GetLogger(typeof(IntegrationTests));
             for (int k = 0; k < count; k++)
@@ -148,9 +147,11 @@ namespace ZeroLog.Tests
             }
 
             LogManager.Shutdown();
+            var gcCountAfter = GC.CollectionCount(0);
             timer.Stop();
+
             Console.WriteLine("BCL  : {0} us/log", timer.ElapsedMilliseconds * 1000.0 / count);
-            Console.WriteLine("GCs  : {0}", GC.CollectionCount(0) - gcCount);
+            Console.WriteLine("GCs  : {0}", gcCountAfter - gcCount);
         }
     }
 }

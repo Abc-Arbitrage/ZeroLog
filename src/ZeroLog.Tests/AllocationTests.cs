@@ -18,7 +18,7 @@ namespace ZeroLog.Tests
                 File.Delete(file);
             }
 
-            LogManager.Initialize(new[] {new DateAndSizeRollingFileAppender("allocation-test")}, 2048, 512);
+            LogManager.Initialize(new[] {new DateAndSizeRollingFileAppender("allocation-test")}, 2048 * 10, 512);
         }
 
         [TearDown]
@@ -32,8 +32,7 @@ namespace ZeroLog.Tests
         {
             var log = LogManager.GetLogger("AllocationTest");
 
-            GC.Collect(2);
-
+            GC.Collect(2, GCCollectionMode.Forced, true);
             var gcCountBefore = GC.CollectionCount(0);
 
             for (var i = 0; i < 2048 * 10; i++)
@@ -47,8 +46,6 @@ namespace ZeroLog.Tests
                                Guid.NewGuid(),
                                DateTime.UtcNow.TimeOfDay,
                                DateTime.UtcNow);
-
-                Thread.Sleep(0);
             }
 
             // Give the appender some time to finish writing to file
