@@ -8,21 +8,6 @@ using Roslyn.Utilities;
 
 namespace ZeroLog
 {
-    internal interface IInternalLogManager : ILogManager
-    {
-        bool IsRunning { get; set;  }
-        Task WriteTask { get; }
-        List<IAppender> Appenders { get; }
-        LogEvent AllocateLogEvent();
-        void Enqueue(LogEvent logEvent);
-        ILog GetNewLog(IInternalLogManager logManager, string name);
-    }
-
-    public interface ILogManager
-    {
-        Level Level { get; }
-    }
-
     public class LogManager : IInternalLogManager
     {
         private static readonly IInternalLogManager _defaultLogManager = new NoopLogManager();
