@@ -326,7 +326,7 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent Append(DateTime dt)
         {
-            EnsureRemainingBytesAndStoreArgPointer(sizeof(ArgumentType) + sizeof(ulong));
+            EnsureRemainingBytesAndStoreArgPointer(sizeof(ArgumentType) + sizeof(DateTime));
             AppendArgumentType(ArgumentType.DateTime);
             AppendDateTime(dt);
             return this;
@@ -335,7 +335,7 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent Append(DateTime dt, string format)
         {
-            EnsureRemainingBytesAndStoreArgPointer(sizeof(ArgumentType) + sizeof(byte) + sizeof(ulong));
+            EnsureRemainingBytesAndStoreArgPointer(sizeof(ArgumentType) + sizeof(byte) + sizeof(DateTime));
             AppendArgumentType(ArgumentType.DateTime, true);
             AppendString(format);
             AppendDateTime(dt);
@@ -345,7 +345,7 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent Append(TimeSpan ts)
         {
-            EnsureRemainingBytesAndStoreArgPointer(sizeof(ArgumentType) + sizeof(long));
+            EnsureRemainingBytesAndStoreArgPointer(sizeof(ArgumentType) + sizeof(TimeSpan));
             AppendArgumentType(ArgumentType.TimeSpan);
             AppendTimeSpan(ts);
             return this;
@@ -354,7 +354,7 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent Append(TimeSpan ts, string format)
         {
-            EnsureRemainingBytesAndStoreArgPointer(sizeof(ArgumentType) + sizeof(byte) + sizeof(long));
+            EnsureRemainingBytesAndStoreArgPointer(sizeof(ArgumentType) + sizeof(byte) + sizeof(TimeSpan));
             AppendArgumentType(ArgumentType.TimeSpan, true);
             AppendString(format);
             AppendTimeSpan(ts);
@@ -370,6 +370,7 @@ namespace ZeroLog
         {
             var endOfData = _dataPointer;
             _dataPointer = _startOfBuffer;
+
             while (_dataPointer < endOfData)
             {
                 stringBuffer.Append(ref _dataPointer, StringView.Empty, _strings, _argPointers);
@@ -486,14 +487,14 @@ namespace ZeroLog
 
         private void AppendDateTime(DateTime dt)
         {
-            *(ulong*)_dataPointer = (ulong)dt.Ticks | ((ulong)dt.Kind << 62);
-            _dataPointer += sizeof(ulong);
+            *(DateTime*)_dataPointer = dt;
+            _dataPointer += sizeof(DateTime);
         }
 
         private void AppendTimeSpan(TimeSpan ts)
         {
-            *(long*)_dataPointer = ts.Ticks;
-            _dataPointer += sizeof(long);
+            *(TimeSpan*)_dataPointer = ts;
+            _dataPointer += sizeof(TimeSpan);
         }
     }
 }
