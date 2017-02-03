@@ -28,7 +28,14 @@ public ContextInfo VersionContext
 public ContextInfo ReadContext(FilePath filepath)
 {
     _versionContext = DeserializeYamlFromFile<ContextInfo>(filepath);
-    _versionContext.Git = GitVersion();
+    try
+    {
+        _versionContext.Git = GitVersion();
+    }
+    catch
+    {
+        _versionContext.Git = new Cake.Common.Tools.GitVersion.GitVersion();
+    }
     return _versionContext;
 }
 
