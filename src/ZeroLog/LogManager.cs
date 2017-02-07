@@ -98,7 +98,7 @@ namespace ZeroLog
 
         private void WriteToAppenders()
         {
-            var stringBuffer = new StringBuffer();
+            var stringBuffer = new StringBuffer(1024);
             var destination = new byte[1024];
             while (IsRunning || !_queue.IsEmpty)
             {
