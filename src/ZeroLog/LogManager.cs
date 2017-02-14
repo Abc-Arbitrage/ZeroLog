@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.Formatting;
+using System.Threading;
 using System.Threading.Tasks;
 using Roslyn.Utilities;
 
@@ -98,13 +99,15 @@ namespace ZeroLog
 
         private void WriteToAppenders()
         {
+            var spinWait = default(SpinWait);
             var stringBuffer = new StringBuffer(1024);
             var destination = new byte[1024];
             while (IsRunning || !_queue.IsEmpty)
             {
                 try
                 {
-                    TryToProcessQueue(stringBuffer, destination);
+                    if (!TryToProcessQueue(stringBuffer, destination))
+                        spinWait.SpinOnce();
                 }
                 catch (Exception ex)
                 {
@@ -115,7 +118,7 @@ namespace ZeroLog
             }
         }
 
-        private unsafe void TryToProcessQueue(StringBuffer stringBuffer, byte[] destination)
+        private unsafe bool TryToProcessQueue(StringBuffer stringBuffer, byte[] destination)
         {
             LogEvent logEvent;
             if (_queue.TryDequeue(out logEvent))
@@ -137,7 +140,9 @@ namespace ZeroLog
                 }
 
                 _pool.Free(logEvent);
+                return true;
             }
+            return false;
         }
     }
 }
