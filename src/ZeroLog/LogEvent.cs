@@ -8,7 +8,7 @@ using System.Threading;
 
 namespace ZeroLog
 {
-    public unsafe class LogEvent : ILogEvent
+    internal unsafe class LogEvent : IInternalLogEvent
     {
         private const int _stringCapacity = 10;
 
@@ -32,7 +32,7 @@ namespace ZeroLog
         public int ThreadId { get; private set; }
         public string Name => _log.Name;
 
-        internal void Initialize(Level level, Log log)
+        public void Initialize(Level level, Log log)
         {
             Timestamp = DateTime.UtcNow;
             Level = level;
@@ -44,7 +44,7 @@ namespace ZeroLog
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal void AppendFormat(string format)
+        public void AppendFormat(string format)
         {
             EnsureRemainingBytesAndStoreArgPointer(1);
             AppendArgumentType(ArgumentType.FormatString);
@@ -52,7 +52,7 @@ namespace ZeroLog
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal void AppendGeneric<T>(T arg)
+        public void AppendGeneric<T>(T arg)
         {
             // Some remarks here:
             // - The JIT knows the type of "arg" at runtime and will be able the remove useless branches for each

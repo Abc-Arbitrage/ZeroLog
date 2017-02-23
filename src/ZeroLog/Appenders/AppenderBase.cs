@@ -32,7 +32,7 @@ namespace ZeroLog.Appenders
             return prefixFormat;
         }
 
-        protected unsafe void WritePrefix(Stream stream, LogEvent logEvent)
+        protected unsafe void WritePrefix(Stream stream, ILogEvent logEvent)
         {
             _stringBuffer.Clear();
             _stringBuffer.AppendFormat(_prefixFormat,
@@ -57,6 +57,6 @@ namespace ZeroLog.Appenders
 
         public abstract void Close();
 
-        public abstract void WriteEvent(LogEvent logEvent, byte[] messageBytes, int messageLength);
+        public abstract void WriteEvent(ILogEvent logEvent, byte[] messageBytes, int messageLength);
     }
 }

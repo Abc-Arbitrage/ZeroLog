@@ -8,7 +8,7 @@ namespace ZeroLog
         bool IsRunning { get; set;  }
         Task WriteTask { get; }
         List<IAppender> Appenders { get; }
-        LogEvent AllocateLogEvent();
+        IInternalLogEvent AllocateLogEvent();
         void Enqueue(LogEvent logEvent);
         ILog GetNewLog(IInternalLogManager logManager, string name);
     }

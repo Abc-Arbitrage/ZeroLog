@@ -52,7 +52,7 @@ namespace ZeroLog.Appenders
             Open();
         }
 
-        public override void WriteEvent(LogEvent logEvent, byte[] messageBytes, int messageLength)
+        public override void WriteEvent(ILogEvent logEvent, byte[] messageBytes, int messageLength)
         {
             var stream = _stream;
             if (stream != null)

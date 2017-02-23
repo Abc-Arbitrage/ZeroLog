@@ -19,7 +19,7 @@ namespace ZeroLog.Appenders
             }
         }
 
-        public void WriteEvent(LogEvent logEvent, byte[] messageBytes, int messageLength)
+        public void WriteEvent(ILogEvent logEvent, byte[] messageBytes, int messageLength)
         {
             Array.Copy(messageBytes, _messages[_count].StartTimestampInChars, messageLength);
             _messages[_count].MessageLength = messageLength;

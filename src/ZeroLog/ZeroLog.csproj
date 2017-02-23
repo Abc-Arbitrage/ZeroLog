@@ -63,8 +63,10 @@
     <Compile Include="BufferSegment.cs" />
     <Compile Include="BufferSegmentProvider.cs" />
     <Compile Include="ConcurrentQueue.cs" />
+    <Compile Include="ConcurrentStack.cs" />
     <Compile Include="FakeCollection.cs" />
     <Compile Include="IAppender.cs" />
+    <Compile Include="IInternalLogEvent.cs" />
     <Compile Include="IInternalLogManager.cs" />
     <Compile Include="ILog.cs" />
     <Compile Include="ILogEvent.cs" />
@@ -79,6 +81,7 @@
     </Compile>
     <Compile Include="LogEvent.cs" />
     <Compile Include="LogManager.cs" />
+    <Compile Include="NoopLogEvent.cs" />
     <Compile Include="NoopLogManager.cs" />
     <Compile Include="ObjectPool.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

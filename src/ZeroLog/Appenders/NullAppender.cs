@@ -10,7 +10,7 @@ namespace ZeroLog.Appenders
         {
         }
 
-        public override void WriteEvent(LogEvent logEvent, byte[] messageBytes, int messageLength)
+        public override void WriteEvent(ILogEvent logEvent, byte[] messageBytes, int messageLength)
         {
             /*_output.Seek(0, SeekOrigin.Begin);
 

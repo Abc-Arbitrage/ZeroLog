@@ -5,7 +5,6 @@ using System.Text;
 using System.Text.Formatting;
 using System.Threading;
 using System.Threading.Tasks;
-using Roslyn.Utilities;
 
 namespace ZeroLog
 {
@@ -17,6 +16,8 @@ namespace ZeroLog
         private readonly ConcurrentQueue<LogEvent> _queue;
         private readonly ObjectPool<LogEvent> _pool;
         private readonly Encoding _encoding;
+        private readonly IInternalLogEvent _noopLogEvent = new NoopLogEvent();
+
         public bool IsRunning { get; set; }
         public Task WriteTask { get; }
         public List<IAppender> Appenders { get; }
@@ -26,8 +27,9 @@ namespace ZeroLog
             Level = level;
             _encoding = Encoding.Default;
             _queue = new ConcurrentQueue<LogEvent>(new FakeCollection(size));
+
             var bufferSegmentProvider = new BufferSegmentProvider(size * logEventBufferSize, logEventBufferSize);
-            _pool = new ObjectPool<LogEvent>(() => new LogEvent(bufferSegmentProvider.GetSegment()), size);
+            _pool = new ObjectPool<LogEvent>(size, () => new LogEvent(bufferSegmentProvider.GetSegment()));
 
             foreach (var appender in appenders)
             {
@@ -39,7 +41,7 @@ namespace ZeroLog
             IsRunning = true;
             WriteTask = Task.Run(() => WriteToAppenders());
         }
-
+        
         public Level Level { get; }
 
         public static ILogManager Initialize(IEnumerable<IAppender> appenders, int size = 1024, int logEventBufferSize = 128, Level level = Level.Finest)
@@ -92,9 +94,13 @@ namespace ZeroLog
             return new Log(logManager, name);
         }
 
-        LogEvent IInternalLogManager.AllocateLogEvent()
+        IInternalLogEvent IInternalLogManager.AllocateLogEvent()
         {
-            return _pool.Allocate();
+            LogEvent logEvent;
+            if (!_pool.TryAcquire(out logEvent))
+                return _noopLogEvent;
+
+            return logEvent;
         }
 
         private void WriteToAppenders()
@@ -139,7 +145,7 @@ namespace ZeroLog
                         appender.WriteEvent(logEvent, destination, bytesWritten);
                 }
 
-                _pool.Free(logEvent);
+                _pool.Release(logEvent);
                 return true;
             }
             return false;

@@ -4,7 +4,7 @@ namespace ZeroLog
 {
     public interface IAppender
     {
-        void WriteEvent(LogEvent logEvent, byte[] messageBytes, int messageLength);
+        void WriteEvent(ILogEvent logEvent, byte[] messageBytes, int messageLength);
         void SetEncoding(Encoding encoding);
         void Close();
     }

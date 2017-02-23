@@ -12,7 +12,7 @@ namespace ZeroLog.Appenders
             _output = Console.OpenStandardOutput();
         }
 
-        public override void WriteEvent(LogEvent logEvent, byte[] messageBytes, int messageLength)
+        public override void WriteEvent(ILogEvent logEvent, byte[] messageBytes, int messageLength)
         {
             Console.BackgroundColor = ConsoleColor.Black;
             switch (logEvent.Level)

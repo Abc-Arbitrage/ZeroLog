@@ -17,7 +17,7 @@
             return GetLogEventFor(level);
         }
 
-        private LogEvent GetLogEventFor(Level level)
+        private IInternalLogEvent GetLogEventFor(Level level)
         {
             var logEvent = _logManager.AllocateLogEvent();
             logEvent.Initialize(level, this);

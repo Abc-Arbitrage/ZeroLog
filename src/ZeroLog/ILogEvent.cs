@@ -11,7 +11,7 @@ namespace ZeroLog
         int ThreadId { get; }
         string Name { get; }
         ILogEvent Append(string s);
-        unsafe ILogEvent Append(byte[] bytes, int length, Encoding encoding);
+        ILogEvent Append(byte[] bytes, int length, Encoding encoding);
         ILogEvent AppendAsciiString(byte[] bytes, int length);
         unsafe ILogEvent AppendAsciiString(byte* bytes, int length);
         ILogEvent Append(bool b);
@@ -37,6 +37,6 @@ namespace ZeroLog
         ILogEvent Append(TimeSpan ts);
         ILogEvent Append(TimeSpan ts, string format);
         void Log();
-        unsafe void WriteToStringBuffer(StringBuffer stringBuffer);
+        void WriteToStringBuffer(StringBuffer stringBuffer);   
     }
 }
