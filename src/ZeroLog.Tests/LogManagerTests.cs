@@ -9,13 +9,13 @@ namespace ZeroLog.Tests
     [TestFixture]
     public class LogManagerTests
     {
-        private MessageCountingTestAppender _messageCountingTestAppender;
+        private TestAppender _testAppender;
 
         [SetUp]
         public void SetUpFixture()
         {
-            _messageCountingTestAppender = new MessageCountingTestAppender();
-            LogManager.Initialize(new List<IAppender> {_messageCountingTestAppender}, 10);
+            _testAppender = new TestAppender();
+            LogManager.Initialize(new List<IAppender> { _testAppender }, 10);
         }
 
         [TearDown]
@@ -31,7 +31,7 @@ namespace ZeroLog.Tests
 
             Check.That(log).IsNotNull();
         }
-        
+
         [Test, ExpectedException]
         public void should_prevent_initialising_already_initialised_log_manager()
         {
@@ -54,7 +54,7 @@ namespace ZeroLog.Tests
             Check.That(actualLogEvents.OfType<LogEvent>().Count()).Equals(actualLogEvents.Count);
             Check.That(noopEvent).IsInstanceOf<NoopLogEvent>();
 
-            var signal = _messageCountingTestAppender.SetMessageCountTarget(actualLogEvents.Count);
+            var signal = _testAppender.SetMessageCountTarget(actualLogEvents.Count);
 
             for (var i = 0; i < actualLogEvents.Count; i++)
             {
@@ -65,6 +65,26 @@ namespace ZeroLog.Tests
             signal.Wait(TimeSpan.FromMilliseconds(100));
 
             Check.That(log.Debug()).IsInstanceOf<LogEvent>();
+        }
+
+        [Test]
+        public void should_log_special_message_when_log_event_pool_is_exhausted()
+        {
+            var log = LogManager.GetLogger(typeof(LogManagerTests));
+
+            var actualLogEvents = new List<ILogEvent>();
+            for (var i = 0; i < 10; i++)
+            {
+                actualLogEvents.Add(log.Debug());
+            }
+
+            var signal = _testAppender.SetMessageCountTarget(actualLogEvents.Count);
+
+            log.Debug().Append("this is not going to happen").Log();
+
+            signal.Wait(TimeSpan.FromMilliseconds(100));
+
+            Check.That(_testAppender.LoggedMessages.Last()).Contains("Log message skipped due to LogEvent pool exhaustion.");
         }
     }
 }

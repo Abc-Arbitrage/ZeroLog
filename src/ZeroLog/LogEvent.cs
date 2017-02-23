@@ -144,7 +144,7 @@ namespace ZeroLog
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public unsafe ILogEvent AppendAsciiString(byte* bytes, int length)
+        public ILogEvent AppendAsciiString(byte* bytes, int length)
         {
             EnsureRemainingBytesAndStoreArgPointer(sizeof(ArgumentType) + sizeof(byte) + length * sizeof(byte));
             AppendArgumentType(ArgumentType.AsciiString);
@@ -420,7 +420,7 @@ namespace ZeroLog
         {
             fixed (byte* b = bytes)
             {
-                for (int i = 0; i < length; i++)
+                for (var i = 0; i < length; i++)
                 {
                     *_dataPointer = b[i];
                     _dataPointer += sizeof(byte);
@@ -428,9 +428,9 @@ namespace ZeroLog
             }
         }
 
-        private unsafe void AppendBytes(byte* bytes, int length)
+        private void AppendBytes(byte* bytes, int length)
         {
-            for (int i = 0; i < length; i++)
+            for (var i = 0; i < length; i++)
             {
                 *_dataPointer = bytes[i];
                 _dataPointer += sizeof(byte);
@@ -495,6 +495,11 @@ namespace ZeroLog
         {
             *(TimeSpan*)_dataPointer = ts;
             _dataPointer += sizeof(TimeSpan);
+        }
+
+        public void SetTimestamp(DateTime timestamp)
+        {
+            Timestamp = timestamp;
         }
     }
 }

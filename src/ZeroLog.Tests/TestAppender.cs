@@ -1,13 +1,16 @@
+using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 
 namespace ZeroLog.Tests
 {
-    public class MessageCountingTestAppender : IAppender
+    public class TestAppender : IAppender
     {
         private int _messageCount;
         private ManualResetEventSlim _signal;
         private int _messageCountTarget;
+
+        public List<string> LoggedMessages { get; } = new List<string>();
 
         public ManualResetEventSlim SetMessageCountTarget(int expectedMessageCount)
         {
@@ -19,7 +22,10 @@ namespace ZeroLog.Tests
 
         public void WriteEvent(ILogEvent logEvent, byte[] messageBytes, int messageLength)
         {
-            if(++_messageCount == _messageCountTarget)
+            var message = Encoding.ASCII.GetString(messageBytes, 0, messageLength);
+            LoggedMessages.Add(message);
+
+            if (++_messageCount == _messageCountTarget)
                 _signal.Set();
         }
 

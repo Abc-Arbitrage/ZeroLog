@@ -9,7 +9,7 @@ namespace ZeroLog
         Task WriteTask { get; }
         List<IAppender> Appenders { get; }
         IInternalLogEvent AllocateLogEvent();
-        void Enqueue(LogEvent logEvent);
+        void Enqueue(IInternalLogEvent logEvent);
         ILog GetNewLog(IInternalLogManager logManager, string name);
     }
 }

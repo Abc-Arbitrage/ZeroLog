@@ -10,12 +10,15 @@
 //
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
+using System;
+using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.Serialization;
 using System.Threading;
 
-namespace System.Collections.Concurrent
+namespace ZeroLog
 {
     // A stack that uses CAS operations internally to maintain thread-safety in a lock-free
     // manner. Attempting to push or pop concurrently from the stack will not trigger waiting,

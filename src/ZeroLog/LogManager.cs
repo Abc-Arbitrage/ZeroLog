@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.Formatting;
@@ -13,8 +12,8 @@ namespace ZeroLog
         private static readonly IInternalLogManager _defaultLogManager = new NoopLogManager();
         private static IInternalLogManager _logManager = _defaultLogManager;
 
-        private readonly ConcurrentQueue<LogEvent> _queue;
-        private readonly ObjectPool<LogEvent> _pool;
+        private readonly ConcurrentQueue<IInternalLogEvent> _queue;
+        private readonly ObjectPool<IInternalLogEvent> _pool;
         private readonly Encoding _encoding;
         private readonly IInternalLogEvent _noopLogEvent = new NoopLogEvent();
 
@@ -26,22 +25,22 @@ namespace ZeroLog
         {
             Level = level;
             _encoding = Encoding.Default;
-            _queue = new ConcurrentQueue<LogEvent>(new FakeCollection(size));
+            _queue = new ConcurrentQueue<IInternalLogEvent>(new FakeCollection(size));
 
             var bufferSegmentProvider = new BufferSegmentProvider(size * logEventBufferSize, logEventBufferSize);
-            _pool = new ObjectPool<LogEvent>(size, () => new LogEvent(bufferSegmentProvider.GetSegment()));
+            _pool = new ObjectPool<IInternalLogEvent>(size, () => new LogEvent(bufferSegmentProvider.GetSegment()));
 
-            foreach (var appender in appenders)
+            Appenders = new List<IAppender>(appenders);
+
+            foreach (var appender in Appenders)
             {
                 appender.SetEncoding(_encoding);
             }
 
-            Appenders = new List<IAppender>(appenders);
-
             IsRunning = true;
             WriteTask = Task.Run(() => WriteToAppenders());
         }
-        
+
         public Level Level { get; }
 
         public static ILogManager Initialize(IEnumerable<IAppender> appenders, int size = 1024, int logEventBufferSize = 128, Level level = Level.Finest)
@@ -84,7 +83,7 @@ namespace ZeroLog
             return log;
         }
 
-        void IInternalLogManager.Enqueue(LogEvent logEvent)
+        void IInternalLogManager.Enqueue(IInternalLogEvent logEvent)
         {
             _queue.Enqueue(logEvent);
         }
@@ -96,7 +95,7 @@ namespace ZeroLog
 
         IInternalLogEvent IInternalLogManager.AllocateLogEvent()
         {
-            LogEvent logEvent;
+            IInternalLogEvent logEvent;
             if (!_pool.TryAcquire(out logEvent))
                 return _noopLogEvent;
 
@@ -124,31 +123,43 @@ namespace ZeroLog
             }
         }
 
-        private unsafe bool TryToProcessQueue(StringBuffer stringBuffer, byte[] destination)
+        private bool TryToProcessQueue(StringBuffer stringBuffer, byte[] destination)
         {
-            LogEvent logEvent;
-            if (_queue.TryDequeue(out logEvent))
+            IInternalLogEvent logEvent;
+            if (!_queue.TryDequeue(out logEvent))
+                return false;
+
+            var isSpecialEvent = false;
+            if (logEvent == SpecialLogEvents.ExhaustedPoolEvent)
             {
-                // Write format only once
-                logEvent.WriteToStringBuffer(stringBuffer);
-                int bytesWritten;
-                fixed (byte* dest = destination)
-                    bytesWritten = stringBuffer.CopyTo(dest, destination.Length, 0, stringBuffer.Count, _encoding);
-
-                stringBuffer.Clear();
-
-                // Write to appenders
-                foreach (var appender in Appenders)
-                {
-                    // TODO: each appender should declare their own level
-                    if (logEvent.Level >= Level)
-                        appender.WriteEvent(logEvent, destination, bytesWritten);
-                }
-
-                _pool.Release(logEvent);
-                return true;
+                isSpecialEvent = true;
+                logEvent.SetTimestamp(DateTime.UtcNow);
             }
-            return false;
+
+            var bytesWritten = FormatLogMessage(stringBuffer, destination, logEvent);
+
+            foreach (var appender in Appenders)
+            {
+                // TODO: each appender should declare their own level
+                if (logEvent.Level >= Level)
+                    appender.WriteEvent(logEvent, destination, bytesWritten);
+            }
+
+            if (!isSpecialEvent)
+                _pool.Release(logEvent);
+
+            return true;
+        }
+
+        private unsafe int FormatLogMessage(StringBuffer stringBuffer, byte[] destination, IInternalLogEvent logEvent)
+        {
+            logEvent.WriteToStringBuffer(stringBuffer);
+            int bytesWritten;
+            fixed (byte* dest = destination)
+                bytesWritten = stringBuffer.CopyTo(dest, destination.Length, 0, stringBuffer.Count, _encoding);
+
+            stringBuffer.Clear();
+            return bytesWritten;
         }
     }
 }

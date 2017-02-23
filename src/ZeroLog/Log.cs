@@ -24,7 +24,7 @@
             return logEvent;
         }
 
-        internal void Enqueue(LogEvent logEvent)
+        internal void Enqueue(IInternalLogEvent logEvent)
         {
             _logManager.Enqueue(logEvent);
         }

@@ -11,8 +11,11 @@ namespace ZeroLog
         public int ThreadId { get; }
         public string Name { get; }
 
+        private Log _log;
+
         public void Initialize(Level level, Log log)
         {
+            _log = log;
         }
 
         public void AppendFormat(string format)
@@ -155,9 +158,14 @@ namespace ZeroLog
 
         public void Log()
         {
+            _log.Enqueue(SpecialLogEvents.ExhaustedPoolEvent);
         }
 
         public void WriteToStringBuffer(StringBuffer stringBuffer)
+        {
+        }
+
+        public void SetTimestamp(DateTime timestamp)
         {
         }
     }

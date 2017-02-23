@@ -22,7 +22,7 @@ namespace ZeroLog
             throw new NotImplementedException();
         }
 
-        public void Enqueue(LogEvent logEvent)
+        public void Enqueue(IInternalLogEvent logEvent)
         {
             throw new NotImplementedException();
         }

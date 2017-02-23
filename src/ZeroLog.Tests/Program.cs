@@ -6,12 +6,12 @@ namespace ZeroLog.Tests
     {
         public static void Main(string[] args)
         {
-            var test = new IntegrationTests();
+            var test = new PerformanceTests();
 
             test.SetUp();
             try
             {
-                test.should_test_encoding_and_decoding();
+                test.should_run_test();
             }
             finally
             {

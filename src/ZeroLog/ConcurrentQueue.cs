@@ -2,13 +2,16 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using System;
+using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using System.Threading;
 
-namespace System.Collections.Concurrent
+namespace ZeroLog
 {
     /// <summary>
     /// Represents a thread-safe first-in, first-out collection of objects.
@@ -211,10 +214,10 @@ namespace System.Collections.Concurrent
         IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable<T>)this).GetEnumerator();
 
         /// <summary>
-        /// Attempts to add an object to the <see cref="Concurrent.IProducerConsumerCollection{T}"/>.
+        /// Attempts to add an object to the <see cref="IProducerConsumerCollection{T}"/>.
         /// </summary>
         /// <param name="item">The object to add to the <see
-        /// cref="Concurrent.IProducerConsumerCollection{T}"/>. The value can be a null
+        /// cref="IProducerConsumerCollection{T}"/>. The value can be a null
         /// reference (Nothing in Visual Basic) for reference types.
         /// </param>
         /// <returns>true if the object was added successfully; otherwise, false.</returns>
@@ -228,7 +231,7 @@ namespace System.Collections.Concurrent
         }
 
         /// <summary>
-        /// Attempts to remove and return an object from the <see cref="Concurrent.IProducerConsumerCollection{T}"/>.
+        /// Attempts to remove and return an object from the <see cref="IProducerConsumerCollection{T}"/>.
         /// </summary>
         /// <param name="item">
         /// When this method returns, if the operation was successful, <paramref name="item"/> contains the
