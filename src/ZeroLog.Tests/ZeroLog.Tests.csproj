@@ -67,6 +67,7 @@
     <Compile Include="LogEventTests.Append.cs" />
     <Compile Include="LogManagerTests.cs" />
     <Compile Include="LogTests.cs" />
+    <Compile Include="MessageCountingTestAppender.cs" />
     <Compile Include="PerformanceTests.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
