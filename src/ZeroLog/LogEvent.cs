@@ -46,7 +46,9 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void AppendFormat(string format)
         {
-            EnsureRemainingBytesAndStoreArgPointer(1);
+            if (!HasEnoughBytes(1))
+                return;
+
             AppendArgumentType(ArgumentType.FormatString);
             AppendString(format);
         }
@@ -108,7 +110,9 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent Append(string s)
         {
-            EnsureRemainingBytesAndStoreArgPointer(sizeof(ArgumentType));
+            if (!HasEnoughBytes(sizeof(ArgumentType)))
+                return this;
+
             AppendArgumentType(ArgumentType.String);
             AppendString(s);
             return this;
@@ -122,7 +126,9 @@ namespace ZeroLog
                 var charCount = encoding.GetCharCount(b, length);
                 var byteCount = charCount * sizeof(char);
 
-                EnsureRemainingBytesAndStoreArgPointer(sizeof(ArgumentType) + sizeof(byte) + byteCount);
+                if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(byte) + byteCount))
+                    return this;
+
                 AppendArgumentType(ArgumentType.RawString);
                 AppendByte((byte)charCount);
 
@@ -136,7 +142,9 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent AppendAsciiString(byte[] bytes, int length)
         {
-            EnsureRemainingBytesAndStoreArgPointer(sizeof(ArgumentType) + sizeof(byte) + length * sizeof(byte));
+            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(byte) + length * sizeof(byte)))
+                return this;
+
             AppendArgumentType(ArgumentType.AsciiString);
             AppendByte((byte)length);
             AppendBytes(bytes, length);
@@ -146,7 +154,9 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent AppendAsciiString(byte* bytes, int length)
         {
-            EnsureRemainingBytesAndStoreArgPointer(sizeof(ArgumentType) + sizeof(byte) + length * sizeof(byte));
+            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(byte) + length * sizeof(byte)))
+                return this;
+
             AppendArgumentType(ArgumentType.AsciiString);
             AppendByte((byte)length);
             AppendBytes(bytes, length);
@@ -156,7 +166,9 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent Append(bool b)
         {
-            EnsureRemainingBytesAndStoreArgPointer(sizeof(ArgumentType) + sizeof(bool));
+            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(bool)))
+                return this;
+
             AppendArgumentType(ArgumentType.Boolean);
             AppendBool(b);
             return this;
@@ -165,7 +177,9 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent Append(byte b)
         {
-            EnsureRemainingBytesAndStoreArgPointer(sizeof(ArgumentType) + sizeof(byte));
+            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(byte)))
+                return this;
+
             AppendArgumentType(ArgumentType.Byte);
             AppendByte(b);
             return this;
@@ -174,7 +188,9 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent Append(byte b, string format)
         {
-            EnsureRemainingBytesAndStoreArgPointer(sizeof(ArgumentType) + 2 * sizeof(byte));
+            if (!HasEnoughBytes(sizeof(ArgumentType) + 2 * sizeof(byte)))
+                return this;
+
             AppendArgumentType(ArgumentType.Byte, true);
             AppendString(format);
             AppendByte(b);
@@ -184,7 +200,9 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent Append(char c)
         {
-            EnsureRemainingBytesAndStoreArgPointer(sizeof(ArgumentType) + sizeof(char));
+            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(char)))
+                return this;
+
             AppendArgumentType(ArgumentType.Char);
             AppendChar(c);
             return this;
@@ -193,7 +211,9 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent Append(short s)
         {
-            EnsureRemainingBytesAndStoreArgPointer(sizeof(ArgumentType) + sizeof(short));
+            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(short)))
+                return this;
+
             AppendArgumentType(ArgumentType.Int16);
             AppendShort(s);
             return this;
@@ -202,7 +222,9 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent Append(short s, string format)
         {
-            EnsureRemainingBytesAndStoreArgPointer(sizeof(ArgumentType) + sizeof(byte) + sizeof(short));
+            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(byte) + sizeof(short)))
+                return this;
+
             AppendArgumentType(ArgumentType.Int16, true);
             AppendString(format);
             AppendShort(s);
@@ -212,7 +234,9 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent Append(int i)
         {
-            EnsureRemainingBytesAndStoreArgPointer(sizeof(ArgumentType) + sizeof(int));
+            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(int)))
+                return this;
+
             AppendArgumentType(ArgumentType.Int32);
             AppendInt(i);
             return this;
@@ -221,7 +245,9 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent Append(int i, string format)
         {
-            EnsureRemainingBytesAndStoreArgPointer(sizeof(ArgumentType) + sizeof(byte) + sizeof(int));
+            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(byte) + sizeof(int)))
+                return this;
+
             AppendArgumentType(ArgumentType.Int32, true);
             AppendString(format);
             AppendInt(i);
@@ -231,7 +257,9 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent Append(long l)
         {
-            EnsureRemainingBytesAndStoreArgPointer(sizeof(ArgumentType) + sizeof(long));
+            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(long)))
+                return this;
+
             AppendArgumentType(ArgumentType.Int64);
             AppendLong(l);
             return this;
@@ -240,7 +268,9 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent Append(long l, string format)
         {
-            EnsureRemainingBytesAndStoreArgPointer(sizeof(ArgumentType) + sizeof(byte) + sizeof(long));
+            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(byte) + sizeof(long)))
+                return this;
+
             AppendArgumentType(ArgumentType.Int64, true);
             AppendString(format);
             AppendLong(l);
@@ -250,7 +280,9 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent Append(float f)
         {
-            EnsureRemainingBytesAndStoreArgPointer(sizeof(ArgumentType) + sizeof(float));
+            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(float)))
+                return this;
+
             AppendArgumentType(ArgumentType.Single);
             AppendFloat(f);
             return this;
@@ -259,7 +291,9 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent Append(float f, string format)
         {
-            EnsureRemainingBytesAndStoreArgPointer(sizeof(ArgumentType) + sizeof(byte) + sizeof(float));
+            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(byte) + sizeof(float)))
+                return this;
+
             AppendArgumentType(ArgumentType.Single, true);
             AppendString(format);
             AppendFloat(f);
@@ -269,7 +303,9 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent Append(double d)
         {
-            EnsureRemainingBytesAndStoreArgPointer(sizeof(ArgumentType) + sizeof(double));
+            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(double)))
+                return this;
+
             AppendArgumentType(ArgumentType.Double);
             AppendDouble(d);
             return this;
@@ -278,7 +314,9 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent Append(double d, string format)
         {
-            EnsureRemainingBytesAndStoreArgPointer(sizeof(ArgumentType) + sizeof(byte) + sizeof(double));
+            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(byte) + sizeof(double)))
+                return this;
+
             AppendArgumentType(ArgumentType.Double, true);
             AppendString(format);
             AppendDouble(d);
@@ -288,7 +326,9 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent Append(decimal d)
         {
-            EnsureRemainingBytesAndStoreArgPointer(sizeof(ArgumentType) + sizeof(decimal));
+            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(decimal)))
+                return this;
+
             AppendArgumentType(ArgumentType.Decimal);
             AppendDecimal(d);
             return this;
@@ -297,7 +337,9 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent Append(decimal d, string format)
         {
-            EnsureRemainingBytesAndStoreArgPointer(sizeof(ArgumentType) + sizeof(byte) + sizeof(decimal));
+            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(byte) + sizeof(decimal)))
+                return this;
+
             AppendArgumentType(ArgumentType.Decimal, true);
             AppendString(format);
             AppendDecimal(d);
@@ -307,7 +349,9 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent Append(Guid g)
         {
-            EnsureRemainingBytesAndStoreArgPointer(sizeof(ArgumentType) + sizeof(Guid));
+            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(Guid)))
+                return this;
+
             AppendArgumentType(ArgumentType.Guid);
             AppendGuid(g);
             return this;
@@ -316,7 +360,9 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent Append(Guid g, string format)
         {
-            EnsureRemainingBytesAndStoreArgPointer(sizeof(ArgumentType) + sizeof(byte) + sizeof(Guid));
+            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(byte) + sizeof(Guid)))
+                return this;
+
             AppendArgumentType(ArgumentType.Guid, true);
             AppendString(format);
             AppendGuid(g);
@@ -326,7 +372,9 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent Append(DateTime dt)
         {
-            EnsureRemainingBytesAndStoreArgPointer(sizeof(ArgumentType) + sizeof(DateTime));
+            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(DateTime)))
+                return this;
+
             AppendArgumentType(ArgumentType.DateTime);
             AppendDateTime(dt);
             return this;
@@ -335,7 +383,9 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent Append(DateTime dt, string format)
         {
-            EnsureRemainingBytesAndStoreArgPointer(sizeof(ArgumentType) + sizeof(byte) + sizeof(DateTime));
+            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(byte) + sizeof(DateTime)))
+                return this;
+
             AppendArgumentType(ArgumentType.DateTime, true);
             AppendString(format);
             AppendDateTime(dt);
@@ -345,7 +395,9 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent Append(TimeSpan ts)
         {
-            EnsureRemainingBytesAndStoreArgPointer(sizeof(ArgumentType) + sizeof(TimeSpan));
+            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(TimeSpan)))
+                return this;
+
             AppendArgumentType(ArgumentType.TimeSpan);
             AppendTimeSpan(ts);
             return this;
@@ -354,7 +406,9 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent Append(TimeSpan ts, string format)
         {
-            EnsureRemainingBytesAndStoreArgPointer(sizeof(ArgumentType) + sizeof(byte) + sizeof(TimeSpan));
+            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(byte) + sizeof(TimeSpan)))
+                return this;
+
             AppendArgumentType(ArgumentType.TimeSpan, true);
             AppendString(format);
             AppendTimeSpan(ts);
@@ -379,16 +433,15 @@ namespace ZeroLog
             Debug.Assert(_dataPointer == endOfData, "Buffer over-read");
         }
 
-        private void EnsureRemainingBytesAndStoreArgPointer(int requestedBytes)
+        private bool HasEnoughBytes(int requestedBytes)
         {
-            if (_dataPointer + requestedBytes > _endOfBuffer)
-                throw new Exception("Buffer is full");
-
-            _argPointers.Add(new IntPtr(_dataPointer));
+            return _dataPointer + requestedBytes <= _endOfBuffer;
         }
 
         private void AppendArgumentType(ArgumentType argumentType, bool withFormatSpecifier = false)
         {
+            _argPointers.Add(new IntPtr(_dataPointer));
+
             if (withFormatSpecifier)
                 *_dataPointer = (byte)((byte)argumentType | ArgumentTypeMask.FormatSpecifier);
             else
