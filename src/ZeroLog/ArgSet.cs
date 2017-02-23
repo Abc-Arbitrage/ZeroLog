@@ -25,7 +25,7 @@ namespace ZeroLog
             var argPointer = (byte*)_argPointers[index + 1].ToPointer();
 
             var dataPointer = argPointer;
-            StringBufferExtension.Append(stringBuffer, ref dataPointer, format, _strings, _argPointers);
+            stringBuffer.Append(ref dataPointer, format, _strings, _argPointers);
 
             BytesRead += (int)(dataPointer - argPointer);
         }

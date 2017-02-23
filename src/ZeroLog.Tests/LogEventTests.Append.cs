@@ -34,46 +34,6 @@ namespace ZeroLog.Tests
             Assert.AreEqual("abc", _output.ToString());
         }
 
-        [Test]
-        public unsafe void should_append_weird_raw_string()
-        {
-            Encoding inputEncoding = Encoding.UTF32;
-            var bytes = inputEncoding.GetBytes("Z̷͙̗̻͖̣̹͉̫̬̪̖̤͆ͤ̓ͫͭ̀̐͜͞ͅͅαлγo");
-            _logEvent.Append(bytes, bytes.Length, inputEncoding);
-            _logEvent.WriteToStringBuffer(_output);
-
-            Assert.AreEqual("Z̷͙̗̻͖̣̹͉̫̬̪̖̤͆ͤ̓ͫͭ̀̐͜͞ͅͅαлγo", _output.ToString());
-
-            var outputBytes = new byte[128];
-            fixed (byte* o = outputBytes)
-            {
-                Encoding outputEncoding = Encoding.UTF8;
-                var bytesWritten = _output.CopyTo(o, outputBytes.Length, 0, _output.Count, outputEncoding);
-
-                var expected = outputEncoding.GetBytes("Z̷͙̗̻͖̣̹͉̫̬̪̖̤͆ͤ̓ͫͭ̀̐͜͞ͅͅαлγo");
-                Check.That(outputBytes.Take(bytesWritten)).ContainsExactly(expected);
-            }
-        }
-
-        [TestCaseSource(nameof(GetEncodings))]
-        public unsafe void should_append_raw_string(Encoding inputEncoding, Encoding outputEncoding)
-        {
-            var bytes = inputEncoding.GetBytes("abc");
-            _logEvent.Append(bytes, bytes.Length, inputEncoding);
-            _logEvent.WriteToStringBuffer(_output);
-
-            Assert.AreEqual("abc", _output.ToString());
-
-            var outputBytes = new byte[32];
-            fixed (byte* o = outputBytes)
-            {
-                var bytesWritten = _output.CopyTo(o, outputBytes.Length, 0, _output.Count, outputEncoding);
-
-                var expected = outputEncoding.GetBytes("abc");
-                Check.That(outputBytes.Take(bytesWritten)).ContainsExactly(expected);
-            }
-        }
-
         private IEnumerable<TestCaseData> GetEncodings()
         {
             var allEncodings = new[] { Encoding.UTF8, Encoding.ASCII, Encoding.UTF32, Encoding.Unicode, Encoding.UTF7, Encoding.UTF8, };

@@ -1,5 +1,4 @@
 using System;
-using System.Text;
 using System.Text.Formatting;
 
 namespace ZeroLog
@@ -11,7 +10,6 @@ namespace ZeroLog
         int ThreadId { get; }
         string Name { get; }
         ILogEvent Append(string s);
-        ILogEvent Append(byte[] bytes, int length, Encoding encoding);
         ILogEvent AppendAsciiString(byte[] bytes, int length);
         unsafe ILogEvent AppendAsciiString(byte* bytes, int length);
         ILogEvent Append(bool b);

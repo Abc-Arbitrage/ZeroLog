@@ -119,47 +119,30 @@ namespace ZeroLog
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ILogEvent Append(byte[] bytes, int length, Encoding encoding)
-        {
-            fixed (byte* b = bytes)
-            {
-                var charCount = encoding.GetCharCount(b, length);
-                var byteCount = charCount * sizeof(char);
-
-                if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(byte) + byteCount))
-                    return this;
-
-                AppendArgumentType(ArgumentType.RawString);
-                AppendByte((byte)charCount);
-
-                encoding.GetChars(b, length, (char*)_dataPointer, charCount);
-                _dataPointer += byteCount;
-            }
-
-            return this;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent AppendAsciiString(byte[] bytes, int length)
         {
-            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(byte) + length * sizeof(byte)))
+            var remainingBytes = (int)(_endOfBuffer - _dataPointer);
+            remainingBytes -= sizeof(ArgumentType) + sizeof(byte);
+            if (remainingBytes <= 0)
                 return this;
 
             AppendArgumentType(ArgumentType.AsciiString);
             AppendByte((byte)length);
-            AppendBytes(bytes, length);
+            AppendBytes(bytes, Math.Min(length, remainingBytes));
             return this;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent AppendAsciiString(byte* bytes, int length)
         {
-            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(byte) + length * sizeof(byte)))
+            var remainingBytes = (int)(_endOfBuffer - _dataPointer);
+            remainingBytes -= sizeof(ArgumentType) + sizeof(byte);
+            if (remainingBytes <= 0)
                 return this;
 
             AppendArgumentType(ArgumentType.AsciiString);
             AppendByte((byte)length);
-            AppendBytes(bytes, length);
+            AppendBytes(bytes, Math.Min(length, remainingBytes));
             return this;
         }
 
