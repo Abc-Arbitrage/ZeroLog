@@ -1,28 +1,33 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Formatting;
-using NFluent;
 using NUnit.Framework;
 
 namespace ZeroLog.Tests
 {
-    public partial class LogEventTests
+    public unsafe partial class LogEventTests
     {
         private LogEvent _logEvent;
         private StringBuffer _output;
-        private BufferSegmentProvider _bufferSegmentProvider;
-        private Encoding _encoding;
+        private GCHandle _bufferHandler;
 
         [SetUp]
         public void SetUp()
         {
-            _bufferSegmentProvider = new BufferSegmentProvider(1024, 1024);
-            _logEvent = new LogEvent(_bufferSegmentProvider.GetSegment());
+            var buffer = new byte[1024];
+            _bufferHandler = GCHandle.Alloc(buffer, GCHandleType.Pinned);
+
+            var bufferSegment = new BufferSegment((byte*)_bufferHandler.AddrOfPinnedObject().ToPointer(), buffer.Length);
+            _logEvent = new LogEvent(bufferSegment);
             _output = new StringBuffer(128) { Culture = CultureInfo.InvariantCulture };
-            _encoding = Encoding.Default;
+        }
+
+        [TearDown]
+        public void Teardown()
+        {
+            _bufferHandler.Free();
         }
 
         [Test]
@@ -32,15 +37,6 @@ namespace ZeroLog.Tests
             _logEvent.WriteToStringBuffer(_output);
 
             Assert.AreEqual("abc", _output.ToString());
-        }
-
-        private IEnumerable<TestCaseData> GetEncodings()
-        {
-            var allEncodings = new[] { Encoding.UTF8, Encoding.ASCII, Encoding.UTF32, Encoding.Unicode, Encoding.UTF7, Encoding.UTF8, };
-
-            return from inputEncoding in allEncodings
-                   from outputEncoding in allEncodings
-                   select new TestCaseData(inputEncoding, outputEncoding);
         }
 
         [Test]

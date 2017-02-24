@@ -63,6 +63,7 @@
     <Compile Include="Appenders\DateAndSizeRollingFileAppenderTests.cs" />
     <Compile Include="BufferSegmentProviderTests.cs" />
     <Compile Include="IntegrationTests.cs" />
+    <Compile Include="LogEventTests.EdgeCases.cs" />
     <Compile Include="LogEventTests.AppendWithFormat.cs" />
     <Compile Include="LogEventTests.Append.cs" />
     <Compile Include="LogManagerTests.cs" />
