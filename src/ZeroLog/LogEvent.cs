@@ -126,9 +126,11 @@ namespace ZeroLog
             if (remainingBytes <= 0)
                 return this;
 
+            length = Math.Min(length, remainingBytes);
+
             AppendArgumentType(ArgumentType.AsciiString);
-            AppendByte((byte)length);
-            AppendBytes(bytes, Math.Min(length, remainingBytes));
+            AppendInt(length);
+            AppendBytes(bytes, length);
             return this;
         }
 
@@ -140,9 +142,11 @@ namespace ZeroLog
             if (remainingBytes <= 0)
                 return this;
 
+            length = Math.Min(length, remainingBytes);
+
             AppendArgumentType(ArgumentType.AsciiString);
-            AppendByte((byte)length);
-            AppendBytes(bytes, Math.Min(length, remainingBytes));
+            AppendInt(length);
+            AppendBytes(bytes, length);
             return this;
         }
 
