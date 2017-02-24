@@ -35,6 +35,5 @@ namespace ZeroLog
         ILogEvent Append(TimeSpan ts);
         ILogEvent Append(TimeSpan ts, string format);
         void Log();
-        void WriteToStringBuffer(StringBuffer stringBuffer);   
     }
 }

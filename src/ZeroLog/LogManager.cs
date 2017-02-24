@@ -136,14 +136,17 @@ namespace ZeroLog
                 logEvent.SetTimestamp(DateTime.UtcNow);
             }
 
-            var bytesWritten = FormatLogMessage(stringBuffer, destination, logEvent);
-
-            foreach (var appender in Appenders)
+            try
             {
-                // TODO: each appender should declare their own level
-                if (logEvent.Level >= Level)
-                    appender.WriteEvent(logEvent, destination, bytesWritten);
+                FormatLogMessage(stringBuffer, logEvent);
             }
+            catch (Exception)
+            {
+                FormatErrorMessage(stringBuffer, logEvent);
+            }
+
+            var bytesWritten = CopyStringBufferToByteArray(stringBuffer, destination);
+            WriteMessageLogToAppenders(destination, logEvent, bytesWritten);
 
             if (!isSpecialEvent)
                 _pool.Release(logEvent);
@@ -151,14 +154,36 @@ namespace ZeroLog
             return true;
         }
 
-        private unsafe int FormatLogMessage(StringBuffer stringBuffer, byte[] destination, IInternalLogEvent logEvent)
+        private void FormatErrorMessage(StringBuffer stringBuffer, IInternalLogEvent logEvent)
         {
+            stringBuffer.Clear();
+            stringBuffer.Append("An error occured during formatting: ");
+
+            logEvent.WriteToStringBufferUnformatted(stringBuffer);
+        }
+
+        private void WriteMessageLogToAppenders(byte[] destination, IInternalLogEvent logEvent, int bytesWritten)
+        {
+            foreach (var appender in Appenders)
+            {
+                // TODO: each appender should declare their own level
+                if (logEvent.Level >= Level)
+                    appender.WriteEvent(logEvent, destination, bytesWritten);
+            }
+        }
+
+        private void FormatLogMessage(StringBuffer stringBuffer, IInternalLogEvent logEvent)
+        {
+            stringBuffer.Clear();
             logEvent.WriteToStringBuffer(stringBuffer);
+        }
+
+        private unsafe int CopyStringBufferToByteArray(StringBuffer stringBuffer, byte[] destination)
+        {
             int bytesWritten;
             fixed (byte* dest = destination)
                 bytesWritten = stringBuffer.CopyTo(dest, destination.Length, 0, stringBuffer.Count, _encoding);
 
-            stringBuffer.Clear();
             return bytesWritten;
         }
     }

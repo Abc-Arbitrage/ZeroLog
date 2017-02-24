@@ -86,5 +86,20 @@ namespace ZeroLog.Tests
 
             Check.That(_testAppender.LoggedMessages.Last()).Contains("Log message skipped due to LogEvent pool exhaustion.");
         }
+
+        [Test]
+        public void should_not_throw_if_formatting_fails()
+        {
+            var log = LogManager.GetLogger(typeof(LogManagerTests));
+            var signal = _testAppender.SetMessageCountTarget(1);
+
+            var guid = Guid.NewGuid();
+            log.InfoFormat("A good format: {0:X4}, A bad format: {1:lol}, Another good format: {2}", (short)-23805, guid, true);
+
+            signal.Wait(TimeSpan.FromMilliseconds(100));
+
+            var logMessage = _testAppender.LoggedMessages.Single();
+            Check.That(logMessage).Equals("An error occured during formatting: \"A good format: {0:X4}, A bad format: {1:lol}, Another good format: {2}\", -23805, " + guid + ", True");
+        }
     }
 }

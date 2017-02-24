@@ -168,5 +168,9 @@ namespace ZeroLog
         public void SetTimestamp(DateTime timestamp)
         {
         }
+
+        public void WriteToStringBufferUnformatted(StringBuffer stringBuffer)
+        {
+        }
     }
 }

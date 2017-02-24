@@ -410,14 +410,133 @@ namespace ZeroLog
         public void WriteToStringBuffer(StringBuffer stringBuffer)
         {
             var endOfData = _dataPointer;
-            _dataPointer = _startOfBuffer;
+            var dataPointer = _startOfBuffer;
 
-            while (_dataPointer < endOfData)
+            while (dataPointer < endOfData)
             {
-                stringBuffer.Append(ref _dataPointer, StringView.Empty, _strings, _argPointers);
+                stringBuffer.Append(ref dataPointer, StringView.Empty, _strings, _argPointers);
             }
 
-            Debug.Assert(_dataPointer == endOfData, "Buffer over-read");
+            Debug.Assert(dataPointer == endOfData, "Buffer over-read");
+        }
+
+        public void WriteToStringBufferUnformatted(StringBuffer stringBuffer)
+        {
+            var endOfData = _dataPointer;
+            var dataPointer = _startOfBuffer;
+
+            while (dataPointer < endOfData)
+            {
+                AppendArgumentToStringBufferUnformatted(stringBuffer, ref dataPointer);
+
+                if (dataPointer < endOfData)
+                    stringBuffer.Append(", ");
+            }
+
+            Debug.Assert(dataPointer == endOfData, "Buffer over-read");
+        }
+
+        private void AppendArgumentToStringBufferUnformatted(StringBuffer stringBuffer, ref byte* dataPointer)
+        {
+            var argument = *dataPointer;
+            dataPointer += sizeof(ArgumentType);
+
+            var argumentType = (ArgumentType)(argument & ArgumentTypeMask.ArgumentType);
+
+            var hasFormatSpecifier = (argument & ArgumentTypeMask.FormatSpecifier) != 0;
+            if (hasFormatSpecifier)
+                dataPointer += sizeof(byte); // Skip it
+
+            switch (argumentType)
+            {
+                case ArgumentType.String:
+                    stringBuffer.Append('"');
+                    stringBuffer.Append(_strings[*dataPointer]);
+                    stringBuffer.Append('"');
+                    dataPointer += sizeof(byte);
+                    break;
+
+                case ArgumentType.AsciiString:
+                    var length = *(int*)dataPointer;
+                    dataPointer += sizeof(int);
+                    stringBuffer.Append('"');
+                    stringBuffer.Append(new AsciiString(dataPointer, length));
+                    stringBuffer.Append('"');
+                    dataPointer += length;
+                    break;
+
+                case ArgumentType.Boolean:
+                    stringBuffer.Append(*(bool*)dataPointer);
+                    dataPointer += sizeof(bool);
+                    break;
+
+                case ArgumentType.Byte:
+                    stringBuffer.Append(*dataPointer, StringView.Empty);
+                    dataPointer += sizeof(byte);
+                    break;
+
+                case ArgumentType.Char:
+                    stringBuffer.Append('\'');
+                    stringBuffer.Append(*(char*)dataPointer);
+                    stringBuffer.Append('\'');
+                    dataPointer += sizeof(char);
+                    break;
+
+                case ArgumentType.Int16:
+                    stringBuffer.Append(*(short*)dataPointer, StringView.Empty);
+                    dataPointer += sizeof(short);
+                    break;
+
+                case ArgumentType.Int32:
+                    stringBuffer.Append(*(int*)dataPointer, StringView.Empty);
+                    dataPointer += sizeof(int);
+                    break;
+
+                case ArgumentType.Int64:
+                    stringBuffer.Append(*(long*)dataPointer, StringView.Empty);
+                    dataPointer += sizeof(long);
+                    break;
+
+                case ArgumentType.Single:
+                    stringBuffer.Append(*(float*)dataPointer, StringView.Empty);
+                    dataPointer += sizeof(float);
+                    break;
+
+                case ArgumentType.Double:
+                    stringBuffer.Append(*(double*)dataPointer, StringView.Empty);
+                    dataPointer += sizeof(double);
+                    break;
+
+                case ArgumentType.Decimal:
+                    stringBuffer.Append(*(decimal*)dataPointer, StringView.Empty);
+                    dataPointer += sizeof(decimal);
+                    break;
+
+                case ArgumentType.Guid:
+                    stringBuffer.Append(*(Guid*)dataPointer, StringView.Empty);
+                    dataPointer += sizeof(Guid);
+                    break;
+
+                case ArgumentType.DateTime:
+                    stringBuffer.Append(*(DateTime*)dataPointer, StringView.Empty);
+                    dataPointer += sizeof(DateTime);
+                    break;
+
+                case ArgumentType.TimeSpan:
+                    stringBuffer.Append(*(TimeSpan*)dataPointer, StringView.Empty);
+                    dataPointer += sizeof(TimeSpan);
+                    break;
+
+                case ArgumentType.FormatString:
+                    stringBuffer.Append('"');
+                    stringBuffer.Append(_strings[*dataPointer]);
+                    stringBuffer.Append('"');
+                    dataPointer += sizeof(byte);
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
 
         private bool HasEnoughBytes(int requestedBytes)

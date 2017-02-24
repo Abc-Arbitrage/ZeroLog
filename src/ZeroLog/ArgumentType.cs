@@ -17,6 +17,5 @@ namespace ZeroLog
         DateTime,
         TimeSpan,
         AsciiString,
-        RawString
     }
 }
