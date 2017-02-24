@@ -88,7 +88,7 @@ namespace ZeroLog.Tests
         }
 
         [Test]
-        public void should_not_throw_if_formatting_fails()
+        public void should_not_throw_if_formatting_fails_when_using_format_string()
         {
             var log = LogManager.GetLogger(typeof(LogManagerTests));
             var signal = _testAppender.SetMessageCountTarget(1);
@@ -100,6 +100,43 @@ namespace ZeroLog.Tests
 
             var logMessage = _testAppender.LoggedMessages.Single();
             Check.That(logMessage).Equals("An error occured during formatting: \"A good format: {0:X4}, A bad format: {1:lol}, Another good format: {2}\", -23805, " + guid + ", True");
+        }
+
+        [Test]
+        public unsafe void should_not_throw_if_formatting_fails_when_appending_formatted_arguments()
+        {
+            var log = LogManager.GetLogger(typeof(LogManagerTests));
+            var signal = _testAppender.SetMessageCountTarget(1);
+
+            var guid = Guid.NewGuid();
+            var date = new DateTime(2017, 02, 24, 16, 51, 51);
+            var timespan = date.TimeOfDay;
+            var asciiString = new[] { (byte)'a', (byte)'b', (byte)'c' };
+
+            fixed (byte* pAsciiString = asciiString)
+            {
+                log.Info().Append("Hello")
+                   .Append(false)
+                   .Append((byte)1)
+                   .Append('a')
+                   .Append((short)2)
+                   .Append(3)
+                   .Append((long)4)
+                   .Append(5f)
+                   .Append(6d)
+                   .Append(7m)
+                   .Append(guid, "meh, this is going to break formatting")
+                   .Append(date)
+                   .Append(timespan)
+                   .AppendAsciiString(asciiString, asciiString.Length)
+                   .AppendAsciiString(pAsciiString, asciiString.Length)
+                   .Log();
+            }
+
+            signal.Wait(TimeSpan.FromMilliseconds(100));
+
+            var logMessage = _testAppender.LoggedMessages.Single();
+            Check.That(logMessage).Equals("An error occured during formatting: \"Hello\", False, 1, 'a', 2, 3, 4, 5, 6, 7, " + guid + ", 2017-02-24 16:51:51.000, 16:51:51.000, \"abc\", \"abc\"");
         }
     }
 }
