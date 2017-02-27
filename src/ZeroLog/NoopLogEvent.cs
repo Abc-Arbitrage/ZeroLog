@@ -158,7 +158,7 @@ namespace ZeroLog
 
         public void Log()
         {
-            _log.Enqueue(SpecialLogEvents.ExhaustedPoolEvent);
+            _log?.Enqueue(SpecialLogEvents.ExhaustedPoolEvent);
         }
 
         public void WriteToStringBuffer(StringBuffer stringBuffer)
