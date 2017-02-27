@@ -40,7 +40,7 @@ namespace ZeroLog
     /// </remarks>
     [DebuggerDisplay("Count = {Count}")]
     [Serializable]
-    public class ConcurrentStack<T> : IProducerConsumerCollection<T>, IReadOnlyCollection<T>
+    internal class ConcurrentStack<T> : IProducerConsumerCollection<T>, IReadOnlyCollection<T>
     {
         /// <summary>
         /// A simple (internal) node type used to store elements of concurrent stacks and queues.

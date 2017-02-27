@@ -23,7 +23,7 @@ namespace ZeroLog
     /// </remarks>
     [DebuggerDisplay("Count = {Count}")]
     [Serializable]
-    public class ConcurrentQueue<T> : IProducerConsumerCollection<T>, IReadOnlyCollection<T>
+    internal class ConcurrentQueue<T> : IProducerConsumerCollection<T>, IReadOnlyCollection<T>
     {
         // This implementation provides an unbounded, multi-producer multi-consumer queue
         // that supports the standard Enqueue/TryDequeue operations, as well as support for
