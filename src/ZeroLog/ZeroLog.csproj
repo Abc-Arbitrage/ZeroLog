@@ -65,7 +65,8 @@
     <Compile Include="ConcurrentQueue.cs" />
     <Compile Include="ConcurrentStack.cs" />
     <Compile Include="FakeCollection.cs" />
-    <Compile Include="IAppender.cs" />
+    <Compile Include="Appenders\GuardedAppender.cs" />
+    <Compile Include="Appenders\IAppender.cs" />
     <Compile Include="IInternalLogEvent.cs" />
     <Compile Include="IInternalLogManager.cs" />
     <Compile Include="ILog.cs" />
@@ -87,6 +88,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SpecialLogEvents.cs" />
     <Compile Include="StringBufferExtension.cs" />
+    <Compile Include="Utils\SystemDateTime.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

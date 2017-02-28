@@ -10,40 +10,40 @@ namespace ZeroLog.Appenders
         private readonly object _lock = new object();
         private DateTime _currentDateTime = DateTime.UtcNow;
         private int _currentFileSize;
-        private string _currentFilename;
         private string _directory;
         private int _rollingFileNumber;
         private Stream _stream;
 
         /// <summary>
-        ///     Gets or sets if the appender should always call <see cref="M:System.IO.TextWriter.Flush" /> on the
-        ///     current file writer after every log event.
+        /// Gets or sets if the appender should always call <see cref="M:System.IO.TextWriter.Flush" /> on the
+        /// current file writer after every log event.
         /// </summary>
         public bool AutoFlush { get; set; }
 
         /// <summary>
-        ///     Gets or sets the file name extension to use for the rolling files. Defaults to "txt".
+        /// Gets or sets the file name extension to use for the rolling files. Defaults to "txt".
         /// </summary>
         public string FilenameExtension { get; set; }
 
         /// <summary>
-        ///     Gets or sets the root path and file name used by this appender, not including the file extension.
+        /// Gets or sets the root path and file name used by this appender, not including the file extension.
         /// </summary>
         public string FilenameRoot { get; set; }
 
         /// <summary>
-        ///     Gets or sets the maximum permitted file size in bytes. Once a file exceeds this value it will
-        ///     be closed and the next log file will be created. Defaults to 4 MB.
-        ///     If the size is 0, the feature is disabled.
+        /// Gets or sets the maximum permitted file size in bytes. Once a file exceeds this value it will
+        /// be closed and the next log file will be created. Defaults to 4 MB.
+        /// If the size is 0, the feature is disabled.
         /// </summary>
         public int MaxFileSizeInBytes { get; set; }
 
-        internal string CurrentFileName => _currentFilename;
+        internal string CurrentFileName { get; private set; }
 
         /// <summary>
-        ///     Initialises a new instance of the class.
+        /// Initialises a new instance of the class.
         /// </summary>
-        public DateAndSizeRollingFileAppender(string filenameRoot, int maxFileSizeInBytes = 200 * 1024 * 1024, string extension = "log", string prefixPattern = "%time - %level - %logger || ") : base(prefixPattern)
+        public DateAndSizeRollingFileAppender(string filenameRoot, int maxFileSizeInBytes = 200 * 1024 * 1024, string extension = "log", string prefixPattern = "%time - %level - %logger || ")
+            : base(prefixPattern)
         {
             FilenameRoot = filenameRoot;
             MaxFileSizeInBytes = maxFileSizeInBytes;
@@ -55,30 +55,31 @@ namespace ZeroLog.Appenders
         public override void WriteEvent(ILogEvent logEvent, byte[] messageBytes, int messageLength)
         {
             var stream = _stream;
-            if (stream != null)
-            {
-                if (messageLength + 1 >= messageBytes.Length)
-                    throw new ApplicationException($"{nameof(messageBytes)} must be big enough to also contain the new line characters");
-                
-                WritePrefix(stream, logEvent);
+            if (stream == null)
+                return;
 
-                NewlineBytes.CopyTo(messageBytes, messageLength);
-                messageLength += NewlineBytes.Length;
+            if (messageLength + 1 >= messageBytes.Length)
+                throw new ApplicationException($"{nameof(messageBytes)} must be big enough to also contain the new line characters");
 
-                stream.Write(messageBytes, 0, messageLength);
+            WritePrefix(stream, logEvent);
 
-                if (AutoFlush)
-                    stream.Flush();
+            NewlineBytes.CopyTo(messageBytes, messageLength);
+            messageLength += NewlineBytes.Length;
 
-                _currentFileSize = (int)stream.Length;
-                CheckRollFile();
-            }
+            stream.Write(messageBytes, 0, messageLength);
+
+            if (AutoFlush)
+                stream.Flush();
+
+            _currentFileSize = (int)stream.Length;
+            CheckRollFile();
         }
 
         private void Open()
         {
             if (FilenameRoot == "")
                 throw new ArgumentException("FilenameRoot name was not supplied for RollingFileAppender");
+
             try
             {
                 FilenameRoot = Path.GetFullPath(FilenameRoot);
@@ -103,8 +104,8 @@ namespace ZeroLog.Appenders
 
             FilenameExtension = FilenameExtension ?? "";
             _rollingFileNumber = FindLastRollingFileNumber();
-            _currentFilename = GetCurrentFileName();
-            _stream = OpenFile(_currentFilename);
+            CurrentFileName = GetCurrentFileName();
+            _stream = OpenFile(CurrentFileName);
             CheckRollFile();
         }
 
@@ -129,7 +130,7 @@ namespace ZeroLog.Appenders
         }
 
         /// <summary>
-        ///     Flushes the current log file writer.
+        /// Flushes the current log file writer.
         /// </summary>
         public void Flush()
         {
@@ -163,23 +164,23 @@ namespace ZeroLog.Appenders
                     _rollingFileNumber = 0;
                 }
 
-                _currentFilename = GetCurrentFileName();
-                _stream = OpenFile(_currentFilename);
+                CurrentFileName = GetCurrentFileName();
+                _stream = OpenFile(CurrentFileName);
             }
             return false;
         }
 
         private int FindLastRollingFileNumber()
         {
-            int fileNumber = 0;
+            var fileNumber = 0;
             var root = FilenameRoot + ".";
             var extension = FilenameExtension.Length == 0 ? "" : "." + FilenameExtension;
             foreach (var filename in Directory.EnumerateFiles(_directory).Select(f => f.ToUpper()))
             {
                 if (filename.StartsWith(root, StringComparison.OrdinalIgnoreCase) && filename.EndsWith(extension, StringComparison.OrdinalIgnoreCase))
                 {
-                    int rootLength = root.Length;
-                    int extensionLength = extension.Length;
+                    var rootLength = root.Length;
+                    var extensionLength = extension.Length;
                     int tempNumber;
                     if (filename.Length - rootLength - extensionLength > 0 && int.TryParse(filename.Substring(rootLength, filename.Length - rootLength - extensionLength), out tempNumber))
                         fileNumber = Math.Max(fileNumber, tempNumber);

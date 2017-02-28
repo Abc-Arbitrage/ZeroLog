@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace ZeroLog
+namespace ZeroLog.Appenders
 {
     public interface IAppender
     {

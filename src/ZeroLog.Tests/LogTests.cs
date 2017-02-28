@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using NFluent;
 using NUnit.Framework;
+using ZeroLog.Appenders;
 
 namespace ZeroLog.Tests
 {

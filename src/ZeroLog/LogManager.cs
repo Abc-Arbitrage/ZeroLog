@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Text.Formatting;
 using System.Threading;
 using System.Threading.Tasks;
+using ZeroLog.Appenders;
 
 namespace ZeroLog
 {
@@ -30,7 +32,7 @@ namespace ZeroLog
             var bufferSegmentProvider = new BufferSegmentProvider(size * logEventBufferSize, logEventBufferSize);
             _pool = new ObjectPool<IInternalLogEvent>(size, () => new LogEvent(bufferSegmentProvider.GetSegment()));
 
-            Appenders = new List<IAppender>(appenders);
+            Appenders = new List<IAppender>(appenders.Select(x => new GuardedAppender(x, TimeSpan.FromSeconds(15))));
 
             foreach (var appender in Appenders)
             {
@@ -109,17 +111,8 @@ namespace ZeroLog
             var destination = new byte[1024];
             while (IsRunning || !_queue.IsEmpty)
             {
-                try
-                {
-                    if (!TryToProcessQueue(stringBuffer, destination))
-                        spinWait.SpinOnce();
-                }
-                catch (Exception ex)
-                {
-                    // TODO: how can we distinguish between exceptions that occur during shutdown and normal operation
-                    Console.WriteLine(ex);
-                    throw;
-                }
+                if (!TryToProcessQueue(stringBuffer, destination))
+                    spinWait.SpinOnce();
             }
         }
 
@@ -146,6 +139,7 @@ namespace ZeroLog
             }
 
             var bytesWritten = CopyStringBufferToByteArray(stringBuffer, destination);
+
             WriteMessageLogToAppenders(destination, logEvent, bytesWritten);
 
             if (!isSpecialEvent)
@@ -154,7 +148,7 @@ namespace ZeroLog
             return true;
         }
 
-        private void FormatErrorMessage(StringBuffer stringBuffer, IInternalLogEvent logEvent)
+        private static void FormatErrorMessage(StringBuffer stringBuffer, IInternalLogEvent logEvent)
         {
             stringBuffer.Clear();
             stringBuffer.Append("An error occured during formatting: ");
@@ -164,15 +158,15 @@ namespace ZeroLog
 
         private void WriteMessageLogToAppenders(byte[] destination, IInternalLogEvent logEvent, int bytesWritten)
         {
-            foreach (var appender in Appenders)
+            for (var i = 0; i < Appenders.Count; i++)
             {
-                // TODO: each appender should declare their own level
+                var appender = Appenders[i];
                 if (logEvent.Level >= Level)
                     appender.WriteEvent(logEvent, destination, bytesWritten);
             }
         }
 
-        private void FormatLogMessage(StringBuffer stringBuffer, IInternalLogEvent logEvent)
+        private static void FormatLogMessage(StringBuffer stringBuffer, IInternalLogEvent logEvent)
         {
             stringBuffer.Clear();
             logEvent.WriteToStringBuffer(stringBuffer);
@@ -182,7 +176,9 @@ namespace ZeroLog
         {
             int bytesWritten;
             fixed (byte* dest = destination)
+            {
                 bytesWritten = stringBuffer.CopyTo(dest, destination.Length, 0, stringBuffer.Count, _encoding);
+            }
 
             return bytesWritten;
         }
