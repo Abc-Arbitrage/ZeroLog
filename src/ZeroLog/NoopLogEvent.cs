@@ -6,12 +6,19 @@ namespace ZeroLog
 {
     internal class NoopLogEvent : IInternalLogEvent
     {
+        private readonly bool _notifyAppenders;
+
         public Level Level { get; }
         public DateTime Timestamp { get; }
         public int ThreadId { get; }
         public string Name { get; }
 
         private Log _log;
+
+        public NoopLogEvent(bool notifyAppenders = true)
+        {
+            _notifyAppenders = notifyAppenders;
+        }
 
         public void Initialize(Level level, Log log)
         {
@@ -158,7 +165,8 @@ namespace ZeroLog
 
         public void Log()
         {
-            _log?.Enqueue(SpecialLogEvents.ExhaustedPoolEvent);
+            if(_notifyAppenders)
+                _log?.Enqueue(SpecialLogEvents.ExhaustedPoolEvent);
         }
 
         public void WriteToStringBuffer(StringBuffer stringBuffer)

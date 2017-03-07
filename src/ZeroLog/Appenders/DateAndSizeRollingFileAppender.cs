@@ -40,7 +40,7 @@ namespace ZeroLog.Appenders
         internal string CurrentFileName { get; private set; }
 
         /// <summary>
-        /// Initialises a new instance of the class.
+        /// Initializes a new instance of the class.
         /// </summary>
         public DateAndSizeRollingFileAppender(string filenameRoot, int maxFileSizeInBytes = 200 * 1024 * 1024, string extension = "log", string prefixPattern = "%time - %level - %logger || ")
             : base(prefixPattern)

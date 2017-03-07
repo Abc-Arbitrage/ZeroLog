@@ -3,7 +3,7 @@ using NUnit.Framework;
 namespace ZeroLog.Tests
 {
     [TestFixture]
-    public class UninitialisedLogManagerTests
+    public class UninitializedLogManagerTests
     {
         [TearDown]
         public void Teardown()
@@ -12,7 +12,7 @@ namespace ZeroLog.Tests
         }
 
         [Test]
-        public void should_log_without_initialise()
+        public void should_log_without_initialize()
         {
             LogManager.GetLogger("Test").Info("Test");
         }

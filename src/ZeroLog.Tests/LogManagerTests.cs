@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using NFluent;
 using NUnit.Framework;
 using ZeroLog.Appenders;
@@ -34,7 +36,7 @@ namespace ZeroLog.Tests
         }
 
         [Test, ExpectedException]
-        public void should_prevent_initialising_already_initialised_log_manager()
+        public void should_prevent_initializing_already_initialized_log_manager()
         {
             LogManager.Initialize(new IAppender[0]);
         }
@@ -71,6 +73,16 @@ namespace ZeroLog.Tests
         [Test]
         public void should_log_special_message_when_log_event_pool_is_exhausted()
         {
+            LogManager.Shutdown();
+            var configuration = new LogManagerConfiguration
+            {
+                Level = Level.Finest,
+                LogEventBufferSize = 128,
+                LogEventQueueSize = 10,
+                LogEventPoolExhaustionStrategy = LogEventPoolExhaustionStrategy.DropLogMessageAndNotifyAppenders,
+            };
+
+            LogManager.Initialize(new[] { _testAppender }, configuration);
             var log = LogManager.GetLogger(typeof(LogManagerTests));
 
             var actualLogEvents = new List<ILogEvent>();
@@ -79,13 +91,79 @@ namespace ZeroLog.Tests
                 actualLogEvents.Add(log.Debug());
             }
 
-            var signal = _testAppender.SetMessageCountTarget(actualLogEvents.Count);
+            var signal = _testAppender.SetMessageCountTarget(1);
 
             log.Debug().Append("this is not going to happen").Log();
 
-            signal.Wait(TimeSpan.FromMilliseconds(100));
+            Check.That(signal.Wait(TimeSpan.FromMilliseconds(100))).IsTrue();
 
             Check.That(_testAppender.LoggedMessages.Last()).Contains("Log message skipped due to LogEvent pool exhaustion.");
+        }
+
+        [Test]
+        public void should_completely_drop_log_event_when_log_event_pool_is_exhausted()
+        {
+            LogManager.Shutdown();
+            var configuration = new LogManagerConfiguration
+            {
+                Level = Level.Finest,
+                LogEventBufferSize = 128,
+                LogEventQueueSize = 10,
+                LogEventPoolExhaustionStrategy = LogEventPoolExhaustionStrategy.DropLogMessage,
+            };
+
+            LogManager.Initialize(new[] { _testAppender }, configuration);
+            var log = LogManager.GetLogger(typeof(LogManagerTests));
+
+            var actualLogEvents = new List<ILogEvent>();
+            for (var i = 0; i < 10; i++)
+            {
+                actualLogEvents.Add(log.Debug());
+            }
+
+            var signal = _testAppender.SetMessageCountTarget(1);
+
+            log.Debug().Append("this is not going to happen").Log();
+
+            Check.That(signal.Wait(TimeSpan.FromMilliseconds(100))).IsFalse();
+        }
+
+        [Test]
+        public void should_wait_for_event_when_log_event_pool_is_exhausted()
+        {
+            LogManager.Shutdown();
+            var configuration = new LogManagerConfiguration
+            {
+                Level = Level.Finest,
+                LogEventBufferSize = 128,
+                LogEventQueueSize = 10,
+                LogEventPoolExhaustionStrategy = LogEventPoolExhaustionStrategy.WaitForLogEvent,
+            };
+
+            LogManager.Initialize(new[] { _testAppender }, configuration);
+            var log = LogManager.GetLogger(typeof(LogManagerTests));
+
+            var actualLogEvents = new List<ILogEvent>();
+            for (var i = 0; i < 10; i++)
+            {
+                actualLogEvents.Add(log.Debug());
+            }
+
+            var signal = _testAppender.SetMessageCountTarget(2);
+            var logCompletedSignal = new ManualResetEvent(false);
+
+            Task.Run(() =>
+            {
+                log.Debug().Append("this is not going to happen").Log();
+                logCompletedSignal.Set();
+            });
+
+            Check.That(logCompletedSignal.WaitOne(TimeSpan.FromMilliseconds(100))).IsFalse();
+
+            actualLogEvents[0].Log();
+
+            Check.That(logCompletedSignal.WaitOne(TimeSpan.FromMilliseconds(100))).IsTrue();
+            Check.That(signal.Wait(TimeSpan.FromMilliseconds(100))).IsTrue();
         }
 
         [Test]

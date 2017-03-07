@@ -81,7 +81,7 @@
     <Compile Include="PerformanceTests.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UninitialisedLogManagerTests.cs" />
+    <Compile Include="UninitializedLogManagerTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

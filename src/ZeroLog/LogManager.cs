@@ -17,20 +17,27 @@ namespace ZeroLog
         private readonly ConcurrentQueue<IInternalLogEvent> _queue;
         private readonly ObjectPool<IInternalLogEvent> _pool;
         private readonly Encoding _encoding;
-        private readonly IInternalLogEvent _noopLogEvent = new NoopLogEvent();
+
+        private readonly IInternalLogEvent _notifyingNoopLogEvent = new NoopLogEvent();
+        private readonly IInternalLogEvent _droppingNoopLogEvent = new NoopLogEvent(false);
+
+        private readonly LogEventPoolExhaustionStrategy _logEventPoolExhaustionStrategy;
 
         public bool IsRunning { get; set; }
         public Task WriteTask { get; }
         public List<IAppender> Appenders { get; }
 
-        internal LogManager(IEnumerable<IAppender> appenders, int size, int logEventBufferSize = 128, Level level = Level.Finest)
+        internal LogManager(IEnumerable<IAppender> appenders, LogManagerConfiguration configuration)
         {
-            Level = level;
-            _encoding = Encoding.Default;
-            _queue = new ConcurrentQueue<IInternalLogEvent>(new FakeCollection(size));
+            Level = configuration.Level;
 
-            var bufferSegmentProvider = new BufferSegmentProvider(size * logEventBufferSize, logEventBufferSize);
-            _pool = new ObjectPool<IInternalLogEvent>(size, () => new LogEvent(bufferSegmentProvider.GetSegment()));
+            _encoding = Encoding.Default;
+            _logEventPoolExhaustionStrategy = configuration.LogEventPoolExhaustionStrategy;
+
+            _queue = new ConcurrentQueue<IInternalLogEvent>(new FakeCollection(configuration.LogEventQueueSize));
+
+            var bufferSegmentProvider = new BufferSegmentProvider(configuration.LogEventQueueSize * configuration.LogEventBufferSize, configuration.LogEventBufferSize);
+            _pool = new ObjectPool<IInternalLogEvent>(configuration.LogEventQueueSize, () => new LogEvent(bufferSegmentProvider.GetSegment()));
 
             Appenders = new List<IAppender>(appenders.Select(x => new GuardedAppender(x, TimeSpan.FromSeconds(15))));
 
@@ -45,13 +52,23 @@ namespace ZeroLog
 
         public Level Level { get; }
 
-        public static ILogManager Initialize(IEnumerable<IAppender> appenders, int size = 1024, int logEventBufferSize = 128, Level level = Level.Finest)
+        public static ILogManager Initialize(IEnumerable<IAppender> appenders, LogManagerConfiguration configuration)
         {
             if (_logManager != _defaultLogManager)
                 throw new ApplicationException("LogManager is already initialized");
 
-            _logManager = new LogManager(appenders, size, logEventBufferSize, level);
+            _logManager = new LogManager(appenders, configuration);
             return _logManager;
+        }
+
+        public static ILogManager Initialize(IEnumerable<IAppender> appenders, int logEventQueueSize = 1024, int logEventBufferSize = 128, Level level = Level.Finest)
+        {
+            return Initialize(appenders, new LogManagerConfiguration
+            {
+                LogEventQueueSize = logEventQueueSize,
+                LogEventBufferSize = logEventBufferSize,
+                Level = level,
+            });
         }
 
         public static void Shutdown()
@@ -98,8 +115,28 @@ namespace ZeroLog
         IInternalLogEvent IInternalLogManager.AllocateLogEvent()
         {
             IInternalLogEvent logEvent;
-            if (!_pool.TryAcquire(out logEvent))
-                return _noopLogEvent;
+            if (_pool.TryAcquire(out logEvent))
+                return logEvent;
+
+            switch (_logEventPoolExhaustionStrategy)
+            {
+                case LogEventPoolExhaustionStrategy.WaitForLogEvent:
+                    return AcquireLogEvent();
+                case LogEventPoolExhaustionStrategy.DropLogMessage:
+                    return _droppingNoopLogEvent;
+                default:
+                    return _notifyingNoopLogEvent;
+            }
+        }
+
+        private IInternalLogEvent AcquireLogEvent()
+        {
+            IInternalLogEvent logEvent;
+            var spinwait = new SpinWait();
+            while (!_pool.TryAcquire(out logEvent))
+            {
+                spinwait.SpinOnce();
+            }
 
             return logEvent;
         }
