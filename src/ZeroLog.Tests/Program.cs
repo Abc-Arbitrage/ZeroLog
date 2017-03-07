@@ -2,13 +2,14 @@
 
 namespace ZeroLog.Tests
 {
-    public class Program
+    public static class Program
     {
-        public static void Main(string[] args)
+        public static void Main()
         {
             var test = new PerformanceTests();
-
+            
             test.SetUp();
+
             try
             {
                 test.should_run_test();

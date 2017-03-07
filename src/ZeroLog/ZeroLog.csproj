@@ -55,7 +55,7 @@
     <Compile Include="Appenders\AppenderBase.cs" />
     <Compile Include="Appenders\ConsoleAppender.cs" />
     <Compile Include="Appenders\DateAndSizeRollingFileAppender.cs" />
-    <Compile Include="Appenders\NullAppender.cs" />
+    <Compile Include="Appenders\NoopAppender.cs" />
     <Compile Include="Appenders\PerformanceAppender.cs" />
     <Compile Include="ArgSet.cs" />
     <Compile Include="ArgumentType.cs" />

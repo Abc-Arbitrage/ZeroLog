@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
-using ZeroLog.Appenders;
 
 namespace ZeroLog.Tests
 {
@@ -11,12 +9,20 @@ namespace ZeroLog.Tests
     [Ignore("Manual")]
     public class PerformanceTests
     {
+        private TestAppender _testAppender;
+
         [SetUp]
         public void SetUp()
         {
-//            LogManager.Initialize(new[] { new DateAndSizeRollingFileAppender("PerfTest"), }, 100 * 1024);
-            LogManager.Initialize(new[] { new NullAppender(), }, 100 * 1024);
-            Thread.Sleep(1);
+            var configuration = new LogManagerConfiguration
+            {
+                Level = Level.Finest,
+                LogEventBufferSize = 512,
+                LogEventQueueSize = 16384,
+                LogEventPoolExhaustionStrategy = LogEventPoolExhaustionStrategy.WaitForLogEvent,
+            };
+            _testAppender = new TestAppender(false);
+            LogManager.Initialize(new[] { _testAppender }, configuration);
         }
 
         [TearDown]
@@ -34,27 +40,37 @@ namespace ZeroLog.Tests
         [Test]
         public void should_run_test()
         {
-            const int count = 100000;
-            const int threads = 4;
+            const int threadMessageCount = 1000 * 1000;
+            const int threadCount = 5;
+            const int totalMessageCount = threadMessageCount * threadCount;
 
             var timer = Stopwatch.StartNew();
 
             var logger = LogManager.GetLogger(typeof(PerformanceTests));
 
-            Parallel.For(0, threads, i =>
+            var signal = _testAppender.SetMessageCountTarget(totalMessageCount);
+            var utcNow = DateTime.UtcNow;
+
+            Parallel.For(0, threadCount, i =>
             {
-                for (int k = 0; k < count; k++)
+                for (var k = 0; k < threadMessageCount; k++)
                 {
-                    Thread.Sleep(1);
-                    var logEvent = logger.Info().Append("Hello ").Append(42).Append(" this is a relatlively long message ").Append(12345.4332m);
-                    logEvent.Log();
+                    logger.Info().Append("Hello ").Append(42).Append(utcNow).Append(42.56).Append(" this is a relatlively long message ").Append(12345.4332m).Log();
                 }
             });
 
-            LogManager.Shutdown();
-            timer.Stop();
-            Console.WriteLine("Log  : {0} us/log", timer.ElapsedMilliseconds * 1000.0 / (count * threads));
-        }
+            var timedOut = !signal.Wait(TimeSpan.FromSeconds(10));
 
+            timer.Stop();
+            if (timedOut)
+                Assert.Fail("Timeout");
+
+            Console.WriteLine($"Total message count  : {totalMessageCount:N0} messages");
+            Console.WriteLine($"Thread message count : {threadMessageCount:N0} messages");
+            Console.WriteLine($"Thread count         : {threadCount} threads");
+            Console.WriteLine($"Elapsed time         : {timer.ElapsedMilliseconds:N0} ms");
+            Console.WriteLine($"Message rate         : {totalMessageCount / timer.Elapsed.TotalSeconds:N0} m/s");
+            Console.WriteLine($"Average log cost     : {timer.ElapsedMilliseconds * 1000 / (double)totalMessageCount:N3} µs");
+        }
     }
 }

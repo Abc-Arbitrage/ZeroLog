@@ -7,11 +7,17 @@ namespace ZeroLog.Tests
 {
     public class TestAppender : IAppender
     {
+        private readonly bool _captureLoggedMessages;
         private int _messageCount;
         private ManualResetEventSlim _signal;
         private int _messageCountTarget;
 
         public List<string> LoggedMessages { get; } = new List<string>();
+
+        public TestAppender(bool captureLoggedMessages = true)
+        {
+            _captureLoggedMessages = captureLoggedMessages;
+        }
 
         public ManualResetEventSlim SetMessageCountTarget(int expectedMessageCount)
         {
@@ -23,8 +29,8 @@ namespace ZeroLog.Tests
 
         public void WriteEvent(ILogEvent logEvent, byte[] messageBytes, int messageLength)
         {
-            var message = Encoding.ASCII.GetString(messageBytes, 0, messageLength);
-            LoggedMessages.Add(message);
+            if (_captureLoggedMessages)
+                LoggedMessages.Add(Encoding.ASCII.GetString(messageBytes, 0, messageLength));
 
             if (++_messageCount == _messageCountTarget)
                 _signal.Set();
