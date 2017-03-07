@@ -63,7 +63,6 @@
     <Compile Include="BufferSegment.cs" />
     <Compile Include="BufferSegmentProvider.cs" />
     <Compile Include="ConcurrentQueue.cs" />
-    <Compile Include="ConcurrentStack.cs" />
     <Compile Include="FakeCollection.cs" />
     <Compile Include="Appenders\GuardedAppender.cs" />
     <Compile Include="Appenders\IAppender.cs" />
