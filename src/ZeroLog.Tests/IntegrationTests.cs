@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Globalization;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Text.Formatting;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
@@ -27,7 +23,6 @@ namespace ZeroLog.Tests
         public void SetUp()
         {
             _performanceAppender = new PerformanceAppender(_count * _nbThreads);
-//            LogManager.Initialize(new[] { _performanceAppender, }, _queueSize);
             LogManager.Initialize(new[] { new ConsoleAppender(), }, _queueSize);
             for (int i = 0; i < _nbThreads; i++)
             {
@@ -67,7 +62,6 @@ namespace ZeroLog.Tests
                     logger.InfoFormat("{0}", timestamp);
                     _enqueueMicros[threadId][i] = ToMicroseconds(Stopwatch.GetTimestamp() - timestamp);
                 }
-                //                logger.InfoFormat("{0}", (byte)1, (char)1, (short)2, (float)3, 2.0, "", true, TimeSpan.Zero);
             });
 
             LogManager.Shutdown();
@@ -103,7 +97,7 @@ namespace ZeroLog.Tests
             var gcCount = GC.CollectionCount(0);
 
             var logger = LogManager.GetLogger(typeof(IntegrationTests));
-            for (int k = 0; k < count; k++)
+            for (var i = 0; i < count; i++)
             {
                 Thread.Sleep(1);
                 logger.Info().Append("Hello").Log();

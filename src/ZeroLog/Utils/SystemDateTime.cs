@@ -6,7 +6,7 @@ namespace ZeroLog.Utils
     {
         private static DateTime? _pausedUtcNow;
         
-        public static DateTime UtcNow => _pausedUtcNow ?? DateTime.UtcNow;
+        public static DateTime UtcNow => _pausedUtcNow ?? HighResolutionDateTime.UtcNow;
         
         public static void Reset()
         {
@@ -48,3 +48,4 @@ namespace ZeroLog.Utils
         }
     }
 }
+
