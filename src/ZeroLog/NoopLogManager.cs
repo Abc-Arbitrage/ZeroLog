@@ -19,34 +19,33 @@ namespace ZeroLog
         }
 
         public IInternalLogEvent AllocateLogEvent()
-        {
-            throw new NotImplementedException();
-        }
+            => throw new NotSupportedException();
 
         public void Enqueue(IInternalLogEvent logEvent)
-        {
-            throw new NotImplementedException();
-        }
+            => throw new NotSupportedException();
 
         public ILog GetNewLog(IInternalLogManager logManager, string name)
+            => NoopLog.Instance;
+
+        private class NoopLog : ILog
         {
-            return new NoopLog();
-        }
+            public static NoopLog Instance { get; } = new NoopLog();
 
-        internal class NoopLog : ILog
-        {
-            private static readonly ILogEvent _event = new NoopLogEvent();
+            public bool IsDebugEnabled => false;
+            public bool IsInfoEnabled => false;
+            public bool IsWarnEnabled => false;
+            public bool IsErrorEnabled => false;
+            public bool IsFatalEnabled => false;
 
-            public bool IsDebugEnabled { get; } = false;
-            public bool IsInfoEnabled { get; } = false;
-            public bool IsWarnEnabled { get; } = false;
-            public bool IsErrorEnabled { get; } = false;
-            public bool IsFatalEnabled { get; } = false;
+            public bool IsLevelEnabled(Level level) => false;
 
-            public ILogEvent Debug()
+            public ILogEvent ForLevel(Level level) => NoopLogEvent.Instance;
+
+            private NoopLog()
             {
-                return _event;
             }
+
+            public ILogEvent Debug() => NoopLogEvent.Instance;
 
             public void Debug(string message)
             {
@@ -88,10 +87,7 @@ namespace ZeroLog
             {
             }
 
-            public ILogEvent Info()
-            {
-                return _event;
-            }
+            public ILogEvent Info() => NoopLogEvent.Instance;
 
             public void Info(string message)
             {
@@ -133,10 +129,7 @@ namespace ZeroLog
             {
             }
 
-            public ILogEvent Warn()
-            {
-                return _event;
-            }
+            public ILogEvent Warn() => NoopLogEvent.Instance;
 
             public void Warn(string message)
             {
@@ -178,10 +171,7 @@ namespace ZeroLog
             {
             }
 
-            public ILogEvent Error()
-            {
-                return _event;
-            }
+            public ILogEvent Error() => NoopLogEvent.Instance;
 
             public void Error(string message)
             {
@@ -223,10 +213,7 @@ namespace ZeroLog
             {
             }
 
-            public ILogEvent Fatal()
-            {
-                return _event;
-            }
+            public ILogEvent Fatal() => NoopLogEvent.Instance;
 
             public void Fatal(string message)
             {
@@ -267,10 +254,6 @@ namespace ZeroLog
             public void FatalFormat<T0, T1, T2, T3, T4, T5, T6, T7>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7)
             {
             }
-
-            public bool IsLevelEnabled(Level level) => false;
-
-            public ILogEvent ForLevel(Level level) => _event;
         }
     }
 }

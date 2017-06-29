@@ -4,21 +4,25 @@ using System.Text.Formatting;
 
 namespace ZeroLog
 {
-    internal class NoopLogEvent : IInternalLogEvent
+    internal class ForwardingLogEvent : IInternalLogEvent
     {
-        public static NoopLogEvent Instance { get; } = new NoopLogEvent();
+        private readonly IInternalLogEvent _logEventToAppend;
 
         public Level Level { get; }
         public DateTime Timestamp { get; }
         public int ThreadId { get; }
         public string Name { get; }
 
-        private NoopLogEvent()
+        private Log _log;
+
+        public ForwardingLogEvent(IInternalLogEvent logEventToAppend)
         {
+            _logEventToAppend = logEventToAppend;
         }
 
         public void Initialize(Level level, Log log)
         {
+            _log = log;
         }
 
         public void AppendFormat(string format)
@@ -58,6 +62,8 @@ namespace ZeroLog
 
         public void Log()
         {
+            if (_logEventToAppend != null)
+                _log?.Enqueue(_logEventToAppend);
         }
 
         public void WriteToStringBuffer(StringBuffer stringBuffer)

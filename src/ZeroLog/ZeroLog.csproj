@@ -66,6 +66,7 @@
     <Compile Include="FakeCollection.cs" />
     <Compile Include="Appenders\GuardedAppender.cs" />
     <Compile Include="Appenders\IAppender.cs" />
+    <Compile Include="ForwardingLogEvent.cs" />
     <Compile Include="IInternalLogEvent.cs" />
     <Compile Include="IInternalLogManager.cs" />
     <Compile Include="ILog.cs" />

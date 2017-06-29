@@ -18,6 +18,9 @@
 
         private IInternalLogEvent GetLogEventFor(Level level)
         {
+            if (!IsLevelEnabled(level))
+                return NoopLogEvent.Instance;
+
             var logEvent = _logManager.AllocateLogEvent();
             logEvent.Initialize(level, this);
             return logEvent;

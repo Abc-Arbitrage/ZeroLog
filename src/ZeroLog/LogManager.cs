@@ -18,8 +18,7 @@ namespace ZeroLog
         private readonly ObjectPool<IInternalLogEvent> _pool;
         private readonly Encoding _encoding;
 
-        private readonly IInternalLogEvent _notifyingNoopLogEvent = new NoopLogEvent();
-        private readonly IInternalLogEvent _droppingNoopLogEvent = new NoopLogEvent(false);
+        private readonly IInternalLogEvent _notifyPoolExhaustionLogEvent = new ForwardingLogEvent(SpecialLogEvents.ExhaustedPoolEvent);
 
         private readonly LogEventPoolExhaustionStrategy _logEventPoolExhaustionStrategy;
 
@@ -114,18 +113,19 @@ namespace ZeroLog
 
         IInternalLogEvent IInternalLogManager.AllocateLogEvent()
         {
-            IInternalLogEvent logEvent;
-            if (_pool.TryAcquire(out logEvent))
+            if (_pool.TryAcquire(out var logEvent))
                 return logEvent;
 
             switch (_logEventPoolExhaustionStrategy)
             {
                 case LogEventPoolExhaustionStrategy.WaitForLogEvent:
                     return AcquireLogEvent();
+
                 case LogEventPoolExhaustionStrategy.DropLogMessage:
-                    return _droppingNoopLogEvent;
+                    return NoopLogEvent.Instance;
+
                 default:
-                    return _notifyingNoopLogEvent;
+                    return _notifyPoolExhaustionLogEvent;
             }
         }
 

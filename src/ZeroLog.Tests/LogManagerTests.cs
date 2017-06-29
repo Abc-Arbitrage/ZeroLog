@@ -42,7 +42,7 @@ namespace ZeroLog.Tests
         }
 
         [Test]
-        public void should_return_noop_log_event_when_no_more_log_event_are_available()
+        public void should_return_special_log_event_when_no_more_log_event_are_available()
         {
             var log = LogManager.GetLogger(typeof(LogManagerTests));
 
@@ -52,10 +52,10 @@ namespace ZeroLog.Tests
                 actualLogEvents.Add(log.Debug());
             }
 
-            var noopEvent = log.Debug();
+            var unavailableEvent = log.Debug();
 
             Check.That(actualLogEvents.OfType<LogEvent>().Count()).Equals(actualLogEvents.Count);
-            Check.That(noopEvent).IsInstanceOf<NoopLogEvent>();
+            Check.That(unavailableEvent).IsInstanceOf<ForwardingLogEvent>();
 
             var signal = _testAppender.SetMessageCountTarget(actualLogEvents.Count);
 
