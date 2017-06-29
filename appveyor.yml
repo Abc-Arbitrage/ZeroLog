@@ -1,4 +1,4 @@
-image: Visual Studio 2015
+image: Visual Studio 2017
 build: off
 test_script:
 - ps: build\build.ps1 -Script build\build.cake -Target Test
