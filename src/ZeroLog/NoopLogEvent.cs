@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Text;
 using System.Text.Formatting;
 
 namespace ZeroLog
@@ -8,10 +7,10 @@ namespace ZeroLog
     {
         public static NoopLogEvent Instance { get; } = new NoopLogEvent();
 
-        public Level Level { get; }
-        public DateTime Timestamp { get; }
-        public int ThreadId { get; }
-        public string Name { get; }
+        public Level Level => default(Level);
+        public DateTime Timestamp => default(DateTime);
+        public int ThreadId => 0;
+        public string Name => null;
 
         private NoopLogEvent()
         {
@@ -30,7 +29,6 @@ namespace ZeroLog
         }
 
         public ILogEvent Append(string s) => this;
-        public ILogEvent Append(byte[] bytes, int length, Encoding encoding) => this;
         public ILogEvent AppendAsciiString(byte[] bytes, int length) => this;
         public unsafe ILogEvent AppendAsciiString(byte* bytes, int length) => this;
         public ILogEvent Append(bool b) => this;

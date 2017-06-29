@@ -9,14 +9,8 @@ namespace ZeroLog
     {
         public Level Level { get; } = Level.Finest;
         public bool IsRunning { get; set; } = true;
-        public Task WriteTask { get; }
-        public List<IAppender> Appenders { get; }
-
-        public NoopLogManager()
-        {
-            WriteTask = Task.FromResult(true);
-            Appenders = new List<IAppender>(0);
-        }
+        public Task WriteTask { get; } = Task.FromResult(true);
+        public List<IAppender> Appenders { get; } = new List<IAppender>(0);
 
         public IInternalLogEvent AllocateLogEvent()
             => throw new NotSupportedException();
