@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Text.Formatting;
@@ -20,10 +19,8 @@ namespace ZeroLog
         private readonly Encoding _encoding;
 
         private readonly IInternalLogEvent _notifyPoolExhaustionLogEvent = new ForwardingLogEvent(SpecialLogEvents.ExhaustedPoolEvent);
-
         private readonly LogEventPoolExhaustionStrategy _logEventPoolExhaustionStrategy;
 
-        [SuppressMessage("ReSharper", "PrivateFieldCanBeConvertedToLocalVariable")]
         private readonly BufferSegmentProvider _bufferSegmentProvider;
 
         public bool IsRunning { get; set; }
@@ -79,16 +76,21 @@ namespace ZeroLog
             var logManager = _logManager;
             _logManager = _defaultLogManager;
 
-            if (logManager == null)
+            logManager?.Dispose();
+        }
+
+        public void Dispose()
+        {
+            if (!IsRunning)
                 return;
 
-            logManager.IsRunning = false;
-            logManager.WriteTask.Wait(15000);
+            IsRunning = false;
+            WriteTask.Wait(15000);
 
-            foreach (var appender in logManager.Appenders)
-            {
+            foreach (var appender in Appenders)
                 appender.Close();
-            }
+
+            _bufferSegmentProvider.Dispose();
         }
 
         public static ILog GetLogger(Type type)

@@ -21,6 +21,10 @@ namespace ZeroLog
         public ILog GetNewLog(IInternalLogManager logManager, string name)
             => NoopLog.Instance;
 
+        public void Dispose()
+        {
+        }
+
         private class NoopLog : ILog
         {
             public static NoopLog Instance { get; } = new NoopLog();
