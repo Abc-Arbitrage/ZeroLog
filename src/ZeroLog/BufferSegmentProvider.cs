@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Runtime.InteropServices;
 using System.Threading;
+using ZeroLog.Utils;
 
 namespace ZeroLog
 {
@@ -72,27 +72,25 @@ namespace ZeroLog
 
         private unsafe class LargeBuffer : IDisposable
         {
-            private readonly int _firstSegmentGlobalIndex;
-            private GCHandle _handle;
-            private readonly byte[] _buffer;
+            private readonly SafeHeapHandle _bufferHandle;
             private readonly byte* _bufferPointer;
 
             public LargeBuffer(int size, int firstSegmentGlobalIndex)
             {
-                _firstSegmentGlobalIndex = firstSegmentGlobalIndex;
-                _buffer = new byte[size];
-                _handle = GCHandle.Alloc(_buffer, GCHandleType.Pinned);
-                _bufferPointer = (byte*)_handle.AddrOfPinnedObject().ToPointer();
+                FirstSegmentGlobalIndex = firstSegmentGlobalIndex;
+
+                _bufferHandle = new SafeHeapHandle(size);
+                _bufferPointer = (byte*)_bufferHandle.DangerousGetHandle();
             }
 
-            public int FirstSegmentGlobalIndex => _firstSegmentGlobalIndex;
+            public int FirstSegmentGlobalIndex { get; }
 
             public BufferSegment GetSegment(int offset, int length)
             {
-                if (offset < 0 || offset >= _buffer.Length)
+                if (offset < 0 || offset >= _bufferHandle.ByteLength)
                     throw new ArgumentOutOfRangeException(nameof(offset));
 
-                if (length <= 0 || offset + length > _buffer.Length)
+                if (length <= 0 || offset + length > _bufferHandle.ByteLength)
                     throw new ArgumentOutOfRangeException(nameof(offset));
 
                 return new BufferSegment(_bufferPointer + offset, length);
@@ -100,8 +98,7 @@ namespace ZeroLog
 
             public void Dispose()
             {
-                if (_handle.IsAllocated)
-                    _handle.Free();
+                _bufferHandle.Dispose();
             }
         }
     }

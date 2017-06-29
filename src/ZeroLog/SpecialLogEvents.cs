@@ -1,4 +1,5 @@
-using System.Runtime.InteropServices;
+using System.Diagnostics.CodeAnalysis;
+using ZeroLog.Utils;
 
 namespace ZeroLog
 {
@@ -9,21 +10,23 @@ namespace ZeroLog
 
         private unsafe class SpecialLogEvent
         {
-            private readonly byte[] _buffer = new byte[1024];
-            private readonly GCHandle _bufferHandle;
+            [SuppressMessage("ReSharper", "PrivateFieldCanBeConvertedToLocalVariable")]
+            private readonly SafeHeapHandle _bufferHandle;
 
             public readonly IInternalLogEvent LogEvent;
 
             public SpecialLogEvent(Level level, string message)
             {
                 var log = new Log(null, nameof(ZeroLog));
-                var bufferHandle = GCHandle.Alloc(_buffer, GCHandleType.Pinned);
-                var bufferSegment = new BufferSegment((byte*)bufferHandle.AddrOfPinnedObject(), _buffer.Length);
+
+                _bufferHandle = new SafeHeapHandle(1024);
+                var bufferPointer = (byte*)_bufferHandle.DangerousGetHandle();
+
+                var bufferSegment = new BufferSegment(bufferPointer, _bufferHandle.ByteLength);
+
                 LogEvent = new LogEvent(bufferSegment);
                 LogEvent.Initialize(level, log);
                 LogEvent.Append(message);
-
-                _bufferHandle = bufferHandle;
             }
         }
     }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Text.Formatting;
@@ -22,6 +23,9 @@ namespace ZeroLog
 
         private readonly LogEventPoolExhaustionStrategy _logEventPoolExhaustionStrategy;
 
+        [SuppressMessage("ReSharper", "PrivateFieldCanBeConvertedToLocalVariable")]
+        private readonly BufferSegmentProvider _bufferSegmentProvider;
+
         public bool IsRunning { get; set; }
         public Task WriteTask { get; }
         public List<IAppender> Appenders { get; }
@@ -35,8 +39,8 @@ namespace ZeroLog
 
             _queue = new ConcurrentQueue<IInternalLogEvent>(new FakeCollection(configuration.LogEventQueueSize));
 
-            var bufferSegmentProvider = new BufferSegmentProvider(configuration.LogEventQueueSize * configuration.LogEventBufferSize, configuration.LogEventBufferSize);
-            _pool = new ObjectPool<IInternalLogEvent>(configuration.LogEventQueueSize, () => new LogEvent(bufferSegmentProvider.GetSegment()));
+            _bufferSegmentProvider = new BufferSegmentProvider(configuration.LogEventQueueSize * configuration.LogEventBufferSize, configuration.LogEventBufferSize);
+            _pool = new ObjectPool<IInternalLogEvent>(configuration.LogEventQueueSize, () => new LogEvent(_bufferSegmentProvider.GetSegment()));
 
             Appenders = new List<IAppender>(appenders.Select(x => new GuardedAppender(x, TimeSpan.FromSeconds(15))));
 

@@ -91,6 +91,7 @@
     <Compile Include="SpecialLogEvents.cs" />
     <Compile Include="StringBufferExtension.cs" />
     <Compile Include="Utils\HighResolutionDateTime.cs" />
+    <Compile Include="Utils\SafeHeapHandle.cs" />
     <Compile Include="Utils\SystemDateTime.cs" />
   </ItemGroup>
   <ItemGroup>

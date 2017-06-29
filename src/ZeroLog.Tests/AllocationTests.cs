@@ -1,8 +1,8 @@
-﻿using NUnit.Framework;
-using System;
+﻿using System;
 using System.IO;
 using System.Threading;
 using NFluent;
+using NUnit.Framework;
 using ZeroLog.Appenders;
 
 namespace ZeroLog.Tests
@@ -18,7 +18,7 @@ namespace ZeroLog.Tests
                 File.Delete(file);
             }
 
-            LogManager.Initialize(new[] {new DateAndSizeRollingFileAppender("allocation-test")}, 2048 * 10, 512);
+            LogManager.Initialize(new[] { new DateAndSizeRollingFileAppender("allocation-test") }, 2048 * 10, 512);
         }
 
         [TearDown]
@@ -30,6 +30,8 @@ namespace ZeroLog.Tests
         [Test]
         public void should_not_allocate_using_all_formats_and_file_appender()
         {
+            // Allocation tests are unreliable when run from NCrunch
+
             var log = LogManager.GetLogger("AllocationTest");
 
             GC.Collect(2, GCCollectionMode.Forced, true);
