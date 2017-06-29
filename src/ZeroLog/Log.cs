@@ -1,6 +1,6 @@
 ﻿namespace ZeroLog
 {
-    public partial class Log : ILog
+    internal partial class Log : ILog
     {
         private readonly IInternalLogManager _logManager;
 

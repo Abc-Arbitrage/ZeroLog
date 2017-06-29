@@ -2,10 +2,11 @@
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using ZeroLog.Appenders;
 
-namespace ZeroLog.Appenders
+namespace ZeroLog.Tests
 {
-    class PerformanceAppender : IAppender
+    internal class PerformanceAppender : IAppender
     {
         private readonly MessageReceived[] _messages;
         private int _count;

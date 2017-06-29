@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 
 namespace ZeroLog
 {
-    partial class Log
+    internal partial class Log
     {
                 
         public bool IsDebugEnabled => Level.Debug >= _logManager.Level;

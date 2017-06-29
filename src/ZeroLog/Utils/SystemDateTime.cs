@@ -2,24 +2,20 @@
 
 namespace ZeroLog.Utils
 {
-    public static class SystemDateTime
+    internal static class SystemDateTime
     {
         private static DateTime? _pausedUtcNow;
-        
+
         public static DateTime UtcNow => _pausedUtcNow ?? HighResolutionDateTime.UtcNow;
-        
+
         public static void Reset()
         {
             _pausedUtcNow = null;
         }
-        
+
         public static IDisposable Set(DateTime? utcNow = null)
         {
-            if (utcNow == null)
-                throw new ArgumentNullException();
-
-            _pausedUtcNow = utcNow;
-
+            _pausedUtcNow = utcNow ?? throw new ArgumentNullException();
             return Scope.Instance;
         }
 
@@ -48,4 +44,3 @@ namespace ZeroLog.Utils
         }
     }
 }
-

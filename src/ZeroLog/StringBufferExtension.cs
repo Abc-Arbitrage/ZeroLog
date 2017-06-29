@@ -4,7 +4,7 @@ using System.Text.Formatting;
 
 namespace ZeroLog
 {
-    public static unsafe class StringBufferExtension
+    internal static unsafe class StringBufferExtension
     {
         public static void Append(this StringBuffer stringBuffer, ref byte* dataPointer, StringView format, List<string> strings, List<IntPtr> argPointers)
         {

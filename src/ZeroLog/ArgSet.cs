@@ -4,7 +4,7 @@ using System.Text.Formatting;
 
 namespace ZeroLog
 {
-    public unsafe struct ArgSet : IArgSet
+    internal unsafe struct ArgSet : IArgSet
     {
         private readonly List<IntPtr> _argPointers;
         private readonly List<string> _strings;

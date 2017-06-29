@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace ZeroLog
 {
-    public class LevelStringCache
+    internal static class LevelStringCache
     {
         private static readonly string[] _levelStrings;
 

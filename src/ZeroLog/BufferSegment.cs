@@ -1,6 +1,6 @@
 ﻿namespace ZeroLog
 {
-    public unsafe struct BufferSegment
+    internal unsafe struct BufferSegment
     {
         public readonly byte* Data;
         public readonly int Length;

@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 
 namespace ZeroLog.Utils
 {
-    public static class HighResolutionDateTime
+    internal static class HighResolutionDateTime
     {
         private static readonly bool _isAvailable;
 
@@ -18,9 +18,7 @@ namespace ZeroLog.Utils
                 if (!_isAvailable)
                     return DateTime.UtcNow;
 
-                long filetime;
-                GetSystemTimePreciseAsFileTime(out filetime);
-
+                GetSystemTimePreciseAsFileTime(out var filetime);
                 return DateTime.FromFileTimeUtc(filetime);
             }
         }
@@ -30,8 +28,7 @@ namespace ZeroLog.Utils
         {
             try
             {
-                long filetime;
-                GetSystemTimePreciseAsFileTime(out filetime);
+                GetSystemTimePreciseAsFileTime(out _);
                 _isAvailable = true;
             }
             catch (EntryPointNotFoundException)

@@ -4,7 +4,7 @@ using ZeroLog.Utils;
 
 namespace ZeroLog
 {
-    public class BufferSegmentProvider : IDisposable
+    internal class BufferSegmentProvider : IDisposable
     {
         private readonly LargeBuffer[] _largeBuffers = new LargeBuffer[16384];
 
@@ -64,10 +64,8 @@ namespace ZeroLog
 
         public void Dispose()
         {
-            foreach (var pinnedBuffer in _largeBuffers)
-            {
-                pinnedBuffer.Dispose();
-            }
+            for (var i = 0; i < LargeBufferCount; ++i)
+                _largeBuffers[i].Dispose();
         }
 
         private unsafe class LargeBuffer : IDisposable
