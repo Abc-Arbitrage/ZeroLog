@@ -14,13 +14,15 @@
 
         public bool IsLevelEnabled(Level level) => level >= _logManager.Level;
 
-        public ILogEvent ForLevel(Level level) => GetLogEventFor(level);
+        public ILogEvent ForLevel(Level level)
+        {
+            return IsLevelEnabled(level)
+                ? GetLogEventFor(level)
+                : NoopLogEvent.Instance;
+        }
 
         private IInternalLogEvent GetLogEventFor(Level level)
         {
-            if (!IsLevelEnabled(level))
-                return NoopLogEvent.Instance;
-
             var logEvent = _logManager.AllocateLogEvent();
             logEvent.Initialize(level, this);
             return logEvent;

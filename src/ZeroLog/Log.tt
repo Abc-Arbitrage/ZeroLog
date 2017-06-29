@@ -23,16 +23,24 @@ namespace ZeroLog
 
         public ILogEvent <#=levelName#>()
         {
-            return GetLogEventFor(Level.<#=levelName#>);
+            return Is<#=levelName#>Enabled
+                ? GetLogEventFor(Level.<#=levelName#>)
+                : NoopLogEvent.Instance;
         }
         
         public void <#=levelName#>(string message)
         {
+            if (!Is<#=levelName#>Enabled)
+                return;
+
             GetLogEventFor(Level.<#=levelName#>).Append(message).Log();
         }
 
         public void <#=levelName#>(string message, Exception ex)
         {
+            if (!Is<#=levelName#>Enabled)
+                return;
+
             var logEvent = GetLogEventFor(Level.<#=levelName#>);
             logEvent.Append(message);
             logEvent.Append(ex.ToString());
@@ -55,6 +63,9 @@ namespace ZeroLog
         [StringFormatMethod("format")]	
         public void <#=levelName#>Format<#=genericParams#>(string format, T0 arg0<#for(int j = 1; j < i; j++) { #>, T<#=j#> arg<#=j#><#}#>)
         {
+            if (!Is<#=levelName#>Enabled)
+                return;
+
             var logEvent = GetLogEventFor(Level.<#=levelName#>);
             logEvent.AppendFormat(format);
             <#for(int j = 0; j < i; j++){#>
