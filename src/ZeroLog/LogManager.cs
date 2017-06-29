@@ -46,7 +46,7 @@ namespace ZeroLog
             }
 
             IsRunning = true;
-            WriteTask = Task.Run(() => WriteToAppenders());
+            WriteTask = Task.Factory.StartNew(WriteToAppenders, TaskCreationOptions.LongRunning);
         }
 
         public Level Level { get; }
@@ -131,8 +131,9 @@ namespace ZeroLog
 
         private IInternalLogEvent AcquireLogEvent()
         {
-            IInternalLogEvent logEvent;
             var spinwait = new SpinWait();
+
+            IInternalLogEvent logEvent;
             while (!_pool.TryAcquire(out logEvent))
             {
                 spinwait.SpinOnce();
@@ -143,20 +144,22 @@ namespace ZeroLog
 
         private void WriteToAppenders()
         {
-            var spinWait = default(SpinWait);
+            var spinWait = new SpinWait();
             var stringBuffer = new StringBuffer(16 * 1024);
             var destination = new byte[16 * 1024];
+
             while (IsRunning || !_queue.IsEmpty)
             {
-                if (!TryToProcessQueue(stringBuffer, destination))
+                if (TryToProcessQueue(stringBuffer, destination))
+                    spinWait.Reset();
+                else
                     spinWait.SpinOnce();
             }
         }
 
         private bool TryToProcessQueue(StringBuffer stringBuffer, byte[] destination)
         {
-            IInternalLogEvent logEvent;
-            if (!_queue.TryDequeue(out logEvent))
+            if (!_queue.TryDequeue(out var logEvent))
                 return false;
 
             var isSpecialEvent = false;
