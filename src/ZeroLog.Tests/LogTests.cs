@@ -32,6 +32,12 @@ namespace ZeroLog.Tests
             Check.That(log.IsWarnEnabled).Equals(isWarn);
             Check.That(log.IsErrorEnabled).Equals(isError);
             Check.That(log.IsFatalEnabled).Equals(isFatal);
+
+            Check.That(log.IsLevelEnabled(logLevel)).IsTrue();
+            if (logLevel > Level.Finest)
+                Check.That(log.IsLevelEnabled(logLevel - 1)).IsFalse();
+            if (logLevel < Level.Fatal)
+                Check.That(log.IsLevelEnabled(logLevel + 1)).IsTrue();
         }
     }
 }

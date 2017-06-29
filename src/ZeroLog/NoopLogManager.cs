@@ -268,10 +268,9 @@ namespace ZeroLog
             {
             }
 
-            public ILogEvent ForLevel(Level level)
-            {
-                return _event;
-            }
+            public bool IsLevelEnabled(Level level) => false;
+
+            public ILogEvent ForLevel(Level level) => _event;
         }
     }
 }

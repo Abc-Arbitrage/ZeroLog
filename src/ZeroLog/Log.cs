@@ -12,10 +12,9 @@
 
         internal string Name { get; }
 
-        public ILogEvent ForLevel(Level level)
-        {
-            return GetLogEventFor(level);
-        }
+        public bool IsLevelEnabled(Level level) => level >= _logManager.Level;
+
+        public ILogEvent ForLevel(Level level) => GetLogEventFor(level);
 
         private IInternalLogEvent GetLogEventFor(Level level)
         {
