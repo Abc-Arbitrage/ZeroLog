@@ -63,6 +63,10 @@
     <Compile Include="BufferSegmentProvider.cs" />
     <Compile Include="ConcurrentQueue.cs" />
     <Compile Include="ConcurrentQueueCapacityInitializer.cs" />
+    <Compile Include="Config\AppenderDefinition.cs" />
+    <Compile Include="Config\LoggerDefinition.cs" />
+    <Compile Include="Config\RootDefinition.cs" />
+    <Compile Include="FakeCollection.cs" />
     <Compile Include="Appenders\GuardedAppender.cs" />
     <Compile Include="Appenders\IAppender.cs" />
     <Compile Include="ForwardingLogEvent.cs" />
