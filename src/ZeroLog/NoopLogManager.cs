@@ -12,14 +12,11 @@ namespace ZeroLog
         public Task WriteTask { get; } = Task.FromResult(true);
         public List<IAppender> Appenders { get; } = new List<IAppender>(0);
 
-        public IInternalLogEvent AllocateLogEvent()
-            => throw new NotSupportedException();
+        public IInternalLogEvent AllocateLogEvent() => throw new NotSupportedException();
 
-        public void Enqueue(IInternalLogEvent logEvent)
-            => throw new NotSupportedException();
+        public void Enqueue(IInternalLogEvent logEvent) => throw new NotSupportedException();
 
-        public ILog GetNewLog(IInternalLogManager logManager, string name)
-            => NoopLog.Instance;
+        public ILog GetNewLog(IInternalLogManager logManager, string name) => NoopLog.Instance;
 
         public void Dispose()
         {
