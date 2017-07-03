@@ -25,6 +25,9 @@ namespace ZeroLog
         public LogEventPoolExhaustionStrategy ResolveLogEventPoolExhaustionStrategy(string name)
             => LogEventPoolExhaustionStrategy.Default;
 
+        public Level ResolveLevel(string name)
+            => Level.Fatal;
+
         public void Dispose()
         {
         }

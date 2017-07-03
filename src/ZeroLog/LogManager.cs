@@ -154,6 +154,11 @@ namespace ZeroLog
             return _logEventPoolExhaustionStrategy;
         }
 
+        public Level ResolveLevel(string name)
+        {
+            return Level;
+        }
+
         IInternalLogEvent IInternalLogManager.AllocateLogEvent(LogEventPoolExhaustionStrategy logEventPoolExhaustionStrategy, IInternalLogEvent notifyPoolExhaustionLogEvent)
         {
             if (_pool.TryAcquire(out var logEvent))
@@ -240,8 +245,8 @@ namespace ZeroLog
             for (var i = 0; i < appenders.Count; i++)
             {
                 var appender = appenders[i];
-                if (logEvent.Level >= Level)
-                    appender.WriteEvent(logEvent, destination, bytesWritten);
+                // if (logEvent.Level >= Level) // TODO Check this ? log event should not be in queue if not > Level
+                appender.WriteEvent(logEvent, destination, bytesWritten);
             }
         }
 

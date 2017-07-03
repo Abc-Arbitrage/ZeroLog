@@ -14,5 +14,6 @@ namespace ZeroLog
         ILog GetNewLog(IInternalLogManager logManager, string name);
         IList<IAppender> ResolveAppenders(string name);
         LogEventPoolExhaustionStrategy ResolveLogEventPoolExhaustionStrategy(string name);
+        Level ResolveLevel(string name);
     }
 }

@@ -10,19 +10,27 @@ namespace ZeroLog
 
         internal Log(IInternalLogManager logManager, string name)
         {
+             Name = name;
             _logManager = logManager;
-            Name = name;
-            Appenders = _logManager?.ResolveAppenders(name);
-            LogEventPoolExhaustionStrategy = _logManager?.ResolveLogEventPoolExhaustionStrategy(name) ?? LogEventPoolExhaustionStrategy.Default;
             _specialLogMessage = new ForwardingLogEvent(new SpecialLogEvents.SpecialLogEvent(Level.Fatal, "Log message skipped due to LogEvent pool exhaustion.", this).LogEvent);
+
+            ResetConfiguration();
+        }
+
+        internal void ResetConfiguration()
+        {
+            Appenders = _logManager?.ResolveAppenders(Name);
+            LogEventPoolExhaustionStrategy = _logManager?.ResolveLogEventPoolExhaustionStrategy(Name) ?? LogEventPoolExhaustionStrategy.Default;
+            LogLevel = _logManager?.ResolveLevel(Name) ?? Level.Fatal;
         }
 
         internal string Name { get; }
 
-        public IList<IAppender> Appenders { get; }
-        public LogEventPoolExhaustionStrategy LogEventPoolExhaustionStrategy { get; }
+        public IList<IAppender> Appenders { get; private set; }
+        public LogEventPoolExhaustionStrategy LogEventPoolExhaustionStrategy { get; private set; }
+        private Level LogLevel { get; set; }
 
-        public bool IsLevelEnabled(Level level) => level >= _logManager.Level;
+        public bool IsLevelEnabled(Level level) => level >= LogLevel;
 
         public ILogEvent ForLevel(Level level)
         {
