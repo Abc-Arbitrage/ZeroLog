@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text.Formatting;
 using System.Threading;
+using ZeroLog.Utils;
 
 namespace ZeroLog
 {
@@ -33,7 +34,7 @@ namespace ZeroLog
 
         public void Initialize(Level level, Log log)
         {
-            Timestamp = DateTime.UtcNow;
+            Timestamp = SystemDateTime.UtcNow;
             Level = level;
             _log = log;
             _strings.Clear();
