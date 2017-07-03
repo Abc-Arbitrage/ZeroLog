@@ -12,11 +12,18 @@ namespace ZeroLog
         public Task WriteTask { get; } = Task.FromResult(true);
         public List<IAppender> Appenders { get; } = new List<IAppender>(0);
 
-        public IInternalLogEvent AllocateLogEvent() => throw new NotSupportedException();
+        public IInternalLogEvent AllocateLogEvent(LogEventPoolExhaustionStrategy logEventPoolExhaustionStrategy, IInternalLogEvent logEvent)
+            => throw new NotSupportedException();
 
         public void Enqueue(IInternalLogEvent logEvent) => throw new NotSupportedException();
 
         public ILog GetNewLog(IInternalLogManager logManager, string name) => NoopLog.Instance;
+
+        public IList<IAppender> ResolveAppenders(string name) 
+            => NoopLog.Instance.Appenders;
+
+        public LogEventPoolExhaustionStrategy ResolveLogEventPoolExhaustionStrategy(string name)
+            => LogEventPoolExhaustionStrategy.Default;
 
         public void Dispose()
         {
@@ -25,6 +32,9 @@ namespace ZeroLog
         private class NoopLog : ILog
         {
             public static NoopLog Instance { get; } = new NoopLog();
+
+            public IList<IAppender> Appenders { get; } = new List<IAppender>();
+            public LogEventPoolExhaustionStrategy LogEventPoolExhaustionStrategy { get; } = LogEventPoolExhaustionStrategy.DropLogMessage;
 
             public bool IsDebugEnabled => false;
             public bool IsInfoEnabled => false;

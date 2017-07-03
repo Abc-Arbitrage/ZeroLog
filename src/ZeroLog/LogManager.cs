@@ -9,6 +9,28 @@ using ZeroLog.Appenders;
 
 namespace ZeroLog
 {
+    public interface IAppenderResolver
+    {
+        IList<IAppender> Resolve(string name);
+    }
+
+    public class DummyAppenderResolver : IAppenderResolver
+    {
+        private readonly IList<IAppender> _appenders;
+
+        public DummyAppenderResolver(IEnumerable<IAppender> appenders, Encoding encoding)
+        {
+            _appenders = new List<IAppender>(appenders.Select(x => new GuardedAppender(x, TimeSpan.FromSeconds(15))));
+
+            foreach (var appender in _appenders)
+            {
+                appender.SetEncoding(encoding);
+            }
+        }
+
+        public IList<IAppender> Resolve(string name) => _appenders;
+    }
+
     public class LogManager : IInternalLogManager
     {
         private static readonly IInternalLogManager _defaultLogManager = new NoopLogManager();
@@ -18,17 +40,19 @@ namespace ZeroLog
         private readonly ObjectPool<IInternalLogEvent> _pool;
         private readonly Encoding _encoding;
 
-        private readonly IInternalLogEvent _notifyPoolExhaustionLogEvent = new ForwardingLogEvent(SpecialLogEvents.ExhaustedPoolEvent);
         private readonly LogEventPoolExhaustionStrategy _logEventPoolExhaustionStrategy;
 
         private readonly BufferSegmentProvider _bufferSegmentProvider;
 
+        private readonly IAppenderResolver _appenderResolver;
+
         public bool IsRunning { get; set; }
         public Task WriteTask { get; }
-        public List<IAppender> Appenders { get; }
+        //public List<IAppender> Appenders { get; }
 
-        internal LogManager(IEnumerable<IAppender> appenders, LogManagerConfiguration configuration)
+        internal LogManager(IAppenderResolver appenderResolver, LogManagerConfiguration configuration)
         {
+            _appenderResolver = appenderResolver;
             Level = configuration.Level;
 
             _encoding = Encoding.Default;
@@ -39,12 +63,14 @@ namespace ZeroLog
             _bufferSegmentProvider = new BufferSegmentProvider(configuration.LogEventQueueSize * configuration.LogEventBufferSize, configuration.LogEventBufferSize);
             _pool = new ObjectPool<IInternalLogEvent>(configuration.LogEventQueueSize, () => new LogEvent(_bufferSegmentProvider.GetSegment()));
 
-            Appenders = new List<IAppender>(appenders.Select(x => new GuardedAppender(x, TimeSpan.FromSeconds(15))));
+            // TODO : move that somewhere ?
 
-            foreach (var appender in Appenders)
-            {
-                appender.SetEncoding(_encoding);
-            }
+            //Appenders = new List<IAppender>(appenders.Select(x => new GuardedAppender(x, TimeSpan.FromSeconds(15))));
+
+            //foreach (var appender in Appenders)
+            //{
+            //    appender.SetEncoding(_encoding);
+            //}
 
             IsRunning = true;
             WriteTask = Task.Factory.StartNew(WriteToAppenders, TaskCreationOptions.LongRunning);
@@ -57,7 +83,7 @@ namespace ZeroLog
             if (_logManager != _defaultLogManager)
                 throw new ApplicationException("LogManager is already initialized");
 
-            _logManager = new LogManager(appenders, configuration);
+            _logManager = new LogManager(new DummyAppenderResolver(appenders, Encoding.Default), configuration);
             return _logManager;
         }
 
@@ -87,8 +113,9 @@ namespace ZeroLog
             IsRunning = false;
             WriteTask.Wait(15000);
 
-            foreach (var appender in Appenders)
-                appender.Close();
+            // TODO
+            //foreach (var appender in Appenders)
+            //    appender.Close();
 
             _bufferSegmentProvider.Dispose();
         }
@@ -117,12 +144,22 @@ namespace ZeroLog
             return new Log(logManager, name);
         }
 
-        IInternalLogEvent IInternalLogManager.AllocateLogEvent()
+        public IList<IAppender> ResolveAppenders(string name)
+        {
+            return _appenderResolver.Resolve(name);
+        }
+
+        public LogEventPoolExhaustionStrategy ResolveLogEventPoolExhaustionStrategy(string name)
+        {
+            return _logEventPoolExhaustionStrategy;
+        }
+
+        IInternalLogEvent IInternalLogManager.AllocateLogEvent(LogEventPoolExhaustionStrategy logEventPoolExhaustionStrategy, IInternalLogEvent notifyPoolExhaustionLogEvent)
         {
             if (_pool.TryAcquire(out var logEvent))
                 return logEvent;
 
-            switch (_logEventPoolExhaustionStrategy)
+            switch (logEventPoolExhaustionStrategy)
             {
                 case LogEventPoolExhaustionStrategy.WaitForLogEvent:
                     return AcquireLogEvent();
@@ -131,7 +168,7 @@ namespace ZeroLog
                     return NoopLogEvent.Instance;
 
                 default:
-                    return _notifyPoolExhaustionLogEvent;
+                    return notifyPoolExhaustionLogEvent;
             }
         }
 
@@ -167,13 +204,8 @@ namespace ZeroLog
         {
             if (!_queue.TryDequeue(out var logEvent))
                 return false;
-
-            var isSpecialEvent = false;
-            if (logEvent == SpecialLogEvents.ExhaustedPoolEvent)
-            {
-                isSpecialEvent = true;
-                logEvent.SetTimestamp(DateTime.UtcNow);
-            }
+            if ((logEvent.Appenders?.Count ?? 0) <= 0)
+                return true;
 
             try
             {
@@ -188,7 +220,7 @@ namespace ZeroLog
 
             WriteMessageLogToAppenders(destination, logEvent, bytesWritten);
 
-            if (!isSpecialEvent)
+            if (logEvent.IsPooled)
                 _pool.Release(logEvent);
 
             return true;
@@ -204,9 +236,10 @@ namespace ZeroLog
 
         private void WriteMessageLogToAppenders(byte[] destination, IInternalLogEvent logEvent, int bytesWritten)
         {
-            for (var i = 0; i < Appenders.Count; i++)
+            var appenders = logEvent.Appenders;
+            for (var i = 0; i < appenders.Count; i++)
             {
-                var appender = Appenders[i];
+                var appender = appenders[i];
                 if (logEvent.Level >= Level)
                     appender.WriteEvent(logEvent, destination, bytesWritten);
             }

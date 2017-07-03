@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Moq;
 using NFluent;
 using NUnit.Framework;
 using ZeroLog.Appenders;
@@ -24,7 +25,8 @@ namespace ZeroLog.Tests
                 Level = logLevel,
             };
 
-            var logManager = new LogManager(new List<IAppender>(), configuration);
+            var appenderResolver = new Mock<IAppenderResolver>();
+            var logManager = new LogManager(appenderResolver.Object, configuration);
             var log = new Log(logManager, "logger");
 
             Check.That(log.IsDebugEnabled).Equals(isDebug);

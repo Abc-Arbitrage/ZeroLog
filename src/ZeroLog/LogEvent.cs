@@ -4,10 +4,21 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text.Formatting;
 using System.Threading;
+using ZeroLog.Appenders;
 using ZeroLog.Utils;
 
 namespace ZeroLog
 {
+    internal unsafe class UnpooledLogEvent : LogEvent
+    {
+        public UnpooledLogEvent(BufferSegment bufferSegment)
+            : base(bufferSegment)
+        {
+        }
+
+        public override bool IsPooled => false;
+    }
+
     internal unsafe class LogEvent : IInternalLogEvent
     {
         private const int _stringCapacity = 10;
@@ -31,6 +42,8 @@ namespace ZeroLog
         public DateTime Timestamp { get; private set; }
         public int ThreadId { get; private set; }
         public string Name => _log.Name;
+        public IList<IAppender> Appenders => _log.Appenders;
+        public virtual bool IsPooled => true;
 
         public void Initialize(Level level, Log log)
         {

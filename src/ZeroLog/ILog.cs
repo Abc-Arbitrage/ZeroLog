@@ -1,9 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
+using ZeroLog.Appenders;
 
 namespace ZeroLog
 {
     public interface ILog
     {
+        IList<IAppender> Appenders { get; }
+        LogEventPoolExhaustionStrategy LogEventPoolExhaustionStrategy { get; }
+
         bool IsDebugEnabled { get; }
         bool IsInfoEnabled { get; }
         bool IsWarnEnabled { get; }

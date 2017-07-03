@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using ZeroLog.Appenders;
 
 namespace ZeroLog
 {
@@ -8,6 +10,7 @@ namespace ZeroLog
         DateTime Timestamp { get; }
         int ThreadId { get; }
         string Name { get; }
+        IList<IAppender> Appenders { get; }
         ILogEvent Append(string s);
         ILogEvent AppendAsciiString(byte[] bytes, int length);
         unsafe ILogEvent AppendAsciiString(byte* bytes, int length);

@@ -9,9 +9,10 @@ namespace ZeroLog
     {
         bool IsRunning { get; set; }
         Task WriteTask { get; }
-        List<IAppender> Appenders { get; }
-        IInternalLogEvent AllocateLogEvent();
+        IInternalLogEvent AllocateLogEvent(LogEventPoolExhaustionStrategy logEventPoolExhaustionStrategy, IInternalLogEvent logEvent);
         void Enqueue(IInternalLogEvent logEvent);
         ILog GetNewLog(IInternalLogManager logManager, string name);
+        IList<IAppender> ResolveAppenders(string name);
+        LogEventPoolExhaustionStrategy ResolveLogEventPoolExhaustionStrategy(string name);
     }
 }
