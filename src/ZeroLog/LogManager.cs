@@ -34,7 +34,7 @@ namespace ZeroLog
             _encoding = Encoding.Default;
             _logEventPoolExhaustionStrategy = configuration.LogEventPoolExhaustionStrategy;
 
-            _queue = new ConcurrentQueue<IInternalLogEvent>(new FakeCollection(configuration.LogEventQueueSize));
+            _queue = new ConcurrentQueue<IInternalLogEvent>(new ConcurrentQueueCapacityInitializer(configuration.LogEventQueueSize));
 
             _bufferSegmentProvider = new BufferSegmentProvider(configuration.LogEventQueueSize * configuration.LogEventBufferSize, configuration.LogEventBufferSize);
             _pool = new ObjectPool<IInternalLogEvent>(configuration.LogEventQueueSize, () => new LogEvent(_bufferSegmentProvider.GetSegment()));
@@ -225,7 +225,6 @@ namespace ZeroLog
             {
                 bytesWritten = stringBuffer.CopyTo(dest, destination.Length, 0, stringBuffer.Count, _encoding);
             }
-
             return bytesWritten;
         }
     }

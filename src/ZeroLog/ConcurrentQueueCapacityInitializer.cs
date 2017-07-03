@@ -5,11 +5,16 @@ using System.Linq;
 
 namespace ZeroLog
 {
-    internal class FakeCollection : ICollection<LogEvent>
+    /// <summary>
+    /// Fake collection used to initialize the capacity of a ConcurrentQueue :
+    ///     - Has a Count property set to the desired initial capacity
+    ///     - Has a noop iterator
+    /// </summary>
+    internal class ConcurrentQueueCapacityInitializer : ICollection<LogEvent>
     {
         private readonly int _size;
 
-        public FakeCollection(int size)
+        public ConcurrentQueueCapacityInitializer(int size)
         {
             _size = size;
         }
