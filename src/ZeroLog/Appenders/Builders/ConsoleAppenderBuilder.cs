@@ -6,7 +6,12 @@ namespace ZeroLog.Appenders.Builders
             => nameof(ConsoleAppender);
 
         public IAppender BuildAppender(string name, string config)
-            => new ConsoleAppender();
+            => new ConsoleAppender(JSONExtensions.DeserializeOrDefault(config, new Config()).PrefixPattern);
+
+        public class Config
+        {
+            public string PrefixPattern { get; set; } = ConsoleAppender.DefaultPrefixPattern;
+        }
 
     }
 }

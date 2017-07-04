@@ -5,12 +5,15 @@ namespace ZeroLog.Appenders
 {
     public class ConsoleAppender : AppenderBase
     {
+        public const string DefaultPrefixPattern = "%time - %level - %logger || ";
+
         private readonly Stream _output;
 
-        public ConsoleAppender(string prefixPattern = "%time - %level - %logger || ") : base(prefixPattern)
+        public ConsoleAppender(string prefixPattern = DefaultPrefixPattern) : base(prefixPattern)
         {
             _output = Console.OpenStandardOutput();
         }
+
 
         public override void WriteEvent(ILogEvent logEvent, byte[] messageBytes, int messageLength)
         {

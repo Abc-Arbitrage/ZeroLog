@@ -7,6 +7,10 @@ namespace ZeroLog.Appenders
 {
     public class DateAndSizeRollingFileAppender : AppenderBase
     {
+        public const int DefaultMaxSize = 200 * 1024 * 1024;
+        public const string DefaultExtension = "log";
+        public const string DefaultPrefixPattern = "%time - %level - %logger || ";
+
         private readonly object _lock = new object();
         private DateTime _currentDateTime = DateTime.UtcNow;
         private int _currentFileSize;
@@ -42,7 +46,7 @@ namespace ZeroLog.Appenders
         /// <summary>
         /// Initializes a new instance of the class.
         /// </summary>
-        public DateAndSizeRollingFileAppender(string filenameRoot, int maxFileSizeInBytes = 200 * 1024 * 1024, string extension = "log", string prefixPattern = "%time - %level - %logger || ")
+        public DateAndSizeRollingFileAppender(string filenameRoot, int maxFileSizeInBytes = DefaultMaxSize, string extension = DefaultExtension, string prefixPattern = DefaultPrefixPattern)
             : base(prefixPattern)
         {
             FilenameRoot = filenameRoot;

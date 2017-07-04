@@ -48,6 +48,9 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ValueTuple, Version=4.0.1.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.3.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -64,6 +67,7 @@
     <Compile Include="Appenders\Builders\DateAndSizeRollingFileAppenderBuilder.cs" />
     <Compile Include="Appenders\Builders\IAppenderBuilder.cs" />
     <Compile Include="Appenders\Builders\IAppenderFactory.cs" />
+    <Compile Include="Appenders\Builders\JSONExtensions.cs" />
     <Compile Include="Appenders\ConsoleAppender.cs" />
     <Compile Include="Appenders\DateAndSizeRollingFileAppender.cs" />
     <Compile Include="Appenders\NoopAppender.cs" />
@@ -85,6 +89,7 @@
     <Compile Include="Appenders\GuardedAppender.cs" />
     <Compile Include="Appenders\IAppender.cs" />
     <Compile Include="ConfigResolvers\DummyResolver.cs" />
+    <Compile Include="Config\ZeroLogConfiguration.cs" />
     <Compile Include="ForwardingLogEvent.cs" />
     <Compile Include="ConfigResolvers\HierarchicalResolver.cs" />
     <Compile Include="ConfigResolvers\IAppenderResolver.cs" />

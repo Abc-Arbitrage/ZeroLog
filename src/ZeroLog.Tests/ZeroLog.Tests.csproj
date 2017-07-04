@@ -63,6 +63,7 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ValueTuple, Version=4.0.1.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -75,9 +76,11 @@
       <Link>Properties\SharedVersionInfo.cs</Link>
     </Compile>
     <Compile Include="AllocationTests.cs" />
+    <Compile Include="Appenders\Builder\ConsoleAppenderBuilder.cs" />
     <Compile Include="Appenders\DateAndSizeRollingFileAppenderTests.cs" />
     <Compile Include="Appenders\GuardedAppenderTests.cs" />
     <Compile Include="BufferSegmentProviderTests.cs" />
+    <Compile Include="Config\ConfiguratorTests.cs" />
     <Compile Include="HierarchicalAppenderResolverTests.cs" />
     <Compile Include="IntegrationTests.cs" />
     <Compile Include="LogEventTests.EdgeCases.cs" />
@@ -104,5 +107,6 @@
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
