@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Text.Formatting;
 using System.Threading;
 using System.Threading.Tasks;
+using ZeroLog.AppenderResolvers;
 using ZeroLog.Appenders;
 
 namespace ZeroLog
@@ -12,23 +12,7 @@ namespace ZeroLog
     public interface IAppenderResolver
     {
         IList<IAppender> Resolve(string name);
-    }
-
-    public class DummyAppenderResolver : IAppenderResolver
-    {
-        private readonly IList<IAppender> _appenders;
-
-        public DummyAppenderResolver(IEnumerable<IAppender> appenders, Encoding encoding)
-        {
-            _appenders = new List<IAppender>(appenders.Select(x => new GuardedAppender(x, TimeSpan.FromSeconds(15))));
-
-            foreach (var appender in _appenders)
-            {
-                appender.SetEncoding(encoding);
-            }
-        }
-
-        public IList<IAppender> Resolve(string name) => _appenders;
+        void Initialize(Encoding encoding);
     }
 
     public class LogManager : IInternalLogManager
@@ -63,20 +47,22 @@ namespace ZeroLog
             _bufferSegmentProvider = new BufferSegmentProvider(configuration.LogEventQueueSize * configuration.LogEventBufferSize, configuration.LogEventBufferSize);
             _pool = new ObjectPool<IInternalLogEvent>(configuration.LogEventQueueSize, () => new LogEvent(_bufferSegmentProvider.GetSegment()));
 
-            // TODO : move that somewhere ?
-
-            //Appenders = new List<IAppender>(appenders.Select(x => new GuardedAppender(x, TimeSpan.FromSeconds(15))));
-
-            //foreach (var appender in Appenders)
-            //{
-            //    appender.SetEncoding(_encoding);
-            //}
+            _appenderResolver.Initialize(_encoding);
 
             IsRunning = true;
             WriteTask = Task.Factory.StartNew(WriteToAppenders, TaskCreationOptions.LongRunning);
         }
 
         public Level Level { get; }
+
+        public static ILogManager Initialize(IAppenderResolver appenderResolver, LogManagerConfiguration configuration)
+        {
+            if (_logManager != _defaultLogManager)
+                throw new ApplicationException("LogManager is already initialized");
+
+            _logManager = new LogManager(appenderResolver, configuration);
+            return _logManager;
+        }
 
         public static ILogManager Initialize(IEnumerable<IAppender> appenders, LogManagerConfiguration configuration)
         {

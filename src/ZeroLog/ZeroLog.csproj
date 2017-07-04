@@ -68,8 +68,9 @@
     <Compile Include="Config\RootDefinition.cs" />
     <Compile Include="Appenders\GuardedAppender.cs" />
     <Compile Include="Appenders\IAppender.cs" />
+    <Compile Include="AppenderResolvers\DummyAppenderResolver.cs" />
     <Compile Include="ForwardingLogEvent.cs" />
-    <Compile Include="HierarchicalAppenderResolver.cs" />
+    <Compile Include="AppenderResolvers\HierarchicalAppenderResolver.cs" />
     <Compile Include="IInternalLogEvent.cs" />
     <Compile Include="IInternalLogManager.cs" />
     <Compile Include="ILog.cs" />
@@ -109,5 +110,6 @@
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

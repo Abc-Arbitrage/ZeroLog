@@ -1,27 +1,30 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using ZeroLog.Appenders;
 
-namespace ZeroLog
+namespace ZeroLog.AppenderResolvers
 {
     public class HierarchicalAppenderResolver : IAppenderResolver
     {
         private class Node
         {
-            public string Key;
             public Dictionary<string, Node> Childrens = new Dictionary<string, Node>();
             public IEnumerable<IAppender> Appenders;
-            public bool IncludeParentsAppenders;
-            public bool Real;
         }
 
         private Node _root;
-        private List<Tuple<string, IEnumerable<IAppender>, bool>> _buildList = new List<Tuple<string, IEnumerable<IAppender>, bool>>();
+        private readonly List<Tuple<string, IEnumerable<IAppender>, bool>> _buildList = new List<Tuple<string, IEnumerable<IAppender>, bool>>();
+        private Encoding AppendersEncoding { get; set; }
 
         public void AddNode(string name, IEnumerable<IAppender> appenders, bool includeParentsAppenders)
         {
-            _buildList.Add(new Tuple<string, IEnumerable<IAppender>, bool>(name, appenders, includeParentsAppenders));
+            var initializedAppenders = appenders.Select(x => new GuardedAppender(x, TimeSpan.FromSeconds(15)));
+            foreach(var appender in initializedAppenders)
+                appender.SetEncoding(AppendersEncoding);
+
+            _buildList.Add(new Tuple<string, IEnumerable<IAppender>, bool>(name, initializedAppenders, includeParentsAppenders));
         }
 
         public void Build()
@@ -37,20 +40,20 @@ namespace ZeroLog
                     path = (path + "." + part).Trim('.');
 
                     if (!node.Childrens.ContainsKey(part))
-                        node.Childrens[part] = new Node { Key = path, Appenders = node.Appenders };
+                        node.Childrens[part] = new Node { Appenders = node.Appenders };
 
                     node = node.Childrens[part];
                 }
 
                 node.Appenders = includeParentsAppenders ? appenders.Union(node.Appenders) : appenders;
-                node.IncludeParentsAppenders = includeParentsAppenders;
-                node.Real = true;
             }
 
             _root = new Node();
 
             foreach (var item in _buildList.OrderBy(x => x.Item1))
                 InternalAddNode(item.Item1, item.Item2, item.Item3);
+
+            _buildList.Clear();
         }
         
         public IList<IAppender> Resolve(string name)
@@ -67,6 +70,24 @@ namespace ZeroLog
             }
 
             return node.Appenders?.ToList();
+        }
+
+        public void Initialize(Encoding encoding)
+        {
+            AppendersEncoding = encoding;
+            Initialize(_root);
+        }
+
+
+        private void Initialize(Node node)
+        {
+            node.Appenders = new List<IAppender>(node.Appenders.Select(x => new GuardedAppender(x, TimeSpan.FromSeconds(15))));
+
+            foreach (var appender in node.Appenders)
+                appender.SetEncoding(AppendersEncoding);
+
+            foreach(var n in node.Childrens)
+                Initialize(n.Value);
         }
     }
 }

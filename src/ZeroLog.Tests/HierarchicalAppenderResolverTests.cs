@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Castle.Core.Internal;
 using Moq;
 using NFluent;
 using NUnit.Framework;
+using ZeroLog.AppenderResolvers;
 using ZeroLog.Appenders;
 
 namespace ZeroLog.Tests
