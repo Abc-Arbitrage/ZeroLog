@@ -4,23 +4,26 @@ using System.Linq;
 using System.Text;
 using ZeroLog.Appenders;
 
-namespace ZeroLog.AppenderResolvers
+namespace ZeroLog.ConfigResolvers
 {
-    public class DummyAppenderResolver : IAppenderResolver
+    public class DummyResolver : IConfigurationResolver
     {
         private IList<IAppender> _appenders;
+        private readonly Level _level;
+        private LogEventPoolExhaustionStrategy _strategy;
 
-        public DummyAppenderResolver(IEnumerable<IAppender> appenders, Encoding encoding)
+        public DummyResolver(IEnumerable<IAppender> appenders, Level level, LogEventPoolExhaustionStrategy strategy)
         {
+            _level = level;
+            _strategy = strategy;
             _appenders = new List<IAppender>(appenders.Select(x => new GuardedAppender(x, TimeSpan.FromSeconds(15))));
-
-            foreach (var appender in _appenders)
-            {
-                appender.SetEncoding(encoding);
-            }
         }
 
-        public IList<IAppender> Resolve(string name) => _appenders;
+        public IList<IAppender> ResolveAppenders(string name) => _appenders;
+
+        public Level ResolveLevel(string name) => _level;
+        public LogEventPoolExhaustionStrategy ResolveExhaustionStrategy(string name) => _strategy;
+
 
         public void Initialize(Encoding encoding)
         {

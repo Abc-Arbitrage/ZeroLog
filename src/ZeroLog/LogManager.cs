@@ -4,17 +4,11 @@ using System.Text;
 using System.Text.Formatting;
 using System.Threading;
 using System.Threading.Tasks;
-using ZeroLog.AppenderResolvers;
 using ZeroLog.Appenders;
+using ZeroLog.ConfigResolvers;
 
 namespace ZeroLog
 {
-    public interface IAppenderResolver
-    {
-        IList<IAppender> Resolve(string name);
-        void Initialize(Encoding encoding);
-    }
-
     public class LogManager : IInternalLogManager
     {
         private static readonly IInternalLogManager _defaultLogManager = new NoopLogManager();
@@ -28,16 +22,15 @@ namespace ZeroLog
 
         private readonly BufferSegmentProvider _bufferSegmentProvider;
 
-        private readonly IAppenderResolver _appenderResolver;
+        private readonly IConfigurationResolver _configResolver;
 
         public bool IsRunning { get; set; }
         public Task WriteTask { get; }
         //public List<IAppender> Appenders { get; }
 
-        internal LogManager(IAppenderResolver appenderResolver, LogManagerConfiguration configuration)
+        internal LogManager(IConfigurationResolver configResolver, LogManagerConfiguration configuration)
         {
-            _appenderResolver = appenderResolver;
-            Level = configuration.Level;
+            _configResolver = configResolver;
 
             _encoding = Encoding.Default;
             _logEventPoolExhaustionStrategy = configuration.LogEventPoolExhaustionStrategy;
@@ -47,20 +40,20 @@ namespace ZeroLog
             _bufferSegmentProvider = new BufferSegmentProvider(configuration.LogEventQueueSize * configuration.LogEventBufferSize, configuration.LogEventBufferSize);
             _pool = new ObjectPool<IInternalLogEvent>(configuration.LogEventQueueSize, () => new LogEvent(_bufferSegmentProvider.GetSegment()));
 
-            _appenderResolver.Initialize(_encoding);
+            configResolver.Initialize(_encoding);
 
             IsRunning = true;
             WriteTask = Task.Factory.StartNew(WriteToAppenders, TaskCreationOptions.LongRunning);
         }
 
-        public Level Level { get; }
+        public Level Level => _configResolver.ResolveLevel("");
 
-        public static ILogManager Initialize(IAppenderResolver appenderResolver, LogManagerConfiguration configuration)
+        public static ILogManager Initialize(IConfigurationResolver configResolver, LogManagerConfiguration configuration)
         {
             if (_logManager != _defaultLogManager)
                 throw new ApplicationException("LogManager is already initialized");
 
-            _logManager = new LogManager(appenderResolver, configuration);
+            _logManager = new LogManager(configResolver, configuration);
             return _logManager;
         }
 
@@ -69,7 +62,8 @@ namespace ZeroLog
             if (_logManager != _defaultLogManager)
                 throw new ApplicationException("LogManager is already initialized");
 
-            _logManager = new LogManager(new DummyAppenderResolver(appenders, Encoding.Default), configuration);
+            var dummyResolver = new DummyResolver(appenders, configuration.Level, configuration.LogEventPoolExhaustionStrategy);
+            _logManager = new LogManager(dummyResolver, configuration);
             return _logManager;
         }
 
@@ -131,19 +125,13 @@ namespace ZeroLog
         }
 
         public IList<IAppender> ResolveAppenders(string name)
-        {
-            return _appenderResolver.Resolve(name);
-        }
+            => _configResolver.ResolveAppenders(name);
 
         public LogEventPoolExhaustionStrategy ResolveLogEventPoolExhaustionStrategy(string name)
-        {
-            return _logEventPoolExhaustionStrategy;
-        }
+            => _configResolver.ResolveExhaustionStrategy(name);
 
         public Level ResolveLevel(string name)
-        {
-            return Level;
-        }
+            => _configResolver.ResolveLevel(name);
 
         IInternalLogEvent IInternalLogManager.AllocateLogEvent(LogEventPoolExhaustionStrategy logEventPoolExhaustionStrategy, IInternalLogEvent notifyPoolExhaustionLogEvent)
         {
