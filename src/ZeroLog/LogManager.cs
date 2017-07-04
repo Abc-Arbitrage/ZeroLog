@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.Formatting;
 using System.Threading;
 using System.Threading.Tasks;
 using ZeroLog.Appenders;
+using ZeroLog.Appenders.Builders;
+using ZeroLog.Config;
 using ZeroLog.ConfigResolvers;
 
 namespace ZeroLog
@@ -14,6 +17,7 @@ namespace ZeroLog
         private static readonly IInternalLogManager _defaultLogManager = new NoopLogManager();
         private static IInternalLogManager _logManager = _defaultLogManager;
 
+        private readonly ConcurrentBag<Log> _loggers;
         private readonly ConcurrentQueue<IInternalLogEvent> _queue;
         private readonly ObjectPool<IInternalLogEvent> _pool;
         private readonly Encoding _encoding;
@@ -35,18 +39,30 @@ namespace ZeroLog
             _encoding = Encoding.Default;
             _logEventPoolExhaustionStrategy = configuration.LogEventPoolExhaustionStrategy;
 
+            _loggers = new ConcurrentBag<Log>();
             _queue = new ConcurrentQueue<IInternalLogEvent>(new ConcurrentQueueCapacityInitializer(configuration.LogEventQueueSize));
 
             _bufferSegmentProvider = new BufferSegmentProvider(configuration.LogEventQueueSize * configuration.LogEventBufferSize, configuration.LogEventBufferSize);
             _pool = new ObjectPool<IInternalLogEvent>(configuration.LogEventQueueSize, () => new LogEvent(_bufferSegmentProvider.GetSegment()));
 
             configResolver.Initialize(_encoding);
+            configResolver.Updated += () =>
+            {
+                foreach (var logger in _loggers)
+                    logger.ResetConfiguration();
+            };
 
             IsRunning = true;
             WriteTask = Task.Factory.StartNew(WriteToAppenders, TaskCreationOptions.LongRunning);
         }
 
         public Level Level => _configResolver.ResolveLevel("");
+
+        public static ILogManager ConfigureAndWatch(string filepath)
+        {
+            var factory = new AppenderFactory(new ConsoleAppenderBuilder(), new DateAndSizeRollingFileAppenderBuilder());
+            return Configurator.ConfigureAndWatch(factory, filepath);
+        }
 
         public static ILogManager Initialize(IConfigurationResolver configResolver, LogManagerConfiguration configuration)
         {
@@ -121,7 +137,9 @@ namespace ZeroLog
 
         ILog IInternalLogManager.GetNewLog(IInternalLogManager logManager, string name)
         {
-            return new Log(logManager, name);
+            var logger = new Log(logManager, name);
+            _loggers.Add(logger);
+            return logger;
         }
 
         public IList<IAppender> ResolveAppenders(string name)

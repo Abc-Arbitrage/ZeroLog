@@ -7,7 +7,7 @@ namespace ZeroLog.Appenders.Builders
     {
         private readonly IAppenderBuilder[] _builders;
 
-        public AppenderFactory(IAppenderBuilder[] builders)
+        public AppenderFactory(params IAppenderBuilder[] builders)
         {
             _builders = builders;
         }

@@ -41,9 +41,10 @@ namespace ZeroLog.ConfigResolvers
 
         public void AddNode(string name, IEnumerable<IAppender> appenders, Level level, bool includeParentsAppenders, LogEventPoolExhaustionStrategy strategy)
         {
-            var initializedAppenders = appenders.Select(x => new GuardedAppender(x, TimeSpan.FromSeconds(15)));
-            foreach(var appender in initializedAppenders)
-                appender.SetEncoding(AppendersEncoding);
+            var initializedAppenders = appenders?.Select(x => new GuardedAppender(x, TimeSpan.FromSeconds(15))) ?? Enumerable.Empty<IAppender>();
+            if(AppendersEncoding != null)
+                foreach (var appender in initializedAppenders)
+                    appender.SetEncoding(AppendersEncoding);
 
             _buildList.Add(new Config (name, initializedAppenders, level, includeParentsAppenders, strategy));
         }
@@ -77,7 +78,9 @@ namespace ZeroLog.ConfigResolvers
                 InternalAddNode(item);
 
             _buildList.Clear();
+            Updated();
         }
+
         private Node Resolve(string name)
         {
             var parts = name.Split(new[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
@@ -107,7 +110,6 @@ namespace ZeroLog.ConfigResolvers
             Initialize(_root);
         }
 
-
         private void Initialize(Node node)
         {
             node.Appenders = new List<IAppender>(node.Appenders.Select(x => new GuardedAppender(x, TimeSpan.FromSeconds(15))));
@@ -119,5 +121,6 @@ namespace ZeroLog.ConfigResolvers
                 Initialize(n.Value);
         }
 
+        public event Action Updated = delegate {};
     }
 }

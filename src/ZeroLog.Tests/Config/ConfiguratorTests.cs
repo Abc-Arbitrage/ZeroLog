@@ -15,7 +15,7 @@ namespace ZeroLog.Tests.Config
         [Test]
         public void should_load_configuration()
         {
-            var appenderA = new AppenderDefinition { Name = "A", AppenderTypeName = nameof(ConsoleAppender) };
+            var appenderA = new AppenderDefinition { Name = "A", AppenderTypeName = nameof(ConsoleAppender), AppenderJsonConfig = JSON.Serialize(new ConsoleAppenderBuilder.Config{PrefixPattern = "[%level] @ %time - %logger: " })};
             var appenderB = new AppenderDefinition { Name = "B", AppenderTypeName = nameof(DateAndSizeRollingFileAppender), AppenderJsonConfig = JSON.Serialize(new DateAndSizeRollingFileAppenderBuilder.Config { FilepathRoot = "totopath " }) };
             var config = new ZeroLogConfiguration
             {
@@ -30,7 +30,7 @@ namespace ZeroLog.Tests.Config
                 Appenders = new[] { appenderA, appenderB },
                 Loggers = new[] {new LoggerDefinition{ Name = "Abc.Zebus", Level = Level.Debug, AppenderReferences = new []{ "B" } }}
             };
-            var configJson = JSON.Serialize(config);
+            var configJson = JSON.Serialize(config, Options.PrettyPrint);
 
 
             var (root, loggers, appenders, _) = Configurator.LoadFromJson(configJson);

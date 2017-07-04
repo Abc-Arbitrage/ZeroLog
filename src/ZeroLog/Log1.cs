@@ -4,10 +4,10 @@ using JetBrains.Annotations;
 
 namespace ZeroLog
 {
-    internal partial class Log
+    partial class Log
     {
                 
-        public bool IsDebugEnabled => Level.Debug >= _logManager.Level;
+        public bool IsDebugEnabled => Level.Debug >= LogLevel;
 
         public ILogEvent Debug()
         {
@@ -160,7 +160,7 @@ namespace ZeroLog
             logEvent.Log();
         }
                     
-        public bool IsInfoEnabled => Level.Info >= _logManager.Level;
+        public bool IsInfoEnabled => Level.Info >= LogLevel;
 
         public ILogEvent Info()
         {
@@ -313,7 +313,7 @@ namespace ZeroLog
             logEvent.Log();
         }
                     
-        public bool IsWarnEnabled => Level.Warn >= _logManager.Level;
+        public bool IsWarnEnabled => Level.Warn >= LogLevel;
 
         public ILogEvent Warn()
         {
@@ -466,7 +466,7 @@ namespace ZeroLog
             logEvent.Log();
         }
                     
-        public bool IsErrorEnabled => Level.Error >= _logManager.Level;
+        public bool IsErrorEnabled => Level.Error >= LogLevel;
 
         public ILogEvent Error()
         {
@@ -619,7 +619,7 @@ namespace ZeroLog
             logEvent.Log();
         }
                     
-        public bool IsFatalEnabled => Level.Fatal >= _logManager.Level;
+        public bool IsFatalEnabled => Level.Fatal >= LogLevel;
 
         public ILogEvent Fatal()
         {

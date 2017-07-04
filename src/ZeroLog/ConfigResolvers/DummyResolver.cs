@@ -10,7 +10,7 @@ namespace ZeroLog.ConfigResolvers
     {
         private IList<IAppender> _appenders;
         private readonly Level _level;
-        private LogEventPoolExhaustionStrategy _strategy;
+        private readonly LogEventPoolExhaustionStrategy _strategy;
 
         public DummyResolver(IEnumerable<IAppender> appenders, Level level, LogEventPoolExhaustionStrategy strategy)
         {
@@ -32,5 +32,7 @@ namespace ZeroLog.ConfigResolvers
             foreach (var appender in _appenders)
                 appender.SetEncoding(encoding);
         }
+
+        public event Action Updated = delegate {};
     }
 }
