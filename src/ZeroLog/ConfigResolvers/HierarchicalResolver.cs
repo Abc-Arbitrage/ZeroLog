@@ -67,7 +67,7 @@ namespace ZeroLog.ConfigResolvers
                     node = node.Childrens[part];
                 }
 
-                node.Appenders = config.IncludeParentsAppenders ? config.Appenders.Union(node.Appenders) : config.Appenders;
+                node.Appenders = (config.IncludeParentsAppenders ? config.Appenders.Union(node.Appenders) : config.Appenders).Distinct();
                 node.Strategy = config.Strategy;
                 node.Level = config.Level;
             }

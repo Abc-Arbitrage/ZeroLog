@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Castle.Core.Internal;
 using Moq;
 using NFluent;
@@ -72,6 +73,19 @@ namespace ZeroLog.Tests
             Check.That(appenders.Contains(_appenderA.Object));
             Check.That(appenders.Contains(_appenderB.Object) == includeParents);
             Check.That(appenders.Contains(_appenderC.Object) == false);
+        }
+
+        [Test]
+        public void should_not_have_the_same_appender_twice()
+        {
+            _resolver.AddNode("Abc.Zebus", new List<IAppender> { _appenderA.Object }, Level.Info, true, LogEventPoolExhaustionStrategy.Default);
+            _resolver.AddNode("Abc", new List<IAppender> { _appenderA.Object, _appenderB.Object }, Level.Info, false, LogEventPoolExhaustionStrategy.Default);
+            _resolver.Build();
+
+            var appenders = _resolver.ResolveAppenders("Abc.Zebus.Dispatch.Handler");
+
+            Check.That(appenders.Count(x => x == _appenderB.Object)).Equals(1);
+            Check.That(appenders.Count(x => x == _appenderA.Object)).Equals(1);
         }
     }
 }
