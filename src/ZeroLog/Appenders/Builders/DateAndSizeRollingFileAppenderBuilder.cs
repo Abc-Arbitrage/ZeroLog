@@ -11,7 +11,10 @@ namespace ZeroLog.Appenders.Builders
         public IAppender BuildAppender(string name, string configJson)
         {
             var config = JSONExtensions.DeserializeOrDefault(configJson, new Config());
-            return new DateAndSizeRollingFileAppender(config.FilepathRoot, config.MaxFileSizeInBytes, config.Extension, config.PrefixPattern);
+            return new DateAndSizeRollingFileAppender(config.FilepathRoot, config.MaxFileSizeInBytes, config.Extension, config.PrefixPattern)
+            {
+                AutoFlush = config.AutoFlush,
+            };
         }
 
         public class Config
@@ -20,6 +23,7 @@ namespace ZeroLog.Appenders.Builders
             public string Extension { get; set; } = DateAndSizeRollingFileAppender.DefaultExtension;
             public int MaxFileSizeInBytes { get; set; } = DateAndSizeRollingFileAppender.DefaultMaxSize;
             public string PrefixPattern { get; set; } = DateAndSizeRollingFileAppender.DefaultPrefixPattern;
+            public bool AutoFlush { get; set; } = true;
         }
     }
 }

@@ -36,7 +36,7 @@ namespace ZeroLog.Appenders
 
         /// <summary>
         /// Gets or sets the maximum permitted file size in bytes. Once a file exceeds this value it will
-        /// be closed and the next log file will be created. Defaults to 4 MB.
+        /// be closed and the next log file will be created. Defaults to 200 MB.
         /// If the size is 0, the feature is disabled.
         /// </summary>
         public int MaxFileSizeInBytes { get; set; }
@@ -203,7 +203,7 @@ namespace ZeroLog.Appenders
             var fullPath = Path.GetFullPath(filename);
             try
             {
-                var fileStream = File.Open(fullPath, FileMode.Append, FileAccess.Write, FileShare.Read);
+                var fileStream = File.Open(fullPath, FileMode.Append, FileAccess.Write, FileShare.ReadWrite);
                 _currentFileSize = (int)fileStream.Length;
                 return fileStream;
             }

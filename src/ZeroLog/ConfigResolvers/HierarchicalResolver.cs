@@ -51,10 +51,10 @@ namespace ZeroLog.ConfigResolvers
 
         public void Build()
         {
-            void InternalAddNode(Config config)
+            void InternalAddNode(Node root, Config config)
             {
                 var parts = config.Name.Split(new[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
-                var node = _root;
+                var node = root;
                 var path = "";
 
                 foreach (var part in parts)
@@ -72,11 +72,12 @@ namespace ZeroLog.ConfigResolvers
                 node.Level = config.Level;
             }
 
-            _root = new Node();
+            var newRoot = new Node();
 
             foreach (var item in _buildList.OrderBy(x => x.Name))
-                InternalAddNode(item);
+                InternalAddNode(newRoot, item);
 
+            _root = newRoot;
             _buildList.Clear();
             Updated();
         }
