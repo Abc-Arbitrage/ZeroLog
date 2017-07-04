@@ -5,6 +5,7 @@ using NUnit.Framework;
 using ZeroLog.Appenders;
 using ZeroLog.Appenders.Builders;
 using ZeroLog.Config;
+using ZeroLog.ConfigResolvers;
 
 namespace ZeroLog.Tests.Config
 {

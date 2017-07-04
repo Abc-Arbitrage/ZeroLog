@@ -3,14 +3,36 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using Jil;
 using ZeroLog.Appenders.Builders;
-using ZeroLog.ConfigResolvers;
+using ZeroLog.Config;
 
-namespace ZeroLog.Config
+namespace ZeroLog.ConfigResolvers
 {
     public static class Configurator
     {
+        public static ILogManager ConfigureAndWatch(IAppenderFactory factory, string filepath)
+        {
+            var fullpath = Path.GetFullPath(filepath);
+            var filecontent = File.Exists(filepath) ? File.ReadAllText(filepath) : "";
+            var (r, l, a, c) = LoadFromJson(filecontent);
+            var resolver = new HierarchicalResolver();
+
+            var watcher = new FileSystemWatcher
+            {
+                Path = Path.GetDirectoryName(fullpath),
+                NotifyFilter = NotifyFilters.LastWrite,
+                EnableRaisingEvents = true
+            };
+            watcher.Changed += (sender, args) =>
+            {
+                if (string.Equals(args.FullPath, fullpath, StringComparison.InvariantCultureIgnoreCase))
+                    ConfigureResolver(factory, filepath, resolver);
+            };
+
+            FillResolver(factory, resolver, r, l, a);
+            return LogManager.Initialize(resolver, c);
+        }
+
         public static (RootDefinition rootDefinition, IList<LoggerDefinition> loggersDefinition, IList<AppenderDefinition> appendersDefinition, LogManagerConfiguration configuration) LoadFromJson(string jsonConfiguration)
         {
             var config = JSONExtensions.DeserializeOrDefault(jsonConfiguration, new ZeroLogConfiguration());
@@ -25,9 +47,9 @@ namespace ZeroLog.Config
             return (config.Root, config.Loggers, config.Appenders, legacyConfiguration);
         }
 
-        public static void FillResolver(IAppenderFactory factory, HierarchicalResolver hierarchicalResolver, RootDefinition rootDefinition, IList<LoggerDefinition> loggersDefinition, IList<AppenderDefinition> appendersDefinition)
+        private static void FillResolver(IAppenderFactory factory, HierarchicalResolver hierarchicalResolver, RootDefinition rootDefinition, IList<LoggerDefinition> loggersDefinition, IList<AppenderDefinition> appendersDefinition)
         {
-            var appenders = appendersDefinition.ToDictionary(x => x.Name, factory.BuildAppender);
+            var appenders = appendersDefinition.ToDictionary(x => x.Name, x => new NamedAppender(factory.BuildAppender(x), x.Name));
 
             hierarchicalResolver.AddNode("", rootDefinition.AppenderReferences.Select(x => appenders[x]), rootDefinition.DefaultLevel, false, rootDefinition.DefaultLogEventPoolExhaustionStrategy);
 
@@ -39,7 +61,7 @@ namespace ZeroLog.Config
             hierarchicalResolver.Build();
         }
 
-        public static void ConfigureResolver(IAppenderFactory factory, string filepath, HierarchicalResolver resolver)
+        private static void ConfigureResolver(IAppenderFactory factory, string filepath, HierarchicalResolver resolver)
         {
             var fullpath = Path.GetFullPath(filepath);
             var filecontent = SafeRead(filepath);
@@ -66,29 +88,6 @@ namespace ZeroLog.Config
             }
 
             return null;
-        }
-
-        public static ILogManager ConfigureAndWatch(IAppenderFactory factory, string filepath)
-        {
-            var fullpath = Path.GetFullPath(filepath);
-            var filecontent = File.Exists(filepath) ? File.ReadAllText(filepath) : "";
-            var (r, l, a, c) = LoadFromJson(filecontent);
-            var resolver = new HierarchicalResolver();
-
-            var watcher = new FileSystemWatcher
-            {
-                Path = Path.GetDirectoryName(fullpath),
-                NotifyFilter = NotifyFilters.LastWrite,
-                EnableRaisingEvents = true
-            };
-            watcher.Changed += (sender, args) =>
-            {
-                if (string.Equals(args.FullPath, fullpath, StringComparison.InvariantCultureIgnoreCase))
-                    ConfigureResolver(factory, filepath, resolver);
-            };
-
-            FillResolver(factory, resolver, r, l, a);
-            return LogManager.Initialize(resolver, c);
         }
     }
 }

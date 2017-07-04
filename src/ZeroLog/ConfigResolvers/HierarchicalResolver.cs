@@ -12,20 +12,20 @@ namespace ZeroLog.ConfigResolvers
         private class Node
         {
             public Dictionary<string, Node> Childrens = new Dictionary<string, Node>();
-            public IEnumerable<IAppender> Appenders;
+            public IEnumerable<NamedAppender> Appenders;
             public Level Level;
             public LogEventPoolExhaustionStrategy Strategy;
         }
 
         private struct Config
         {
-            public string Name;
-            public IEnumerable<IAppender> Appenders;
-            public Level Level;
-            public bool IncludeParentsAppenders;
-            public LogEventPoolExhaustionStrategy Strategy;
+            public readonly string Name;
+            public readonly IEnumerable<NamedAppender> Appenders;
+            public readonly Level Level;
+            public readonly bool IncludeParentsAppenders;
+            public readonly LogEventPoolExhaustionStrategy Strategy;
 
-            public Config(string name, IEnumerable<IAppender> appenders, Level level, bool includeParentsAppenders, LogEventPoolExhaustionStrategy strategy)
+            public Config(string name, IEnumerable<NamedAppender> appenders, Level level, bool includeParentsAppenders, LogEventPoolExhaustionStrategy strategy)
             {
                 Name = name;
                 Appenders = appenders;
@@ -39,14 +39,9 @@ namespace ZeroLog.ConfigResolvers
         private readonly List<Config> _buildList = new List<Config>();
         private Encoding AppendersEncoding { get; set; }
 
-        public void AddNode(string name, IEnumerable<IAppender> appenders, Level level, bool includeParentsAppenders, LogEventPoolExhaustionStrategy strategy)
+        public void AddNode(string name, IEnumerable<NamedAppender> appenders, Level level, bool includeParentsAppenders, LogEventPoolExhaustionStrategy strategy)
         {
-            var initializedAppenders = appenders?.Select(x => new GuardedAppender(x, TimeSpan.FromSeconds(15))) ?? Enumerable.Empty<IAppender>();
-            if(AppendersEncoding != null)
-                foreach (var appender in initializedAppenders)
-                    appender.SetEncoding(AppendersEncoding);
-
-            _buildList.Add(new Config (name, initializedAppenders, level, includeParentsAppenders, strategy));
+            _buildList.Add(new Config (name, appenders, level, includeParentsAppenders, strategy));
         }
 
         public void Build()
@@ -73,13 +68,18 @@ namespace ZeroLog.ConfigResolvers
             }
 
             var newRoot = new Node();
+            var oldRoot = _root;
 
             foreach (var item in _buildList.OrderBy(x => x.Name))
                 InternalAddNode(newRoot, item);
 
+            Initialize(newRoot);
+
             _root = newRoot;
             _buildList.Clear();
+            
             Updated();
+            Close(oldRoot);
         }
 
         private Node Resolve(string name)
@@ -99,7 +99,7 @@ namespace ZeroLog.ConfigResolvers
         }
 
         public IList<IAppender> ResolveAppenders(string name)
-            => Resolve(name).Appenders?.ToList();
+            => Resolve(name).Appenders?.Select(x => x.Appender).ToList();
         public Level ResolveLevel(string name)
             => Resolve(name).Level;
         public LogEventPoolExhaustionStrategy ResolveExhaustionStrategy(string name)
@@ -113,13 +113,27 @@ namespace ZeroLog.ConfigResolvers
 
         private void Initialize(Node node)
         {
-            node.Appenders = new List<IAppender>(node.Appenders.Select(x => new GuardedAppender(x, TimeSpan.FromSeconds(15))));
+            if(node.Appenders != null)
+                node.Appenders = node.Appenders.Select(x => new NamedAppender(new GuardedAppender(x.Appender, TimeSpan.FromSeconds(15)), x.Name)).ToList();
 
-            foreach (var appender in node.Appenders)
-                appender.SetEncoding(AppendersEncoding);
+            if(AppendersEncoding != null)
+                foreach (var appender in node.Appenders)
+                    appender.Appender.SetEncoding(AppendersEncoding);
 
             foreach(var n in node.Childrens)
                 Initialize(n.Value);
+        }
+
+        private void Close(Node node)
+        {
+            if (node == null)
+                return;
+
+            foreach (var appender in node.Appenders)
+                appender.Appender.Close();
+
+            foreach(var n in node.Childrens)
+                Close(n.Value);
         }
 
         public event Action Updated = delegate {};
