@@ -11,6 +11,7 @@ namespace ZeroLog.ConfigResolvers
 {
     public static class Configurator
     {
+
         public static ILogManager ConfigureAndWatch(string filepath)
         {
             var fullpath = Path.GetFullPath(filepath);
@@ -24,10 +25,19 @@ namespace ZeroLog.ConfigResolvers
                 NotifyFilter = NotifyFilters.LastWrite,
                 EnableRaisingEvents = true
             };
+
             watcher.Changed += (sender, args) =>
             {
-                if (string.Equals(args.FullPath, fullpath, StringComparison.InvariantCultureIgnoreCase))
-                    ConfigureResolver(filepath, resolver);
+                try
+                {
+                    if (string.Equals(args.FullPath, fullpath, StringComparison.InvariantCultureIgnoreCase))
+                        ConfigureResolver(filepath, resolver);
+                }
+                catch(Exception e)
+                {
+                    LogManager.GetLogger(typeof(Configurator))
+                              .FatalFormat("Updating configuration failed with: {0}", e.Message);
+                }
             };
 
             FillResolver(resolver, r, l, a);
@@ -66,7 +76,7 @@ namespace ZeroLog.ConfigResolvers
         private static void ConfigureResolver(string filepath, HierarchicalResolver resolver)
         {
             var filecontent = SafeRead(filepath);
-            var (r, l, a, c) = LoadFromJson(filecontent);
+            var (r, l, a, _) = LoadFromJson(filecontent);
 
             FillResolver(resolver, r, l, a);
         }
