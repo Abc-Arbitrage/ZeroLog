@@ -5,19 +5,23 @@ using System.Text.Formatting;
 
 namespace ZeroLog.Appenders
 {
-    public abstract class AppenderBase : IAppender
+    public abstract class AppenderBase<T> : IAppender<T>
     {
         private readonly string[] _formatSpecifiers = { "%date", "%time", "%thread", "%level", "%logger" };
         private readonly StringBuffer _stringBuffer;
         private readonly byte[] _tempBytes;
         private Encoding _encoding;
         protected byte[] NewlineBytes;
-        private readonly string _prefixFormat;
+        private string _prefixFormat;
 
-        protected AppenderBase(string prefixPattern)
+        protected AppenderBase()
         {
             _stringBuffer = new StringBuffer(256);
             _tempBytes = new byte[512];
+        }
+
+        protected void Configure(string prefixPattern)
+        {
             _prefixFormat = BuildPrefixFormat(prefixPattern);
         }
 
@@ -57,6 +61,7 @@ namespace ZeroLog.Appenders
 
         public abstract void Close();
 
+        public abstract void Configure(T parameters);
         public abstract void WriteEvent(ILogEvent logEvent, byte[] messageBytes, int messageLength);
     }
 }

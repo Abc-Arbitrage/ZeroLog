@@ -1,8 +1,8 @@
 using Jil;
 
-namespace ZeroLog.Appenders.Builders
+namespace ZeroLog.Utils
 {
-    public static class JSONExtensions
+    public static class JsonExtensions
     {
         public static T DeserializeOrDefault<T>(string json, T @default) => string.IsNullOrEmpty(json) ? @default : JSON.Deserialize<T>(json);
     }

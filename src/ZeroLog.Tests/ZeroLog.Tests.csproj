@@ -76,7 +76,6 @@
       <Link>Properties\SharedVersionInfo.cs</Link>
     </Compile>
     <Compile Include="AllocationTests.cs" />
-    <Compile Include="Appenders\Builder\ConsoleAppenderBuilder.cs" />
     <Compile Include="Appenders\DateAndSizeRollingFileAppenderTests.cs" />
     <Compile Include="Appenders\GuardedAppenderTests.cs" />
     <Compile Include="BufferSegmentProviderTests.cs" />

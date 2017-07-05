@@ -60,8 +60,7 @@ namespace ZeroLog
 
         public static ILogManager ConfigureAndWatch(string filepath)
         {
-            var factory = new AppenderFactory(new ConsoleAppenderBuilder(), new DateAndSizeRollingFileAppenderBuilder());
-            return Configurator.ConfigureAndWatch(factory, filepath);
+            return Configurator.ConfigureAndWatch(filepath);
         }
 
         public static ILogManager Initialize(IConfigurationResolver configResolver, LogManagerConfiguration configuration)

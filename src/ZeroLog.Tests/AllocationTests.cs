@@ -37,7 +37,7 @@ namespace ZeroLog.Tests
             GC.Collect(2, GCCollectionMode.Forced, true);
             var gcCountBefore = GC.CollectionCount(0);
 
-            for (var i = 0; i < 2048 * 10; i++)
+            for (var i = 0; i < 1_000_000; i++)
             {
                 log.InfoFormat("Int {0}, Double {1:N4}, String {2}, Bool {3}, Decimal {4:N4}, Guid {5}, Timestamp {6}, DateTime {7}",
                                123243,

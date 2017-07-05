@@ -5,12 +5,13 @@ using System.Linq;
 using System.Threading;
 using ZeroLog.Appenders.Builders;
 using ZeroLog.Config;
+using ZeroLog.Utils;
 
 namespace ZeroLog.ConfigResolvers
 {
     public static class Configurator
     {
-        public static ILogManager ConfigureAndWatch(IAppenderFactory factory, string filepath)
+        public static ILogManager ConfigureAndWatch(string filepath)
         {
             var fullpath = Path.GetFullPath(filepath);
             var filecontent = File.Exists(filepath) ? File.ReadAllText(filepath) : "";
@@ -26,16 +27,17 @@ namespace ZeroLog.ConfigResolvers
             watcher.Changed += (sender, args) =>
             {
                 if (string.Equals(args.FullPath, fullpath, StringComparison.InvariantCultureIgnoreCase))
-                    ConfigureResolver(factory, filepath, resolver);
+                    ConfigureResolver(filepath, resolver);
             };
 
-            FillResolver(factory, resolver, r, l, a);
+            FillResolver(resolver, r, l, a);
             return LogManager.Initialize(resolver, c);
         }
 
         public static (RootDefinition rootDefinition, IList<LoggerDefinition> loggersDefinition, IList<AppenderDefinition> appendersDefinition, LogManagerConfiguration configuration) LoadFromJson(string jsonConfiguration)
         {
-            var config = JSONExtensions.DeserializeOrDefault(jsonConfiguration, new ZeroLogConfiguration());
+            var config = JsonExtensions.DeserializeOrDefault(jsonConfiguration, new ZeroLogConfiguration());
+
             var legacyConfiguration = new LogManagerConfiguration
             {
                 Level = config.Root.DefaultLevel,
@@ -47,9 +49,9 @@ namespace ZeroLog.ConfigResolvers
             return (config.Root, config.Loggers, config.Appenders, legacyConfiguration);
         }
 
-        private static void FillResolver(IAppenderFactory factory, HierarchicalResolver hierarchicalResolver, RootDefinition rootDefinition, IList<LoggerDefinition> loggersDefinition, IList<AppenderDefinition> appendersDefinition)
+        private static void FillResolver(HierarchicalResolver hierarchicalResolver, RootDefinition rootDefinition, IList<LoggerDefinition> loggersDefinition, IList<AppenderDefinition> appendersDefinition)
         {
-            var appenders = appendersDefinition.ToDictionary(x => x.Name, x => new NamedAppender(factory.BuildAppender(x), x.Name));
+            var appenders = appendersDefinition.ToDictionary(x => x.Name, x => new NamedAppender(AppenderFactory.BuildAppender(x), x.Name));
 
             hierarchicalResolver.AddNode("", rootDefinition.AppenderReferences.Select(x => appenders[x]), rootDefinition.DefaultLevel, false, rootDefinition.DefaultLogEventPoolExhaustionStrategy);
 
@@ -60,14 +62,13 @@ namespace ZeroLog.ConfigResolvers
 
             hierarchicalResolver.Build();
         }
-
-        private static void ConfigureResolver(IAppenderFactory factory, string filepath, HierarchicalResolver resolver)
+        
+        private static void ConfigureResolver(string filepath, HierarchicalResolver resolver)
         {
-            var fullpath = Path.GetFullPath(filepath);
             var filecontent = SafeRead(filepath);
             var (r, l, a, c) = LoadFromJson(filecontent);
 
-            FillResolver(factory, resolver, r, l, a);
+            FillResolver(resolver, r, l, a);
         }
 
         private static string SafeRead(string filepath)

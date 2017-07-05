@@ -63,11 +63,9 @@
       <Link>Properties\SharedVersionInfo.cs</Link>
     </Compile>
     <Compile Include="Appenders\AppenderBase.cs" />
-    <Compile Include="Appenders\Builders\ConsoleAppenderBuilder.cs" />
-    <Compile Include="Appenders\Builders\DateAndSizeRollingFileAppenderBuilder.cs" />
-    <Compile Include="Appenders\Builders\IAppenderBuilder.cs" />
-    <Compile Include="Appenders\Builders\IAppenderFactory.cs" />
-    <Compile Include="Appenders\Builders\JSONExtensions.cs" />
+    <Compile Include="Appenders\DefaultAppenderConfig.cs" />
+    <Compile Include="Appenders\DateAndSizeRollingFileAppenderConfig.cs" />
+    <Compile Include="Utils\JsonExtensions.cs" />
     <Compile Include="Appenders\ConsoleAppender.cs" />
     <Compile Include="Appenders\DateAndSizeRollingFileAppender.cs" />
     <Compile Include="Appenders\NoopAppender.cs" />
@@ -78,7 +76,7 @@
     <Compile Include="BufferSegmentProvider.cs" />
     <Compile Include="ConcurrentQueue.cs" />
     <Compile Include="ConcurrentQueueCapacityInitializer.cs" />
-    <Compile Include="Appenders\Builders\AppenderFactory.cs" />
+    <Compile Include="Appenders\AppenderFactory.cs" />
     <Compile Include="ConfigResolvers\IExhaustionStrategyResolver.cs" />
     <Compile Include="ConfigResolvers\ILevelResolver.cs" />
     <Compile Include="ConfigResolvers\NamedAppender.cs" />

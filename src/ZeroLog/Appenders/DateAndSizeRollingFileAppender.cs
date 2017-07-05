@@ -2,10 +2,11 @@
 using System.IO;
 using System.Linq;
 using System.Threading;
+using ZeroLog.Appenders.Builders;
 
 namespace ZeroLog.Appenders
 {
-    public class DateAndSizeRollingFileAppender : AppenderBase
+    public class DateAndSizeRollingFileAppender : AppenderBase<DateAndSizeRollingFileAppenderConfig>
     {
         public const int DefaultMaxSize = 200 * 1024 * 1024;
         public const string DefaultExtension = "log";
@@ -46,12 +47,34 @@ namespace ZeroLog.Appenders
         /// <summary>
         /// Initializes a new instance of the class.
         /// </summary>
-        public DateAndSizeRollingFileAppender(string filenameRoot, int maxFileSizeInBytes = DefaultMaxSize, string extension = DefaultExtension, string prefixPattern = DefaultPrefixPattern)
-            : base(prefixPattern)
+        public DateAndSizeRollingFileAppender(string filePathRoot, int maxFileSizeInBytes = DefaultMaxSize, string extension = DefaultExtension, string prefixPattern = DefaultPrefixPattern)   
         {
-            FilenameRoot = filenameRoot;
-            MaxFileSizeInBytes = maxFileSizeInBytes;
-            FilenameExtension = extension;
+            var config = new DateAndSizeRollingFileAppenderConfig();
+            config.FilePathRoot = filePathRoot;
+            config.MaxFileSizeInBytes = maxFileSizeInBytes;
+            config.Extension = extension;
+            config.AutoFlush = false;
+            config.PrefixPattern = prefixPattern;
+
+            Configure(config);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the class.
+        /// </summary>
+        public DateAndSizeRollingFileAppender()
+        {
+            Configure(DefaultPrefixPattern);
+        }
+
+        public override void Configure(Builders.DateAndSizeRollingFileAppenderConfig parameters)
+        {
+            Configure(parameters.PrefixPattern);
+
+            FilenameRoot = parameters.FilePathRoot;
+            MaxFileSizeInBytes = parameters.MaxFileSizeInBytes;
+            FilenameExtension = parameters.Extension;
+            AutoFlush = parameters.AutoFlush;
 
             Open();
         }

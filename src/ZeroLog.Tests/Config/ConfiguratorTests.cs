@@ -16,8 +16,8 @@ namespace ZeroLog.Tests.Config
         [Test]
         public void should_load_configuration()
         {
-            var appenderA = new AppenderDefinition { Name = "A", AppenderTypeName = nameof(ConsoleAppender), AppenderJsonConfig = JSON.Serialize(new ConsoleAppenderBuilder.Config{PrefixPattern = "[%level] @ %time - %logger: " })};
-            var appenderB = new AppenderDefinition { Name = "B", AppenderTypeName = nameof(DateAndSizeRollingFileAppender), AppenderJsonConfig = JSON.Serialize(new DateAndSizeRollingFileAppenderBuilder.Config { FilepathRoot = "totopath " }) };
+            var appenderA = new AppenderDefinition { Name = "A", AppenderTypeName = nameof(ConsoleAppender), AppenderJsonConfig = JSON.Serialize(new DefaultAppenderConfig{PrefixPattern = "[%level] @ %time - %logger: " })};
+            var appenderB = new AppenderDefinition { Name = "B", AppenderTypeName = nameof(DateAndSizeRollingFileAppender), AppenderJsonConfig = JSON.Serialize(new DateAndSizeRollingFileAppenderConfig { FilePathRoot = "totopath " }) };
             var config = new ZeroLogConfiguration
             {
                 Root = new RootDefinition
@@ -68,7 +68,7 @@ namespace ZeroLog.Tests.Config
                                     {
                                         ""Name"": ""B"",
                                         ""AppenderTypeName"": ""DateAndSizeRollingFileAppender"",
-                                        ""AppenderJsonConfig"": ""{\""FilepathRoot\"":\""totopath \""}""
+                                        ""AppenderJsonConfig"": ""{\""FilePathRoot\"":\""totopath \""}""
                                     }
                                     ],
                                     ""Loggers"": [{
