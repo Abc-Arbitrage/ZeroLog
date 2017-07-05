@@ -2,7 +2,7 @@
 
 namespace ZeroLog.ConfigResolvers
 {
-    public interface IConfigurationResolver : ILevelResolver, IAppenderResolver, IExhaustionStrategyResolver
+    public interface IConfigurationResolver : ILevelResolver, IAppenderResolver, IExhaustionStrategyResolver, IDisposable
     {
         event Action Updated;
     }

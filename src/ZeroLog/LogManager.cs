@@ -109,10 +109,7 @@ namespace ZeroLog
             IsRunning = false;
             WriteTask.Wait(15000);
 
-            // TODO
-            //foreach (var appender in Appenders)
-            //    appender.Close();
-
+            _configResolver.Dispose();
             _bufferSegmentProvider.Dispose();
         }
 

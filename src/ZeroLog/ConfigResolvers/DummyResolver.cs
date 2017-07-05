@@ -34,5 +34,11 @@ namespace ZeroLog.ConfigResolvers
         }
 
         public event Action Updated = delegate {};
+
+        public void Dispose()
+        {
+            foreach (var appender in _appenders)
+                appender.Close();
+        }
     }
 }

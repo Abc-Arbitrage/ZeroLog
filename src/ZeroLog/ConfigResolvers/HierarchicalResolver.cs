@@ -137,5 +137,10 @@ namespace ZeroLog.ConfigResolvers
         }
 
         public event Action Updated = delegate {};
+
+        public void Dispose()
+        {
+            Close(_root);
+        }
     }
 }
