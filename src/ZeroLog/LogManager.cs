@@ -197,25 +197,31 @@ namespace ZeroLog
         {
             if (!_queue.TryDequeue(out var logEvent))
                 return false;
-            if ((logEvent.Appenders?.Count ?? 0) <= 0)
-                return true;
 
             try
             {
-                FormatLogMessage(stringBuffer, logEvent);
+                if ((logEvent.Appenders?.Count ?? 0) <= 0)
+                    return true;
+
+                try
+                {
+                    FormatLogMessage(stringBuffer, logEvent);
+                }
+                catch (Exception)
+                {
+                    FormatErrorMessage(stringBuffer, logEvent);
+                }
+
+                var bytesWritten = CopyStringBufferToByteArray(stringBuffer, destination);
+
+                WriteMessageLogToAppenders(destination, logEvent, bytesWritten);
+
             }
-            catch (Exception)
+            finally
             {
-                FormatErrorMessage(stringBuffer, logEvent);
+                if (logEvent.IsPooled)
+                    _pool.Release(logEvent);
             }
-
-            var bytesWritten = CopyStringBufferToByteArray(stringBuffer, destination);
-
-            WriteMessageLogToAppenders(destination, logEvent, bytesWritten);
-
-            if (logEvent.IsPooled)
-                _pool.Release(logEvent);
-
             return true;
         }
 
