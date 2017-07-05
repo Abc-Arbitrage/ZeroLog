@@ -12,9 +12,21 @@ namespace ZeroLog
         {
              Name = name;
             _logManager = logManager;
-            _specialLogMessage = new ForwardingLogEvent(new SpecialLogEvents.SpecialLogEvent(Level.Fatal, "Log message skipped due to LogEvent pool exhaustion.", this).LogEvent);
+
+            var logEvent = CreateUnpooledLogEvent();
+            _specialLogMessage = new ForwardingLogEvent(logEvent);
+            _specialLogMessage.Initialize(Level.Fatal, this);
 
             ResetConfiguration();
+        }
+
+        private IInternalLogEvent CreateUnpooledLogEvent()
+        {
+            var bufferSegment = _logManager.GetBufferSegment();
+            var logEvent = new UnpooledLogEvent(bufferSegment);
+            logEvent.Initialize(Level.Fatal, this);
+            logEvent.Append("Log message skipped due to LogEvent pool exhaustion.");
+            return logEvent;
         }
 
         internal void ResetConfiguration()
@@ -41,9 +53,7 @@ namespace ZeroLog
 
         private IInternalLogEvent GetLogEventFor(Level level)
         {
-            var logEvent = _logManager.AllocateLogEvent(LogEventPoolExhaustionStrategy, _specialLogMessage);
-            logEvent.Initialize(level, this);
-            return logEvent;
+            return _logManager.AllocateLogEvent(LogEventPoolExhaustionStrategy, _specialLogMessage, level, this);
         }
 
         internal void Enqueue(IInternalLogEvent logEvent)

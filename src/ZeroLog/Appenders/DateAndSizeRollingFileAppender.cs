@@ -79,7 +79,7 @@ namespace ZeroLog.Appenders
             Open();
         }
 
-        public override void WriteEvent(ILogEvent logEvent, byte[] messageBytes, int messageLength)
+        public override void WriteEvent(ILogEventHeader logEventHeader, byte[] messageBytes, int messageLength)
         {
             var stream = _stream;
             if (stream == null)
@@ -88,7 +88,7 @@ namespace ZeroLog.Appenders
             if (messageLength + 1 >= messageBytes.Length)
                 throw new ApplicationException($"{nameof(messageBytes)} must be big enough to also contain the new line characters");
 
-            WritePrefix(stream, logEvent);
+            WritePrefix(stream, logEventHeader);
 
             NewlineBytes.CopyTo(messageBytes, messageLength);
             messageLength += NewlineBytes.Length;

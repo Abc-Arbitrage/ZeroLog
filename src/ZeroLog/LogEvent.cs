@@ -9,16 +9,6 @@ using ZeroLog.Utils;
 
 namespace ZeroLog
 {
-    internal unsafe class UnpooledLogEvent : LogEvent
-    {
-        public UnpooledLogEvent(BufferSegment bufferSegment)
-            : base(bufferSegment)
-        {
-        }
-
-        public override bool IsPooled => false;
-    }
-
     internal unsafe class LogEvent : IInternalLogEvent
     {
         private const int _stringCapacity = 10;
@@ -27,9 +17,9 @@ namespace ZeroLog
         private readonly List<IntPtr> _argPointers = new List<IntPtr>(_stringCapacity);
         private Log _log;
 
-        private readonly byte* _startOfBuffer;
-        private readonly byte* _endOfBuffer;
-        private byte* _dataPointer;
+        protected readonly byte* _startOfBuffer;
+        protected readonly byte* _endOfBuffer;
+        protected byte* _dataPointer;
 
         public LogEvent(BufferSegment bufferSegment)
         {

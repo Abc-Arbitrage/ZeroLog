@@ -12,7 +12,7 @@ namespace ZeroLog
         public Task WriteTask { get; } = Task.FromResult(true);
         public List<IAppender> Appenders { get; } = new List<IAppender>(0);
 
-        public IInternalLogEvent AllocateLogEvent(LogEventPoolExhaustionStrategy logEventPoolExhaustionStrategy, IInternalLogEvent logEvent)
+        public IInternalLogEvent AllocateLogEvent(LogEventPoolExhaustionStrategy logEventPoolExhaustionStrategy, IInternalLogEvent logEvent, Level level, Log log)
             => throw new NotSupportedException();
 
         public void Enqueue(IInternalLogEvent logEvent) => throw new NotSupportedException();
@@ -27,6 +27,8 @@ namespace ZeroLog
 
         public Level ResolveLevel(string name)
             => Level.Fatal;
+
+        public BufferSegment GetBufferSegment() => throw new NotSupportedException();
 
         public void Dispose()
         {

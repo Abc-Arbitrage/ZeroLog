@@ -26,10 +26,10 @@ namespace ZeroLog.Appenders
             Configure(parameters?.PrefixPattern ?? DefaultPrefixPattern);
         }
 
-        public override void WriteEvent(ILogEvent logEvent, byte[] messageBytes, int messageLength)
+        public override void WriteEvent(ILogEventHeader logEventHeader, byte[] messageBytes, int messageLength)
         {
             Console.BackgroundColor = ConsoleColor.Black;
-            switch (logEvent.Level)
+            switch (logEventHeader.Level)
             {
                 case Level.Fatal:
                     Console.ForegroundColor = ConsoleColor.Black;
@@ -58,7 +58,7 @@ namespace ZeroLog.Appenders
                     break;
             }
 
-            WritePrefix(_output, logEvent);
+            WritePrefix(_output, logEventHeader);
 
             NewlineBytes.CopyTo(messageBytes, messageLength);
             messageLength += NewlineBytes.Length;

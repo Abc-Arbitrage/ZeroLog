@@ -10,6 +10,24 @@ namespace ZeroLog.Tests
     [TestFixture]
     public class AllocationTests
     {
+        private WaitableAppender _waitableAppender;
+
+        public class WaitableAppender : DateAndSizeRollingFileAppender
+        {
+            public int WrittenEventCount { get; private set; }
+
+            public WaitableAppender(string filePathRoot)
+                : base(filePathRoot)
+            {
+            }
+
+            public override void WriteEvent(ILogEventHeader logEventHeader, byte[] messageBytes, int messageLength)
+            {
+                WrittenEventCount++;
+                base.WriteEvent(logEventHeader, messageBytes, messageLength);
+            }
+        }
+
         [SetUp]
         public void Setup()
         {
@@ -18,7 +36,8 @@ namespace ZeroLog.Tests
                 File.Delete(file);
             }
 
-            LogManager.Initialize(new[] { new DateAndSizeRollingFileAppender("allocation-test") }, 2048 * 10, 512);
+            _waitableAppender = new WaitableAppender("allocation-test");
+            LogManager.Initialize(new[] { _waitableAppender }, 2048 * 10, 512);
         }
 
         [TearDown]
@@ -37,7 +56,9 @@ namespace ZeroLog.Tests
             GC.Collect(2, GCCollectionMode.Forced, true);
             var gcCountBefore = GC.CollectionCount(0);
 
-            for (var i = 0; i < 1_000_000; i++)
+            var numberOfEvents = 2048 * 10;
+
+            for (var i = 0; i < numberOfEvents; i++)
             {
                 log.InfoFormat("Int {0}, Double {1:N4}, String {2}, Bool {3}, Decimal {4:N4}, Guid {5}, Timestamp {6}, DateTime {7}",
                                123243,
@@ -51,7 +72,8 @@ namespace ZeroLog.Tests
             }
 
             // Give the appender some time to finish writing to file
-            Thread.Sleep(1000);
+            while(_waitableAppender.WrittenEventCount < numberOfEvents) 
+                Thread.Sleep(1);
 
             var gcCountAfter = GC.CollectionCount(0);
 

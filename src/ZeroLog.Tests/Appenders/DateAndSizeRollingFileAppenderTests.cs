@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Threading;
 using NFluent;
@@ -31,15 +33,21 @@ namespace ZeroLog.Tests.Appenders
             var bytes = new byte[256];
             var message = "Test log message";
             var byteLength = Encoding.Default.GetBytes(message, 0, message.Length, bytes, 0);
-            var bufferSegmentProvider = new BufferSegmentProvider(1024, 1024);
-            var logEvent = new LogEvent(bufferSegmentProvider.GetSegment());
-            logEvent.Initialize(Level.Info, new Log(null, "TestLog"));
-            _appender.WriteEvent(logEvent, bytes, byteLength);
+
+            var logEventHeader = new LogEventHeader
+            {
+                Level = Level.Info,
+                Name = "TestLog",
+                ThreadId = 42,
+                Timestamp = DateTime.UtcNow,
+            };
+
+            _appender.WriteEvent(logEventHeader, bytes, byteLength);
             _appender.Flush();
             
             var written = GetLastLine();
 
-            Check.That(written).IsEqualTo($"{logEvent.Timestamp.Date:yyyy-MM-dd} - {logEvent.Timestamp.TimeOfDay.ToString(@"hh\:mm\:ss\.fff")} - {Thread.CurrentThread.ManagedThreadId} - INFO - TestLog || " + message);
+            Check.That(written).IsEqualTo($"{logEventHeader.Timestamp.Date:yyyy-MM-dd} - {logEventHeader.Timestamp.TimeOfDay.ToString(@"hh\:mm\:ss\.fff")} - {logEventHeader.ThreadId} - INFO - TestLog || " + message);
         }
 
         private string GetLastLine()

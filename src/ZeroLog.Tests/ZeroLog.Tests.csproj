@@ -78,6 +78,7 @@
     <Compile Include="AllocationTests.cs" />
     <Compile Include="Appenders\DateAndSizeRollingFileAppenderTests.cs" />
     <Compile Include="Appenders\GuardedAppenderTests.cs" />
+    <Compile Include="Appenders\LogEventHeader.cs" />
     <Compile Include="BufferSegmentProviderTests.cs" />
     <Compile Include="Config\ConfiguratorTests.cs" />
     <Compile Include="HierarchicalAppenderResolverTests.cs" />

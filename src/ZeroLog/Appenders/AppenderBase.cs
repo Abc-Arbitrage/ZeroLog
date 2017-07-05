@@ -36,15 +36,15 @@ namespace ZeroLog.Appenders
             return prefixFormat;
         }
 
-        protected unsafe void WritePrefix(Stream stream, ILogEvent logEvent)
+        protected unsafe void WritePrefix(Stream stream, ILogEventHeader logEventHeader)
         {
             _stringBuffer.Clear();
             _stringBuffer.AppendFormat(_prefixFormat,
-                                       logEvent.Timestamp.Date,
-                                       logEvent.Timestamp.TimeOfDay,
-                                       logEvent.ThreadId,
-                                       LevelStringCache.GetLevelString(logEvent.Level),
-                                       logEvent.Name);
+                                       logEventHeader.Timestamp.Date,
+                                       logEventHeader.Timestamp.TimeOfDay,
+                                       logEventHeader.ThreadId,
+                                       LevelStringCache.GetLevelString(logEventHeader.Level),
+                                       logEventHeader.Name);
 
             int bytesWritten;
             fixed (byte* buf = _tempBytes)
@@ -62,6 +62,6 @@ namespace ZeroLog.Appenders
         public abstract void Close();
 
         public abstract void Configure(T parameters);
-        public abstract void WriteEvent(ILogEvent logEvent, byte[] messageBytes, int messageLength);
+        public abstract void WriteEvent(ILogEventHeader logEventHeader, byte[] messageBytes, int messageLength);
     }
 }
