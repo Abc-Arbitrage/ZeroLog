@@ -16,7 +16,7 @@ namespace ZeroLog
         private static readonly IInternalLogManager _defaultLogManager = new NoopLogManager();
         private static IInternalLogManager _logManager = _defaultLogManager;
 
-        private readonly ConcurrentBag<Log> _loggers;
+        private readonly ConcurrentQueue<Log> _loggers;
         private readonly ConcurrentQueue<IInternalLogEvent> _queue;
         private readonly ObjectPool<IInternalLogEvent> _pool;
 
@@ -30,7 +30,7 @@ namespace ZeroLog
         internal LogManager(IConfigurationResolver configResolver)
         {
             _configResolver = configResolver;
-            _loggers = new ConcurrentBag<Log>();
+            _loggers = new ConcurrentQueue<Log>();
             _queue = new ConcurrentQueue<IInternalLogEvent>(new ConcurrentQueueCapacityInitializer(configResolver.LogEventQueueSize));
 
             _bufferSegmentProvider = new BufferSegmentProvider(configResolver.LogEventQueueSize * configResolver.LogEventBufferSize, configResolver.LogEventBufferSize);
@@ -115,7 +115,7 @@ namespace ZeroLog
         ILog IInternalLogManager.GetNewLog(IInternalLogManager logManager, string name)
         {
             var logger = new Log(logManager, name);
-            _loggers.Add(logger);
+            _loggers.Enqueue(logger);
             return logger;
         }
 
