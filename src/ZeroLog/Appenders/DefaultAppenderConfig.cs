@@ -1,4 +1,4 @@
-namespace ZeroLog.Appenders.Builders
+namespace ZeroLog.Appenders
 {
     public class DefaultAppenderConfig
     {

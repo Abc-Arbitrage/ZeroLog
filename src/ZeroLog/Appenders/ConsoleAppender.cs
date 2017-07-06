@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using ZeroLog.Appenders.Builders;
 
 namespace ZeroLog.Appenders
 {

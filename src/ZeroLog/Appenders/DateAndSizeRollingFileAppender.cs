@@ -2,7 +2,6 @@
 using System.IO;
 using System.Linq;
 using System.Threading;
-using ZeroLog.Appenders.Builders;
 
 namespace ZeroLog.Appenders
 {
@@ -67,7 +66,7 @@ namespace ZeroLog.Appenders
             Configure(DefaultPrefixPattern);
         }
 
-        public override void Configure(Builders.DateAndSizeRollingFileAppenderConfig parameters)
+        public override void Configure(DateAndSizeRollingFileAppenderConfig parameters)
         {
             Configure(parameters.PrefixPattern);
 

@@ -67,6 +67,7 @@
     <Compile Include="Appenders\DateAndSizeRollingFileAppenderConfig.cs" />
     <Compile Include="Appenders\IAppender`1.cs" />
     <Compile Include="ILogEventHeader.cs" />
+    <Compile Include="PaddedHeadAndTail.cs" />
     <Compile Include="UnpooledLogEvent.cs" />
     <Compile Include="Utils\JsonExtensions.cs" />
     <Compile Include="Appenders\ConsoleAppender.cs" />
