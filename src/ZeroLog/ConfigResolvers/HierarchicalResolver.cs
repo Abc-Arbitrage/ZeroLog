@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using ZeroLog.Appenders;
-using ZeroLog.Appenders.Builders;
 using ZeroLog.Config;
 
 namespace ZeroLog.ConfigResolvers

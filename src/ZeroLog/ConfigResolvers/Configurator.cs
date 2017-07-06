@@ -1,8 +1,6 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using System.Threading;
-using ZeroLog.Appenders.Builders;
 using ZeroLog.Config;
 using ZeroLog.Utils;
 
