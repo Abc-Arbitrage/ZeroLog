@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Castle.Core.Internal;
 using Moq;
@@ -86,6 +88,25 @@ namespace ZeroLog.Tests
             var appenders = _resolver.ResolveAppenders("Abc.Zebus.Dispatch.Handler");
 
             Check.That(appenders.Count).Equals(2);
+        }
+
+        [Test, Ignore("Performance is relative & better tested by humans")]
+        public void should_be_fast()
+        {
+            var timer = Stopwatch.StartNew();
+
+            for (int i = 0; i < 10_000; i++)
+            {
+                _resolver.AddNode("Abc.Zebus", new List<NamedAppender> { _appenderB }, Level.Info, false, LogEventPoolExhaustionStrategy.Default);
+                _resolver.AddNode("Abc.Zebus.Dispatch", new List<NamedAppender> { _appenderA }, Level.Error, true, LogEventPoolExhaustionStrategy.Default);
+                _resolver.AddNode("Abc", new List<NamedAppender> { _appenderC }, Level.Info, false, LogEventPoolExhaustionStrategy.Default);
+                _resolver.AddNode("ZeroLog", new List<NamedAppender> { _appenderA, _appenderB }, Level.Debug, false, LogEventPoolExhaustionStrategy.Default);
+                _resolver.AddNode("ZeroLog.Internals", new List<NamedAppender> { _appenderA }, Level.Warn, false, LogEventPoolExhaustionStrategy.Default);
+                _resolver.Build();
+            }
+
+            timer.Stop();
+            Check.That(timer.Elapsed).IsLessThan(TimeSpan.FromSeconds(1));
         }
     }
 }

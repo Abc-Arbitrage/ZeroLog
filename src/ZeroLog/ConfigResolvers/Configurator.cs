@@ -11,13 +11,10 @@ namespace ZeroLog.ConfigResolvers
 {
     public static class Configurator
     {
-
         public static ILogManager ConfigureAndWatch(string filepath)
         {
-            var fullpath = Path.GetFullPath(filepath);
-            var filecontent = File.Exists(filepath) ? File.ReadAllText(filepath) : "";
-            var (r, l, a, c) = LoadFromJson(filecontent);
             var resolver = new HierarchicalResolver();
+            var fullpath = Path.GetFullPath(filepath);
 
             var watcher = new FileSystemWatcher
             {
@@ -26,12 +23,14 @@ namespace ZeroLog.ConfigResolvers
                 EnableRaisingEvents = true
             };
 
+            ConfigureResolver(fullpath, resolver);
+
             watcher.Changed += (sender, args) =>
             {
                 try
                 {
                     if (string.Equals(args.FullPath, fullpath, StringComparison.InvariantCultureIgnoreCase))
-                        ConfigureResolver(filepath, resolver);
+                        ConfigureResolver(fullpath, resolver);
                 }
                 catch(Exception e)
                 {
@@ -40,28 +39,21 @@ namespace ZeroLog.ConfigResolvers
                 }
             };
 
-            FillResolver(resolver, r, l, a);
-            return LogManager.Initialize(resolver, c);
+            return LogManager.Initialize(resolver);
         }
 
-        public static (RootDefinition rootDefinition, IList<LoggerDefinition> loggersDefinition, IList<AppenderDefinition> appendersDefinition, LogManagerConfiguration configuration) LoadFromJson(string jsonConfiguration)
+        public static (RootDefinition rootDefinition, IList<LoggerDefinition> loggersDefinition, IList<AppenderDefinition> appendersDefinition) LoadFromJson(string jsonConfiguration)
         {
             var config = JsonExtensions.DeserializeOrDefault(jsonConfiguration, new ZeroLogConfiguration());
-
-            var legacyConfiguration = new LogManagerConfiguration
-            {
-                Level = config.Root.DefaultLevel,
-                LogEventPoolExhaustionStrategy = config.Root.DefaultLogEventPoolExhaustionStrategy,
-                LogEventBufferSize = config.Root.LogEventBufferSize,
-                LogEventQueueSize = config.Root.LogEventQueueSize
-            };
-
-            return (config.Root, config.Loggers, config.Appenders, legacyConfiguration);
+            return (config.Root, config.Loggers, config.Appenders);
         }
 
         private static void FillResolver(HierarchicalResolver hierarchicalResolver, RootDefinition rootDefinition, IList<LoggerDefinition> loggersDefinition, IList<AppenderDefinition> appendersDefinition)
         {
             var appenders = appendersDefinition.ToDictionary(x => x.Name, x => new NamedAppender(AppenderFactory.BuildAppender(x), x.Name));
+
+            hierarchicalResolver.LogEventBufferSize = rootDefinition.LogEventBufferSize;
+            hierarchicalResolver.LogEventQueueSize = rootDefinition.LogEventQueueSize;
 
             hierarchicalResolver.AddNode("", rootDefinition.AppenderReferences.Select(x => appenders[x]), rootDefinition.DefaultLevel, false, rootDefinition.DefaultLogEventPoolExhaustionStrategy);
 
@@ -73,15 +65,15 @@ namespace ZeroLog.ConfigResolvers
             hierarchicalResolver.Build();
         }
         
-        private static void ConfigureResolver(string filepath, HierarchicalResolver resolver)
+        private static void ConfigureResolver(string fullpath, HierarchicalResolver resolver)
         {
-            var filecontent = SafeRead(filepath);
-            var (r, l, a, _) = LoadFromJson(filecontent);
+            var filecontent = SafeRead(fullpath);
+            var (r, l, a) = LoadFromJson(filecontent);
 
             FillResolver(resolver, r, l, a);
         }
 
-        private static string SafeRead(string filepath)
+        private static string SafeRead(string fullpath)
         {
             const int numberOfRetries = 3;
             const int delayOnRetry = 1000;
@@ -90,7 +82,7 @@ namespace ZeroLog.ConfigResolvers
             {
                 try
                 {
-                    return File.ReadAllText(filepath);
+                    return File.ReadAllText(fullpath);
                 }
                 catch (IOException)
                 {

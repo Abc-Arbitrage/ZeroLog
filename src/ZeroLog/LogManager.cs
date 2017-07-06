@@ -16,7 +16,7 @@ namespace ZeroLog
         private static readonly IInternalLogManager _defaultLogManager = new NoopLogManager();
         private static IInternalLogManager _logManager = _defaultLogManager;
 
-        private readonly ConcurrentBag<Log> _loggers;
+        private readonly ConcurrentQueue<Log> _loggers;
         private readonly ConcurrentQueue<IInternalLogEvent> _queue;
         private readonly ObjectPool<IInternalLogEvent> _pool;
 
@@ -27,14 +27,14 @@ namespace ZeroLog
         private bool _isRunning;
         private readonly Encoding _encoding = Encoding.UTF8;
 
-        internal LogManager(IConfigurationResolver configResolver, LogManagerConfiguration configuration)
+        internal LogManager(IConfigurationResolver configResolver)
         {
             _configResolver = configResolver;
-            _loggers = new ConcurrentBag<Log>();
-            _queue = new ConcurrentQueue<IInternalLogEvent>(new ConcurrentQueueCapacityInitializer(configuration.LogEventQueueSize));
+            _loggers = new ConcurrentQueue<Log>();
+            _queue = new ConcurrentQueue<IInternalLogEvent>(new ConcurrentQueueCapacityInitializer(configResolver.LogEventQueueSize));
 
-            _bufferSegmentProvider = new BufferSegmentProvider(configuration.LogEventQueueSize * configuration.LogEventBufferSize, configuration.LogEventBufferSize);
-            _pool = new ObjectPool<IInternalLogEvent>(configuration.LogEventQueueSize, () => new LogEvent(_bufferSegmentProvider.GetSegment()));
+            _bufferSegmentProvider = new BufferSegmentProvider(configResolver.LogEventQueueSize * configResolver.LogEventBufferSize, configResolver.LogEventBufferSize);
+            _pool = new ObjectPool<IInternalLogEvent>(configResolver.LogEventQueueSize, () => new LogEvent(_bufferSegmentProvider.GetSegment()));
 
             configResolver.Initialize(_encoding);
             configResolver.Updated += () =>
@@ -54,34 +54,23 @@ namespace ZeroLog
             return Configurator.ConfigureAndWatch(filepath);
         }
 
-        public static ILogManager Initialize(IConfigurationResolver configResolver, LogManagerConfiguration configuration)
+        public static ILogManager Initialize(IConfigurationResolver configResolver)
         {
             if (_logManager != _defaultLogManager)
                 throw new ApplicationException("LogManager is already initialized");
 
-            _logManager = new LogManager(configResolver, configuration);
-            return _logManager;
-        }
-
-        public static ILogManager Initialize(IEnumerable<IAppender> appenders, LogManagerConfiguration configuration)
-        {
-            if (_logManager != _defaultLogManager)
-                throw new ApplicationException("LogManager is already initialized");
-
-            var dummyResolver = new DummyResolver(appenders, configuration.Level, configuration.LogEventPoolExhaustionStrategy);
-            _logManager = new LogManager(dummyResolver, configuration);
+            _logManager = new LogManager(configResolver);
             return _logManager;
         }
 
         public static ILogManager Initialize(IEnumerable<IAppender> appenders, int logEventQueueSize = 1024, int logEventBufferSize = 128, Level level = Level.Finest, LogEventPoolExhaustionStrategy exhaustionStrategy = LogEventPoolExhaustionStrategy.Default)
         {
-            return Initialize(appenders, new LogManagerConfiguration
-            {
-                LogEventQueueSize = logEventQueueSize,
-                LogEventBufferSize = logEventBufferSize,
-                Level = level,
-                LogEventPoolExhaustionStrategy = exhaustionStrategy
-            });
+            if (_logManager != _defaultLogManager)
+                throw new ApplicationException("LogManager is already initialized");
+
+            var dummyResolver = new DummyResolver(appenders, level, exhaustionStrategy, logEventQueueSize, logEventBufferSize);
+            _logManager = new LogManager(dummyResolver);
+            return _logManager;
         }
 
         public static void Shutdown()
@@ -126,7 +115,7 @@ namespace ZeroLog
         ILog IInternalLogManager.GetNewLog(IInternalLogManager logManager, string name)
         {
             var logger = new Log(logManager, name);
-            _loggers.Add(logger);
+            _loggers.Enqueue(logger);
             return logger;
         }
 

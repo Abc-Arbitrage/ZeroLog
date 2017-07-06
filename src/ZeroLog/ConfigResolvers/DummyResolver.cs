@@ -11,18 +11,27 @@ namespace ZeroLog.ConfigResolvers
         private IList<IAppender> _appenders;
         private readonly Level _level;
         private readonly LogEventPoolExhaustionStrategy _strategy;
+        private readonly int _logEventQueueSize;
+        private readonly int _logEventBufferSize;
 
-        public DummyResolver(IEnumerable<IAppender> appenders, Level level, LogEventPoolExhaustionStrategy strategy)
+        public DummyResolver(IEnumerable<IAppender> appenders, Level level, LogEventPoolExhaustionStrategy strategy, int logEventQueueSize = 1024, int logEventBufferSize = 128)
         {
             _level = level;
             _strategy = strategy;
+            _logEventQueueSize = logEventQueueSize;
+            _logEventBufferSize = logEventBufferSize;
             _appenders = new List<IAppender>(appenders.Select(x => new GuardedAppender(x, TimeSpan.FromSeconds(15))));
         }
-
+        
         public IList<IAppender> ResolveAppenders(string name) => _appenders;
 
         public Level ResolveLevel(string name) => _level;
+
         public LogEventPoolExhaustionStrategy ResolveExhaustionStrategy(string name) => _strategy;
+
+        public int LogEventBufferSize => _logEventBufferSize;
+
+        public int LogEventQueueSize => _logEventQueueSize;
 
 
         public void Initialize(Encoding encoding)

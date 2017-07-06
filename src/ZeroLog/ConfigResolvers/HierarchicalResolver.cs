@@ -12,7 +12,7 @@ namespace ZeroLog.ConfigResolvers
         private class Node
         {
             public Dictionary<string, Node> Childrens = new Dictionary<string, Node>();
-            public IEnumerable<NamedAppender> Appenders;
+            public IEnumerable<NamedAppender> Appenders = Enumerable.Empty<NamedAppender>();
             public Level Level;
             public LogEventPoolExhaustionStrategy Strategy;
         }
@@ -36,6 +36,8 @@ namespace ZeroLog.ConfigResolvers
         }
 
         private Node _root;
+        public int LogEventQueueSize { get; set; }
+        public int LogEventBufferSize { get; set; }
         private readonly List<Config> _buildList = new List<Config>();
         private Encoding AppendersEncoding { get; set; }
 
