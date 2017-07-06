@@ -19,18 +19,13 @@ namespace ZeroLog.Tests
         [TestCase(Level.Fatal, false, false, false, false, true)]
         public void should_return_if_log_level_is_enabled(Level logLevel, bool isDebug, bool isInfo, bool isWarn, bool isError, bool isFatal)
         {
-            var configuration = new LogManagerConfiguration
-            {
-                LogEventQueueSize = 1,
-                LogEventBufferSize = 128,
-                Level = logLevel,
-            };
-
             var configResolver = new Mock<IConfigurationResolver>();
             configResolver.Setup(x => x.ResolveLevel(It.IsAny<string>()))
                          .Returns(logLevel);
+            configResolver.Setup(x => x.LogEventQueueSize).Returns(1);
+            configResolver.Setup(x => x.LogEventBufferSize).Returns(128);
 
-            var logManager = new LogManager(configResolver.Object, configuration);
+            var logManager = new LogManager(configResolver.Object);
             var log = new Log(logManager, "logger");
 
 

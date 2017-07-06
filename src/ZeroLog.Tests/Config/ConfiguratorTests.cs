@@ -34,7 +34,7 @@ namespace ZeroLog.Tests.Config
             var configJson = JSON.Serialize(config, Options.PrettyPrint);
 
 
-            var (root, loggers, appenders, _) = Configurator.LoadFromJson(configJson);
+            var (root, loggers, appenders) = Configurator.LoadFromJson(configJson);
 
             Check.That(root.DefaultLevel).Equals(config.Root.DefaultLevel);
             Check.That(root.LogEventBufferSize).Equals(config.Root.LogEventBufferSize);
@@ -81,7 +81,7 @@ namespace ZeroLog.Tests.Config
                                     }]
                                }";
 
-            var (root, loggers, appenders, _) = Configurator.LoadFromJson(configJson);
+            var (root, loggers, appenders) = Configurator.LoadFromJson(configJson);
 
             Check.That(root.DefaultLogEventPoolExhaustionStrategy).Equals(LogEventPoolExhaustionStrategy.Default);
             Check.That(root.LogEventBufferSize).Equals(10);
