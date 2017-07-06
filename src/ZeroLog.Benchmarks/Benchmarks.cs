@@ -203,24 +203,5 @@ namespace ZeroLog.Benchmarks
 
             signal.Wait(TimeSpan.FromSeconds(30));
         }
-        
-
-        //
-        // Run benchmark
-        //
-
-        public static void Main()
-        {
-            // Setup
-            NLog.Targets.Target.Register<NLogTestTarget>("NLogTestTarget");
-
-            // Run baby run
-            var config = ManualConfig.Create(DefaultConfig.Instance);
-            config.Add(StatisticColumn.P90);
-            config.Add(StatisticColumn.P95);
-
-            var summary = BenchmarkRunner.Run<Benchmarks>(config);
-            Console.ReadLine();
-        }
     }
 }

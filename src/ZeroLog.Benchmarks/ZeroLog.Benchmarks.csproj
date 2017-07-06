@@ -141,8 +141,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Benchmarks.cs" />
-    <Compile Include="Log4NetTestAppender.cs" />
-    <Compile Include="NLogTestTarget.cs" />
+    <Compile Include="Latency\NLogAsyncSingleProducer.cs" />
+    <Compile Include="Latency\NLogSyncSingleProducer.cs" />
+    <Compile Include="Latency\Log4NetSingleProducer.cs" />
+    <Compile Include="Latency\ZeroLogSingleProducer.cs" />
+    <Compile Include="Tools\Log4NetTestAppender.cs" />
+    <Compile Include="Tools\NLogTestTarget.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -163,5 +168,6 @@
       <Name>ZeroLog</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
