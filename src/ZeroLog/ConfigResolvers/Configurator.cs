@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -11,17 +10,17 @@ namespace ZeroLog.ConfigResolvers
 {
     public static class Configurator
     {
-
-        public static ILogManager ConfigureAndWatch(string filepath)
+        public static ILogManager ConfigureAndWatch(string configFilePath)
         {
-            var fullpath = Path.GetFullPath(filepath);
-            var filecontent = File.Exists(filepath) ? File.ReadAllText(filepath) : "";
-            var (r, l, a, c) = LoadFromJson(filecontent);
+            var configFileFullPath = Path.GetFullPath(configFilePath);
+
             var resolver = new HierarchicalResolver();
+
+            var config = ConfigureResolver(configFileFullPath, resolver);
 
             var watcher = new FileSystemWatcher
             {
-                Path = Path.GetDirectoryName(fullpath),
+                Path = Path.GetDirectoryName(configFileFullPath),
                 NotifyFilter = NotifyFilters.LastWrite,
                 EnableRaisingEvents = true
             };
@@ -30,58 +29,75 @@ namespace ZeroLog.ConfigResolvers
             {
                 try
                 {
-                    if (string.Equals(args.FullPath, fullpath, StringComparison.InvariantCultureIgnoreCase))
-                        ConfigureResolver(filepath, resolver);
+                    if (!string.Equals(args.FullPath, configFileFullPath, StringComparison.InvariantCultureIgnoreCase))
+                        return;
+
+                    var newConfig = ReadConfiguration(configFileFullPath);
+                    ConfigureResolver(resolver, newConfig);
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     LogManager.GetLogger(typeof(Configurator))
-                              .FatalFormat("Updating configuration failed with: {0}", e.Message);
+                        .FatalFormat("Updating config failed with: {0}", e.Message);
                 }
             };
 
-            FillResolver(resolver, r, l, a);
-            return LogManager.Initialize(resolver, c);
+            var lecagyConfiguration = CreateLegacyConfiguration(config);
+
+            return LogManager.Initialize(resolver, lecagyConfiguration);
         }
 
-        public static (RootDefinition rootDefinition, IList<LoggerDefinition> loggersDefinition, IList<AppenderDefinition> appendersDefinition, LogManagerConfiguration configuration) LoadFromJson(string jsonConfiguration)
+        private static ZeroLogConfiguration ConfigureResolver(string configFileFullPath, HierarchicalResolver resolver)
         {
-            var config = JsonExtensions.DeserializeOrDefault(jsonConfiguration, new ZeroLogConfiguration());
-
-            var legacyConfiguration = new LogManagerConfiguration
-            {
-                Level = config.Root.DefaultLevel,
-                LogEventPoolExhaustionStrategy = config.Root.DefaultLogEventPoolExhaustionStrategy,
-                LogEventBufferSize = config.Root.LogEventBufferSize,
-                LogEventQueueSize = config.Root.LogEventQueueSize
-            };
-
-            return (config.Root, config.Loggers, config.Appenders, legacyConfiguration);
+            var config = ReadConfiguration(configFileFullPath);
+            ConfigureResolver(resolver, config);
+            return config;
         }
 
-        private static void FillResolver(HierarchicalResolver hierarchicalResolver, RootDefinition rootDefinition, IList<LoggerDefinition> loggersDefinition, IList<AppenderDefinition> appendersDefinition)
+        private static ZeroLogConfiguration ReadConfiguration(string configFilePath)
         {
-            var appenders = appendersDefinition.ToDictionary(x => x.Name, x => new NamedAppender(AppenderFactory.BuildAppender(x), x.Name));
+            var filecontent = ReadFileContentWithRetry(configFilePath);
+            return DeserializeConfiguration(filecontent);
+        }
 
-            hierarchicalResolver.AddNode("", rootDefinition.AppenderReferences.Select(x => appenders[x]), rootDefinition.DefaultLevel, false, rootDefinition.DefaultLogEventPoolExhaustionStrategy);
+        private static void ConfigureResolver(HierarchicalResolver resolver, ZeroLogConfiguration config)
+        {
+            var appenders = config.Appenders.ToDictionary(x => x.Name, x => new NamedAppender(AppenderFactory.BuildAppender(x), x.Name));
+            
+            var namedAppenders = config.RootLogger.AppenderReferences.Select(x => appenders[x]);
 
-            foreach (var loggerDefinition in loggersDefinition)
+            resolver.AddNode("", namedAppenders, config.RootLogger.Level, false, config.RootLogger.LogEventPoolExhaustionStrategy);
+
+            foreach (var loggerDefinition in config.Loggers)
             {
-                hierarchicalResolver.AddNode(loggerDefinition.Name, loggerDefinition.AppenderReferences.Select(x => appenders[x]), loggerDefinition.Level, loggerDefinition.IncludeParentAppenders, loggerDefinition.LogEventPoolExhaustionStrategy);
+                var loggerAppenders = loggerDefinition.AppenderReferences.Select(x => appenders[x]);
+
+                resolver.AddNode(loggerDefinition.Name, loggerAppenders, loggerDefinition.Level, loggerDefinition.IncludeParentAppenders, loggerDefinition.LogEventPoolExhaustionStrategy);
             }
 
-            hierarchicalResolver.Build();
+            resolver.Build();
         }
-        
-        private static void ConfigureResolver(string filepath, HierarchicalResolver resolver)
+
+        private static LogManagerConfiguration CreateLegacyConfiguration(ZeroLogConfiguration config)
         {
-            var filecontent = SafeRead(filepath);
-            var (r, l, a, _) = LoadFromJson(filecontent);
+            var legacyConfig = new LogManagerConfiguration
+            {
+                Level = config.RootLogger.Level,
+                LogEventPoolExhaustionStrategy = config.RootLogger.LogEventPoolExhaustionStrategy,
+                LogEventBufferSize = config.LogEventBufferSize,
+                LogEventQueueSize = config.LogEventQueueSize
+            };
 
-            FillResolver(resolver, r, l, a);
+            return legacyConfig;
         }
 
-        private static string SafeRead(string filepath)
+        public static ZeroLogConfiguration DeserializeConfiguration(string jsonConfiguration)
+        {
+            var config = JsonExtensions.DeserializeOrDefault(jsonConfiguration, new ZeroLogConfiguration());
+            return config;
+        }
+
+        private static string ReadFileContentWithRetry(string filepath)
         {
             const int numberOfRetries = 3;
             const int delayOnRetry = 1000;

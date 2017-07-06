@@ -20,17 +20,17 @@ namespace ZeroLog.ConfigResolvers
         }
 
         public IList<IAppender> ResolveAppenders(string name) => _appenders;
-
         public Level ResolveLevel(string name) => _level;
         public LogEventPoolExhaustionStrategy ResolveExhaustionStrategy(string name) => _strategy;
-
 
         public void Initialize(Encoding encoding)
         {
             _appenders = new List<IAppender>(_appenders.Select(x => new GuardedAppender(x, TimeSpan.FromSeconds(15))));
 
             foreach (var appender in _appenders)
+            {
                 appender.SetEncoding(encoding);
+            }
         }
 
         public event Action Updated = delegate {};
@@ -38,7 +38,9 @@ namespace ZeroLog.ConfigResolvers
         public void Dispose()
         {
             foreach (var appender in _appenders)
+            {
                 appender.Close();
+            }
         }
     }
 }

@@ -12,7 +12,6 @@ namespace ZeroLog.Tests.Config
     [TestFixture]
     public class ConfiguratorTests
     {
-
         [Test]
         public void should_load_configuration()
         {
@@ -20,46 +19,48 @@ namespace ZeroLog.Tests.Config
             var appenderB = new AppenderDefinition { Name = "B", AppenderTypeName = nameof(DateAndSizeRollingFileAppender), AppenderJsonConfig = JSON.Serialize(new DateAndSizeRollingFileAppenderConfig { FilePathRoot = "totopath " }) };
             var config = new ZeroLogConfiguration
             {
-                Root = new RootDefinition
+                LogEventBufferSize = 5,
+                LogEventQueueSize = 7,
+                RootLogger = new LoggerDefinition
                 {
-                    DefaultLevel = Level.Warn,
-                    DefaultLogEventPoolExhaustionStrategy = LogEventPoolExhaustionStrategy.DropLogMessage,
+                    Level = Level.Warn,
+                    LogEventPoolExhaustionStrategy = LogEventPoolExhaustionStrategy.DropLogMessage,
                     AppenderReferences = new []{ "A" },
-                    LogEventBufferSize = 5,
-                    LogEventQueueSize = 7
+  
                 },
                 Appenders = new[] { appenderA, appenderB },
                 Loggers = new[] {new LoggerDefinition{ Name = "Abc.Zebus", Level = Level.Debug, AppenderReferences = new []{ "B" } }}
             };
             var configJson = JSON.Serialize(config, Options.PrettyPrint);
 
+            var loadedConfig = Configurator.DeserializeConfiguration(configJson);
 
-            var (root, loggers, appenders, _) = Configurator.LoadFromJson(configJson);
+            Check.That(loadedConfig.LogEventBufferSize).Equals(config.LogEventBufferSize);
+            Check.That(loadedConfig.LogEventQueueSize).Equals(config.LogEventQueueSize);
 
-            Check.That(root.DefaultLevel).Equals(config.Root.DefaultLevel);
-            Check.That(root.LogEventBufferSize).Equals(config.Root.LogEventBufferSize);
-            Check.That(root.LogEventQueueSize).Equals(config.Root.LogEventQueueSize);
-            Check.That(root.AppenderReferences.Single()).Equals(config.Root.AppenderReferences.Single());
+            Check.That(loadedConfig.RootLogger.Level).Equals(config.RootLogger.Level);
+            Check.That(loadedConfig.RootLogger.AppenderReferences.Single()).Equals(config.RootLogger.AppenderReferences.Single());
 
-            Check.That(appenders.Single(a => a.Name == "A").Name).Equals(appenderA.Name);
-            Check.That(appenders.Single(a => a.Name == "A").AppenderTypeName).Equals(appenderA.AppenderTypeName);
-            Check.That(appenders.Single(a => a.Name == "A").AppenderJsonConfig).Equals(appenderA.AppenderJsonConfig);
+            Check.That(loadedConfig.Appenders.Single(a => a.Name == "A").Name).Equals(appenderA.Name);
+            Check.That(loadedConfig.Appenders.Single(a => a.Name == "A").AppenderTypeName).Equals(appenderA.AppenderTypeName);
+            Check.That(loadedConfig.Appenders.Single(a => a.Name == "A").AppenderJsonConfig).Equals(appenderA.AppenderJsonConfig);
 
-            Check.That(appenders.Single(a => a.Name == "B").Name).Equals(appenderB.Name);
-            Check.That(appenders.Single(a => a.Name == "B").AppenderTypeName).Equals(appenderB.AppenderTypeName);
-            Check.That(appenders.Single(a => a.Name == "B").AppenderJsonConfig).Equals(appenderB.AppenderJsonConfig);
+            Check.That(loadedConfig.Appenders.Single(a => a.Name == "B").Name).Equals(appenderB.Name);
+            Check.That(loadedConfig.Appenders.Single(a => a.Name == "B").AppenderTypeName).Equals(appenderB.AppenderTypeName);
+            Check.That(loadedConfig.Appenders.Single(a => a.Name == "B").AppenderJsonConfig).Equals(appenderB.AppenderJsonConfig);
         }
 
         [Test]
         public void should_handle_missing_part()
         {
             var configJson = @"{
-                                    ""Root"": {
+                                    ""RootLogger"": {
                                     ""AppenderReferences"": [
                                         ""A""
                                     ],
-                                    ""DefaultLevel"": ""Warn""
+                                    ""Level"": ""Warn""
                                     },
+
                                     ""Appenders"": [
                                     {
                                         ""Name"": ""A"",
@@ -71,6 +72,7 @@ namespace ZeroLog.Tests.Config
                                         ""AppenderJsonConfig"": ""{\""FilePathRoot\"":\""totopath \""}""
                                     }
                                     ],
+
                                     ""Loggers"": [{
                                         ""Name"": ""Abc.Zebus"",
                                         ""AppenderReferences"": [
@@ -81,11 +83,11 @@ namespace ZeroLog.Tests.Config
                                     }]
                                }";
 
-            var (root, loggers, appenders, _) = Configurator.LoadFromJson(configJson);
+            var config = Configurator.DeserializeConfiguration(configJson);
 
-            Check.That(root.DefaultLogEventPoolExhaustionStrategy).Equals(LogEventPoolExhaustionStrategy.Default);
-            Check.That(root.LogEventBufferSize).Equals(10);
-            Check.That(root.LogEventQueueSize).Equals(10);
+            Check.That(config.RootLogger.LogEventPoolExhaustionStrategy).Equals(LogEventPoolExhaustionStrategy.Default);
+            Check.That(config.LogEventBufferSize).Equals(10);
+            Check.That(config.LogEventQueueSize).Equals(10);
         }
     }
 }

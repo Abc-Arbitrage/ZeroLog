@@ -87,7 +87,6 @@
     <Compile Include="ConfigResolvers\Configurator.cs" />
     <Compile Include="ConfigResolvers\IConfigurationResolver.cs" />
     <Compile Include="Config\LoggerDefinition.cs" />
-    <Compile Include="Config\RootDefinition.cs" />
     <Compile Include="Appenders\GuardedAppender.cs" />
     <Compile Include="Appenders\IAppender.cs" />
     <Compile Include="ConfigResolvers\DummyResolver.cs" />

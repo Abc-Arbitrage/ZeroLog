@@ -7,13 +7,13 @@ namespace ZeroLog.ConfigResolvers
     {
         public IAppender Appender { get; }
         public string Name { get; }
+
         public NamedAppender(IAppender appender, string name)
         {
             Appender = appender;
             Name = name;
         }
 
-        public bool Equals(NamedAppender other)
-            => string.Equals(Name, other?.Name);
+        public bool Equals(NamedAppender other) => string.Equals(Name, other?.Name);
     }
 }
