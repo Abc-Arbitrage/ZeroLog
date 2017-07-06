@@ -8,7 +8,7 @@ namespace ZeroLog.ConfigResolvers
 {
     public class DummyResolver : IConfigurationResolver
     {
-        private IList<IAppender> _appenders;
+        private readonly IList<IAppender> _appenders;
         private readonly Level _level;
         private readonly LogEventPoolExhaustionStrategy _strategy;
 
@@ -25,8 +25,6 @@ namespace ZeroLog.ConfigResolvers
 
         public void Initialize(Encoding encoding)
         {
-            _appenders = new List<IAppender>(_appenders.Select(x => new GuardedAppender(x, TimeSpan.FromSeconds(15))));
-
             foreach (var appender in _appenders)
             {
                 appender.SetEncoding(encoding);

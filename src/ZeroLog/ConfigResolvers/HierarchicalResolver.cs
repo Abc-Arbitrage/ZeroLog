@@ -28,7 +28,7 @@ namespace ZeroLog.ConfigResolvers
                 AddNode(newRoot, loggerWithAppenders.logger, loggerWithAppenders.appenders);
             }
 
-            Initialize(newRoot);
+            ApplyEncodingToAllAppenders(newRoot);
 
             _root = newRoot;
 
@@ -39,7 +39,7 @@ namespace ZeroLog.ConfigResolvers
 
         private static List<(LoggerDefinition logger, IAppender[] appenders)> CreateLoggersWithAppenders(ZeroLogConfiguration config)
         {
-            var appendersByNames = config.Appenders.ToDictionary(x => x.Name, AppenderFactory.BuildAppender);
+            var appendersByNames = config.Appenders.ToDictionary(x => x.Name, CreateAppender);
 
             var loggerWithAppenders = new List<(LoggerDefinition, IAppender[])>();
 
@@ -54,6 +54,12 @@ namespace ZeroLog.ConfigResolvers
             }
 
             return loggerWithAppenders;
+        }
+
+        private static IAppender CreateAppender(AppenderDefinition appenderDefinition)
+        {
+            var appender = AppenderFactory.CreateAppender(appenderDefinition);
+            return new GuardedAppender(appender, TimeSpan.FromSeconds(15));
         }
 
         private static void AddNode(Node root, LoggerDefinition logger, IAppender[] appenders)
@@ -97,14 +103,11 @@ namespace ZeroLog.ConfigResolvers
         {
             AppenderEncoding = encoding;
 
-            Initialize(_root);
+            ApplyEncodingToAllAppenders(_root);
         }
 
-        private void Initialize(Node node)
+        private void ApplyEncodingToAllAppenders(Node node)
         {
-            if (node.Appenders != null)
-                node.Appenders = node.Appenders.Select(x => new GuardedAppender(x, TimeSpan.FromSeconds(15))).ToList();
-
             if (AppenderEncoding != null && node.Appenders != null)
             {
                 foreach (var appender in node.Appenders)
@@ -115,7 +118,7 @@ namespace ZeroLog.ConfigResolvers
 
             foreach (var n in node.Children)
             {
-                Initialize(n.Value);
+                ApplyEncodingToAllAppenders(n.Value);
             }
         }
 

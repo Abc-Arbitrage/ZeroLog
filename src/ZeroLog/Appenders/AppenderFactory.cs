@@ -7,7 +7,7 @@ namespace ZeroLog.Appenders
 {
     public class AppenderFactory
     {
-        public static IAppender BuildAppender(AppenderDefinition definition)
+        public static IAppender CreateAppender(AppenderDefinition definition)
         {
             var appenderType = GetAppenderType(definition);
 

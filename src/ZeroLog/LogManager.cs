@@ -40,7 +40,9 @@ namespace ZeroLog
             configResolver.Updated += () =>
             {
                 foreach (var logger in _loggers)
+                {
                     logger.ResetConfiguration();
+                }
             };
 
             _isRunning = true;
