@@ -11,5 +11,6 @@ namespace ZeroLog
         void AppendGeneric<T>(T arg);
         void WriteToStringBuffer(StringBuffer stringBuffer);
         void WriteToStringBufferUnformatted(StringBuffer stringBuffer);
+        bool IsPooled { get; }
     }
 }

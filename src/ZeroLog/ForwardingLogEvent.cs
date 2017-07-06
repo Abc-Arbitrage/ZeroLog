@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text.Formatting;
+using ZeroLog.Appenders;
+using ZeroLog.Utils;
 
 namespace ZeroLog
 {
@@ -11,6 +14,7 @@ namespace ZeroLog
         public DateTime Timestamp => default(DateTime);
         public int ThreadId => 0;
         public string Name => _logEventToAppend?.Name;
+        public IList<IAppender> Appenders => _log?.Appenders;
 
         private Log _log;
 
@@ -75,5 +79,7 @@ namespace ZeroLog
         public void WriteToStringBufferUnformatted(StringBuffer stringBuffer)
         {
         }
+
+        public bool IsPooled => false;
     }
 }

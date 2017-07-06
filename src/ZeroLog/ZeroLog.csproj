@@ -36,11 +36,21 @@
       <HintPath>..\packages\JetBrains.Annotations.10.2.1\lib\net\JetBrains.Annotations.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Jil, Version=2.15.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Jil.2.15.1\lib\net45\Jil.dll</HintPath>
+    </Reference>
+    <Reference Include="Sigil, Version=4.7.0.0, Culture=neutral, PublicKeyToken=2d06c3494341c8ab, processorArchitecture=MSIL">
+      <HintPath>..\packages\Sigil.4.7.0\lib\net45\Sigil.dll</HintPath>
+    </Reference>
     <Reference Include="StringFormatter, Version=1.0.0.5, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\StringFormatter.1.0.0.5\lib\net45\StringFormatter.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ValueTuple, Version=4.0.1.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.3.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -53,6 +63,12 @@
       <Link>Properties\SharedVersionInfo.cs</Link>
     </Compile>
     <Compile Include="Appenders\AppenderBase.cs" />
+    <Compile Include="Appenders\DefaultAppenderConfig.cs" />
+    <Compile Include="Appenders\DateAndSizeRollingFileAppenderConfig.cs" />
+    <Compile Include="Appenders\IAppender`1.cs" />
+    <Compile Include="ILogEventHeader.cs" />
+    <Compile Include="UnpooledLogEvent.cs" />
+    <Compile Include="Utils\JsonExtensions.cs" />
     <Compile Include="Appenders\ConsoleAppender.cs" />
     <Compile Include="Appenders\DateAndSizeRollingFileAppender.cs" />
     <Compile Include="Appenders\NoopAppender.cs" />
@@ -63,9 +79,22 @@
     <Compile Include="BufferSegmentProvider.cs" />
     <Compile Include="ConcurrentQueue.cs" />
     <Compile Include="ConcurrentQueueCapacityInitializer.cs" />
+    <Compile Include="Appenders\AppenderFactory.cs" />
+    <Compile Include="ConfigResolvers\IExhaustionStrategyResolver.cs" />
+    <Compile Include="ConfigResolvers\ILevelResolver.cs" />
+    <Compile Include="ConfigResolvers\NamedAppender.cs" />
+    <Compile Include="Config\AppenderDefinition.cs" />
+    <Compile Include="ConfigResolvers\Configurator.cs" />
+    <Compile Include="ConfigResolvers\IConfigurationResolver.cs" />
+    <Compile Include="Config\LoggerDefinition.cs" />
+    <Compile Include="Config\RootDefinition.cs" />
     <Compile Include="Appenders\GuardedAppender.cs" />
     <Compile Include="Appenders\IAppender.cs" />
+    <Compile Include="ConfigResolvers\DummyResolver.cs" />
+    <Compile Include="Config\ZeroLogConfiguration.cs" />
     <Compile Include="ForwardingLogEvent.cs" />
+    <Compile Include="ConfigResolvers\HierarchicalResolver.cs" />
+    <Compile Include="ConfigResolvers\IAppenderResolver.cs" />
     <Compile Include="IInternalLogEvent.cs" />
     <Compile Include="IInternalLogManager.cs" />
     <Compile Include="ILog.cs" />
@@ -87,7 +116,6 @@
     <Compile Include="NoopLogManager.cs" />
     <Compile Include="ObjectPool.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SpecialLogEvents.cs" />
     <Compile Include="StringBufferExtension.cs" />
     <Compile Include="Utils\HighResolutionDateTime.cs" />
     <Compile Include="Utils\SafeHeapHandle.cs" />
@@ -105,5 +133,6 @@
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

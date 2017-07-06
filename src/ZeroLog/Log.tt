@@ -19,7 +19,7 @@ namespace ZeroLog
         {
         #>
         
-        public bool Is<#=levelName#>Enabled => Level.<#=levelName#> >= _logManager.Level;
+        public bool Is<#=levelName#>Enabled => Level.<#=levelName#> >= LogLevel;
 
         public ILogEvent <#=levelName#>()
         {

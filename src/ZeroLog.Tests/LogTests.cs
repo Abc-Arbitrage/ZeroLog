@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
+using Moq;
 using NFluent;
 using NUnit.Framework;
 using ZeroLog.Appenders;
+using ZeroLog.ConfigResolvers;
 
 namespace ZeroLog.Tests
 {
@@ -24,8 +26,13 @@ namespace ZeroLog.Tests
                 Level = logLevel,
             };
 
-            var logManager = new LogManager(new List<IAppender>(), configuration);
+            var configResolver = new Mock<IConfigurationResolver>();
+            configResolver.Setup(x => x.ResolveLevel(It.IsAny<string>()))
+                         .Returns(logLevel);
+
+            var logManager = new LogManager(configResolver.Object, configuration);
             var log = new Log(logManager, "logger");
+
 
             Check.That(log.IsDebugEnabled).Equals(isDebug);
             Check.That(log.IsInfoEnabled).Equals(isInfo);

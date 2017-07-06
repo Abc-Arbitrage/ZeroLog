@@ -2,11 +2,16 @@
 using System.IO;
 using System.Linq;
 using System.Threading;
+using ZeroLog.Appenders.Builders;
 
 namespace ZeroLog.Appenders
 {
-    public class DateAndSizeRollingFileAppender : AppenderBase
+    public class DateAndSizeRollingFileAppender : AppenderBase<DateAndSizeRollingFileAppenderConfig>
     {
+        public const int DefaultMaxSize = 200 * 1024 * 1024;
+        public const string DefaultExtension = "log";
+        public const string DefaultPrefixPattern = "%time - %level - %logger || ";
+
         private readonly object _lock = new object();
         private DateTime _currentDateTime = DateTime.UtcNow;
         private int _currentFileSize;
@@ -32,7 +37,7 @@ namespace ZeroLog.Appenders
 
         /// <summary>
         /// Gets or sets the maximum permitted file size in bytes. Once a file exceeds this value it will
-        /// be closed and the next log file will be created. Defaults to 4 MB.
+        /// be closed and the next log file will be created. Defaults to 200 MB.
         /// If the size is 0, the feature is disabled.
         /// </summary>
         public int MaxFileSizeInBytes { get; set; }
@@ -42,17 +47,39 @@ namespace ZeroLog.Appenders
         /// <summary>
         /// Initializes a new instance of the class.
         /// </summary>
-        public DateAndSizeRollingFileAppender(string filenameRoot, int maxFileSizeInBytes = 200 * 1024 * 1024, string extension = "log", string prefixPattern = "%time - %level - %logger || ")
-            : base(prefixPattern)
+        public DateAndSizeRollingFileAppender(string filePathRoot, int maxFileSizeInBytes = DefaultMaxSize, string extension = DefaultExtension, string prefixPattern = DefaultPrefixPattern)   
         {
-            FilenameRoot = filenameRoot;
-            MaxFileSizeInBytes = maxFileSizeInBytes;
-            FilenameExtension = extension;
+            var config = new DateAndSizeRollingFileAppenderConfig();
+            config.FilePathRoot = filePathRoot;
+            config.MaxFileSizeInBytes = maxFileSizeInBytes;
+            config.Extension = extension;
+            config.AutoFlush = false;
+            config.PrefixPattern = prefixPattern;
+
+            Configure(config);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the class.
+        /// </summary>
+        public DateAndSizeRollingFileAppender()
+        {
+            Configure(DefaultPrefixPattern);
+        }
+
+        public override void Configure(Builders.DateAndSizeRollingFileAppenderConfig parameters)
+        {
+            Configure(parameters.PrefixPattern);
+
+            FilenameRoot = parameters.FilePathRoot;
+            MaxFileSizeInBytes = parameters.MaxFileSizeInBytes;
+            FilenameExtension = parameters.Extension;
+            AutoFlush = parameters.AutoFlush;
 
             Open();
         }
 
-        public override void WriteEvent(ILogEvent logEvent, byte[] messageBytes, int messageLength)
+        public override void WriteEvent(ILogEventHeader logEventHeader, byte[] messageBytes, int messageLength)
         {
             var stream = _stream;
             if (stream == null)
@@ -61,7 +88,7 @@ namespace ZeroLog.Appenders
             if (messageLength + 1 >= messageBytes.Length)
                 throw new ApplicationException($"{nameof(messageBytes)} must be big enough to also contain the new line characters");
 
-            WritePrefix(stream, logEvent);
+            WritePrefix(stream, logEventHeader);
 
             NewlineBytes.CopyTo(messageBytes, messageLength);
             messageLength += NewlineBytes.Length;
@@ -199,7 +226,7 @@ namespace ZeroLog.Appenders
             var fullPath = Path.GetFullPath(filename);
             try
             {
-                var fileStream = File.Open(fullPath, FileMode.Append, FileAccess.Write, FileShare.Read);
+                var fileStream = File.Open(fullPath, FileMode.Append, FileAccess.Write, FileShare.ReadWrite);
                 _currentFileSize = (int)fileStream.Length;
                 return fileStream;
             }

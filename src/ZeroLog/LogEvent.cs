@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text.Formatting;
 using System.Threading;
+using ZeroLog.Appenders;
 using ZeroLog.Utils;
 
 namespace ZeroLog
@@ -16,9 +17,9 @@ namespace ZeroLog
         private readonly List<IntPtr> _argPointers = new List<IntPtr>(_stringCapacity);
         private Log _log;
 
-        private readonly byte* _startOfBuffer;
-        private readonly byte* _endOfBuffer;
-        private byte* _dataPointer;
+        protected readonly byte* _startOfBuffer;
+        protected readonly byte* _endOfBuffer;
+        protected byte* _dataPointer;
 
         public LogEvent(BufferSegment bufferSegment)
         {
@@ -31,6 +32,8 @@ namespace ZeroLog
         public DateTime Timestamp { get; private set; }
         public int ThreadId { get; private set; }
         public string Name => _log.Name;
+        public IList<IAppender> Appenders => _log.Appenders;
+        public virtual bool IsPooled => true;
 
         public void Initialize(Level level, Log log)
         {

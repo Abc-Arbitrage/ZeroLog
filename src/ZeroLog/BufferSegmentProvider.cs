@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using ZeroLog.Utils;
 
 namespace ZeroLog
@@ -10,6 +11,8 @@ namespace ZeroLog
         private readonly int _largeBufferSize;
         private readonly int _bufferSegmentSize;
 
+        private int _segmentIndex = -1;
+
         public BufferSegmentProvider(int largeBufferSize, int bufferSegmentSize)
         {
             _largeBufferSize = largeBufferSize;
@@ -18,12 +21,12 @@ namespace ZeroLog
             AllocateLargeBuffer(0);
         }
 
-        public int LastSegmentIndex { get; private set; } = -1;
+        public int LastSegmentIndex => _segmentIndex;
         public int LargeBufferCount { get; private set; }
 
         public BufferSegment GetSegment()
         {
-            var nextSegmentIndex = ++LastSegmentIndex;
+            var nextSegmentIndex = Interlocked.Increment(ref _segmentIndex);
 
             var largeBuffer = AllocateLargeBufferIfNeeded(nextSegmentIndex);
 
@@ -43,10 +46,13 @@ namespace ZeroLog
             if (largeBufferIndex < LargeBufferCount)
                 return _largeBuffers[largeBufferIndex];
 
-            if (largeBufferIndex < LargeBufferCount)
-                return _largeBuffers[largeBufferIndex];
+            lock (_largeBuffers)
+            {
+                if (largeBufferIndex < LargeBufferCount)
+                    return _largeBuffers[largeBufferIndex];
 
-            return AllocateLargeBuffer(segmentIndex);
+                return AllocateLargeBuffer(segmentIndex);
+            }
         }
 
         private LargeBuffer AllocateLargeBuffer(int firstSegmentGlobalIndex)
@@ -72,7 +78,7 @@ namespace ZeroLog
                 FirstSegmentGlobalIndex = firstSegmentGlobalIndex;
 
                 _bufferHandle = new SafeHeapHandle(size);
-                _bufferPointer = (byte*) _bufferHandle.DangerousGetHandle();
+                _bufferPointer = (byte*)_bufferHandle.DangerousGetHandle();
             }
 
             public int FirstSegmentGlobalIndex { get; }

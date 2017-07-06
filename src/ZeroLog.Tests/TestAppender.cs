@@ -27,7 +27,7 @@ namespace ZeroLog.Tests
             return _signal;
         }
 
-        public void WriteEvent(ILogEvent logEvent, byte[] messageBytes, int messageLength)
+        public void WriteEvent(ILogEventHeader logEventHeader, byte[] messageBytes, int messageLength)
         {
             if (_captureLoggedMessages)
                 LoggedMessages.Add(Encoding.ASCII.GetString(messageBytes, 0, messageLength));

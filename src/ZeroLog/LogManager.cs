@@ -1,11 +1,13 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Text.Formatting;
 using System.Threading;
 using System.Threading.Tasks;
 using ZeroLog.Appenders;
+using ZeroLog.ConfigResolvers;
+using ZeroLog.Utils;
 
 namespace ZeroLog
 {
@@ -14,60 +16,71 @@ namespace ZeroLog
         private static readonly IInternalLogManager _defaultLogManager = new NoopLogManager();
         private static IInternalLogManager _logManager = _defaultLogManager;
 
+        private readonly ConcurrentBag<Log> _loggers;
         private readonly ConcurrentQueue<IInternalLogEvent> _queue;
         private readonly ObjectPool<IInternalLogEvent> _pool;
-        private readonly Encoding _encoding;
-
-        private readonly IInternalLogEvent _notifyPoolExhaustionLogEvent = new ForwardingLogEvent(SpecialLogEvents.ExhaustedPoolEvent);
-        private readonly LogEventPoolExhaustionStrategy _logEventPoolExhaustionStrategy;
 
         private readonly BufferSegmentProvider _bufferSegmentProvider;
+        private readonly IConfigurationResolver _configResolver;
+        private readonly Task _writeTask;
 
-        public bool IsRunning { get; set; }
-        public Task WriteTask { get; }
-        public List<IAppender> Appenders { get; }
+        private bool _isRunning;
+        private readonly Encoding _encoding = Encoding.UTF8;
 
-        internal LogManager(IEnumerable<IAppender> appenders, LogManagerConfiguration configuration)
+        internal LogManager(IConfigurationResolver configResolver, LogManagerConfiguration configuration)
         {
-            Level = configuration.Level;
-
-            _encoding = Encoding.Default;
-            _logEventPoolExhaustionStrategy = configuration.LogEventPoolExhaustionStrategy;
-
+            _configResolver = configResolver;
+            _loggers = new ConcurrentBag<Log>();
             _queue = new ConcurrentQueue<IInternalLogEvent>(new ConcurrentQueueCapacityInitializer(configuration.LogEventQueueSize));
 
             _bufferSegmentProvider = new BufferSegmentProvider(configuration.LogEventQueueSize * configuration.LogEventBufferSize, configuration.LogEventBufferSize);
             _pool = new ObjectPool<IInternalLogEvent>(configuration.LogEventQueueSize, () => new LogEvent(_bufferSegmentProvider.GetSegment()));
 
-            Appenders = new List<IAppender>(appenders.Select(x => new GuardedAppender(x, TimeSpan.FromSeconds(15))));
-
-            foreach (var appender in Appenders)
+            configResolver.Initialize(_encoding);
+            configResolver.Updated += () =>
             {
-                appender.SetEncoding(_encoding);
-            }
+                foreach (var logger in _loggers)
+                    logger.ResetConfiguration();
+            };
 
-            IsRunning = true;
-            WriteTask = Task.Factory.StartNew(WriteToAppenders, TaskCreationOptions.LongRunning);
+            _isRunning = true;
+            _writeTask = Task.Factory.StartNew(WriteToAppenders, TaskCreationOptions.LongRunning);
         }
 
-        public Level Level { get; }
+        public Level Level => _configResolver.ResolveLevel("");
+
+        public static ILogManager ConfigureAndWatch(string filepath)
+        {
+            return Configurator.ConfigureAndWatch(filepath);
+        }
+
+        public static ILogManager Initialize(IConfigurationResolver configResolver, LogManagerConfiguration configuration)
+        {
+            if (_logManager != _defaultLogManager)
+                throw new ApplicationException("LogManager is already initialized");
+
+            _logManager = new LogManager(configResolver, configuration);
+            return _logManager;
+        }
 
         public static ILogManager Initialize(IEnumerable<IAppender> appenders, LogManagerConfiguration configuration)
         {
             if (_logManager != _defaultLogManager)
                 throw new ApplicationException("LogManager is already initialized");
 
-            _logManager = new LogManager(appenders, configuration);
+            var dummyResolver = new DummyResolver(appenders, configuration.Level, configuration.LogEventPoolExhaustionStrategy);
+            _logManager = new LogManager(dummyResolver, configuration);
             return _logManager;
         }
 
-        public static ILogManager Initialize(IEnumerable<IAppender> appenders, int logEventQueueSize = 1024, int logEventBufferSize = 128, Level level = Level.Finest)
+        public static ILogManager Initialize(IEnumerable<IAppender> appenders, int logEventQueueSize = 1024, int logEventBufferSize = 128, Level level = Level.Finest, LogEventPoolExhaustionStrategy exhaustionStrategy = LogEventPoolExhaustionStrategy.Default)
         {
             return Initialize(appenders, new LogManagerConfiguration
             {
                 LogEventQueueSize = logEventQueueSize,
                 LogEventBufferSize = logEventBufferSize,
                 Level = level,
+                LogEventPoolExhaustionStrategy = exhaustionStrategy
             });
         }
 
@@ -81,15 +94,13 @@ namespace ZeroLog
 
         public void Dispose()
         {
-            if (!IsRunning)
+            if (!_isRunning)
                 return;
 
-            IsRunning = false;
-            WriteTask.Wait(15000);
+            _isRunning = false;
+            _writeTask.Wait(15000);
 
-            foreach (var appender in Appenders)
-                appender.Close();
-
+            _configResolver.Dispose();
             _bufferSegmentProvider.Dispose();
         }
 
@@ -114,24 +125,41 @@ namespace ZeroLog
 
         ILog IInternalLogManager.GetNewLog(IInternalLogManager logManager, string name)
         {
-            return new Log(logManager, name);
+            var logger = new Log(logManager, name);
+            _loggers.Add(logger);
+            return logger;
         }
 
-        IInternalLogEvent IInternalLogManager.AllocateLogEvent()
-        {
-            if (_pool.TryAcquire(out var logEvent))
-                return logEvent;
+        public IList<IAppender> ResolveAppenders(string name)
+            => _configResolver.ResolveAppenders(name);
 
-            switch (_logEventPoolExhaustionStrategy)
+        public LogEventPoolExhaustionStrategy ResolveLogEventPoolExhaustionStrategy(string name)
+            => _configResolver.ResolveExhaustionStrategy(name);
+
+        public Level ResolveLevel(string name)
+            => _configResolver.ResolveLevel(name);
+
+        IInternalLogEvent IInternalLogManager.AllocateLogEvent(LogEventPoolExhaustionStrategy logEventPoolExhaustionStrategy, IInternalLogEvent notifyPoolExhaustionLogEvent, Level level, Log log)
+        {
+            IInternalLogEvent Initialize(IInternalLogEvent l)
+            {
+                l.Initialize(level, log);
+                return l;
+            }
+
+            if (_pool.TryAcquire(out var logEvent))
+                return Initialize(logEvent);
+
+            switch (logEventPoolExhaustionStrategy)
             {
                 case LogEventPoolExhaustionStrategy.WaitForLogEvent:
-                    return AcquireLogEvent();
+                    return Initialize(AcquireLogEvent());
 
                 case LogEventPoolExhaustionStrategy.DropLogMessage:
                     return NoopLogEvent.Instance;
 
                 default:
-                    return _notifyPoolExhaustionLogEvent;
+                    return notifyPoolExhaustionLogEvent;
             }
         }
 
@@ -154,7 +182,7 @@ namespace ZeroLog
             var stringBuffer = new StringBuffer(16 * 1024);
             var destination = new byte[16 * 1024];
 
-            while (IsRunning || !_queue.IsEmpty)
+            while (_isRunning || !_queue.IsEmpty)
             {
                 if (TryToProcessQueue(stringBuffer, destination))
                     spinWait.Reset();
@@ -168,29 +196,33 @@ namespace ZeroLog
             if (!_queue.TryDequeue(out var logEvent))
                 return false;
 
-            var isSpecialEvent = false;
-            if (logEvent == SpecialLogEvents.ExhaustedPoolEvent)
-            {
-                isSpecialEvent = true;
-                logEvent.SetTimestamp(DateTime.UtcNow);
-            }
-
             try
             {
-                FormatLogMessage(stringBuffer, logEvent);
+                if (!logEvent.IsPooled)
+                    logEvent.SetTimestamp(SystemDateTime.UtcNow);
+
+                if ((logEvent.Appenders?.Count ?? 0) <= 0)
+                    return true;
+
+                try
+                {
+                    FormatLogMessage(stringBuffer, logEvent);
+                }
+                catch (Exception)
+                {
+                    FormatErrorMessage(stringBuffer, logEvent);
+                }
+
+                var bytesWritten = CopyStringBufferToByteArray(stringBuffer, destination);
+
+                WriteMessageLogToAppenders(destination, logEvent, bytesWritten);
+
             }
-            catch (Exception)
+            finally
             {
-                FormatErrorMessage(stringBuffer, logEvent);
+                if (logEvent.IsPooled)
+                    _pool.Release(logEvent);
             }
-
-            var bytesWritten = CopyStringBufferToByteArray(stringBuffer, destination);
-
-            WriteMessageLogToAppenders(destination, logEvent, bytesWritten);
-
-            if (!isSpecialEvent)
-                _pool.Release(logEvent);
-
             return true;
         }
 
@@ -204,11 +236,12 @@ namespace ZeroLog
 
         private void WriteMessageLogToAppenders(byte[] destination, IInternalLogEvent logEvent, int bytesWritten)
         {
-            for (var i = 0; i < Appenders.Count; i++)
+            var appenders = logEvent.Appenders;
+            for (var i = 0; i < appenders.Count; i++)
             {
-                var appender = Appenders[i];
-                if (logEvent.Level >= Level)
-                    appender.WriteEvent(logEvent, destination, bytesWritten);
+                var appender = appenders[i];
+                // if (logEvent.Level >= Level) // TODO Check this ? log event should not be in queue if not > Level
+                appender.WriteEvent(logEvent, destination, bytesWritten);
             }
         }
 
@@ -227,5 +260,7 @@ namespace ZeroLog
             }
             return bytesWritten;
         }
+
+        BufferSegment IInternalLogManager.GetBufferSegment() => _bufferSegmentProvider.GetSegment();
     }
 }

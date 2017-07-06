@@ -39,6 +39,9 @@
       <HintPath>..\packages\Castle.Core.4.0.0\lib\net45\Castle.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Jil, Version=2.15.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Jil.2.15.1\lib\net45\Jil.dll</HintPath>
+    </Reference>
     <Reference Include="Moq, Version=4.7.0.0, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
       <HintPath>..\packages\Moq.4.7.0\lib\net45\Moq.dll</HintPath>
       <Private>True</Private>
@@ -51,11 +54,16 @@
       <HintPath>..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Sigil, Version=4.7.0.0, Culture=neutral, PublicKeyToken=2d06c3494341c8ab, processorArchitecture=MSIL">
+      <HintPath>..\packages\Sigil.4.7.0\lib\net45\Sigil.dll</HintPath>
+    </Reference>
     <Reference Include="StringFormatter, Version=1.0.0.5, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\StringFormatter.1.0.0.5\lib\net45\StringFormatter.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ValueTuple, Version=4.0.1.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -70,7 +78,10 @@
     <Compile Include="AllocationTests.cs" />
     <Compile Include="Appenders\DateAndSizeRollingFileAppenderTests.cs" />
     <Compile Include="Appenders\GuardedAppenderTests.cs" />
+    <Compile Include="Appenders\LogEventHeader.cs" />
     <Compile Include="BufferSegmentProviderTests.cs" />
+    <Compile Include="Config\ConfiguratorTests.cs" />
+    <Compile Include="HierarchicalAppenderResolverTests.cs" />
     <Compile Include="IntegrationTests.cs" />
     <Compile Include="LogEventTests.EdgeCases.cs" />
     <Compile Include="LogEventTests.AppendWithFormat.cs" />
@@ -96,5 +107,6 @@
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

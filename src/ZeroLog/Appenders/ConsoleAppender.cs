@@ -1,21 +1,35 @@
 ﻿using System;
 using System.IO;
+using ZeroLog.Appenders.Builders;
 
 namespace ZeroLog.Appenders
 {
-    public class ConsoleAppender : AppenderBase
+    public class ConsoleAppender : AppenderBase<DefaultAppenderConfig>
     {
+        public const string DefaultPrefixPattern = "%time - %level - %logger || ";
+
         private readonly Stream _output;
 
-        public ConsoleAppender(string prefixPattern = "%time - %level - %logger || ") : base(prefixPattern)
+        public ConsoleAppender()
         {
             _output = Console.OpenStandardOutput();
         }
 
-        public override void WriteEvent(ILogEvent logEvent, byte[] messageBytes, int messageLength)
+        public ConsoleAppender(string prefixPattern = DefaultPrefixPattern)
+            : this()
+        {
+            Configure(prefixPattern);
+        }
+
+        public override void Configure(DefaultAppenderConfig parameters)
+        {
+            Configure(parameters?.PrefixPattern ?? DefaultPrefixPattern);
+        }
+
+        public override void WriteEvent(ILogEventHeader logEventHeader, byte[] messageBytes, int messageLength)
         {
             Console.BackgroundColor = ConsoleColor.Black;
-            switch (logEvent.Level)
+            switch (logEventHeader.Level)
             {
                 case Level.Fatal:
                     Console.ForegroundColor = ConsoleColor.Black;
@@ -44,7 +58,7 @@ namespace ZeroLog.Appenders
                     break;
             }
 
-            WritePrefix(_output, logEvent);
+            WritePrefix(_output, logEventHeader);
 
             NewlineBytes.CopyTo(messageBytes, messageLength);
             messageLength += NewlineBytes.Length;
