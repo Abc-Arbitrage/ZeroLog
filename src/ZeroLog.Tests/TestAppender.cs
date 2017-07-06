@@ -14,6 +14,10 @@ namespace ZeroLog.Tests
 
         public List<string> LoggedMessages { get; } = new List<string>();
 
+        public TestAppender()
+        {
+        }
+
         public TestAppender(bool captureLoggedMessages = true)
         {
             _captureLoggedMessages = captureLoggedMessages;
@@ -26,6 +30,8 @@ namespace ZeroLog.Tests
             _messageCountTarget = expectedMessageCount;
             return _signal;
         }
+
+        public string Name { get; set; }
 
         public void WriteEvent(ILogEventHeader logEventHeader, byte[] messageBytes, int messageLength)
         {

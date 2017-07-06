@@ -3,44 +3,63 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using ZeroLog.Appenders;
+using ZeroLog.Appenders.Builders;
+using ZeroLog.Config;
 
 namespace ZeroLog.ConfigResolvers
 {
     public class HierarchicalResolver : IConfigurationResolver
     {
         private Node _root;
-        private readonly List<Config> _configs = new List<Config>();
         private Encoding AppenderEncoding { get; set; }
 
-        public void AddNode(string name, IEnumerable<NamedAppender> appenders, Level level, bool includeParentsAppenders, LogEventPoolExhaustionStrategy strategy)
-        {
-            _configs.Add(new Config (name, appenders, level, includeParentsAppenders, strategy));
-        }
+        public IList<IAppender> ResolveAppenders(string name) => Resolve(name).Appenders.ToList();
+        public Level ResolveLevel(string name) => Resolve(name).Level;
+        public LogEventPoolExhaustionStrategy ResolveExhaustionStrategy(string name) => Resolve(name).Strategy;
 
-        public void Build()
+        public event Action Updated = delegate { };
+
+        public void Build(ZeroLogConfiguration config)
         {
+            var oldRoot = _root;
             var newRoot = new Node();
 
-            var oldRoot = _root;
-
-            foreach (var item in _configs.OrderBy(x => x.Name))
+            foreach (var loggerWithAppenders in CreateLoggersWithAppenders(config).OrderBy(x => x.logger.Name))
             {
-                InternalAddNode(newRoot, item);
+                AddNode(newRoot, loggerWithAppenders.logger, loggerWithAppenders.appenders);
             }
 
             Initialize(newRoot);
 
             _root = newRoot;
-            _configs.Clear();
-            
+
             Updated();
 
             oldRoot?.Close();
         }
 
-        private static void InternalAddNode(Node root, Config config)
+        private static List<(LoggerDefinition logger, IAppender[] appenders)> CreateLoggersWithAppenders(ZeroLogConfiguration config)
         {
-            var parts = config.Name.Split(new[] {'.'}, StringSplitOptions.RemoveEmptyEntries);
+            var appendersByNames = config.Appenders.ToDictionary(x => x.Name, AppenderFactory.BuildAppender);
+
+            var loggerWithAppenders = new List<(LoggerDefinition, IAppender[])>();
+
+            config.RootLogger.Name = string.Empty;
+            config.RootLogger.IncludeParentAppenders = false;
+
+            loggerWithAppenders.Add((config.RootLogger, config.RootLogger.AppenderReferences.Select(x => appendersByNames[x]).ToArray()));
+
+            foreach (var loggerDefinition in config.Loggers)
+            {
+                loggerWithAppenders.Add((loggerDefinition, loggerDefinition.AppenderReferences.Select(x => appendersByNames[x]).ToArray()));
+            }
+
+            return loggerWithAppenders;
+        }
+
+        private static void AddNode(Node root, LoggerDefinition logger, IAppender[] appenders)
+        {
+            var parts = logger.Name.Split(new[] {'.'}, StringSplitOptions.RemoveEmptyEntries);
             var node = root;
             var path = "";
 
@@ -54,14 +73,14 @@ namespace ZeroLog.ConfigResolvers
                 node = node.Children[part];
             }
 
-            node.Appenders = (config.IncludeParentsAppenders ? config.Appenders.Union(node.Appenders) : config.Appenders).Distinct();
-            node.Strategy = config.Strategy;
-            node.Level = config.Level;
+            node.Appenders = (logger.IncludeParentAppenders ? appenders.Union(node.Appenders) : appenders).Distinct();
+            node.Strategy = logger.LogEventPoolExhaustionStrategy;
+            node.Level = logger.Level;
         }
 
         private Node Resolve(string name)
         {
-            var parts = name.Split(new[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
+            var parts = name.Split(new[] {'.'}, StringSplitOptions.RemoveEmptyEntries);
             var node = _root;
 
             foreach (var part in parts)
@@ -75,26 +94,23 @@ namespace ZeroLog.ConfigResolvers
             return node;
         }
 
-        public IList<IAppender> ResolveAppenders(string name) => Resolve(name).Appenders?.Select(x => x.Appender).ToList();
-        public Level ResolveLevel(string name) => Resolve(name).Level;
-        public LogEventPoolExhaustionStrategy ResolveExhaustionStrategy(string name) => Resolve(name).Strategy;
-
         public void Initialize(Encoding encoding)
         {
             AppenderEncoding = encoding;
+
             Initialize(_root);
         }
 
         private void Initialize(Node node)
         {
-            if(node.Appenders != null)
-                node.Appenders = node.Appenders.Select(x => new NamedAppender(new GuardedAppender(x.Appender, TimeSpan.FromSeconds(15)), x.Name)).ToList();
+            if (node.Appenders != null)
+                node.Appenders = node.Appenders.Select(x => new GuardedAppender(x, TimeSpan.FromSeconds(15))).ToList();
 
-            if (AppenderEncoding != null)
+            if (AppenderEncoding != null && node.Appenders != null)
             {
                 foreach (var appender in node.Appenders)
                 {
-                    appender.Appender.SetEncoding(AppenderEncoding);
+                    appender.SetEncoding(AppenderEncoding);
                 }
             }
 
@@ -104,8 +120,6 @@ namespace ZeroLog.ConfigResolvers
             }
         }
 
-        public event Action Updated = delegate {};
-
         public void Dispose()
         {
             _root?.Close();
@@ -114,7 +128,7 @@ namespace ZeroLog.ConfigResolvers
         private class Node
         {
             public readonly Dictionary<string, Node> Children = new Dictionary<string, Node>();
-            public IEnumerable<NamedAppender> Appenders;
+            public IEnumerable<IAppender> Appenders;
             public Level Level;
             public LogEventPoolExhaustionStrategy Strategy;
 
@@ -122,31 +136,13 @@ namespace ZeroLog.ConfigResolvers
             {
                 foreach (var appender in Appenders)
                 {
-                    appender.Appender.Close();
+                    appender.Close();
                 }
 
                 foreach (var child in Children.Values)
                 {
                     child.Close();
                 }
-            }
-        }
-
-        private class Config
-        {
-            public readonly string Name;
-            public readonly IEnumerable<NamedAppender> Appenders;
-            public readonly Level Level;
-            public readonly bool IncludeParentsAppenders;
-            public readonly LogEventPoolExhaustionStrategy Strategy;
-
-            public Config(string name, IEnumerable<NamedAppender> appenders, Level level, bool includeParentsAppenders, LogEventPoolExhaustionStrategy strategy)
-            {
-                Name = name;
-                Appenders = appenders;
-                Level = level;
-                Strategy = strategy;
-                IncludeParentsAppenders = includeParentsAppenders;
             }
         }
     }

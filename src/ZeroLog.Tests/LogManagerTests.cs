@@ -17,7 +17,7 @@ namespace ZeroLog.Tests
         [SetUp]
         public void SetUpFixture()
         {
-            _testAppender = new TestAppender();
+            _testAppender = new TestAppender(true);
             LogManager.Initialize(new List<IAppender> { _testAppender }, 10);
         }
 

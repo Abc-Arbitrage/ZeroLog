@@ -61,6 +61,7 @@ namespace ZeroLog.Appenders
 
         public abstract void Close();
 
+        public string Name { get; set; }
         public abstract void Configure(T parameters);
         public abstract void WriteEvent(ILogEventHeader logEventHeader, byte[] messageBytes, int messageLength);
     }

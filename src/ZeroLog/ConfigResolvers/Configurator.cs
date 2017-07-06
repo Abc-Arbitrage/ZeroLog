@@ -33,7 +33,7 @@ namespace ZeroLog.ConfigResolvers
                         return;
 
                     var newConfig = ReadConfiguration(configFileFullPath);
-                    ConfigureResolver(resolver, newConfig);
+                    resolver.Build(newConfig);
                 }
                 catch (Exception e)
                 {
@@ -50,7 +50,7 @@ namespace ZeroLog.ConfigResolvers
         private static ZeroLogConfiguration ConfigureResolver(string configFileFullPath, HierarchicalResolver resolver)
         {
             var config = ReadConfiguration(configFileFullPath);
-            ConfigureResolver(resolver, config);
+            resolver.Build(config);
             return config;
         }
 
@@ -58,24 +58,6 @@ namespace ZeroLog.ConfigResolvers
         {
             var filecontent = ReadFileContentWithRetry(configFilePath);
             return DeserializeConfiguration(filecontent);
-        }
-
-        private static void ConfigureResolver(HierarchicalResolver resolver, ZeroLogConfiguration config)
-        {
-            var appenders = config.Appenders.ToDictionary(x => x.Name, x => new NamedAppender(AppenderFactory.BuildAppender(x), x.Name));
-            
-            var namedAppenders = config.RootLogger.AppenderReferences.Select(x => appenders[x]);
-
-            resolver.AddNode("", namedAppenders, config.RootLogger.Level, false, config.RootLogger.LogEventPoolExhaustionStrategy);
-
-            foreach (var loggerDefinition in config.Loggers)
-            {
-                var loggerAppenders = loggerDefinition.AppenderReferences.Select(x => appenders[x]);
-
-                resolver.AddNode(loggerDefinition.Name, loggerAppenders, loggerDefinition.Level, loggerDefinition.IncludeParentAppenders, loggerDefinition.LogEventPoolExhaustionStrategy);
-            }
-
-            resolver.Build();
         }
 
         private static LogManagerConfiguration CreateLegacyConfiguration(ZeroLogConfiguration config)

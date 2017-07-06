@@ -17,6 +17,12 @@ namespace ZeroLog.Appenders
             _nextActivationTime = null;
         }
 
+        public string Name
+        {
+            get => _appender.Name;
+            set => _appender.Name = value;
+        }
+
         public void WriteEvent(ILogEventHeader logEventHeader, byte[] messageBytes, int messageLength)
         {
             if (_nextActivationTime.HasValue && _nextActivationTime.Value > SystemDateTime.UtcNow)

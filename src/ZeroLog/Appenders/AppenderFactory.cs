@@ -1,25 +1,38 @@
 ﻿using System;
+using System.Linq;
 using Jil;
 using ZeroLog.Config;
 
-namespace ZeroLog.Appenders.Builders
+namespace ZeroLog.Appenders
 {
     public class AppenderFactory
     {
         public static IAppender BuildAppender(AppenderDefinition definition)
         {
-            var appenderType = Type.GetType(definition.AppenderTypeName);
+            var appenderType = GetAppenderType(definition);
+
+            var appender = (IAppender)Activator.CreateInstance(appenderType);
+            appender.Name = definition.Name;
 
             var appenderParameterType = GetAppenderParameterType(appenderType);
+            if (appenderParameterType != null)
+            {
+                var appenderParameters = GetAppenderParameters(definition, appenderParameterType);
 
-            var appenderParameters = GetAppenderParameters(definition, appenderParameterType);
+                var configureMethod = appenderType.GetMethod(nameof(IAppender<object>.Configure), new[] {appenderParameterType});
+                configureMethod.Invoke(appender, new[] {appenderParameters});
+            }
 
-            var appender = Activator.CreateInstance(appenderType);
+            return appender;
+        }
 
-            var configureMethod = appenderType.GetMethod(nameof(IAppender<object>.Configure), new[] { appenderParameterType });
-            configureMethod.Invoke(appender, new[]{appenderParameters});
+        private static Type GetAppenderType(AppenderDefinition definition)
+        {
+            var appenderType = AppDomain.CurrentDomain.GetAssemblies()
+                                        .Select(x => x.GetType(definition.AppenderTypeName))
+                                        .FirstOrDefault(x => x != null);
 
-            return (IAppender)appender;
+            return appenderType;
         }
 
         private static object GetAppenderParameters(AppenderDefinition definition, Type appenderParameterType)
@@ -41,7 +54,7 @@ namespace ZeroLog.Appenders.Builders
                     return interfaceType.GetGenericArguments()[0];
             }
 
-            throw new InvalidOperationException();
+            return null;
         }
     }
 }

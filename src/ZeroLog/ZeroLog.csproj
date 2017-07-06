@@ -82,7 +82,6 @@
     <Compile Include="Appenders\AppenderFactory.cs" />
     <Compile Include="ConfigResolvers\IExhaustionStrategyResolver.cs" />
     <Compile Include="ConfigResolvers\ILevelResolver.cs" />
-    <Compile Include="ConfigResolvers\NamedAppender.cs" />
     <Compile Include="Config\AppenderDefinition.cs" />
     <Compile Include="ConfigResolvers\Configurator.cs" />
     <Compile Include="ConfigResolvers\IConfigurationResolver.cs" />
