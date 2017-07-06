@@ -1,9 +1,10 @@
 ﻿using System.Linq;
-using System.Text;
-using NFluent;
+ using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+ using NFluent;
 using NUnit.Framework;
-using ZeroLog.Appenders;
-using ZeroLog.Config;
+ using ZeroLog.Config;
 using ZeroLog.ConfigResolvers;
 
 namespace ZeroLog.Tests
