@@ -25,10 +25,11 @@ The second goal implies a major design choice: the actual logging is completely 
 
 ## Getting started
 
-Before using ZeroLog, you need to initialize the `LogManager`:
+Before using ZeroLog, you need to initialize the `LogManager`. 
+You have two options - either use a json configuration file, or use a programmatic setup:
 
 ```csharp
-LogManager.Initialize(new[] { new ConsoleAppender() });
+BasicConfigurator.Configure(new[] { new ConsoleAppender() });
 ```
 As of today, the library comes with two existing appender implementations:
 
@@ -64,16 +65,66 @@ log.InfoFormat("Tomorrow ({0}) will occur in {1} seconds", tomorrow, numberOfSec
 
 Both APIs can be used in a zero allocation fashion, but not all formatting options are currently supported (notably for DateTimes and TimeSpans).
 
+## Configuration
+
+Zero log supports hierarchical loggers and can be configured using a Json configuration file: 
+
+```csharp
+JsonConfigurator.ConfigureAndWatch("ZeroLog.json");
+```
+
+Please see [ZeroLog.json](ZeroLog.json)
+There is three part to the configuration file:
+
+### Appenders
+
+You have to configure a set of appenders (*output channel*) that can be used by the loggers.
+
+ - **Name** is a unique identifier used by loggers for reference
+ - **AppenderTypeName** is the full type name used to instanciate the appender
+ - **AppenderJsonConfig** is any additional parameters used by the appender
+
+### Loggers
+
+When ``GetLogger("Foo.Something.Item")`` is called, it will try to find the best matching configuration using a hierarchical namespace-like mode.
+If ``Foo.Something`` is configured, but ``Foo.Something.Item`` is not, it will use ``Foo.Something`` configuration.
+
+A logger configuration is composed of a *Name*, a *Level*, a list of *AppenderReferences* (name of appenders to use) and optionaly a boolean *IncludeParentAppenders*.  
+
+ - **Name** is used for hierarchical matching
+ - **Level** is the minimal level the logger will work on
+ - **AppenderReferences** is a list of appenders names the logger will use
+ - **IncludeParentAppenders** (optional) will, if set to true, copy the parent appenders into the current logger
+ - **LogEventPoolExhaustionStrategy** (optional) is used to specify what to do when the log event queue is full
+
+### RootLogger
+
+The root logger is the default logger. If a GetLogger is called on an unconfigured namespace, it will fallback to the root logger.
+Same parameters as other loggers.
+
+### Exhaustion Strategy
+
+There is currently three strategies to handle full-queue:
+
+- **DropLogMessage** Forget about the message
+- **DropLogMessageAndNotifyAppenders** Log an error message and drop the log message
+- **WaitForLogEvent** Block until it's possible to log
+
+### Queue and message size
+
+These values can be configured at the root of the json configuration file:
+
+- **LogEventQueueSize** (default to 1024)
+- **LogEventBufferSize** (default to 512)
+
+
 ## What's next
 
  Even if ZeroLog is still a very young project, you can begin to use it from now on. However, a lot of things still need to be added:
 
- - Configuration files
- - Dynamic log level configuration
  - More appenders
  - Multiple logging (formatting and appending) threads
- - Layout pattern (basic support already available in `DateAndSizeRollingFileAppender`)
+ - Better layout pattern
  - Support of standard formatting options (some already available; some modifiers not supported for DateTime and TimeSpan)
- - Hierarchical loggers
  - XML code documentation for the public API
     

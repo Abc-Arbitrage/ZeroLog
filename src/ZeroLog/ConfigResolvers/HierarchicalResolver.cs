@@ -46,11 +46,11 @@ namespace ZeroLog.ConfigResolvers
             config.RootLogger.Name = string.Empty;
             config.RootLogger.IncludeParentAppenders = false;
 
-            loggerWithAppenders.Add((config.RootLogger, config.RootLogger.AppenderReferences.Select(x => appendersByNames[x]).ToArray()));
+            loggerWithAppenders.Add((config.RootLogger, config.RootLogger.AppenderReferences?.Select(x => appendersByNames[x]).ToArray() ?? new IAppender[0]));
 
             foreach (var loggerDefinition in config.Loggers)
             {
-                loggerWithAppenders.Add((loggerDefinition, loggerDefinition.AppenderReferences.Select(x => appendersByNames[x]).ToArray()));
+                loggerWithAppenders.Add((loggerDefinition, loggerDefinition.AppenderReferences?.Select(x => appendersByNames[x]).ToArray() ?? new IAppender[0]));
             }
 
             return loggerWithAppenders;
