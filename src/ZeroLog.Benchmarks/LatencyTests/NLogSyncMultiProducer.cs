@@ -1,16 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
-using BenchmarkDotNet.Attributes;
 using HdrHistogram;
 using NLog;
 using NLog.Config;
-using ZeroLog.Benchmarks.Latency;
 using ZeroLog.Benchmarks.Tools;
 
-namespace ZeroLog.Benchmarks.HandmadeTest
+namespace ZeroLog.Benchmarks.LatencyTests
 {
     public class NLogSyncMultiProducer
     {

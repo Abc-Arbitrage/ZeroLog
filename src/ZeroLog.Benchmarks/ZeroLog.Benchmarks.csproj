@@ -146,16 +146,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="HandmadeTest\NLogAsyncMultiProducer.cs" />
-    <Compile Include="HandmadeTest\Log4NetMultiProducer.cs" />
-    <Compile Include="HandmadeTest\NLogSyncMultiProducer.cs" />
-    <Compile Include="HandmadeTest\ZeroLogMultiProducer.cs" />
+    <Compile Include="LatencyTests\NLogAsyncMultiProducer.cs" />
+    <Compile Include="LatencyTests\Log4NetMultiProducer.cs" />
+    <Compile Include="LatencyTests\NLogSyncMultiProducer.cs" />
+    <Compile Include="LatencyTests\ZeroLogMultiProducer.cs" />
     <Compile Include="Tools\SimpleLatencyBenchmark.cs" />
-    <Compile Include="ThroughputBenchmarks.cs" />
-    <Compile Include="Latency\NLogAsyncSingleProducer.cs" />
-    <Compile Include="Latency\NLogSyncSingleProducer.cs" />
-    <Compile Include="Latency\Log4NetSingleProducer.cs" />
-    <Compile Include="Latency\ZeroLogSingleProducer.cs" />
+    <Compile Include="ThroughputTests\ThroughputBenchmarks.cs" />
     <Compile Include="Tools\Log4NetTestAppender.cs" />
     <Compile Include="Tools\NLogTestTarget.cs" />
     <Compile Include="Program.cs" />

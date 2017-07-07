@@ -1,31 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
-using BenchmarkDotNet.Attributes;
 using HdrHistogram;
-using log4net.Config;
-using log4net.Layout;
-using NLog;
-using NLog.Config;
-using ZeroLog.Benchmarks.Latency;
 using ZeroLog.Benchmarks.Tools;
+using ZeroLog.Config;
 
-namespace ZeroLog.Benchmarks.HandmadeTest
+namespace ZeroLog.Benchmarks.LatencyTests
 {
-    public class Log4NetMultiProducer
+    public class ZeroLogMultiProducer
     {
-        public List<HistogramBase> Bench(int totalMessageCount, int producingThreadCount)
+        public List<HistogramBase> Bench(int queueSize, int totalMessageCount, int producingThreadCount)
         {
-            var layout = new PatternLayout("%-4timestamp [%thread] %-5level %logger %ndc - %message%newline");
-            layout.ActivateOptions();
-            var appender = new Log4NetTestAppender(false);
-            appender.ActivateOptions();
-            BasicConfigurator.Configure(appender);
-
-            var logger = log4net.LogManager.GetLogger(nameof(appender));
-
+            var appender = new ZeroLog.Tests.TestAppender(false);
+            BasicConfigurator.Configure(new[] { appender }, queueSize, logEventPoolExhaustionStrategy: LogEventPoolExhaustionStrategy.WaitForLogEvent);
+            var logger = LogManager.GetLogger(nameof(ZeroLog));
 
             var signal = appender.SetMessageCountTarget(totalMessageCount);
 
@@ -40,9 +29,9 @@ namespace ZeroLog.Benchmarks.HandmadeTest
                 tasks.Add(Task.Factory.StartNew(produce, TaskCreationOptions.LongRunning));
 
             signal.Wait(TimeSpan.FromSeconds(30));
+            LogManager.Shutdown();
 
             return tasks.Select(x => x.Result).ToList();
         }
-
     }
 }

@@ -3,29 +3,14 @@
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Running;
-using ZeroLog.Benchmarks.HandmadeTest;
-using ZeroLog.Benchmarks.Latency;
+using ZeroLog.Benchmarks.LatencyTests;
+using ZeroLog.Benchmarks.ThroughputTests;
 using ZeroLog.Benchmarks.Tools;
 
 namespace ZeroLog.Benchmarks
 {
     public class Program
     {
-        private static void LatencySingleProducer()
-        {
-            var config = ManualConfig.Create(DefaultConfig.Instance);
-            config.Add(StatisticColumn.P90);
-            config.Add(StatisticColumn.P95);
-
-            var benchs = BenchmarkConverter.TypeToBenchmarks(typeof(ZeroLogSingleProducer))
-                                     .Union(BenchmarkConverter.TypeToBenchmarks(typeof(Log4NetSingleProducer)))
-                                     .Union(BenchmarkConverter.TypeToBenchmarks(typeof(NLogSyncSingleProducer)))
-                                     .Union(BenchmarkConverter.TypeToBenchmarks(typeof(NLogAsyncSingleProducer)))
-                                     .ToArray();
-
-            BenchmarkRunner.Run(benchs, config);
-        }
-
         private static void Throughput()
         {
             var config = ManualConfig.Create(DefaultConfig.Instance);
@@ -57,7 +42,6 @@ namespace ZeroLog.Benchmarks
         public static void Main()
         {
             //Throughput();
-            //LatencySingleProducer();
 
             LatencyMultiProducer(4, 4 * 25_000, 64);
             LatencyMultiProducer(8, 8 * 25_000, 64);
