@@ -31,7 +31,7 @@ namespace ZeroLog.Benchmarks
             var nlogAsync = new NLogAsyncMultiProducer().Bench(queueSize, warmupMessageCount, messageCount, threadCount);
             var log4net = new Log4NetMultiProducer().Bench(warmupMessageCount, messageCount, threadCount);
 
-            SimpleLatencyBenchmark.PrintSummary($"{threadCount} producers, {messageCount} total log events (queue size={queueSize}) - unit is *us*",
+            SimpleLatencyBenchmark.PrintSummary($"{threadCount} producers, {messageCount:N0} total log events (queue size={queueSize:N0}) - unit is *us*",
                                                 ("ZeroLog", zeroLog),
                                                 ("NLogSync", nlogSync),
                                                 ("NLogAsync", nlogAsync),

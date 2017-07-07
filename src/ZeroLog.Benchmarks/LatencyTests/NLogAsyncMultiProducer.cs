@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using HdrHistogram;
 using NLog;
@@ -12,7 +10,7 @@ namespace ZeroLog.Benchmarks.LatencyTests
 {
     public class NLogAsyncMultiProducer
     {
-        public List<HistogramBase> Bench(int queueSize, int warmingMessageCount, int totalMessageCount, int producingThreadCount)
+        public SimpleLatencyBenchmarkResult Bench(int queueSize, int warmingMessageCount, int totalMessageCount, int producingThreadCount)
         {
             var appender = new NLogTestTarget(false);
             var asyncTarget = (new AsyncTargetWrapper(appender, queueSize, overflowAction: AsyncTargetWrapperOverflowAction.Block));
@@ -31,10 +29,12 @@ namespace ZeroLog.Benchmarks.LatencyTests
             var produce = new Func<HistogramBase>(() =>
             {
                 var warmingMessageByProducer = warmingMessageCount / producingThreadCount;
-                var warmingResult = SimpleLatencyBenchmark.Bench(i => logger.Info("Hi {0} ! It's {1:HH:mm:ss}, and the message is #{2}", "dude", DateTime.UtcNow, i), warmingMessageByProducer);
+                int[] counter = { 0 };
+                var warmingResult = SimpleLatencyBenchmark.Bench(() => logger.Info("Hi {0} ! It's {1:HH:mm:ss}, and the message is #{2}", "dude", DateTime.UtcNow, counter[0]++), warmingMessageByProducer);
 
                 var messageByProducer = totalMessageCount / producingThreadCount;
-                return SimpleLatencyBenchmark.Bench(i => logger.Info("Hi {0} ! It's {1:HH:mm:ss}, and the message is #{2}", "dude", DateTime.UtcNow, i), messageByProducer);
+                counter[0] = 0;
+                return SimpleLatencyBenchmark.Bench(() => logger.Info("Hi {0} ! It's {1:HH:mm:ss}, and the message is #{2}", "dude", DateTime.UtcNow, counter[0]++), messageByProducer);
             });
 
             var flusher = new Action(() =>
@@ -45,14 +45,10 @@ namespace ZeroLog.Benchmarks.LatencyTests
 
             Task.Factory.StartNew(flusher, TaskCreationOptions.LongRunning);
 
-            var tasks = new List<Task<HistogramBase>>();
-            for (var i = 0; i < producingThreadCount; i++)
-                tasks.Add(Task.Factory.StartNew(produce, TaskCreationOptions.LongRunning));
-
-            signal.Wait(TimeSpan.FromSeconds(30));
+            var result = SimpleLatencyBenchmark.RunBench(producingThreadCount, produce, signal);
             LogManager.Shutdown();
 
-            return tasks.Select(x => x.Result).ToList();
+            return result;
         }
 
     }
