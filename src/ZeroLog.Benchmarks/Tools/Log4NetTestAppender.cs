@@ -29,6 +29,8 @@ namespace ZeroLog.Benchmarks
 
         protected override void Append(LoggingEvent loggingEvent)
         {
+            var formatted = loggingEvent.RenderedMessage;
+
             if (_captureLoggedMessages)
                 LoggedMessages.Add(loggingEvent.ToString());
 
