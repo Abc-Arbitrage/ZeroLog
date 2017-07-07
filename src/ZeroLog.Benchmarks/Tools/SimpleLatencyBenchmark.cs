@@ -19,22 +19,6 @@ namespace ZeroLog.Benchmarks.Tools
             return histogram;
         }
 
-        public static double Percentile(List<HistogramBase> seq, double percentile)
-        {
-            var result = seq.First().Copy();
-            foreach(var h in seq.Skip(1))
-                result.Add(h);
-            return result.GetValueAtPercentile((int)(percentile * 100));
-        }
-
-        public static double Mean(List<HistogramBase> seq)
-        {
-            var result = seq.First().Copy();
-            foreach(var h in seq.Skip(1))
-                result.Add(h);
-            return result.GetMean();
-        }
-
         struct Result
         {
             public string Test { get; set; }
