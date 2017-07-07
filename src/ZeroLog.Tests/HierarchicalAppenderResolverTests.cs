@@ -1,4 +1,7 @@
-﻿using System.Linq;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using NFluent;
 using NUnit.Framework;
 using ZeroLog.Config;
