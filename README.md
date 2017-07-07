@@ -47,11 +47,13 @@ In order to meet the zero allocation constraint, the API had to be a little diff
 - A `StringBuilder` like API:
 
 ```csharp
-log.Info().Append("Tomorrow (")
-          .Append(tomorrow)
-          .Append(") will occur in ")
-          .Append(numberOfSecondsUntilTomorrow)
-          .Append(" seconds").Log();
+log.Info()
+   .Append("Tomorrow (")
+   .Append(tomorrow)
+   .Append(") will occur in ")
+   .Append(numberOfSecondsUntilTomorrow)
+   .Append(" seconds")
+   .Log();
 ```
 
 - A more classic, string format like API:
