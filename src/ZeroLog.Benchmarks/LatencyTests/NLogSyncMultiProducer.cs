@@ -11,7 +11,7 @@ namespace ZeroLog.Benchmarks.LatencyTests
 {
     public class NLogSyncMultiProducer
     {
-        public List<HistogramBase> Bench(int totalMessageCount, int producingThreadCount)
+        public List<HistogramBase> Bench(int warmingMessageCount, int totalMessageCount, int producingThreadCount)
         {
             var appender = new NLogTestTarget(false);
 
@@ -28,6 +28,9 @@ namespace ZeroLog.Benchmarks.LatencyTests
 
             var produce = new Func<HistogramBase>(() =>
             {
+                var warmingMessageByProducer = warmingMessageCount / producingThreadCount;
+                var warmingResult = SimpleLatencyBenchmark.Bench(i => logger.Info("Hi {0} ! It's {1:HH:mm:ss}, and the message is #{2}", "dude", DateTime.UtcNow, i), warmingMessageByProducer);
+
                 var messageByProducer = totalMessageCount / producingThreadCount;
                 return SimpleLatencyBenchmark.Bench(i => logger.Info("Hi {0} ! It's {1:HH:mm:ss}, and the message is #{2}", "dude", DateTime.UtcNow, i), messageByProducer);
             });

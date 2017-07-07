@@ -12,7 +12,7 @@ namespace ZeroLog.Benchmarks.LatencyTests
 {
     public class NLogAsyncMultiProducer
     {
-        public List<HistogramBase> Bench(int queueSize, int totalMessageCount, int producingThreadCount)
+        public List<HistogramBase> Bench(int queueSize, int warmingMessageCount, int totalMessageCount, int producingThreadCount)
         {
             var appender = new NLogTestTarget(false);
             var asyncTarget = (new AsyncTargetWrapper(appender, queueSize, overflowAction: AsyncTargetWrapperOverflowAction.Block));
@@ -26,10 +26,13 @@ namespace ZeroLog.Benchmarks.LatencyTests
             var logger = NLog.LogManager.GetLogger(nameof(asyncTarget));
 
 
-            var signal = appender.SetMessageCountTarget(totalMessageCount);
+            var signal = appender.SetMessageCountTarget(warmingMessageCount + totalMessageCount);
 
             var produce = new Func<HistogramBase>(() =>
             {
+                var warmingMessageByProducer = warmingMessageCount / producingThreadCount;
+                var warmingResult = SimpleLatencyBenchmark.Bench(i => logger.Info("Hi {0} ! It's {1:HH:mm:ss}, and the message is #{2}", "dude", DateTime.UtcNow, i), warmingMessageByProducer);
+
                 var messageByProducer = totalMessageCount / producingThreadCount;
                 return SimpleLatencyBenchmark.Bench(i => logger.Info("Hi {0} ! It's {1:HH:mm:ss}, and the message is #{2}", "dude", DateTime.UtcNow, i), messageByProducer);
             });

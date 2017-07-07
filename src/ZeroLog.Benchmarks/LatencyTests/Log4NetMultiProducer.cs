@@ -11,7 +11,7 @@ namespace ZeroLog.Benchmarks.LatencyTests
 {
     public class Log4NetMultiProducer
     {
-        public List<HistogramBase> Bench(int totalMessageCount, int producingThreadCount)
+        public List<HistogramBase> Bench(int warmingMessageCount, int totalMessageCount, int producingThreadCount)
         {
             var layout = new PatternLayout("%-4timestamp [%thread] %-5level %logger %ndc - %message%newline");
             layout.ActivateOptions();
@@ -22,10 +22,13 @@ namespace ZeroLog.Benchmarks.LatencyTests
             var logger = log4net.LogManager.GetLogger(nameof(appender));
 
 
-            var signal = appender.SetMessageCountTarget(totalMessageCount);
+            var signal = appender.SetMessageCountTarget(totalMessageCount + warmingMessageCount);
 
             var produce = new Func<HistogramBase>(() =>
             {
+                var warmingMessageByProducer = warmingMessageCount / producingThreadCount;
+                var warmingResult = SimpleLatencyBenchmark.Bench(i => logger.InfoFormat("Hi {0} ! It's {1:HH:mm:ss}, and the message is #{2}", "dude", DateTime.UtcNow, i), warmingMessageByProducer);
+
                 var messageByProducer = totalMessageCount / producingThreadCount;
                 return SimpleLatencyBenchmark.Bench(i => logger.InfoFormat("Hi {0} ! It's {1:HH:mm:ss}, and the message is #{2}", "dude", DateTime.UtcNow, i), messageByProducer);
             });

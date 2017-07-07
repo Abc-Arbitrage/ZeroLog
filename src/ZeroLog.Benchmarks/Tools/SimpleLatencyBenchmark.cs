@@ -28,6 +28,8 @@ namespace ZeroLog.Benchmarks.Tools
             public double P95 { get; set; }
             public double P99 { get; set; }
             public double P99_9 { get; set; }
+            public double P99_99 { get; set; }
+            public double P99_999 { get; set; }
             public double Max { get; set; }
         }
 
@@ -55,6 +57,8 @@ namespace ZeroLog.Benchmarks.Tools
                                 P95 = format(histo.GetValueAtPercentile(95)),
                                 P99 = format(histo.GetValueAtPercentile(99)),
                                 P99_9 = format(histo.GetValueAtPercentile(99.9)),
+                                P99_99 = format(histo.GetValueAtPercentile(99.99)),
+                                P99_999 = format(histo.GetValueAtPercentile(99.999)),
 
                             };
                         }))

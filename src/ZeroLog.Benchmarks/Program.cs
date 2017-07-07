@@ -24,29 +24,28 @@ namespace ZeroLog.Benchmarks
         }
 
 
-        private static void LatencyMultiProducer(int threadCount, int messageCount, int queueSize)
+        private static void LatencyMultiProducer(int threadCount, int warmupMessageCount, int messageCount, int queueSize)
         {
-            var zeroLog = new ZeroLogMultiProducer().Bench(queueSize, messageCount, threadCount);
-            var nlogSync = new NLogSyncMultiProducer().Bench(messageCount, threadCount);
-            var nlogAsync = new NLogAsyncMultiProducer().Bench(queueSize, messageCount, threadCount);
-            var log4net = new Log4NetMultiProducer().Bench(messageCount, threadCount);
+            var zeroLog = new ZeroLogMultiProducer().Bench(queueSize, warmupMessageCount, messageCount, threadCount);
+            var nlogSync = new NLogSyncMultiProducer().Bench(warmupMessageCount, messageCount, threadCount);
+            var nlogAsync = new NLogAsyncMultiProducer().Bench(queueSize, warmupMessageCount, messageCount, threadCount);
+            var log4net = new Log4NetMultiProducer().Bench(warmupMessageCount, messageCount, threadCount);
 
             SimpleLatencyBenchmark.PrintSummary($"{threadCount} producers, {messageCount} total log events (queue size={queueSize}) - unit is *us*",
                                                 ("ZeroLog", zeroLog),
                                                 ("NLogSync", nlogSync),
                                                 ("NLogAsync", nlogAsync),
                                                 ("Log4net", log4net));
-
         }
 
         public static void Main()
         {
             //Throughput();
 
-            LatencyMultiProducer(4, 4 * 25_000, 64);
-            LatencyMultiProducer(8, 8 * 25_000, 64);
-            LatencyMultiProducer(4, 4 * 25_000, 1024);
-            LatencyMultiProducer(8, 8 * 25_000, 1024);
+            LatencyMultiProducer(4, 4 * 25_000, 4 * 250_000, 64);
+            LatencyMultiProducer(8, 8 * 25_000, 8 * 250_000, 64);
+            LatencyMultiProducer(4, 4 * 25_000, 4 * 250_000, 1024);
+            LatencyMultiProducer(8, 8 * 25_000, 8 * 250_000, 1024);
 
             Console.ReadLine();
         }
