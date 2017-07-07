@@ -15,7 +15,7 @@ namespace ZeroLog.Benchmarks
 {
     [MemoryDiagnoser]
     [SimpleJob(RunStrategy.ColdStart, targetCount: 1000, invocationCount: 1)]
-    public class Benchmarks
+    public class ThroughputBenchmarks
     {
         [Params(4)]
         public int ProducingThreadCount;
@@ -65,6 +65,7 @@ namespace ZeroLog.Benchmarks
             _zeroLogTestAppender = new ZeroLog.Tests.TestAppender(false);
 
             BasicConfigurator.Configure(new[] { _zeroLogTestAppender }, QueueSize, logEventPoolExhaustionStrategy: LogEventPoolExhaustionStrategy.WaitForLogEvent);
+
             _zeroLogLogger = LogManager.GetLogger(nameof(ZeroLog));
         }
 

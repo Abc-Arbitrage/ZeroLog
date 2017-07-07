@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Attributes.Jobs;
 using BenchmarkDotNet.Engines;
@@ -44,6 +45,8 @@ namespace ZeroLog.Benchmarks.Latency
                 while (!_signal.IsSet)
                     NLog.LogManager.Flush();
             });
+
+            Task.Factory.StartNew(flusher, TaskCreationOptions.LongRunning);
         }
 
         [GlobalCleanup]
