@@ -82,8 +82,6 @@
     <Compile Include="ConcurrentQueue.cs" />
     <Compile Include="ConcurrentQueueCapacityInitializer.cs" />
     <Compile Include="Appenders\AppenderFactory.cs" />
-    <Compile Include="ConfigResolvers\IExhaustionStrategyResolver.cs" />
-    <Compile Include="ConfigResolvers\ILevelResolver.cs" />
     <Compile Include="Config\AppenderDefinition.cs" />
     <Compile Include="Config\JsonConfigurator.cs" />
     <Compile Include="ConfigResolvers\IConfigurationResolver.cs" />
@@ -94,7 +92,6 @@
     <Compile Include="Config\ZeroLogConfiguration.cs" />
     <Compile Include="ForwardingLogEvent.cs" />
     <Compile Include="ConfigResolvers\HierarchicalResolver.cs" />
-    <Compile Include="ConfigResolvers\IAppenderResolver.cs" />
     <Compile Include="IInternalLogEvent.cs" />
     <Compile Include="IInternalLogManager.cs" />
     <Compile Include="ILog.cs" />

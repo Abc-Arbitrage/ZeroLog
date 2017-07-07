@@ -52,11 +52,6 @@ namespace ZeroLog
 
         public Level Level => _configResolver.ResolveLevel("");
 
-        public static ILogManager ConfigureAndWatch(string filepath)
-        {
-            return JsonConfigurator.ConfigureAndWatch(filepath);
-        }
-
         public static ILogManager Initialize(IConfigurationResolver configResolver, int logEventQueueSize = 1024, int logEventBufferSize = 128)
         {
             if (_logManager != _defaultLogManager)
@@ -78,7 +73,7 @@ namespace ZeroLog
         {
             if (!_isRunning)
                 return;
-
+            
             _isRunning = false;
             _writeTask.Wait(15000);
 
@@ -112,13 +107,13 @@ namespace ZeroLog
             return logger;
         }
 
-        public IList<IAppender> ResolveAppenders(string name)
+        IList<IAppender> IInternalLogManager.ResolveAppenders(string name)
             => _configResolver.ResolveAppenders(name);
 
-        public LogEventPoolExhaustionStrategy ResolveLogEventPoolExhaustionStrategy(string name)
+        LogEventPoolExhaustionStrategy IInternalLogManager.ResolveLogEventPoolExhaustionStrategy(string name)
             => _configResolver.ResolveExhaustionStrategy(name);
 
-        public Level ResolveLevel(string name)
+        Level IInternalLogManager.ResolveLevel(string name)
             => _configResolver.ResolveLevel(name);
 
         IInternalLogEvent IInternalLogManager.AllocateLogEvent(LogEventPoolExhaustionStrategy logEventPoolExhaustionStrategy, IInternalLogEvent notifyPoolExhaustionLogEvent, Level level, Log log)
