@@ -7,10 +7,16 @@ namespace ZeroLog
     {
         private readonly IInternalLogManager _logManager;
         private readonly ForwardingLogEvent _specialLogMessage;
+        private Level _logLevel;
+
+        internal string Name { get; }
+
+        public IList<IAppender> Appenders { get; private set; }
+        public LogEventPoolExhaustionStrategy LogEventPoolExhaustionStrategy { get; private set; }
 
         internal Log(IInternalLogManager logManager, string name)
         {
-             Name = name;
+            Name = name;
             _logManager = logManager;
 
             var logEvent = CreateUnpooledLogEvent();
@@ -33,28 +39,16 @@ namespace ZeroLog
         {
             Appenders = _logManager?.ResolveAppenders(Name);
             LogEventPoolExhaustionStrategy = _logManager?.ResolveLogEventPoolExhaustionStrategy(Name) ?? LogEventPoolExhaustionStrategy.Default;
-            LogLevel = _logManager?.ResolveLevel(Name) ?? Level.Fatal;
+            _logLevel = _logManager?.ResolveLevel(Name) ?? Level.Fatal;
         }
+        
+        public bool IsLevelEnabled(Level level) => level >= _logLevel;
 
-        internal string Name { get; }
+        public ILogEvent ForLevel(Level level) => IsLevelEnabled(level)
+            ? GetLogEventFor(level)
+            : NoopLogEvent.Instance;
 
-        public IList<IAppender> Appenders { get; private set; }
-        public LogEventPoolExhaustionStrategy LogEventPoolExhaustionStrategy { get; private set; }
-        private Level LogLevel { get; set; }
-
-        public bool IsLevelEnabled(Level level) => level >= LogLevel;
-
-        public ILogEvent ForLevel(Level level)
-        {
-            return IsLevelEnabled(level)
-                ? GetLogEventFor(level)
-                : NoopLogEvent.Instance;
-        }
-
-        private IInternalLogEvent GetLogEventFor(Level level)
-        {
-            return _logManager.AllocateLogEvent(LogEventPoolExhaustionStrategy, _specialLogMessage, level, this);
-        }
+        private IInternalLogEvent GetLogEventFor(Level level) => _logManager.AllocateLogEvent(LogEventPoolExhaustionStrategy, _specialLogMessage, level, this);
 
         internal void Enqueue(IInternalLogEvent logEvent)
         {

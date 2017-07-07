@@ -5,6 +5,7 @@ using System.Text.Formatting;
 using System.Threading;
 using System.Threading.Tasks;
 using ZeroLog.Appenders;
+using ZeroLog.Config;
 using ZeroLog.ConfigResolvers;
 using ZeroLog.Utils;
 
@@ -53,7 +54,7 @@ namespace ZeroLog
 
         public static ILogManager ConfigureAndWatch(string filepath)
         {
-            return Configurator.ConfigureAndWatch(filepath);
+            return JsonConfigurator.ConfigureAndWatch(filepath);
         }
 
         public static ILogManager Initialize(IConfigurationResolver configResolver, int logEventQueueSize = 1024, int logEventBufferSize = 128)

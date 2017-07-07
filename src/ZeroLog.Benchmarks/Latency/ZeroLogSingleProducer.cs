@@ -3,6 +3,7 @@ using System.Threading;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Attributes.Jobs;
 using BenchmarkDotNet.Engines;
+using ZeroLog.Config;
 using ZeroLog.ConfigResolvers;
 
 namespace ZeroLog.Benchmarks.Latency
@@ -27,7 +28,7 @@ namespace ZeroLog.Benchmarks.Latency
         {
             _zeroLogTestAppender = new ZeroLog.Tests.TestAppender(false);
 
-            Configurator.Configure(new[] { _zeroLogTestAppender }, QueueSize, logEventPoolExhaustionStrategy: LogEventPoolExhaustionStrategy.WaitForLogEvent);
+            BasicConfigurator.Configure(new[] { _zeroLogTestAppender }, QueueSize, logEventPoolExhaustionStrategy: LogEventPoolExhaustionStrategy.WaitForLogEvent);
             _zeroLogLogger = LogManager.GetLogger(nameof(ZeroLog));
 
             _signal = _zeroLogTestAppender.SetMessageCountTarget(TotalMessageCount);

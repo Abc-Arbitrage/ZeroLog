@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using NFluent;
 using NUnit.Framework;
 using ZeroLog.Appenders;
+using ZeroLog.Config;
 using ZeroLog.ConfigResolvers;
 
 namespace ZeroLog.Tests
@@ -19,7 +20,7 @@ namespace ZeroLog.Tests
         public void SetUpFixture()
         {
             _testAppender = new TestAppender(true);
-            Configurator.Configure(new List<IAppender> { _testAppender }, 10);
+            BasicConfigurator.Configure(new List<IAppender> { _testAppender }, 10);
         }
 
         [TearDown]
@@ -39,7 +40,7 @@ namespace ZeroLog.Tests
         [Test, ExpectedException]
         public void should_prevent_initializing_already_initialized_log_manager()
         {
-            Configurator.Configure(new IAppender[0]);
+            BasicConfigurator.Configure(new IAppender[0]);
         }
 
         [Test]
@@ -76,7 +77,7 @@ namespace ZeroLog.Tests
         {
             LogManager.Shutdown();
             
-            Configurator.Configure(new[] { _testAppender }, 10, 128, Level.Finest, LogEventPoolExhaustionStrategy.DropLogMessageAndNotifyAppenders);
+            BasicConfigurator.Configure(new[] { _testAppender }, 10, 128, Level.Finest, LogEventPoolExhaustionStrategy.DropLogMessageAndNotifyAppenders);
 
             var log = LogManager.GetLogger(typeof(LogManagerTests));
 
@@ -100,7 +101,7 @@ namespace ZeroLog.Tests
         {
             LogManager.Shutdown();
             
-            Configurator.Configure(new[] { _testAppender }, 10, 128, Level.Finest, LogEventPoolExhaustionStrategy.DropLogMessage);
+            BasicConfigurator.Configure(new[] { _testAppender }, 10, 128, Level.Finest, LogEventPoolExhaustionStrategy.DropLogMessage);
             var log = LogManager.GetLogger(typeof(LogManagerTests));
 
             var actualLogEvents = new List<ILogEvent>();
@@ -121,7 +122,7 @@ namespace ZeroLog.Tests
         {
             LogManager.Shutdown();
 
-            Configurator.Configure(new[] { _testAppender }, 10, 128, Level.Finest, LogEventPoolExhaustionStrategy.WaitForLogEvent);
+            BasicConfigurator.Configure(new[] { _testAppender }, 10, 128, Level.Finest, LogEventPoolExhaustionStrategy.WaitForLogEvent);
 
             var log = LogManager.GetLogger(typeof(LogManagerTests));
 

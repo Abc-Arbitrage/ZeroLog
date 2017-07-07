@@ -7,7 +7,7 @@ namespace ZeroLog
     partial class Log
     {
                 
-        public bool IsDebugEnabled => Level.Debug >= LogLevel;
+        public bool IsDebugEnabled => Level.Debug >= _logLevel;
 
         public ILogEvent Debug()
         {
@@ -160,7 +160,7 @@ namespace ZeroLog
             logEvent.Log();
         }
                     
-        public bool IsInfoEnabled => Level.Info >= LogLevel;
+        public bool IsInfoEnabled => Level.Info >= _logLevel;
 
         public ILogEvent Info()
         {
@@ -313,7 +313,7 @@ namespace ZeroLog
             logEvent.Log();
         }
                     
-        public bool IsWarnEnabled => Level.Warn >= LogLevel;
+        public bool IsWarnEnabled => Level.Warn >= _logLevel;
 
         public ILogEvent Warn()
         {
@@ -466,7 +466,7 @@ namespace ZeroLog
             logEvent.Log();
         }
                     
-        public bool IsErrorEnabled => Level.Error >= LogLevel;
+        public bool IsErrorEnabled => Level.Error >= _logLevel;
 
         public ILogEvent Error()
         {
@@ -619,7 +619,7 @@ namespace ZeroLog
             logEvent.Log();
         }
                     
-        public bool IsFatalEnabled => Level.Fatal >= LogLevel;
+        public bool IsFatalEnabled => Level.Fatal >= _logLevel;
 
         public ILogEvent Fatal()
         {

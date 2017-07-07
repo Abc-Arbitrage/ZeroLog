@@ -6,13 +6,13 @@ using ZeroLog.Appenders;
 
 namespace ZeroLog.ConfigResolvers
 {
-    public class DummyResolver : IConfigurationResolver
+    public class BasicResolver : IConfigurationResolver
     {
         private readonly IList<IAppender> _appenders;
         private readonly Level _level;
         private readonly LogEventPoolExhaustionStrategy _strategy;
 
-        public DummyResolver(IEnumerable<IAppender> appenders, Level level, LogEventPoolExhaustionStrategy strategy)
+        public BasicResolver(IEnumerable<IAppender> appenders, Level level, LogEventPoolExhaustionStrategy strategy)
         {
             _level = level;
             _strategy = strategy;

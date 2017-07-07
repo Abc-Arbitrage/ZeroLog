@@ -32,7 +32,7 @@ namespace ZeroLog.Tests.Config
             };
             var configJson = JSON.Serialize(config, Options.PrettyPrint);
 
-            var loadedConfig = Configurator.DeserializeConfiguration(configJson);
+            var loadedConfig = JsonConfigurator.DeserializeConfiguration(configJson);
 
             Check.That(loadedConfig.LogEventBufferSize).Equals(config.LogEventBufferSize);
             Check.That(loadedConfig.LogEventQueueSize).Equals(config.LogEventQueueSize);
@@ -82,7 +82,7 @@ namespace ZeroLog.Tests.Config
                                     }]
                                }";
 
-            var config = Configurator.DeserializeConfiguration(configJson);
+            var config = JsonConfigurator.DeserializeConfiguration(configJson);
 
             Check.That(config.RootLogger.LogEventPoolExhaustionStrategy).Equals(LogEventPoolExhaustionStrategy.Default);
             Check.That(config.LogEventBufferSize).Equals(10);

@@ -66,6 +66,7 @@
     <Compile Include="Appenders\DefaultAppenderConfig.cs" />
     <Compile Include="Appenders\DateAndSizeRollingFileAppenderConfig.cs" />
     <Compile Include="Appenders\IAppender`1.cs" />
+    <Compile Include="Config\BasicConfigurator.cs" />
     <Compile Include="ILogEventHeader.cs" />
     <Compile Include="PaddedHeadAndTail.cs" />
     <Compile Include="UnpooledLogEvent.cs" />
@@ -84,12 +85,12 @@
     <Compile Include="ConfigResolvers\IExhaustionStrategyResolver.cs" />
     <Compile Include="ConfigResolvers\ILevelResolver.cs" />
     <Compile Include="Config\AppenderDefinition.cs" />
-    <Compile Include="ConfigResolvers\Configurator.cs" />
+    <Compile Include="Config\JsonConfigurator.cs" />
     <Compile Include="ConfigResolvers\IConfigurationResolver.cs" />
     <Compile Include="Config\LoggerDefinition.cs" />
     <Compile Include="Appenders\GuardedAppender.cs" />
     <Compile Include="Appenders\IAppender.cs" />
-    <Compile Include="ConfigResolvers\DummyResolver.cs" />
+    <Compile Include="ConfigResolvers\BasicResolver.cs" />
     <Compile Include="Config\ZeroLogConfiguration.cs" />
     <Compile Include="ForwardingLogEvent.cs" />
     <Compile Include="ConfigResolvers\HierarchicalResolver.cs" />

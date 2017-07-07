@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Text.Formatting;
 using ZeroLog.Appenders;
-using ZeroLog.Utils;
 
 namespace ZeroLog
 {
