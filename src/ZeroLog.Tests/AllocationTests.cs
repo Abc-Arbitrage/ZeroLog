@@ -4,6 +4,7 @@ using System.Threading;
 using NFluent;
 using NUnit.Framework;
 using ZeroLog.Appenders;
+using ZeroLog.ConfigResolvers;
 
 namespace ZeroLog.Tests
 {
@@ -37,7 +38,7 @@ namespace ZeroLog.Tests
             }
 
             _waitableAppender = new WaitableAppender("allocation-test");
-            LogManager.Initialize(new[] { _waitableAppender }, 2048 * 10, 512);
+            Configurator.Configure(new[] { _waitableAppender }, 2048 * 10, 512);
         }
 
         [TearDown]

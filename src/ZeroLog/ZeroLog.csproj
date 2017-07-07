@@ -110,7 +110,6 @@
     <Compile Include="LogEvent.cs" />
     <Compile Include="LogEventPoolExhaustionStrategy.cs" />
     <Compile Include="LogManager.cs" />
-    <Compile Include="LogManagerConfiguration.cs" />
     <Compile Include="NoopLogEvent.cs" />
     <Compile Include="NoopLogManager.cs" />
     <Compile Include="ObjectPool.cs" />

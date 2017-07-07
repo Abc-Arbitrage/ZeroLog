@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using ZeroLog.ConfigResolvers;
 
 namespace ZeroLog.Tests
 {
@@ -14,15 +15,8 @@ namespace ZeroLog.Tests
         [SetUp]
         public void SetUp()
         {
-            var configuration = new LogManagerConfiguration
-            {
-                Level = Level.Finest,
-                LogEventBufferSize = 512,
-                LogEventQueueSize = 16384,
-                LogEventPoolExhaustionStrategy = LogEventPoolExhaustionStrategy.WaitForLogEvent,
-            };
             _testAppender = new TestAppender(false);
-            LogManager.Initialize(new[] { _testAppender }, configuration);
+            Configurator.Configure(new[] { _testAppender }, 16384, 512, Level.Finest, LogEventPoolExhaustionStrategy.WaitForLogEvent);
         }
 
         [TearDown]

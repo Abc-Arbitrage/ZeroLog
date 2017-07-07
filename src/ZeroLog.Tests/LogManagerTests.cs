@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using NFluent;
 using NUnit.Framework;
 using ZeroLog.Appenders;
+using ZeroLog.ConfigResolvers;
 
 namespace ZeroLog.Tests
 {
@@ -18,7 +19,7 @@ namespace ZeroLog.Tests
         public void SetUpFixture()
         {
             _testAppender = new TestAppender(true);
-            LogManager.Initialize(new List<IAppender> { _testAppender }, 10);
+            Configurator.Configure(new List<IAppender> { _testAppender }, 10);
         }
 
         [TearDown]
@@ -38,7 +39,7 @@ namespace ZeroLog.Tests
         [Test, ExpectedException]
         public void should_prevent_initializing_already_initialized_log_manager()
         {
-            LogManager.Initialize(new IAppender[0]);
+            Configurator.Configure(new IAppender[0]);
         }
 
         [Test]
@@ -74,15 +75,9 @@ namespace ZeroLog.Tests
         public void should_log_special_message_when_log_event_pool_is_exhausted()
         {
             LogManager.Shutdown();
-            var configuration = new LogManagerConfiguration
-            {
-                Level = Level.Finest,
-                LogEventBufferSize = 128,
-                LogEventQueueSize = 10,
-                LogEventPoolExhaustionStrategy = LogEventPoolExhaustionStrategy.DropLogMessageAndNotifyAppenders,
-            };
+            
+            Configurator.Configure(new[] { _testAppender }, 10, 128, Level.Finest, LogEventPoolExhaustionStrategy.DropLogMessageAndNotifyAppenders);
 
-            LogManager.Initialize(new[] { _testAppender }, configuration);
             var log = LogManager.GetLogger(typeof(LogManagerTests));
 
             var actualLogEvents = new List<ILogEvent>();
@@ -104,15 +99,8 @@ namespace ZeroLog.Tests
         public void should_completely_drop_log_event_when_log_event_pool_is_exhausted()
         {
             LogManager.Shutdown();
-            var configuration = new LogManagerConfiguration
-            {
-                Level = Level.Finest,
-                LogEventBufferSize = 128,
-                LogEventQueueSize = 10,
-                LogEventPoolExhaustionStrategy = LogEventPoolExhaustionStrategy.DropLogMessage,
-            };
-
-            LogManager.Initialize(new[] { _testAppender }, configuration);
+            
+            Configurator.Configure(new[] { _testAppender }, 10, 128, Level.Finest, LogEventPoolExhaustionStrategy.DropLogMessage);
             var log = LogManager.GetLogger(typeof(LogManagerTests));
 
             var actualLogEvents = new List<ILogEvent>();
@@ -132,15 +120,9 @@ namespace ZeroLog.Tests
         public void should_wait_for_event_when_log_event_pool_is_exhausted()
         {
             LogManager.Shutdown();
-            var configuration = new LogManagerConfiguration
-            {
-                Level = Level.Finest,
-                LogEventBufferSize = 128,
-                LogEventQueueSize = 10,
-                LogEventPoolExhaustionStrategy = LogEventPoolExhaustionStrategy.WaitForLogEvent,
-            };
 
-            LogManager.Initialize(new[] { _testAppender }, configuration);
+            Configurator.Configure(new[] { _testAppender }, 10, 128, Level.Finest, LogEventPoolExhaustionStrategy.WaitForLogEvent);
+
             var log = LogManager.GetLogger(typeof(LogManagerTests));
 
             var actualLogEvents = new List<ILogEvent>();
