@@ -43,6 +43,12 @@
     <Reference Include="BenchmarkDotNet.Toolchains.Roslyn, Version=0.10.8.0, Culture=neutral, PublicKeyToken=aa0ca2f9092cefc4, processorArchitecture=MSIL">
       <HintPath>..\packages\BenchmarkDotNet.Toolchains.Roslyn.0.10.8\lib\net46\BenchmarkDotNet.Toolchains.Roslyn.dll</HintPath>
     </Reference>
+    <Reference Include="ConsoleTables.Core, Version=1.1.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ConsoleTables.1.1.2\lib\net40\ConsoleTables.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="HdrHistogram, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\HdrHistogram.2.0.0\lib\net45\HdrHistogram.dll</HintPath>
+    </Reference>
     <Reference Include="log4net, Version=2.0.8.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
       <HintPath>..\packages\log4net.2.0.8\lib\net45-full\log4net.dll</HintPath>
     </Reference>
@@ -140,11 +146,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Benchmarks.cs" />
-    <Compile Include="Latency\NLogAsyncSingleProducer.cs" />
-    <Compile Include="Latency\NLogSyncSingleProducer.cs" />
-    <Compile Include="Latency\Log4NetSingleProducer.cs" />
-    <Compile Include="Latency\ZeroLogSingleProducer.cs" />
+    <Compile Include="LatencyTests\NLogAsyncMultiProducer.cs" />
+    <Compile Include="LatencyTests\Log4NetMultiProducer.cs" />
+    <Compile Include="LatencyTests\NLogSyncMultiProducer.cs" />
+    <Compile Include="LatencyTests\ZeroLogMultiProducer.cs" />
+    <Compile Include="Tools\SimpleLatencyBenchmark.cs" />
+    <Compile Include="ThroughputTests\ThroughputBenchmarks.cs" />
     <Compile Include="Tools\Log4NetTestAppender.cs" />
     <Compile Include="Tools\NLogTestTarget.cs" />
     <Compile Include="Program.cs" />

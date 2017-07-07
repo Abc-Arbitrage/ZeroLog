@@ -1,21 +1,19 @@
-﻿using BenchmarkDotNet.Attributes;
+﻿using System;
+using System.Threading.Tasks;
+using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Attributes.Jobs;
 using BenchmarkDotNet.Engines;
-using log4net.Config;
 using log4net.Layout;
 using NLog;
 using NLog.Config;
 using NLog.Targets.Wrappers;
-using System;
-using System.Threading.Tasks;
-using ZeroLog.ConfigResolvers;
 using BasicConfigurator = ZeroLog.Config.BasicConfigurator;
 
-namespace ZeroLog.Benchmarks
+namespace ZeroLog.Benchmarks.ThroughputTests
 {
     [MemoryDiagnoser]
     [SimpleJob(RunStrategy.ColdStart, targetCount: 1000, invocationCount: 1)]
-    public class Benchmarks
+    public class ThroughputBenchmarks
     {
         [Params(4)]
         public int ProducingThreadCount;
@@ -65,6 +63,7 @@ namespace ZeroLog.Benchmarks
             _zeroLogTestAppender = new ZeroLog.Tests.TestAppender(false);
 
             BasicConfigurator.Configure(new[] { _zeroLogTestAppender }, QueueSize, logEventPoolExhaustionStrategy: LogEventPoolExhaustionStrategy.WaitForLogEvent);
+
             _zeroLogLogger = LogManager.GetLogger(nameof(ZeroLog));
         }
 
