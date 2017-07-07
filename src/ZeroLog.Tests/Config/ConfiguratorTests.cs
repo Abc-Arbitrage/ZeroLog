@@ -85,8 +85,8 @@ namespace ZeroLog.Tests.Config
             var config = JsonConfigurator.DeserializeConfiguration(configJson);
 
             Check.That(config.RootLogger.LogEventPoolExhaustionStrategy).Equals(LogEventPoolExhaustionStrategy.Default);
-            Check.That(config.LogEventBufferSize).Equals(10);
-            Check.That(config.LogEventQueueSize).Equals(10);
+            Check.That(config.LogEventBufferSize).Equals(new ZeroLogConfiguration().LogEventBufferSize);
+            Check.That(config.LogEventQueueSize).Equals(new ZeroLogConfiguration().LogEventQueueSize);
         }
     }
 }
