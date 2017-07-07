@@ -27,14 +27,15 @@ namespace ZeroLog
         private bool _isRunning;
         private readonly Encoding _encoding = Encoding.UTF8;
 
-        internal LogManager(IConfigurationResolver configResolver, LogManagerConfiguration configuration)
+        internal LogManager(IConfigurationResolver configResolver, int logEventQueueSize = 1024, int logEventBufferSize = 128)
         {
             _configResolver = configResolver;
-            _loggers = new ConcurrentQueue<Log>();
-            _queue = new ConcurrentQueue<IInternalLogEvent>(new ConcurrentQueueCapacityInitializer(configuration.LogEventQueueSize));
 
-            _bufferSegmentProvider = new BufferSegmentProvider(configuration.LogEventQueueSize * configuration.LogEventBufferSize, configuration.LogEventBufferSize);
-            _pool = new ObjectPool<IInternalLogEvent>(configuration.LogEventQueueSize, () => new LogEvent(_bufferSegmentProvider.GetSegment()));
+            _loggers = new ConcurrentQueue<Log>();
+            _queue = new ConcurrentQueue<IInternalLogEvent>(new ConcurrentQueueCapacityInitializer(logEventQueueSize));
+
+            _bufferSegmentProvider = new BufferSegmentProvider(logEventQueueSize * logEventBufferSize, logEventBufferSize);
+            _pool = new ObjectPool<IInternalLogEvent>(logEventQueueSize, () => new LogEvent(_bufferSegmentProvider.GetSegment()));
 
             configResolver.Initialize(_encoding);
             configResolver.Updated += () =>
@@ -56,36 +57,15 @@ namespace ZeroLog
             return Configurator.ConfigureAndWatch(filepath);
         }
 
-        public static ILogManager Initialize(IConfigurationResolver configResolver, LogManagerConfiguration configuration)
+        public static ILogManager Initialize(IConfigurationResolver configResolver, int logEventQueueSize = 1024, int logEventBufferSize = 128)
         {
             if (_logManager != _defaultLogManager)
                 throw new ApplicationException("LogManager is already initialized");
 
-            _logManager = new LogManager(configResolver, configuration);
+            _logManager = new LogManager(configResolver, logEventQueueSize, logEventBufferSize);
             return _logManager;
         }
-
-        public static ILogManager Initialize(IEnumerable<IAppender> appenders, LogManagerConfiguration configuration)
-        {
-            if (_logManager != _defaultLogManager)
-                throw new ApplicationException("LogManager is already initialized");
-
-            var dummyResolver = new DummyResolver(appenders, configuration.Level, configuration.LogEventPoolExhaustionStrategy);
-            _logManager = new LogManager(dummyResolver, configuration);
-            return _logManager;
-        }
-
-        public static ILogManager Initialize(IEnumerable<IAppender> appenders, int logEventQueueSize = 1024, int logEventBufferSize = 128, Level level = Level.Finest, LogEventPoolExhaustionStrategy exhaustionStrategy = LogEventPoolExhaustionStrategy.Default)
-        {
-            return Initialize(appenders, new LogManagerConfiguration
-            {
-                LogEventQueueSize = logEventQueueSize,
-                LogEventBufferSize = logEventBufferSize,
-                Level = level,
-                LogEventPoolExhaustionStrategy = exhaustionStrategy
-            });
-        }
-
+        
         public static void Shutdown()
         {
             var logManager = _logManager;

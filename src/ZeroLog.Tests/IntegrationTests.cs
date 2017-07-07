@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using ZeroLog.Appenders;
+using ZeroLog.ConfigResolvers;
 
 namespace ZeroLog.Tests
 {
@@ -23,7 +24,7 @@ namespace ZeroLog.Tests
         public void SetUp()
         {
             _performanceAppender = new PerformanceAppender(_count * _nbThreads);
-            LogManager.Initialize(new[] { new ConsoleAppender(), }, _queueSize);
+            Configurator.Configure(new[] { new ConsoleAppender(), }, _queueSize);
             for (int i = 0; i < _nbThreads; i++)
             {
                 _enqueueMicros.Add(new double[_count]);

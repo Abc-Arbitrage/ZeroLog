@@ -1,8 +1,6 @@
-﻿using System.Collections.Generic;
-using Moq;
+﻿using Moq;
 using NFluent;
 using NUnit.Framework;
-using ZeroLog.Appenders;
 using ZeroLog.ConfigResolvers;
 
 namespace ZeroLog.Tests
@@ -19,18 +17,11 @@ namespace ZeroLog.Tests
         [TestCase(Level.Fatal, false, false, false, false, true)]
         public void should_return_if_log_level_is_enabled(Level logLevel, bool isDebug, bool isInfo, bool isWarn, bool isError, bool isFatal)
         {
-            var configuration = new LogManagerConfiguration
-            {
-                LogEventQueueSize = 1,
-                LogEventBufferSize = 128,
-                Level = logLevel,
-            };
-
             var configResolver = new Mock<IConfigurationResolver>();
             configResolver.Setup(x => x.ResolveLevel(It.IsAny<string>()))
                          .Returns(logLevel);
 
-            var logManager = new LogManager(configResolver.Object, configuration);
+            var logManager = new LogManager(configResolver.Object, 1, 128);
             var log = new Log(logManager, "logger");
 
 

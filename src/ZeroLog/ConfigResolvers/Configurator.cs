@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
+using ZeroLog.Appenders;
 using ZeroLog.Config;
 using ZeroLog.Utils;
 
@@ -40,9 +42,13 @@ namespace ZeroLog.ConfigResolvers
                 }
             };
 
-            var lecagyConfiguration = CreateLegacyConfiguration(config);
+            return LogManager.Initialize(resolver, config.LogEventQueueSize, config.LogEventBufferSize);
+        }
 
-            return LogManager.Initialize(resolver, lecagyConfiguration);
+        public static ILogManager Configure(IEnumerable<IAppender> appenders, int logEventQueueSize = 1024, int logEventBufferSize = 128, Level level = Level.Finest, LogEventPoolExhaustionStrategy logEventPoolExhaustionStrategy = LogEventPoolExhaustionStrategy.Default)
+        {
+            var dummyResolver = new DummyResolver(appenders, level, logEventPoolExhaustionStrategy);
+            return LogManager.Initialize(dummyResolver, logEventQueueSize, logEventBufferSize);
         }
 
         private static ZeroLogConfiguration ConfigureResolver(string configFileFullPath, HierarchicalResolver resolver)
@@ -56,19 +62,6 @@ namespace ZeroLog.ConfigResolvers
         {
             var filecontent = ReadFileContentWithRetry(configFilePath);
             return DeserializeConfiguration(filecontent);
-        }
-
-        private static LogManagerConfiguration CreateLegacyConfiguration(ZeroLogConfiguration config)
-        {
-            var legacyConfig = new LogManagerConfiguration
-            {
-                Level = config.RootLogger.Level,
-                LogEventPoolExhaustionStrategy = config.RootLogger.LogEventPoolExhaustionStrategy,
-                LogEventBufferSize = config.LogEventBufferSize,
-                LogEventQueueSize = config.LogEventQueueSize
-            };
-
-            return legacyConfig;
         }
 
         public static ZeroLogConfiguration DeserializeConfiguration(string jsonConfiguration)
