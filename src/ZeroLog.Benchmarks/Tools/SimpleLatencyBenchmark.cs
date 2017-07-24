@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using ConsoleTables.Core;
+using ConsoleTables;
 using HdrHistogram;
 
 namespace ZeroLog.Benchmarks.Tools
@@ -64,7 +64,7 @@ namespace ZeroLog.Benchmarks.Tools
                                 GCCount = x.Item2.CollectionCount,
                             };
                         }))
-                        .Write(ConsoleTables.Core.Format.Alternative);
+                        .Write(ConsoleTables.Format.Alternative);
         }
 
         private static HistogramBase Concatenate(List<HistogramBase> seq)

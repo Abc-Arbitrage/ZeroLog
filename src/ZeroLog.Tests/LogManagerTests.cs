@@ -37,10 +37,10 @@ namespace ZeroLog.Tests
             Check.That(log).IsNotNull();
         }
 
-        [Test, ExpectedException]
+        [Test]
         public void should_prevent_initializing_already_initialized_log_manager()
         {
-            BasicConfigurator.Configure(new IAppender[0]);
+            Assert.Throws<ApplicationException>(() => BasicConfigurator.Configure(new IAppender[0]));
         }
 
         [Test]
