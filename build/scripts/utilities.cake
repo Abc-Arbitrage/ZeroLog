@@ -1,5 +1,5 @@
 #tool "nuget:?package=GitVersion.CommandLine"
-#addin "Cake.Yaml"
+#addin "nuget:?package=YamlDotNet"
 
 public class ContextInfo
 {
@@ -27,7 +27,8 @@ public ContextInfo VersionContext
 
 public ContextInfo ReadContext(FilePath filepath)
 {
-    _versionContext = DeserializeYamlFromFile<ContextInfo>(filepath);
+    var deserializer = new YamlDotNet.Serialization.Deserializer();
+    _versionContext = deserializer.Deserialize<ContextInfo>(System.IO.File.ReadAllText(filepath.ToString()));
     try
     {
         _versionContext.Git = GitVersion();

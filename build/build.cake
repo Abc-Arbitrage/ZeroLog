@@ -1,6 +1,6 @@
 #l "scripts/utilities.cake"
 #tool nuget:?package=NUnit.Runners.Net4&version=2.6.4
-#addin "Cake.FileHelpers"
+
 //////////////////////////////////////////////////////////////////////
 // ARGUMENTS
 //////////////////////////////////////////////////////////////////////
@@ -42,6 +42,8 @@ Task("Clean").Does(() =>
 });
 Task("Restore-NuGet-Packages").Does(() => NuGetRestore(paths.solution));
 Task("Create-AssemblyInfo").Does(()=>{
+    Information("Assembly Version: {0}", VersionContext.AssemblyVersion);
+    Information("   NuGet Version: {0}", VersionContext.NugetVersion);
     CreateAssemblyInfo(paths.assemblyInfo, new AssemblyInfoSettings {
         Version = VersionContext.AssemblyVersion,
         FileVersion = VersionContext.AssemblyVersion,
@@ -50,7 +52,7 @@ Task("Create-AssemblyInfo").Does(()=>{
 });
 Task("Build-Debug").Does(() => Build("Debug", paths.output.build));
 Task("Build-Release").Does(() => Build("Release", paths.output.build));
-Task("Clean-AssemblyInfo").Does(() => FileWriteText(paths.assemblyInfo, string.Empty));
+Task("Clean-AssemblyInfo").Does(() => System.IO.File.WriteAllText(paths.assemblyInfo, string.Empty));
 Task("Run-Debug-Unit-Tests").Does(() => NUnit(paths.output.build + "/Debug/*.Tests.exe", new NUnitSettings { Framework = "net-4.6.1", NoResults = true }));
 Task("Run-Release-Unit-Tests").Does(() => NUnit(paths.output.build + "/Release/*.Tests.exe", new NUnitSettings { Framework = "net-4.6.1", NoResults = true }));
 Task("Nuget-Pack").Does(() => 
