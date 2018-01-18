@@ -35,6 +35,7 @@ _ReSharper*/
 *.vspx
 packages/*
 .vs/*
+src/.vs/*
 output/*
 src/packages/**
 build/tools/*/
