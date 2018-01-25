@@ -6,9 +6,7 @@ ZeroLog is a **zero-allocation .NET logging library**. It uses the excellent for
   
   Since ZeroLog does not aim to replace any existing logging libraries in any kind of application, it won't try to compete on feature set level with more pre-eminent projets like log4net or NLog for example. The focus will remain on performance and allocation free aspects.
   
-## Disclaimer
-
->The project is production ready and you can get it via Nuget if you want to give it a try. The package is available here:
+   The project is production ready and you can get it via Nuget if you want to give it a try. The package is available here:
 
 >https://www.nuget.org/packages/ZeroLog/
 
