@@ -8,7 +8,7 @@ ZeroLog is a **zero-allocation .NET logging library**. It uses the excellent for
   
 ## Disclaimer
 
->The project is not production ready yet; it's still a work in progress. However, you can already obtain it via Nuget if you want to give it a try. The package is available here:
+>The project is production ready and you can get it via Nuget if you want to give it a try. The package is available here:
 
 >https://www.nuget.org/packages/ZeroLog/
 
