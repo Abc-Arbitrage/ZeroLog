@@ -17,6 +17,9 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="netstandard2.0.\*" target="lib\netstandard2.0" />
+    <file src="Release\ZeroLog.dll" target="lib\net462" />
+    <file src="Release\ZeroLog.pdb" target="lib\net462" />
+    <file src="netstandard2.0\ZeroLog.dll" target="lib\netstandard2.0" />
+    <file src="netstandard2.0\ZeroLog.pdb" target="lib\netstandard2.0" />
   </files>
 </package>
