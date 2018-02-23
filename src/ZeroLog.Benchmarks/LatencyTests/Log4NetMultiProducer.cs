@@ -10,10 +10,10 @@ namespace ZeroLog.Benchmarks.LatencyTests
     public class Log4NetMultiProducer
     {
         public SimpleLatencyBenchmarkResult Bench(int warmingMessageCount, int totalMessageCount, int producingThreadCount)
-		{
-			var repository = log4net.LogManager.GetRepository(Assembly.GetExecutingAssembly());
+        {
+            var repository = log4net.LogManager.GetRepository(Assembly.GetExecutingAssembly());
 
-			var layout = new PatternLayout("%-4timestamp [%thread] %-5level %logger %ndc - %message%newline");
+            var layout = new PatternLayout("%-4timestamp [%thread] %-5level %logger %ndc - %message%newline");
             layout.ActivateOptions();
             var appender = new Log4NetTestAppender(false);
             appender.ActivateOptions();
