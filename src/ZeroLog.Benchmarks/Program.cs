@@ -17,10 +17,9 @@ namespace ZeroLog.Benchmarks
             config.Add(StatisticColumn.P90);
             config.Add(StatisticColumn.P95);
 
-            var benchs = BenchmarkConverter.TypeToBenchmarks(typeof(ThroughputBenchmarks))
-                                     .ToArray();
+            BenchmarkRunInfo benchs = BenchmarkConverter.TypeToBenchmarks(typeof(ThroughputBenchmarks));
 
-            BenchmarkRunner.Run(benchs, config);
+            BenchmarkRunner.Run(benchs.Benchmarks, config);
         }
 
 
