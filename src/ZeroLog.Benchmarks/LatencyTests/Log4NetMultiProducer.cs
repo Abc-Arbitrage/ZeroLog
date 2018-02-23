@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using HdrHistogram;
 using log4net.Config;
 using log4net.Layout;
@@ -10,15 +11,15 @@ namespace ZeroLog.Benchmarks.LatencyTests
     {
         public SimpleLatencyBenchmarkResult Bench(int warmingMessageCount, int totalMessageCount, int producingThreadCount)
         {
+            var repository = log4net.LogManager.GetRepository(Assembly.GetExecutingAssembly());
+
             var layout = new PatternLayout("%-4timestamp [%thread] %-5level %logger %ndc - %message%newline");
             layout.ActivateOptions();
             var appender = new Log4NetTestAppender(false);
             appender.ActivateOptions();
-            BasicConfigurator.Configure(appender);
+            BasicConfigurator.Configure(repository, appender);
 
-            var logger = log4net.LogManager.GetLogger(nameof(appender));
-
-
+            var logger = log4net.LogManager.GetLogger(repository.Name, nameof(appender));
             var signal = appender.SetMessageCountTarget(totalMessageCount + warmingMessageCount);
 
             var produce = new Func<HistogramBase>(() =>

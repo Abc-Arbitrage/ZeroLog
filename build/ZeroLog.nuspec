@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<package >
+<package>
   <metadata>
     <id>ZeroLog</id>
     <authors>Reda Bouallou, Mendel Monteiro-Beckerman, Romain Verdier</authors>
@@ -17,7 +17,6 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="Release\ZeroLog.dll" target="lib\net45" />
-    <file src="Release\ZeroLog.pdb" target="lib\net45" />
+    <file src="netstandard2.0.\*" target="lib\netstandard2.0" />
   </files>
 </package>
