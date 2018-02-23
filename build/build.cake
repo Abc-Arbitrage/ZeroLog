@@ -51,14 +51,10 @@ Task("Create-AssemblyInfo").Does(()=>{
         InformationalVersion = VersionContext.NugetVersion + " Commit: " + VersionContext.Git.Sha
     });
 });
-Task("Build-Debug").Does(() => Build("Debug", paths.output.build));
 Task("Build-Release").Does(() => Build("Release", paths.output.build));
-Task("Build-Debug-Core").Does(() => DotNetCoreBuild(paths.solution, new DotNetCoreBuildSettings { Configuration = "Debug" }));
 Task("Build-Release-Core").Does(() => DotNetCoreBuild(paths.solution, new DotNetCoreBuildSettings { Configuration = "Release" }));
 Task("Clean-AssemblyInfo").Does(() => System.IO.File.WriteAllText(paths.assemblyInfo, string.Empty));
-Task("Run-Debug-Unit-Tests").Does(() => DotNetCoreTest(paths.testProject, new DotNetCoreTestSettings { Configuration = "Debug", Framework = "net462" }));
 Task("Run-Release-Unit-Tests").Does(() => DotNetCoreTest(paths.testProject, new DotNetCoreTestSettings { Configuration = "Release", Framework = "net462" }));
-Task("Run-Debug-Unit-Tests-Core").Does(() => DotNetCoreTest(paths.testProject, new DotNetCoreTestSettings { Configuration = "Debug", Framework = "netcoreapp2.0" }));
 Task("Run-Release-Unit-Tests-Core").Does(() => DotNetCoreTest(paths.testProject, new DotNetCoreTestSettings { Configuration = "Release", Framework = "netcoreapp2.0" }));
 Task("Nuget-Pack").Does(() => 
 {
@@ -78,17 +74,13 @@ Task("Build")
     .IsDependentOn("Clean")
     .IsDependentOn("Restore-NuGet-Packages")
     .IsDependentOn("Create-AssemblyInfo")
-    .IsDependentOn("Build-Debug")
     .IsDependentOn("Build-Release")
-    .IsDependentOn("Build-Debug-Core")
     .IsDependentOn("Build-Release-Core")
     .IsDependentOn("Clean-AssemblyInfo");
 
 Task("Test")
     .IsDependentOn("Build")
-    .IsDependentOn("Run-Debug-Unit-Tests")
     .IsDependentOn("Run-Release-Unit-Tests")
-    .IsDependentOn("Run-Debug-Unit-Tests-Core")
     .IsDependentOn("Run-Release-Unit-Tests-Core");
 
 Task("Nuget")
