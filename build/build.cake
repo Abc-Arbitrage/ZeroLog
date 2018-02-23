@@ -8,6 +8,7 @@
 var target = Argument("target", "Default");
 var paths = new {
     solution = MakeAbsolute(File("./../src/ZeroLog.sln")).FullPath,
+    project  = MakeAbsolute(File("./../src/ZeroLog/ZeroLog.csproj")).FullPath,
     version = MakeAbsolute(File("./../version.yml")).FullPath,
     assemblyInfo = MakeAbsolute(File("./../src/SharedVersionInfo.cs")).FullPath,
     output = new {
@@ -52,7 +53,7 @@ Task("Create-AssemblyInfo").Does(()=>{
     });
 });
 Task("Build-Release").Does(() => Build("Release", paths.output.build));
-Task("Build-Release-Core").Does(() => DotNetCoreBuild(paths.solution, new DotNetCoreBuildSettings { Configuration = "Release" }));
+Task("Build-Release-Core").Does(() => DotNetCoreBuild(paths.project, new DotNetCoreBuildSettings { Framework = "netstandard2.0", Configuration = "Release", OutputDirectory = paths.output.build + "/netstandard2.0"} ));
 Task("Clean-AssemblyInfo").Does(() => System.IO.File.WriteAllText(paths.assemblyInfo, string.Empty));
 Task("Run-Release-Unit-Tests").Does(() => DotNetCoreTest(paths.testProject, new DotNetCoreTestSettings { Configuration = "Release", Framework = "net462" }));
 Task("Run-Release-Unit-Tests-Core").Does(() => DotNetCoreTest(paths.testProject, new DotNetCoreTestSettings { Configuration = "Release", Framework = "netcoreapp2.0" }));
