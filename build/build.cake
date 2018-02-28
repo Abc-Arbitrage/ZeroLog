@@ -52,11 +52,13 @@ Task("Create-AssemblyInfo").Does(()=>{
         InformationalVersion = VersionContext.NugetVersion + " Commit: " + VersionContext.Git.Sha
     });
 });
-Task("Build-Release").Does(() => Build("Release", paths.output.build));
-Task("Build-Release-Core").Does(() => DotNetCoreBuild(paths.project, new DotNetCoreBuildSettings { Framework = "netstandard2.0", Configuration = "Release", OutputDirectory = paths.output.build + "/netstandard2.0"} ));
+Task("Build-Net452").Does(() => DotNetCoreBuild(paths.project, new DotNetCoreBuildSettings { Framework = "net452", Configuration = "Release", OutputDirectory = paths.output.build + "/net452"} ));
+Task("Build-Net462").Does(() => DotNetCoreBuild(paths.project, new DotNetCoreBuildSettings { Framework = "net462", Configuration = "Release", OutputDirectory = paths.output.build + "/net462"} ));
+Task("Build-NetCore").Does(() => DotNetCoreBuild(paths.project, new DotNetCoreBuildSettings { Framework = "netstandard2.0", Configuration = "Release", OutputDirectory = paths.output.build + "/netstandard2.0"} ));
 Task("Clean-AssemblyInfo").Does(() => System.IO.File.WriteAllText(paths.assemblyInfo, string.Empty));
-Task("Run-Release-Unit-Tests").Does(() => DotNetCoreTest(paths.testProject, new DotNetCoreTestSettings { Configuration = "Release", Framework = "net462" }));
-Task("Run-Release-Unit-Tests-Core").Does(() => DotNetCoreTest(paths.testProject, new DotNetCoreTestSettings { Configuration = "Release", Framework = "netcoreapp2.0" }));
+Task("Run-Unit-Tests-Net452").Does(() => DotNetCoreTest(paths.testProject, new DotNetCoreTestSettings { Configuration = "Release", Framework = "net452" }));
+Task("Run-Unit-Tests-Net462").Does(() => DotNetCoreTest(paths.testProject, new DotNetCoreTestSettings { Configuration = "Release", Framework = "net462" }));
+Task("Run-Unit-Tests-NetCore").Does(() => DotNetCoreTest(paths.testProject, new DotNetCoreTestSettings { Configuration = "Release", Framework = "netcoreapp2.0" }));
 Task("Nuget-Pack").Does(() => 
 {
     NuGetPack(paths.nuspec, new NuGetPackSettings {
@@ -75,14 +77,16 @@ Task("Build")
     .IsDependentOn("Clean")
     .IsDependentOn("Restore-NuGet-Packages")
     .IsDependentOn("Create-AssemblyInfo")
-    .IsDependentOn("Build-Release")
-    .IsDependentOn("Build-Release-Core")
+    .IsDependentOn("Build-Net452")
+    .IsDependentOn("Build-Net462")
+    .IsDependentOn("Build-NetCore")
     .IsDependentOn("Clean-AssemblyInfo");
 
 Task("Test")
     .IsDependentOn("Build")
-    .IsDependentOn("Run-Release-Unit-Tests")
-    .IsDependentOn("Run-Release-Unit-Tests-Core");
+    .IsDependentOn("Run-Unit-Tests-Net452")
+    .IsDependentOn("Run-Unit-Tests-Net462")
+    .IsDependentOn("Run-Unit-Tests-NetCore");
 
 Task("Nuget")
     .IsDependentOn("Test")
