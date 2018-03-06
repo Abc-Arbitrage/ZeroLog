@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Attributes.Jobs;
@@ -102,9 +103,10 @@ namespace ZeroLog.Benchmarks.ThroughputTests
             layout.ActivateOptions();
             _log4NetTestAppender.ActivateOptions();
 
-            log4net.Config.BasicConfigurator.Configure(_log4NetTestAppender);
+            var repository = log4net.LogManager.GetRepository(Assembly.GetExecutingAssembly());
+            log4net.Config.BasicConfigurator.Configure(repository, _log4NetTestAppender);
 
-            _log4NetLogger = log4net.LogManager.GetLogger(nameof(Log4Net));
+            _log4NetLogger = log4net.LogManager.GetLogger(repository.Name, nameof(Log4Net));
         }
 
         private void TearDownLog4Net()

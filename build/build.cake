@@ -1,5 +1,5 @@
 #l "scripts/utilities.cake"
-#tool nuget:?package=NUnit.Runners.Net4&version=2.6.4
+#tool nuget:?package=NUnit.ConsoleRunner&version=3.7.0
 
 //////////////////////////////////////////////////////////////////////
 // ARGUMENTS
@@ -8,6 +8,7 @@
 var target = Argument("target", "Default");
 var paths = new {
     solution = MakeAbsolute(File("./../src/ZeroLog.sln")).FullPath,
+    project  = MakeAbsolute(File("./../src/ZeroLog/ZeroLog.csproj")).FullPath,
     version = MakeAbsolute(File("./../version.yml")).FullPath,
     assemblyInfo = MakeAbsolute(File("./../src/SharedVersionInfo.cs")).FullPath,
     output = new {
@@ -15,6 +16,7 @@ var paths = new {
         nuget = MakeAbsolute(Directory("./../output/nuget")).FullPath,
     },
     nuspec = MakeAbsolute(File("./ZeroLog.nuspec")).FullPath,
+    testProject = MakeAbsolute(File("./../src/ZeroLog.Tests/ZeroLog.Tests.csproj")).FullPath,
 };
 
 ReadContext(paths.version);
@@ -40,7 +42,7 @@ Task("Clean").Does(() =>
     CleanDirectory(paths.output.build);
     CleanDirectory(paths.output.nuget);
 });
-Task("Restore-NuGet-Packages").Does(() => NuGetRestore(paths.solution));
+Task("Restore-NuGet-Packages").Does(() => DotNetCoreRestore(paths.solution));
 Task("Create-AssemblyInfo").Does(()=>{
     Information("Assembly Version: {0}", VersionContext.AssemblyVersion);
     Information("   NuGet Version: {0}", VersionContext.NugetVersion);
@@ -50,11 +52,13 @@ Task("Create-AssemblyInfo").Does(()=>{
         InformationalVersion = VersionContext.NugetVersion + " Commit: " + VersionContext.Git.Sha
     });
 });
-Task("Build-Debug").Does(() => Build("Debug", paths.output.build));
-Task("Build-Release").Does(() => Build("Release", paths.output.build));
+Task("Build-Net452").Does(() => DotNetCoreBuild(paths.project, new DotNetCoreBuildSettings { Framework = "net452", Configuration = "Release", OutputDirectory = paths.output.build + "/net452"} ));
+Task("Build-Net462").Does(() => DotNetCoreBuild(paths.project, new DotNetCoreBuildSettings { Framework = "net462", Configuration = "Release", OutputDirectory = paths.output.build + "/net462"} ));
+Task("Build-NetCore").Does(() => DotNetCoreBuild(paths.project, new DotNetCoreBuildSettings { Framework = "netstandard2.0", Configuration = "Release", OutputDirectory = paths.output.build + "/netstandard2.0"} ));
 Task("Clean-AssemblyInfo").Does(() => System.IO.File.WriteAllText(paths.assemblyInfo, string.Empty));
-Task("Run-Debug-Unit-Tests").Does(() => NUnit(paths.output.build + "/Debug/*.Tests.exe", new NUnitSettings { Framework = "net-4.6.1", NoResults = true }));
-Task("Run-Release-Unit-Tests").Does(() => NUnit(paths.output.build + "/Release/*.Tests.exe", new NUnitSettings { Framework = "net-4.6.1", NoResults = true }));
+Task("Run-Unit-Tests-Net452").Does(() => DotNetCoreTest(paths.testProject, new DotNetCoreTestSettings { Configuration = "Release", Framework = "net452" }));
+Task("Run-Unit-Tests-Net462").Does(() => DotNetCoreTest(paths.testProject, new DotNetCoreTestSettings { Configuration = "Release", Framework = "net462" }));
+Task("Run-Unit-Tests-NetCore").Does(() => DotNetCoreTest(paths.testProject, new DotNetCoreTestSettings { Configuration = "Release", Framework = "netcoreapp2.0" }));
 Task("Nuget-Pack").Does(() => 
 {
     NuGetPack(paths.nuspec, new NuGetPackSettings {
@@ -73,14 +77,16 @@ Task("Build")
     .IsDependentOn("Clean")
     .IsDependentOn("Restore-NuGet-Packages")
     .IsDependentOn("Create-AssemblyInfo")
-    .IsDependentOn("Build-Debug")
-    .IsDependentOn("Build-Release")
+    .IsDependentOn("Build-Net452")
+    .IsDependentOn("Build-Net462")
+    .IsDependentOn("Build-NetCore")
     .IsDependentOn("Clean-AssemblyInfo");
 
 Task("Test")
     .IsDependentOn("Build")
-    .IsDependentOn("Run-Debug-Unit-Tests")
-    .IsDependentOn("Run-Release-Unit-Tests");
+    .IsDependentOn("Run-Unit-Tests-Net452")
+    .IsDependentOn("Run-Unit-Tests-Net462")
+    .IsDependentOn("Run-Unit-Tests-NetCore");
 
 Task("Nuget")
     .IsDependentOn("Test")
