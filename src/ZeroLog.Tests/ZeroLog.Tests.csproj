@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp2.0;net462;net452</TargetFrameworks>
+    <TargetFrameworks>netcoreapp2.0;net45</TargetFrameworks>
     <OutputType>Exe</OutputType>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
@@ -44,7 +44,7 @@
     <PackageReference Include="NUnit" Version="3.9.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.9.0" />
     <PackageReference Include="Sigil" Version="4.7.0" />
-    <PackageReference Include="StringFormatter" Version="1.0.0.10" />
+    <PackageReference Include="StringFormatter" Version="1.0.0.11" />
     <PackageReference Include="System.ValueTuple" Version="4.3.1" />
   </ItemGroup>
   <ItemGroup>

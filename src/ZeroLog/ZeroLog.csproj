@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net462;net452</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;net45</TargetFrameworks>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
@@ -34,7 +34,7 @@
     <PackageReference Include="JetBrains.Annotations" Version="11.0.0" />
     <PackageReference Include="Jil" Version="2.15.2" />
     <PackageReference Include="Sigil" Version="4.7.0" />
-    <PackageReference Include="StringFormatter" Version="1.0.0.10" />
+    <PackageReference Include="StringFormatter" Version="1.0.0.11" />
     <PackageReference Include="System.ValueTuple" Version="4.3.1" />
   </ItemGroup>
   <ItemGroup>
