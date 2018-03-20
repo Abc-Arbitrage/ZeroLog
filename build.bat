@@ -1,2 +1,2 @@
-powershell build\build.ps1 -Script build\build.cake -Target Build
+powershell -ExecutionPolicy Bypass build\build.ps1 -Script build\build.cake -Target Build
 pause
