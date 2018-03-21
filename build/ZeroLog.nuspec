@@ -13,7 +13,7 @@
     <tags>logging zero-allocation</tags>
 	  <dependencies>
       <dependency id="JetBrains.Annotations" version="10.2.1" />
-      <dependency id="StringFormatter" version="1.0.0.10" />
+      <dependency id="StringFormatter" version="1.0.0.11" />
       <dependency id="System.ValueTuple" version="4.3.1" />
     </dependencies>
   </metadata>
