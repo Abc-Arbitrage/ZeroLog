@@ -1,18 +1,16 @@
 ﻿using System;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using ExtraConstraints;
 using static System.Linq.Expressions.Expression;
 
 namespace ZeroLog.Utils
 {
-    internal static class EnumUtil
+    internal static class TypeUtil
     {
         private static readonly Func<IntPtr, Type> _getTypeFromHandleFunc = BuildGetTypeFromHandleFunc();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static IntPtr GetTypeHandle<[EnumConstraint] T>()
-            where T : struct
+        public static IntPtr GetTypeHandle<T>()
             => Cache<T>.TypeHandle;
 
         public static Type GetTypeFromHandle(IntPtr typeHandle)
@@ -33,7 +31,6 @@ namespace ZeroLog.Utils
         }
 
         private struct Cache<T>
-            where T : struct
         {
             public static readonly IntPtr TypeHandle = typeof(T).TypeHandle.Value;
         }

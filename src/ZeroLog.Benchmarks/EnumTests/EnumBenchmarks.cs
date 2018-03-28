@@ -57,7 +57,6 @@ namespace ZeroLog.Benchmarks.EnumTests
         }
 
         private struct Cache<T>
-            where T : struct
         {
             public static readonly IntPtr TypeHandle = typeof(T).TypeHandle.Value;
         }
