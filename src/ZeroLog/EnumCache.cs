@@ -111,13 +111,14 @@ namespace ZeroLog
         {
             public static EnumStrings Create(Type enumType)
             {
-                var enumValues = Enum.GetValues(enumType)
-                                     .Cast<Enum>()
-                                     .ToList();
+                var enumItems = Enum.GetValues(enumType)
+                                    .Cast<Enum>()
+                                    .Select(i => new EnumItem(i))
+                                    .ToList();
 
-                return ArrayEnumStrings.CanHandle(enumValues)
-                    ? (EnumStrings)new ArrayEnumStrings(enumValues)
-                    : new DictionaryEnumStrings(enumValues);
+                return ArrayEnumStrings.CanHandle(enumItems)
+                    ? (EnumStrings)new ArrayEnumStrings(enumItems)
+                    : new DictionaryEnumStrings(enumItems);
             }
 
             [CanBeNull]
@@ -128,22 +129,22 @@ namespace ZeroLog
         {
             private readonly string[] _strings;
 
-            public static bool CanHandle(IEnumerable<Enum> enumValues)
-                => enumValues.All(i => ToUInt64Slow(i) <= 32);
+            public static bool CanHandle(IEnumerable<EnumItem> enumItems)
+                => enumItems.All(i => i.Value < 32);
 
-            public ArrayEnumStrings(List<Enum> enumValues)
+            public ArrayEnumStrings(List<EnumItem> enumItems)
             {
-                if (enumValues.Count == 0)
+                if (enumItems.Count == 0)
                 {
                     _strings = Array.Empty<string>();
                     return;
                 }
 
-                var maxValue = (int)enumValues.Select(ToUInt64Slow).Max();
+                var maxValue = enumItems.Select(i => i.Value).Max();
                 _strings = new string[maxValue + 1];
 
-                foreach (var value in enumValues)
-                    _strings[ToUInt64Slow(value)] = value.ToString();
+                foreach (var item in enumItems)
+                    _strings[item.Value] = item.Name;
             }
 
             public override string TryGetString(ulong value)
@@ -156,16 +157,28 @@ namespace ZeroLog
         {
             private readonly Dictionary<ulong, string> _strings = new Dictionary<ulong, string>();
 
-            public DictionaryEnumStrings(List<Enum> enumValues)
+            public DictionaryEnumStrings(List<EnumItem> enumItems)
             {
-                foreach (var value in enumValues)
-                    _strings[ToUInt64Slow(value)] = value.ToString();
+                foreach (var item in enumItems)
+                    _strings[item.Value] = item.Name;
             }
 
             public override string TryGetString(ulong value)
             {
                 _strings.TryGetValue(value, out var str);
                 return str;
+            }
+        }
+
+        private struct EnumItem
+        {
+            public ulong Value { get; }
+            public string Name { get; }
+
+            public EnumItem(Enum item)
+            {
+                Value = ToUInt64Slow(item);
+                Name = item.ToString();
             }
         }
     }
