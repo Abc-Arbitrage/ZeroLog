@@ -96,11 +96,30 @@ namespace ZeroLog.Tests
             Check.That(GetString(EnumWithLargeValues.Baz)).Equals("Baz");
         }
 
+        [Test]
+        public void should_return_sign_info()
+        {
+            Check.That(GetIsSigned<EnumByte>()).Equals(false);
+            Check.That(GetIsSigned<EnumSByte>()).Equals(true);
+            Check.That(GetIsSigned<EnumInt16>()).Equals(true);
+            Check.That(GetIsSigned<EnumUInt16>()).Equals(false);
+            Check.That(GetIsSigned<EnumInt32>()).Equals(true);
+            Check.That(GetIsSigned<EnumUInt32>()).Equals(false);
+            Check.That(GetIsSigned<EnumInt64>()).Equals(true);
+            Check.That(GetIsSigned<EnumUInt64>()).Equals(false);
+        }
+
         private static string GetString<T>(T value)
             where T : struct
         {
             EnumCache.Register(typeof(T));
             return EnumCache.TryGetString(TypeUtil.GetTypeHandle<T>(), EnumCache.ToUInt64(value));
+        }
+
+        private static bool GetIsSigned<T>()
+            where T : struct
+        {
+            return EnumCache.IsEnumSigned(TypeUtil.GetTypeHandle<T>());
         }
 
         private enum EnumByte : byte

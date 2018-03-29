@@ -4,6 +4,7 @@ using System.Text;
 using System.Text.Formatting;
 using System.Threading;
 using System.Threading.Tasks;
+using ExtraConstraints;
 using ZeroLog.Appenders;
 using ZeroLog.Config;
 using ZeroLog.ConfigResolvers;
@@ -68,6 +69,12 @@ namespace ZeroLog
 
             logManager?.Dispose();
         }
+
+        public static void RegisterEnum(Type enumType)
+            => EnumCache.Register(enumType);
+
+        public static void RegisterEnum<[EnumConstraint] T>()
+            => EnumCache.Register(typeof(T));
 
         public void Dispose()
         {

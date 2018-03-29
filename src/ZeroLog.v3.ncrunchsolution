@@ -2,6 +2,7 @@
   <Settings>
     <AllowParallelTestExecution>False</AllowParallelTestExecution>
     <AllowTestsToRunInParallelWithThemselves>False</AllowTestsToRunInParallelWithThemselves>
+    <ConsiderInconclusiveTestsAsPassing>True</ConsiderInconclusiveTestsAsPassing>
     <SolutionConfigured>True</SolutionConfigured>
   </Settings>
 </SolutionConfiguration>

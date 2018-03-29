@@ -114,6 +114,22 @@ namespace ZeroLog
                     argPointer += sizeof(byte) + argSet.BytesRead;
                     break;
 
+                case ArgumentType.Enum:
+                    var enumTypeHandle = *(IntPtr*)argPointer;
+                    argPointer += sizeof(IntPtr);
+                    var enumValue = *(ulong*)argPointer;
+                    argPointer += sizeof(ulong);
+                    var enumString = EnumCache.TryGetString(enumTypeHandle, enumValue);
+                    if (enumString != null)
+                        stringBuffer.Append(enumString);
+                    else if (enumValue <= long.MaxValue)
+                        stringBuffer.Append(enumValue, format);
+                    else if (EnumCache.IsEnumSigned(enumTypeHandle))
+                        stringBuffer.Append(unchecked((long)enumValue), format);
+                    else
+                        stringBuffer.Append(enumValue, format);
+                    break;
+
                 default:
                     throw new ArgumentOutOfRangeException();
             }

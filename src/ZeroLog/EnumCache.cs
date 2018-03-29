@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection.Emit;
+using System.Runtime.CompilerServices;
 using InlineIL;
 using JetBrains.Annotations;
 using ZeroLog.Utils;
@@ -12,6 +14,7 @@ namespace ZeroLog
     internal static class EnumCache
     {
         private static readonly ConcurrentDictionary<IntPtr, EnumStrings> _enums = new ConcurrentDictionary<IntPtr, EnumStrings>();
+        private static readonly ConcurrentDictionary<IntPtr, bool> _isEnumSigned = new ConcurrentDictionary<IntPtr, bool>();
 
         public static void Register([NotNull] Type enumType)
         {
@@ -29,8 +32,8 @@ namespace ZeroLog
                 ? values.TryGetString(value)
                 : null;
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ulong ToUInt64<T>(T value)
-            where T : struct
         {
             IL.Push(value);
             IL.Emit(OpCodes.Conv_I8);
@@ -68,7 +71,35 @@ namespace ZeroLog
                         return (ulong)(object)value;
 
                     default:
-                        throw new InvalidOperationException($"Invalid enum underlying type: {value.GetType()}");
+                        throw new InvalidOperationException($"Invalid enum: {value.GetType()}");
+                }
+            }
+        }
+
+        [SuppressMessage("ReSharper", "ConvertClosureToMethodGroup")]
+        public static bool IsEnumSigned(IntPtr typeHandle)
+        {
+            return _isEnumSigned.GetOrAdd(typeHandle, h => IsEnumSignedImpl(h));
+
+            bool IsEnumSignedImpl(IntPtr h)
+            {
+                var type = TypeUtil.GetTypeFromHandle(h);
+                switch (Type.GetTypeCode(Enum.GetUnderlyingType(type)))
+                {
+                    case TypeCode.SByte:
+                    case TypeCode.Int16:
+                    case TypeCode.Int32:
+                    case TypeCode.Int64:
+                        return true;
+
+                    case TypeCode.Byte:
+                    case TypeCode.UInt16:
+                    case TypeCode.UInt32:
+                    case TypeCode.UInt64:
+                        return false;
+
+                    default:
+                        throw new InvalidOperationException($"Invalid enum: {type}");
                 }
             }
         }

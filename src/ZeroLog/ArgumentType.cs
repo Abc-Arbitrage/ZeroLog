@@ -17,5 +17,6 @@ namespace ZeroLog
         DateTime,
         TimeSpan,
         AsciiString,
+        Enum
     }
 }

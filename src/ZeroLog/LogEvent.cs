@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text.Formatting;
 using System.Threading;
+using ExtraConstraints;
 using ZeroLog.Appenders;
 using ZeroLog.Utils;
 
@@ -106,6 +107,9 @@ namespace ZeroLog
             else if (typeof(T) == typeof(TimeSpan))
                 Append((TimeSpan)(object)arg);
 
+            else if (typeof(T).IsEnum)
+                AppendEnumInternal(arg);
+
             else
                 throw new NotSupportedException($"Type {typeof(T)} is not supported ");
         }
@@ -132,7 +136,7 @@ namespace ZeroLog
             length = Math.Min(length, remainingBytes);
 
             AppendArgumentType(ArgumentType.AsciiString);
-            AppendInt(length);
+            AppendInt32(length);
             AppendBytes(bytes, length);
             return this;
         }
@@ -148,7 +152,7 @@ namespace ZeroLog
             length = Math.Min(length, remainingBytes);
 
             AppendArgumentType(ArgumentType.AsciiString);
-            AppendInt(length);
+            AppendInt32(length);
             AppendBytes(bytes, length);
             return this;
         }
@@ -205,7 +209,7 @@ namespace ZeroLog
                 return this;
 
             AppendArgumentType(ArgumentType.Int16);
-            AppendShort(s);
+            AppendInt16(s);
             return this;
         }
 
@@ -217,7 +221,7 @@ namespace ZeroLog
 
             AppendArgumentType(ArgumentType.Int16, true);
             AppendString(format);
-            AppendShort(s);
+            AppendInt16(s);
             return this;
         }
 
@@ -228,7 +232,7 @@ namespace ZeroLog
                 return this;
 
             AppendArgumentType(ArgumentType.Int32);
-            AppendInt(i);
+            AppendInt32(i);
             return this;
         }
 
@@ -240,7 +244,7 @@ namespace ZeroLog
 
             AppendArgumentType(ArgumentType.Int32, true);
             AppendString(format);
-            AppendInt(i);
+            AppendInt32(i);
             return this;
         }
 
@@ -251,7 +255,7 @@ namespace ZeroLog
                 return this;
 
             AppendArgumentType(ArgumentType.Int64);
-            AppendLong(l);
+            AppendInt64(l);
             return this;
         }
 
@@ -263,7 +267,7 @@ namespace ZeroLog
 
             AppendArgumentType(ArgumentType.Int64, true);
             AppendString(format);
-            AppendLong(l);
+            AppendInt64(l);
             return this;
         }
 
@@ -402,6 +406,25 @@ namespace ZeroLog
             AppendArgumentType(ArgumentType.TimeSpan, true);
             AppendString(format);
             AppendTimeSpan(ts);
+            return this;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ILogEvent AppendEnum<[EnumConstraint] T>(T value)
+            where T : struct
+        {
+            return AppendEnumInternal(value);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private ILogEvent AppendEnumInternal<T>(T value)
+        {
+            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(IntPtr) + sizeof(ulong)))
+                return this;
+
+            AppendArgumentType(ArgumentType.Enum);
+            AppendPointer(TypeUtil.GetTypeHandle<T>());
+            AppendUInt64(EnumCache.ToUInt64(value));
             return this;
         }
 
@@ -605,22 +628,28 @@ namespace ZeroLog
             _dataPointer += sizeof(char);
         }
 
-        private void AppendShort(short s)
+        private void AppendInt16(short s)
         {
             *(short*)_dataPointer = s;
             _dataPointer += sizeof(short);
         }
 
-        private void AppendInt(int i)
+        private void AppendInt32(int i)
         {
             *(int*)_dataPointer = i;
             _dataPointer += sizeof(int);
         }
 
-        private void AppendLong(long l)
+        private void AppendInt64(long l)
         {
             *(long*)_dataPointer = l;
             _dataPointer += sizeof(long);
+        }
+
+        private void AppendUInt64(ulong l)
+        {
+            *(ulong*)_dataPointer = l;
+            _dataPointer += sizeof(ulong);
         }
 
         private void AppendFloat(float f)
@@ -657,6 +686,12 @@ namespace ZeroLog
         {
             *(TimeSpan*)_dataPointer = ts;
             _dataPointer += sizeof(TimeSpan);
+        }
+
+        private void AppendPointer(IntPtr ptr)
+        {
+            *(IntPtr*)_dataPointer = ptr;
+            _dataPointer += sizeof(IntPtr);
         }
 
         public void SetTimestamp(DateTime timestamp)
