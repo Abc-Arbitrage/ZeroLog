@@ -13,6 +13,9 @@ namespace ZeroLog.Utils
         public static IntPtr GetTypeHandle<T>()
             => Cache<T>.TypeHandle;
 
+        public static IntPtr GetTypeHandleSlow(Type type)
+            => type.TypeHandle.Value;
+
         public static Type GetTypeFromHandle(IntPtr typeHandle)
             => _getTypeFromHandleFunc?.Invoke(typeHandle);
 
@@ -32,7 +35,7 @@ namespace ZeroLog.Utils
 
         private struct Cache<T>
         {
-            public static readonly IntPtr TypeHandle = typeof(T).TypeHandle.Value;
+            public static readonly IntPtr TypeHandle = GetTypeHandleSlow(typeof(T));
         }
     }
 }
