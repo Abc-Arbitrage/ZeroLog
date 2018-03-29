@@ -1,15 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net452;net47</TargetFrameworks>
-    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
-    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
-    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
-    <GenerateAssemblyInformationalVersionAttribute>false</GenerateAssemblyInformationalVersionAttribute>
-    <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
-    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
-    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
-    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -18,8 +12,6 @@
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType Condition="'$(TargetFramework)' != 'netstandard2.0'">pdbonly</DebugType>
@@ -27,16 +19,16 @@
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
+  <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="ExtraConstraints.Fody" Version="1.12.2" />
     <PackageReference Include="Fody" Version="2.4.6" />
     <PackageReference Include="InlineIL.Fody" Version="0.1.2" />
     <PackageReference Include="JetBrains.Annotations" Version="11.0.0" />
     <PackageReference Include="Jil" Version="2.15.2" />
-    <PackageReference Include="Sigil" Version="4.7.0" />
     <PackageReference Include="StringFormatter" Version="1.0.0.11" />
     <PackageReference Include="System.ValueTuple" Version="4.3.1" />
   </ItemGroup>
@@ -47,9 +39,14 @@
     <Compile Include="..\SharedVersionInfo.cs">
       <Link>Properties\SharedVersionInfo.cs</Link>
     </Compile>
-    <None Include="Log.tt">
+    <Compile Update="Log.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Log.tt</DependentUpon>
+    </Compile>
+    <None Update="Log.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>Log1.cs</LastGenOutput>
+      <LastGenOutput>Log.cs</LastGenOutput>
     </None>
   </ItemGroup>
 </Project>
