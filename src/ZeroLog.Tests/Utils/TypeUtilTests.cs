@@ -13,7 +13,7 @@ namespace ZeroLog.Tests.Utils
             var typeHandle = TypeUtil.GetTypeHandle<DayOfWeek>();
             var type = TypeUtil.GetTypeFromHandle(typeHandle);
 
-            Check.That(type).Equals(typeof(DayOfWeek));
+            Check.That(type).IsEqualTo(typeof(DayOfWeek));
         }
     }
 }

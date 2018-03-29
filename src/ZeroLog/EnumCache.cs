@@ -27,6 +27,9 @@ namespace ZeroLog
             _enums.TryAdd(TypeUtil.GetTypeHandleSlow(enumType), EnumStrings.Create(enumType));
         }
 
+        public static bool IsRegistered([NotNull] Type enumType)
+            => _enums.ContainsKey(TypeUtil.GetTypeHandleSlow(enumType));
+
         public static string TryGetString(IntPtr typeHandle, ulong value)
             => _enums.TryGetValue(typeHandle, out var values)
                 ? values.TryGetString(value)
@@ -130,7 +133,14 @@ namespace ZeroLog
 
             public ArrayEnumStrings(List<Enum> enumValues)
             {
-                _strings = new string[enumValues.Count];
+                if (enumValues.Count == 0)
+                {
+                    _strings = Array.Empty<string>();
+                    return;
+                }
+
+                var maxValue = (int)enumValues.Select(ToUInt64Slow).Max();
+                _strings = new string[maxValue + 1];
 
                 foreach (var value in enumValues)
                     _strings[ToUInt64Slow(value)] = value.ToString();

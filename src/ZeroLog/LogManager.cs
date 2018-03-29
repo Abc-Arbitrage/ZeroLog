@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Text.Formatting;
 using System.Threading;
 using System.Threading.Tasks;
 using ExtraConstraints;
+using JetBrains.Annotations;
 using ZeroLog.Appenders;
-using ZeroLog.Config;
 using ZeroLog.ConfigResolvers;
 using ZeroLog.Utils;
 
@@ -61,7 +63,7 @@ namespace ZeroLog
             _logManager = new LogManager(configResolver, logEventQueueSize, logEventBufferSize);
             return _logManager;
         }
-        
+
         public static void Shutdown()
         {
             var logManager = _logManager;
@@ -70,17 +72,26 @@ namespace ZeroLog
             logManager?.Dispose();
         }
 
-        public static void RegisterEnum(Type enumType)
+        public static void RegisterEnum([NotNull] Type enumType)
             => EnumCache.Register(enumType);
 
         public static void RegisterEnum<[EnumConstraint] T>()
             => EnumCache.Register(typeof(T));
 
+        public static void RegisterAllEnumsFrom([NotNull] Assembly assembly)
+        {
+            if (assembly == null)
+                throw new ArgumentNullException(nameof(assembly));
+
+            foreach (var type in assembly.GetTypes().Where(t => t.IsEnum))
+                RegisterEnum(type);
+        }
+
         public void Dispose()
         {
             if (!_isRunning)
                 return;
-            
+
             _isRunning = false;
             _writeTask.Wait(15000);
 
@@ -200,13 +211,13 @@ namespace ZeroLog
                 var bytesWritten = CopyStringBufferToByteArray(stringBuffer, destination);
 
                 WriteMessageLogToAppenders(destination, logEvent, bytesWritten);
-
             }
             finally
             {
                 if (logEvent.IsPooled)
                     _pool.Release(logEvent);
             }
+
             return true;
         }
 
@@ -242,6 +253,7 @@ namespace ZeroLog
             {
                 bytesWritten = stringBuffer.CopyTo(dest, destination.Length, 0, stringBuffer.Count, _encoding);
             }
+
             return bytesWritten;
         }
 

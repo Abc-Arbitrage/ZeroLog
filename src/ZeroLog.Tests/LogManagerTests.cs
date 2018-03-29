@@ -200,5 +200,13 @@ namespace ZeroLog.Tests
             var logMessage = _testAppender.LoggedMessages.Single();
             Check.That(logMessage).Equals("An error occured during formatting: \"Hello\", False, 1, 'a', 2, 3, 4, 5, 6, 7, " + guid + ", 2017-02-24 16:51:51.000, 16:51:51.000, \"abc\", \"abc\"");
         }
+
+        [Test]
+        public void should_register_all_assembly_enums()
+        {
+            Check.That(EnumCache.IsRegistered(typeof(ConsoleColor))).IsFalse();
+            LogManager.RegisterAllEnumsFrom(typeof(ConsoleColor).Assembly);
+            Check.That(EnumCache.IsRegistered(typeof(ConsoleColor))).IsTrue();
+        }
     }
 }

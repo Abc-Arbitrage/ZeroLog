@@ -79,7 +79,7 @@ namespace ZeroLog.Tests
                 log.InfoFormat(
                     "Enum {0}, UnknownEnum {1}",
                     DayOfWeek.Friday,
-                    ConsoleColor.Blue
+                    UnregisteredEnum.Bar
                 );
             }
 
@@ -90,6 +90,13 @@ namespace ZeroLog.Tests
             var gcCountAfter = GC.CollectionCount(0);
 
             Check.That(gcCountBefore).IsEqualTo(gcCountAfter);
+        }
+
+        private enum UnregisteredEnum
+        {
+            Foo,
+            Bar,
+            Baz
         }
     }
 }

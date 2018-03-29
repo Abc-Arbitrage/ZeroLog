@@ -9,65 +9,65 @@ namespace ZeroLog.Tests
         [Test]
         public void should_get_enum_strings_byte()
         {
-            Check.That(GetString(EnumByte.Foo)).Equals("Foo");
-            Check.That(GetString(EnumByte.Bar)).Equals("Bar");
-            Check.That(GetString(EnumByte.Baz)).Equals("Baz");
+            Check.That(GetString(EnumByte.Foo)).IsEqualTo("Foo");
+            Check.That(GetString(EnumByte.Bar)).IsEqualTo("Bar");
+            Check.That(GetString(EnumByte.Baz)).IsEqualTo("Baz");
         }
 
         [Test]
         public void should_get_enum_strings_sbyte()
         {
-            Check.That(GetString(EnumSByte.Foo)).Equals("Foo");
-            Check.That(GetString(EnumSByte.Bar)).Equals("Bar");
-            Check.That(GetString(EnumSByte.Baz)).Equals("Baz");
+            Check.That(GetString(EnumSByte.Foo)).IsEqualTo("Foo");
+            Check.That(GetString(EnumSByte.Bar)).IsEqualTo("Bar");
+            Check.That(GetString(EnumSByte.Baz)).IsEqualTo("Baz");
         }
 
         [Test]
         public void should_get_enum_strings_int16()
         {
-            Check.That(GetString(EnumInt16.Foo)).Equals("Foo");
-            Check.That(GetString(EnumInt16.Bar)).Equals("Bar");
-            Check.That(GetString(EnumInt16.Baz)).Equals("Baz");
+            Check.That(GetString(EnumInt16.Foo)).IsEqualTo("Foo");
+            Check.That(GetString(EnumInt16.Bar)).IsEqualTo("Bar");
+            Check.That(GetString(EnumInt16.Baz)).IsEqualTo("Baz");
         }
 
         [Test]
         public void should_get_enum_strings_uint16()
         {
-            Check.That(GetString(EnumUInt16.Foo)).Equals("Foo");
-            Check.That(GetString(EnumUInt16.Bar)).Equals("Bar");
-            Check.That(GetString(EnumUInt16.Baz)).Equals("Baz");
+            Check.That(GetString(EnumUInt16.Foo)).IsEqualTo("Foo");
+            Check.That(GetString(EnumUInt16.Bar)).IsEqualTo("Bar");
+            Check.That(GetString(EnumUInt16.Baz)).IsEqualTo("Baz");
         }
 
         [Test]
         public void should_get_enum_strings_int32()
         {
-            Check.That(GetString(EnumInt32.Foo)).Equals("Foo");
-            Check.That(GetString(EnumInt32.Bar)).Equals("Bar");
-            Check.That(GetString(EnumInt32.Baz)).Equals("Baz");
+            Check.That(GetString(EnumInt32.Foo)).IsEqualTo("Foo");
+            Check.That(GetString(EnumInt32.Bar)).IsEqualTo("Bar");
+            Check.That(GetString(EnumInt32.Baz)).IsEqualTo("Baz");
         }
 
         [Test]
         public void should_get_enum_strings_uint32()
         {
-            Check.That(GetString(EnumUInt32.Foo)).Equals("Foo");
-            Check.That(GetString(EnumUInt32.Bar)).Equals("Bar");
-            Check.That(GetString(EnumUInt32.Baz)).Equals("Baz");
+            Check.That(GetString(EnumUInt32.Foo)).IsEqualTo("Foo");
+            Check.That(GetString(EnumUInt32.Bar)).IsEqualTo("Bar");
+            Check.That(GetString(EnumUInt32.Baz)).IsEqualTo("Baz");
         }
 
         [Test]
         public void should_get_enum_strings_int64()
         {
-            Check.That(GetString(EnumInt64.Foo)).Equals("Foo");
-            Check.That(GetString(EnumInt64.Bar)).Equals("Bar");
-            Check.That(GetString(EnumInt64.Baz)).Equals("Baz");
+            Check.That(GetString(EnumInt64.Foo)).IsEqualTo("Foo");
+            Check.That(GetString(EnumInt64.Bar)).IsEqualTo("Bar");
+            Check.That(GetString(EnumInt64.Baz)).IsEqualTo("Baz");
         }
 
         [Test]
         public void should_get_enum_strings_uint64()
         {
-            Check.That(GetString(EnumUInt64.Foo)).Equals("Foo");
-            Check.That(GetString(EnumUInt64.Bar)).Equals("Bar");
-            Check.That(GetString(EnumUInt64.Baz)).Equals("Baz");
+            Check.That(GetString(EnumUInt64.Foo)).IsEqualTo("Foo");
+            Check.That(GetString(EnumUInt64.Bar)).IsEqualTo("Bar");
+            Check.That(GetString(EnumUInt64.Baz)).IsEqualTo("Baz");
         }
 
         [Test]
@@ -83,30 +83,42 @@ namespace ZeroLog.Tests
         [Test]
         public void should_get_enum_strings_on_enums_with_negative_values()
         {
-            Check.That(GetString(EnumWithNegativeValues.Foo)).Equals("Foo");
-            Check.That(GetString(EnumWithNegativeValues.Bar)).Equals("Bar");
-            Check.That(GetString(EnumWithNegativeValues.Baz)).Equals("Baz");
+            Check.That(GetString(EnumWithNegativeValues.Foo)).IsEqualTo("Foo");
+            Check.That(GetString(EnumWithNegativeValues.Bar)).IsEqualTo("Bar");
+            Check.That(GetString(EnumWithNegativeValues.Baz)).IsEqualTo("Baz");
         }
 
         [Test]
         public void should_get_enum_strings_on_enums_with_large_values()
         {
-            Check.That(GetString(EnumWithLargeValues.Foo)).Equals("Foo");
-            Check.That(GetString(EnumWithLargeValues.Bar)).Equals("Bar");
-            Check.That(GetString(EnumWithLargeValues.Baz)).Equals("Baz");
+            Check.That(GetString(EnumWithLargeValues.Foo)).IsEqualTo("Foo");
+            Check.That(GetString(EnumWithLargeValues.Bar)).IsEqualTo("Bar");
+            Check.That(GetString(EnumWithLargeValues.Baz)).IsEqualTo("Baz");
+        }
+
+        [Test]
+        public void should_get_enum_strings_on_enums_with_value_larger_than_item_count()
+        {
+            Check.That(GetString(EnumWithValueLargerThanItemCount.Foo)).IsEqualTo("Foo");
+        }
+
+        [Test]
+        public void should_get_enum_strings_on_empty_enums()
+        {
+            Check.That(GetString(default(EmptyEnum))).IsNull();
         }
 
         [Test]
         public void should_return_sign_info()
         {
-            Check.That(GetIsSigned<EnumByte>()).Equals(false);
-            Check.That(GetIsSigned<EnumSByte>()).Equals(true);
-            Check.That(GetIsSigned<EnumInt16>()).Equals(true);
-            Check.That(GetIsSigned<EnumUInt16>()).Equals(false);
-            Check.That(GetIsSigned<EnumInt32>()).Equals(true);
-            Check.That(GetIsSigned<EnumUInt32>()).Equals(false);
-            Check.That(GetIsSigned<EnumInt64>()).Equals(true);
-            Check.That(GetIsSigned<EnumUInt64>()).Equals(false);
+            Check.That(GetIsSigned<EnumByte>()).IsFalse();
+            Check.That(GetIsSigned<EnumSByte>()).IsTrue();
+            Check.That(GetIsSigned<EnumInt16>()).IsTrue();
+            Check.That(GetIsSigned<EnumUInt16>()).IsFalse();
+            Check.That(GetIsSigned<EnumInt32>()).IsTrue();
+            Check.That(GetIsSigned<EnumUInt32>()).IsFalse();
+            Check.That(GetIsSigned<EnumInt64>()).IsTrue();
+            Check.That(GetIsSigned<EnumUInt64>()).IsFalse();
         }
 
         private static string GetString<T>(T value)
@@ -190,6 +202,15 @@ namespace ZeroLog.Tests
             Foo = long.MinValue,
             Bar = 0,
             Baz = long.MaxValue
+        }
+
+        private enum EnumWithValueLargerThanItemCount
+        {
+            Foo = 4
+        }
+
+        private enum EmptyEnum
+        {
         }
     }
 }
