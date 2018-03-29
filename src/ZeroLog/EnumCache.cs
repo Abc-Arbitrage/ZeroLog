@@ -129,6 +129,10 @@ namespace ZeroLog
         {
             private readonly string[] _strings;
 
+#if NET452
+            private static readonly string[] _emptyStrings = new string[0];
+#endif
+
             public static bool CanHandle(IEnumerable<EnumItem> enumItems)
                 => enumItems.All(i => i.Value < 32);
 
@@ -136,7 +140,11 @@ namespace ZeroLog
             {
                 if (enumItems.Count == 0)
                 {
+#if NET452
+                    _strings = _emptyStrings;
+#else
                     _strings = Array.Empty<string>();
+#endif
                     return;
                 }
 
