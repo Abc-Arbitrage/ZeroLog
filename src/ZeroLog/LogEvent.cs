@@ -419,12 +419,12 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private ILogEvent AppendEnumInternal<T>(T value)
         {
-            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(IntPtr) + sizeof(ulong)))
+            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(EnumArg)))
                 return this;
 
             AppendArgumentType(ArgumentType.Enum);
-            AppendPointer(TypeUtil.GetTypeHandle<T>());
-            AppendUInt64(EnumCache.ToUInt64(value));
+            *(EnumArg*)_dataPointer = new EnumArg(TypeUtil.GetTypeHandle<T>(), EnumCache.ToUInt64(value));
+            _dataPointer += sizeof(EnumArg);
             return this;
         }
 
@@ -561,9 +561,9 @@ namespace ZeroLog
                     break;
 
                 case ArgumentType.Enum:
-                    dataPointer += sizeof(IntPtr);
-                    stringBuffer.Append(*(ulong*)dataPointer, StringView.Empty);
-                    dataPointer += sizeof(ulong);
+                    var enumArg = (EnumArg*)dataPointer;
+                    dataPointer += sizeof(EnumArg);
+                    stringBuffer.Append(enumArg->Value, StringView.Empty);
                     break;
 
                 default:
@@ -655,12 +655,6 @@ namespace ZeroLog
             _dataPointer += sizeof(long);
         }
 
-        private void AppendUInt64(ulong l)
-        {
-            *(ulong*)_dataPointer = l;
-            _dataPointer += sizeof(ulong);
-        }
-
         private void AppendFloat(float f)
         {
             *(float*)_dataPointer = f;
@@ -695,12 +689,6 @@ namespace ZeroLog
         {
             *(TimeSpan*)_dataPointer = ts;
             _dataPointer += sizeof(TimeSpan);
-        }
-
-        private void AppendPointer(IntPtr ptr)
-        {
-            *(IntPtr*)_dataPointer = ptr;
-            _dataPointer += sizeof(IntPtr);
         }
 
         public void SetTimestamp(DateTime timestamp)

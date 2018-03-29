@@ -115,19 +115,17 @@ namespace ZeroLog
                     break;
 
                 case ArgumentType.Enum:
-                    var enumTypeHandle = *(IntPtr*)argPointer;
-                    argPointer += sizeof(IntPtr);
-                    var enumValue = *(ulong*)argPointer;
-                    argPointer += sizeof(ulong);
-                    var enumString = EnumCache.TryGetString(enumTypeHandle, enumValue);
+                    var enumArg = (EnumArg*)argPointer;
+                    argPointer += sizeof(EnumArg);
+                    var enumString = EnumCache.TryGetString(enumArg->TypeHandle, enumArg->Value);
                     if (enumString != null)
                         stringBuffer.Append(enumString);
-                    else if (enumValue <= long.MaxValue)
-                        stringBuffer.Append(enumValue, format);
-                    else if (EnumCache.IsEnumSigned(enumTypeHandle))
-                        stringBuffer.Append(unchecked((long)enumValue), format);
+                    else if (enumArg->Value <= long.MaxValue)
+                        stringBuffer.Append(enumArg->Value, format);
+                    else if (EnumCache.IsEnumSigned(enumArg->TypeHandle))
+                        stringBuffer.Append(unchecked((long)enumArg->Value), format);
                     else
-                        stringBuffer.Append(enumValue, format);
+                        stringBuffer.Append(enumArg->Value, format);
                     break;
 
                 default:
