@@ -563,7 +563,7 @@ namespace ZeroLog
                 case ArgumentType.Enum:
                     var enumArg = (EnumArg*)dataPointer;
                     dataPointer += sizeof(EnumArg);
-                    stringBuffer.Append(enumArg->Value, StringView.Empty);
+                    enumArg->AppendTo(stringBuffer);
                     break;
 
                 default:

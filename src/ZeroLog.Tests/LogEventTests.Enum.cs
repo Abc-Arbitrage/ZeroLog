@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using NCrunch.Framework;
 using NUnit.Framework;
 
 namespace ZeroLog.Tests
@@ -28,6 +29,7 @@ namespace ZeroLog.Tests
         }
 
         [Test]
+        [ExclusivelyUses("EnumRegistration")]
         public void should_append_unregistered_enum()
         {
             _logEvent.AppendEnum(UnregisteredEnum.Bar);
@@ -37,6 +39,7 @@ namespace ZeroLog.Tests
         }
 
         [Test]
+        [ExclusivelyUses("EnumRegistration")]
         public void should_append_unregistered_enum_negative()
         {
             _logEvent.AppendEnum(UnregisteredEnum.Neg);
@@ -46,12 +49,32 @@ namespace ZeroLog.Tests
         }
 
         [Test]
+        [ExclusivelyUses("EnumRegistration")]
         public void should_append_unregistered_enum_large()
         {
             _logEvent.AppendEnum(UnregisteredEnumLarge.LargeValue);
             _logEvent.WriteToStringBuffer(_output);
 
             Assert.AreEqual(((ulong)UnregisteredEnumLarge.LargeValue).ToString(CultureInfo.InvariantCulture), _output.ToString());
+        }
+
+        [Test]
+        [ExclusivelyUses("EnumRegistration")]
+        public void should_auto_register_enum()
+        {
+            try
+            {
+                LogManager.LazyRegisterEnums = true;
+
+                _logEvent.AppendEnum(AutoRegisterEnum.Bar);
+                _logEvent.WriteToStringBuffer(_output);
+
+                Assert.AreEqual("Bar", _output.ToString());
+            }
+            finally
+            {
+                LogManager.LazyRegisterEnums = false;
+            }
         }
 
         private enum TestEnum
@@ -72,6 +95,13 @@ namespace ZeroLog.Tests
         private enum UnregisteredEnumLarge : ulong
         {
             LargeValue = long.MaxValue + 42UL
+        }
+
+        private enum AutoRegisterEnum
+        {
+            Foo,
+            Bar,
+            Baz
         }
     }
 }

@@ -30,6 +30,8 @@ namespace ZeroLog
         private bool _isRunning;
         private readonly Encoding _encoding = Encoding.UTF8;
 
+        public static bool LazyRegisterEnums { get; set; }
+
         internal LogManager(IConfigurationResolver configResolver, int logEventQueueSize = 1024, int logEventBufferSize = 128)
         {
             _configResolver = configResolver;

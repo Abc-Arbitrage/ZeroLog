@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text.Formatting;
+using ZeroLog.Utils;
 
 namespace ZeroLog
 {
@@ -117,15 +118,7 @@ namespace ZeroLog
                 case ArgumentType.Enum:
                     var enumArg = (EnumArg*)argPointer;
                     argPointer += sizeof(EnumArg);
-                    var enumString = EnumCache.TryGetString(enumArg->TypeHandle, enumArg->Value);
-                    if (enumString != null)
-                        stringBuffer.Append(enumString);
-                    else if (enumArg->Value <= long.MaxValue)
-                        stringBuffer.Append(enumArg->Value, format);
-                    else if (EnumCache.IsEnumSigned(enumArg->TypeHandle))
-                        stringBuffer.Append(unchecked((long)enumArg->Value), format);
-                    else
-                        stringBuffer.Append(enumArg->Value, format);
+                    enumArg->AppendTo(stringBuffer);
                     break;
 
                 default:

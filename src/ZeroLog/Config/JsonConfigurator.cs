@@ -32,15 +32,23 @@ namespace ZeroLog.Config
 
                     var newConfig = ReadConfiguration(configFileFullPath);
                     resolver.Build(newConfig);
+                    ConfigureGlobal(newConfig);
                 }
                 catch (Exception e)
                 {
                     LogManager.GetLogger(typeof(JsonConfigurator))
-                        .FatalFormat("Updating config failed with: {0}", e.Message);
+                              .FatalFormat("Updating config failed with: {0}", e.Message);
                 }
             };
 
-            return LogManager.Initialize(resolver, config.LogEventQueueSize, config.LogEventBufferSize);
+            var logManager = LogManager.Initialize(resolver, config.LogEventQueueSize, config.LogEventBufferSize);
+            ConfigureGlobal(config);
+            return logManager;
+        }
+
+        private static void ConfigureGlobal(ZeroLogConfiguration config)
+        {
+            LogManager.LazyRegisterEnums = config.LazyRegisterEnums;
         }
 
         private static ZeroLogConfiguration ConfigureResolver(string configFileFullPath, HierarchicalResolver resolver)

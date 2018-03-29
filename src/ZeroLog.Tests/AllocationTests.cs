@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Threading;
+using NCrunch.Framework;
 using NFluent;
 using NUnit.Framework;
 using ZeroLog.Appenders;
@@ -12,6 +13,7 @@ namespace ZeroLog.Tests
     public class AllocationTests
     {
         private WaitableAppender _waitableAppender;
+        private string _tempDirectory;
 
         public class WaitableAppender : DateAndSizeRollingFileAppender
         {
@@ -32,13 +34,12 @@ namespace ZeroLog.Tests
         [SetUp]
         public void Setup()
         {
-            foreach (var file in Directory.EnumerateFiles(@".\", $"allocation-test.*"))
-            {
-                File.Delete(file);
-            }
+            _tempDirectory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
+            Directory.CreateDirectory(_tempDirectory);
 
-            _waitableAppender = new WaitableAppender("allocation-test");
-            BasicConfigurator.Configure(new[] { _waitableAppender }, 2048 * 10, 512);
+
+            _waitableAppender = new WaitableAppender(Path.Combine(_tempDirectory, "allocation-test"));
+            BasicConfigurator.Configure(new[] {_waitableAppender}, 2048 * 10, 512);
             LogManager.RegisterEnum<DayOfWeek>();
         }
 
@@ -46,13 +47,14 @@ namespace ZeroLog.Tests
         public void Teardown()
         {
             LogManager.Shutdown();
+            Directory.Delete(_tempDirectory, true);
         }
 
         [Test]
         public void should_not_allocate_using_all_formats_and_file_appender()
         {
             // Allocation tests are unreliable when run from NCrunch
-            if (Environment.GetEnvironmentVariable("NCrunch") == "1")
+            if (NCrunchEnvironment.NCrunchIsResident())
                 Assert.Inconclusive();
 
             var log = LogManager.GetLogger("AllocationTest");

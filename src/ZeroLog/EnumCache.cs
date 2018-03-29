@@ -30,10 +30,17 @@ namespace ZeroLog
         public static bool IsRegistered([NotNull] Type enumType)
             => _enums.ContainsKey(TypeUtil.GetTypeHandleSlow(enumType));
 
-        public static string TryGetString(IntPtr typeHandle, ulong value)
-            => _enums.TryGetValue(typeHandle, out var values)
-                ? values.TryGetString(value)
-                : null;
+        public static string TryGetString(IntPtr typeHandle, ulong value, out bool registered)
+        {
+            if (_enums.TryGetValue(typeHandle, out var values))
+            {
+                registered = true;
+                return values.TryGetString(value);
+            }
+
+            registered = false;
+            return null;
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ulong ToUInt64<T>(T value)
