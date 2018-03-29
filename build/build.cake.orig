@@ -81,10 +81,14 @@ Task("Build")
 
 Task("Test")
     .IsDependentOn("Build")
+<<<<<<< HEAD
+    .IsDependentOn("Run-Unit-Tests-NetFwk")
+=======
     .IsDependentOn("Run-Tests");
 
 Task("Run-Tests")
-    .IsDependentOn("Run-Unit-Tests-NetFwk")
+    .IsDependentOn("Run-Unit-Tests-Net45")
+>>>>>>> master
     .IsDependentOn("Run-Unit-Tests-NetCore");
 
 Task("Nuget")
