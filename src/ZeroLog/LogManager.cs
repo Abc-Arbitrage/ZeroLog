@@ -76,7 +76,7 @@ namespace ZeroLog
             => EnumCache.Register(enumType);
 
         public static void RegisterEnum<[EnumConstraint] T>()
-            => EnumCache.Register(typeof(T));
+            => RegisterEnum(typeof(T));
 
         public static void RegisterAllEnumsFrom([NotNull] Assembly assembly)
         {

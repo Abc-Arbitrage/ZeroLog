@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using ExtraConstraints;
 using ZeroLog.Appenders;
 
 namespace ZeroLog
@@ -7,6 +8,7 @@ namespace ZeroLog
     public interface ILogEvent : ILogEventHeader
     {
         IList<IAppender> Appenders { get; }
+
         ILogEvent Append(string s);
         ILogEvent AppendAsciiString(byte[] bytes, int length);
         unsafe ILogEvent AppendAsciiString(byte* bytes, int length);
@@ -32,6 +34,10 @@ namespace ZeroLog
         ILogEvent Append(DateTime dt, string format);
         ILogEvent Append(TimeSpan ts);
         ILogEvent Append(TimeSpan ts, string format);
+
+        ILogEvent AppendEnum<[EnumConstraint] T>(T value)
+            where T : struct;
+
         void Log();
     }
 }

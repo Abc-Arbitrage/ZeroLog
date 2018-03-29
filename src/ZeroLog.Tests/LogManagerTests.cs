@@ -177,7 +177,8 @@ namespace ZeroLog.Tests
 
             fixed (byte* pAsciiString = asciiString)
             {
-                log.Info().Append("Hello")
+                log.Info()
+                   .Append("Hello")
                    .Append(false)
                    .Append((byte)1)
                    .Append('a')
@@ -192,13 +193,14 @@ namespace ZeroLog.Tests
                    .Append(timespan)
                    .AppendAsciiString(asciiString, asciiString.Length)
                    .AppendAsciiString(pAsciiString, asciiString.Length)
+                   .AppendEnum(DayOfWeek.Friday)
                    .Log();
             }
 
             signal.Wait(TimeSpan.FromMilliseconds(100));
 
             var logMessage = _testAppender.LoggedMessages.Single();
-            Check.That(logMessage).Equals("An error occured during formatting: \"Hello\", False, 1, 'a', 2, 3, 4, 5, 6, 7, " + guid + ", 2017-02-24 16:51:51.000, 16:51:51.000, \"abc\", \"abc\"");
+            Check.That(logMessage).Equals("An error occured during formatting: \"Hello\", False, 1, 'a', 2, 3, 4, 5, 6, 7, " + guid + ", 2017-02-24 16:51:51.000, 16:51:51.000, \"abc\", \"abc\", 5");
         }
 
         [Test]

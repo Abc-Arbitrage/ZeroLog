@@ -560,6 +560,12 @@ namespace ZeroLog
                     dataPointer += sizeof(byte);
                     break;
 
+                case ArgumentType.Enum:
+                    dataPointer += sizeof(IntPtr);
+                    stringBuffer.Append(*(ulong*)dataPointer, StringView.Empty);
+                    dataPointer += sizeof(ulong);
+                    break;
+
                 default:
                     throw new ArgumentOutOfRangeException();
             }
