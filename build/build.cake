@@ -81,6 +81,9 @@ Task("Build")
 
 Task("Test")
     .IsDependentOn("Build")
+    .IsDependentOn("Run-Tests");
+
+Task("Run-Tests")
     .IsDependentOn("Run-Unit-Tests-Net45")
     .IsDependentOn("Run-Unit-Tests-NetCore");
 
