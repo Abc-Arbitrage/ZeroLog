@@ -52,12 +52,12 @@ Task("Create-AssemblyInfo").Does(()=>{
         InformationalVersion = VersionContext.NugetVersion + " Commit: " + VersionContext.Git.Sha
     });
 });
-Task("Build-Net45").Does(() => DotNetCoreBuild(paths.project, new DotNetCoreBuildSettings { Framework = "net45", Configuration = "Release", OutputDirectory = paths.output.build + "/net45"} ));
+Task("Build-NetFwk").Does(() => DotNetCoreBuild(paths.project, new DotNetCoreBuildSettings { Framework = "net452", Configuration = "Release", OutputDirectory = paths.output.build + "/net452"} ));
 Task("Build-NetCore").Does(() => DotNetCoreBuild(paths.project, new DotNetCoreBuildSettings { Framework = "netstandard2.0", Configuration = "Release", OutputDirectory = paths.output.build + "/netstandard2.0"} ));
 Task("Clean-AssemblyInfo").Does(() => System.IO.File.WriteAllText(paths.assemblyInfo, string.Empty));
-Task("Run-Unit-Tests-Net45").Does(() => DotNetCoreTest(paths.testProject, new DotNetCoreTestSettings { Configuration = "Release", Framework = "net45" }));
+Task("Run-Unit-Tests-NetFwk").Does(() => DotNetCoreTest(paths.testProject, new DotNetCoreTestSettings { Configuration = "Release", Framework = "net47" }));
 Task("Run-Unit-Tests-NetCore").Does(() => DotNetCoreTest(paths.testProject, new DotNetCoreTestSettings { Configuration = "Release", Framework = "netcoreapp2.0" }));
-Task("Nuget-Pack").Does(() => 
+Task("Nuget-Pack").Does(() =>
 {
     NuGetPack(paths.nuspec, new NuGetPackSettings {
         Version = VersionContext.NugetVersion,
@@ -75,13 +75,13 @@ Task("Build")
     .IsDependentOn("Clean")
     .IsDependentOn("Restore-NuGet-Packages")
     .IsDependentOn("Create-AssemblyInfo")
-    .IsDependentOn("Build-Net45")
+    .IsDependentOn("Build-NetFwk")
     .IsDependentOn("Build-NetCore")
     .IsDependentOn("Clean-AssemblyInfo");
 
 Task("Test")
     .IsDependentOn("Build")
-    .IsDependentOn("Run-Unit-Tests-Net45")
+    .IsDependentOn("Run-Unit-Tests-NetFwk")
     .IsDependentOn("Run-Unit-Tests-NetCore");
 
 Task("Nuget")
