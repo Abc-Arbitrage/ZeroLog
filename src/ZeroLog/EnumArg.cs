@@ -23,7 +23,7 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void AppendTo(StringBuffer stringBuffer)
         {
-            var enumString = EnumCache.TryGetString(_typeHandle, _value, out var enumRegistered);
+            var enumString = EnumCache.GetString(_typeHandle, _value, out var enumRegistered);
             if (enumString != null)
             {
                 stringBuffer.Append(enumString);
@@ -39,7 +39,7 @@ namespace ZeroLog
             if (!enumRegistered && LogManager.LazyRegisterEnums)
             {
                 LogManager.RegisterEnum(TypeUtil.GetTypeFromHandle(_typeHandle));
-                var enumString = EnumCache.TryGetString(_typeHandle, _value, out _);
+                var enumString = EnumCache.GetString(_typeHandle, _value, out _);
                 if (enumString != null)
                 {
                     stringBuffer.Append(enumString);

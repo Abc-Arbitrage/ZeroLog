@@ -125,7 +125,7 @@ namespace ZeroLog.Tests
             where T : struct
         {
             EnumCache.Register(typeof(T));
-            return EnumCache.TryGetString(TypeUtil.GetTypeHandle<T>(), EnumCache.ToUInt64(value), out _);
+            return EnumCache.GetString(TypeUtil.GetTypeHandle<T>(), EnumCache.ToUInt64(value), out _);
         }
 
         private static bool GetIsSigned<T>()

@@ -30,7 +30,8 @@ namespace ZeroLog
         public static bool IsRegistered([NotNull] Type enumType)
             => _enums.ContainsKey(TypeUtil.GetTypeHandleSlow(enumType));
 
-        public static string TryGetString(IntPtr typeHandle, ulong value, out bool registered)
+        [CanBeNull]
+        public static string GetString(IntPtr typeHandle, ulong value, out bool registered)
         {
             if (_enums.TryGetValue(typeHandle, out var values))
             {
@@ -136,10 +137,6 @@ namespace ZeroLog
         {
             private readonly string[] _strings;
 
-#if NET452
-            private static readonly string[] _emptyStrings = new string[0];
-#endif
-
             public static bool CanHandle(IEnumerable<EnumItem> enumItems)
                 => enumItems.All(i => i.Value < 32);
 
@@ -147,11 +144,7 @@ namespace ZeroLog
             {
                 if (enumItems.Count == 0)
                 {
-#if NET452
-                    _strings = _emptyStrings;
-#else
-                    _strings = Array.Empty<string>();
-#endif
+                    _strings = ArrayUtil.Empty<string>();
                     return;
                 }
 
