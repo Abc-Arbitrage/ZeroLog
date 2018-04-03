@@ -4,6 +4,7 @@
     {
         public int LogEventQueueSize { get; set; } = 1024;
         public int LogEventBufferSize { get; set; } = 128;
+        public bool LazyRegisterEnums { get; set; }
 
         public AppenderDefinition[] Appenders { get; set; } = new AppenderDefinition[0];
 

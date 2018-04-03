@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text.Formatting;
 using System.Threading;
+using ExtraConstraints;
 using ZeroLog.Appenders;
 using ZeroLog.Utils;
 
@@ -106,6 +107,9 @@ namespace ZeroLog
             else if (typeof(T) == typeof(TimeSpan))
                 Append((TimeSpan)(object)arg);
 
+            else if (typeof(T).IsEnum)
+                AppendEnumInternal(arg);
+
             else
                 throw new NotSupportedException($"Type {typeof(T)} is not supported ");
         }
@@ -132,7 +136,7 @@ namespace ZeroLog
             length = Math.Min(length, remainingBytes);
 
             AppendArgumentType(ArgumentType.AsciiString);
-            AppendInt(length);
+            AppendInt32(length);
             AppendBytes(bytes, length);
             return this;
         }
@@ -148,7 +152,7 @@ namespace ZeroLog
             length = Math.Min(length, remainingBytes);
 
             AppendArgumentType(ArgumentType.AsciiString);
-            AppendInt(length);
+            AppendInt32(length);
             AppendBytes(bytes, length);
             return this;
         }
@@ -181,7 +185,7 @@ namespace ZeroLog
             if (!HasEnoughBytes(sizeof(ArgumentType) + 2 * sizeof(byte)))
                 return this;
 
-            AppendArgumentType(ArgumentType.Byte, true);
+            AppendArgumentTypeWithFormat(ArgumentType.Byte);
             AppendString(format);
             AppendByte(b);
             return this;
@@ -205,7 +209,7 @@ namespace ZeroLog
                 return this;
 
             AppendArgumentType(ArgumentType.Int16);
-            AppendShort(s);
+            AppendInt16(s);
             return this;
         }
 
@@ -215,9 +219,9 @@ namespace ZeroLog
             if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(byte) + sizeof(short)))
                 return this;
 
-            AppendArgumentType(ArgumentType.Int16, true);
+            AppendArgumentTypeWithFormat(ArgumentType.Int16);
             AppendString(format);
-            AppendShort(s);
+            AppendInt16(s);
             return this;
         }
 
@@ -228,7 +232,7 @@ namespace ZeroLog
                 return this;
 
             AppendArgumentType(ArgumentType.Int32);
-            AppendInt(i);
+            AppendInt32(i);
             return this;
         }
 
@@ -238,9 +242,9 @@ namespace ZeroLog
             if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(byte) + sizeof(int)))
                 return this;
 
-            AppendArgumentType(ArgumentType.Int32, true);
+            AppendArgumentTypeWithFormat(ArgumentType.Int32);
             AppendString(format);
-            AppendInt(i);
+            AppendInt32(i);
             return this;
         }
 
@@ -251,7 +255,7 @@ namespace ZeroLog
                 return this;
 
             AppendArgumentType(ArgumentType.Int64);
-            AppendLong(l);
+            AppendInt64(l);
             return this;
         }
 
@@ -261,9 +265,9 @@ namespace ZeroLog
             if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(byte) + sizeof(long)))
                 return this;
 
-            AppendArgumentType(ArgumentType.Int64, true);
+            AppendArgumentTypeWithFormat(ArgumentType.Int64);
             AppendString(format);
-            AppendLong(l);
+            AppendInt64(l);
             return this;
         }
 
@@ -284,7 +288,7 @@ namespace ZeroLog
             if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(byte) + sizeof(float)))
                 return this;
 
-            AppendArgumentType(ArgumentType.Single, true);
+            AppendArgumentTypeWithFormat(ArgumentType.Single);
             AppendString(format);
             AppendFloat(f);
             return this;
@@ -307,7 +311,7 @@ namespace ZeroLog
             if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(byte) + sizeof(double)))
                 return this;
 
-            AppendArgumentType(ArgumentType.Double, true);
+            AppendArgumentTypeWithFormat(ArgumentType.Double);
             AppendString(format);
             AppendDouble(d);
             return this;
@@ -330,7 +334,7 @@ namespace ZeroLog
             if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(byte) + sizeof(decimal)))
                 return this;
 
-            AppendArgumentType(ArgumentType.Decimal, true);
+            AppendArgumentTypeWithFormat(ArgumentType.Decimal);
             AppendString(format);
             AppendDecimal(d);
             return this;
@@ -353,7 +357,7 @@ namespace ZeroLog
             if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(byte) + sizeof(Guid)))
                 return this;
 
-            AppendArgumentType(ArgumentType.Guid, true);
+            AppendArgumentTypeWithFormat(ArgumentType.Guid);
             AppendString(format);
             AppendGuid(g);
             return this;
@@ -376,7 +380,7 @@ namespace ZeroLog
             if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(byte) + sizeof(DateTime)))
                 return this;
 
-            AppendArgumentType(ArgumentType.DateTime, true);
+            AppendArgumentTypeWithFormat(ArgumentType.DateTime);
             AppendString(format);
             AppendDateTime(dt);
             return this;
@@ -399,9 +403,28 @@ namespace ZeroLog
             if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(byte) + sizeof(TimeSpan)))
                 return this;
 
-            AppendArgumentType(ArgumentType.TimeSpan, true);
+            AppendArgumentTypeWithFormat(ArgumentType.TimeSpan);
             AppendString(format);
             AppendTimeSpan(ts);
+            return this;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ILogEvent AppendEnum<[EnumConstraint] T>(T value)
+            where T : struct
+        {
+            return AppendEnumInternal(value);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private ILogEvent AppendEnumInternal<T>(T value)
+        {
+            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(EnumArg)))
+                return this;
+
+            AppendArgumentType(ArgumentType.Enum);
+            *(EnumArg*)_dataPointer = new EnumArg(TypeUtil.GetTypeHandle<T>(), EnumCache.ToUInt64(value));
+            _dataPointer += sizeof(EnumArg);
             return this;
         }
 
@@ -537,25 +560,34 @@ namespace ZeroLog
                     dataPointer += sizeof(byte);
                     break;
 
+                case ArgumentType.Enum:
+                    var enumArg = (EnumArg*)dataPointer;
+                    dataPointer += sizeof(EnumArg);
+                    enumArg->AppendTo(stringBuffer);
+                    break;
+
                 default:
                     throw new ArgumentOutOfRangeException();
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private bool HasEnoughBytes(int requestedBytes)
-        {
-            return _dataPointer + requestedBytes <= _endOfBuffer;
-        }
+            => _dataPointer + requestedBytes <= _endOfBuffer;
 
-        private void AppendArgumentType(ArgumentType argumentType, bool withFormatSpecifier = false)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void AppendArgumentType(ArgumentType argumentType)
         {
             _argPointers.Add(new IntPtr(_dataPointer));
+            *_dataPointer = (byte)argumentType;
+            _dataPointer += sizeof(byte);
+        }
 
-            if (withFormatSpecifier)
-                *_dataPointer = (byte)((byte)argumentType | ArgumentTypeMask.FormatSpecifier);
-            else
-                *_dataPointer = (byte)argumentType;
-
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void AppendArgumentTypeWithFormat(ArgumentType argumentType)
+        {
+            _argPointers.Add(new IntPtr(_dataPointer));
+            *_dataPointer = (byte)((byte)argumentType | ArgumentTypeMask.FormatSpecifier);
             _dataPointer += sizeof(byte);
         }
 
@@ -605,19 +637,19 @@ namespace ZeroLog
             _dataPointer += sizeof(char);
         }
 
-        private void AppendShort(short s)
+        private void AppendInt16(short s)
         {
             *(short*)_dataPointer = s;
             _dataPointer += sizeof(short);
         }
 
-        private void AppendInt(int i)
+        private void AppendInt32(int i)
         {
             *(int*)_dataPointer = i;
             _dataPointer += sizeof(int);
         }
 
-        private void AppendLong(long l)
+        private void AppendInt64(long l)
         {
             *(long*)_dataPointer = l;
             _dataPointer += sizeof(long);

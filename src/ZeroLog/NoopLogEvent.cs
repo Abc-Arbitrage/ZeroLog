@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.Formatting;
+using ExtraConstraints;
 using ZeroLog.Appenders;
 
 namespace ZeroLog
@@ -56,6 +57,12 @@ namespace ZeroLog
         public ILogEvent Append(DateTime dt, string format) => this;
         public ILogEvent Append(TimeSpan ts) => this;
         public ILogEvent Append(TimeSpan ts, string format) => this;
+
+        public ILogEvent AppendEnum<[EnumConstraint] T>(T value)
+            where T : struct
+        {
+            return this;
+        }
 
         public void Log()
         {

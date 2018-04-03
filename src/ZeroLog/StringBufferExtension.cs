@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text.Formatting;
+using ZeroLog.Utils;
 
 namespace ZeroLog
 {
@@ -112,6 +113,12 @@ namespace ZeroLog
                     var argSet = new ArgSet(argPointers, strings);
                     stringBuffer.AppendArgSet(strings[*argPointer], ref argSet);
                     argPointer += sizeof(byte) + argSet.BytesRead;
+                    break;
+
+                case ArgumentType.Enum:
+                    var enumArg = (EnumArg*)argPointer;
+                    argPointer += sizeof(EnumArg);
+                    enumArg->AppendTo(stringBuffer);
                     break;
 
                 default:

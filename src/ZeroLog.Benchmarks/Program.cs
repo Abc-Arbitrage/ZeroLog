@@ -1,8 +1,8 @@
-﻿using System.Linq;
 ﻿using System;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Running;
+using ZeroLog.Benchmarks.EnumTests;
 using ZeroLog.Benchmarks.LatencyTests;
 using ZeroLog.Benchmarks.ThroughputTests;
 using ZeroLog.Benchmarks.Tools;
@@ -22,7 +22,6 @@ namespace ZeroLog.Benchmarks
             BenchmarkRunner.Run(benchs.Benchmarks, config);
         }
 
-
         private static void LatencyMultiProducer(int threadCount, int warmupMessageCount, int messageCount, int queueSize)
         {
             var zeroLog = new ZeroLogMultiProducer().Bench(queueSize, warmupMessageCount, messageCount, threadCount);
@@ -41,10 +40,12 @@ namespace ZeroLog.Benchmarks
         {
             //Throughput();
 
-            LatencyMultiProducer(4, 4 * 25_000, 4 * 250_000, 64);
-            LatencyMultiProducer(8, 8 * 25_000, 8 * 250_000, 64);
-            LatencyMultiProducer(4, 4 * 25_000, 4 * 250_000, 1024);
-            LatencyMultiProducer(8, 8 * 25_000, 8 * 250_000, 1024);
+            //LatencyMultiProducer(4, 4 * 25_000, 4 * 250_000, 64);
+            //LatencyMultiProducer(8, 8 * 25_000, 8 * 250_000, 64);
+            //LatencyMultiProducer(4, 4 * 25_000, 4 * 250_000, 1024);
+            //LatencyMultiProducer(8, 8 * 25_000, 8 * 250_000, 1024);
+
+            EnumBenchmarksRunner.Run();
 
             Console.ReadLine();
         }
