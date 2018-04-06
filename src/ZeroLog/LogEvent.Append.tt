@@ -1,0 +1,163 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".cs" #>
+<#
+    var types = new (string name, string argType, bool isFormattable)[]
+    {
+        ("bool", "Boolean", false),
+        ("byte", "Byte", true),
+        ("char", "Char", false),
+        ("short", "Int16", true),
+        ("int", "Int32", true),
+        ("long", "Int64", true),
+        ("float", "Single", true),
+        ("double", "Double", true),
+        ("decimal", "Decimal", true),
+        ("Guid", "Guid", true),
+        ("DateTime", "DateTime", true),
+        ("TimeSpan", "TimeSpan", true),
+    };
+#>
+using System;
+using System.Runtime.CompilerServices;
+
+namespace ZeroLog
+{
+    partial interface ILogEvent
+    {
+<#
+    foreach (var type in types)
+    {
+#>
+        ILogEvent Append(<#= type.name #> value);
+        ILogEvent Append(<#= type.name #>? value);
+<#
+        if (type.isFormattable)
+        {
+#>
+        ILogEvent Append(<#= type.name #> value, string format);
+        ILogEvent Append(<#= type.name #>? value, string format);
+<#
+        }
+    }
+#>
+    }
+
+    unsafe partial class LogEvent
+    {
+<#
+    foreach (var type in types)
+    {
+#>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ILogEvent Append(<#= type.name #> value)
+        {
+            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(<#= type.name #>)))
+                return this;
+
+            AppendArgumentType(ArgumentType.<#= type.argType #>);
+            Append<#= type.argType #>(value);
+            return this;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ILogEvent Append(<#= type.name #>? value)
+        {
+            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(<#= type.name #>)))
+                return this;
+
+            if (value == null)
+            {
+                AppendArgumentType(ArgumentType.Null);
+                return this;
+            }
+
+            AppendArgumentType(ArgumentType.<#= type.argType #>);
+            Append<#= type.argType #>(value.GetValueOrDefault());
+            return this;
+        }
+
+<#
+        if (type.isFormattable)
+        {
+#>
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ILogEvent Append(<#= type.name #> value, string format)
+        {
+            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(byte) + sizeof(<#= type.name #>)))
+                return this;
+
+            AppendArgumentTypeWithFormat(ArgumentType.<#= type.argType #>);
+            AppendString(format);
+            Append<#= type.argType #>(value);
+            return this;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ILogEvent Append(<#= type.name #>? value, string format)
+        {
+            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(byte) + sizeof(<#= type.name #>)))
+                return this;
+
+            if (value == null)
+            {
+                AppendArgumentType(ArgumentType.Null);
+                return this;
+            }
+
+            AppendArgumentTypeWithFormat(ArgumentType.<#= type.argType #>);
+            AppendString(format);
+            Append<#= type.argType #>(value.GetValueOrDefault());
+            return this;
+        }
+
+<#
+        }
+    }
+#>
+    }
+
+    partial class NoopLogEvent
+    {
+<#
+    foreach (var type in types)
+    {
+#>
+        public ILogEvent Append(<#= type.name #> value) => this;
+        public ILogEvent Append(<#= type.name #>? value) => this;
+<#
+        if (type.isFormattable)
+        {
+#>
+        public ILogEvent Append(<#= type.name #> value, string format) => this;
+        public ILogEvent Append(<#= type.name #>? value, string format) => this;
+<#
+        }
+    }
+#>
+    }
+
+    partial class ForwardingLogEvent
+    {
+<#
+    foreach (var type in types)
+    {
+#>
+        public ILogEvent Append(<#= type.name #> value) => this;
+        public ILogEvent Append(<#= type.name #>? value) => this;
+<#
+        if (type.isFormattable)
+        {
+#>
+        public ILogEvent Append(<#= type.name #> value, string format) => this;
+        public ILogEvent Append(<#= type.name #>? value, string format) => this;
+<#
+        }
+    }
+#>
+    }
+}

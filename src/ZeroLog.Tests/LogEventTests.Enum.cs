@@ -18,6 +18,17 @@ namespace ZeroLog.Tests
         }
 
         [Test]
+        public void should_append_null_enum()
+        {
+            LogManager.RegisterEnum(typeof(TestEnum));
+
+            _logEvent.AppendEnum((TestEnum?)null);
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreEqual("null", _output.ToString());
+        }
+
+        [Test]
         public void should_append_enum_generic()
         {
             LogManager.RegisterEnum(typeof(TestEnum));

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Formatting;
@@ -50,13 +51,14 @@ namespace ZeroLog.Tests
         }
 
         [Test]
-        public unsafe void should_append_unsafe_byte_array()
+        public void should_append_unsafe_byte_array()
         {
             var bytes = Encoding.Default.GetBytes("abc");
             fixed (byte* b = bytes)
             {
                 _logEvent.AppendAsciiString(b, bytes.Length);
             }
+
             _logEvent.WriteToStringBuffer(_output);
 
             Assert.AreEqual("abc", _output.ToString());
@@ -224,6 +226,35 @@ namespace ZeroLog.Tests
             _logEvent.WriteToStringBuffer(_output);
 
             Assert.AreEqual("AbCFalseTrue128£12345-128999999999999999999123.456789.012345.67890129ac124-e588-47e5-9d3d-fa3a4d174e292017-01-12 13:14:15.00002:03:04.005", _output.ToString());
+        }
+
+        [Test]
+        [TestCase(typeof(bool))]
+        [TestCase(typeof(byte))]
+        [TestCase(typeof(char))]
+        [TestCase(typeof(short))]
+        [TestCase(typeof(int))]
+        [TestCase(typeof(long))]
+        [TestCase(typeof(float))]
+        [TestCase(typeof(double))]
+        [TestCase(typeof(decimal))]
+        [TestCase(typeof(Guid))]
+        [TestCase(typeof(DateTime))]
+        [TestCase(typeof(TimeSpan))]
+        public void should_append_null(Type type)
+        {
+            typeof(LogEventTests).GetMethod(nameof(should_append_null), BindingFlags.Instance | BindingFlags.NonPublic, null, Type.EmptyTypes, null)
+                                 .MakeGenericMethod(type)
+                                 .Invoke(this, new object[0]);
+        }
+
+        private void should_append_null<T>()
+            where T : struct
+        {
+            ((dynamic)_logEvent).Append((T?)null);
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreEqual("null", _output.ToString());
         }
     }
 }

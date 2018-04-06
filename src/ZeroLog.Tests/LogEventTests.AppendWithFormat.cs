@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using NUnit.Framework;
 
 namespace ZeroLog.Tests
@@ -93,6 +94,33 @@ namespace ZeroLog.Tests
             _logEvent.WriteToStringBuffer(_output);
 
             Assert.AreEqual("02:03:04.005", _output.ToString());
+        }
+
+        [Test]
+        [TestCase(typeof(byte))]
+        [TestCase(typeof(short))]
+        [TestCase(typeof(int))]
+        [TestCase(typeof(long))]
+        [TestCase(typeof(float))]
+        [TestCase(typeof(double))]
+        [TestCase(typeof(decimal))]
+        [TestCase(typeof(Guid))]
+        [TestCase(typeof(DateTime))]
+        [TestCase(typeof(TimeSpan))]
+        public void should_append_null_with_format(Type type)
+        {
+            typeof(LogEventTests).GetMethod(nameof(should_append_null_with_format), BindingFlags.Instance | BindingFlags.NonPublic, null, Type.EmptyTypes, null)
+                                 .MakeGenericMethod(type)
+                                 .Invoke(this, new object[0]);
+        }
+
+        private void should_append_null_with_format<T>()
+            where T : struct
+        {
+            ((dynamic)_logEvent).Append((T?)null, "dummy");
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreEqual("null", _output.ToString());
         }
     }
 }
