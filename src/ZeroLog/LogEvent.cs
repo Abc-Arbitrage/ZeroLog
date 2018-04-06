@@ -58,63 +58,6 @@ namespace ZeroLog
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void AppendGeneric<T>(T arg)
-        {
-            // Some remarks here:
-            // - The JIT knows the type of "arg" at runtime and will be able the remove useless branches for each
-            //   struct specific jitted version of this method.
-            // - Since a jitted version of this method will be shared for all reference types, the optimisation
-            //   we just mentionned earlier can't occur. That's why we put the test against string at the top.
-            // - Casting to "object" then to the desired value type will force the C# compiler to emit boxing and 
-            //   unboxing IL opcodes, but the JIT is smart enough to prevent the actual boxing/unboxing from happening.
-
-            if (typeof(T) == typeof(string))
-                Append((string)(object)arg);
-
-            else if (typeof(T) == typeof(bool))
-                Append((bool)(object)arg);
-
-            else if (typeof(T) == typeof(byte))
-                Append((byte)(object)arg);
-
-            else if (typeof(T) == typeof(char))
-                Append((char)(object)arg);
-
-            else if (typeof(T) == typeof(short))
-                Append((short)(object)arg);
-
-            else if (typeof(T) == typeof(int))
-                Append((int)(object)arg);
-
-            else if (typeof(T) == typeof(long))
-                Append((long)(object)arg);
-
-            else if (typeof(T) == typeof(float))
-                Append((float)(object)arg);
-
-            else if (typeof(T) == typeof(double))
-                Append((double)(object)arg);
-
-            else if (typeof(T) == typeof(decimal))
-                Append((decimal)(object)arg);
-
-            else if (typeof(T) == typeof(Guid))
-                Append((Guid)(object)arg);
-
-            else if (typeof(T) == typeof(DateTime))
-                Append((DateTime)(object)arg);
-
-            else if (typeof(T) == typeof(TimeSpan))
-                Append((TimeSpan)(object)arg);
-
-            else if (typeof(T).IsEnum)
-                AppendEnumInternal(arg);
-
-            else
-                throw new NotSupportedException($"Type {typeof(T)} is not supported ");
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent Append(string s)
         {
             if (!HasEnoughBytes(sizeof(ArgumentType)))
@@ -186,9 +129,27 @@ namespace ZeroLog
                 return this;
 
             AppendArgumentType(ArgumentType.Enum);
-            *(EnumArg*)_dataPointer = new EnumArg(TypeUtil.GetTypeHandle<T>(), EnumCache.ToUInt64(value));
+            *(EnumArg*)_dataPointer = new EnumArg(TypeUtil<T>.TypeHandle, EnumCache.ToUInt64(value));
             _dataPointer += sizeof(EnumArg);
             return this;
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private void AppendNullableEnumInternal<T>(T value) // T = Nullable<SomeEnum>
+        {
+            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(EnumArg)))
+                return;
+
+            var enumValue = EnumCache.ToUInt64Nullable(value);
+            if (enumValue == null)
+            {
+                AppendArgumentType(ArgumentType.Null);
+                return;
+            }
+
+            AppendArgumentType(ArgumentType.Enum);
+            *(EnumArg*)_dataPointer = new EnumArg(TypeUtil<T>.TypeHandleNullableUnwrapped, enumValue.GetValueOrDefault());
+            _dataPointer += sizeof(EnumArg);
         }
 
         public void Log()

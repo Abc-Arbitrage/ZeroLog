@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
+using ZeroLog.Utils;
 
 namespace ZeroLog
 {
@@ -53,6 +54,75 @@ namespace ZeroLog
 
     unsafe partial class LogEvent
     {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void AppendGeneric<T>(T arg)
+        {
+            // Some remarks here:
+            // - The JIT knows the type of "arg" at runtime and will be able the remove useless branches for each
+            //   struct specific jitted version of this method.
+            // - Since a jitted version of this method will be shared for all reference types, the optimisation
+            //   we just mentionned earlier can't occur. That's why we put the test against string at the top.
+            // - Casting to "object" then to the desired value type will force the C# compiler to emit boxing and 
+            //   unboxing IL opcodes, but the JIT is smart enough to prevent the actual boxing/unboxing from happening.
+
+            if (typeof(T) == typeof(string))
+                Append((string)(object)arg);
+            else if (typeof(T) == typeof(bool))
+                Append((bool)(object)arg);
+            else if (typeof(T) == typeof(bool?))
+                Append((bool?)(object)arg);
+            else if (typeof(T) == typeof(byte))
+                Append((byte)(object)arg);
+            else if (typeof(T) == typeof(byte?))
+                Append((byte?)(object)arg);
+            else if (typeof(T) == typeof(char))
+                Append((char)(object)arg);
+            else if (typeof(T) == typeof(char?))
+                Append((char?)(object)arg);
+            else if (typeof(T) == typeof(short))
+                Append((short)(object)arg);
+            else if (typeof(T) == typeof(short?))
+                Append((short?)(object)arg);
+            else if (typeof(T) == typeof(int))
+                Append((int)(object)arg);
+            else if (typeof(T) == typeof(int?))
+                Append((int?)(object)arg);
+            else if (typeof(T) == typeof(long))
+                Append((long)(object)arg);
+            else if (typeof(T) == typeof(long?))
+                Append((long?)(object)arg);
+            else if (typeof(T) == typeof(float))
+                Append((float)(object)arg);
+            else if (typeof(T) == typeof(float?))
+                Append((float?)(object)arg);
+            else if (typeof(T) == typeof(double))
+                Append((double)(object)arg);
+            else if (typeof(T) == typeof(double?))
+                Append((double?)(object)arg);
+            else if (typeof(T) == typeof(decimal))
+                Append((decimal)(object)arg);
+            else if (typeof(T) == typeof(decimal?))
+                Append((decimal?)(object)arg);
+            else if (typeof(T) == typeof(Guid))
+                Append((Guid)(object)arg);
+            else if (typeof(T) == typeof(Guid?))
+                Append((Guid?)(object)arg);
+            else if (typeof(T) == typeof(DateTime))
+                Append((DateTime)(object)arg);
+            else if (typeof(T) == typeof(DateTime?))
+                Append((DateTime?)(object)arg);
+            else if (typeof(T) == typeof(TimeSpan))
+                Append((TimeSpan)(object)arg);
+            else if (typeof(T) == typeof(TimeSpan?))
+                Append((TimeSpan?)(object)arg);
+            else if (TypeUtil<T>.IsEnum)
+                AppendEnumInternal(arg);
+            else if (TypeUtil<T>.IsNullableEnum)
+                AppendNullableEnumInternal(arg);
+            else
+                throw new NotSupportedException($"Type {typeof(T)} is not supported ");
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent Append(bool value)
         {

@@ -255,6 +255,14 @@ namespace ZeroLog.Tests
             _logEvent.WriteToStringBuffer(_output);
 
             Assert.AreEqual("null", _output.ToString());
+
+            _output.Clear();
+            _logEvent.Initialize(Level.Info, null);
+
+            ((dynamic)_logEvent).AppendGeneric((T?)null);
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreEqual("null", _output.ToString());
         }
     }
 }

@@ -87,6 +87,47 @@ namespace ZeroLog
             }
         }
 
+        public static ulong? ToUInt64Nullable<T>(T value) // T = Nullable<SomeEnum>
+        {
+            switch (TypeUtil<T>.SizeOfNullableValue)
+            {
+                case 1:
+                {
+                    ref var nullable = ref TypeUtil.As<T, sbyte?>(ref value);
+                    return nullable != null
+                        ? unchecked((ulong?)nullable.GetValueOrDefault())
+                        : null;
+                }
+
+                case 2:
+                {
+                    ref var nullable = ref TypeUtil.As<T, short?>(ref value);
+                    return nullable != null
+                        ? unchecked((ulong?)nullable.GetValueOrDefault())
+                        : null;
+                }
+
+                case 4:
+                {
+                    ref var nullable = ref TypeUtil.As<T, int?>(ref value);
+                    return nullable != null
+                        ? unchecked((ulong?)nullable.GetValueOrDefault())
+                        : null;
+                }
+
+                case 8:
+                {
+                    ref var nullable = ref TypeUtil.As<T, long?>(ref value);
+                    return nullable != null
+                        ? unchecked((ulong?)nullable.GetValueOrDefault())
+                        : null;
+                }
+
+                default:
+                    return null;
+            }
+        }
+
         [SuppressMessage("ReSharper", "ConvertClosureToMethodGroup")]
         public static bool IsEnumSigned(IntPtr typeHandle)
         {

@@ -125,13 +125,13 @@ namespace ZeroLog.Tests
             where T : struct
         {
             EnumCache.Register(typeof(T));
-            return EnumCache.GetString(TypeUtil.GetTypeHandle<T>(), EnumCache.ToUInt64(value), out _);
+            return EnumCache.GetString(TypeUtil<T>.TypeHandle, EnumCache.ToUInt64(value), out _);
         }
 
         private static bool GetIsSigned<T>()
             where T : struct
         {
-            return EnumCache.IsEnumSigned(TypeUtil.GetTypeHandle<T>());
+            return EnumCache.IsEnumSigned(TypeUtil<T>.TypeHandle);
         }
 
         private enum EnumByte : byte
