@@ -241,14 +241,14 @@ namespace ZeroLog.Tests
         [TestCase(typeof(Guid))]
         [TestCase(typeof(DateTime))]
         [TestCase(typeof(TimeSpan))]
-        public void should_append_null(Type type)
+        public void should_append_nullable(Type type)
         {
-            typeof(LogEventTests).GetMethod(nameof(should_append_null), BindingFlags.Instance | BindingFlags.NonPublic, null, Type.EmptyTypes, null)
+            typeof(LogEventTests).GetMethod(nameof(should_append_nullable), BindingFlags.Instance | BindingFlags.NonPublic, null, Type.EmptyTypes, null)
                                  .MakeGenericMethod(type)
                                  .Invoke(this, new object[0]);
         }
 
-        private void should_append_null<T>()
+        private void should_append_nullable<T>()
             where T : struct
         {
             ((dynamic)_logEvent).Append((T?)null);
@@ -263,6 +263,22 @@ namespace ZeroLog.Tests
             _logEvent.WriteToStringBuffer(_output);
 
             Assert.AreEqual("null", _output.ToString());
+
+            _output.Clear();
+            _logEvent.Initialize(Level.Info, null);
+
+            ((dynamic)_logEvent).Append((T?)new T());
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreNotEqual("null", _output.ToString());
+
+            _output.Clear();
+            _logEvent.Initialize(Level.Info, null);
+
+            ((dynamic)_logEvent).AppendGeneric((T?)new T());
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreNotEqual("null", _output.ToString());
         }
     }
 }
