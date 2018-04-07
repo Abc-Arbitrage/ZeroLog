@@ -61,9 +61,15 @@ namespace ZeroLog.Utils
     internal static class TypeUtil<T>
     {
         public static readonly IntPtr TypeHandle = TypeUtil.GetTypeHandleSlow(typeof(T));
-        public static readonly IntPtr TypeHandleNullableUnwrapped = TypeUtil.GetTypeHandleSlow(Nullable.GetUnderlyingType(typeof(T)) ?? typeof(T));
         public static readonly bool IsEnum = typeof(T).IsEnum;
+    }
+
+    internal static class TypeUtilNullable<T>
+    {
+        // Nullable-specific properties, initializing this type will allocate
+
         public static readonly bool IsNullableEnum = Nullable.GetUnderlyingType(typeof(T))?.IsEnum == true;
-        public static readonly int SizeOfNullableValue = TypeUtil.SizeOfSlow(Nullable.GetUnderlyingType(typeof(T)));
+        public static readonly IntPtr UnderlyingTypeHandle = TypeUtil.GetTypeHandleSlow(Nullable.GetUnderlyingType(typeof(T)));
+        public static readonly int SizeOfUnderlyingType = TypeUtil.SizeOfSlow(Nullable.GetUnderlyingType(typeof(T)));
     }
 }

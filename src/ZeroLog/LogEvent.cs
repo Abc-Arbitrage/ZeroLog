@@ -47,6 +47,15 @@ namespace ZeroLog
             ThreadId = Thread.CurrentThread.ManagedThreadId;
         }
 
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private void AppendGenericSlow<T>(T arg)
+        {
+            if (TypeUtilNullable<T>.IsNullableEnum)
+                AppendNullableEnumInternal(arg);
+            else
+                throw new NotSupportedException($"Type {typeof(T)} is not supported ");
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void AppendFormat(string format)
         {
@@ -148,7 +157,7 @@ namespace ZeroLog
             }
 
             AppendArgumentType(ArgumentType.Enum);
-            *(EnumArg*)_dataPointer = new EnumArg(TypeUtil<T>.TypeHandleNullableUnwrapped, enumValue.GetValueOrDefault());
+            *(EnumArg*)_dataPointer = new EnumArg(TypeUtilNullable<T>.UnderlyingTypeHandle, enumValue.GetValueOrDefault());
             _dataPointer += sizeof(EnumArg);
         }
 

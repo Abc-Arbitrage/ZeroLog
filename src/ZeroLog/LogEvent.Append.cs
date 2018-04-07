@@ -117,10 +117,8 @@ namespace ZeroLog
                 Append((TimeSpan?)(object)arg);
             else if (TypeUtil<T>.IsEnum)
                 AppendEnumInternal(arg);
-            else if (TypeUtil<T>.IsNullableEnum)
-                AppendNullableEnumInternal(arg);
             else
-                throw new NotSupportedException($"Type {typeof(T)} is not supported ");
+                AppendGenericSlow(arg);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

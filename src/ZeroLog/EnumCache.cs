@@ -89,7 +89,7 @@ namespace ZeroLog
 
         public static ulong? ToUInt64Nullable<T>(T value) // T = Nullable<SomeEnum>
         {
-            switch (TypeUtil<T>.SizeOfNullableValue)
+            switch (TypeUtilNullable<T>.SizeOfUnderlyingType)
             {
                 case 1:
                 {
