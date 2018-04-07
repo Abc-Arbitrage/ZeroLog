@@ -51,81 +51,89 @@ namespace ZeroLog
             return IL.Return<ulong>();
         }
 
-        private static ulong ToUInt64Slow(Enum value)
+        internal static ulong ToUInt64Slow(Enum value)
         {
-            unchecked
+            switch (Type.GetTypeCode(Enum.GetUnderlyingType(value.GetType())))
             {
-                switch (Type.GetTypeCode(Enum.GetUnderlyingType(value.GetType())))
-                {
-                    case TypeCode.Byte:
-                        return (byte)(object)value;
+                case TypeCode.Byte:
+                    return ToUInt64((byte)(object)value);
 
-                    case TypeCode.SByte:
-                        return (ulong)(sbyte)(object)value;
+                case TypeCode.SByte:
+                    return ToUInt64((sbyte)(object)value);
 
-                    case TypeCode.Int16:
-                        return (ulong)(short)(object)value;
+                case TypeCode.Int16:
+                    return ToUInt64((short)(object)value);
 
-                    case TypeCode.UInt16:
-                        return (ushort)(object)value;
+                case TypeCode.UInt16:
+                    return ToUInt64((ushort)(object)value);
 
-                    case TypeCode.Int32:
-                        return (ulong)(int)(object)value;
+                case TypeCode.Int32:
+                    return ToUInt64((int)(object)value);
 
-                    case TypeCode.UInt32:
-                        return (uint)(object)value;
+                case TypeCode.UInt32:
+                    return ToUInt64((uint)(object)value);
 
-                    case TypeCode.Int64:
-                        return (ulong)(long)(object)value;
+                case TypeCode.Int64:
+                    return ToUInt64((long)(object)value);
 
-                    case TypeCode.UInt64:
-                        return (ulong)(object)value;
+                case TypeCode.UInt64:
+                    return ToUInt64((ulong)(object)value);
 
-                    default:
-                        throw new InvalidOperationException($"Invalid enum: {value.GetType()}");
-                }
+                default:
+                    throw new InvalidOperationException($"Invalid enum: {value.GetType()}");
             }
         }
 
         public static ulong? ToUInt64Nullable<T>(T value) // T = Nullable<SomeEnum>
         {
+            if (EnumTypeCache<T>.IsNullableUnderlyingEnumTypeSigned)
+            {
+                switch (TypeUtilNullable<T>.SizeOfUnderlyingType)
+                {
+                    case 1:
+                        return ToUInt64Nullable<T, sbyte>(value);
+
+                    case 2:
+                        return ToUInt64Nullable<T, short>(value);
+
+                    case 4:
+                        return ToUInt64Nullable<T, int>(value);
+
+                    case 8:
+                        return ToUInt64Nullable<T, long>(value);
+
+                    default:
+                        return null;
+                }
+            }
+
             switch (TypeUtilNullable<T>.SizeOfUnderlyingType)
             {
                 case 1:
-                {
-                    ref var nullable = ref TypeUtil.As<T, sbyte?>(ref value);
-                    return nullable != null
-                        ? unchecked((ulong?)nullable.GetValueOrDefault())
-                        : null;
-                }
+                    return ToUInt64Nullable<T, byte>(value);
 
                 case 2:
-                {
-                    ref var nullable = ref TypeUtil.As<T, short?>(ref value);
-                    return nullable != null
-                        ? unchecked((ulong?)nullable.GetValueOrDefault())
-                        : null;
-                }
+                    return ToUInt64Nullable<T, ushort>(value);
 
                 case 4:
-                {
-                    ref var nullable = ref TypeUtil.As<T, int?>(ref value);
-                    return nullable != null
-                        ? unchecked((ulong?)nullable.GetValueOrDefault())
-                        : null;
-                }
+                    return ToUInt64Nullable<T, uint>(value);
 
                 case 8:
-                {
-                    ref var nullable = ref TypeUtil.As<T, long?>(ref value);
-                    return nullable != null
-                        ? unchecked((ulong?)nullable.GetValueOrDefault())
-                        : null;
-                }
+                    return ToUInt64Nullable<T, ulong>(value);
 
                 default:
                     return null;
             }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static ulong? ToUInt64Nullable<T, TBase>(T value) // T = Nullable<SomeEnum>
+            where TBase : struct
+        {
+            ref var nullable = ref TypeUtil.As<T, TBase?>(ref value);
+            return nullable != null
+                ? ToUInt64(nullable.GetValueOrDefault())
+                : (ulong?)null;
         }
 
         [SuppressMessage("ReSharper", "ConvertClosureToMethodGroup")]
@@ -229,6 +237,11 @@ namespace ZeroLog
                 Value = ToUInt64Slow(item);
                 Name = item.ToString();
             }
+        }
+
+        private static class EnumTypeCache<T>
+        {
+            public static readonly bool IsNullableUnderlyingEnumTypeSigned = IsEnumSigned(TypeUtilNullable<T>.UnderlyingTypeHandle);
         }
     }
 }
