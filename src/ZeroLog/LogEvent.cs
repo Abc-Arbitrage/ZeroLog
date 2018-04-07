@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Text.Formatting;
 using System.Threading;
@@ -316,16 +317,17 @@ namespace ZeroLog
         private void AppendArgumentType(ArgumentType argumentType)
         {
             _argPointers.Add(new IntPtr(_dataPointer));
-            *_dataPointer = (byte)argumentType;
-            _dataPointer += sizeof(byte);
+            *(ArgumentType*)_dataPointer = argumentType;
+            _dataPointer += sizeof(ArgumentType);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [SuppressMessage("ReSharper", "BitwiseOperatorOnEnumWithoutFlags")]
         private void AppendArgumentTypeWithFormat(ArgumentType argumentType)
         {
             _argPointers.Add(new IntPtr(_dataPointer));
-            *_dataPointer = (byte)((byte)argumentType | ArgumentTypeMask.FormatSpecifier);
-            _dataPointer += sizeof(byte);
+            *(ArgumentType*)_dataPointer = argumentType | (ArgumentType)ArgumentTypeMask.FormatSpecifier;
+            _dataPointer += sizeof(ArgumentType);
         }
 
         private void AppendString(string value)
