@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
@@ -17,23 +18,6 @@ namespace ZeroLog.Utils
 
         public static Type GetTypeFromHandle(IntPtr typeHandle)
             => _getTypeFromHandleFunc?.Invoke(typeHandle);
-
-        public static int SizeOfSlow(Type type)
-        {
-            if (type == null)
-                return 0;
-
-            // ReSharper disable once PossibleNullReferenceException
-            return (int)typeof(TypeUtil).GetMethod(nameof(SizeOf), BindingFlags.NonPublic | BindingFlags.Static, null, Type.EmptyTypes, null)
-                                        .MakeGenericMethod(type)
-                                        .Invoke(null, ArrayUtil.Empty<object>());
-        }
-
-        private static int SizeOf<T>()
-        {
-            IL.Emit(OpCodes.Sizeof, typeof(T));
-            return IL.Return<int>();
-        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ref TTo As<TFrom, TTo>([UsedImplicitly] ref TFrom source)
@@ -64,12 +48,15 @@ namespace ZeroLog.Utils
         public static readonly bool IsEnum = typeof(T).IsEnum;
     }
 
+    [SuppressMessage("ReSharper", "StaticMemberInGenericType")]
     internal static class TypeUtilNullable<T>
     {
         // Nullable-specific properties, initializing this type will allocate
 
-        public static readonly bool IsNullableEnum = Nullable.GetUnderlyingType(typeof(T))?.IsEnum == true;
-        public static readonly IntPtr UnderlyingTypeHandle = TypeUtil.GetTypeHandleSlow(Nullable.GetUnderlyingType(typeof(T)));
-        public static readonly int SizeOfUnderlyingType = TypeUtil.SizeOfSlow(Nullable.GetUnderlyingType(typeof(T)));
+        [CanBeNull] private static readonly Type _underlyingType = Nullable.GetUnderlyingType(typeof(T));
+
+        public static readonly bool IsNullableEnum = _underlyingType?.IsEnum == true;
+        public static readonly IntPtr UnderlyingTypeHandle = TypeUtil.GetTypeHandleSlow(_underlyingType);
+        public static readonly TypeCode UnderlyingTypeCode = Type.GetTypeCode(_underlyingType);
     }
 }

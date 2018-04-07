@@ -55,11 +55,11 @@ namespace ZeroLog
         {
             switch (Type.GetTypeCode(Enum.GetUnderlyingType(value.GetType())))
             {
-                case TypeCode.Byte:
-                    return ToUInt64((byte)(object)value);
-
                 case TypeCode.SByte:
                     return ToUInt64((sbyte)(object)value);
+
+                case TypeCode.Byte:
+                    return ToUInt64((byte)(object)value);
 
                 case TypeCode.Int16:
                     return ToUInt64((short)(object)value);
@@ -86,39 +86,30 @@ namespace ZeroLog
 
         public static ulong? ToUInt64Nullable<T>(T value) // T = Nullable<SomeEnum>
         {
-            if (EnumTypeCache<T>.IsNullableUnderlyingEnumTypeSigned)
+            switch (TypeUtilNullable<T>.UnderlyingTypeCode)
             {
-                switch (TypeUtilNullable<T>.SizeOfUnderlyingType)
-                {
-                    case 1:
-                        return ToUInt64Nullable<T, sbyte>(value);
+                case TypeCode.SByte:
+                    return ToUInt64Nullable<T, sbyte>(value);
 
-                    case 2:
-                        return ToUInt64Nullable<T, short>(value);
-
-                    case 4:
-                        return ToUInt64Nullable<T, int>(value);
-
-                    case 8:
-                        return ToUInt64Nullable<T, long>(value);
-
-                    default:
-                        return null;
-                }
-            }
-
-            switch (TypeUtilNullable<T>.SizeOfUnderlyingType)
-            {
-                case 1:
+                case TypeCode.Byte:
                     return ToUInt64Nullable<T, byte>(value);
 
-                case 2:
+                case TypeCode.Int16:
+                    return ToUInt64Nullable<T, short>(value);
+
+                case TypeCode.UInt16:
                     return ToUInt64Nullable<T, ushort>(value);
 
-                case 4:
+                case TypeCode.Int32:
+                    return ToUInt64Nullable<T, int>(value);
+
+                case TypeCode.UInt32:
                     return ToUInt64Nullable<T, uint>(value);
 
-                case 8:
+                case TypeCode.Int64:
+                    return ToUInt64Nullable<T, long>(value);
+
+                case TypeCode.UInt64:
                     return ToUInt64Nullable<T, ulong>(value);
 
                 default:
@@ -237,11 +228,6 @@ namespace ZeroLog
                 Value = ToUInt64Slow(item);
                 Name = item.ToString();
             }
-        }
-
-        private static class EnumTypeCache<T>
-        {
-            public static readonly bool IsNullableUnderlyingEnumTypeSigned = IsEnumSigned(TypeUtilNullable<T>.UnderlyingTypeHandle);
         }
     }
 }
