@@ -352,6 +352,7 @@ namespace ZeroLog
             _dataPointer += sizeof(ArgumentType);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void AppendString(string value)
         {
             *_dataPointer = (byte)_strings.Count;
@@ -359,18 +360,21 @@ namespace ZeroLog
             _strings.Add(value);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void AppendBoolean(bool b)
         {
             *(bool*)_dataPointer = b;
             _dataPointer += sizeof(bool);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void AppendByte(byte b)
         {
             *_dataPointer = b;
             _dataPointer += sizeof(byte);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void AppendBytes(byte[] bytes, int length)
         {
             fixed (byte* b = bytes)
@@ -383,6 +387,7 @@ namespace ZeroLog
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void AppendBytes(byte* bytes, int length)
         {
             for (var i = 0; i < length; i++)
@@ -392,60 +397,70 @@ namespace ZeroLog
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void AppendChar(char c)
         {
             *(char*)_dataPointer = c;
             _dataPointer += sizeof(char);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void AppendInt16(short s)
         {
             *(short*)_dataPointer = s;
             _dataPointer += sizeof(short);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void AppendInt32(int i)
         {
             *(int*)_dataPointer = i;
             _dataPointer += sizeof(int);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void AppendInt64(long l)
         {
             *(long*)_dataPointer = l;
             _dataPointer += sizeof(long);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void AppendSingle(float f)
         {
             *(float*)_dataPointer = f;
             _dataPointer += sizeof(float);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void AppendDouble(double d)
         {
             *(double*)_dataPointer = d;
             _dataPointer += sizeof(double);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void AppendDecimal(decimal d)
         {
             *(decimal*)_dataPointer = d;
             _dataPointer += sizeof(decimal);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void AppendGuid(Guid g)
         {
             *(Guid*)_dataPointer = g;
             _dataPointer += sizeof(Guid);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void AppendDateTime(DateTime dt)
         {
             *(DateTime*)_dataPointer = dt;
             _dataPointer += sizeof(DateTime);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void AppendTimeSpan(TimeSpan ts)
         {
             *(TimeSpan*)_dataPointer = ts;
