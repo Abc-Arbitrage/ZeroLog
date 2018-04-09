@@ -60,7 +60,7 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void AppendFormat(string format)
         {
-            if (!HasEnoughBytes(1))
+            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(byte)))
                 return;
 
             AppendArgumentType(ArgumentType.FormatString);
@@ -70,8 +70,14 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent Append(string s)
         {
-            if (!HasEnoughBytes(sizeof(ArgumentType)))
+            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(byte)))
                 return this;
+
+            if (s == null)
+            {
+                AppendArgumentType(ArgumentType.Null);
+                return this;
+            }
 
             AppendArgumentType(ArgumentType.String);
             AppendString(s);
@@ -81,6 +87,14 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent AppendAsciiString(byte[] bytes, int length)
         {
+            if (bytes == null)
+            {
+                if (HasEnoughBytes(sizeof(ArgumentType)))
+                    AppendArgumentType(ArgumentType.Null);
+
+                return this;
+            }
+
             var remainingBytes = (int)(_endOfBuffer - _dataPointer);
             remainingBytes -= sizeof(ArgumentType) + sizeof(byte);
             if (remainingBytes <= 0)
@@ -97,6 +111,14 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent AppendAsciiString(byte* bytes, int length)
         {
+            if (bytes == null)
+            {
+                if (HasEnoughBytes(sizeof(ArgumentType)))
+                    AppendArgumentType(ArgumentType.Null);
+
+                return this;
+            }
+
             var remainingBytes = (int)(_endOfBuffer - _dataPointer);
             remainingBytes -= sizeof(ArgumentType) + sizeof(byte);
             if (remainingBytes <= 0)
@@ -301,7 +323,7 @@ namespace ZeroLog
                     break;
 
                 case ArgumentType.Null:
-                    stringBuffer.Append("null");
+                    stringBuffer.Append(LogManager.Config.NullDisplayString);
                     break;
 
                 default:

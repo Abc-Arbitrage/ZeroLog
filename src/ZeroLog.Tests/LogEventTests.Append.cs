@@ -41,6 +41,15 @@ namespace ZeroLog.Tests
         }
 
         [Test]
+        public void should_append_null_string()
+        {
+            _logEvent.Append((string)null);
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreEqual("null", _output.ToString());
+        }
+
+        [Test]
         public void should_append_byte_array()
         {
             var bytes = Encoding.Default.GetBytes("abc");
@@ -48,6 +57,15 @@ namespace ZeroLog.Tests
             _logEvent.WriteToStringBuffer(_output);
 
             Assert.AreEqual("abc", _output.ToString());
+        }
+
+        [Test]
+        public void should_append_null_byte_array()
+        {
+            _logEvent.AppendAsciiString((byte[])null, 0);
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreEqual("null", _output.ToString());
         }
 
         [Test]
@@ -62,6 +80,15 @@ namespace ZeroLog.Tests
             _logEvent.WriteToStringBuffer(_output);
 
             Assert.AreEqual("abc", _output.ToString());
+        }
+
+        [Test]
+        public void should_append_null_unsafe_byte_array()
+        {
+            _logEvent.AppendAsciiString((byte*)null, 0);
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreEqual("null", _output.ToString());
         }
 
         [Test]

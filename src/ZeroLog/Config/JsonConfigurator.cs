@@ -49,6 +49,9 @@ namespace ZeroLog.Config
         private static void ConfigureGlobal(ZeroLogConfiguration config)
         {
             LogManager.Config.LazyRegisterEnums = config.LazyRegisterEnums;
+
+            if (config.NullDisplayString != null)
+                LogManager.Config.NullDisplayString = config.NullDisplayString;
         }
 
         private static ZeroLogConfiguration ConfigureResolver(string configFileFullPath, HierarchicalResolver resolver)

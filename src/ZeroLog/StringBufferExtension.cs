@@ -122,7 +122,7 @@ namespace ZeroLog
                     break;
 
                 case ArgumentType.Null:
-                    stringBuffer.Append("null");
+                    stringBuffer.Append(LogManager.Config.NullDisplayString);
                     break;
 
                 default:
