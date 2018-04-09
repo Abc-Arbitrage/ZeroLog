@@ -108,7 +108,7 @@ namespace ZeroLog.Tests
         {
             try
             {
-                LogManager.LazyRegisterEnums = true;
+                LogManager.Config.LazyRegisterEnums = true;
 
                 _logEvent.AppendEnum(AutoRegisterEnum.Bar);
                 _logEvent.WriteToStringBuffer(_output);
@@ -117,7 +117,7 @@ namespace ZeroLog.Tests
             }
             finally
             {
-                LogManager.LazyRegisterEnums = false;
+                LogManager.Config.LazyRegisterEnums = false;
             }
         }
 

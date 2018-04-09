@@ -36,7 +36,7 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.NoInlining)]
         private void AppendToSlow(StringBuffer stringBuffer, bool enumRegistered)
         {
-            if (!enumRegistered && LogManager.LazyRegisterEnums)
+            if (!enumRegistered && LogManager.Config.LazyRegisterEnums)
             {
                 LogManager.RegisterEnum(TypeUtil.GetTypeFromHandle(_typeHandle));
                 var enumString = EnumCache.GetString(_typeHandle, _value, out _);
