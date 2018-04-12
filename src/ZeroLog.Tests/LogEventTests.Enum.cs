@@ -18,6 +18,28 @@ namespace ZeroLog.Tests
         }
 
         [Test]
+        public void should_append_nullable_enum()
+        {
+            LogManager.RegisterEnum(typeof(TestEnum));
+
+            _logEvent.AppendEnum((TestEnum?)TestEnum.Bar);
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreEqual("Bar", _output.ToString());
+        }
+
+        [Test]
+        public void should_append_null_enum()
+        {
+            LogManager.RegisterEnum(typeof(TestEnum));
+
+            _logEvent.AppendEnum((TestEnum?)null);
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreEqual("null", _output.ToString());
+        }
+
+        [Test]
         public void should_append_enum_generic()
         {
             LogManager.RegisterEnum(typeof(TestEnum));
@@ -26,6 +48,28 @@ namespace ZeroLog.Tests
             _logEvent.WriteToStringBuffer(_output);
 
             Assert.AreEqual("Baz", _output.ToString());
+        }
+
+        [Test]
+        public void should_append_nullable_enum_generic()
+        {
+            LogManager.RegisterEnum(typeof(TestEnum));
+
+            _logEvent.AppendGeneric((TestEnum?)TestEnum.Baz);
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreEqual("Baz", _output.ToString());
+        }
+
+        [Test]
+        public void should_append_null_enum_generic()
+        {
+            LogManager.RegisterEnum(typeof(TestEnum));
+
+            _logEvent.AppendGeneric((TestEnum?)null);
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreEqual("null", _output.ToString());
         }
 
         [Test]
@@ -64,7 +108,7 @@ namespace ZeroLog.Tests
         {
             try
             {
-                LogManager.LazyRegisterEnums = true;
+                LogManager.Config.LazyRegisterEnums = true;
 
                 _logEvent.AppendEnum(AutoRegisterEnum.Bar);
                 _logEvent.WriteToStringBuffer(_output);
@@ -73,7 +117,7 @@ namespace ZeroLog.Tests
             }
             finally
             {
-                LogManager.LazyRegisterEnums = false;
+                LogManager.Config.LazyRegisterEnums = false;
             }
         }
 

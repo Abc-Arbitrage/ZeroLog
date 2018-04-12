@@ -121,6 +121,10 @@ namespace ZeroLog
                     enumArg->AppendTo(stringBuffer);
                     break;
 
+                case ArgumentType.Null:
+                    stringBuffer.Append(LogManager.Config.NullDisplayString);
+                    break;
+
                 default:
                     throw new ArgumentOutOfRangeException();
             }

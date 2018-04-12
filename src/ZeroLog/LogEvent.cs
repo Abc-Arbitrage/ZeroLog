@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Text.Formatting;
 using System.Threading;
@@ -10,7 +11,7 @@ using ZeroLog.Utils;
 
 namespace ZeroLog
 {
-    internal unsafe class LogEvent : IInternalLogEvent
+    internal unsafe partial class LogEvent : IInternalLogEvent
     {
         private const int _stringCapacity = 10;
 
@@ -47,10 +48,19 @@ namespace ZeroLog
             ThreadId = Thread.CurrentThread.ManagedThreadId;
         }
 
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private void AppendGenericSlow<T>(T arg)
+        {
+            if (TypeUtilNullable<T>.IsNullableEnum)
+                AppendNullableEnumInternal(arg);
+            else
+                throw new NotSupportedException($"Type {typeof(T)} is not supported ");
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void AppendFormat(string format)
         {
-            if (!HasEnoughBytes(1))
+            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(byte)))
                 return;
 
             AppendArgumentType(ArgumentType.FormatString);
@@ -58,67 +68,16 @@ namespace ZeroLog
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void AppendGeneric<T>(T arg)
-        {
-            // Some remarks here:
-            // - The JIT knows the type of "arg" at runtime and will be able the remove useless branches for each
-            //   struct specific jitted version of this method.
-            // - Since a jitted version of this method will be shared for all reference types, the optimisation
-            //   we just mentionned earlier can't occur. That's why we put the test against string at the top.
-            // - Casting to "object" then to the desired value type will force the C# compiler to emit boxing and 
-            //   unboxing IL opcodes, but the JIT is smart enough to prevent the actual boxing/unboxing from happening.
-
-            if (typeof(T) == typeof(string))
-                Append((string)(object)arg);
-
-            else if (typeof(T) == typeof(bool))
-                Append((bool)(object)arg);
-
-            else if (typeof(T) == typeof(byte))
-                Append((byte)(object)arg);
-
-            else if (typeof(T) == typeof(char))
-                Append((char)(object)arg);
-
-            else if (typeof(T) == typeof(short))
-                Append((short)(object)arg);
-
-            else if (typeof(T) == typeof(int))
-                Append((int)(object)arg);
-
-            else if (typeof(T) == typeof(long))
-                Append((long)(object)arg);
-
-            else if (typeof(T) == typeof(float))
-                Append((float)(object)arg);
-
-            else if (typeof(T) == typeof(double))
-                Append((double)(object)arg);
-
-            else if (typeof(T) == typeof(decimal))
-                Append((decimal)(object)arg);
-
-            else if (typeof(T) == typeof(Guid))
-                Append((Guid)(object)arg);
-
-            else if (typeof(T) == typeof(DateTime))
-                Append((DateTime)(object)arg);
-
-            else if (typeof(T) == typeof(TimeSpan))
-                Append((TimeSpan)(object)arg);
-
-            else if (typeof(T).IsEnum)
-                AppendEnumInternal(arg);
-
-            else
-                throw new NotSupportedException($"Type {typeof(T)} is not supported ");
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent Append(string s)
         {
-            if (!HasEnoughBytes(sizeof(ArgumentType)))
+            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(byte)))
                 return this;
+
+            if (s == null)
+            {
+                AppendArgumentType(ArgumentType.Null);
+                return this;
+            }
 
             AppendArgumentType(ArgumentType.String);
             AppendString(s);
@@ -128,6 +87,14 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent AppendAsciiString(byte[] bytes, int length)
         {
+            if (bytes == null)
+            {
+                if (HasEnoughBytes(sizeof(ArgumentType)))
+                    AppendArgumentType(ArgumentType.Null);
+
+                return this;
+            }
+
             var remainingBytes = (int)(_endOfBuffer - _dataPointer);
             remainingBytes -= sizeof(ArgumentType) + sizeof(byte);
             if (remainingBytes <= 0)
@@ -144,6 +111,14 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent AppendAsciiString(byte* bytes, int length)
         {
+            if (bytes == null)
+            {
+                if (HasEnoughBytes(sizeof(ArgumentType)))
+                    AppendArgumentType(ArgumentType.Null);
+
+                return this;
+            }
+
             var remainingBytes = (int)(_endOfBuffer - _dataPointer);
             remainingBytes -= sizeof(ArgumentType) + sizeof(byte);
             if (remainingBytes <= 0)
@@ -158,262 +133,25 @@ namespace ZeroLog
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ILogEvent Append(bool b)
-        {
-            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(bool)))
-                return this;
-
-            AppendArgumentType(ArgumentType.Boolean);
-            AppendBool(b);
-            return this;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ILogEvent Append(byte b)
-        {
-            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(byte)))
-                return this;
-
-            AppendArgumentType(ArgumentType.Byte);
-            AppendByte(b);
-            return this;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ILogEvent Append(byte b, string format)
-        {
-            if (!HasEnoughBytes(sizeof(ArgumentType) + 2 * sizeof(byte)))
-                return this;
-
-            AppendArgumentTypeWithFormat(ArgumentType.Byte);
-            AppendString(format);
-            AppendByte(b);
-            return this;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ILogEvent Append(char c)
-        {
-            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(char)))
-                return this;
-
-            AppendArgumentType(ArgumentType.Char);
-            AppendChar(c);
-            return this;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ILogEvent Append(short s)
-        {
-            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(short)))
-                return this;
-
-            AppendArgumentType(ArgumentType.Int16);
-            AppendInt16(s);
-            return this;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ILogEvent Append(short s, string format)
-        {
-            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(byte) + sizeof(short)))
-                return this;
-
-            AppendArgumentTypeWithFormat(ArgumentType.Int16);
-            AppendString(format);
-            AppendInt16(s);
-            return this;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ILogEvent Append(int i)
-        {
-            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(int)))
-                return this;
-
-            AppendArgumentType(ArgumentType.Int32);
-            AppendInt32(i);
-            return this;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ILogEvent Append(int i, string format)
-        {
-            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(byte) + sizeof(int)))
-                return this;
-
-            AppendArgumentTypeWithFormat(ArgumentType.Int32);
-            AppendString(format);
-            AppendInt32(i);
-            return this;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ILogEvent Append(long l)
-        {
-            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(long)))
-                return this;
-
-            AppendArgumentType(ArgumentType.Int64);
-            AppendInt64(l);
-            return this;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ILogEvent Append(long l, string format)
-        {
-            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(byte) + sizeof(long)))
-                return this;
-
-            AppendArgumentTypeWithFormat(ArgumentType.Int64);
-            AppendString(format);
-            AppendInt64(l);
-            return this;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ILogEvent Append(float f)
-        {
-            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(float)))
-                return this;
-
-            AppendArgumentType(ArgumentType.Single);
-            AppendFloat(f);
-            return this;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ILogEvent Append(float f, string format)
-        {
-            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(byte) + sizeof(float)))
-                return this;
-
-            AppendArgumentTypeWithFormat(ArgumentType.Single);
-            AppendString(format);
-            AppendFloat(f);
-            return this;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ILogEvent Append(double d)
-        {
-            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(double)))
-                return this;
-
-            AppendArgumentType(ArgumentType.Double);
-            AppendDouble(d);
-            return this;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ILogEvent Append(double d, string format)
-        {
-            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(byte) + sizeof(double)))
-                return this;
-
-            AppendArgumentTypeWithFormat(ArgumentType.Double);
-            AppendString(format);
-            AppendDouble(d);
-            return this;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ILogEvent Append(decimal d)
-        {
-            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(decimal)))
-                return this;
-
-            AppendArgumentType(ArgumentType.Decimal);
-            AppendDecimal(d);
-            return this;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ILogEvent Append(decimal d, string format)
-        {
-            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(byte) + sizeof(decimal)))
-                return this;
-
-            AppendArgumentTypeWithFormat(ArgumentType.Decimal);
-            AppendString(format);
-            AppendDecimal(d);
-            return this;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ILogEvent Append(Guid g)
-        {
-            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(Guid)))
-                return this;
-
-            AppendArgumentType(ArgumentType.Guid);
-            AppendGuid(g);
-            return this;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ILogEvent Append(Guid g, string format)
-        {
-            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(byte) + sizeof(Guid)))
-                return this;
-
-            AppendArgumentTypeWithFormat(ArgumentType.Guid);
-            AppendString(format);
-            AppendGuid(g);
-            return this;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ILogEvent Append(DateTime dt)
-        {
-            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(DateTime)))
-                return this;
-
-            AppendArgumentType(ArgumentType.DateTime);
-            AppendDateTime(dt);
-            return this;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ILogEvent Append(DateTime dt, string format)
-        {
-            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(byte) + sizeof(DateTime)))
-                return this;
-
-            AppendArgumentTypeWithFormat(ArgumentType.DateTime);
-            AppendString(format);
-            AppendDateTime(dt);
-            return this;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ILogEvent Append(TimeSpan ts)
-        {
-            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(TimeSpan)))
-                return this;
-
-            AppendArgumentType(ArgumentType.TimeSpan);
-            AppendTimeSpan(ts);
-            return this;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ILogEvent Append(TimeSpan ts, string format)
-        {
-            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(byte) + sizeof(TimeSpan)))
-                return this;
-
-            AppendArgumentTypeWithFormat(ArgumentType.TimeSpan);
-            AppendString(format);
-            AppendTimeSpan(ts);
-            return this;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent AppendEnum<[EnumConstraint] T>(T value)
             where T : struct
         {
             return AppendEnumInternal(value);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ILogEvent AppendEnum<[EnumConstraint] T>(T? value)
+            where T : struct
+        {
+            if (value == null)
+            {
+                if (HasEnoughBytes(sizeof(ArgumentType)))
+                    AppendArgumentType(ArgumentType.Null);
+
+                return this;
+            }
+
+            return AppendEnumInternal(value.GetValueOrDefault());
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -423,9 +161,27 @@ namespace ZeroLog
                 return this;
 
             AppendArgumentType(ArgumentType.Enum);
-            *(EnumArg*)_dataPointer = new EnumArg(TypeUtil.GetTypeHandle<T>(), EnumCache.ToUInt64(value));
+            *(EnumArg*)_dataPointer = new EnumArg(TypeUtil<T>.TypeHandle, EnumCache.ToUInt64(value));
             _dataPointer += sizeof(EnumArg);
             return this;
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private void AppendNullableEnumInternal<T>(T value) // T = Nullable<SomeEnum>
+        {
+            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(EnumArg)))
+                return;
+
+            var enumValue = EnumCache.ToUInt64Nullable(value);
+            if (enumValue == null)
+            {
+                AppendArgumentType(ArgumentType.Null);
+                return;
+            }
+
+            AppendArgumentType(ArgumentType.Enum);
+            *(EnumArg*)_dataPointer = new EnumArg(TypeUtilNullable<T>.UnderlyingTypeHandle, enumValue.GetValueOrDefault());
+            _dataPointer += sizeof(EnumArg);
         }
 
         public void Log()
@@ -566,6 +322,10 @@ namespace ZeroLog
                     enumArg->AppendTo(stringBuffer);
                     break;
 
+                case ArgumentType.Null:
+                    stringBuffer.Append(LogManager.Config.NullDisplayString);
+                    break;
+
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -579,18 +339,20 @@ namespace ZeroLog
         private void AppendArgumentType(ArgumentType argumentType)
         {
             _argPointers.Add(new IntPtr(_dataPointer));
-            *_dataPointer = (byte)argumentType;
-            _dataPointer += sizeof(byte);
+            *(ArgumentType*)_dataPointer = argumentType;
+            _dataPointer += sizeof(ArgumentType);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [SuppressMessage("ReSharper", "BitwiseOperatorOnEnumWithoutFlags")]
         private void AppendArgumentTypeWithFormat(ArgumentType argumentType)
         {
             _argPointers.Add(new IntPtr(_dataPointer));
-            *_dataPointer = (byte)((byte)argumentType | ArgumentTypeMask.FormatSpecifier);
-            _dataPointer += sizeof(byte);
+            *(ArgumentType*)_dataPointer = argumentType | (ArgumentType)ArgumentTypeMask.FormatSpecifier;
+            _dataPointer += sizeof(ArgumentType);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void AppendString(string value)
         {
             *_dataPointer = (byte)_strings.Count;
@@ -598,18 +360,21 @@ namespace ZeroLog
             _strings.Add(value);
         }
 
-        private void AppendBool(bool b)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void AppendBoolean(bool b)
         {
             *(bool*)_dataPointer = b;
             _dataPointer += sizeof(bool);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void AppendByte(byte b)
         {
             *_dataPointer = b;
             _dataPointer += sizeof(byte);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void AppendBytes(byte[] bytes, int length)
         {
             fixed (byte* b = bytes)
@@ -622,6 +387,7 @@ namespace ZeroLog
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void AppendBytes(byte* bytes, int length)
         {
             for (var i = 0; i < length; i++)
@@ -631,60 +397,70 @@ namespace ZeroLog
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void AppendChar(char c)
         {
             *(char*)_dataPointer = c;
             _dataPointer += sizeof(char);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void AppendInt16(short s)
         {
             *(short*)_dataPointer = s;
             _dataPointer += sizeof(short);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void AppendInt32(int i)
         {
             *(int*)_dataPointer = i;
             _dataPointer += sizeof(int);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void AppendInt64(long l)
         {
             *(long*)_dataPointer = l;
             _dataPointer += sizeof(long);
         }
 
-        private void AppendFloat(float f)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void AppendSingle(float f)
         {
             *(float*)_dataPointer = f;
             _dataPointer += sizeof(float);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void AppendDouble(double d)
         {
             *(double*)_dataPointer = d;
             _dataPointer += sizeof(double);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void AppendDecimal(decimal d)
         {
             *(decimal*)_dataPointer = d;
             _dataPointer += sizeof(decimal);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void AppendGuid(Guid g)
         {
             *(Guid*)_dataPointer = g;
             _dataPointer += sizeof(Guid);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void AppendDateTime(DateTime dt)
         {
             *(DateTime*)_dataPointer = dt;
             _dataPointer += sizeof(DateTime);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void AppendTimeSpan(TimeSpan ts)
         {
             *(TimeSpan*)_dataPointer = ts;

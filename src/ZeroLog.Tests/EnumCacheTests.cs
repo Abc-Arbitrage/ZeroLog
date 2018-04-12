@@ -1,4 +1,5 @@
-﻿using NFluent;
+﻿using System;
+using NFluent;
 using NUnit.Framework;
 using ZeroLog.Utils;
 
@@ -121,17 +122,81 @@ namespace ZeroLog.Tests
             Check.That(GetIsSigned<EnumUInt64>()).IsFalse();
         }
 
+        [Test]
+        public void should_correctly_handle_nullable_values_for_byte()
+        {
+            CheckNullableValue(EnumMinMaxByte.Min);
+            CheckNullableValue(EnumMinMaxByte.Max);
+        }
+
+        [Test]
+        public void should_correctly_handle_nullable_values_for_sbyte()
+        {
+            CheckNullableValue(EnumMinMaxSByte.Min);
+            CheckNullableValue(EnumMinMaxSByte.Max);
+        }
+
+        [Test]
+        public void should_correctly_handle_nullable_values_for_int16()
+        {
+            CheckNullableValue(EnumMinMaxInt16.Min);
+            CheckNullableValue(EnumMinMaxInt16.Max);
+        }
+
+        [Test]
+        public void should_correctly_handle_nullable_values_for_uint16()
+        {
+            CheckNullableValue(EnumMinMaxUInt16.Min);
+            CheckNullableValue(EnumMinMaxUInt16.Max);
+        }
+
+        [Test]
+        public void should_correctly_handle_nullable_values_for_int32()
+        {
+            CheckNullableValue(EnumMinMaxInt32.Min);
+            CheckNullableValue(EnumMinMaxInt32.Max);
+        }
+
+        [Test]
+        public void should_correctly_handle_nullable_values_for_uint32()
+        {
+            CheckNullableValue(EnumMinMaxUInt32.Min);
+            CheckNullableValue(EnumMinMaxUInt32.Max);
+        }
+
+        [Test]
+        public void should_correctly_handle_nullable_values_for_int64()
+        {
+            CheckNullableValue(EnumMinMaxInt64.Min);
+            CheckNullableValue(EnumMinMaxInt64.Max);
+        }
+
+        [Test]
+        public void should_correctly_handle_nullable_values_for_uint64()
+        {
+            CheckNullableValue(EnumMinMaxUInt64.Min);
+            CheckNullableValue(EnumMinMaxUInt64.Max);
+        }
+
         private static string GetString<T>(T value)
             where T : struct
         {
             EnumCache.Register(typeof(T));
-            return EnumCache.GetString(TypeUtil.GetTypeHandle<T>(), EnumCache.ToUInt64(value), out _);
+            return EnumCache.GetString(TypeUtil<T>.TypeHandle, EnumCache.ToUInt64(value), out _);
         }
 
         private static bool GetIsSigned<T>()
             where T : struct
         {
-            return EnumCache.IsEnumSigned(TypeUtil.GetTypeHandle<T>());
+            return EnumCache.IsEnumSigned(TypeUtil<T>.TypeHandle);
+        }
+
+        private static void CheckNullableValue<T>(T value)
+            where T : struct
+        {
+            Check.That(EnumCache.ToUInt64Slow((Enum)(object)value)).IsEqualTo(EnumCache.ToUInt64(value));
+            Check.That(EnumCache.ToUInt64Nullable((T?)value)).IsEqualTo(EnumCache.ToUInt64(value));
+            Check.That(GetString(value)).IsEqualTo(value.ToString());
         }
 
         private enum EnumByte : byte
@@ -211,6 +276,54 @@ namespace ZeroLog.Tests
 
         private enum EmptyEnum
         {
+        }
+
+        private enum EnumMinMaxByte : byte
+        {
+            Min = byte.MinValue,
+            Max = byte.MaxValue
+        }
+
+        private enum EnumMinMaxSByte : sbyte
+        {
+            Min = sbyte.MinValue,
+            Max = sbyte.MaxValue
+        }
+
+        private enum EnumMinMaxInt16 : short
+        {
+            Min = short.MinValue,
+            Max = short.MaxValue
+        }
+
+        private enum EnumMinMaxUInt16 : ushort
+        {
+            Min = ushort.MinValue,
+            Max = ushort.MaxValue
+        }
+
+        private enum EnumMinMaxInt32
+        {
+            Min = int.MinValue,
+            Max = int.MaxValue
+        }
+
+        private enum EnumMinMaxUInt32 : uint
+        {
+            Min = uint.MinValue,
+            Max = uint.MaxValue
+        }
+
+        private enum EnumMinMaxInt64 : long
+        {
+            Min = long.MinValue,
+            Max = long.MaxValue
+        }
+
+        private enum EnumMinMaxUInt64 : ulong
+        {
+            Min = ulong.MinValue,
+            Max = ulong.MaxValue
         }
     }
 }

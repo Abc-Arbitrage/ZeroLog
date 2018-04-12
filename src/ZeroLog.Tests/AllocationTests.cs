@@ -79,9 +79,13 @@ namespace ZeroLog.Tests
                 );
 
                 log.InfoFormat(
-                    "Enum {0}, UnknownEnum {1}",
+                    "Enum {0}, UnknownEnum {1}, NullableEnum {2}, NullableNullEnum {3}, NullableInt {4}, NullableNullInt {5}",
                     DayOfWeek.Friday,
-                    UnregisteredEnum.Bar
+                    UnregisteredEnum.Bar,
+                    (DayOfWeek?)DayOfWeek.Monday,
+                    (DayOfWeek?)null,
+                    (int?)42,
+                    (int?)null
                 );
             }
 

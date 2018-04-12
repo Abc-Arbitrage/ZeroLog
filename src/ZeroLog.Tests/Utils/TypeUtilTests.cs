@@ -10,7 +10,7 @@ namespace ZeroLog.Tests.Utils
         [Test]
         public void should_round_trip_enum()
         {
-            var typeHandle = TypeUtil.GetTypeHandle<DayOfWeek>();
+            var typeHandle = TypeUtil<DayOfWeek>.TypeHandle;
             var type = TypeUtil.GetTypeFromHandle(typeHandle);
 
             Check.That(type).IsEqualTo(typeof(DayOfWeek));

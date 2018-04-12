@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using NUnit.Framework;
 
 namespace ZeroLog.Tests
@@ -93,6 +94,40 @@ namespace ZeroLog.Tests
             _logEvent.WriteToStringBuffer(_output);
 
             Assert.AreEqual("02:03:04.005", _output.ToString());
+        }
+
+        [TestCase(typeof(byte), "X4")]
+        [TestCase(typeof(short), "X4")]
+        [TestCase(typeof(int), "X")]
+        [TestCase(typeof(long), "X")]
+        [TestCase(typeof(float), "E")]
+        [TestCase(typeof(double), "P3")]
+        [TestCase(typeof(decimal), "E04")]
+        [TestCase(typeof(Guid), "X")]
+        [TestCase(typeof(DateTime), "yyyy-MM-dd")]
+        [TestCase(typeof(TimeSpan), "TODO in StringFormatter")]
+        public void should_append_nullable_with_format(Type type, string format)
+        {
+            typeof(LogEventTests).GetMethod(nameof(should_append_nullable_with_format), BindingFlags.Instance | BindingFlags.NonPublic, null, new[] { typeof(string) }, null)
+                                 .MakeGenericMethod(type)
+                                 .Invoke(this, new object[] { format });
+        }
+
+        private void should_append_nullable_with_format<T>(string format)
+            where T : struct
+        {
+            ((dynamic)_logEvent).Append((T?)new T(), format);
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreNotEqual("null", _output.ToString());
+
+            _output.Clear();
+            _logEvent.Initialize(Level.Info, null);
+
+            ((dynamic)_logEvent).Append((T?)null, format);
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreEqual("null", _output.ToString());
         }
     }
 }

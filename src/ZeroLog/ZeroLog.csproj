@@ -25,8 +25,8 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="ExtraConstraints.Fody" Version="1.13.0" />
-    <PackageReference Include="Fody" Version="3.0.0" />
-    <PackageReference Include="InlineIL.Fody" Version="0.2.0" />
+    <PackageReference Include="Fody" Version="3.0.1" />
+    <PackageReference Include="InlineIL.Fody" Version="0.3.0" />
     <PackageReference Include="JetBrains.Annotations" Version="11.0.0" />
     <PackageReference Include="Jil" Version="2.15.2" />
     <PackageReference Include="StringFormatter" Version="1.0.0.11" />
@@ -39,6 +39,11 @@
     <Compile Include="..\SharedVersionInfo.cs">
       <Link>Properties\SharedVersionInfo.cs</Link>
     </Compile>
+    <Compile Update="LogEvent.Append.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>LogEvent.Append.tt</DependentUpon>
+    </Compile>
     <Compile Update="Log.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -47,6 +52,10 @@
     <None Update="Log.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Log.cs</LastGenOutput>
+    </None>
+    <None Update="LogEvent.Append.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>LogEvent.Append.cs</LastGenOutput>
     </None>
   </ItemGroup>
 </Project>
