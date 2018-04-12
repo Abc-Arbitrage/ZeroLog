@@ -51,6 +51,9 @@ namespace ZeroLog
             return IL.Return<ulong>();
         }
 
+        /// <summary>
+        /// Only used when registering enums
+        /// </summary>
         internal static ulong ToUInt64Slow(Enum value)
         {
             switch (Type.GetTypeCode(Enum.GetUnderlyingType(value.GetType())))

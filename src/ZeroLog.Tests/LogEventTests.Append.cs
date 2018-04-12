@@ -255,7 +255,6 @@ namespace ZeroLog.Tests
             Assert.AreEqual("AbCFalseTrue128£12345-128999999999999999999123.456789.012345.67890129ac124-e588-47e5-9d3d-fa3a4d174e292017-01-12 13:14:15.00002:03:04.005", _output.ToString());
         }
 
-        [Test]
         [TestCase(typeof(bool))]
         [TestCase(typeof(byte))]
         [TestCase(typeof(char))]

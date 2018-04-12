@@ -96,7 +96,6 @@ namespace ZeroLog.Tests
             Assert.AreEqual("02:03:04.005", _output.ToString());
         }
 
-        [Test]
         [TestCase(typeof(byte), "X4")]
         [TestCase(typeof(short), "X4")]
         [TestCase(typeof(int), "X")]

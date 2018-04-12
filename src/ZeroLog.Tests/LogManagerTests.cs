@@ -167,6 +167,7 @@ namespace ZeroLog.Tests
         [Test]
         public unsafe void should_not_throw_if_formatting_fails_when_appending_formatted_arguments()
         {
+            LogManager.RegisterEnum<DayOfWeek>();
             var log = LogManager.GetLogger(typeof(LogManagerTests));
             var signal = _testAppender.SetMessageCountTarget(1);
 
