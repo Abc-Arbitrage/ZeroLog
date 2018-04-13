@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using NFluent;
 using NUnit.Framework;
 using ZeroLog.Utils;
@@ -178,6 +179,13 @@ namespace ZeroLog.Tests
             CheckNullableValue(EnumMinMaxUInt64.Max);
         }
 
+        [Test]
+        public void should_not_throw_when_registering_enum_in_open_type()
+        {
+            EnumCache.Register(typeof(GenericType<>.EnumInGenericType));
+            EnumCache.Register(typeof(GenericType<>.AnotherOne<>.EnumInGenericType2));
+        }
+
         private static string GetString<T>(T value)
             where T : struct
         {
@@ -324,6 +332,21 @@ namespace ZeroLog.Tests
         {
             Min = ulong.MinValue,
             Max = ulong.MaxValue
+        }
+
+        [SuppressMessage("ReSharper", "ClassNeverInstantiated.Local")]
+        private class GenericType<TFoo>
+        {
+            public enum EnumInGenericType
+            {
+            }
+
+            public class AnotherOne<TBar>
+            {
+                public enum EnumInGenericType2
+                {
+                }
+            }
         }
     }
 }

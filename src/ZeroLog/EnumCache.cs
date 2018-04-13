@@ -24,6 +24,19 @@ namespace ZeroLog
             if (!enumType.IsEnum)
                 throw new ArgumentException($"Not an enum type: {enumType}");
 
+            if (enumType.IsNested)
+            {
+                var declaringType = enumType.DeclaringType;
+
+                while (declaringType != null)
+                {
+                    if (declaringType.IsGenericType)
+                        return;
+
+                    declaringType = declaringType.DeclaringType;
+                }
+            }
+
             _enums.TryAdd(TypeUtil.GetTypeHandleSlow(enumType), EnumStrings.Create(enumType));
         }
 
