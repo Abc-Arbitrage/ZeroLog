@@ -9,11 +9,12 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <title>ZeroLog</title>
     <description>A zero-allocation .NET logging library</description>
-    <copyright>Copyright (c) 2017 ABC arbitrage</copyright>
+    <copyright>Copyright (c) 2017-2018 ABC arbitrage</copyright>
     <tags>logging zero-allocation</tags>
     <dependencies>
       <dependency id="StringFormatter" version="1.0.0.11" />
-      <dependency id="System.ValueTuple" version="4.3.1" />
+      <dependency id="Jil" version="2.15.4" />
+      <dependency id="System.ValueTuple" version="4.4.0" />
     </dependencies>
   </metadata>
   <files>

@@ -26,17 +26,17 @@
     <ProjectReference Include="..\ZeroLog\ZeroLog.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="BenchmarkDotNet" Version="0.10.13" />
-    <PackageReference Include="ConsoleTables" Version="2.1.0" />
-    <PackageReference Include="HdrHistogram" Version="2.0.0" />
-    <PackageReference Include="Fody" Version="3.0.1" />
-    <PackageReference Include="InlineIL.Fody" Version="0.3.0" />
+    <PackageReference Include="BenchmarkDotNet" Version="0.10.14" />
+    <PackageReference Include="ConsoleTables" Version="2.2.0" />
+    <PackageReference Include="HdrHistogram" Version="2.5.0" />
+    <PackageReference Include="Fody" Version="3.0.3" />
+    <PackageReference Include="InlineIL.Fody" Version="0.3.1" />
     <PackageReference Include="log4net" Version="2.0.8" />
-    <PackageReference Include="NLog" Version="4.5.0-rc06" />
-    <PackageReference Include="NUnit" Version="3.9.0" />
-    <PackageReference Include="NUnit3TestAdapter" Version="3.9.0" />
+    <PackageReference Include="NLog" Version="4.5.2" />
+    <PackageReference Include="NUnit" Version="3.10.1" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.10.0" />
     <PackageReference Include="System.Net.Sockets" Version="4.3.0" />
-    <PackageReference Include="System.ValueTuple" Version="4.3.1" />
+    <PackageReference Include="System.ValueTuple" Version="4.4.0" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System.ComponentModel.Composition" />
