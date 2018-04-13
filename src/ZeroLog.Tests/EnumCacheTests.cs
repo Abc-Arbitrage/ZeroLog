@@ -186,6 +186,13 @@ namespace ZeroLog.Tests
             EnumCache.Register(typeof(GenericType<>.AnotherOne<>.EnumInGenericType2));
         }
 
+        [Test]
+        public void should_handle_nested_enums_in_constructed_generic_types()
+        {
+            Check.That(GetString(GenericType<int>.EnumInGenericType.Foo)).IsEqualTo("Foo");
+            Check.That(GetString(GenericType<int>.AnotherOne<string>.EnumInGenericType2.Foo)).IsEqualTo("Foo");
+        }
+
         private static string GetString<T>(T value)
             where T : struct
         {
@@ -335,16 +342,19 @@ namespace ZeroLog.Tests
         }
 
         [SuppressMessage("ReSharper", "ClassNeverInstantiated.Local")]
+        [SuppressMessage("ReSharper", "UnusedTypeParameter")]
         private class GenericType<TFoo>
         {
             public enum EnumInGenericType
             {
+                Foo = 42
             }
 
             public class AnotherOne<TBar>
             {
                 public enum EnumInGenericType2
                 {
+                    Foo = 42
                 }
             }
         }
