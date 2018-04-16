@@ -134,7 +134,8 @@ namespace ZeroLog
                 return this;
 
             AppendArgumentType(ArgumentType.Boolean);
-            AppendBoolean(value);
+            *(bool*)_dataPointer = value;
+            _dataPointer += sizeof(bool);
             return this;
         }
 
@@ -151,7 +152,8 @@ namespace ZeroLog
             }
 
             AppendArgumentType(ArgumentType.Boolean);
-            AppendBoolean(value.GetValueOrDefault());
+            *(bool*)_dataPointer = value.GetValueOrDefault();
+            _dataPointer += sizeof(bool);
             return this;
         }
 
@@ -162,7 +164,8 @@ namespace ZeroLog
                 return this;
 
             AppendArgumentType(ArgumentType.Byte);
-            AppendByte(value);
+            *(byte*)_dataPointer = value;
+            _dataPointer += sizeof(byte);
             return this;
         }
 
@@ -179,7 +182,8 @@ namespace ZeroLog
             }
 
             AppendArgumentType(ArgumentType.Byte);
-            AppendByte(value.GetValueOrDefault());
+            *(byte*)_dataPointer = value.GetValueOrDefault();
+            _dataPointer += sizeof(byte);
             return this;
         }
 
@@ -192,7 +196,8 @@ namespace ZeroLog
 
             AppendArgumentTypeWithFormat(ArgumentType.Byte);
             AppendString(format);
-            AppendByte(value);
+            *(byte*)_dataPointer = value;
+            _dataPointer += sizeof(byte);
             return this;
         }
 
@@ -210,7 +215,8 @@ namespace ZeroLog
 
             AppendArgumentTypeWithFormat(ArgumentType.Byte);
             AppendString(format);
-            AppendByte(value.GetValueOrDefault());
+            *(byte*)_dataPointer = value.GetValueOrDefault();
+            _dataPointer += sizeof(byte);
             return this;
         }
 
@@ -221,7 +227,8 @@ namespace ZeroLog
                 return this;
 
             AppendArgumentType(ArgumentType.Char);
-            AppendChar(value);
+            *(char*)_dataPointer = value;
+            _dataPointer += sizeof(char);
             return this;
         }
 
@@ -238,7 +245,8 @@ namespace ZeroLog
             }
 
             AppendArgumentType(ArgumentType.Char);
-            AppendChar(value.GetValueOrDefault());
+            *(char*)_dataPointer = value.GetValueOrDefault();
+            _dataPointer += sizeof(char);
             return this;
         }
 
@@ -249,7 +257,8 @@ namespace ZeroLog
                 return this;
 
             AppendArgumentType(ArgumentType.Int16);
-            AppendInt16(value);
+            *(short*)_dataPointer = value;
+            _dataPointer += sizeof(short);
             return this;
         }
 
@@ -266,7 +275,8 @@ namespace ZeroLog
             }
 
             AppendArgumentType(ArgumentType.Int16);
-            AppendInt16(value.GetValueOrDefault());
+            *(short*)_dataPointer = value.GetValueOrDefault();
+            _dataPointer += sizeof(short);
             return this;
         }
 
@@ -279,7 +289,8 @@ namespace ZeroLog
 
             AppendArgumentTypeWithFormat(ArgumentType.Int16);
             AppendString(format);
-            AppendInt16(value);
+            *(short*)_dataPointer = value;
+            _dataPointer += sizeof(short);
             return this;
         }
 
@@ -297,7 +308,8 @@ namespace ZeroLog
 
             AppendArgumentTypeWithFormat(ArgumentType.Int16);
             AppendString(format);
-            AppendInt16(value.GetValueOrDefault());
+            *(short*)_dataPointer = value.GetValueOrDefault();
+            _dataPointer += sizeof(short);
             return this;
         }
 
@@ -308,7 +320,8 @@ namespace ZeroLog
                 return this;
 
             AppendArgumentType(ArgumentType.Int32);
-            AppendInt32(value);
+            *(int*)_dataPointer = value;
+            _dataPointer += sizeof(int);
             return this;
         }
 
@@ -325,7 +338,8 @@ namespace ZeroLog
             }
 
             AppendArgumentType(ArgumentType.Int32);
-            AppendInt32(value.GetValueOrDefault());
+            *(int*)_dataPointer = value.GetValueOrDefault();
+            _dataPointer += sizeof(int);
             return this;
         }
 
@@ -338,7 +352,8 @@ namespace ZeroLog
 
             AppendArgumentTypeWithFormat(ArgumentType.Int32);
             AppendString(format);
-            AppendInt32(value);
+            *(int*)_dataPointer = value;
+            _dataPointer += sizeof(int);
             return this;
         }
 
@@ -356,7 +371,8 @@ namespace ZeroLog
 
             AppendArgumentTypeWithFormat(ArgumentType.Int32);
             AppendString(format);
-            AppendInt32(value.GetValueOrDefault());
+            *(int*)_dataPointer = value.GetValueOrDefault();
+            _dataPointer += sizeof(int);
             return this;
         }
 
@@ -367,7 +383,8 @@ namespace ZeroLog
                 return this;
 
             AppendArgumentType(ArgumentType.Int64);
-            AppendInt64(value);
+            *(long*)_dataPointer = value;
+            _dataPointer += sizeof(long);
             return this;
         }
 
@@ -384,7 +401,8 @@ namespace ZeroLog
             }
 
             AppendArgumentType(ArgumentType.Int64);
-            AppendInt64(value.GetValueOrDefault());
+            *(long*)_dataPointer = value.GetValueOrDefault();
+            _dataPointer += sizeof(long);
             return this;
         }
 
@@ -397,7 +415,8 @@ namespace ZeroLog
 
             AppendArgumentTypeWithFormat(ArgumentType.Int64);
             AppendString(format);
-            AppendInt64(value);
+            *(long*)_dataPointer = value;
+            _dataPointer += sizeof(long);
             return this;
         }
 
@@ -415,7 +434,8 @@ namespace ZeroLog
 
             AppendArgumentTypeWithFormat(ArgumentType.Int64);
             AppendString(format);
-            AppendInt64(value.GetValueOrDefault());
+            *(long*)_dataPointer = value.GetValueOrDefault();
+            _dataPointer += sizeof(long);
             return this;
         }
 
@@ -426,7 +446,8 @@ namespace ZeroLog
                 return this;
 
             AppendArgumentType(ArgumentType.Single);
-            AppendSingle(value);
+            *(float*)_dataPointer = value;
+            _dataPointer += sizeof(float);
             return this;
         }
 
@@ -443,7 +464,8 @@ namespace ZeroLog
             }
 
             AppendArgumentType(ArgumentType.Single);
-            AppendSingle(value.GetValueOrDefault());
+            *(float*)_dataPointer = value.GetValueOrDefault();
+            _dataPointer += sizeof(float);
             return this;
         }
 
@@ -456,7 +478,8 @@ namespace ZeroLog
 
             AppendArgumentTypeWithFormat(ArgumentType.Single);
             AppendString(format);
-            AppendSingle(value);
+            *(float*)_dataPointer = value;
+            _dataPointer += sizeof(float);
             return this;
         }
 
@@ -474,7 +497,8 @@ namespace ZeroLog
 
             AppendArgumentTypeWithFormat(ArgumentType.Single);
             AppendString(format);
-            AppendSingle(value.GetValueOrDefault());
+            *(float*)_dataPointer = value.GetValueOrDefault();
+            _dataPointer += sizeof(float);
             return this;
         }
 
@@ -485,7 +509,8 @@ namespace ZeroLog
                 return this;
 
             AppendArgumentType(ArgumentType.Double);
-            AppendDouble(value);
+            *(double*)_dataPointer = value;
+            _dataPointer += sizeof(double);
             return this;
         }
 
@@ -502,7 +527,8 @@ namespace ZeroLog
             }
 
             AppendArgumentType(ArgumentType.Double);
-            AppendDouble(value.GetValueOrDefault());
+            *(double*)_dataPointer = value.GetValueOrDefault();
+            _dataPointer += sizeof(double);
             return this;
         }
 
@@ -515,7 +541,8 @@ namespace ZeroLog
 
             AppendArgumentTypeWithFormat(ArgumentType.Double);
             AppendString(format);
-            AppendDouble(value);
+            *(double*)_dataPointer = value;
+            _dataPointer += sizeof(double);
             return this;
         }
 
@@ -533,7 +560,8 @@ namespace ZeroLog
 
             AppendArgumentTypeWithFormat(ArgumentType.Double);
             AppendString(format);
-            AppendDouble(value.GetValueOrDefault());
+            *(double*)_dataPointer = value.GetValueOrDefault();
+            _dataPointer += sizeof(double);
             return this;
         }
 
@@ -544,7 +572,8 @@ namespace ZeroLog
                 return this;
 
             AppendArgumentType(ArgumentType.Decimal);
-            AppendDecimal(value);
+            *(decimal*)_dataPointer = value;
+            _dataPointer += sizeof(decimal);
             return this;
         }
 
@@ -561,7 +590,8 @@ namespace ZeroLog
             }
 
             AppendArgumentType(ArgumentType.Decimal);
-            AppendDecimal(value.GetValueOrDefault());
+            *(decimal*)_dataPointer = value.GetValueOrDefault();
+            _dataPointer += sizeof(decimal);
             return this;
         }
 
@@ -574,7 +604,8 @@ namespace ZeroLog
 
             AppendArgumentTypeWithFormat(ArgumentType.Decimal);
             AppendString(format);
-            AppendDecimal(value);
+            *(decimal*)_dataPointer = value;
+            _dataPointer += sizeof(decimal);
             return this;
         }
 
@@ -592,7 +623,8 @@ namespace ZeroLog
 
             AppendArgumentTypeWithFormat(ArgumentType.Decimal);
             AppendString(format);
-            AppendDecimal(value.GetValueOrDefault());
+            *(decimal*)_dataPointer = value.GetValueOrDefault();
+            _dataPointer += sizeof(decimal);
             return this;
         }
 
@@ -603,7 +635,8 @@ namespace ZeroLog
                 return this;
 
             AppendArgumentType(ArgumentType.Guid);
-            AppendGuid(value);
+            *(Guid*)_dataPointer = value;
+            _dataPointer += sizeof(Guid);
             return this;
         }
 
@@ -620,7 +653,8 @@ namespace ZeroLog
             }
 
             AppendArgumentType(ArgumentType.Guid);
-            AppendGuid(value.GetValueOrDefault());
+            *(Guid*)_dataPointer = value.GetValueOrDefault();
+            _dataPointer += sizeof(Guid);
             return this;
         }
 
@@ -633,7 +667,8 @@ namespace ZeroLog
 
             AppendArgumentTypeWithFormat(ArgumentType.Guid);
             AppendString(format);
-            AppendGuid(value);
+            *(Guid*)_dataPointer = value;
+            _dataPointer += sizeof(Guid);
             return this;
         }
 
@@ -651,7 +686,8 @@ namespace ZeroLog
 
             AppendArgumentTypeWithFormat(ArgumentType.Guid);
             AppendString(format);
-            AppendGuid(value.GetValueOrDefault());
+            *(Guid*)_dataPointer = value.GetValueOrDefault();
+            _dataPointer += sizeof(Guid);
             return this;
         }
 
@@ -662,7 +698,8 @@ namespace ZeroLog
                 return this;
 
             AppendArgumentType(ArgumentType.DateTime);
-            AppendDateTime(value);
+            *(DateTime*)_dataPointer = value;
+            _dataPointer += sizeof(DateTime);
             return this;
         }
 
@@ -679,7 +716,8 @@ namespace ZeroLog
             }
 
             AppendArgumentType(ArgumentType.DateTime);
-            AppendDateTime(value.GetValueOrDefault());
+            *(DateTime*)_dataPointer = value.GetValueOrDefault();
+            _dataPointer += sizeof(DateTime);
             return this;
         }
 
@@ -692,7 +730,8 @@ namespace ZeroLog
 
             AppendArgumentTypeWithFormat(ArgumentType.DateTime);
             AppendString(format);
-            AppendDateTime(value);
+            *(DateTime*)_dataPointer = value;
+            _dataPointer += sizeof(DateTime);
             return this;
         }
 
@@ -710,7 +749,8 @@ namespace ZeroLog
 
             AppendArgumentTypeWithFormat(ArgumentType.DateTime);
             AppendString(format);
-            AppendDateTime(value.GetValueOrDefault());
+            *(DateTime*)_dataPointer = value.GetValueOrDefault();
+            _dataPointer += sizeof(DateTime);
             return this;
         }
 
@@ -721,7 +761,8 @@ namespace ZeroLog
                 return this;
 
             AppendArgumentType(ArgumentType.TimeSpan);
-            AppendTimeSpan(value);
+            *(TimeSpan*)_dataPointer = value;
+            _dataPointer += sizeof(TimeSpan);
             return this;
         }
 
@@ -738,7 +779,8 @@ namespace ZeroLog
             }
 
             AppendArgumentType(ArgumentType.TimeSpan);
-            AppendTimeSpan(value.GetValueOrDefault());
+            *(TimeSpan*)_dataPointer = value.GetValueOrDefault();
+            _dataPointer += sizeof(TimeSpan);
             return this;
         }
 
@@ -751,7 +793,8 @@ namespace ZeroLog
 
             AppendArgumentTypeWithFormat(ArgumentType.TimeSpan);
             AppendString(format);
-            AppendTimeSpan(value);
+            *(TimeSpan*)_dataPointer = value;
+            _dataPointer += sizeof(TimeSpan);
             return this;
         }
 
@@ -769,7 +812,8 @@ namespace ZeroLog
 
             AppendArgumentTypeWithFormat(ArgumentType.TimeSpan);
             AppendString(format);
-            AppendTimeSpan(value.GetValueOrDefault());
+            *(TimeSpan*)_dataPointer = value.GetValueOrDefault();
+            _dataPointer += sizeof(TimeSpan);
             return this;
         }
 
