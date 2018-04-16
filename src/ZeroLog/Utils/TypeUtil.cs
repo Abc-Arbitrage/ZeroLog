@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
-using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using InlineIL;
 using JetBrains.Annotations;
+using static InlineIL.ILEmit;
 using static System.Linq.Expressions.Expression;
 
 namespace ZeroLog.Utils
@@ -20,10 +20,11 @@ namespace ZeroLog.Utils
             => _getTypeFromHandleFunc?.Invoke(typeHandle);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ref TTo As<TFrom, TTo>([UsedImplicitly] ref TFrom source)
+        [SuppressMessage("ReSharper", "UnusedParameter.Global")]
+        public static ref TTo As<TFrom, TTo>(ref TFrom source)
         {
-            IL.Emit(OpCodes.Ldarg_0);
-            IL.Emit(OpCodes.Ret);
+            Ldarg(nameof(source));
+            Ret();
             throw IL.Unreachable();
         }
 
@@ -53,7 +54,8 @@ namespace ZeroLog.Utils
     {
         // Nullable-specific properties, initializing this type will allocate
 
-        [CanBeNull] private static readonly Type _underlyingType = Nullable.GetUnderlyingType(typeof(T));
+        [CanBeNull]
+        private static readonly Type _underlyingType = Nullable.GetUnderlyingType(typeof(T));
 
         public static readonly bool IsNullableEnum = _underlyingType?.IsEnum == true;
         public static readonly IntPtr UnderlyingTypeHandle = TypeUtil.GetTypeHandleSlow(_underlyingType);

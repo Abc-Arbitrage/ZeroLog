@@ -3,11 +3,11 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using InlineIL;
 using JetBrains.Annotations;
 using ZeroLog.Utils;
+using static InlineIL.ILEmit;
 
 namespace ZeroLog
 {
@@ -47,10 +47,11 @@ namespace ZeroLog
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [SuppressMessage("ReSharper", "UnusedParameter.Global")]
         public static ulong ToUInt64<T>(T value)
         {
-            IL.Push(value);
-            IL.Emit(OpCodes.Conv_I8);
+            Ldarg(nameof(value));
+            Conv_I8();
             return IL.Return<ulong>();
         }
 

@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Attributes.Jobs;
 using BenchmarkDotNet.Running;
 using InlineIL;
+using static InlineIL.ILEmit;
 
 namespace ZeroLog.Benchmarks.EnumTests
 {
@@ -85,10 +85,10 @@ namespace ZeroLog.Benchmarks.EnumTests
                 new LocalVar(typeof(RuntimeTypeHandle))
             );
 
-            IL.Push(typeof(T));
-            IL.Emit(OpCodes.Stloc_0);
-            IL.Emit(OpCodes.Ldloca_S, 0);
-            IL.Emit(OpCodes.Call, new MethodRef(typeof(RuntimeTypeHandle), "get_" + nameof(RuntimeTypeHandle.Value)));
+            Ldtoken(typeof(T));
+            Stloc_0();
+            Ldloca_S(0);
+            Call(new MethodRef(typeof(RuntimeTypeHandle), "get_" + nameof(RuntimeTypeHandle.Value)));
             return IL.Return<IntPtr>();
         }
     }
