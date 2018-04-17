@@ -7,7 +7,7 @@ using System.Runtime.CompilerServices;
 using InlineIL;
 using JetBrains.Annotations;
 using ZeroLog.Utils;
-using static InlineIL.ILEmit;
+using static InlineIL.IL.Emit;
 
 namespace ZeroLog
 {

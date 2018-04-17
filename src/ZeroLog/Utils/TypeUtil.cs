@@ -4,7 +4,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using InlineIL;
 using JetBrains.Annotations;
-using static InlineIL.ILEmit;
+using static InlineIL.IL.Emit;
 using static System.Linq.Expressions.Expression;
 
 namespace ZeroLog.Utils

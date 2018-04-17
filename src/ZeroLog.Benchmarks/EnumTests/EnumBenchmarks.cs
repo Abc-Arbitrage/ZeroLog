@@ -4,7 +4,7 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Attributes.Jobs;
 using BenchmarkDotNet.Running;
 using InlineIL;
-using static InlineIL.ILEmit;
+using static InlineIL.IL.Emit;
 
 namespace ZeroLog.Benchmarks.EnumTests
 {
