@@ -10,7 +10,7 @@ using System.Runtime.CompilerServices;
 [assembly: AssemblyDescription("A zero-allocation .NET logging library - https://github.com/Abc-Arbitrage/ZeroLog")]
 [assembly: AssemblyCompany("ABC arbitrage")]
 [assembly: AssemblyProduct("ZeroLog")]
-[assembly: AssemblyCopyright("Copyright © ABC arbitrage 2017")]
+[assembly: AssemblyCopyright("Copyright © ABC arbitrage Asset Management 2017-2018")]
 
 [assembly: InternalsVisibleTo("ZeroLog.Tests")]
 

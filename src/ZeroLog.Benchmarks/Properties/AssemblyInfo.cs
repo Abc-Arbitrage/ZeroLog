@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("ABC arbitrage Asset Management")]
 [assembly: AssemblyProduct("ZeroLog.Benchmarks")]
-[assembly: AssemblyCopyright("Copyright © ABC arbitrage Asset Management 2017")]
+[assembly: AssemblyCopyright("Copyright © ABC arbitrage Asset Management 2017-2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
