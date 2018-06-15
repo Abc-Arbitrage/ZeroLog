@@ -11,18 +11,11 @@ namespace ZeroLog.Appenders
         public const string DefaultExtension = "log";
         public const string DefaultPrefixPattern = "%time - %level - %logger || ";
 
-        private readonly object _lock = new object();
         private DateTime _currentDateTime = DateTime.UtcNow;
         private int _currentFileSize;
         private string _directory;
         private int _rollingFileNumber;
         private Stream _stream;
-
-        /// <summary>
-        /// Gets or sets if the appender should always call <see cref="M:System.IO.Stream.Flush" /> on the
-        /// current stream after every log event.
-        /// </summary>
-        public bool AutoFlush { get; set; }
 
         /// <summary>
         /// Gets or sets the file name extension to use for the rolling files. Defaults to "txt".
@@ -52,7 +45,6 @@ namespace ZeroLog.Appenders
             config.FilePathRoot = filePathRoot;
             config.MaxFileSizeInBytes = maxFileSizeInBytes;
             config.Extension = extension;
-            config.AutoFlush = false;
             config.PrefixPattern = prefixPattern;
 
             Configure(config);
@@ -73,7 +65,6 @@ namespace ZeroLog.Appenders
             FilenameRoot = parameters.FilePathRoot;
             MaxFileSizeInBytes = parameters.MaxFileSizeInBytes;
             FilenameExtension = parameters.Extension;
-            AutoFlush = parameters.AutoFlush;
 
             Open();
         }
@@ -93,9 +84,6 @@ namespace ZeroLog.Appenders
             messageLength += NewlineBytes.Length;
 
             stream.Write(messageBytes, 0, messageLength);
-
-            if (AutoFlush)
-                stream.Flush();
 
             _currentFileSize = (int)stream.Length;
             CheckRollFile();
@@ -135,12 +123,11 @@ namespace ZeroLog.Appenders
             CheckRollFile();
         }
 
-        public override void Close()
+        public override void Dispose()
         {
-            lock (_lock)
-            {
-                CloseWriter();
-            }
+            base.Dispose();
+
+            CloseWriter();
         }
 
         private void CloseWriter()
@@ -152,21 +139,14 @@ namespace ZeroLog.Appenders
             Flush();
             _stream = null;
             Thread.MemoryBarrier();
-            stream.Close();
+            stream.Dispose();
         }
 
         /// <summary>
         /// Flushes the current log file writer.
         /// </summary>
-        public void Flush()
-        {
-            lock (_lock)
-            {
-                if (_stream == null)
-                    return;
-                _stream.Flush();
-            }
-        }
+        public override void Flush()
+            => _stream?.Flush();
 
         private bool CheckRollFile()
         {
@@ -177,22 +157,19 @@ namespace ZeroLog.Appenders
             if (!maxSizeReached && !dateReached)
                 return true;
 
-            lock (_lock)
+            CloseWriter();
+
+            if (maxSizeReached)
+                ++_rollingFileNumber;
+
+            if (dateReached)
             {
-                CloseWriter();
-
-                if (maxSizeReached)
-                    ++_rollingFileNumber;
-
-                if (dateReached)
-                {
-                    _currentDateTime = now;
-                    _rollingFileNumber = 0;
-                }
-
-                CurrentFileName = GetCurrentFileName();
-                _stream = OpenFile(CurrentFileName);
+                _currentDateTime = now;
+                _rollingFileNumber = 0;
             }
+
+            CurrentFileName = GetCurrentFileName();
+            _stream = OpenFile(CurrentFileName);
             return false;
         }
 
@@ -207,8 +184,7 @@ namespace ZeroLog.Appenders
                 {
                     var rootLength = root.Length;
                     var extensionLength = extension.Length;
-                    int tempNumber;
-                    if (filename.Length - rootLength - extensionLength > 0 && int.TryParse(filename.Substring(rootLength, filename.Length - rootLength - extensionLength), out tempNumber))
+                    if (filename.Length - rootLength - extensionLength > 0 && int.TryParse(filename.Substring(rootLength, filename.Length - rootLength - extensionLength), out var tempNumber))
                         fileNumber = Math.Max(fileNumber, tempNumber);
                 }
             }

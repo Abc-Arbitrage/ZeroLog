@@ -64,9 +64,5 @@ namespace ZeroLog.Appenders
 
             _output.Write(messageBytes, 0, messageLength);
         }
-
-        public override void Close()
-        {
-        }
     }
 }

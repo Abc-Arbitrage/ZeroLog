@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -202,6 +203,26 @@ namespace ZeroLog.Tests
 
             var logMessage = _testAppender.LoggedMessages.Single();
             Check.That(logMessage).Equals("An error occured during formatting: \"Hello\", False, 1, 'a', 2, 3, 4, 5, 6, 7, " + guid + ", 2017-02-24 16:51:51.000, 16:51:51.000, \"abc\", \"abc\", Friday");
+        }
+
+        [Test]
+        public void should_flush_appenders_when_not_logging_messages()
+        {
+            var log = LogManager.GetLogger(typeof(LogManagerTests));
+            var signal = _testAppender.SetMessageCountTarget(3);
+            _testAppender.WaitOnWriteEvent = new ManualResetEventSlim(false);
+
+            log.Info("Foo");
+            log.Info("Bar");
+            log.Info("Baz");
+
+            _testAppender.WaitOnWriteEvent.Set();
+            signal.Wait(TimeSpan.FromMilliseconds(500));
+
+            Wait.Until(() => _testAppender.FlushCount == 1, TimeSpan.FromSeconds(1));
+
+            log.Info("Foo");
+            Wait.Until(() => _testAppender.FlushCount == 2, TimeSpan.FromSeconds(1));
         }
 
         [Test]

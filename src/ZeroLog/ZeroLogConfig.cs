@@ -8,6 +8,7 @@ namespace ZeroLog
         private string _nullDisplayString = "null";
 
         public bool LazyRegisterEnums { get; set; }
+        public bool FlushAppenders { get; set; } = true;
 
         public string NullDisplayString
         {

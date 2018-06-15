@@ -10,6 +10,7 @@ namespace ZeroLog.ConfigResolvers
         void Initialize(Encoding encoding);
 
         Level ResolveLevel(string name);
+        IEnumerable<IAppender> GetAllAppenders();
         IList<IAppender> ResolveAppenders(string name);
         LogEventPoolExhaustionStrategy ResolveExhaustionStrategy(string name);
 

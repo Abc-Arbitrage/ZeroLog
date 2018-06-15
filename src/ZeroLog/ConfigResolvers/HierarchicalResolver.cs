@@ -12,6 +12,23 @@ namespace ZeroLog.ConfigResolvers
         private Node _root;
         private Encoding AppenderEncoding { get; set; }
 
+        public IEnumerable<IAppender> GetAllAppenders()
+        {
+            var appenders = new HashSet<IAppender>();
+            AddAppenders(_root);
+            return appenders;
+
+            void AddAppenders(Node node)
+            {
+                if (node == null)
+                    return;
+
+                appenders.UnionWith(node.Appenders);
+                foreach (var childNode in node.Children.Values)
+                    AddAppenders(childNode);
+            }
+        }
+
         public IList<IAppender> ResolveAppenders(string name) => Resolve(name).Appenders.ToList();
         public Level ResolveLevel(string name) => Resolve(name).Level;
         public LogEventPoolExhaustionStrategy ResolveExhaustionStrategy(string name) => Resolve(name).Strategy;
@@ -34,7 +51,7 @@ namespace ZeroLog.ConfigResolvers
 
             Updated();
 
-            oldRoot?.Close();
+            oldRoot?.Dispose();
         }
 
         private static List<(LoggerDefinition logger, IAppender[] appenders)> CreateLoggersWithAppenders(ZeroLogConfiguration config)
@@ -64,7 +81,7 @@ namespace ZeroLog.ConfigResolvers
 
         private static void AddNode(Node root, LoggerDefinition logger, IAppender[] appenders)
         {
-            var parts = logger.Name.Split(new[] {'.'}, StringSplitOptions.RemoveEmptyEntries);
+            var parts = logger.Name.Split(new[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
             var node = root;
             var path = "";
 
@@ -73,7 +90,7 @@ namespace ZeroLog.ConfigResolvers
                 path = (path + "." + part).Trim('.');
 
                 if (!node.Children.ContainsKey(part))
-                    node.Children[part] = new Node {Appenders = node.Appenders, Level = node.Level, Strategy = node.Strategy};
+                    node.Children[part] = new Node { Appenders = node.Appenders, Level = node.Level, Strategy = node.Strategy };
 
                 node = node.Children[part];
             }
@@ -85,7 +102,7 @@ namespace ZeroLog.ConfigResolvers
 
         private Node Resolve(string name)
         {
-            var parts = name.Split(new[] {'.'}, StringSplitOptions.RemoveEmptyEntries);
+            var parts = name.Split(new[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
             var node = _root;
 
             foreach (var part in parts)
@@ -124,27 +141,23 @@ namespace ZeroLog.ConfigResolvers
 
         public void Dispose()
         {
-            _root?.Close();
+            _root?.Dispose();
         }
 
-        private class Node
+        private class Node : IDisposable
         {
             public readonly Dictionary<string, Node> Children = new Dictionary<string, Node>();
             public IEnumerable<IAppender> Appenders = Enumerable.Empty<IAppender>();
             public Level Level;
             public LogEventPoolExhaustionStrategy Strategy;
 
-            public void Close()
+            public void Dispose()
             {
                 foreach (var appender in Appenders)
-                {
-                    appender.Close();
-                }
+                    appender.Dispose();
 
                 foreach (var child in Children.Values)
-                {
-                    child.Close();
-                }
+                    child.Dispose();
             }
         }
     }

@@ -19,6 +19,7 @@ namespace ZeroLog.ConfigResolvers
             _appenders = new List<IAppender>(appenders.Select(x => new GuardedAppender(x, TimeSpan.FromSeconds(15))));
         }
 
+        public IEnumerable<IAppender> GetAllAppenders() => _appenders;
         public IList<IAppender> ResolveAppenders(string name) => _appenders;
         public Level ResolveLevel(string name) => _level;
         public LogEventPoolExhaustionStrategy ResolveExhaustionStrategy(string name) => _strategy;
@@ -36,9 +37,7 @@ namespace ZeroLog.ConfigResolvers
         public void Dispose()
         {
             foreach (var appender in _appenders)
-            {
-                appender.Close();
-            }
+                appender.Dispose();
         }
     }
 }

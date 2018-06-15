@@ -59,7 +59,13 @@ namespace ZeroLog.Appenders
             NewlineBytes = encoding.GetBytes(Environment.NewLine);
         }
 
-        public abstract void Close();
+        public virtual void Flush()
+        {
+        }
+
+        public virtual void Dispose()
+        {
+        }
 
         public string Name { get; set; }
         public abstract void Configure(T parameters);

@@ -34,7 +34,11 @@ namespace ZeroLog.Tests
         {
         }
 
-        public void Close()
+        public void Flush()
+        {
+        }
+
+        public void Dispose()
         {
         }
 

@@ -30,6 +30,7 @@ namespace ZeroLog
 
         private bool _isRunning;
         private readonly Encoding _encoding = Encoding.UTF8;
+        private IAppender[] _appenders = ArrayUtil.Empty<IAppender>();
 
         public static ZeroLogConfig Config { get; } = new ZeroLogConfig();
 
@@ -47,7 +48,11 @@ namespace ZeroLog
             {
                 foreach (var logger in _loggers.Values)
                     logger.ResetConfiguration();
+
+                UpdateAppenders();
             };
+
+            UpdateAppenders();
 
             _isRunning = true;
             _writeTask = Task.Factory.StartNew(WriteToAppenders, TaskCreationOptions.LongRunning);
@@ -170,14 +175,29 @@ namespace ZeroLog
             var spinWait = new SpinWait();
             var stringBuffer = new StringBuffer(16 * 1024);
             var destination = new byte[16 * 1024];
+            var flush = false;
 
             while (_isRunning || !_queue.IsEmpty)
             {
                 if (TryToProcessQueue(stringBuffer, destination))
+                {
                     spinWait.Reset();
+                    flush = true;
+                    continue;
+                }
+
+                if (flush && spinWait.NextSpinWillYield && Config.FlushAppenders)
+                {
+                    FlushAppenders();
+                    flush = false;
+                }
                 else
+                {
                     spinWait.SpinOnce();
+                }
             }
+
+            FlushAppenders();
         }
 
         private bool TryToProcessQueue(StringBuffer stringBuffer, byte[] destination)
@@ -223,7 +243,7 @@ namespace ZeroLog
             logEvent.WriteToStringBufferUnformatted(stringBuffer);
         }
 
-        private void WriteMessageLogToAppenders(byte[] destination, IInternalLogEvent logEvent, int bytesWritten)
+        private static void WriteMessageLogToAppenders(byte[] destination, IInternalLogEvent logEvent, int bytesWritten)
         {
             var appenders = logEvent.Appenders;
             for (var i = 0; i < appenders.Count; i++)
@@ -242,13 +262,23 @@ namespace ZeroLog
 
         private unsafe int CopyStringBufferToByteArray(StringBuffer stringBuffer, byte[] destination)
         {
-            int bytesWritten;
-            fixed (byte* dest = destination)
+            fixed (byte* dest = &destination[0])
             {
-                bytesWritten = stringBuffer.CopyTo(dest, destination.Length, 0, stringBuffer.Count, _encoding);
+                return stringBuffer.CopyTo(dest, destination.Length, 0, stringBuffer.Count, _encoding);
             }
+        }
 
-            return bytesWritten;
+        private void UpdateAppenders()
+        {
+            var appenders = _configResolver.GetAllAppenders().ToArray();
+            Thread.MemoryBarrier();
+            _appenders = appenders;
+        }
+
+        private void FlushAppenders()
+        {
+            foreach (var appender in _appenders)
+                appender.Flush();
         }
 
         BufferSegment IInternalLogManager.GetBufferSegment() => _bufferSegmentProvider.GetSegment();

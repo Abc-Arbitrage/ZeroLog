@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using System.Threading;
 using NFluent;
 using NUnit.Framework;
 using ZeroLog.Appenders;
@@ -24,7 +22,7 @@ namespace ZeroLog.Tests.Appenders
         [TearDown]
         public void Teardown()
         {
-            _appender.Close();
+            _appender.Dispose();
         }
 
         [Test]
@@ -44,10 +42,10 @@ namespace ZeroLog.Tests.Appenders
 
             _appender.WriteEvent(logEventHeader, bytes, byteLength);
             _appender.Flush();
-            
+
             var written = GetLastLine();
 
-            Check.That(written).IsEqualTo($"{logEventHeader.Timestamp.Date:yyyy-MM-dd} - {logEventHeader.Timestamp.TimeOfDay.ToString(@"hh\:mm\:ss\.fff")} - {logEventHeader.ThreadId} - INFO - TestLog || " + message);
+            Check.That(written).IsEqualTo($"{logEventHeader.Timestamp.Date:yyyy-MM-dd} - {logEventHeader.Timestamp.TimeOfDay:hh\\:mm\\:ss\\.fff} - {logEventHeader.ThreadId} - INFO - TestLog || " + message);
         }
 
         private string GetLastLine()
@@ -59,6 +57,7 @@ namespace ZeroLog.Tests.Appenders
             {
                 written = reader.ReadLine();
             }
+
             return written;
         }
     }

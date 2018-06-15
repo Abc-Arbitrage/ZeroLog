@@ -40,13 +40,12 @@ namespace ZeroLog.Appenders
         }
 
         public void SetEncoding(Encoding encoding)
-        {
-            _appender.SetEncoding(encoding);
-        }
+            => _appender.SetEncoding(encoding);
 
-        public void Close()
-        {
-            _appender.Close();
-        }
+        public void Flush()
+            => _appender.Flush();
+
+        public void Dispose()
+            => _appender.Dispose();
     }
 }

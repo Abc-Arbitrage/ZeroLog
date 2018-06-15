@@ -6,6 +6,5 @@ namespace ZeroLog.Appenders
         public string Extension { get; set; } = DateAndSizeRollingFileAppender.DefaultExtension;
         public int MaxFileSizeInBytes { get; set; } = DateAndSizeRollingFileAppender.DefaultMaxSize;
         public string PrefixPattern { get; set; } = DateAndSizeRollingFileAppender.DefaultPrefixPattern;
-        public bool AutoFlush { get; set; } = true;
     }
 }

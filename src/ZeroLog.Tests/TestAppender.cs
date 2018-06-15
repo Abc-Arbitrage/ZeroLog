@@ -13,6 +13,9 @@ namespace ZeroLog.Tests
         private int _messageCountTarget;
 
         public List<string> LoggedMessages { get; } = new List<string>();
+        public int FlushCount { get; set; }
+
+        public ManualResetEventSlim WaitOnWriteEvent { get; set; }
 
         public TestAppender()
         {
@@ -40,13 +43,20 @@ namespace ZeroLog.Tests
 
             if (++_messageCount == _messageCountTarget)
                 _signal.Set();
+
+            WaitOnWriteEvent?.Wait();
         }
 
         public void SetEncoding(Encoding encoding)
         {
         }
 
-        public void Close()
+        public void Flush()
+        {
+            ++FlushCount;
+        }
+
+        public void Dispose()
         {
         }
     }
