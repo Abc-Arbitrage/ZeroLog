@@ -25,8 +25,8 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="ExtraConstraints.Fody" Version="1.13.0" />
-    <PackageReference Include="Fody" Version="3.0.3" />
-    <PackageReference Include="InlineIL.Fody" Version="0.5.0" />
+    <PackageReference Include="Fody" Version="3.0.4" />
+    <PackageReference Include="InlineIL.Fody" Version="0.6.2" />
     <PackageReference Include="JetBrains.Annotations" Version="11.1.0" />
     <PackageReference Include="Jil" Version="2.15.4" />
     <PackageReference Include="StringFormatter" Version="1.0.0.11" />
