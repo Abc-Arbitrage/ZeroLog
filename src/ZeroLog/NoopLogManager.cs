@@ -15,11 +15,13 @@ namespace ZeroLog
         public IInternalLogEvent AllocateLogEvent(LogEventPoolExhaustionStrategy logEventPoolExhaustionStrategy, IInternalLogEvent logEvent, Level level, Log log)
             => throw new NotSupportedException();
 
-        public void Enqueue(IInternalLogEvent logEvent) => throw new NotSupportedException();
+        public void Enqueue(IInternalLogEvent logEvent)
+            => throw new NotSupportedException();
 
-        public ILog GetNewLog(IInternalLogManager logManager, string name) => NoopLog.Instance;
+        public ILog GetLog(string name)
+            => NoopLog.Instance;
 
-        public IList<IAppender> ResolveAppenders(string name) 
+        public IList<IAppender> ResolveAppenders(string name)
             => NoopLog.Instance.Appenders;
 
         public LogEventPoolExhaustionStrategy ResolveLogEventPoolExhaustionStrategy(string name)
@@ -39,7 +41,6 @@ namespace ZeroLog
             public static NoopLog Instance { get; } = new NoopLog();
 
             public IList<IAppender> Appenders { get; } = new List<IAppender>();
-            public LogEventPoolExhaustionStrategy LogEventPoolExhaustionStrategy { get; } = LogEventPoolExhaustionStrategy.DropLogMessage;
 
             public bool IsDebugEnabled => false;
             public bool IsInfoEnabled => false;

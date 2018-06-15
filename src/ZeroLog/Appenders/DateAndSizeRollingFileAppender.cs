@@ -19,8 +19,8 @@ namespace ZeroLog.Appenders
         private Stream _stream;
 
         /// <summary>
-        /// Gets or sets if the appender should always call <see cref="M:System.IO.TextWriter.Flush" /> on the
-        /// current file writer after every log event.
+        /// Gets or sets if the appender should always call <see cref="M:System.IO.Stream.Flush" /> on the
+        /// current stream after every log event.
         /// </summary>
         public bool AutoFlush { get; set; }
 

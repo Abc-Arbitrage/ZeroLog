@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -19,7 +20,7 @@ namespace ZeroLog
         private static readonly IInternalLogManager _defaultLogManager = new NoopLogManager();
         private static IInternalLogManager _logManager = _defaultLogManager;
 
-        private readonly ConcurrentQueue<Log> _loggers;
+        private readonly ConcurrentDictionary<string, Log> _loggers = new ConcurrentDictionary<string, Log>();
         private readonly ConcurrentQueue<IInternalLogEvent> _queue;
         private readonly ObjectPool<IInternalLogEvent> _pool;
 
@@ -36,7 +37,6 @@ namespace ZeroLog
         {
             _configResolver = configResolver;
 
-            _loggers = new ConcurrentQueue<Log>();
             _queue = new ConcurrentQueue<IInternalLogEvent>(new ConcurrentQueueCapacityInitializer(logEventQueueSize));
 
             _bufferSegmentProvider = new BufferSegmentProvider(logEventQueueSize * logEventBufferSize, logEventBufferSize);
@@ -45,10 +45,8 @@ namespace ZeroLog
             configResolver.Initialize(_encoding);
             configResolver.Updated += () =>
             {
-                foreach (var logger in _loggers)
-                {
+                foreach (var logger in _loggers.Values)
                     logger.ResetConfiguration();
-                }
             };
 
             _isRunning = true;
@@ -112,20 +110,14 @@ namespace ZeroLog
             if (_logManager == null)
                 throw new ApplicationException("LogManager is not yet initialized, please call LogManager.Initialize()");
 
-            return _logManager.GetNewLog(_logManager, name);
+            return _logManager.GetLog(name);
         }
 
         void IInternalLogManager.Enqueue(IInternalLogEvent logEvent)
-        {
-            _queue.Enqueue(logEvent);
-        }
+            => _queue.Enqueue(logEvent);
 
-        ILog IInternalLogManager.GetNewLog(IInternalLogManager logManager, string name)
-        {
-            var logger = new Log(logManager, name);
-            _loggers.Enqueue(logger);
-            return logger;
-        }
+        ILog IInternalLogManager.GetLog(string name)
+            => _loggers.GetOrAdd(name, n => new Log(this, n));
 
         IList<IAppender> IInternalLogManager.ResolveAppenders(string name)
             => _configResolver.ResolveAppenders(name);
