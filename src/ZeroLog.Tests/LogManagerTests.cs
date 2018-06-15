@@ -32,7 +32,7 @@ namespace ZeroLog.Tests
         [Test]
         public void should_create_log()
         {
-            var log = LogManager.GetLogger(typeof(LogManagerTests));
+            var log = LogManager.GetLogger<LogManagerTests>();
 
             Check.That(log).IsNotNull();
         }

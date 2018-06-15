@@ -101,18 +101,18 @@ namespace ZeroLog
             _bufferSegmentProvider.Dispose();
         }
 
+        public static ILog GetLogger<T>()
+            => GetLogger(typeof(T));
+
         public static ILog GetLogger(Type type)
-        {
-            return GetLogger(type.FullName);
-        }
+            => GetLogger(type.FullName);
 
         public static ILog GetLogger(string name)
         {
             if (_logManager == null)
                 throw new ApplicationException("LogManager is not yet initialized, please call LogManager.Initialize()");
 
-            var log = _logManager.GetNewLog(_logManager, name);
-            return log;
+            return _logManager.GetNewLog(_logManager, name);
         }
 
         void IInternalLogManager.Enqueue(IInternalLogEvent logEvent)
