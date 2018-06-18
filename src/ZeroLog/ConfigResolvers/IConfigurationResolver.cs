@@ -11,7 +11,7 @@ namespace ZeroLog.ConfigResolvers
 
         Level ResolveLevel(string name);
         IEnumerable<IAppender> GetAllAppenders();
-        IList<IAppender> ResolveAppenders(string name);
+        IAppender[] ResolveAppenders(string name);
         LogEventPoolExhaustionStrategy ResolveExhaustionStrategy(string name);
 
         event Action Updated;

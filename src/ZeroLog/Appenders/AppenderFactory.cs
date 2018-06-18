@@ -19,8 +19,8 @@ namespace ZeroLog.Appenders
             {
                 var appenderParameters = GetAppenderParameters(definition, appenderParameterType);
 
-                var configureMethod = appenderType.GetMethod(nameof(IAppender<object>.Configure), new[] {appenderParameterType});
-                configureMethod.Invoke(appender, new[] {appenderParameters});
+                var configureMethod = appenderType.GetMethod(nameof(IAppender<object>.Configure), new[] { appenderParameterType });
+                configureMethod?.Invoke(appender, new[] { appenderParameters });
             }
 
             return appender;

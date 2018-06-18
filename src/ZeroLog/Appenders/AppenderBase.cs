@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Text;
 using System.Text.Formatting;
+using ZeroLog.Utils;
 
 namespace ZeroLog.Appenders
 {
@@ -11,7 +12,7 @@ namespace ZeroLog.Appenders
         private readonly StringBuffer _stringBuffer;
         private readonly byte[] _tempBytes;
         private Encoding _encoding;
-        protected byte[] NewlineBytes;
+        private byte[] _newlineBytes = ArrayUtil.Empty<byte>();
         private string _prefixFormat;
 
         protected AppenderBase()
@@ -36,6 +37,12 @@ namespace ZeroLog.Appenders
             return prefixFormat;
         }
 
+        protected void WriteEventToStream(Stream stream, ILogEventHeader logEventHeader, byte[] messageBytes, int messageLength)
+        {
+            WritePrefix(stream, logEventHeader);
+            WriteLine(stream, messageBytes, messageLength);
+        }
+
         protected unsafe void WritePrefix(Stream stream, ILogEventHeader logEventHeader)
         {
             _stringBuffer.Clear();
@@ -47,16 +54,34 @@ namespace ZeroLog.Appenders
                                        logEventHeader.Name);
 
             int bytesWritten;
-            fixed (byte* buf = _tempBytes)
+            fixed (byte* buf = &_tempBytes[0])
                 bytesWritten = _stringBuffer.CopyTo(buf, _tempBytes.Length, 0, _stringBuffer.Count, _encoding);
 
             stream.Write(_tempBytes, 0, bytesWritten);
         }
 
+        protected void WriteLine(Stream stream, byte[] messageBytes, int messageLength)
+        {
+            var newlineBytes = _newlineBytes;
+
+            if (messageLength + newlineBytes.Length < messageBytes.Length)
+            {
+                Array.Copy(newlineBytes, 0, messageBytes, messageLength, newlineBytes.Length);
+                messageLength += newlineBytes.Length;
+
+                stream.Write(messageBytes, 0, messageLength);
+            }
+            else
+            {
+                stream.Write(messageBytes, 0, messageLength);
+                stream.Write(newlineBytes, 0, newlineBytes.Length);
+            }
+        }
+
         public void SetEncoding(Encoding encoding)
         {
             _encoding = encoding;
-            NewlineBytes = encoding.GetBytes(Environment.NewLine);
+            _newlineBytes = encoding.GetBytes(Environment.NewLine);
         }
 
         public virtual void Flush()

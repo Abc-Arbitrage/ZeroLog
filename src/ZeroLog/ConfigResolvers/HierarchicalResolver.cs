@@ -29,7 +29,7 @@ namespace ZeroLog.ConfigResolvers
             }
         }
 
-        public IList<IAppender> ResolveAppenders(string name) => Resolve(name).Appenders.ToList();
+        public IAppender[] ResolveAppenders(string name) => Resolve(name).Appenders.ToArray();
         public Level ResolveLevel(string name) => Resolve(name).Level;
         public LogEventPoolExhaustionStrategy ResolveExhaustionStrategy(string name) => Resolve(name).Strategy;
 

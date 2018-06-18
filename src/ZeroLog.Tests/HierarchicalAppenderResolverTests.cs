@@ -97,7 +97,7 @@ namespace ZeroLog.Tests
 
             var appenders = _resolver.ResolveAppenders("Abc.Zebus.Dispatch.Handler");
 
-            Check.That(appenders.Count).Equals(2);
+            Check.That(appenders.Length).Equals(2);
         }
     }
 }

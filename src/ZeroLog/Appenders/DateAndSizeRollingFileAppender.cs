@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Threading;
+using JetBrains.Annotations;
 
 namespace ZeroLog.Appenders
 {
@@ -12,7 +13,6 @@ namespace ZeroLog.Appenders
         public const string DefaultPrefixPattern = "%time - %level - %logger || ";
 
         private DateTime _currentDateTime = DateTime.UtcNow;
-        private int _currentFileSize;
         private string _directory;
         private int _rollingFileNumber;
         private Stream _stream;
@@ -39,13 +39,15 @@ namespace ZeroLog.Appenders
         /// <summary>
         /// Initializes a new instance of the class.
         /// </summary>
-        public DateAndSizeRollingFileAppender(string filePathRoot, int maxFileSizeInBytes = DefaultMaxSize, string extension = DefaultExtension, string prefixPattern = DefaultPrefixPattern)   
+        public DateAndSizeRollingFileAppender(string filePathRoot, int maxFileSizeInBytes = DefaultMaxSize, string extension = DefaultExtension, string prefixPattern = DefaultPrefixPattern)
         {
-            var config = new DateAndSizeRollingFileAppenderConfig();
-            config.FilePathRoot = filePathRoot;
-            config.MaxFileSizeInBytes = maxFileSizeInBytes;
-            config.Extension = extension;
-            config.PrefixPattern = prefixPattern;
+            var config = new DateAndSizeRollingFileAppenderConfig
+            {
+                FilePathRoot = filePathRoot,
+                MaxFileSizeInBytes = maxFileSizeInBytes,
+                Extension = extension,
+                PrefixPattern = prefixPattern
+            };
 
             Configure(config);
         }
@@ -53,6 +55,7 @@ namespace ZeroLog.Appenders
         /// <summary>
         /// Initializes a new instance of the class.
         /// </summary>
+        [UsedImplicitly]
         public DateAndSizeRollingFileAppender()
         {
             Configure(DefaultPrefixPattern);
@@ -75,17 +78,7 @@ namespace ZeroLog.Appenders
             if (stream == null)
                 return;
 
-            if (messageLength + 1 >= messageBytes.Length)
-                throw new ApplicationException($"{nameof(messageBytes)} must be big enough to also contain the new line characters");
-
-            WritePrefix(stream, logEventHeader);
-
-            NewlineBytes.CopyTo(messageBytes, messageLength);
-            messageLength += NewlineBytes.Length;
-
-            stream.Write(messageBytes, 0, messageLength);
-
-            _currentFileSize = (int)stream.Length;
+            WriteEventToStream(stream, logEventHeader, messageBytes, messageLength);
             CheckRollFile();
         }
 
@@ -104,7 +97,7 @@ namespace ZeroLog.Appenders
             }
 
             _directory = Path.GetDirectoryName(FilenameRoot);
-            if (!Directory.Exists(_directory))
+            if (!string.IsNullOrEmpty(_directory) && !Directory.Exists(_directory))
             {
                 try
                 {
@@ -148,14 +141,14 @@ namespace ZeroLog.Appenders
         public override void Flush()
             => _stream?.Flush();
 
-        private bool CheckRollFile()
+        private void CheckRollFile()
         {
             var now = DateTime.UtcNow;
-            var maxSizeReached = MaxFileSizeInBytes > 0 && _currentFileSize >= MaxFileSizeInBytes;
+            var maxSizeReached = MaxFileSizeInBytes > 0 && _stream?.Length >= MaxFileSizeInBytes;
             var dateReached = _currentDateTime.Date != now.Date;
 
             if (!maxSizeReached && !dateReached)
-                return true;
+                return;
 
             CloseWriter();
 
@@ -170,7 +163,6 @@ namespace ZeroLog.Appenders
 
             CurrentFileName = GetCurrentFileName();
             _stream = OpenFile(CurrentFileName);
-            return false;
         }
 
         private int FindLastRollingFileNumber()
@@ -196,14 +188,13 @@ namespace ZeroLog.Appenders
             return $"{FilenameRoot}.{_currentDateTime:yyyyMMdd}.{_rollingFileNumber:D3}{(FilenameExtension.Length == 0 ? "" : "." + FilenameExtension)}";
         }
 
-        private Stream OpenFile(string filename)
+        private static Stream OpenFile(string filename)
         {
             var fullPath = Path.GetFullPath(filename);
+
             try
             {
-                var fileStream = File.Open(fullPath, FileMode.Append, FileAccess.Write, FileShare.ReadWrite);
-                _currentFileSize = (int)fileStream.Length;
-                return fileStream;
+                return File.Open(fullPath, FileMode.Append, FileAccess.Write, FileShare.ReadWrite);
             }
             catch (Exception ex)
             {

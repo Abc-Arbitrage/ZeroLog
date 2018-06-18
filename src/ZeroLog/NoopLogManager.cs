@@ -1,16 +1,12 @@
 using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using ZeroLog.Appenders;
+using ZeroLog.Utils;
 
 namespace ZeroLog
 {
     internal class NoopLogManager : IInternalLogManager
     {
         public Level Level { get; } = Level.Finest;
-        public bool IsRunning { get; set; } = true;
-        public Task WriteTask { get; } = Task.FromResult(true);
-        public List<IAppender> Appenders { get; } = new List<IAppender>(0);
 
         public IInternalLogEvent AllocateLogEvent(LogEventPoolExhaustionStrategy logEventPoolExhaustionStrategy, IInternalLogEvent logEvent, Level level, Log log)
             => throw new NotSupportedException();
@@ -21,7 +17,7 @@ namespace ZeroLog
         public ILog GetLog(string name)
             => NoopLog.Instance;
 
-        public IList<IAppender> ResolveAppenders(string name)
+        public IAppender[] ResolveAppenders(string name)
             => NoopLog.Instance.Appenders;
 
         public LogEventPoolExhaustionStrategy ResolveLogEventPoolExhaustionStrategy(string name)
@@ -40,7 +36,7 @@ namespace ZeroLog
         {
             public static NoopLog Instance { get; } = new NoopLog();
 
-            public IList<IAppender> Appenders { get; } = new List<IAppender>();
+            public IAppender[] Appenders { get; } = ArrayUtil.Empty<IAppender>();
 
             public bool IsDebugEnabled => false;
             public bool IsInfoEnabled => false;

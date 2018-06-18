@@ -57,12 +57,7 @@ namespace ZeroLog.Appenders
                     break;
             }
 
-            WritePrefix(_output, logEventHeader);
-
-            NewlineBytes.CopyTo(messageBytes, messageLength);
-            messageLength += NewlineBytes.Length;
-
-            _output.Write(messageBytes, 0, messageLength);
+            WriteEventToStream(_output, logEventHeader, messageBytes, messageLength);
         }
     }
 }

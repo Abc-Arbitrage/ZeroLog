@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text.Formatting;
 using ExtraConstraints;
 using ZeroLog.Appenders;
+using ZeroLog.Utils;
 
 namespace ZeroLog
 {
@@ -14,7 +14,7 @@ namespace ZeroLog
         public DateTime Timestamp => default(DateTime);
         public int ThreadId => 0;
         public string Name => null;
-        public IList<IAppender> Appenders { get; } = new List<IAppender>();
+        public IAppender[] Appenders { get; } = ArrayUtil.Empty<IAppender>();
 
         private NoopLogEvent()
         {

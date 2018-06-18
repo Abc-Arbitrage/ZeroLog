@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -124,7 +123,7 @@ namespace ZeroLog
         ILog IInternalLogManager.GetLog(string name)
             => _loggers.GetOrAdd(name, n => new Log(this, n));
 
-        IList<IAppender> IInternalLogManager.ResolveAppenders(string name)
+        IAppender[] IInternalLogManager.ResolveAppenders(string name)
             => _configResolver.ResolveAppenders(name);
 
         LogEventPoolExhaustionStrategy IInternalLogManager.ResolveLogEventPoolExhaustionStrategy(string name)
@@ -210,7 +209,7 @@ namespace ZeroLog
                 if (!logEvent.IsPooled)
                     logEvent.SetTimestamp(SystemDateTime.UtcNow);
 
-                if ((logEvent.Appenders?.Count ?? 0) <= 0)
+                if ((logEvent.Appenders?.Length ?? 0) <= 0)
                     return true;
 
                 try
@@ -245,10 +244,8 @@ namespace ZeroLog
 
         private static void WriteMessageLogToAppenders(byte[] destination, IInternalLogEvent logEvent, int bytesWritten)
         {
-            var appenders = logEvent.Appenders;
-            for (var i = 0; i < appenders.Count; i++)
+            foreach (var appender in logEvent.Appenders)
             {
-                var appender = appenders[i];
                 // if (logEvent.Level >= Level) // TODO Check this ? log event should not be in queue if not > Level
                 appender.WriteEvent(logEvent, destination, bytesWritten);
             }

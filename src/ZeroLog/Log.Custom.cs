@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using ZeroLog.Appenders;
+﻿using ZeroLog.Appenders;
 
 namespace ZeroLog
 {
@@ -11,7 +10,7 @@ namespace ZeroLog
 
         internal string Name { get; }
 
-        public IList<IAppender> Appenders { get; private set; }
+        public IAppender[] Appenders { get; private set; }
         public LogEventPoolExhaustionStrategy LogEventPoolExhaustionStrategy { get; private set; }
 
         internal Log(IInternalLogManager logManager, string name)
@@ -41,7 +40,7 @@ namespace ZeroLog
             LogEventPoolExhaustionStrategy = _logManager?.ResolveLogEventPoolExhaustionStrategy(Name) ?? LogEventPoolExhaustionStrategy.Default;
             _logLevel = _logManager?.ResolveLevel(Name) ?? Level.Fatal;
         }
-        
+
         public bool IsLevelEnabled(Level level) => level >= _logLevel;
 
         public ILogEvent ForLevel(Level level) => IsLevelEnabled(level)

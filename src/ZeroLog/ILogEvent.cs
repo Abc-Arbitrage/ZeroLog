@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using ExtraConstraints;
 using ZeroLog.Appenders;
 
@@ -6,7 +5,7 @@ namespace ZeroLog
 {
     public partial interface ILogEvent : ILogEventHeader
     {
-        IList<IAppender> Appenders { get; }
+        IAppender[] Appenders { get; }
 
         ILogEvent Append(string s);
         ILogEvent AppendAsciiString(byte[] bytes, int length);

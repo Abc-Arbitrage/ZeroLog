@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text.Formatting;
 using ExtraConstraints;
 using ZeroLog.Appenders;
@@ -14,7 +13,7 @@ namespace ZeroLog
         public DateTime Timestamp => default(DateTime);
         public int ThreadId => 0;
         public string Name => _logEventToAppend?.Name;
-        public IList<IAppender> Appenders => _log?.Appenders;
+        public IAppender[] Appenders => _log?.Appenders;
 
         private Log _log;
 
