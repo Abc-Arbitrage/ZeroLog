@@ -5,7 +5,6 @@ using System.Reflection;
 using System.Text;
 using System.Text.Formatting;
 using System.Threading;
-using System.Threading.Tasks;
 using ExtraConstraints;
 using JetBrains.Annotations;
 using ZeroLog.Appenders;
@@ -16,8 +15,8 @@ namespace ZeroLog
 {
     public class LogManager : IInternalLogManager
     {
-        private static readonly IInternalLogManager _defaultLogManager = new NoopLogManager();
-        private static IInternalLogManager _logManager = _defaultLogManager;
+        private static readonly IInternalLogManager _noOpLogManager = new NoopLogManager();
+        private static IInternalLogManager _logManager = _noOpLogManager;
 
         private readonly ConcurrentDictionary<string, Log> _loggers = new ConcurrentDictionary<string, Log>();
         private readonly ConcurrentQueue<IInternalLogEvent> _queue;
@@ -25,7 +24,7 @@ namespace ZeroLog
 
         private readonly BufferSegmentProvider _bufferSegmentProvider;
         private readonly IConfigurationResolver _configResolver;
-        private readonly Task _writeTask;
+        private readonly Thread _writeThread;
 
         private bool _isRunning;
         private readonly Encoding _encoding = Encoding.UTF8;
@@ -54,14 +53,20 @@ namespace ZeroLog
             UpdateAppenders();
 
             _isRunning = true;
-            _writeTask = Task.Factory.StartNew(WriteToAppenders, TaskCreationOptions.LongRunning);
+
+            _writeThread = new Thread(WriteThread)
+            {
+                Name = $"{nameof(ZeroLog)}.{nameof(WriteThread)}"
+            };
+
+            _writeThread.Start();
         }
 
         public Level Level => _configResolver.ResolveLevel("");
 
         public static ILogManager Initialize(IConfigurationResolver configResolver, int logEventQueueSize = 1024, int logEventBufferSize = 128)
         {
-            if (_logManager != _defaultLogManager)
+            if (_logManager != _noOpLogManager)
                 throw new ApplicationException("LogManager is already initialized");
 
             _logManager = new LogManager(configResolver, logEventQueueSize, logEventBufferSize);
@@ -71,7 +76,7 @@ namespace ZeroLog
         public static void Shutdown()
         {
             var logManager = _logManager;
-            _logManager = _defaultLogManager;
+            _logManager = _noOpLogManager;
 
             logManager?.Dispose();
         }
@@ -97,7 +102,7 @@ namespace ZeroLog
                 return;
 
             _isRunning = false;
-            _writeTask.Wait(15000);
+            _writeThread.Join(15000);
 
             _configResolver.Dispose();
             _bufferSegmentProvider.Dispose();
@@ -167,6 +172,28 @@ namespace ZeroLog
             }
 
             return logEvent;
+        }
+
+        private void WriteThread()
+        {
+            try
+            {
+                WriteToAppenders();
+            }
+            catch (Exception ex)
+            {
+                try
+                {
+                    Console.Error.WriteLine("Fatal error in ZeroLog." + nameof(WriteThread) + ":");
+                    Console.Error.WriteLine(ex);
+
+                    Shutdown();
+                }
+                catch 
+                {
+                    // Don't kill the process
+                }
+            }
         }
 
         private void WriteToAppenders()
