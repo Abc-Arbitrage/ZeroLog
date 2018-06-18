@@ -6,7 +6,7 @@ namespace ZeroLog.Utils
 {
     internal static class HighResolutionDateTime
     {
-        private static readonly bool _isAvailable;
+        private static readonly bool _isAvailable = CheckAvailability();
 
         [DllImport("Kernel32.dll", CallingConvention = CallingConvention.Winapi)]
         private static extern void GetSystemTimePreciseAsFileTime(out long filetime);
@@ -24,17 +24,17 @@ namespace ZeroLog.Utils
         }
 
         [DebuggerStepThrough]
-        static HighResolutionDateTime()
+        private static bool CheckAvailability()
         {
             try
             {
                 GetSystemTimePreciseAsFileTime(out _);
-                _isAvailable = true;
+                return true;
             }
             catch (EntryPointNotFoundException)
             {
                 // Not running Windows 8 or higher.
-                _isAvailable = false;
+                return false;
             }
         }
     }
