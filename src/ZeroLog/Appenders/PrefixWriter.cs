@@ -70,14 +70,18 @@ namespace ZeroLog.Appenders
             var stringOffsets = new Dictionary<string, (int offset, int length)>();
             var stringsBuilder = new StringBuilder();
 
-            AddString(_dateFormat);
-
             foreach (var part in parts)
             {
-                if (part.Type != PatternPartType.String)
-                    continue;
+                switch (part.Type)
+                {
+                    case PatternPartType.String:
+                        AddString(part.Value);
+                        break;
 
-                AddString(part.Value);
+                    case PatternPartType.Date:
+                        AddString(_dateFormat);
+                        break;
+                }
             }
 
             void AddString(string value)
@@ -90,6 +94,9 @@ namespace ZeroLog.Appenders
                 stringOffsets[value] = (offset, value.Length);
             }
 
+            if (stringsBuilder.Length == 0)
+                AddString(" ");
+
             var strings = new char[stringsBuilder.Length];
             stringsBuilder.CopyTo(0, strings, 0, stringsBuilder.Length);
             map = stringOffsets;
@@ -97,15 +104,18 @@ namespace ZeroLog.Appenders
         }
 
         [SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
-        private static Action<PrefixWriter, ILogEventHeader> BuildAppendMethod(IEnumerable<PatternPart> parts, Dictionary<string, (int offset, int length)> stringMap)
+        private static Action<PrefixWriter, ILogEventHeader> BuildAppendMethod(ICollection<PatternPart> parts, Dictionary<string, (int offset, int length)> stringMap)
         {
-            var method = new DynamicMethod("WritePrefix", typeof(void), new[] { typeof(PrefixWriter), typeof(ILogEventHeader) }, typeof(PrefixWriter), false);
+            var method = new DynamicMethod("WritePrefix", typeof(void), new[] { typeof(PrefixWriter), typeof(ILogEventHeader) }, typeof(PrefixWriter), false)
+            {
+                InitLocals = false
+            };
+
             var il = method.GetILGenerator();
 
             var stringBufferLocal = il.DeclareLocal(typeof(StringBuffer));
             var stringsLocal = il.DeclareLocal(typeof(char).MakeByRefType(), true);
-            var stringsPtrLocal = il.DeclareLocal(typeof(char*));
-            var dateTimeLocal = il.DeclareLocal(typeof(DateTime));
+            var dateTimeLocal = default(LocalBuilder);
 
             il.Emit(OpCodes.Ldarg_0);
             il.Emit(OpCodes.Ldfld, typeof(PrefixWriter).GetField(nameof(_stringBuffer), BindingFlags.Instance | BindingFlags.NonPublic));
@@ -116,9 +126,6 @@ namespace ZeroLog.Appenders
             il.Emit(OpCodes.Ldc_I4_0);
             il.Emit(OpCodes.Ldelema, typeof(char));
             il.Emit(OpCodes.Stloc, stringsLocal);
-            il.Emit(OpCodes.Ldloc, stringsLocal);
-            il.Emit(OpCodes.Conv_U);
-            il.Emit(OpCodes.Stloc, stringsPtrLocal);
 
             foreach (var part in parts)
             {
@@ -132,7 +139,8 @@ namespace ZeroLog.Appenders
 
                         il.Emit(OpCodes.Ldloc, stringBufferLocal);
 
-                        il.Emit(OpCodes.Ldloc, stringsPtrLocal);
+                        il.Emit(OpCodes.Ldloc, stringsLocal);
+                        il.Emit(OpCodes.Conv_U);
                         il.Emit(OpCodes.Ldc_I4, offset * sizeof(char));
                         il.Emit(OpCodes.Add);
 
@@ -153,7 +161,8 @@ namespace ZeroLog.Appenders
                         il.Emit(OpCodes.Ldarg_1);
                         il.Emit(OpCodes.Callvirt, typeof(ILogEventHeader).GetProperty(nameof(ILogEventHeader.Timestamp))?.GetGetMethod());
 
-                        il.Emit(OpCodes.Ldloc, stringsPtrLocal);
+                        il.Emit(OpCodes.Ldloc, stringsLocal);
+                        il.Emit(OpCodes.Conv_U);
                         il.Emit(OpCodes.Ldc_I4, offset * sizeof(char));
                         il.Emit(OpCodes.Add);
 
@@ -173,7 +182,7 @@ namespace ZeroLog.Appenders
 
                         il.Emit(OpCodes.Ldarg_1);
                         il.Emit(OpCodes.Callvirt, typeof(ILogEventHeader).GetProperty(nameof(ILogEventHeader.Timestamp))?.GetGetMethod());
-                        il.Emit(OpCodes.Stloc, dateTimeLocal);
+                        il.Emit(OpCodes.Stloc, dateTimeLocal ?? (dateTimeLocal = il.DeclareLocal(typeof(DateTime))));
                         il.Emit(OpCodes.Ldloca, dateTimeLocal);
                         il.Emit(OpCodes.Call, typeof(DateTime).GetProperty(nameof(DateTime.TimeOfDay))?.GetGetMethod());
 

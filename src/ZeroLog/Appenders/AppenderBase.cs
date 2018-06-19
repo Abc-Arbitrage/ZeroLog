@@ -24,7 +24,7 @@ namespace ZeroLog.Appenders
             return bytesWritten;
         }
 
-        protected int WriteLine(Stream stream, byte[] messageBytes, int messageLength)
+        private int WriteLine(Stream stream, byte[] messageBytes, int messageLength)
         {
             var newlineBytes = _newlineBytes;
 
