@@ -2,7 +2,6 @@
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Running;
-using ZeroLog.Benchmarks.EnumTests;
 using ZeroLog.Benchmarks.LatencyTests;
 using ZeroLog.Benchmarks.ThroughputTests;
 using ZeroLog.Benchmarks.Tools;
@@ -45,7 +44,8 @@ namespace ZeroLog.Benchmarks
             //LatencyMultiProducer(4, 4 * 25_000, 4 * 250_000, 1024);
             //LatencyMultiProducer(8, 8 * 25_000, 8 * 250_000, 1024);
 
-            EnumBenchmarksRunner.Run();
+            //EnumBenchmarksRunner.Run();
+            ThroughputToFileBench.Run();
 
             Console.ReadLine();
         }
