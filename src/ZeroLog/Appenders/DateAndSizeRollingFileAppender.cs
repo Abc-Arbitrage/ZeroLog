@@ -12,10 +12,11 @@ namespace ZeroLog.Appenders
         public const string DefaultExtension = "log";
         public const string DefaultPrefixPattern = "%time - %level - %logger || ";
 
-        private DateTime _currentDateTime = DateTime.UtcNow;
+        private DateTime _currentDate = DateTime.UtcNow.Date;
         private string _directory;
         private int _rollingFileNumber;
         private Stream _stream;
+        private long _fileSize;
 
         /// <summary>
         /// Gets or sets the file name extension to use for the rolling files. Defaults to "txt".
@@ -78,8 +79,8 @@ namespace ZeroLog.Appenders
             if (stream == null)
                 return;
 
-            WriteEventToStream(stream, logEventHeader, messageBytes, messageLength);
-            CheckRollFile();
+            _fileSize += WriteEventToStream(stream, logEventHeader, messageBytes, messageLength);
+            CheckRollFile(logEventHeader.Timestamp);
         }
 
         private void Open()
@@ -111,19 +112,26 @@ namespace ZeroLog.Appenders
 
             FilenameExtension = FilenameExtension ?? "";
             _rollingFileNumber = FindLastRollingFileNumber();
-            CurrentFileName = GetCurrentFileName();
-            _stream = OpenFile(CurrentFileName);
-            CheckRollFile();
+
+            OpenStream();
+            CheckRollFile(DateTime.UtcNow);
         }
 
         public override void Dispose()
         {
             base.Dispose();
 
-            CloseWriter();
+            CloseStream();
         }
 
-        private void CloseWriter()
+        private void OpenStream()
+        {
+            CurrentFileName = GetCurrentFileName();
+            _stream = OpenFile(CurrentFileName);
+            _fileSize = _stream.Length;
+        }
+
+        private void CloseStream()
         {
             var stream = _stream;
             if (stream == null)
@@ -131,7 +139,7 @@ namespace ZeroLog.Appenders
 
             Flush();
             _stream = null;
-            Thread.MemoryBarrier();
+            _fileSize = 0;
             stream.Dispose();
         }
 
@@ -141,28 +149,26 @@ namespace ZeroLog.Appenders
         public override void Flush()
             => _stream?.Flush();
 
-        private void CheckRollFile()
+        private void CheckRollFile(DateTime timestamp)
         {
-            var now = DateTime.UtcNow;
-            var maxSizeReached = MaxFileSizeInBytes > 0 && _stream?.Length >= MaxFileSizeInBytes;
-            var dateReached = _currentDateTime.Date != now.Date;
+            var maxSizeReached = MaxFileSizeInBytes > 0 && _fileSize >= MaxFileSizeInBytes;
+            var dateReached = _currentDate != timestamp.Date;
 
             if (!maxSizeReached && !dateReached)
                 return;
 
-            CloseWriter();
+            CloseStream();
 
             if (maxSizeReached)
                 ++_rollingFileNumber;
 
             if (dateReached)
             {
-                _currentDateTime = now;
+                _currentDate = timestamp.Date;
                 _rollingFileNumber = 0;
             }
 
-            CurrentFileName = GetCurrentFileName();
-            _stream = OpenFile(CurrentFileName);
+            OpenStream();
         }
 
         private int FindLastRollingFileNumber()
@@ -180,12 +186,13 @@ namespace ZeroLog.Appenders
                         fileNumber = Math.Max(fileNumber, tempNumber);
                 }
             }
+
             return fileNumber;
         }
 
         private string GetCurrentFileName()
         {
-            return $"{FilenameRoot}.{_currentDateTime:yyyyMMdd}.{_rollingFileNumber:D3}{(FilenameExtension.Length == 0 ? "" : "." + FilenameExtension)}";
+            return $"{FilenameRoot}.{_currentDate:yyyyMMdd}.{_rollingFileNumber:D3}{(FilenameExtension.Length == 0 ? "" : "." + FilenameExtension)}";
         }
 
         private static Stream OpenFile(string filename)
@@ -194,11 +201,11 @@ namespace ZeroLog.Appenders
 
             try
             {
-                return File.Open(fullPath, FileMode.Append, FileAccess.Write, FileShare.ReadWrite);
+                return new FileStream(fullPath, FileMode.Append, FileAccess.Write, FileShare.Read, 64 * 1024, FileOptions.SequentialScan);
             }
             catch (Exception ex)
             {
-                throw new ApplicationException($"Could not open log file '{fullPath}'", ex);
+                throw new IOException($"Could not open log file '{fullPath}'", ex);
             }
         }
     }
