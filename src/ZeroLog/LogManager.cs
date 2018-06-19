@@ -102,7 +102,7 @@ namespace ZeroLog
                 return;
 
             _isRunning = false;
-            _writeThread.Join(15000);
+            _writeThread.Join();
 
             _configResolver.Dispose();
             _bufferSegmentProvider.Dispose();
