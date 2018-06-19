@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -12,19 +13,20 @@ namespace ZeroLog.Appenders
 {
     internal class PrefixWriter
     {
+        private const int _maxLength = 512;
         private const string _dateFormat = "yyyy-MM-dd";
 
-        private readonly StringBuffer _stringBuffer = new StringBuffer(256);
-        private readonly byte[] _tempBytes = new byte[512];
+        private readonly StringBuffer _stringBuffer = new StringBuffer(_maxLength);
+        private readonly byte[] _buffer = new byte[_maxLength * sizeof(char)];
         private readonly char[] _strings;
 
-        private readonly Action<PrefixWriter, ILogEventHeader> _writePrefixMethod;
+        private readonly Action<PrefixWriter, ILogEventHeader> _appendMethod;
 
         public PrefixWriter(string pattern)
         {
             var parts = ParsePattern(pattern).ToList();
-            BuildStrings(parts, out _strings, out var stringMap);
-            _writePrefixMethod = BuildAppendMethod(parts, stringMap);
+            _strings = BuildStrings(parts, out var stringMap);
+            _appendMethod = BuildAppendMethod(parts, stringMap);
         }
 
         private static IEnumerable<PatternPart> ParsePattern(string pattern)
@@ -63,7 +65,7 @@ namespace ZeroLog.Appenders
             }
         }
 
-        private static void BuildStrings(IEnumerable<PatternPart> parts, out char[] strings, out Dictionary<string, (int offset, int length)> map)
+        private static char[] BuildStrings(IEnumerable<PatternPart> parts, out Dictionary<string, (int offset, int length)> map)
         {
             var stringOffsets = new Dictionary<string, (int offset, int length)>();
             var stringsBuilder = new StringBuilder();
@@ -88,13 +90,16 @@ namespace ZeroLog.Appenders
                 stringOffsets[value] = (offset, value.Length);
             }
 
-            strings = stringsBuilder.ToString().ToCharArray();
+            var strings = new char[stringsBuilder.Length];
+            stringsBuilder.CopyTo(0, strings, 0, stringsBuilder.Length);
             map = stringOffsets;
+            return strings;
         }
 
+        [SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
         private static Action<PrefixWriter, ILogEventHeader> BuildAppendMethod(IEnumerable<PatternPart> parts, Dictionary<string, (int offset, int length)> stringMap)
         {
-            var method = new DynamicMethod("WritePrefix", typeof(void), new[] { typeof(PrefixWriter), typeof(ILogEventHeader) }, typeof(PrefixWriter), true);
+            var method = new DynamicMethod("WritePrefix", typeof(void), new[] { typeof(PrefixWriter), typeof(ILogEventHeader) }, typeof(PrefixWriter), false);
             var il = method.GetILGenerator();
 
             var stringBufferLocal = il.DeclareLocal(typeof(StringBuffer));
@@ -121,17 +126,17 @@ namespace ZeroLog.Appenders
                 {
                     case PatternPartType.String:
                     {
-                        // _stringBuffer.Append(&_strings[0] + sizeof(char) * offset, length);
+                        // _stringBuffer.Append(&_strings[0] + offset * sizeof(char), length);
 
-                        var offsets = stringMap[part.Value];
+                        var (offset, length) = stringMap[part.Value];
 
                         il.Emit(OpCodes.Ldloc, stringBufferLocal);
 
                         il.Emit(OpCodes.Ldloc, stringsPtrLocal);
-                        il.Emit(OpCodes.Ldc_I4, sizeof(char) * offsets.offset);
+                        il.Emit(OpCodes.Ldc_I4, offset * sizeof(char));
                         il.Emit(OpCodes.Add);
 
-                        il.Emit(OpCodes.Ldc_I4, offsets.length);
+                        il.Emit(OpCodes.Ldc_I4, length);
 
                         il.Emit(OpCodes.Call, typeof(StringBuffer).GetMethod(nameof(StringBuffer.Append), new[] { typeof(char*), typeof(int) }));
                         break;
@@ -139,9 +144,9 @@ namespace ZeroLog.Appenders
 
                     case PatternPartType.Date:
                     {
-                        // _stringBuffer.Append(logEventHeader.Timestamp, new StringView(&_strings[0] + sizeof(char) * offset, length));
+                        // _stringBuffer.Append(logEventHeader.Timestamp, new StringView(&_strings[0] + offset * sizeof(char), length));
 
-                        var formatOffsets = stringMap[_dateFormat];
+                        var (offset, length) = stringMap[_dateFormat];
 
                         il.Emit(OpCodes.Ldloc, stringBufferLocal);
 
@@ -149,10 +154,10 @@ namespace ZeroLog.Appenders
                         il.Emit(OpCodes.Callvirt, typeof(ILogEventHeader).GetProperty(nameof(ILogEventHeader.Timestamp))?.GetGetMethod());
 
                         il.Emit(OpCodes.Ldloc, stringsPtrLocal);
-                        il.Emit(OpCodes.Ldc_I4, sizeof(char) * formatOffsets.offset);
+                        il.Emit(OpCodes.Ldc_I4, offset * sizeof(char));
                         il.Emit(OpCodes.Add);
 
-                        il.Emit(OpCodes.Ldc_I4, formatOffsets.length);
+                        il.Emit(OpCodes.Ldc_I4, length);
 
                         il.Emit(OpCodes.Newobj, typeof(StringView).GetConstructor(new[] { typeof(char*), typeof(int) }));
 
@@ -233,13 +238,13 @@ namespace ZeroLog.Appenders
         public unsafe int WritePrefix(Stream stream, ILogEventHeader logEventHeader, Encoding encoding)
         {
             _stringBuffer.Clear();
-            _writePrefixMethod(this, logEventHeader);
+            _appendMethod(this, logEventHeader);
 
             int bytesWritten;
-            fixed (byte* buf = &_tempBytes[0])
-                bytesWritten = _stringBuffer.CopyTo(buf, _tempBytes.Length, 0, _stringBuffer.Count, encoding);
+            fixed (byte* buf = &_buffer[0])
+                bytesWritten = _stringBuffer.CopyTo(buf, _buffer.Length, 0, _stringBuffer.Count, encoding);
 
-            stream.Write(_tempBytes, 0, bytesWritten);
+            stream.Write(_buffer, 0, bytesWritten);
             return bytesWritten;
         }
 
