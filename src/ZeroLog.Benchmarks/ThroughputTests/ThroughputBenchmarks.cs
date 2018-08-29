@@ -2,7 +2,6 @@
 using System.Reflection;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Attributes.Jobs;
 using BenchmarkDotNet.Engines;
 using log4net.Layout;
 using NLog;

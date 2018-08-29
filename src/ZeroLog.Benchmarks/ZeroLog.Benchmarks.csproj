@@ -11,15 +11,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="BenchmarkDotNet" Version="0.10.14" />
+    <PackageReference Include="BenchmarkDotNet" Version="0.11.1" />
     <PackageReference Include="ConsoleTables" Version="2.2.0" />
     <PackageReference Include="HdrHistogram" Version="2.5.0" />
     <PackageReference Include="Fody" Version="3.1.4" PrivateAssets="all" />
     <PackageReference Include="InlineIL.Fody" Version="0.7.0" PrivateAssets="all" />
     <PackageReference Include="log4net" Version="2.0.8" />
-    <PackageReference Include="NLog" Version="4.5.2" />
+    <PackageReference Include="NLog" Version="4.5.9" />
     <PackageReference Include="System.Net.Sockets" Version="4.3.0" />
-    <PackageReference Include="System.ValueTuple" Version="4.4.0" />
+    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
   </ItemGroup>
 
   <ItemGroup>

@@ -16,9 +16,9 @@ namespace ZeroLog.Benchmarks
             config.Add(StatisticColumn.P90);
             config.Add(StatisticColumn.P95);
 
-            BenchmarkRunInfo benchs = BenchmarkConverter.TypeToBenchmarks(typeof(ThroughputBenchmarks));
+            var benchs = BenchmarkConverter.TypeToBenchmarks(typeof(ThroughputBenchmarks), config);
 
-            BenchmarkRunner.Run(benchs.Benchmarks, config);
+            BenchmarkRunner.Run(benchs);
         }
 
         private static void LatencyMultiProducer(int threadCount, int warmupMessageCount, int messageCount, int queueSize)
