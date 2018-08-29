@@ -5,9 +5,44 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <LangVersion>latest</LangVersion>
+    <Prefer32Bit>false</Prefer32Bit>
+    <DefaultItemExcludes>$(DefaultItemExcludes);*.DotSettings;*.ncrunchproject</DefaultItemExcludes>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Version>1.2.0</Version>
+    <Description>A zero-allocation .NET logging library</Description>
+    <Authors>Reda Bouallou;Mendel Monteiro-Beckerman;Romain Verdier;Lucas Trzesniewski</Authors>
+    <PackageProjectUrl>https://github.com/Abc-Arbitrage/ZeroLog</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/Abc-Arbitrage/ZeroLog/blob/master/LICENSE.md</PackageLicenseUrl>
+    <Company>ABC arbitrage</Company>
+    <Copyright>Copyright © ABC arbitrage 2017-2018</Copyright>
+    <PackageTags>log;logging;zero-allocation</PackageTags>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <ContinuousIntegrationBuild Condition="'$(ContinuousIntegrationBuild)' == ''">false</ContinuousIntegrationBuild>
+    <ContinuousIntegrationBuild Condition="'$(APPVEYOR)' == 'True'">true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="$(ContinuousIntegrationBuild)">
+    <Deterministic>true</Deterministic>
+    <DeterministicSourcePaths>true</DeterministicSourcePaths>
+    <PackageVersion Condition="'$(PackageVersion)' == ''">$(Version)</PackageVersion>
+    <PackageVersion Condition="'$(APPVEYOR_REPO_TAG)' == 'false'">$(PackageVersion)-pre$(APPVEYOR_BUILD_NUMBER)</PackageVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(NCrunch)' == '1'">
+    <EnableSourceLink>false</EnableSourceLink>
+    <EnableSourceControlManagerQueries>false</EnableSourceControlManagerQueries>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="JetBrains.Annotations" Version="2018.2.1" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta-63127-02" PrivateAssets="All" />
   </ItemGroup>
+
 </Project>

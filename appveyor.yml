@@ -1,5 +1,6 @@
 image: Visual Studio 2017
-build: off
-test_script:
-- ps: build\build.ps1 -Script build\build.cake -Target Test
-deploy: off
+build_script:
+- ps: build\build.ps1 -Script build\build.cake -Target AppVeyor
+test: off
+artifacts:
+- path: output\**\*.nupkg

@@ -25,10 +25,4 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Net.Http" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Compile Include="..\SharedVersionInfo.cs">
-      <Link>Properties\SharedVersionInfo.cs</Link>
-    </Compile>
-  </ItemGroup>
 </Project>

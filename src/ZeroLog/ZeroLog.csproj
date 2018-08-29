@@ -1,7 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net452;net47</TargetFrameworks>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <IsPackable>true</IsPackable>
+    <PackageId>ZeroLog</PackageId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -17,9 +21,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="..\SharedVersionInfo.cs">
-      <Link>Properties\SharedVersionInfo.cs</Link>
-    </Compile>
     <Compile Update="LogEvent.Append.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
