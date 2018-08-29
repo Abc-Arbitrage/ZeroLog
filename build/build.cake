@@ -9,6 +9,7 @@ var target = Argument("target", "Default");
 var paths = new {
     src = MakeAbsolute(Directory("./../src")).FullPath,
     solution = MakeAbsolute(File("./../src/ZeroLog.sln")).FullPath,
+    props = MakeAbsolute(File("./../src/Directory.Build.props")).FullPath,
     testProject = MakeAbsolute(File("./../src/ZeroLog.Tests/ZeroLog.Tests.csproj")).FullPath,
     output = MakeAbsolute(Directory("./../output")).FullPath
 };
@@ -16,6 +17,15 @@ var paths = new {
 //////////////////////////////////////////////////////////////////////
 // TASKS
 //////////////////////////////////////////////////////////////////////
+
+Task("Init").Does(() =>
+{
+    var version = XmlPeek(paths.props, @"/Project/PropertyGroup/Version/text()");
+    Information("Version: {0}", version);
+
+    if (AppVeyor.IsRunningOnAppVeyor)
+        AppVeyor.UpdateBuildVersion($"{version}-{AppVeyor.Environment.Build.Number}");
+});
 
 Task("Clean").Does(() =>
 {
@@ -62,6 +72,7 @@ Task("NuGet-Pack").Does(() =>
 //////////////////////////////////////////////////////////////////////
 
 Task("Build")
+    .IsDependentOn("Init")
     .IsDependentOn("Clean")
     .IsDependentOn("Restore-NuGet-Packages")
     .IsDependentOn("Run-Build");
