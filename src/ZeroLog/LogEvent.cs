@@ -5,7 +5,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Text.Formatting;
 using System.Threading;
-using ExtraConstraints;
 using ZeroLog.Appenders;
 using ZeroLog.Utils;
 
@@ -133,15 +132,15 @@ namespace ZeroLog
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ILogEvent AppendEnum<[EnumConstraint] T>(T value)
-            where T : struct
+        public ILogEvent AppendEnum<T>(T value)
+            where T : struct, Enum
         {
             return AppendEnumInternal(value);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ILogEvent AppendEnum<[EnumConstraint] T>(T? value)
-            where T : struct
+        public ILogEvent AppendEnum<T>(T? value)
+            where T : struct, Enum
         {
             if (value == null)
             {

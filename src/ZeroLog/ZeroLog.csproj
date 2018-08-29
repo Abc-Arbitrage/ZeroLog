@@ -2,39 +2,20 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net452;net47</TargetFrameworks>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType Condition="'$(TargetFramework)' != 'netstandard2.0'">Full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType Condition="'$(TargetFramework)' != 'netstandard2.0'">pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-  </PropertyGroup>
+
   <ItemGroup>
-    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="ExtraConstraints.Fody" Version="1.13.0" />
-    <PackageReference Include="Fody" Version="3.0.4" />
-    <PackageReference Include="InlineIL.Fody" Version="0.6.2" />
-    <PackageReference Include="JetBrains.Annotations" Version="11.1.0" />
+    <PackageReference Include="Fody" Version="3.1.4" PrivateAssets="all" />
+    <PackageReference Include="InlineIL.Fody" Version="0.7.0" PrivateAssets="all" />
     <PackageReference Include="Jil" Version="2.15.4" />
     <PackageReference Include="StringFormatter" Version="1.0.0.11" />
     <PackageReference Include="System.ValueTuple" Version="4.4.0" />
   </ItemGroup>
+
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
+
   <ItemGroup>
     <Compile Include="..\SharedVersionInfo.cs">
       <Link>Properties\SharedVersionInfo.cs</Link>
@@ -57,5 +38,9 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>LogEvent.Append.cs</LastGenOutput>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
   </ItemGroup>
 </Project>

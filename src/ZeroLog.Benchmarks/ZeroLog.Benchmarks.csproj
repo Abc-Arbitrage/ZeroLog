@@ -3,46 +3,27 @@
     <TargetFrameworks>netcoreapp2.0;net47</TargetFrameworks>
     <OutputType>Exe</OutputType>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType Condition="'$(TargetFramework)' != 'netcoreapp2.0'">Full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType Condition="'$(TargetFramework)' != 'netcoreapp2.0'">pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-  </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\ZeroLog.Tests\ZeroLog.Tests.csproj" />
     <ProjectReference Include="..\ZeroLog\ZeroLog.csproj" />
   </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="BenchmarkDotNet" Version="0.10.14" />
     <PackageReference Include="ConsoleTables" Version="2.2.0" />
     <PackageReference Include="HdrHistogram" Version="2.5.0" />
-    <PackageReference Include="Fody" Version="3.0.4" />
-    <PackageReference Include="InlineIL.Fody" Version="0.6.2" />
+    <PackageReference Include="Fody" Version="3.1.4" PrivateAssets="all" />
+    <PackageReference Include="InlineIL.Fody" Version="0.7.0" PrivateAssets="all" />
     <PackageReference Include="log4net" Version="2.0.8" />
     <PackageReference Include="NLog" Version="4.5.2" />
-    <PackageReference Include="NUnit" Version="3.10.1" />
-    <PackageReference Include="NUnit3TestAdapter" Version="3.10.0" />
     <PackageReference Include="System.Net.Sockets" Version="4.3.0" />
     <PackageReference Include="System.ValueTuple" Version="4.4.0" />
   </ItemGroup>
+
   <ItemGroup>
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="Microsoft.CSharp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="app.config" />
   </ItemGroup>
 </Project>

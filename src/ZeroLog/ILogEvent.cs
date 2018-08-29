@@ -1,4 +1,4 @@
-using ExtraConstraints;
+using System;
 using ZeroLog.Appenders;
 
 namespace ZeroLog
@@ -11,11 +11,11 @@ namespace ZeroLog
         ILogEvent AppendAsciiString(byte[] bytes, int length);
         unsafe ILogEvent AppendAsciiString(byte* bytes, int length);
 
-        ILogEvent AppendEnum<[EnumConstraint] T>(T value)
-            where T : struct;
+        ILogEvent AppendEnum<T>(T value)
+            where T : struct, Enum;
 
-        ILogEvent AppendEnum<[EnumConstraint] T>(T? value)
-            where T : struct;
+        ILogEvent AppendEnum<T>(T? value)
+            where T : struct, Enum;
 
         void Log();
     }

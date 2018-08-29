@@ -4,27 +4,12 @@
     <OutputType>Exe</OutputType>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <StartupObject>ZeroLog.Tests.Program</StartupObject>
-    <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType Condition="'$(TargetFramework)' != 'netcoreapp2.0'">Full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType Condition="'$(TargetFramework)' != 'netcoreapp2.0'">pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-  </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\ZeroLog\ZeroLog.csproj" />
   </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.7.0" />
     <PackageReference Include="Moq" Version="4.8.2" />
@@ -35,10 +20,12 @@
     <PackageReference Include="StringFormatter" Version="1.0.0.11" />
     <PackageReference Include="System.ValueTuple" Version="4.4.0" />
   </ItemGroup>
+
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Net.Http" />
   </ItemGroup>
+
   <ItemGroup>
     <Compile Include="..\SharedVersionInfo.cs">
       <Link>Properties\SharedVersionInfo.cs</Link>

@@ -5,7 +5,6 @@ using System.Reflection;
 using System.Text;
 using System.Text.Formatting;
 using System.Threading;
-using ExtraConstraints;
 using JetBrains.Annotations;
 using ZeroLog.Appenders;
 using ZeroLog.ConfigResolvers;
@@ -84,7 +83,8 @@ namespace ZeroLog
         public static void RegisterEnum([NotNull] Type enumType)
             => EnumCache.Register(enumType);
 
-        public static void RegisterEnum<[EnumConstraint] T>()
+        public static void RegisterEnum<T>()
+            where T : struct, Enum
             => RegisterEnum(typeof(T));
 
         public static void RegisterAllEnumsFrom([NotNull] Assembly assembly)

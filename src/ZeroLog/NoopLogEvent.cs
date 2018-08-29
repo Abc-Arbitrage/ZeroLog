@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Text.Formatting;
-using ExtraConstraints;
 using ZeroLog.Appenders;
 using ZeroLog.Utils;
 
@@ -36,14 +35,14 @@ namespace ZeroLog
         public ILogEvent AppendAsciiString(byte[] bytes, int length) => this;
         public unsafe ILogEvent AppendAsciiString(byte* bytes, int length) => this;
 
-        public ILogEvent AppendEnum<[EnumConstraint] T>(T value)
-            where T : struct
+        public ILogEvent AppendEnum<T>(T value)
+            where T : struct, Enum
         {
             return this;
         }
 
-        public ILogEvent AppendEnum<[EnumConstraint] T>(T? value)
-            where T : struct
+        public ILogEvent AppendEnum<T>(T? value)
+            where T : struct, Enum
         {
             return this;
         }
