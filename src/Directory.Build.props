@@ -7,6 +7,7 @@
     <LangVersion>latest</LangVersion>
     <Prefer32Bit>false</Prefer32Bit>
     <DefaultItemExcludes>$(DefaultItemExcludes);*.DotSettings;*.ncrunchproject</DefaultItemExcludes>
+    <DebugType>portable</DebugType>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
