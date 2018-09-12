@@ -27,13 +27,15 @@
   <PropertyGroup>
     <ContinuousIntegrationBuild Condition="'$(ContinuousIntegrationBuild)' == ''">false</ContinuousIntegrationBuild>
     <ContinuousIntegrationBuild Condition="'$(APPVEYOR)' == 'True'">true</ContinuousIntegrationBuild>
+    <ContinuousIntegrationBuild Condition="'$(TEAMCITY_VERSION)' != ''">true</ContinuousIntegrationBuild>
   </PropertyGroup>
 
   <PropertyGroup Condition="$(ContinuousIntegrationBuild)">
     <Deterministic>true</Deterministic>
     <DeterministicSourcePaths>true</DeterministicSourcePaths>
     <PackageVersion Condition="'$(PackageVersion)' == ''">$(Version)</PackageVersion>
-    <PackageVersion Condition="'$(APPVEYOR_REPO_TAG)' == 'false'">$(PackageVersion)-pre$(APPVEYOR_BUILD_NUMBER)</PackageVersion>
+    <PackageVersion Condition="'$(APPVEYOR_REPO_TAG)' == 'false' and '$(APPVEYOR_BUILD_NUMBER)' != ''">$(PackageVersion)-pre$(APPVEYOR_BUILD_NUMBER)</PackageVersion>
+    <PackageVersion Condition="'$(TEAMCITY_VERSION)' != '' and '$(BUILD_NUMBER)' != ''">$(PackageVersion)-pre$(BUILD_NUMBER)</PackageVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(NCrunch)' == '1'">
