@@ -1,4 +1,5 @@
 #tool "nuget:?package=NUnit.ConsoleRunner"
+#tool "nuget:?package=NuGet.CommandLine"
 
 //////////////////////////////////////////////////////////////////////
 // ARGUMENTS

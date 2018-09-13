@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Jil" Version="2.15.4" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.8.0" />
     <PackageReference Include="Moq" Version="4.9.0" />
     <PackageReference Include="NCrunch.Framework" Version="3.17.0" />
