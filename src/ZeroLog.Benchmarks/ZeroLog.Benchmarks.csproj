@@ -14,7 +14,7 @@
     <PackageReference Include="BenchmarkDotNet" Version="0.11.1" />
     <PackageReference Include="ConsoleTables" Version="2.2.0" />
     <PackageReference Include="HdrHistogram" Version="2.5.0" />
-    <PackageReference Include="Fody" Version="3.1.4" PrivateAssets="all" />
+    <PackageReference Include="Fody" Version="3.2.4" PrivateAssets="all" />
     <PackageReference Include="InlineIL.Fody" Version="0.7.0" PrivateAssets="all" />
     <PackageReference Include="log4net" Version="2.0.8" />
     <PackageReference Include="NLog" Version="4.5.9" />

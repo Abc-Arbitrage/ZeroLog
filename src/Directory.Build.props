@@ -7,7 +7,7 @@
     <LangVersion>latest</LangVersion>
     <Prefer32Bit>false</Prefer32Bit>
     <DefaultItemExcludes>$(DefaultItemExcludes);*.DotSettings;*.ncrunchproject</DefaultItemExcludes>
-    <DebugType>portable</DebugType>
+    <DebugType>embedded</DebugType>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
@@ -21,7 +21,6 @@
     <Copyright>Copyright © ABC arbitrage 2017-2018</Copyright>
     <PackageTags>log;logging;zero-allocation</PackageTags>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
   </PropertyGroup>
 
   <PropertyGroup>
