@@ -24,7 +24,13 @@ namespace ZeroLog.Tests
         public void SetUp()
         {
             _performanceAppender = new PerformanceAppender(_count * _nbThreads);
-            BasicConfigurator.Configure(new[] { new ConsoleAppender(), }, new ZeroLogInitializationConfig { LogEventQueueSize = _queueSize });
+
+            BasicConfigurator.Configure(new ZeroLogBasicConfig
+            {
+                Appenders = { new ConsoleAppender(), },
+                LogEventQueueSize = _queueSize
+            });
+
             for (int i = 0; i < _nbThreads; i++)
             {
                 _enqueueMicros.Add(new double[_count]);

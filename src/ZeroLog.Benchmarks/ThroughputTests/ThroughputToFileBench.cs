@@ -18,12 +18,12 @@ namespace ZeroLog.Benchmarks.ThroughputTests
                 Console.WriteLine("Initializing...");
 
                 BasicConfigurator.Configure(
-                    new[] { new DateAndSizeRollingFileAppender(Path.Combine(dir, "Output")), },
-                    new ZeroLogInitializationConfig
+                    new ZeroLogBasicConfig
                     {
+                        Appenders = { new DateAndSizeRollingFileAppender(Path.Combine(dir, "Output")), },
                         LogEventQueueSize = 1000 * 4096 * 4,
-                    },
-                    logEventPoolExhaustionStrategy: LogEventPoolExhaustionStrategy.WaitForLogEvent
+                        LogEventPoolExhaustionStrategy = LogEventPoolExhaustionStrategy.WaitForLogEvent
+                    }
                 );
 
                 var log = LogManager.GetLogger(typeof(ThroughputToFileBench));

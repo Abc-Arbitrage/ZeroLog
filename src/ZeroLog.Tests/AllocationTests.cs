@@ -37,9 +37,15 @@ namespace ZeroLog.Tests
             _tempDirectory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(_tempDirectory);
 
-
             _waitableAppender = new WaitableAppender(Path.Combine(_tempDirectory, "allocation-test"));
-            BasicConfigurator.Configure(new[] { _waitableAppender }, new ZeroLogInitializationConfig { LogEventQueueSize = 2048 * 10, LogEventBufferSize = 512 });
+
+            BasicConfigurator.Configure(new ZeroLogBasicConfig
+            {
+                Appenders = { _waitableAppender },
+                LogEventQueueSize = 2048 * 10,
+                LogEventBufferSize = 512
+            });
+
             LogManager.RegisterEnum<DayOfWeek>();
         }
 

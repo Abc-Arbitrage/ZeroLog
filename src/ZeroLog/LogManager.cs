@@ -61,7 +61,7 @@ namespace ZeroLog
             _writeThread.Start();
         }
 
-        public Level Level => _configResolver.ResolveLevel("");
+        public Level Level { get; private set; }
 
         public static ILogManager Initialize(IConfigurationResolver configResolver, [CanBeNull] ZeroLogInitializationConfig config = null)
         {
@@ -141,16 +141,10 @@ namespace ZeroLog
         ILog IInternalLogManager.GetLog(string name)
             => _loggers.GetOrAdd(name, n => new Log(this, n));
 
-        IAppender[] IInternalLogManager.ResolveAppenders(string name)
-            => _configResolver.ResolveAppenders(name);
+        LogConfig IInternalLogManager.ResolveLogConfig(string name)
+            => _configResolver.ResolveLogConfig(name);
 
-        LogEventPoolExhaustionStrategy IInternalLogManager.ResolveLogEventPoolExhaustionStrategy(string name)
-            => _configResolver.ResolveExhaustionStrategy(name);
-
-        Level IInternalLogManager.ResolveLevel(string name)
-            => _configResolver.ResolveLevel(name);
-
-        IInternalLogEvent IInternalLogManager.AllocateLogEvent(LogEventPoolExhaustionStrategy logEventPoolExhaustionStrategy, IInternalLogEvent notifyPoolExhaustionLogEvent, Level level, Log log)
+        IInternalLogEvent IInternalLogManager.AcquireLogEvent(LogEventPoolExhaustionStrategy logEventPoolExhaustionStrategy, IInternalLogEvent notifyPoolExhaustionLogEvent, Level level, Log log)
         {
             IInternalLogEvent Initialize(IInternalLogEvent l)
             {
@@ -164,7 +158,7 @@ namespace ZeroLog
             switch (logEventPoolExhaustionStrategy)
             {
                 case LogEventPoolExhaustionStrategy.WaitForLogEvent:
-                    return Initialize(AcquireLogEvent());
+                    return Initialize(AcquireLogEventWait());
 
                 case LogEventPoolExhaustionStrategy.DropLogMessage:
                     return NoopLogEvent.Instance;
@@ -174,14 +168,14 @@ namespace ZeroLog
             }
         }
 
-        private IInternalLogEvent AcquireLogEvent()
+        private IInternalLogEvent AcquireLogEventWait()
         {
-            var spinwait = new SpinWait();
+            var spinWait = new SpinWait();
 
             IInternalLogEvent logEvent;
             while (!_pool.TryAcquire(out logEvent))
             {
-                spinwait.SpinOnce();
+                spinWait.SpinOnce();
             }
 
             return logEvent;
@@ -310,6 +304,8 @@ namespace ZeroLog
             var appenders = _configResolver.GetAllAppenders().ToArray();
             Thread.MemoryBarrier();
             _appenders = appenders;
+
+            Level = _configResolver.ResolveLogConfig(string.Empty).Level;
         }
 
         private void FlushAppenders()

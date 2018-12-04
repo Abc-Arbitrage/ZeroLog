@@ -43,7 +43,7 @@ namespace ZeroLog.Tests
         {
             _resolver.Build(_config);
 
-            var appenders = _resolver.ResolveAppenders("test");
+            var appenders = _resolver.ResolveLogConfig("test").Appenders;
             
             Check.That(appenders.Single().Name == "A");
         }
@@ -59,7 +59,7 @@ namespace ZeroLog.Tests
 
             _resolver.Build(_config);
 
-            var appenders = _resolver.ResolveAppenders("Abc.Zebus.Dispatch.Handler");
+            var appenders = _resolver.ResolveLogConfig("Abc.Zebus.Dispatch.Handler").Appenders;
 
             Check.That(appenders.Single().Name == "A").IsTrue();
         }
@@ -77,7 +77,7 @@ namespace ZeroLog.Tests
 
             _resolver.Build(_config);
 
-            var appenders = _resolver.ResolveAppenders("Abc.Zebus.Dispatch.Handler");
+            var appenders = _resolver.ResolveLogConfig("Abc.Zebus.Dispatch.Handler").Appenders;
 
             Check.That(appenders.Any(x => x.Name == "A")).IsTrue();
             Check.That(appenders.Any(x => x.Name == "B")).Equals(includeParents);
@@ -95,7 +95,7 @@ namespace ZeroLog.Tests
 
             _resolver.Build(_config);
 
-            var appenders = _resolver.ResolveAppenders("Abc.Zebus.Dispatch.Handler");
+            var appenders = _resolver.ResolveLogConfig("Abc.Zebus.Dispatch.Handler").Appenders;
 
             Check.That(appenders.Length).Equals(2);
         }

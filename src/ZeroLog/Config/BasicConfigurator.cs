@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using JetBrains.Annotations;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using ZeroLog.Appenders;
 using ZeroLog.ConfigResolvers;
 
@@ -8,25 +9,41 @@ namespace ZeroLog.Config
 {
     public static class BasicConfigurator
     {
-        public static ILogManager Configure(IEnumerable<IAppender> appenders, [CanBeNull] ZeroLogInitializationConfig config = null, Level level = Level.Finest, LogEventPoolExhaustionStrategy logEventPoolExhaustionStrategy = LogEventPoolExhaustionStrategy.Default)
+        public static ILogManager Configure(ZeroLogBasicConfig config)
         {
-            var dummyResolver = new BasicResolver(appenders, level, logEventPoolExhaustionStrategy);
-            return LogManager.Initialize(dummyResolver, config);
+            config = config ?? new ZeroLogBasicConfig();
+            var dummyResolver = new BasicResolver(config.Appenders, config.Level, config.LogEventPoolExhaustionStrategy);
+            return LogManager.Initialize(dummyResolver, config.ToInitializationConfig());
         }
 
-        [Obsolete("Use the overload with the " + nameof(ZeroLogInitializationConfig) + " parameter")]
-        public static ILogManager Configure(IEnumerable<IAppender> appenders, int logEventQueueSize, int logEventBufferSize = 128, Level level = Level.Finest, LogEventPoolExhaustionStrategy logEventPoolExhaustionStrategy = LogEventPoolExhaustionStrategy.Default)
+        public static ILogManager Configure(IEnumerable<IAppender> appenders)
+            => Configure(appenders, new ZeroLogInitializationConfig());
+
+        public static ILogManager Configure(IEnumerable<IAppender> appenders, ZeroLogInitializationConfig initializationConfig)
         {
-            return Configure(
-                appenders,
-                new ZeroLogInitializationConfig
-                {
-                    LogEventQueueSize = logEventQueueSize,
-                    LogEventBufferSize = logEventBufferSize
-                },
-                level,
-                logEventPoolExhaustionStrategy
-            );
+            var config = new ZeroLogBasicConfig
+            {
+                Appenders = appenders.ToList()
+            };
+
+            if (initializationConfig != null)
+                config.ApplyInitializationConfig(initializationConfig);
+
+            return Configure(config);
+        }
+
+        [Obsolete("Use the overload with the " + nameof(ZeroLogBasicConfig) + " parameter")]
+        [SuppressMessage("ReSharper", "MethodOverloadWithOptionalParameter")]
+        public static ILogManager Configure(IEnumerable<IAppender> appenders, int logEventQueueSize = 1024, int logEventBufferSize = 128, Level level = Level.Finest, LogEventPoolExhaustionStrategy logEventPoolExhaustionStrategy = LogEventPoolExhaustionStrategy.Default)
+        {
+            return Configure(new ZeroLogBasicConfig
+            {
+                Appenders = appenders.ToList(),
+                Level = level,
+                LogEventQueueSize = logEventQueueSize,
+                LogEventBufferSize = logEventBufferSize,
+                LogEventPoolExhaustionStrategy = logEventPoolExhaustionStrategy
+            });
         }
     }
 }

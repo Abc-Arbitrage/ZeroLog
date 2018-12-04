@@ -16,7 +16,15 @@ namespace ZeroLog.Tests
         public void SetUp()
         {
             _testAppender = new TestAppender(false);
-            BasicConfigurator.Configure(new[] { _testAppender }, new ZeroLogInitializationConfig { LogEventQueueSize = 16384, LogEventBufferSize = 512 }, Level.Finest, LogEventPoolExhaustionStrategy.WaitForLogEvent);
+
+            BasicConfigurator.Configure(new ZeroLogBasicConfig
+            {
+                Appenders = { _testAppender },
+                LogEventQueueSize = 16384,
+                LogEventBufferSize = 512,
+                Level = Level.Finest,
+                LogEventPoolExhaustionStrategy = LogEventPoolExhaustionStrategy.WaitForLogEvent
+            });
         }
 
         [TearDown]

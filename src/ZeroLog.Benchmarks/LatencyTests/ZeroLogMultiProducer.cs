@@ -10,7 +10,12 @@ namespace ZeroLog.Benchmarks.LatencyTests
         public SimpleLatencyBenchmarkResult Bench(int queueSize, int warmingMessageCount, int totalMessageCount, int producingThreadCount)
         {
             var appender = new Tests.TestAppender(false);
-            BasicConfigurator.Configure(new[] { appender }, new ZeroLogInitializationConfig { LogEventQueueSize = queueSize }, logEventPoolExhaustionStrategy: LogEventPoolExhaustionStrategy.WaitForLogEvent);
+            BasicConfigurator.Configure(new ZeroLogBasicConfig
+            {
+                Appenders = { appender },
+                LogEventQueueSize = queueSize,
+                LogEventPoolExhaustionStrategy = LogEventPoolExhaustionStrategy.WaitForLogEvent
+            });
             var logger = LogManager.GetLogger(nameof(ZeroLog));
 
             var signal = appender.SetMessageCountTarget(warmingMessageCount + totalMessageCount);

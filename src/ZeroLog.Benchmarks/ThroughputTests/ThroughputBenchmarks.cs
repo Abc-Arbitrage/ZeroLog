@@ -7,6 +7,7 @@ using log4net.Layout;
 using NLog;
 using NLog.Config;
 using NLog.Targets.Wrappers;
+using ZeroLog.Config;
 using BasicConfigurator = ZeroLog.Config.BasicConfigurator;
 
 namespace ZeroLog.Benchmarks.ThroughputTests
@@ -62,7 +63,12 @@ namespace ZeroLog.Benchmarks.ThroughputTests
         {
             _zeroLogTestAppender = new ZeroLog.Tests.TestAppender(false);
 
-            BasicConfigurator.Configure(new[] { _zeroLogTestAppender }, new ZeroLogInitializationConfig { LogEventQueueSize = QueueSize }, logEventPoolExhaustionStrategy: LogEventPoolExhaustionStrategy.WaitForLogEvent);
+            BasicConfigurator.Configure(new ZeroLogBasicConfig
+            {
+                Appenders = { _zeroLogTestAppender },
+                LogEventQueueSize = QueueSize,
+                LogEventPoolExhaustionStrategy = LogEventPoolExhaustionStrategy.WaitForLogEvent
+            });
 
             _zeroLogLogger = LogManager.GetLogger(nameof(ZeroLog));
         }

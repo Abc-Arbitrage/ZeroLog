@@ -1,4 +1,5 @@
 ﻿using ZeroLog.Appenders;
+using ZeroLog.Utils;
 
 namespace ZeroLog
 {
@@ -10,7 +11,7 @@ namespace ZeroLog
 
         internal string Name { get; }
 
-        public IAppender[] Appenders { get; private set; }
+        public IAppender[] Appenders { get; private set; } = ArrayUtil.Empty<IAppender>();
         public LogEventPoolExhaustionStrategy LogEventPoolExhaustionStrategy { get; private set; }
 
         internal Log(IInternalLogManager logManager, string name)
@@ -36,9 +37,11 @@ namespace ZeroLog
 
         internal void ResetConfiguration()
         {
-            Appenders = _logManager?.ResolveAppenders(Name);
-            LogEventPoolExhaustionStrategy = _logManager?.ResolveLogEventPoolExhaustionStrategy(Name) ?? LogEventPoolExhaustionStrategy.Default;
-            _logLevel = _logManager?.ResolveLevel(Name) ?? Level.Fatal;
+            var config = _logManager?.ResolveLogConfig(Name);
+
+            Appenders = config?.Appenders ?? ArrayUtil.Empty<IAppender>();
+            LogEventPoolExhaustionStrategy = config?.LogEventPoolExhaustionStrategy ?? default;
+            _logLevel = config?.Level ?? Level.Fatal;
         }
 
         public bool IsLevelEnabled(Level level) => level >= _logLevel;
@@ -47,7 +50,7 @@ namespace ZeroLog
             ? GetLogEventFor(level)
             : NoopLogEvent.Instance;
 
-        private IInternalLogEvent GetLogEventFor(Level level) => _logManager.AllocateLogEvent(LogEventPoolExhaustionStrategy, _specialLogMessage, level, this);
+        private IInternalLogEvent GetLogEventFor(Level level) => _logManager.AcquireLogEvent(LogEventPoolExhaustionStrategy, _specialLogMessage, level, this);
 
         internal void Enqueue(IInternalLogEvent logEvent)
         {

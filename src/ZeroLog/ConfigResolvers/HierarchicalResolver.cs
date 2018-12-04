@@ -29,9 +29,17 @@ namespace ZeroLog.ConfigResolvers
             }
         }
 
-        public IAppender[] ResolveAppenders(string name) => Resolve(name).Appenders.ToArray();
-        public Level ResolveLevel(string name) => Resolve(name).Level;
-        public LogEventPoolExhaustionStrategy ResolveExhaustionStrategy(string name) => Resolve(name).Strategy;
+        public LogConfig ResolveLogConfig(string name)
+        {
+            var node = Resolve(name);
+
+            return new LogConfig
+            {
+                Appenders = node.Appenders.ToArray(),
+                Level = node.Level,
+                LogEventPoolExhaustionStrategy = node.LogEventPoolExhaustionStrategy,
+            };
+        }
 
         public event Action Updated = delegate { };
 
@@ -90,13 +98,20 @@ namespace ZeroLog.ConfigResolvers
                 path = (path + "." + part).Trim('.');
 
                 if (!node.Children.ContainsKey(part))
-                    node.Children[part] = new Node { Appenders = node.Appenders, Level = node.Level, Strategy = node.Strategy };
+                {
+                    node.Children[part] = new Node
+                    {
+                        Appenders = node.Appenders,
+                        Level = node.Level,
+                        LogEventPoolExhaustionStrategy = node.LogEventPoolExhaustionStrategy,
+                    };
+                }
 
                 node = node.Children[part];
             }
 
             node.Appenders = (logger.IncludeParentAppenders ? appenders.Union(node.Appenders) : appenders).Distinct();
-            node.Strategy = logger.LogEventPoolExhaustionStrategy;
+            node.LogEventPoolExhaustionStrategy = logger.LogEventPoolExhaustionStrategy;
             node.Level = logger.Level;
         }
 
@@ -149,7 +164,7 @@ namespace ZeroLog.ConfigResolvers
             public readonly Dictionary<string, Node> Children = new Dictionary<string, Node>();
             public IEnumerable<IAppender> Appenders = Enumerable.Empty<IAppender>();
             public Level Level;
-            public LogEventPoolExhaustionStrategy Strategy;
+            public LogEventPoolExhaustionStrategy LogEventPoolExhaustionStrategy;
 
             public void Dispose()
             {

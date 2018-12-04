@@ -10,19 +10,26 @@ namespace ZeroLog.ConfigResolvers
     {
         private readonly IAppender[] _appenders;
         private readonly Level _level;
-        private readonly LogEventPoolExhaustionStrategy _strategy;
+        private readonly LogEventPoolExhaustionStrategy _logEventPoolExhaustionStrategy;
 
-        public BasicResolver(IEnumerable<IAppender> appenders, Level level, LogEventPoolExhaustionStrategy strategy)
+        public BasicResolver(IEnumerable<IAppender> appenders, Level level, LogEventPoolExhaustionStrategy logEventPoolExhaustionStrategy)
         {
             _level = level;
-            _strategy = strategy;
+            _logEventPoolExhaustionStrategy = logEventPoolExhaustionStrategy;
             _appenders = appenders.Select(x => new GuardedAppender(x, TimeSpan.FromSeconds(15))).ToArray<IAppender>();
         }
 
         public IEnumerable<IAppender> GetAllAppenders() => _appenders;
-        public IAppender[] ResolveAppenders(string name) => _appenders;
-        public Level ResolveLevel(string name) => _level;
-        public LogEventPoolExhaustionStrategy ResolveExhaustionStrategy(string name) => _strategy;
+
+        public LogConfig ResolveLogConfig(string name)
+        {
+            return new LogConfig
+            {
+                Appenders = _appenders,
+                Level = _level,
+                LogEventPoolExhaustionStrategy = _logEventPoolExhaustionStrategy,
+            };
+        }
 
         public void Initialize(Encoding encoding)
         {
@@ -32,7 +39,7 @@ namespace ZeroLog.ConfigResolvers
             }
         }
 
-        public event Action Updated = delegate {};
+        public event Action Updated = delegate { };
 
         public void Dispose()
         {

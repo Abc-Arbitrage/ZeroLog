@@ -78,7 +78,12 @@ namespace ZeroLog.Tests
         {
             LogManager.Shutdown();
 
-            BasicConfigurator.Configure(new[] { _testAppender }, new ZeroLogInitializationConfig { LogEventQueueSize = 10, LogEventBufferSize = 128 }, Level.Finest, LogEventPoolExhaustionStrategy.DropLogMessageAndNotifyAppenders);
+            BasicConfigurator.Configure(new ZeroLogBasicConfig
+            {
+                Appenders = { _testAppender },
+                LogEventQueueSize = 10,
+                LogEventPoolExhaustionStrategy = LogEventPoolExhaustionStrategy.DropLogMessageAndNotifyAppenders
+            });
 
             var log = LogManager.GetLogger(typeof(LogManagerTests));
 
@@ -102,7 +107,13 @@ namespace ZeroLog.Tests
         {
             LogManager.Shutdown();
             
-            BasicConfigurator.Configure(new[] { _testAppender }, new ZeroLogInitializationConfig { LogEventQueueSize = 10, LogEventBufferSize = 128 }, Level.Finest, LogEventPoolExhaustionStrategy.DropLogMessage);
+            BasicConfigurator.Configure(new ZeroLogBasicConfig
+            {
+                Appenders = { _testAppender },
+                LogEventQueueSize = 10,
+                LogEventPoolExhaustionStrategy = LogEventPoolExhaustionStrategy.DropLogMessage
+            });
+
             var log = LogManager.GetLogger(typeof(LogManagerTests));
 
             var actualLogEvents = new List<ILogEvent>();
@@ -123,7 +134,12 @@ namespace ZeroLog.Tests
         {
             LogManager.Shutdown();
 
-            BasicConfigurator.Configure(new[] { _testAppender }, new ZeroLogInitializationConfig { LogEventQueueSize = 10, LogEventBufferSize = 128 }, Level.Finest, LogEventPoolExhaustionStrategy.WaitForLogEvent);
+            BasicConfigurator.Configure(new ZeroLogBasicConfig
+            {
+                Appenders = { _testAppender },
+                LogEventQueueSize = 10,
+                LogEventPoolExhaustionStrategy = LogEventPoolExhaustionStrategy.WaitForLogEvent
+            });
 
             var log = LogManager.GetLogger(typeof(LogManagerTests));
 
