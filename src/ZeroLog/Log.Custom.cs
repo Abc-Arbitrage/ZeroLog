@@ -28,7 +28,7 @@ namespace ZeroLog
         private IInternalLogEvent CreateUnpooledLogEvent()
         {
             var bufferSegment = _logManager.GetBufferSegment();
-            var logEvent = new UnpooledLogEvent(bufferSegment);
+            var logEvent = new UnpooledLogEvent(bufferSegment, 1);
             logEvent.Initialize(Level.Fatal, this);
             logEvent.Append("Log message skipped due to LogEvent pool exhaustion.");
             return logEvent;

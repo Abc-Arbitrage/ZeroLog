@@ -12,18 +12,19 @@ namespace ZeroLog
 {
     internal unsafe partial class LogEvent : IInternalLogEvent
     {
-        private const int _stringCapacity = 10;
-
-        private readonly List<string> _strings = new List<string>(_stringCapacity);
-        private readonly List<IntPtr> _argPointers = new List<IntPtr>(_stringCapacity);
+        private readonly List<string> _strings;
+        private readonly List<IntPtr> _argPointers;
         private Log _log;
 
         protected readonly byte* _startOfBuffer;
         protected readonly byte* _endOfBuffer;
         protected byte* _dataPointer;
 
-        public LogEvent(BufferSegment bufferSegment)
+        public LogEvent(BufferSegment bufferSegment, int argCapacity)
         {
+            _argPointers = new List<IntPtr>(argCapacity);
+            _strings = new List<string>(argCapacity);
+
             _startOfBuffer = bufferSegment.Data;
             _dataPointer = bufferSegment.Data;
             _endOfBuffer = bufferSegment.Data + bufferSegment.Length;

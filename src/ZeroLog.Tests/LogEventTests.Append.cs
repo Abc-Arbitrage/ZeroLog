@@ -21,7 +21,7 @@ namespace ZeroLog.Tests
             _bufferHandler = GCHandle.Alloc(buffer, GCHandleType.Pinned);
 
             var bufferSegment = new BufferSegment((byte*)_bufferHandler.AddrOfPinnedObject().ToPointer(), buffer.Length);
-            _logEvent = new LogEvent(bufferSegment);
+            _logEvent = new LogEvent(bufferSegment, 10);
             _output = new StringBuffer(128) { Culture = CultureInfo.InvariantCulture };
         }
 

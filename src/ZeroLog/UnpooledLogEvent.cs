@@ -2,8 +2,8 @@ namespace ZeroLog
 {
     internal unsafe class UnpooledLogEvent : LogEvent
     {
-        public UnpooledLogEvent(BufferSegment bufferSegment)
-            : base(bufferSegment)
+        public UnpooledLogEvent(BufferSegment bufferSegment, int argCapacity)
+            : base(bufferSegment, argCapacity)
         {
         }
 

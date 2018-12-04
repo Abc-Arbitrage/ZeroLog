@@ -38,7 +38,7 @@ namespace ZeroLog
             _queue = new ConcurrentQueue<IInternalLogEvent>(new ConcurrentQueueCapacityInitializer(config.LogEventQueueSize));
 
             _bufferSegmentProvider = new BufferSegmentProvider(config.LogEventQueueSize * config.LogEventBufferSize, config.LogEventBufferSize);
-            _pool = new ObjectPool<IInternalLogEvent>(config.LogEventQueueSize, () => new LogEvent(_bufferSegmentProvider.GetSegment()));
+            _pool = new ObjectPool<IInternalLogEvent>(config.LogEventQueueSize, () => new LogEvent(_bufferSegmentProvider.GetSegment(), config.LogEventArgumentCapacity));
 
             configResolver.Initialize(_encoding);
             configResolver.Updated += () =>
