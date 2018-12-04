@@ -10,6 +10,9 @@ namespace ZeroLog.Tests
 {
     public unsafe partial class LogEventTests
     {
+        private const int _bufferLength = 1024;
+        private const int _argCapacity = 10;
+
         private LogEvent _logEvent;
         private StringBuffer _output;
         private GCHandle _bufferHandler;
@@ -17,11 +20,12 @@ namespace ZeroLog.Tests
         [SetUp]
         public void SetUp()
         {
-            var buffer = new byte[1024];
+            var buffer = new byte[_bufferLength];
             _bufferHandler = GCHandle.Alloc(buffer, GCHandleType.Pinned);
 
             var bufferSegment = new BufferSegment((byte*)_bufferHandler.AddrOfPinnedObject().ToPointer(), buffer.Length);
-            _logEvent = new LogEvent(bufferSegment, 10);
+            _logEvent = new LogEvent(bufferSegment, _argCapacity);
+            _logEvent.Initialize(Level.Info, null, LogEventArgumentExhaustionStrategy.Allocate);
             _output = new StringBuffer(128) { Culture = CultureInfo.InvariantCulture };
         }
 
@@ -283,7 +287,7 @@ namespace ZeroLog.Tests
             Assert.AreEqual("null", _output.ToString());
 
             _output.Clear();
-            _logEvent.Initialize(Level.Info, null);
+            _logEvent.Initialize(Level.Info, null, LogEventArgumentExhaustionStrategy.Default);
 
             ((dynamic)_logEvent).AppendGeneric((T?)null);
             _logEvent.WriteToStringBuffer(_output);
@@ -291,7 +295,7 @@ namespace ZeroLog.Tests
             Assert.AreEqual("null", _output.ToString());
 
             _output.Clear();
-            _logEvent.Initialize(Level.Info, null);
+            _logEvent.Initialize(Level.Info, null, LogEventArgumentExhaustionStrategy.Default);
 
             ((dynamic)_logEvent).Append((T?)new T());
             _logEvent.WriteToStringBuffer(_output);
@@ -299,12 +303,40 @@ namespace ZeroLog.Tests
             Assert.AreNotEqual("null", _output.ToString());
 
             _output.Clear();
-            _logEvent.Initialize(Level.Info, null);
+            _logEvent.Initialize(Level.Info, null, LogEventArgumentExhaustionStrategy.Default);
 
             ((dynamic)_logEvent).AppendGeneric((T?)new T());
             _logEvent.WriteToStringBuffer(_output);
 
             Assert.AreNotEqual("null", _output.ToString());
+        }
+
+        [Test]
+        public void should_truncate_log_message()
+        {
+            _logEvent.Initialize(Level.Info, null, LogEventArgumentExhaustionStrategy.TruncateMessage);
+
+            for (var i = 0; i < _argCapacity; ++i)
+                _logEvent.Append(".");
+
+            _logEvent.Append("!");
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreEqual(new string('.', _argCapacity) + LogManager.Config.TruncatedMessageSuffix, _output.ToString());
+        }
+
+        [Test]
+        public void should_not_truncate_log_message()
+        {
+            _logEvent.Initialize(Level.Info, null, LogEventArgumentExhaustionStrategy.Allocate);
+
+            for (var i = 0; i < _argCapacity * 2; ++i)
+                _logEvent.Append(".");
+
+            _logEvent.Append("!");
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreEqual(new string('.', _argCapacity * 2) + "!", _output.ToString());
         }
     }
 }

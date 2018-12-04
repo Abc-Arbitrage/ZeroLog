@@ -1,10 +1,13 @@
 ﻿using System;
+using JetBrains.Annotations;
 
 namespace ZeroLog
 {
     internal interface IInternalLogManager : ILogManager, IDisposable
     {
-        IInternalLogEvent AcquireLogEvent(LogEventPoolExhaustionStrategy logEventPoolExhaustionStrategy, IInternalLogEvent logEvent, Level level, Log log);
+        [CanBeNull]
+        IInternalLogEvent AcquireLogEvent(LogEventPoolExhaustionStrategy logEventPoolExhaustionStrategy);
+
         void Enqueue(IInternalLogEvent logEvent);
         ILog GetLog(string name);
         LogConfig ResolveLogConfig(string name);

@@ -92,7 +92,7 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent Append(<#= type.name #> value)
         {
-            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(<#= type.name #>)))
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(<#= type.name #>)))
                 return this;
 
             AppendArgumentType(ArgumentType.<#= type.argType #>);
@@ -104,7 +104,7 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent Append(<#= type.name #>? value)
         {
-            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(<#= type.name #>)))
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(<#= type.name #>)))
                 return this;
 
             if (value == null)
@@ -127,7 +127,7 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent Append(<#= type.name #> value, string format)
         {
-            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(byte) + sizeof(<#= type.name #>)))
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte) + sizeof(<#= type.name #>)))
                 return this;
 
             AppendArgumentTypeWithFormat(ArgumentType.<#= type.argType #>);
@@ -140,7 +140,7 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent Append(<#= type.name #>? value, string format)
         {
-            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(byte) + sizeof(<#= type.name #>)))
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte) + sizeof(<#= type.name #>)))
                 return this;
 
             if (value == null)

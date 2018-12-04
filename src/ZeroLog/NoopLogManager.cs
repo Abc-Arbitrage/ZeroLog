@@ -8,7 +8,7 @@ namespace ZeroLog
     {
         public Level Level { get; } = Level.Finest;
 
-        public IInternalLogEvent AcquireLogEvent(LogEventPoolExhaustionStrategy logEventPoolExhaustionStrategy, IInternalLogEvent logEvent, Level level, Log log)
+        public IInternalLogEvent AcquireLogEvent(LogEventPoolExhaustionStrategy logEventPoolExhaustionStrategy)
             => throw new NotSupportedException();
 
         public void Enqueue(IInternalLogEvent logEvent)
@@ -24,6 +24,7 @@ namespace ZeroLog
                 Appenders = NoopLog.Instance.Appenders,
                 Level = Level.Fatal,
                 LogEventPoolExhaustionStrategy = LogEventPoolExhaustionStrategy.Default,
+                LogEventArgumentExhaustionStrategy = LogEventArgumentExhaustionStrategy.Default
             };
         }
 

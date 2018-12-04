@@ -8,8 +8,8 @@ namespace ZeroLog
     {
         private readonly IInternalLogEvent _logEventToAppend;
 
-        public Level Level => _logEventToAppend?.Level ?? default(Level);
-        public DateTime Timestamp => default(DateTime);
+        public Level Level => _logEventToAppend?.Level ?? default;
+        public DateTime Timestamp => default;
         public int ThreadId => 0;
         public string Name => _logEventToAppend?.Name;
         public IAppender[] Appenders => _log?.Appenders;
@@ -21,7 +21,7 @@ namespace ZeroLog
             _logEventToAppend = logEventToAppend;
         }
 
-        public void Initialize(Level level, Log log)
+        public void Initialize(Level level, Log log, LogEventArgumentExhaustionStrategy argumentExhaustionStrategy)
         {
             _log = log;
         }

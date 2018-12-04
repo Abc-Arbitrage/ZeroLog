@@ -35,7 +35,7 @@ namespace ZeroLog.Tests
             _logEvent.AppendAsciiString(asciiBytes, asciiBytes.Length);
             _logEvent.WriteToStringBuffer(_output);
 
-            Check.That(_output.ToString().Length).Equals(1022);
+            Check.That(_output.ToString().Length).Equals(_bufferSize - sizeof(ArgumentType) - sizeof(int) + LogManager.Config.TruncatedMessageSuffix.Length);
         }
 
         [Test]
@@ -51,7 +51,7 @@ namespace ZeroLog.Tests
 
             _logEvent.WriteToStringBuffer(_output);
 
-            Check.That(_output.ToString().Length).Equals(1022);
+            Check.That(_output.ToString().Length).Equals(_bufferSize - sizeof(ArgumentType) - sizeof(int) + LogManager.Config.TruncatedMessageSuffix.Length);
         }
 
         [Test]

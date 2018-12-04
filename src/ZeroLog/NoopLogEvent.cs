@@ -9,8 +9,8 @@ namespace ZeroLog
     {
         public static NoopLogEvent Instance { get; } = new NoopLogEvent();
 
-        public Level Level => default(Level);
-        public DateTime Timestamp => default(DateTime);
+        public Level Level => default;
+        public DateTime Timestamp => default;
         public int ThreadId => 0;
         public string Name => null;
         public IAppender[] Appenders { get; } = ArrayUtil.Empty<IAppender>();
@@ -19,7 +19,7 @@ namespace ZeroLog
         {
         }
 
-        public void Initialize(Level level, Log log)
+        public void Initialize(Level level, Log log, LogEventArgumentExhaustionStrategy argumentExhaustionStrategy)
         {
         }
 

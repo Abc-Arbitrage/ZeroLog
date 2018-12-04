@@ -122,7 +122,7 @@ namespace ZeroLog.Tests
             Assert.AreNotEqual("null", _output.ToString());
 
             _output.Clear();
-            _logEvent.Initialize(Level.Info, null);
+            _logEvent.Initialize(Level.Info, null, LogEventArgumentExhaustionStrategy.Default);
 
             ((dynamic)_logEvent).Append((T?)null, format);
             _logEvent.WriteToStringBuffer(_output);

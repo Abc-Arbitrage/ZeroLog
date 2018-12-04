@@ -15,10 +15,12 @@ namespace ZeroLog
         private readonly List<string> _strings;
         private readonly List<IntPtr> _argPointers;
         private Log _log;
+        private LogEventArgumentExhaustionStrategy _argumentExhaustionStrategy;
 
         protected readonly byte* _startOfBuffer;
         protected readonly byte* _endOfBuffer;
         protected byte* _dataPointer;
+        private bool _isTruncated;
 
         public LogEvent(BufferSegment bufferSegment, int argCapacity)
         {
@@ -37,7 +39,7 @@ namespace ZeroLog
         public IAppender[] Appenders => _log.Appenders;
         public virtual bool IsPooled => true;
 
-        public void Initialize(Level level, Log log)
+        public void Initialize(Level level, Log log, LogEventArgumentExhaustionStrategy argumentExhaustionStrategy)
         {
             Timestamp = SystemDateTime.UtcNow;
             Level = level;
@@ -45,6 +47,8 @@ namespace ZeroLog
             _strings.Clear();
             _argPointers.Clear();
             _dataPointer = _startOfBuffer;
+            _isTruncated = false;
+            _argumentExhaustionStrategy = argumentExhaustionStrategy;
             ThreadId = Thread.CurrentThread.ManagedThreadId;
         }
 
@@ -60,7 +64,7 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void AppendFormat(string format)
         {
-            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(byte)))
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte)))
                 return;
 
             AppendArgumentType(ArgumentType.FormatString);
@@ -70,7 +74,7 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent Append(string s)
         {
-            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(byte)))
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte)))
                 return this;
 
             if (s == null)
@@ -89,18 +93,23 @@ namespace ZeroLog
         {
             if (bytes == null)
             {
-                if (HasEnoughBytes(sizeof(ArgumentType)))
+                if (PrepareAppend(sizeof(ArgumentType)))
                     AppendArgumentType(ArgumentType.Null);
 
                 return this;
             }
 
             var remainingBytes = (int)(_endOfBuffer - _dataPointer);
-            remainingBytes -= sizeof(ArgumentType) + sizeof(byte);
+            remainingBytes -= sizeof(ArgumentType) + sizeof(int);
+
+            if (length > remainingBytes)
+            {
+                _isTruncated = true;
+                length = remainingBytes;
+            }
+
             if (remainingBytes <= 0)
                 return this;
-
-            length = Math.Min(length, remainingBytes);
 
             AppendArgumentType(ArgumentType.AsciiString);
             AppendInt32(length);
@@ -113,18 +122,23 @@ namespace ZeroLog
         {
             if (bytes == null)
             {
-                if (HasEnoughBytes(sizeof(ArgumentType)))
+                if (PrepareAppend(sizeof(ArgumentType)))
                     AppendArgumentType(ArgumentType.Null);
 
                 return this;
             }
 
             var remainingBytes = (int)(_endOfBuffer - _dataPointer);
-            remainingBytes -= sizeof(ArgumentType) + sizeof(byte);
+            remainingBytes -= sizeof(ArgumentType) + sizeof(int);
+
+            if (length > remainingBytes)
+            {
+                _isTruncated = true;
+                length = remainingBytes;
+            }
+
             if (remainingBytes <= 0)
                 return this;
-
-            length = Math.Min(length, remainingBytes);
 
             AppendArgumentType(ArgumentType.AsciiString);
             AppendInt32(length);
@@ -145,7 +159,7 @@ namespace ZeroLog
         {
             if (value == null)
             {
-                if (HasEnoughBytes(sizeof(ArgumentType)))
+                if (PrepareAppend(sizeof(ArgumentType)))
                     AppendArgumentType(ArgumentType.Null);
 
                 return this;
@@ -157,7 +171,7 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private ILogEvent AppendEnumInternal<T>(T value)
         {
-            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(EnumArg)))
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(EnumArg)))
                 return this;
 
             AppendArgumentType(ArgumentType.Enum);
@@ -169,7 +183,7 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.NoInlining)]
         private void AppendNullableEnumInternal<T>(T value) // T = Nullable<SomeEnum>
         {
-            if (!HasEnoughBytes(sizeof(ArgumentType) + sizeof(EnumArg)))
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(EnumArg)))
                 return;
 
             var enumValue = EnumCache.ToUInt64Nullable(value);
@@ -200,6 +214,9 @@ namespace ZeroLog
             }
 
             Debug.Assert(dataPointer == endOfData, "Buffer over-read");
+
+            if (_isTruncated)
+                stringBuffer.Append(LogManager.Config.TruncatedMessageSuffix);
         }
 
         public void WriteToStringBufferUnformatted(StringBuffer stringBuffer)
@@ -216,6 +233,9 @@ namespace ZeroLog
             }
 
             Debug.Assert(dataPointer == endOfData, "Buffer over-read");
+
+            if (_isTruncated)
+                stringBuffer.Append(LogManager.Config.TruncatedMessageSuffix);
         }
 
         private void AppendArgumentToStringBufferUnformatted(StringBuffer stringBuffer, ref byte* dataPointer)
@@ -332,8 +352,20 @@ namespace ZeroLog
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private bool HasEnoughBytes(int requestedBytes)
-            => _dataPointer + requestedBytes <= _endOfBuffer;
+        private bool PrepareAppend(int requestedBytes)
+            => _dataPointer + requestedBytes <= _endOfBuffer
+               && _argPointers.Count < _argPointers.Capacity
+               || PrepareAppendSlow(requestedBytes);
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private bool PrepareAppendSlow(int requestedBytes)
+        {
+            if (_dataPointer + requestedBytes <= _endOfBuffer && _argumentExhaustionStrategy == LogEventArgumentExhaustionStrategy.Allocate)
+                return true;
+
+            _isTruncated = true;
+            return false;
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void AppendArgumentType(ArgumentType argumentType)

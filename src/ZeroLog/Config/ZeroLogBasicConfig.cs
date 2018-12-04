@@ -8,6 +8,7 @@ namespace ZeroLog.Config
         public ICollection<IAppender> Appenders { get; set; } = new List<IAppender>();
         public Level Level { get; set; } = Level.Finest;
         public LogEventPoolExhaustionStrategy LogEventPoolExhaustionStrategy { get; set; } = LogEventPoolExhaustionStrategy.Default;
+        public LogEventArgumentExhaustionStrategy LogEventArgumentExhaustionStrategy { get; set; } = LogEventArgumentExhaustionStrategy.Default;
 
         public int LogEventQueueSize { get; set; }
         public int LogEventBufferSize { get; set; }

@@ -144,27 +144,21 @@ namespace ZeroLog
         LogConfig IInternalLogManager.ResolveLogConfig(string name)
             => _configResolver.ResolveLogConfig(name);
 
-        IInternalLogEvent IInternalLogManager.AcquireLogEvent(LogEventPoolExhaustionStrategy logEventPoolExhaustionStrategy, IInternalLogEvent notifyPoolExhaustionLogEvent, Level level, Log log)
+        IInternalLogEvent IInternalLogManager.AcquireLogEvent(LogEventPoolExhaustionStrategy logEventPoolExhaustionStrategy)
         {
-            IInternalLogEvent Initialize(IInternalLogEvent l)
-            {
-                l.Initialize(level, log);
-                return l;
-            }
-
             if (_pool.TryAcquire(out var logEvent))
-                return Initialize(logEvent);
+                return logEvent;
 
             switch (logEventPoolExhaustionStrategy)
             {
                 case LogEventPoolExhaustionStrategy.WaitForLogEvent:
-                    return Initialize(AcquireLogEventWait());
+                    return AcquireLogEventWait();
 
                 case LogEventPoolExhaustionStrategy.DropLogMessage:
                     return NoopLogEvent.Instance;
 
                 default:
-                    return notifyPoolExhaustionLogEvent;
+                    return null;
             }
         }
 
