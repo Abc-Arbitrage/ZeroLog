@@ -21,7 +21,7 @@ namespace ZeroLog.Tests
             configResolver.Setup(x => x.ResolveLevel(It.IsAny<string>()))
                          .Returns(logLevel);
 
-            var logManager = new LogManager(configResolver.Object, 1, 128);
+            var logManager = new LogManager(configResolver.Object, new ZeroLogInitializationConfig { LogEventQueueSize = 1, LogEventBufferSize = 128 });
             var log = new Log(logManager, "logger");
 
 

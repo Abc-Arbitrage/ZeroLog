@@ -39,7 +39,7 @@ namespace ZeroLog.Tests
 
 
             _waitableAppender = new WaitableAppender(Path.Combine(_tempDirectory, "allocation-test"));
-            BasicConfigurator.Configure(new[] {_waitableAppender}, 2048 * 10, 512);
+            BasicConfigurator.Configure(new[] { _waitableAppender }, new ZeroLogInitializationConfig { LogEventQueueSize = 2048 * 10, LogEventBufferSize = 512 });
             LogManager.RegisterEnum<DayOfWeek>();
         }
 

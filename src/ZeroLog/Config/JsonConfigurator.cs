@@ -41,7 +41,7 @@ namespace ZeroLog.Config
                 }
             };
 
-            var logManager = LogManager.Initialize(resolver, config.LogEventQueueSize, config.LogEventBufferSize);
+            var logManager = LogManager.Initialize(resolver, config.GetInitializationConfig());
             ConfigureGlobal(config);
             return logManager;
         }

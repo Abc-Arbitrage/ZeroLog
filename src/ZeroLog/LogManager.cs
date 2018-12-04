@@ -31,14 +31,14 @@ namespace ZeroLog
 
         public static ZeroLogConfig Config { get; } = new ZeroLogConfig();
 
-        internal LogManager(IConfigurationResolver configResolver, int logEventQueueSize = 1024, int logEventBufferSize = 128)
+        internal LogManager(IConfigurationResolver configResolver, ZeroLogInitializationConfig config)
         {
             _configResolver = configResolver;
 
-            _queue = new ConcurrentQueue<IInternalLogEvent>(new ConcurrentQueueCapacityInitializer(logEventQueueSize));
+            _queue = new ConcurrentQueue<IInternalLogEvent>(new ConcurrentQueueCapacityInitializer(config.LogEventQueueSize));
 
-            _bufferSegmentProvider = new BufferSegmentProvider(logEventQueueSize * logEventBufferSize, logEventBufferSize);
-            _pool = new ObjectPool<IInternalLogEvent>(logEventQueueSize, () => new LogEvent(_bufferSegmentProvider.GetSegment()));
+            _bufferSegmentProvider = new BufferSegmentProvider(config.LogEventQueueSize * config.LogEventBufferSize, config.LogEventBufferSize);
+            _pool = new ObjectPool<IInternalLogEvent>(config.LogEventQueueSize, () => new LogEvent(_bufferSegmentProvider.GetSegment()));
 
             configResolver.Initialize(_encoding);
             configResolver.Updated += () =>
@@ -63,13 +63,26 @@ namespace ZeroLog
 
         public Level Level => _configResolver.ResolveLevel("");
 
-        public static ILogManager Initialize(IConfigurationResolver configResolver, int logEventQueueSize = 1024, int logEventBufferSize = 128)
+        public static ILogManager Initialize(IConfigurationResolver configResolver, [CanBeNull] ZeroLogInitializationConfig config = null)
         {
             if (_logManager != _noOpLogManager)
                 throw new ApplicationException("LogManager is already initialized");
 
-            _logManager = new LogManager(configResolver, logEventQueueSize, logEventBufferSize);
+            _logManager = new LogManager(configResolver, config ?? new ZeroLogInitializationConfig());
             return _logManager;
+        }
+
+        [Obsolete("Use the overload with the " + nameof(ZeroLogInitializationConfig) + " parameter")]
+        public static ILogManager Initialize(IConfigurationResolver configResolver, int logEventQueueSize, int logEventBufferSize = 128)
+        {
+            return Initialize(
+                configResolver,
+                new ZeroLogInitializationConfig
+                {
+                    LogEventQueueSize = logEventQueueSize,
+                    LogEventBufferSize = logEventBufferSize
+                }
+            );
         }
 
         public static void Shutdown()

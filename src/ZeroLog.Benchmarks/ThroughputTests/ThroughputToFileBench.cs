@@ -19,7 +19,10 @@ namespace ZeroLog.Benchmarks.ThroughputTests
 
                 BasicConfigurator.Configure(
                     new[] { new DateAndSizeRollingFileAppender(Path.Combine(dir, "Output")), },
-                    logEventQueueSize: 1000 * 4096 * 4,
+                    new ZeroLogInitializationConfig
+                    {
+                        LogEventQueueSize = 1000 * 4096 * 4,
+                    },
                     logEventPoolExhaustionStrategy: LogEventPoolExhaustionStrategy.WaitForLogEvent
                 );
 

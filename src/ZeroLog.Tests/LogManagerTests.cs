@@ -21,7 +21,7 @@ namespace ZeroLog.Tests
         public void SetUpFixture()
         {
             _testAppender = new TestAppender(true);
-            BasicConfigurator.Configure(new List<IAppender> { _testAppender }, 10);
+            BasicConfigurator.Configure(new List<IAppender> { _testAppender }, new ZeroLogInitializationConfig { LogEventQueueSize = 10 });
         }
 
         [TearDown]
@@ -77,8 +77,8 @@ namespace ZeroLog.Tests
         public void should_log_special_message_when_log_event_pool_is_exhausted()
         {
             LogManager.Shutdown();
-            
-            BasicConfigurator.Configure(new[] { _testAppender }, 10, 128, Level.Finest, LogEventPoolExhaustionStrategy.DropLogMessageAndNotifyAppenders);
+
+            BasicConfigurator.Configure(new[] { _testAppender }, new ZeroLogInitializationConfig { LogEventQueueSize = 10, LogEventBufferSize = 128 }, Level.Finest, LogEventPoolExhaustionStrategy.DropLogMessageAndNotifyAppenders);
 
             var log = LogManager.GetLogger(typeof(LogManagerTests));
 
@@ -102,7 +102,7 @@ namespace ZeroLog.Tests
         {
             LogManager.Shutdown();
             
-            BasicConfigurator.Configure(new[] { _testAppender }, 10, 128, Level.Finest, LogEventPoolExhaustionStrategy.DropLogMessage);
+            BasicConfigurator.Configure(new[] { _testAppender }, new ZeroLogInitializationConfig { LogEventQueueSize = 10, LogEventBufferSize = 128 }, Level.Finest, LogEventPoolExhaustionStrategy.DropLogMessage);
             var log = LogManager.GetLogger(typeof(LogManagerTests));
 
             var actualLogEvents = new List<ILogEvent>();
@@ -123,7 +123,7 @@ namespace ZeroLog.Tests
         {
             LogManager.Shutdown();
 
-            BasicConfigurator.Configure(new[] { _testAppender }, 10, 128, Level.Finest, LogEventPoolExhaustionStrategy.WaitForLogEvent);
+            BasicConfigurator.Configure(new[] { _testAppender }, new ZeroLogInitializationConfig { LogEventQueueSize = 10, LogEventBufferSize = 128 }, Level.Finest, LogEventPoolExhaustionStrategy.WaitForLogEvent);
 
             var log = LogManager.GetLogger(typeof(LogManagerTests));
 

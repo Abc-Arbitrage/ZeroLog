@@ -11,5 +11,12 @@
 
         public LoggerDefinition RootLogger { get; set; } = new LoggerDefinition();
         public LoggerDefinition[] Loggers { get; set; } = new LoggerDefinition[0];
+
+        internal ZeroLogInitializationConfig GetInitializationConfig()
+            => new ZeroLogInitializationConfig
+            {
+                LogEventQueueSize = LogEventQueueSize,
+                LogEventBufferSize = LogEventBufferSize
+            };
     }
 }
