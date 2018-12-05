@@ -1,22 +1,9 @@
-﻿namespace ZeroLog.Config
+﻿using System;
+
+namespace ZeroLog.Config
 {
-    public class ZeroLogConfiguration
+    [Obsolete("Use " + nameof(ZeroLogJsonConfiguration) + " instead")]
+    public class ZeroLogConfiguration : ZeroLogJsonConfiguration
     {
-        public int LogEventQueueSize { get; set; } = 1024;
-        public int LogEventBufferSize { get; set; } = 128;
-        public bool LazyRegisterEnums { get; set; }
-        public string NullDisplayString { get; set; }
-
-        public AppenderDefinition[] Appenders { get; set; } = new AppenderDefinition[0];
-
-        public LoggerDefinition RootLogger { get; set; } = new LoggerDefinition();
-        public LoggerDefinition[] Loggers { get; set; } = new LoggerDefinition[0];
-
-        internal ZeroLogInitializationConfig GetInitializationConfig()
-            => new ZeroLogInitializationConfig
-            {
-                LogEventQueueSize = LogEventQueueSize,
-                LogEventBufferSize = LogEventBufferSize
-            };
     }
 }

@@ -18,7 +18,7 @@ namespace ZeroLog.Benchmarks.ThroughputTests
                 Console.WriteLine("Initializing...");
 
                 BasicConfigurator.Configure(
-                    new ZeroLogBasicConfig
+                    new ZeroLogBasicConfiguration
                     {
                         Appenders = { new DateAndSizeRollingFileAppender(Path.Combine(dir, "Output")), },
                         LogEventQueueSize = 1000 * 4096 * 4,

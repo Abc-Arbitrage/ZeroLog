@@ -63,7 +63,7 @@ namespace ZeroLog.Benchmarks.ThroughputTests
         {
             _zeroLogTestAppender = new ZeroLog.Tests.TestAppender(false);
 
-            BasicConfigurator.Configure(new ZeroLogBasicConfig
+            BasicConfigurator.Configure(new ZeroLogBasicConfiguration
             {
                 Appenders = { _zeroLogTestAppender },
                 LogEventQueueSize = QueueSize,

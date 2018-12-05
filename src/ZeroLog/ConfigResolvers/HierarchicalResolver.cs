@@ -44,7 +44,13 @@ namespace ZeroLog.ConfigResolvers
 
         public event Action Updated = delegate { };
 
+        [Obsolete]
         public void Build(ZeroLogConfiguration config)
+        {
+            Build((IHierarchicalConfiguration)config);
+        }
+
+        public void Build(IHierarchicalConfiguration config)
         {
             var oldRoot = _root;
             var newRoot = new Node();
@@ -63,7 +69,7 @@ namespace ZeroLog.ConfigResolvers
             oldRoot?.Dispose();
         }
 
-        private static List<(LoggerDefinition logger, IAppender[] appenders)> CreateLoggersWithAppenders(ZeroLogConfiguration config)
+        private static List<(LoggerDefinition logger, IAppender[] appenders)> CreateLoggersWithAppenders(IHierarchicalConfiguration config)
         {
             var appendersByNames = config.Appenders.ToDictionary(x => x.Name, CreateAppender);
 

@@ -46,7 +46,7 @@ namespace ZeroLog.Config
             return logManager;
         }
 
-        private static void ConfigureGlobal(ZeroLogConfiguration config)
+        private static void ConfigureGlobal(ZeroLogJsonConfiguration config)
         {
             LogManager.Config.LazyRegisterEnums = config.LazyRegisterEnums;
 
@@ -54,22 +54,22 @@ namespace ZeroLog.Config
                 LogManager.Config.NullDisplayString = config.NullDisplayString;
         }
 
-        private static ZeroLogConfiguration ConfigureResolver(string configFileFullPath, HierarchicalResolver resolver)
+        private static ZeroLogJsonConfiguration ConfigureResolver(string configFileFullPath, HierarchicalResolver resolver)
         {
             var config = ReadConfiguration(configFileFullPath);
             resolver.Build(config);
             return config;
         }
 
-        private static ZeroLogConfiguration ReadConfiguration(string configFilePath)
+        private static ZeroLogJsonConfiguration ReadConfiguration(string configFilePath)
         {
             var filecontent = ReadFileContentWithRetry(configFilePath);
             return DeserializeConfiguration(filecontent);
         }
 
-        internal static ZeroLogConfiguration DeserializeConfiguration(string jsonConfiguration)
+        internal static ZeroLogJsonConfiguration DeserializeConfiguration(string jsonConfiguration)
         {
-            var config = JsonExtensions.DeserializeOrDefault(jsonConfiguration, new ZeroLogConfiguration());
+            var config = JsonExtensions.DeserializeOrDefault(jsonConfiguration, new ZeroLogJsonConfiguration());
             return config;
         }
 

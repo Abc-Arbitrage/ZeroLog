@@ -10,7 +10,7 @@ namespace ZeroLog.Benchmarks.LatencyTests
         public SimpleLatencyBenchmarkResult Bench(int queueSize, int warmingMessageCount, int totalMessageCount, int producingThreadCount)
         {
             var appender = new Tests.TestAppender(false);
-            BasicConfigurator.Configure(new ZeroLogBasicConfig
+            BasicConfigurator.Configure(new ZeroLogBasicConfiguration
             {
                 Appenders = { appender },
                 LogEventQueueSize = queueSize,

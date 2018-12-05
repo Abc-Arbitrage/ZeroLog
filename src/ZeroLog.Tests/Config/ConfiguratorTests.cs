@@ -16,7 +16,7 @@ namespace ZeroLog.Tests.Config
         {
             var appenderA = new AppenderDefinition { Name = "A", AppenderTypeName = nameof(ConsoleAppender), AppenderJsonConfig = JSON.Serialize(new DefaultAppenderConfig{PrefixPattern = "[%level] @ %time - %logger: " })};
             var appenderB = new AppenderDefinition { Name = "B", AppenderTypeName = nameof(DateAndSizeRollingFileAppender), AppenderJsonConfig = JSON.Serialize(new DateAndSizeRollingFileAppenderConfig { FilePathRoot = "totopath " }) };
-            var config = new ZeroLogConfiguration
+            var config = new ZeroLogJsonConfiguration
             {
                 LogEventBufferSize = 5,
                 LogEventQueueSize = 7,
@@ -85,8 +85,8 @@ namespace ZeroLog.Tests.Config
             var config = JsonConfigurator.DeserializeConfiguration(configJson);
 
             Check.That(config.RootLogger.LogEventPoolExhaustionStrategy).Equals(LogEventPoolExhaustionStrategy.Default);
-            Check.That(config.LogEventBufferSize).Equals(new ZeroLogConfiguration().LogEventBufferSize);
-            Check.That(config.LogEventQueueSize).Equals(new ZeroLogConfiguration().LogEventQueueSize);
+            Check.That(config.LogEventBufferSize).Equals(new ZeroLogJsonConfiguration().LogEventBufferSize);
+            Check.That(config.LogEventQueueSize).Equals(new ZeroLogJsonConfiguration().LogEventQueueSize);
         }
     }
 }

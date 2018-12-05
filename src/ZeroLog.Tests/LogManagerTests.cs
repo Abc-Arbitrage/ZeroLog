@@ -78,7 +78,7 @@ namespace ZeroLog.Tests
         {
             LogManager.Shutdown();
 
-            BasicConfigurator.Configure(new ZeroLogBasicConfig
+            BasicConfigurator.Configure(new ZeroLogBasicConfiguration
             {
                 Appenders = { _testAppender },
                 LogEventQueueSize = 10,
@@ -107,7 +107,7 @@ namespace ZeroLog.Tests
         {
             LogManager.Shutdown();
             
-            BasicConfigurator.Configure(new ZeroLogBasicConfig
+            BasicConfigurator.Configure(new ZeroLogBasicConfiguration
             {
                 Appenders = { _testAppender },
                 LogEventQueueSize = 10,
@@ -134,7 +134,7 @@ namespace ZeroLog.Tests
         {
             LogManager.Shutdown();
 
-            BasicConfigurator.Configure(new ZeroLogBasicConfig
+            BasicConfigurator.Configure(new ZeroLogBasicConfiguration
             {
                 Appenders = { _testAppender },
                 LogEventQueueSize = 10,

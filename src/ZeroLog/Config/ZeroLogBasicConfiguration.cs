@@ -3,7 +3,7 @@ using ZeroLog.Appenders;
 
 namespace ZeroLog.Config
 {
-    public class ZeroLogBasicConfig
+    public class ZeroLogBasicConfiguration
     {
         public ICollection<IAppender> Appenders { get; set; } = new List<IAppender>();
         public Level Level { get; set; } = Level.Finest;
@@ -14,7 +14,7 @@ namespace ZeroLog.Config
         public int LogEventBufferSize { get; set; }
         public int LogEventArgumentCapacity { get; set; }
 
-        public ZeroLogBasicConfig()
+        public ZeroLogBasicConfiguration()
         {
             ApplyInitializationConfig(new ZeroLogInitializationConfig());
         }

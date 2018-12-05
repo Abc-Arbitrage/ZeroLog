@@ -13,7 +13,7 @@ namespace ZeroLog.Tests
     internal class HierarchicalAppenderResolverTests
     {
         private HierarchicalResolver _resolver;
-        private ZeroLogConfiguration _config;
+        private ZeroLogJsonConfiguration _config;
 
         public class TestAppenderParameters
         {
@@ -27,7 +27,7 @@ namespace ZeroLog.Tests
         {
             _resolver = new HierarchicalResolver();
 
-            _config = new ZeroLogConfiguration();
+            _config = new ZeroLogJsonConfiguration();
             _config.RootLogger = new LoggerDefinition(string.Empty, Level.Info, false, LogEventPoolExhaustionStrategy.Default, "A");
 
             _config.Appenders = new[]

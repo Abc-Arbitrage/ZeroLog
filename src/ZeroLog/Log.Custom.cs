@@ -11,7 +11,7 @@ namespace ZeroLog
 
         internal string Name { get; }
 
-        public IAppender[] Appenders { get; private set; } = ArrayUtil.Empty<IAppender>();
+        public IAppender[] Appenders { get; private set; }
         public LogEventPoolExhaustionStrategy LogEventPoolExhaustionStrategy { get; private set; }
         public LogEventArgumentExhaustionStrategy LogEventArgumentExhaustionStrategy { get; private set; }
 

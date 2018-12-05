@@ -17,7 +17,7 @@ namespace ZeroLog.Tests
         {
             _testAppender = new TestAppender(false);
 
-            BasicConfigurator.Configure(new ZeroLogBasicConfig
+            BasicConfigurator.Configure(new ZeroLogBasicConfiguration
             {
                 Appenders = { _testAppender },
                 LogEventQueueSize = 16384,
