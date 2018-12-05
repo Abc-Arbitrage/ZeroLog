@@ -64,6 +64,20 @@ namespace ZeroLog.Tests
         }
 
         [Test]
+        public void should_truncate_byte_array_after_too_many_args()
+        {
+            _logEvent.Initialize(Level.Info, null, LogEventArgumentExhaustionStrategy.TruncateMessage);
+            for (var i = 0; i < _argCapacity; ++i)
+                _logEvent.Append(".");
+
+            var bytes = Encoding.Default.GetBytes("abc");
+            _logEvent.AppendAsciiString(bytes, bytes.Length);
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreEqual(new string('.', _argCapacity) + LogManager.Config.TruncatedMessageSuffix, _output.ToString());
+        }
+
+        [Test]
         public void should_append_null_byte_array()
         {
             _logEvent.AppendAsciiString((byte[])null, 0);
@@ -84,6 +98,25 @@ namespace ZeroLog.Tests
             _logEvent.WriteToStringBuffer(_output);
 
             Assert.AreEqual("abc", _output.ToString());
+        }
+
+        [Test]
+        public void should_truncate_unsafe_byte_array_after_too_many_args()
+        {
+            _logEvent.Initialize(Level.Info, null, LogEventArgumentExhaustionStrategy.TruncateMessage);
+            for (var i = 0; i < _argCapacity; ++i)
+                _logEvent.Append(".");
+
+            var bytes = Encoding.Default.GetBytes("abc");
+
+            fixed (byte* b = bytes)
+            {
+                _logEvent.AppendAsciiString(b, bytes.Length);
+            }
+
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreEqual(new string('.', _argCapacity) + LogManager.Config.TruncatedMessageSuffix, _output.ToString());
         }
 
         [Test]

@@ -110,7 +110,7 @@ namespace ZeroLog
                 length = remainingBytes;
             }
 
-            if (remainingBytes <= 0)
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(int) + length))
                 return this;
 
             AppendArgumentType(ArgumentType.AsciiString);
@@ -139,7 +139,7 @@ namespace ZeroLog
                 length = remainingBytes;
             }
 
-            if (remainingBytes <= 0)
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(int) + length))
                 return this;
 
             AppendArgumentType(ArgumentType.AsciiString);
