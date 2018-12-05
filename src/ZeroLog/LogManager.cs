@@ -33,6 +33,8 @@ namespace ZeroLog
 
         internal LogManager(IConfigurationResolver configResolver, ZeroLogInitializationConfig config)
         {
+            config.Validate();
+
             _configResolver = configResolver;
 
             _queue = new ConcurrentQueue<IInternalLogEvent>(new ConcurrentQueueCapacityInitializer(config.LogEventQueueSize));
