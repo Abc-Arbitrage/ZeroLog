@@ -110,7 +110,7 @@ namespace ZeroLog
                 length = remainingBytes;
             }
 
-            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(int) + length))
+            if (length <= 0 || !PrepareAppend(sizeof(ArgumentType) + sizeof(int) + length))
                 return this;
 
             AppendArgumentType(ArgumentType.AsciiString);
@@ -139,7 +139,7 @@ namespace ZeroLog
                 length = remainingBytes;
             }
 
-            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(int) + length))
+            if (length <= 0 || !PrepareAppend(sizeof(ArgumentType) + sizeof(int) + length))
                 return this;
 
             AppendArgumentType(ArgumentType.AsciiString);
@@ -407,24 +407,15 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void AppendBytes(byte[] bytes, int length)
         {
-            fixed (byte* b = bytes)
-            {
-                for (var i = 0; i < length; i++)
-                {
-                    *_dataPointer = b[i];
-                    _dataPointer += sizeof(byte);
-                }
-            }
+            Unsafe.CopyBlockUnaligned(ref *_dataPointer, ref bytes[0], (uint)length);
+            _dataPointer += length;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void AppendBytes(byte* bytes, int length)
         {
-            for (var i = 0; i < length; i++)
-            {
-                *_dataPointer = bytes[i];
-                _dataPointer += sizeof(byte);
-            }
+            Unsafe.CopyBlockUnaligned(_dataPointer, bytes, (uint)length);
+            _dataPointer += length;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

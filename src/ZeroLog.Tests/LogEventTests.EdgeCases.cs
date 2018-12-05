@@ -11,6 +11,7 @@ namespace ZeroLog.Tests
     public unsafe class LogEventEdgeCaseTests
     {
         private const int _bufferSize = 1024;
+        private const int _asciiHeaderSize = sizeof(ArgumentType) + sizeof(int);
         private LogEvent _logEvent;
         private StringBuffer _output;
         private GCHandle _bufferHandler;
@@ -35,7 +36,24 @@ namespace ZeroLog.Tests
             _logEvent.AppendAsciiString(asciiBytes, asciiBytes.Length);
             _logEvent.WriteToStringBuffer(_output);
 
-            Check.That(_output.ToString().Length).Equals(_bufferSize - sizeof(ArgumentType) - sizeof(int) + LogManager.Config.TruncatedMessageSuffix.Length);
+            Check.That(_output.ToString().Length).Equals(_bufferSize - _asciiHeaderSize + LogManager.Config.TruncatedMessageSuffix.Length);
+        }
+
+        [Test]
+        public void should_ignore_ascii_string_if_buffer_is_not_large_enough_for_header([Range(_bufferSize - 2 * _asciiHeaderSize, _bufferSize)] int firstStringLength)
+        {
+            var largeString1 = new string('a', firstStringLength);
+            var asciiBytes1 = Encoding.ASCII.GetBytes(largeString1);
+            _logEvent.AppendAsciiString(asciiBytes1, asciiBytes1.Length);
+
+            var largeString2 = new string('b', _bufferSize);
+            var asciiBytes2 = Encoding.ASCII.GetBytes(largeString2);
+            _logEvent.AppendAsciiString(asciiBytes2, asciiBytes2.Length);
+
+            _logEvent.WriteToStringBuffer(_output);
+
+            var expectedTextLength = Math.Min(firstStringLength, _bufferSize - _asciiHeaderSize);
+            Check.That(_output.ToString()).IsEqualTo(new string('a', expectedTextLength) + LogManager.Config.TruncatedMessageSuffix);
         }
 
         [Test]
@@ -51,7 +69,7 @@ namespace ZeroLog.Tests
 
             _logEvent.WriteToStringBuffer(_output);
 
-            Check.That(_output.ToString().Length).Equals(_bufferSize - sizeof(ArgumentType) - sizeof(int) + LogManager.Config.TruncatedMessageSuffix.Length);
+            Check.That(_output.ToString().Length).Equals(_bufferSize - _asciiHeaderSize + LogManager.Config.TruncatedMessageSuffix.Length);
         }
 
         [Test]

@@ -64,6 +64,25 @@ namespace ZeroLog.Tests
         }
 
         [Test]
+        public void should_ignore_byte_array_with_negative_length()
+        {
+            var bytes = Encoding.Default.GetBytes("abc");
+            _logEvent.AppendAsciiString(bytes, -1);
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreEqual("", _output.ToString());
+        }
+
+        [Test]
+        public void should_ignore_empty_byte_array()
+        {
+            _logEvent.AppendAsciiString(new byte[0], 0);
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreEqual("", _output.ToString());
+        }
+
+        [Test]
         public void should_truncate_byte_array_after_too_many_args()
         {
             _logEvent.Initialize(Level.Info, null, LogEventArgumentExhaustionStrategy.TruncateMessage);
