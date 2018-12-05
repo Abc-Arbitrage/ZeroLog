@@ -1,13 +1,11 @@
 using System;
-using System.Collections.Generic;
 using System.Text.Formatting;
-using ZeroLog.Utils;
 
 namespace ZeroLog
 {
     internal static unsafe class StringBufferExtension
     {
-        public static void Append(this StringBuffer stringBuffer, ref byte* dataPointer, StringView format, List<string> strings, List<IntPtr> argPointers)
+        public static void Append(this StringBuffer stringBuffer, ref byte* dataPointer, StringView format, string[] strings, IntPtr[] argPointers, int argCount)
         {
             var argument = *dataPointer;
             dataPointer += sizeof(ArgumentType);
@@ -23,16 +21,16 @@ namespace ZeroLog
                 fixed (char* p = formatSpecifier)
                 {
                     var formatSpecifierView = new StringView(p, formatSpecifier.Length);
-                    AppendArg(stringBuffer, ref dataPointer, argumentType, formatSpecifierView, strings, argPointers);
+                    AppendArg(stringBuffer, ref dataPointer, argumentType, formatSpecifierView, strings, argPointers, argCount);
                 }
             }
             else
             {
-                AppendArg(stringBuffer, ref dataPointer, argumentType, format, strings, argPointers);
+                AppendArg(stringBuffer, ref dataPointer, argumentType, format, strings, argPointers, argCount);
             }
         }
 
-        private static void AppendArg(StringBuffer stringBuffer, ref byte* argPointer, ArgumentType argumentType, StringView format, List<string> strings, List<IntPtr> argPointers)
+        private static void AppendArg(StringBuffer stringBuffer, ref byte* argPointer, ArgumentType argumentType, StringView format, string[] strings, IntPtr[] argPointers, int argCount)
         {
             switch (argumentType)
             {
@@ -110,7 +108,7 @@ namespace ZeroLog
                     break;
 
                 case ArgumentType.FormatString:
-                    var argSet = new ArgSet(argPointers, strings);
+                    var argSet = new ArgSet(argPointers, strings, argCount);
                     stringBuffer.AppendArgSet(strings[*argPointer], ref argSet);
                     argPointer += sizeof(byte) + argSet.BytesRead;
                     break;

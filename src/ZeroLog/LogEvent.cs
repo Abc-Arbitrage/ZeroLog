@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
@@ -12,20 +11,21 @@ namespace ZeroLog
 {
     internal unsafe partial class LogEvent : IInternalLogEvent
     {
-        private readonly List<string> _strings;
-        private readonly List<IntPtr> _argPointers;
+        private string[] _strings;
+        private IntPtr[] _argPointers;
         private Log _log;
         private LogEventArgumentExhaustionStrategy _argumentExhaustionStrategy;
 
         protected readonly byte* _startOfBuffer;
         protected readonly byte* _endOfBuffer;
         protected byte* _dataPointer;
+        private int _argCount;
         private bool _isTruncated;
 
         public LogEvent(BufferSegment bufferSegment, int argCapacity)
         {
-            _argPointers = new List<IntPtr>(argCapacity);
-            _strings = new List<string>(argCapacity);
+            _argPointers = new IntPtr[argCapacity];
+            _strings = new string[argCapacity];
 
             _startOfBuffer = bufferSegment.Data;
             _dataPointer = bufferSegment.Data;
@@ -44,8 +44,7 @@ namespace ZeroLog
             Timestamp = SystemDateTime.UtcNow;
             Level = level;
             _log = log;
-            _strings.Clear();
-            _argPointers.Clear();
+            _argCount = 0;
             _dataPointer = _startOfBuffer;
             _isTruncated = false;
             _argumentExhaustionStrategy = argumentExhaustionStrategy;
@@ -210,7 +209,7 @@ namespace ZeroLog
 
             while (dataPointer < endOfData)
             {
-                stringBuffer.Append(ref dataPointer, StringView.Empty, _strings, _argPointers);
+                stringBuffer.Append(ref dataPointer, StringView.Empty, _strings, _argPointers, _argCount);
             }
 
             Debug.Assert(dataPointer == endOfData, "Buffer over-read");
@@ -354,14 +353,18 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private bool PrepareAppend(int requestedBytes)
             => _dataPointer + requestedBytes <= _endOfBuffer
-               && _argPointers.Count < _argPointers.Capacity
+               && _argCount < _argPointers.Length
                || PrepareAppendSlow(requestedBytes);
 
         [MethodImpl(MethodImplOptions.NoInlining)]
         private bool PrepareAppendSlow(int requestedBytes)
         {
             if (_dataPointer + requestedBytes <= _endOfBuffer && _argumentExhaustionStrategy == LogEventArgumentExhaustionStrategy.Allocate)
+            {
+                Array.Resize(ref _argPointers, _argPointers.Length * 2);
+                Array.Resize(ref _strings, _strings.Length * 2);
                 return true;
+            }
 
             _isTruncated = true;
             return false;
@@ -370,7 +373,7 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void AppendArgumentType(ArgumentType argumentType)
         {
-            _argPointers.Add(new IntPtr(_dataPointer));
+            _argPointers[_argCount++] = new IntPtr(_dataPointer);
             *(ArgumentType*)_dataPointer = argumentType;
             _dataPointer += sizeof(ArgumentType);
         }
@@ -379,7 +382,7 @@ namespace ZeroLog
         [SuppressMessage("ReSharper", "BitwiseOperatorOnEnumWithoutFlags")]
         private void AppendArgumentTypeWithFormat(ArgumentType argumentType)
         {
-            _argPointers.Add(new IntPtr(_dataPointer));
+            _argPointers[_argCount++] = new IntPtr(_dataPointer);
             *(ArgumentType*)_dataPointer = argumentType | (ArgumentType)ArgumentTypeMask.FormatSpecifier;
             _dataPointer += sizeof(ArgumentType);
         }
@@ -387,9 +390,10 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void AppendString(string value)
         {
-            *_dataPointer = (byte)_strings.Count;
+            var argIndex = _argCount - 1;
+            *_dataPointer = (byte)argIndex;
             _dataPointer += sizeof(byte);
-            _strings.Add(value);
+            _strings[argIndex] = value;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
