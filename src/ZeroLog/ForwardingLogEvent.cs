@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text.Formatting;
+using JetBrains.Annotations;
 using ZeroLog.Appenders;
 
 namespace ZeroLog
@@ -7,23 +8,22 @@ namespace ZeroLog
     internal partial class ForwardingLogEvent : IInternalLogEvent
     {
         private readonly IInternalLogEvent _logEventToAppend;
+        private readonly Log _log;
 
-        public Level Level => _logEventToAppend?.Level ?? default;
+        public Level Level => _logEventToAppend.Level;
         public DateTime Timestamp => default;
         public int ThreadId => 0;
-        public string Name => _logEventToAppend?.Name;
-        public IAppender[] Appenders => _log?.Appenders;
+        public string Name => _logEventToAppend.Name;
+        public IAppender[] Appenders => _log.Appenders;
 
-        private Log _log;
-
-        public ForwardingLogEvent(IInternalLogEvent logEventToAppend)
+        public ForwardingLogEvent([NotNull] IInternalLogEvent logEventToAppend, [NotNull] Log log)
         {
             _logEventToAppend = logEventToAppend;
+            _log = log;
         }
 
         public void Initialize(Level level, Log log, LogEventArgumentExhaustionStrategy argumentExhaustionStrategy)
         {
-            _log = log;
         }
 
         public void AppendFormat(string format)
@@ -52,8 +52,7 @@ namespace ZeroLog
 
         public void Log()
         {
-            if (_logEventToAppend != null)
-                _log?.Enqueue(_logEventToAppend);
+            _log.Enqueue(_logEventToAppend);
         }
 
         public void WriteToStringBuffer(StringBuffer stringBuffer)

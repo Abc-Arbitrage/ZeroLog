@@ -21,8 +21,7 @@ namespace ZeroLog
             _logManager = logManager;
 
             var logEvent = CreateUnpooledLogEvent();
-            _skippedMessageLogEvent = new ForwardingLogEvent(logEvent);
-            _skippedMessageLogEvent.Initialize(Level.Fatal, this, LogEventArgumentExhaustionStrategy.Allocate);
+            _skippedMessageLogEvent = new ForwardingLogEvent(logEvent, this);
 
             ResetConfiguration();
         }
@@ -54,12 +53,8 @@ namespace ZeroLog
 
         private IInternalLogEvent GetLogEventFor(Level level)
         {
-            var logEvent = _logManager.AcquireLogEvent(LogEventPoolExhaustionStrategy);
-
-            if (logEvent != null)
-                logEvent.Initialize(level, this, LogEventArgumentExhaustionStrategy);
-            else
-                logEvent = _skippedMessageLogEvent;
+            var logEvent = _logManager.AcquireLogEvent(LogEventPoolExhaustionStrategy) ?? _skippedMessageLogEvent;
+            logEvent.Initialize(level, this, LogEventArgumentExhaustionStrategy);
 
             return logEvent;
         }
