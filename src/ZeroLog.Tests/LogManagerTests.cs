@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -8,7 +7,6 @@ using NFluent;
 using NUnit.Framework;
 using ZeroLog.Appenders;
 using ZeroLog.Config;
-using ZeroLog.ConfigResolvers;
 
 namespace ZeroLog.Tests
 {
@@ -256,6 +254,21 @@ namespace ZeroLog.Tests
             Check.That(EnumCache.IsRegistered(typeof(ConsoleColor))).IsFalse();
             LogManager.RegisterAllEnumsFrom(typeof(ConsoleColor).Assembly);
             Check.That(EnumCache.IsRegistered(typeof(ConsoleColor))).IsTrue();
+        }
+
+        [Test]
+        public void should_truncate_long_lines()
+        {
+            var log = LogManager.GetLogger(typeof(LogManagerTests));
+
+            var signal = _testAppender.SetMessageCountTarget(1);
+
+            var longMessage = new string('.', LogManager.OutputBufferSize + 1);
+            log.Info().Append(longMessage).Log();
+
+            signal.Wait(TimeSpan.FromMilliseconds(100));
+            var message = _testAppender.LoggedMessages.Single();
+            Check.That(message).IsEqualTo(new string('.', LogManager.OutputBufferSize - LogManager.Config.TruncatedMessageSuffix.Length) + LogManager.Config.TruncatedMessageSuffix);
         }
     }
 }

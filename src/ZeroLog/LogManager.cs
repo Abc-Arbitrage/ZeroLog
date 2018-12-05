@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Formatting;
 using System.Threading;
@@ -14,8 +15,11 @@ namespace ZeroLog
 {
     public class LogManager : IInternalLogManager
     {
+        internal const int OutputBufferSize = 16 * 1024;
+
         private static readonly IInternalLogManager _noOpLogManager = new NoopLogManager();
         private static IInternalLogManager _logManager = _noOpLogManager;
+        private static readonly Encoding _encoding = Encoding.UTF8;
 
         private readonly ConcurrentDictionary<string, Log> _loggers = new ConcurrentDictionary<string, Log>();
         private readonly ConcurrentQueue<IInternalLogEvent> _queue;
@@ -26,7 +30,6 @@ namespace ZeroLog
         private readonly Thread _writeThread;
 
         private bool _isRunning;
-        private readonly Encoding _encoding = Encoding.UTF8;
         private IAppender[] _appenders = ArrayUtil.Empty<IAppender>();
 
         public static ZeroLogConfig Config { get; } = new ZeroLogConfig();
@@ -204,7 +207,7 @@ namespace ZeroLog
 
                     Shutdown();
                 }
-                catch 
+                catch
                 {
                     // Don't kill the process
                 }
@@ -214,8 +217,8 @@ namespace ZeroLog
         private void WriteToAppenders()
         {
             var spinWait = new SpinWait();
-            var stringBuffer = new StringBuffer(16 * 1024);
-            var destination = new byte[16 * 1024];
+            var stringBuffer = new StringBuffer(OutputBufferSize);
+            var destination = new byte[OutputBufferSize];
             var flush = false;
 
             while (_isRunning || !_queue.IsEmpty)
@@ -254,16 +257,17 @@ namespace ZeroLog
                 if ((logEvent.Appenders?.Length ?? 0) <= 0)
                     return true;
 
+                int bytesWritten;
+
                 try
                 {
                     FormatLogMessage(stringBuffer, logEvent);
+                    bytesWritten = CopyStringBufferToByteArray(stringBuffer, destination);
                 }
-                catch (Exception)
+                catch
                 {
-                    FormatErrorMessage(stringBuffer, logEvent);
+                    HandleFormattingError(stringBuffer, logEvent, destination, out bytesWritten);
                 }
-
-                var bytesWritten = CopyStringBufferToByteArray(stringBuffer, destination);
 
                 WriteMessageLogToAppenders(destination, logEvent, bytesWritten);
             }
@@ -276,12 +280,24 @@ namespace ZeroLog
             return true;
         }
 
-        private static void FormatErrorMessage(StringBuffer stringBuffer, IInternalLogEvent logEvent)
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static void HandleFormattingError(StringBuffer stringBuffer, IInternalLogEvent logEvent, byte[] destination, out int bytesWritten)
         {
-            stringBuffer.Clear();
-            stringBuffer.Append("An error occured during formatting: ");
+            try
+            {
+                stringBuffer.Clear();
+                stringBuffer.Append("An error occured during formatting: ");
 
-            logEvent.WriteToStringBufferUnformatted(stringBuffer);
+                logEvent.WriteToStringBufferUnformatted(stringBuffer);
+                bytesWritten = CopyStringBufferToByteArray(stringBuffer, destination);
+            }
+            catch (Exception ex)
+            {
+                stringBuffer.Clear();
+                stringBuffer.Append("An error occured during formatting: ");
+                stringBuffer.Append(ex.Message);
+                bytesWritten = CopyStringBufferToByteArray(stringBuffer, destination);
+            }
         }
 
         private static void WriteMessageLogToAppenders(byte[] destination, IInternalLogEvent logEvent, int bytesWritten)
@@ -299,11 +315,32 @@ namespace ZeroLog
             logEvent.WriteToStringBuffer(stringBuffer);
         }
 
-        private unsafe int CopyStringBufferToByteArray(StringBuffer stringBuffer, byte[] destination)
+        private static unsafe int CopyStringBufferToByteArray(StringBuffer stringBuffer, byte[] destination)
         {
             fixed (byte* dest = &destination[0])
             {
+                // This works only for ASCII strings, but doing the real check would be expensive, and it's an edge case...
+                if (stringBuffer.Count > destination.Length)
+                    TruncateMessage(stringBuffer, destination.Length);
+
                 return stringBuffer.CopyTo(dest, destination.Length, 0, stringBuffer.Count, _encoding);
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static void TruncateMessage(StringBuffer stringBuffer, int maxLength)
+        {
+            var suffix = Config.TruncatedMessageSuffix;
+            var maxMessageLength = maxLength - suffix.Length;
+
+            if (maxMessageLength > 0)
+            {
+                stringBuffer.Count = maxMessageLength;
+                stringBuffer.Append(suffix);
+            }
+            else
+            {
+                stringBuffer.Count = maxLength;
             }
         }
 
