@@ -115,7 +115,13 @@ namespace ZeroLog
                 return;
 
             _isRunning = false;
+
+            _pool.Clear();
             _writeThread.Join();
+            _pool.Clear();
+
+            if (_pool.IsAnyItemAcquired())
+                Thread.Sleep(100); // Can't really do much better here
 
             _configResolver.Dispose();
             _bufferSegmentProvider.Dispose();
@@ -149,6 +155,9 @@ namespace ZeroLog
             if (_pool.TryAcquire(out var logEvent))
                 return logEvent;
 
+            if (!_isRunning)
+                return NoopLogEvent.Instance;
+
             switch (logEventPoolExhaustionStrategy)
             {
                 case LogEventPoolExhaustionStrategy.WaitForLogEvent:
@@ -170,6 +179,9 @@ namespace ZeroLog
             while (!_pool.TryAcquire(out logEvent))
             {
                 spinWait.SpinOnce();
+
+                if (!_isRunning)
+                    return NoopLogEvent.Instance;
             }
 
             return logEvent;
@@ -255,7 +267,7 @@ namespace ZeroLog
             }
             finally
             {
-                if (logEvent.IsPooled)
+                if (logEvent.IsPooled && _isRunning)
                     _pool.Release(logEvent);
             }
 

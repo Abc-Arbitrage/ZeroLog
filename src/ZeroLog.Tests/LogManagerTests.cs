@@ -39,6 +39,15 @@ namespace ZeroLog.Tests
         }
 
         [Test]
+        public void should_ignore_logs_after_shutdown()
+        {
+            var log = LogManager.GetLogger<LogManagerTests>();
+            LogManager.Shutdown();
+
+            log.Info().Append("Hello").Log();
+        }
+
+        [Test]
         public void should_prevent_initializing_already_initialized_log_manager()
         {
             Assert.Throws<ApplicationException>(() => BasicConfigurator.Configure(new IAppender[0]));
