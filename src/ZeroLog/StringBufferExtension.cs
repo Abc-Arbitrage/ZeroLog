@@ -108,9 +108,11 @@ namespace ZeroLog
                     break;
 
                 case ArgumentType.FormatString:
-                    var argSet = new ArgSet(argPointers, strings, argCount);
-                    stringBuffer.AppendArgSet(strings[*argPointer], ref argSet);
-                    argPointer += sizeof(byte) + argSet.BytesRead;
+                    var formatStringIndex = *argPointer++;
+                    var argOffset = *argPointer++;
+                    var argSet = new ArgSet(argPointers, strings, argOffset, argCount);
+                    stringBuffer.AppendArgSet(strings[formatStringIndex], ref argSet);
+                    argPointer += argSet.BytesRead;
                     break;
 
                 case ArgumentType.Enum:

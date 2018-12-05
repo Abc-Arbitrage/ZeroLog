@@ -11,6 +11,7 @@ namespace ZeroLog
 {
     internal unsafe partial class LogEvent : IInternalLogEvent
     {
+        private const int _maxArgCapacity = byte.MaxValue;
         private string[] _strings;
         private IntPtr[] _argPointers;
         private Log _log;
@@ -19,11 +20,12 @@ namespace ZeroLog
         protected readonly byte* _startOfBuffer;
         protected readonly byte* _endOfBuffer;
         protected byte* _dataPointer;
-        private int _argCount;
+        private byte _argCount;
         private bool _isTruncated;
 
         public LogEvent(BufferSegment bufferSegment, int argCapacity)
         {
+            argCapacity = Math.Min(argCapacity, _maxArgCapacity);
             _argPointers = new IntPtr[argCapacity];
             _strings = new string[argCapacity];
 
@@ -63,11 +65,12 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void AppendFormat(string format)
         {
-            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte)))
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte) + sizeof(byte)))
                 return;
 
             AppendArgumentType(ArgumentType.FormatString);
             AppendString(format);
+            AppendByte(_argCount);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -329,10 +332,11 @@ namespace ZeroLog
                     break;
 
                 case ArgumentType.FormatString:
+                    var formatStringIndex = *dataPointer;
+                    dataPointer += sizeof(byte) + sizeof(byte);
                     stringBuffer.Append('"');
-                    stringBuffer.Append(_strings[*dataPointer]);
+                    stringBuffer.Append(_strings[formatStringIndex]);
                     stringBuffer.Append('"');
-                    dataPointer += sizeof(byte);
                     break;
 
                 case ArgumentType.Enum:
@@ -361,9 +365,13 @@ namespace ZeroLog
         {
             if (_dataPointer + requestedBytes <= _endOfBuffer && _argumentExhaustionStrategy == LogEventArgumentExhaustionStrategy.Allocate)
             {
-                Array.Resize(ref _argPointers, _argPointers.Length * 2);
-                Array.Resize(ref _strings, _strings.Length * 2);
-                return true;
+                var newCapacity = Math.Min(_argPointers.Length * 2, _maxArgCapacity);
+                if (newCapacity > _argPointers.Length)
+                {
+                    Array.Resize(ref _argPointers, newCapacity);
+                    Array.Resize(ref _strings, newCapacity);
+                    return true;
+                }
             }
 
             _isTruncated = true;
@@ -424,6 +432,13 @@ namespace ZeroLog
         {
             *(int*)_dataPointer = i;
             _dataPointer += sizeof(int);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void AppendByte(byte i)
+        {
+            *_dataPointer = i;
+            _dataPointer += sizeof(byte);
         }
 
         public void SetTimestamp(DateTime timestamp)

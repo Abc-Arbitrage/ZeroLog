@@ -259,6 +259,23 @@ namespace ZeroLog.Tests
             Assert.AreEqual("AbCFalseTrue128£12345-128999999999999999999123.456789.012345.67890129ac124-e588-47e5-9d3d-fa3a4d174e292017-01-12 13:14:15.00002:03:04.005", _output.ToString());
         }
 
+        [Test]
+        public void should_append_format_multiple_times()
+        {
+            _logEvent.Append("foo");
+            _logEvent.AppendFormat("({0}{1})");
+            _logEvent.Append("bar");
+            _logEvent.Append(42);
+            _logEvent.AppendFormat("[{0}{1}]");
+            _logEvent.Append("baz");
+            _logEvent.Append(10);
+            _logEvent.Append("foo");
+
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreEqual("foo(bar42)[baz10]foo", _output.ToString());
+        }
+
         [TestCase(typeof(bool))]
         [TestCase(typeof(byte))]
         [TestCase(typeof(char))]
