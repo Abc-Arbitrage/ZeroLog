@@ -1,4 +1,4 @@
-# ZeroLog [![Build status](https://ci.appveyor.com/api/projects/status/r25x2h7ke5119v18/branch/master?svg=true)](https://ci.appveyor.com/project/Abc-Arbitrage/zerolog/branch/master)
+# ZeroLog [![NuGet](https://img.shields.io/nuget/v/ZeroLog.svg)](http://www.nuget.org/packages/ZeroLog/) [![Build status](https://ci.appveyor.com/api/projects/status/r25x2h7ke5119v18/branch/master?svg=true)](https://ci.appveyor.com/project/Abc-Arbitrage/zerolog/branch/master)
 
 ZeroLog is a **zero-allocation .NET logging library**. It uses the excellent formatting library [StringFormatter](https://github.com/MikePopoloski/StringFormatter).
 
@@ -94,27 +94,44 @@ A logger configuration is composed of a *Name*, a *Level*, a list of *AppenderRe
  - **AppenderReferences** is a list of appenders names the logger will use
  - **IncludeParentAppenders** (optional) will, if set to true, copy the parent appenders into the current logger
  - **LogEventPoolExhaustionStrategy** (optional) is used to specify what to do when the log event queue is full
+ - **LogEventArgumentExhaustionStrategy** (optional) is used to specify what to do when the maximum number of `Append` calls is exceeded
 
 ### RootLogger
 
 The root logger is the default logger. If a GetLogger is called on an unconfigured namespace, it will fallback to the root logger.
 Same parameters as other loggers.
 
-### Exhaustion Strategy
+### Log Event Pool Exhaustion Strategy
 
-There is currently three strategies to handle full-queue:
+There are currently three strategies to handle a full queue scenario:
 
+- **DropLogMessageAndNotifyAppenders** (default) Drop the log message and log an error instead
 - **DropLogMessage** Forget about the message
-- **DropLogMessageAndNotifyAppenders** Log an error message and drop the log message
 - **WaitForLogEvent** Block until it's possible to log
+
+### Log Event Argument Exhaustion Strategy
+
+If the maximum number of `Append` calls is exceeded, the available strategies which handle that are:
+
+- **TruncateMessage** (default) The message is truncated, and a customizable suffix is appended
+- **Allocate** Allocate more space for the next argument
 
 ### Queue and message size
 
 These values can be configured at the root of the json configuration file:
 
-- **LogEventQueueSize** (default to 1024)
-- **LogEventBufferSize** (default to 512)
+- **LogEventQueueSize** (default: `1024`) Count of pooled log events. A log event is acquired from the pool on demand, and released by the logging thread.
+- **LogEventBufferSize** (default: `128`) The size of the buffer used to serialize log event arguments. Once exceeded, the message is truncated. All `Append` calls use a few bytes, except for `AppendAsciiString` which copies the whole string into the buffer.
+- **LogEventArgumentCapacity** (default: `32`) The maximum number of `Append` calls that can be made for a log event. Additional calls will behave based on the configured `LogEventArgumentExhaustionStrategy`.
 
+### Global Configuration
+
+Some settings can be set globally on the `LogManager.Config` object:
+
+- **LazyRegisterEnums** (default: `false`) Automatically registers an enum type when first logged. This causes some allocations. Use `LogManager.RegisterEnum` when automatic registration is disabled.
+- **FlushAppenders** (default: `true`) Automatically flushes appenders when there is a pause in the log event stream.
+- **NullDisplayString** (default: `"null"`) The string which should be logged instead of a `null` value
+- **TruncatedMessageSuffix** (default: `" [TRUNCATED]"`) The string which is appended to a message when it is truncated
 
 ## What's next
 
