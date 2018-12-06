@@ -12,7 +12,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>1.3.0</Version>
+    <Version>1.3.1</Version>
     <Description>A zero-allocation .NET logging library</Description>
     <Authors>Reda Bouallou;Mendel Monteiro-Beckerman;Romain Verdier;Lucas Trzesniewski</Authors>
     <PackageProjectUrl>https://github.com/Abc-Arbitrage/ZeroLog</PackageProjectUrl>
