@@ -24,8 +24,7 @@ namespace ZeroLog.Utils
         public static ref TTo As<TFrom, TTo>(ref TFrom source)
         {
             Ldarg(nameof(source));
-            Ret();
-            throw IL.Unreachable();
+            return ref IL.ReturnRef<TTo>();
         }
 
         private static Func<IntPtr, Type> BuildGetTypeFromHandleFunc()
