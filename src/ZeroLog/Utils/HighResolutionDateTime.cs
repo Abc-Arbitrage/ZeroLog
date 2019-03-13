@@ -18,7 +18,7 @@ namespace ZeroLog.Utils
                 if (!_isAvailable)
                     return DateTime.UtcNow;
 
-                GetSystemTimePreciseAsFileTime(out var filetime);
+	            GetSystemTimePreciseAsFileTime(out var filetime);
                 return DateTime.FromFileTimeUtc(filetime);
             }
         }
@@ -28,8 +28,13 @@ namespace ZeroLog.Utils
         {
             try
             {
-                GetSystemTimePreciseAsFileTime(out _);
+	            GetSystemTimePreciseAsFileTime(out _);
                 return true;
+            }
+            catch (DllNotFoundException)
+            {
+	            // Not running Windows 8 or higher.
+	            return false;
             }
             catch (EntryPointNotFoundException)
             {
