@@ -23,9 +23,6 @@ Task("Init").Does(() =>
 {
     var version = XmlPeek(paths.props, @"/Project/PropertyGroup/Version/text()");
     Information("Version: {0}", version);
-
-    if (AppVeyor.IsRunningOnAppVeyor)
-        AppVeyor.UpdateBuildVersion($"{version}-{AppVeyor.Environment.Build.Number}");
 });
 
 Task("Clean").Does(() =>
@@ -85,11 +82,6 @@ Task("Test")
 Task("NuGet")
     .IsDependentOn("Test")
     .IsDependentOn("NuGet-Pack");
-
-Task("AppVeyor")
-    .IsDependentOn("Build")
-    .IsDependentOn("Test")
-    .IsDependentOn("NuGet");
 
 //////////////////////////////////////////////////////////////////////
 // EXECUTION
