@@ -27,6 +27,11 @@ namespace ZeroLog
         {
         }
 
+        public ILogEvent AppendF(string format)
+        {
+            return this;
+        }
+
         public void AppendGeneric<T>(T arg)
         {
         }

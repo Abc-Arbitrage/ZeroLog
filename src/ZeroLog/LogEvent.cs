@@ -74,6 +74,18 @@ namespace ZeroLog
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ILogEvent AppendF(string format)
+        {
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte) + sizeof(byte)))
+                return this;
+
+            AppendArgumentType(ArgumentType.FormatString);
+            AppendString(format);
+            AppendByte(_argCount);
+            return this;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent Append(string s)
         {
             if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte)))

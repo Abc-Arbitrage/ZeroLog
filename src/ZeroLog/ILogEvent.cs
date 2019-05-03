@@ -8,6 +8,7 @@ namespace ZeroLog
         IAppender[] Appenders { get; }
 
         ILogEvent Append(string s);
+        ILogEvent AppendF(string s);
         ILogEvent AppendAsciiString(byte[] bytes, int length);
         unsafe ILogEvent AppendAsciiString(byte* bytes, int length);
 

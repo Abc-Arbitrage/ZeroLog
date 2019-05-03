@@ -67,6 +67,11 @@ namespace ZeroLog
         {
         }
 
+        public ILogEvent AppendF(string s)
+        {
+            return this;
+        }
+
         public bool IsPooled => false;
     }
 }
