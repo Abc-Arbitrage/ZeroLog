@@ -114,6 +114,14 @@ namespace ZeroLog
                 RegisterEnum(type);
         }
 
+        public static void RegisterUnmanaged<T>()
+            where T : unmanaged, IStringFormattable
+            => UnmanagedCache.Register<T>();
+
+        public static void RegisterUnmanaged<T>(UnmanagedFormatterDel<T> formatter)
+            where T : unmanaged
+            => UnmanagedCache.Register<T>(formatter);
+
         public void Dispose()
         {
             if (!_isRunning)

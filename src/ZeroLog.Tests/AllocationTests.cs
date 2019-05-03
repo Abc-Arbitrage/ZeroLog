@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Text.Formatting;
 using System.Threading;
 using NCrunch.Framework;
 using NFluent;
@@ -47,6 +48,7 @@ namespace ZeroLog.Tests
             });
 
             LogManager.RegisterEnum<DayOfWeek>();
+            LogManager.RegisterUnmanaged<UnmanagedStruct>();
         }
 
         [TearDown]
@@ -156,6 +158,13 @@ namespace ZeroLog.Tests
                     .Append((int?)null)
                     .Log();
 
+                log
+                    .Info()
+                    .Append("Unmanaged Struct ")
+                    .AppendUnmanaged(new UnmanagedStruct(1, 2, 3))
+                    .Append("Unregistered Unmanaged Struct ")
+                    .AppendUnmanaged(new UnregisteredUnmanagedStruct(4, 5, 6))
+                    .Log();
             }
 
             // Give the appender some time to finish writing to file
@@ -172,6 +181,52 @@ namespace ZeroLog.Tests
             Foo,
             Bar,
             Baz
+        }
+
+        private struct UnmanagedStruct : IStringFormattable
+        {
+            public long A;
+            public int B;
+            public byte C;
+
+            public UnmanagedStruct(long a, int b, byte c)
+            {
+                this.A = a;
+                this.B = b;
+                this.C = c;
+            }
+
+            public void Format(StringBuffer buffer, StringView format)
+            {
+                buffer.Append(this.A, StringView.Empty);
+                buffer.Append("-");
+                buffer.Append(this.B, StringView.Empty);
+                buffer.Append("-");
+                buffer.Append(this.C, StringView.Empty);
+            }
+        }
+
+        private struct UnregisteredUnmanagedStruct : IStringFormattable
+        {
+            public long D;
+            public int E;
+            public byte F;
+
+            public UnregisteredUnmanagedStruct(long d, int e, byte f)
+            {
+                this.D = d;
+                this.E = e;
+                this.F = f;
+            }
+
+            public void Format(StringBuffer buffer, StringView format)
+            {
+                buffer.Append(this.D, StringView.Empty);
+                buffer.Append("-");
+                buffer.Append(this.E, StringView.Empty);
+                buffer.Append("-");
+                buffer.Append(this.F, StringView.Empty);
+            }
         }
     }
 }

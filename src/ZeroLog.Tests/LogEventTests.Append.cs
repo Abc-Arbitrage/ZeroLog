@@ -373,6 +373,25 @@ namespace ZeroLog.Tests
             Assert.AreEqual("foo(bar42)[baz10]foo", _output.ToString());
         }
 
+        [Test]
+        public void should_appendf_unmanaged()
+        {
+            ILogEvent le = _logEvent;
+            LogManager.RegisterUnmanaged<UnmanagedStruct>();
+
+            le.AppendF("Unmanaged: {0}!");
+            le.AppendUnmanaged(new UnmanagedStruct()
+            {
+                A = 1,
+                B = 2,
+                C = 3
+            });
+
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreEqual("Unmanaged: 1-2-3!", _output.ToString());
+        }
+
         [TestCase(typeof(bool))]
         [TestCase(typeof(byte))]
         [TestCase(typeof(char))]

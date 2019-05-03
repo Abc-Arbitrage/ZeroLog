@@ -212,6 +212,19 @@ namespace ZeroLog
             _dataPointer += sizeof(EnumArg);
         }
 
+        public ILogEvent AppendUnmanaged<T>(T value) where T : unmanaged
+        {
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(UnmanagedArgHeader) + sizeof(T)))
+                return this;
+
+            AppendArgumentType(ArgumentType.Unmanaged);
+            *(UnmanagedArgHeader*)_dataPointer = new UnmanagedArgHeader(TypeUtil<T>.TypeHandle, sizeof(T));
+            _dataPointer += sizeof(UnmanagedArgHeader);
+            *(T*)_dataPointer = value;
+            _dataPointer += sizeof(T);
+            return this;
+        }
+
         public void Log()
         {
             _log.Enqueue(this);
