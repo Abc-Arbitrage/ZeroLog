@@ -104,6 +104,69 @@ namespace ZeroLog.Tests
             Check.That(gcCountBefore).IsEqualTo(gcCountAfter);
         }
 
+        [Test]
+        public void should_not_allocate_using_all_formats_and_file_appender_builder()
+        {
+            // Allocation tests are unreliable when run from NCrunch
+            if (NCrunchEnvironment.NCrunchIsResident())
+                Assert.Inconclusive();
+
+            var log = LogManager.GetLogger("AllocationTest");
+
+            GC.Collect(2, GCCollectionMode.Forced, true);
+            var gcCountBefore = GC.CollectionCount(0);
+
+            var numberOfEvents = 2048 * 10;
+
+            for (var i = 0; i < numberOfEvents; i++)
+            {
+                log
+                    .Info()
+                    .Append("Int ")
+                    .Append(123243)
+                    .Append("Double ")
+                    .Append(32423432.4398438, "N4")
+                    .Append("String ")
+                    .Append("Some random string")
+                    .Append("Bool ")
+                    .Append(true)
+                    .Append("Decimal ")
+                    .Append(4234324324.23423423, "N4")
+                    .Append("Guid ")
+                    .Append(Guid.NewGuid())
+                    .Append("Timestamp ")
+                    .Append(DateTime.UtcNow.TimeOfDay)
+                    .Append("DateTime ")
+                    .Append(DateTime.UtcNow)
+                    .Log();
+
+                log
+                    .Info()
+                    .Append("Enum ")
+                    .AppendEnum(DayOfWeek.Friday)
+                    .Append("UnknownEnum ")
+                    .AppendEnum(UnregisteredEnum.Bar)
+                    .Append("NullableEnum ")
+                    .AppendEnum((DayOfWeek?)DayOfWeek.Monday)
+                    .Append("NullableNullEnum ")
+                    .AppendEnum((DayOfWeek?)null)
+                    .Append("NullableInt ")
+                    .Append((int?)42)
+                    .Append("NullableNullInt ")
+                    .Append((int?)null)
+                    .Log();
+
+            }
+
+            // Give the appender some time to finish writing to file
+            while (_waitableAppender.WrittenEventCount < numberOfEvents)
+                Thread.Sleep(1);
+
+            var gcCountAfter = GC.CollectionCount(0);
+
+            Check.That(gcCountBefore).IsEqualTo(gcCountAfter);
+        }
+
         private enum UnregisteredEnum
         {
             Foo,
