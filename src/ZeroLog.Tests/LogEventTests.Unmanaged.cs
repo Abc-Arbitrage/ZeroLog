@@ -42,6 +42,40 @@ namespace ZeroLog.Tests
             Assert.AreEqual("1-2-3", _output.ToString());
         }
 
+        public struct UnmanagedStruct2 : IStringFormattable
+        {
+            public long A;
+            public int B;
+            public byte C;
+
+            public void Format(StringBuffer buffer, StringView format)
+            {
+                buffer.Append(this.A, StringView.Empty);
+                buffer.Append("-");
+                buffer.Append(this.B, StringView.Empty);
+                buffer.Append("-");
+                buffer.Append(this.C, StringView.Empty);
+            }
+        }
+
+        [Test]
+        public void should_append_unmanaged_2()
+        {
+            var o = new UnmanagedStruct2()
+            {
+                A = 1,
+                B = 2,
+                C = 3,
+            };
+
+            UnmanagedCache.Register(typeof(UnmanagedStruct2));
+
+            _logEvent.AppendUnmanaged(o);
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreEqual("1-2-3", _output.ToString());
+        }
+
         public struct ExternalUnmanagedStruct
         {
             public long A;

@@ -26,8 +26,14 @@ namespace ZeroLog
             if (!typeof(IStringFormattable).IsAssignableFrom(unmanagedType))
                 throw new ArgumentException($"Not an IStringFormattable type: {unmanagedType}");
 
-            _unmanaged_structs.TryAdd(TypeUtil.GetTypeHandleSlow(unmanagedType), null);
+            // Ideally we would explitly check that unmanagedType is actually unmanaged
+            // However, I'm not sure that's possible.
+
+            var generic = _register_method.MakeGenericMethod(unmanagedType);
+            generic.Invoke(null, null);
         }
+
+        private static readonly MethodInfo _register_method = typeof(UnmanagedCache).GetMethod("Register", new Type[] { });
 
         public static void Register<T>(UnmanagedFormatterDel<T> formatter) where T : unmanaged
         {
