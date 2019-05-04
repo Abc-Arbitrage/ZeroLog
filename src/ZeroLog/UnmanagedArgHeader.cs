@@ -25,10 +25,17 @@ namespace ZeroLog
         {
             if (!UnmanagedCache.TryGetFormatter(_typeHandle, out var formatter))
             {
-                stringBuffer.Append("[unregistered unmanaged struct]");
+                AppendUnregistered(stringBuffer, value_ptr, _typeSize);
                 return;
             }
             formatter(stringBuffer, value_ptr, StringView.Empty);
+        }
+
+        internal static void AppendUnregistered(StringBuffer buffer, byte* value_ptr, int size)
+        {
+            buffer.Append("Unmanaged(0x");
+            HexUtils.AppendValueAsHex(buffer, value_ptr, size);
+            buffer.Append(")");
         }
     }
 }

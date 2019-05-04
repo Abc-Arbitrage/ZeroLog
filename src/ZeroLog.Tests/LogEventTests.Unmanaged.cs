@@ -98,7 +98,7 @@ namespace ZeroLog.Tests
             _logEvent.AppendUnmanaged(o);
             _logEvent.WriteToStringBuffer(_output);
 
-            Assert.AreEqual("[unregistered unmanaged struct]", _output.ToString());
+            Assert.AreEqual("Unmanaged(0x01000000000000000200000003000000)", _output.ToString());
         }
     }
 }
