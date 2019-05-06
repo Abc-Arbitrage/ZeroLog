@@ -19,6 +19,9 @@ namespace ZeroLog
             where T : struct, Enum;
 
         ILogEvent AppendUnmanaged<T>(T value) where T : unmanaged;
+        ILogEvent AppendUnmanaged<T>(ref T value) where T : unmanaged;
+        ILogEvent AppendUnmanaged<T>(T? value) where T : unmanaged;
+        ILogEvent AppendUnmanaged<T>(ref T? value) where T : unmanaged;
 
         void Log();
     }

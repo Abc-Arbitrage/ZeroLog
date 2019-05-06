@@ -225,6 +225,54 @@ namespace ZeroLog
             return this;
         }
 
+        public ILogEvent AppendUnmanaged<T>(ref T value) where T : unmanaged
+        {
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(UnmanagedArgHeader) + sizeof(T)))
+                return this;
+
+            AppendArgumentType(ArgumentType.Unmanaged);
+            *(UnmanagedArgHeader*)_dataPointer = new UnmanagedArgHeader(TypeUtil<T>.TypeHandle, sizeof(T));
+            _dataPointer += sizeof(UnmanagedArgHeader);
+            *(T*)_dataPointer = value;
+            _dataPointer += sizeof(T);
+            return this;
+        }
+
+        public ILogEvent AppendUnmanaged<T>(T? value) where T : unmanaged
+        {
+            if (!value.HasValue)
+            {
+                if (PrepareAppend(sizeof(ArgumentType)))
+                    AppendArgumentType(ArgumentType.Null);
+
+                return this;
+            }
+            return this.AppendUnmanaged<T>(value.Value);
+        }
+
+        public ILogEvent AppendUnmanaged<T>(ref T? value) where T : unmanaged
+        {
+            if (!value.HasValue)
+            {
+                if (PrepareAppend(sizeof(ArgumentType)))
+                    AppendArgumentType(ArgumentType.Null);
+
+                return this;
+            }
+            else
+            {
+                if (!PrepareAppend(sizeof(ArgumentType) + sizeof(UnmanagedArgHeader) + sizeof(T)))
+                    return this;
+
+                AppendArgumentType(ArgumentType.Unmanaged);
+                *(UnmanagedArgHeader*)_dataPointer = new UnmanagedArgHeader(TypeUtil<T>.TypeHandle, sizeof(T));
+                _dataPointer += sizeof(UnmanagedArgHeader);
+                *(T*)_dataPointer = value.Value;
+                _dataPointer += sizeof(T);
+                return this;
+            }
+        }
+
         public void Log()
         {
             _log.Enqueue(this);

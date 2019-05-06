@@ -42,6 +42,86 @@ namespace ZeroLog.Tests
             Assert.AreEqual("1-2-3", _output.ToString());
         }
 
+        [Test]
+        public void should_append_unmanaged_byref()
+        {
+            var o = new UnmanagedStruct()
+            {
+                A = 1,
+                B = 2,
+                C = 3,
+            };
+
+            UnmanagedCache.Register<UnmanagedStruct>();
+
+            _logEvent.AppendUnmanaged(ref o);
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreEqual("1-2-3", _output.ToString());
+        }
+
+        [Test]
+        public void should_append_nullable_unmanaged()
+        {
+            UnmanagedStruct? o = new UnmanagedStruct()
+            {
+                A = 1,
+                B = 2,
+                C = 3,
+            };
+
+            UnmanagedCache.Register<UnmanagedStruct>();
+
+            _logEvent.AppendUnmanaged(o);
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreEqual("1-2-3", _output.ToString());
+        }
+
+        [Test]
+        public void should_append_null_nullable_unmanaged()
+        {
+            UnmanagedStruct? o = null;
+
+            UnmanagedCache.Register<UnmanagedStruct>();
+
+            _logEvent.AppendUnmanaged(o);
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreEqual("null", _output.ToString());
+        }
+
+        [Test]
+        public void should_append_nullable_unmanaged_byref()
+        {
+            UnmanagedStruct? o = new UnmanagedStruct()
+            {
+                A = 1,
+                B = 2,
+                C = 3,
+            };
+
+            UnmanagedCache.Register<UnmanagedStruct>();
+
+            _logEvent.AppendUnmanaged(ref o);
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreEqual("1-2-3", _output.ToString());
+        }
+
+        [Test]
+        public void should_append_null_nullable_unmanaged_byref()
+        {
+            UnmanagedStruct? o = null;
+
+            UnmanagedCache.Register<UnmanagedStruct>();
+
+            _logEvent.AppendUnmanaged(ref o);
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreEqual("null", _output.ToString());
+        }
+
         public struct UnmanagedStruct2 : IStringFormattable
         {
             public long A;
@@ -112,6 +192,86 @@ namespace ZeroLog.Tests
             Assert.AreEqual("External(1-2-3)", _output.ToString());
         }
 
+        [Test]
+        public void should_append_external_unmanaged_byref()
+        {
+            var o = new ExternalUnmanagedStruct()
+            {
+                A = 1,
+                B = 2,
+                C = 3,
+            };
+
+            UnmanagedCache.Register<ExternalUnmanagedStruct>(ExternalUnmanagedStructFormatter);
+
+            _logEvent.AppendUnmanaged(ref o);
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreEqual("External(1-2-3)", _output.ToString());
+        }
+
+        [Test]
+        public void should_append_nullable_external_unmanaged()
+        {
+            ExternalUnmanagedStruct? o = new ExternalUnmanagedStruct()
+            {
+                A = 1,
+                B = 2,
+                C = 3,
+            };
+
+            UnmanagedCache.Register<ExternalUnmanagedStruct>(ExternalUnmanagedStructFormatter);
+
+            _logEvent.AppendUnmanaged(o);
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreEqual("External(1-2-3)", _output.ToString());
+        }
+
+        [Test]
+        public void should_append_null_nullable_external_unmanaged()
+        {
+            ExternalUnmanagedStruct? o = null;
+
+            UnmanagedCache.Register<ExternalUnmanagedStruct>(ExternalUnmanagedStructFormatter);
+
+            _logEvent.AppendUnmanaged(o);
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreEqual("null", _output.ToString());
+        }
+
+        [Test]
+        public void should_append_nullable_external_unmanaged_byref()
+        {
+            ExternalUnmanagedStruct? o = new ExternalUnmanagedStruct()
+            {
+                A = 1,
+                B = 2,
+                C = 3,
+            };
+
+            UnmanagedCache.Register<ExternalUnmanagedStruct>(ExternalUnmanagedStructFormatter);
+
+            _logEvent.AppendUnmanaged(ref o);
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreEqual("External(1-2-3)", _output.ToString());
+        }
+
+        [Test]
+        public void should_append_null_nullable_external_unmanaged_byref()
+        {
+            ExternalUnmanagedStruct? o = null;
+
+            UnmanagedCache.Register<ExternalUnmanagedStruct>(ExternalUnmanagedStructFormatter);
+
+            _logEvent.AppendUnmanaged(ref o);
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreEqual("null", _output.ToString());
+        }
+
         public struct UnregisteredUnmanagedStruct
         {
             public long A;
@@ -133,6 +293,76 @@ namespace ZeroLog.Tests
             _logEvent.WriteToStringBuffer(_output);
 
             Assert.AreEqual("Unmanaged(0x01000000000000000200000003000000)", _output.ToString());
+        }
+
+        [Test]
+        public void should_append_unregistered_unmanaged_byref()
+        {
+            var o = new UnregisteredUnmanagedStruct()
+            {
+                A = 1,
+                B = 2,
+                C = 3,
+            };
+
+            _logEvent.AppendUnmanaged(ref o);
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreEqual("Unmanaged(0x01000000000000000200000003000000)", _output.ToString());
+        }
+
+        [Test]
+        public void should_append_unregistered_nullable_unmanaged()
+        {
+            UnregisteredUnmanagedStruct? o = new UnregisteredUnmanagedStruct()
+            {
+                A = 1,
+                B = 2,
+                C = 3,
+            };
+
+            _logEvent.AppendUnmanaged(o);
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreEqual("Unmanaged(0x01000000000000000200000003000000)", _output.ToString());
+        }
+
+        [Test]
+        public void should_append_null_unregistered_nullable_unmanaged()
+        {
+            UnregisteredUnmanagedStruct? o = null;
+
+            _logEvent.AppendUnmanaged(o);
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreEqual("null", _output.ToString());
+        }
+
+        [Test]
+        public void should_append_unregistered_nullable_unmanaged_byref()
+        {
+            UnregisteredUnmanagedStruct? o = new UnregisteredUnmanagedStruct()
+            {
+                A = 1,
+                B = 2,
+                C = 3,
+            };
+
+            _logEvent.AppendUnmanaged(ref o);
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreEqual("Unmanaged(0x01000000000000000200000003000000)", _output.ToString());
+        }
+
+        [Test]
+        public void should_append_null_unregistered_nullable_unmanaged_byref()
+        {
+            UnregisteredUnmanagedStruct? o = null;
+
+            _logEvent.AppendUnmanaged(ref o);
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreEqual("null", _output.ToString());
         }
     }
 }

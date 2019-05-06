@@ -158,12 +158,43 @@ namespace ZeroLog.Tests
                     .Append((int?)null)
                     .Log();
 
+                var unmanaged = new UnmanagedStruct(1, 2, 3);
+                var unregistered_unmanaged = new UnregisteredUnmanagedStruct(4, 5, 6);
+                UnmanagedStruct? nullable_unmanaged = unmanaged;
+                UnmanagedStruct? null_nullable_unmanaged = (UnmanagedStruct?)null;
+                UnregisteredUnmanagedStruct? nullable_unregistered_unmanaged = new UnregisteredUnmanagedStruct(4, 5, 6);
+                UnregisteredUnmanagedStruct? null_nullable_unregistered_unmanaged = (UnregisteredUnmanagedStruct?)null;
+
                 log
                     .Info()
                     .Append("Unmanaged Struct ")
-                    .AppendUnmanaged(new UnmanagedStruct(1, 2, 3))
+                    .AppendUnmanaged(unmanaged)
                     .Append("Unregistered Unmanaged Struct ")
-                    .AppendUnmanaged(new UnregisteredUnmanagedStruct(4, 5, 6))
+                    .AppendUnmanaged(unregistered_unmanaged)
+
+                    .Append("Unmanaged Struct byref ")
+                    .AppendUnmanaged(ref unmanaged)
+                    .Append("Unregistered Unmanaged byref ")
+                    .AppendUnmanaged(ref unregistered_unmanaged)
+
+                    .Append("Nullable Unmanaged ")
+                    .AppendUnmanaged(nullable_unmanaged)
+                    .Append("Null Nullable Unmanaged ")
+                    .AppendUnmanaged(null_nullable_unmanaged)
+                    .Append("Nullable Unregistered Unmanaged ")
+                    .AppendUnmanaged(nullable_unregistered_unmanaged)
+                    .Append("Null Nullable Unregistered Unmanaged")
+                    .AppendUnmanaged(null_nullable_unregistered_unmanaged)
+
+                    .Append("Nullable Unmanaged byref ")
+                    .AppendUnmanaged(ref nullable_unmanaged)
+                    .Append("Null Nullable Unmanaged byref ")
+                    .AppendUnmanaged(ref null_nullable_unmanaged)
+                    .Append("Nullable Unregistered Unmanaged byref ")
+                    .AppendUnmanaged(ref nullable_unregistered_unmanaged)
+                    .Append("Null Nullable Unregistered Unmanaged byref ")
+                    .AppendUnmanaged(ref null_nullable_unregistered_unmanaged)
+
                     .Log();
             }
 

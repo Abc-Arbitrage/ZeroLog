@@ -57,6 +57,21 @@ namespace ZeroLog
             return this;
         }
 
+        public ILogEvent AppendUnmanaged<T>(ref T value) where T : unmanaged
+        {
+            return this;
+        }
+
+        public ILogEvent AppendUnmanaged<T>(T? value) where T : unmanaged
+        {
+            return this;
+        }
+
+        public ILogEvent AppendUnmanaged<T>(ref T? value) where T : unmanaged
+        {
+            return this;
+        }
+
         public void Log()
         {
         }
