@@ -290,7 +290,9 @@ namespace ZeroLog.Tests
         [Test]
         public void should_append_format()
         {
-            _logEvent.AppendFormat("{0}{1}{2}{3}{4}{5}{6}{7}{8}{9}{10}{11}{12}{13}");
+            LogManager.RegisterUnmanaged<UnmanagedStruct>();
+
+            _logEvent.AppendFormat("{0}{1}{2}{3}{4}{5}{6}{7}{8}{9}{10}{11}{12}{13}{14}");
             _logEvent.Append("AbC");
             _logEvent.Append(false);
             _logEvent.Append(true);
@@ -305,10 +307,11 @@ namespace ZeroLog.Tests
             _logEvent.Append(new Guid("129ac124-e588-47e5-9d3d-fa3a4d174e29"));
             _logEvent.Append(new DateTime(2017, 01, 12, 13, 14, 15));
             _logEvent.Append(new TimeSpan(1, 2, 3, 4, 5));
+            _logEvent.AppendUnmanaged(new UnmanagedStruct(){A = 1, B = 2, C = 3});
 
             _logEvent.WriteToStringBuffer(_output);
 
-            Assert.AreEqual("AbCFalseTrue128£12345-128999999999999999999123.456789.012345.67890129ac124-e588-47e5-9d3d-fa3a4d174e292017-01-12 13:14:15.00002:03:04.005", _output.ToString());
+            Assert.AreEqual("AbCFalseTrue128£12345-128999999999999999999123.456789.012345.67890129ac124-e588-47e5-9d3d-fa3a4d174e292017-01-12 13:14:15.00002:03:04.0051-2-3", _output.ToString());
         }
 
         [Test]
@@ -329,58 +332,11 @@ namespace ZeroLog.Tests
         }
 
         [Test]
-        public void should_appendf()
+        public void should_append_unmanaged_from_append_generic()
         {
-            ILogEvent le = _logEvent;
-
-            le.AppendF("{0}{1}{2}{3}{4}{5}{6}{7}{8}{9}{10}{11}{12}{13}");
-            le.Append("AbC");
-            le.Append(false);
-            le.Append(true);
-            le.Append((byte)128);
-            le.Append('£');
-            le.Append((short)12345);
-            le.Append(-128);
-            le.Append(999999999999999999L);
-            le.Append(123.456f);
-            le.Append(789.012d);
-            le.Append(345.67890m);
-            le.Append(new Guid("129ac124-e588-47e5-9d3d-fa3a4d174e29"));
-            le.Append(new DateTime(2017, 01, 12, 13, 14, 15));
-            le.Append(new TimeSpan(1, 2, 3, 4, 5));
-
-            _logEvent.WriteToStringBuffer(_output);
-
-            Assert.AreEqual("AbCFalseTrue128£12345-128999999999999999999123.456789.012345.67890129ac124-e588-47e5-9d3d-fa3a4d174e292017-01-12 13:14:15.00002:03:04.005", _output.ToString());
-        }
-
-        [Test]
-        public void should_appendf_multiple_times()
-        {
-            ILogEvent le = _logEvent;
-
-            le.Append("foo");
-            le.AppendF("({0}{1})");
-            le.Append("bar");
-            le.Append(42);
-            le.AppendF("[{0}{1}]");
-            le.Append("baz");
-            le.Append(10);
-            le.Append("foo");
-
-            _logEvent.WriteToStringBuffer(_output);
-
-            Assert.AreEqual("foo(bar42)[baz10]foo", _output.ToString());
-        }
-
-        [Test]
-        public void should_appendf_unmanaged()
-        {
-            ILogEvent le = _logEvent;
             LogManager.RegisterUnmanaged<UnmanagedStruct>();
 
-            le.AppendF("Unmanaged: {0}!");
-            le.AppendUnmanaged(new UnmanagedStruct()
+            _logEvent.AppendGeneric(new UnmanagedStruct()
             {
                 A = 1,
                 B = 2,
@@ -389,7 +345,7 @@ namespace ZeroLog.Tests
 
             _logEvent.WriteToStringBuffer(_output);
 
-            Assert.AreEqual("Unmanaged: 1-2-3!", _output.ToString());
+            Assert.AreEqual("1-2-3", _output.ToString());
         }
 
         [TestCase(typeof(bool))]

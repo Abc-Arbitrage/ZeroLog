@@ -22,8 +22,7 @@ namespace ZeroLog.Tests
                           .Returns(new LogConfig { Level = logLevel });
 
             var logManager = new LogManager(configResolver.Object, new ZeroLogInitializationConfig { LogEventQueueSize = 1, LogEventBufferSize = 128 });
-            var log = new Log(logManager, "logger");
-
+            var log = new Log(logManager, "logger"); 
 
             Check.That(log.IsDebugEnabled).Equals(isDebug);
             Check.That(log.IsInfoEnabled).Equals(isInfo);

@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using InlineIL;
 using JetBrains.Annotations;
 using static InlineIL.IL.Emit;
@@ -39,6 +41,46 @@ namespace ZeroLog.Utils
                 Call(method, param),
                 param
             ).Compile();
+        }
+
+        public static bool IsReferenceOrContainsReferences<T>()
+        {
+            return !ByTypeValues<T>.IsPinnable;
+        }
+
+        [SuppressMessage("ReSharper", "StaticMemberInGenericType")]
+        private static class ByTypeValues<T>
+        {
+            public static bool IsPinnable { get; } = GetIsPinnable();
+
+            private static bool GetIsPinnable()
+            {
+                if (default(T) == null)
+                    return false;
+
+                if (typeof(T).IsPrimitive)
+                    return true;
+
+                if (typeof(T).GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).Any(f => !f.FieldType.IsValueType))
+                    return false;
+
+                try
+                {
+                    GCHandle.Alloc(default(T), GCHandleType.Pinned).Free();
+                    return true;
+                }
+                catch (ArgumentException)
+                {
+                    return false;
+                }
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int SizeOf<T>()
+        {
+            Sizeof(typeof(T));
+            return IL.Return<int>();
         }
     }
 

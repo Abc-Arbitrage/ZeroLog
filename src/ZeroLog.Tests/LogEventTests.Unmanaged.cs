@@ -1,7 +1,4 @@
 ﻿using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Text.Formatting;
 
 namespace ZeroLog.Tests
@@ -16,11 +13,11 @@ namespace ZeroLog.Tests
 
             public void Format(StringBuffer buffer, StringView format)
             {
-                buffer.Append(this.A, StringView.Empty);
+                buffer.Append(A, StringView.Empty);
                 buffer.Append("-");
-                buffer.Append(this.B, StringView.Empty);
+                buffer.Append(B, StringView.Empty);
                 buffer.Append("-");
-                buffer.Append(this.C, StringView.Empty);
+                buffer.Append(C, StringView.Empty);
             }
         }
 
@@ -37,7 +34,7 @@ namespace ZeroLog.Tests
             UnmanagedCache.Register<UnmanagedStruct>();
 
             _logEvent.AppendUnmanaged(o);
-            _logEvent.WriteToStringBuffer(_output);
+            _logEvent.WriteToStringBuffer(_output); 
 
             Assert.AreEqual("1-2-3", _output.ToString());
         }
@@ -130,11 +127,11 @@ namespace ZeroLog.Tests
 
             public void Format(StringBuffer buffer, StringView format)
             {
-                buffer.Append(this.A, StringView.Empty);
+                buffer.Append(A, StringView.Empty);
                 buffer.Append("-");
-                buffer.Append(this.B, StringView.Empty);
+                buffer.Append(B, StringView.Empty);
                 buffer.Append("-");
-                buffer.Append(this.C, StringView.Empty);
+                buffer.Append(C, StringView.Empty);
             }
         }
 

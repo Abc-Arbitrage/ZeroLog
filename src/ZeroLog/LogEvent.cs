@@ -4,8 +4,10 @@ using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Text.Formatting;
 using System.Threading;
+using InlineIL;
 using ZeroLog.Appenders;
 using ZeroLog.Utils;
+using static InlineIL.IL.Emit;
 
 namespace ZeroLog
 {
@@ -57,9 +59,31 @@ namespace ZeroLog
         private void AppendGenericSlow<T>(T arg)
         {
             if (TypeUtilNullable<T>.IsNullableEnum)
+            {
                 AppendNullableEnumInternal(arg);
+            }
+            else if (!TypeUtil.IsReferenceOrContainsReferences<T>())
+            {
+                AppendUnmanagedInternal(arg);
+            }
             else
+            {
                 throw new NotSupportedException($"Type {typeof(T)} is not supported ");
+            }
+        }
+
+        private void AppendUnmanagedInternal<T>(T arg)
+        {
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(UnmanagedArgHeader) + TypeUtil.SizeOf<T>()))
+                return ;
+
+            AppendArgumentType(ArgumentType.Unmanaged);
+            *(UnmanagedArgHeader*)_dataPointer = new UnmanagedArgHeader(TypeUtil<T>.TypeHandle, TypeUtil.SizeOf<T>());
+            _dataPointer += sizeof(UnmanagedArgHeader);
+            IL.Push(_dataPointer);
+            IL.Push(arg);
+            Stobj(typeof(T));
+            _dataPointer += TypeUtil.SizeOf<T>();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -71,18 +95,6 @@ namespace ZeroLog
             AppendArgumentType(ArgumentType.FormatString);
             AppendString(format);
             AppendByte(_argCount);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ILogEvent AppendF(string format)
-        {
-            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte) + sizeof(byte)))
-                return this;
-
-            AppendArgumentType(ArgumentType.FormatString);
-            AppendString(format);
-            AppendByte(_argCount);
-            return this;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
