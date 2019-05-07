@@ -118,7 +118,7 @@ namespace ZeroLog
             where T : unmanaged, IStringFormattable
             => UnmanagedCache.Register<T>();
 
-        public static void RegisterUnmanaged<T>(UnmanagedFormatterDel<T> formatter)
+        public static void RegisterUnmanaged<T>(UnmanagedFormatterDelegate<T> formatter)
             where T : unmanaged
             => UnmanagedCache.Register<T>(formatter);
 

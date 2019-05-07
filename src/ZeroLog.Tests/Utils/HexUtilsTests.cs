@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Text.Formatting;
 using NUnit.Framework;
 using ZeroLog.Utils;
@@ -11,7 +9,7 @@ namespace ZeroLog.Tests.Utils
     public unsafe class HexUtilsTests
     {
         [Test]
-        public void AppendValueAsHex_works_1()
+        public void should_append_value_as_hex_1()
         {
             StringBuffer buffer = new StringBuffer(1024);
             int x = 0x1234abcd;
@@ -24,7 +22,7 @@ namespace ZeroLog.Tests.Utils
         }
 
         [Test]
-        public void AppendValueAsHex_works_2()
+        public void should_append_value_as_hex_2()
         {
             StringBuffer buffer = new StringBuffer(1024);
             int x = 0x01020304;
@@ -37,7 +35,7 @@ namespace ZeroLog.Tests.Utils
         }
 
         [Test]
-        public void AppendValueAsHex_works_3()
+        public void should_append_value_as_hex_3()
         {
             StringBuffer buffer = new StringBuffer(1024);
             int x = 0x10203040;

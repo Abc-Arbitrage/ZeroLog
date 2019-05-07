@@ -1,22 +1,19 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Text;
 using System.Text.Formatting;
 using JetBrains.Annotations;
-using ZeroLog.Utils;
 
 namespace ZeroLog
 {
-    public delegate void UnmanagedFormatterDel<T>(ref T value, StringBuffer stringBuffer, StringView view) where T : unmanaged;
+    public delegate void UnmanagedFormatterDelegate<T>(ref T value, StringBuffer stringBuffer, StringView view) where T : unmanaged;
 
     internal static unsafe class UnmanagedCache
     {
         internal delegate void FormatterDel(StringBuffer stringBuffer, byte* valuePtr, StringView view);
 
-        private static readonly ConcurrentDictionary<IntPtr, FormatterDel> _unmanaged_structs = new ConcurrentDictionary<IntPtr, FormatterDel>();
+        private static readonly ConcurrentDictionary<IntPtr, FormatterDel> _unmanagedStructs = new ConcurrentDictionary<IntPtr, FormatterDel>();
 
         internal static void Register([NotNull] Type unmanagedType)
         {
@@ -26,30 +23,30 @@ namespace ZeroLog
             if (!typeof(IStringFormattable).IsAssignableFrom(unmanagedType))
                 throw new ArgumentException($"Not an IStringFormattable type: {unmanagedType}");
 
-            // Ideally we would explitly check that unmanagedType is actually unmanaged
+            // Ideally we would explicitly check that unmanagedType is actually unmanaged
             // However, I'm not sure that's possible.
 
-            var generic = _register_method.MakeGenericMethod(unmanagedType);
+            var generic = _registerMethod.MakeGenericMethod(unmanagedType);
             generic.Invoke(null, null);
         }
 
-        private static readonly MethodInfo _register_method = typeof(UnmanagedCache).GetMethod("Register", new Type[] { });
+        private static readonly MethodInfo _registerMethod = typeof(UnmanagedCache).GetMethod(nameof(Register), new Type[] { });
 
-        public static void Register<T>(UnmanagedFormatterDel<T> formatter) where T : unmanaged
+        public static void Register<T>(UnmanagedFormatterDelegate<T> formatter) where T : unmanaged
         {
             var handle = typeof(T).TypeHandle.Value;
-            FormatterDel raw_formatter = (b, vp, view) => FormatterGeneric<T>(b, vp, view, formatter);
-            _unmanaged_structs.TryAdd(typeof(T).TypeHandle.Value, raw_formatter);
+            FormatterDel rawFormatter = (b, vp, view) => FormatterGeneric<T>(b, vp, view, formatter);
+            _unmanagedStructs.TryAdd(typeof(T).TypeHandle.Value, rawFormatter);
         }
 
         public static void Register<T>() where T : unmanaged, IStringFormattable
         {
             var handle = typeof(T).TypeHandle.Value;
             FormatterDel formatter = (b, vp, view) => FormatterGeneric<T>(b, vp, view, ValueHelper<T>.Formatter);
-            _unmanaged_structs.TryAdd(typeof(T).TypeHandle.Value, formatter);
+            _unmanagedStructs.TryAdd(typeof(T).TypeHandle.Value, formatter);
         }
 
-        private static unsafe void FormatterGeneric<T>(StringBuffer stringBuffer, byte* valuePtr, StringView view, UnmanagedFormatterDel<T> typedFormatter) where T : unmanaged
+        private static unsafe void FormatterGeneric<T>(StringBuffer stringBuffer, byte* valuePtr, StringView view, UnmanagedFormatterDelegate<T> typedFormatter) where T : unmanaged
         {
             var typedValueRef = Unsafe.AsRef<T>(valuePtr);
             typedFormatter(ref typedValueRef, stringBuffer, view);
@@ -57,7 +54,7 @@ namespace ZeroLog
 
         public static bool TryGetFormatter(IntPtr typeHandle, out FormatterDel formatter)
         {
-            return _unmanaged_structs.TryGetValue(typeHandle, out formatter);
+            return _unmanagedStructs.TryGetValue(typeHandle, out formatter);
         }
 
         // The point of this class is to allow us to generate a direct call to a known
@@ -67,9 +64,9 @@ namespace ZeroLog
         // the parameter to the appropriate method in a strongly typed fashion.
         static class ValueHelper<T> where T : unmanaged
         {
-            public static UnmanagedFormatterDel<T> Formatter = Prepare();
+            public static UnmanagedFormatterDelegate<T> Formatter = Prepare();
 
-            static UnmanagedFormatterDel<T> Prepare()
+            static UnmanagedFormatterDelegate<T> Prepare()
             {
                 // we only use this class for value types that also implement IStringFormattable
                 var type = typeof(T);
@@ -77,14 +74,14 @@ namespace ZeroLog
                     return null;
 
                 var result = typeof(ValueHelper<T>)
-                    .GetTypeInfo()
-                    .GetDeclaredMethod("Assign")
-                    .MakeGenericMethod(type)
-                    .Invoke(null, null);
-                return (UnmanagedFormatterDel<T>)result;
+                             .GetTypeInfo()
+                             .GetDeclaredMethod(nameof(Assign))
+                             .MakeGenericMethod(type)
+                             .Invoke(null, null);
+                return (UnmanagedFormatterDelegate<T>)result;
             }
 
-            public static UnmanagedFormatterDel<U> Assign<U>() where U : unmanaged, IStringFormattable
+            public static UnmanagedFormatterDelegate<U> Assign<U>() where U : unmanaged, IStringFormattable
             {
                 return ValueHelper2.DoFormat<U>;
             }

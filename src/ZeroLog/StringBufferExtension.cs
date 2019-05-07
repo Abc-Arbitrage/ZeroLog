@@ -129,7 +129,7 @@ namespace ZeroLog
                     var unmanagedArgHeader = (UnmanagedArgHeader*)argPointer;
                     argPointer += sizeof(UnmanagedArgHeader);
                     unmanagedArgHeader->AppendTo(stringBuffer, argPointer);
-                    argPointer += unmanagedArgHeader->ArgumentSize;
+                    argPointer += unmanagedArgHeader->Size;
                     break;
 
                 default:
