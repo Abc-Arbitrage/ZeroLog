@@ -21,7 +21,7 @@ namespace ZeroLog
             _typeSize = typeSize;
         }
 
-        public void AppendTo(StringBuffer stringBuffer, byte* valuePtr)
+        public void AppendTo(StringBuffer stringBuffer, byte* valuePtr, StringView format)
         {
             if (!UnmanagedCache.TryGetFormatter(_typeHandle, out var formatter))
             {
@@ -29,7 +29,7 @@ namespace ZeroLog
                 return;
             }
 
-            formatter(stringBuffer, valuePtr, StringView.Empty);
+            formatter(stringBuffer, valuePtr, format);
         }
 
         private static void AppendUnregistered(StringBuffer buffer, byte* valuePtr, int size)

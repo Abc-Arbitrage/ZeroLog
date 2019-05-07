@@ -1,5 +1,5 @@
-﻿using NUnit.Framework;
-using System.Text.Formatting;
+﻿using System.Text.Formatting;
+using NUnit.Framework;
 
 namespace ZeroLog.Tests
 {
@@ -24,7 +24,7 @@ namespace ZeroLog.Tests
         [Test]
         public void should_append_unmanaged()
         {
-            var o = new UnmanagedStruct()
+            var o = new UnmanagedStruct
             {
                 A = 1,
                 B = 2,
@@ -42,7 +42,7 @@ namespace ZeroLog.Tests
         [Test]
         public void should_append_unmanaged_byref()
         {
-            var o = new UnmanagedStruct()
+            var o = new UnmanagedStruct
             {
                 A = 1,
                 B = 2,
@@ -60,7 +60,7 @@ namespace ZeroLog.Tests
         [Test]
         public void should_append_nullable_unmanaged()
         {
-            UnmanagedStruct? o = new UnmanagedStruct()
+            UnmanagedStruct? o = new UnmanagedStruct
             {
                 A = 1,
                 B = 2,
@@ -91,7 +91,7 @@ namespace ZeroLog.Tests
         [Test]
         public void should_append_nullable_unmanaged_byref()
         {
-            UnmanagedStruct? o = new UnmanagedStruct()
+            UnmanagedStruct? o = new UnmanagedStruct
             {
                 A = 1,
                 B = 2,
@@ -138,7 +138,7 @@ namespace ZeroLog.Tests
         [Test]
         public void should_append_unmanaged_2()
         {
-            var o = new UnmanagedStruct2()
+            var o = new UnmanagedStruct2
             {
                 A = 1,
                 B = 2,
@@ -174,7 +174,7 @@ namespace ZeroLog.Tests
         [Test]
         public void should_append_external_unmanaged()
         {
-            var o = new ExternalUnmanagedStruct()
+            var o = new ExternalUnmanagedStruct
             {
                 A = 1,
                 B = 2,
@@ -192,7 +192,7 @@ namespace ZeroLog.Tests
         [Test]
         public void should_append_external_unmanaged_byref()
         {
-            var o = new ExternalUnmanagedStruct()
+            var o = new ExternalUnmanagedStruct
             {
                 A = 1,
                 B = 2,
@@ -210,7 +210,7 @@ namespace ZeroLog.Tests
         [Test]
         public void should_append_nullable_external_unmanaged()
         {
-            ExternalUnmanagedStruct? o = new ExternalUnmanagedStruct()
+            ExternalUnmanagedStruct? o = new ExternalUnmanagedStruct
             {
                 A = 1,
                 B = 2,
@@ -241,7 +241,7 @@ namespace ZeroLog.Tests
         [Test]
         public void should_append_nullable_external_unmanaged_byref()
         {
-            ExternalUnmanagedStruct? o = new ExternalUnmanagedStruct()
+            ExternalUnmanagedStruct? o = new ExternalUnmanagedStruct
             {
                 A = 1,
                 B = 2,
@@ -279,7 +279,7 @@ namespace ZeroLog.Tests
         [Test]
         public void should_append_unregistered_unmanaged()
         {
-            var o = new UnregisteredUnmanagedStruct()
+            var o = new UnregisteredUnmanagedStruct
             {
                 A = 1,
                 B = 2,
@@ -295,7 +295,7 @@ namespace ZeroLog.Tests
         [Test]
         public void should_append_unregistered_unmanaged_byref()
         {
-            var o = new UnregisteredUnmanagedStruct()
+            var o = new UnregisteredUnmanagedStruct
             {
                 A = 1,
                 B = 2,
@@ -311,7 +311,7 @@ namespace ZeroLog.Tests
         [Test]
         public void should_append_unregistered_nullable_unmanaged()
         {
-            UnregisteredUnmanagedStruct? o = new UnregisteredUnmanagedStruct()
+            UnregisteredUnmanagedStruct? o = new UnregisteredUnmanagedStruct
             {
                 A = 1,
                 B = 2,
@@ -338,7 +338,7 @@ namespace ZeroLog.Tests
         [Test]
         public void should_append_unregistered_nullable_unmanaged_byref()
         {
-            UnregisteredUnmanagedStruct? o = new UnregisteredUnmanagedStruct()
+            UnregisteredUnmanagedStruct? o = new UnregisteredUnmanagedStruct
             {
                 A = 1,
                 B = 2,
@@ -360,6 +360,100 @@ namespace ZeroLog.Tests
             _logEvent.WriteToStringBuffer(_output);
 
             Assert.AreEqual("null", _output.ToString());
+        }
+
+        public struct UnmanagedStructWithFormatSupport : IStringFormattable
+        {
+            public long A;
+
+            public void Format(StringBuffer buffer, StringView format)
+            {
+                buffer.Append(A, StringView.Empty);
+
+                if (!format.IsEmpty)
+                {
+                    buffer.Append("[");
+                    buffer.Append(format.ToString());
+                    buffer.Append("]");
+                }
+            }
+        }
+
+        [Test]
+        public void should_append_unmanaged_with_format()
+        {
+            var o = new UnmanagedStructWithFormatSupport
+            {
+                A = 42
+            };
+
+            UnmanagedCache.Register<UnmanagedStructWithFormatSupport>();
+
+            _logEvent.AppendUnmanaged(o, "foo");
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreEqual("42[foo]", _output.ToString());
+        }
+
+        [Test]
+        public void should_append_unmanaged_byref_with_format()
+        {
+            var o = new UnmanagedStructWithFormatSupport
+            {
+                A = 42
+            };
+
+            UnmanagedCache.Register<UnmanagedStructWithFormatSupport>();
+
+            _logEvent.AppendUnmanaged(ref o, "foo");
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreEqual("42[foo]", _output.ToString());
+        }
+
+        [Test]
+        public void should_append_nullable_unmanaged_with_format()
+        {
+            UnmanagedStructWithFormatSupport? o = new UnmanagedStructWithFormatSupport
+            {
+                A = 42
+            };
+
+            UnmanagedCache.Register<UnmanagedStructWithFormatSupport>();
+
+            _logEvent.AppendUnmanaged(o, "foo");
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreEqual("42[foo]", _output.ToString());
+        }
+
+        [Test]
+        public void should_append_null_unmanaged_with_format()
+        {
+            UnmanagedStructWithFormatSupport? o = null;
+
+            UnmanagedCache.Register<UnmanagedStructWithFormatSupport>();
+
+            _logEvent.AppendUnmanaged(o, "foo");
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreEqual("null", _output.ToString());
+        }
+
+        [Test]
+        public void should_append_nullable_unmanaged_byref_with_format()
+        {
+            UnmanagedStructWithFormatSupport? o = new UnmanagedStructWithFormatSupport
+            {
+                A = 42
+            };
+
+            UnmanagedCache.Register<UnmanagedStructWithFormatSupport>();
+
+            _logEvent.AppendUnmanaged(ref o, "foo");
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreEqual("42[foo]", _output.ToString());
         }
     }
 }

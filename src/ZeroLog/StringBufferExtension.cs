@@ -128,7 +128,7 @@ namespace ZeroLog
                 case ArgumentType.Unmanaged:
                     var unmanagedArgHeader = (UnmanagedArgHeader*)argPointer;
                     argPointer += sizeof(UnmanagedArgHeader);
-                    unmanagedArgHeader->AppendTo(stringBuffer, argPointer);
+                    unmanagedArgHeader->AppendTo(stringBuffer, argPointer, format);
                     argPointer += unmanagedArgHeader->Size;
                     break;
 
