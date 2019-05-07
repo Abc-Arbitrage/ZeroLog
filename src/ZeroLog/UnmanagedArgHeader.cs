@@ -21,20 +21,21 @@ namespace ZeroLog
             _typeSize = typeSize;
         }
 
-        public void AppendTo(StringBuffer stringBuffer, byte* value_ptr)
+        public void AppendTo(StringBuffer stringBuffer, byte* valuePtr)
         {
             if (!UnmanagedCache.TryGetFormatter(_typeHandle, out var formatter))
             {
-                AppendUnregistered(stringBuffer, value_ptr, _typeSize);
+                AppendUnregistered(stringBuffer, valuePtr, _typeSize);
                 return;
             }
-            formatter(stringBuffer, value_ptr, StringView.Empty);
+
+            formatter(stringBuffer, valuePtr, StringView.Empty);
         }
 
-        internal static void AppendUnregistered(StringBuffer buffer, byte* value_ptr, int size)
+        private static void AppendUnregistered(StringBuffer buffer, byte* valuePtr, int size)
         {
             buffer.Append("Unmanaged(0x");
-            HexUtils.AppendValueAsHex(buffer, value_ptr, size);
+            HexUtils.AppendValueAsHex(buffer, valuePtr, size);
             buffer.Append(")");
         }
     }

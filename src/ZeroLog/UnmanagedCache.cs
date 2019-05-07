@@ -7,7 +7,8 @@ using JetBrains.Annotations;
 
 namespace ZeroLog
 {
-    public delegate void UnmanagedFormatterDelegate<T>(ref T value, StringBuffer stringBuffer, StringView view) where T : unmanaged;
+    public delegate void UnmanagedFormatterDelegate<T>(ref T value, StringBuffer stringBuffer, StringView view)
+        where T : unmanaged;
 
     internal static unsafe class UnmanagedCache
     {
@@ -32,21 +33,22 @@ namespace ZeroLog
 
         private static readonly MethodInfo _registerMethod = typeof(UnmanagedCache).GetMethod(nameof(Register), new Type[] { });
 
-        public static void Register<T>(UnmanagedFormatterDelegate<T> formatter) where T : unmanaged
+        public static void Register<T>(UnmanagedFormatterDelegate<T> formatter)
+            where T : unmanaged
         {
-            var handle = typeof(T).TypeHandle.Value;
-            FormatterDel rawFormatter = (b, vp, view) => FormatterGeneric<T>(b, vp, view, formatter);
-            _unmanagedStructs.TryAdd(typeof(T).TypeHandle.Value, rawFormatter);
+            void Formatter(StringBuffer b, byte* vp, StringView view) => FormatterGeneric(b, vp, view, formatter);
+            _unmanagedStructs.TryAdd(typeof(T).TypeHandle.Value, Formatter);
         }
 
-        public static void Register<T>() where T : unmanaged, IStringFormattable
+        public static void Register<T>()
+            where T : unmanaged, IStringFormattable
         {
-            var handle = typeof(T).TypeHandle.Value;
-            FormatterDel formatter = (b, vp, view) => FormatterGeneric<T>(b, vp, view, ValueHelper<T>.Formatter);
-            _unmanagedStructs.TryAdd(typeof(T).TypeHandle.Value, formatter);
+            void Formatter(StringBuffer b, byte* vp, StringView view) => FormatterGeneric(b, vp, view, ValueHelper<T>.Formatter);
+            _unmanagedStructs.TryAdd(typeof(T).TypeHandle.Value, Formatter);
         }
 
-        private static unsafe void FormatterGeneric<T>(StringBuffer stringBuffer, byte* valuePtr, StringView view, UnmanagedFormatterDelegate<T> typedFormatter) where T : unmanaged
+        private static void FormatterGeneric<T>(StringBuffer stringBuffer, byte* valuePtr, StringView view, UnmanagedFormatterDelegate<T> typedFormatter)
+            where T : unmanaged
         {
             var typedValueRef = Unsafe.AsRef<T>(valuePtr);
             typedFormatter(ref typedValueRef, stringBuffer, view);
@@ -62,11 +64,12 @@ namespace ZeroLog
         // be impossible; you'd have to cast the generic argument and introduce boxing.
         // Instead we pay a one-time startup cost to create a delegate that will forward
         // the parameter to the appropriate method in a strongly typed fashion.
-        static class ValueHelper<T> where T : unmanaged
+        private static class ValueHelper<T>
+            where T : unmanaged
         {
-            public static UnmanagedFormatterDelegate<T> Formatter = Prepare();
+            public static readonly UnmanagedFormatterDelegate<T> Formatter = Prepare();
 
-            static UnmanagedFormatterDelegate<T> Prepare()
+            private static UnmanagedFormatterDelegate<T> Prepare()
             {
                 // we only use this class for value types that also implement IStringFormattable
                 var type = typeof(T);
@@ -75,21 +78,23 @@ namespace ZeroLog
 
                 var result = typeof(ValueHelper<T>)
                              .GetTypeInfo()
-                             .GetDeclaredMethod(nameof(Assign))
+                             .GetMethod(nameof(Assign), BindingFlags.Static | BindingFlags.NonPublic)?
                              .MakeGenericMethod(type)
                              .Invoke(null, null);
                 return (UnmanagedFormatterDelegate<T>)result;
             }
 
-            public static UnmanagedFormatterDelegate<U> Assign<U>() where U : unmanaged, IStringFormattable
+            private static UnmanagedFormatterDelegate<U> Assign<U>()
+                where U : unmanaged, IStringFormattable
             {
                 return ValueHelper2.DoFormat<U>;
             }
         }
 
-        static class ValueHelper2
+        private static class ValueHelper2
         {
-            public static void DoFormat<T>(ref T input, StringBuffer buffer, StringView view) where T : unmanaged, IStringFormattable
+            public static void DoFormat<T>(ref T input, StringBuffer buffer, StringView view)
+                where T : unmanaged, IStringFormattable
             {
                 input.Format(buffer, view);
             }

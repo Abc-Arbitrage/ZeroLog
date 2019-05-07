@@ -29,6 +29,13 @@ namespace ZeroLog.Utils
             return ref IL.ReturnRef<TTo>();
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int SizeOf<T>()
+        {
+            Sizeof(typeof(T));
+            return IL.Return<int>();
+        }
+
         private static Func<IntPtr, Type> BuildGetTypeFromHandleFunc()
         {
             var method = typeof(Type).GetMethod("GetTypeFromHandleUnsafe", BindingFlags.Static | BindingFlags.NonPublic, null, new[] { typeof(IntPtr) }, null);
@@ -44,9 +51,7 @@ namespace ZeroLog.Utils
         }
 
         public static bool IsReferenceOrContainsReferences<T>()
-        {
-            return !ByTypeValues<T>.IsPinnable;
-        }
+            => !ByTypeValues<T>.IsPinnable;
 
         [SuppressMessage("ReSharper", "StaticMemberInGenericType")]
         private static class ByTypeValues<T>
@@ -74,13 +79,6 @@ namespace ZeroLog.Utils
                     return false;
                 }
             }
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int SizeOf<T>()
-        {
-            Sizeof(typeof(T));
-            return IL.Return<int>();
         }
     }
 

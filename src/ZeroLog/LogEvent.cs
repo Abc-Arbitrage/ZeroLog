@@ -59,31 +59,11 @@ namespace ZeroLog
         private void AppendGenericSlow<T>(T arg)
         {
             if (TypeUtilNullable<T>.IsNullableEnum)
-            {
                 AppendNullableEnumInternal(arg);
-            }
             else if (!TypeUtil.IsReferenceOrContainsReferences<T>())
-            {
                 AppendUnmanagedInternal(arg);
-            }
             else
-            {
                 throw new NotSupportedException($"Type {typeof(T)} is not supported ");
-            }
-        }
-
-        private void AppendUnmanagedInternal<T>(T arg)
-        {
-            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(UnmanagedArgHeader) + TypeUtil.SizeOf<T>()))
-                return ;
-
-            AppendArgumentType(ArgumentType.Unmanaged);
-            *(UnmanagedArgHeader*)_dataPointer = new UnmanagedArgHeader(TypeUtil<T>.TypeHandle, TypeUtil.SizeOf<T>());
-            _dataPointer += sizeof(UnmanagedArgHeader);
-            IL.Push(_dataPointer);
-            IL.Push(arg);
-            Stobj(typeof(T));
-            _dataPointer += TypeUtil.SizeOf<T>();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -224,7 +204,9 @@ namespace ZeroLog
             _dataPointer += sizeof(EnumArg);
         }
 
-        public ILogEvent AppendUnmanaged<T>(T value) where T : unmanaged
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ILogEvent AppendUnmanaged<T>(T value)
+            where T : unmanaged
         {
             if (!PrepareAppend(sizeof(ArgumentType) + sizeof(UnmanagedArgHeader) + sizeof(T)))
                 return this;
@@ -237,7 +219,9 @@ namespace ZeroLog
             return this;
         }
 
-        public ILogEvent AppendUnmanaged<T>(ref T value) where T : unmanaged
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ILogEvent AppendUnmanaged<T>(ref T value)
+            where T : unmanaged
         {
             if (!PrepareAppend(sizeof(ArgumentType) + sizeof(UnmanagedArgHeader) + sizeof(T)))
                 return this;
@@ -250,7 +234,9 @@ namespace ZeroLog
             return this;
         }
 
-        public ILogEvent AppendUnmanaged<T>(T? value) where T : unmanaged
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ILogEvent AppendUnmanaged<T>(T? value)
+            where T : unmanaged
         {
             if (!value.HasValue)
             {
@@ -259,10 +245,13 @@ namespace ZeroLog
 
                 return this;
             }
-            return AppendUnmanaged<T>(value.Value);
+
+            return AppendUnmanaged(value.Value);
         }
 
-        public ILogEvent AppendUnmanaged<T>(ref T? value) where T : unmanaged
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ILogEvent AppendUnmanaged<T>(ref T? value)
+            where T : unmanaged
         {
             if (!value.HasValue)
             {
@@ -281,6 +270,21 @@ namespace ZeroLog
             *(T*)_dataPointer = value.Value;
             _dataPointer += sizeof(T);
             return this;
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private void AppendUnmanagedInternal<T>(T arg) // T = unmanaged
+        {
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(UnmanagedArgHeader) + TypeUtil.SizeOf<T>()))
+                return;
+
+            AppendArgumentType(ArgumentType.Unmanaged);
+            *(UnmanagedArgHeader*)_dataPointer = new UnmanagedArgHeader(TypeUtil<T>.TypeHandle, TypeUtil.SizeOf<T>());
+            _dataPointer += sizeof(UnmanagedArgHeader);
+            IL.Push(_dataPointer);
+            IL.Push(arg);
+            Stobj(typeof(T));
+            _dataPointer += TypeUtil.SizeOf<T>();
         }
 
         public void Log()

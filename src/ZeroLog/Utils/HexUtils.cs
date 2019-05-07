@@ -4,9 +4,11 @@ namespace ZeroLog.Utils
 {
     internal static class HexUtils
     {
+        private static readonly char[] _hexTable = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
+
         public static unsafe void AppendValueAsHex(StringBuffer buffer, byte* valuePtr, int size)
         {
-            for (int index = 0; index < size; ++index)
+            for (var index = 0; index < size; ++index)
             {
                 var char0Index = valuePtr[index] & 0xf;
                 var char1Index = (valuePtr[index] & 0xf0) >> 4;
@@ -15,7 +17,5 @@ namespace ZeroLog.Utils
                 buffer.Append(_hexTable[char0Index]);
             }
         }
-
-        private static readonly char[] _hexTable = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
     }
 }
