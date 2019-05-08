@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using InlineIL;
 using JetBrains.Annotations;
 using static InlineIL.IL.Emit;
@@ -50,26 +48,38 @@ namespace ZeroLog.Utils
             ).Compile();
         }
 
+        public static bool GetIsUnmanagedSlow<T>()
+        {
+#if NETCOREAPP
+             return !RuntimeHelpers.IsReferenceOrContainsReferences<T>();
+#else
+             return GetIsUnmanagedSlow(typeof(T));
+#endif
+        }
+
         public static bool GetIsUnmanagedSlow(Type type)
         {
+#if NETCOREAPP
+            return !(bool)typeof(RuntimeHelpers).GetMethod(nameof(RuntimeHelpers.IsReferenceOrContainsReferences), BindingFlags.Static | BindingFlags.Public)
+                                                .MakeGenericMethod(type)
+                                                .Invoke(null, null);
+#else
             if (!type.IsValueType)
                 return false;
 
-            if (type.IsPrimitive)
+            type = Nullable.GetUnderlyingType(type) ?? type;
+
+            if (type.IsPrimitive || type.IsEnum)
                 return true;
 
-            if (type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).Any(f => !f.FieldType.IsValueType))
-                return false;
+            foreach (var field in type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
+            {
+                if (!GetIsUnmanagedSlow(field.FieldType))
+                    return false;
+            }
 
-            try
-            {
-                GCHandle.Alloc(Activator.CreateInstance(type), GCHandleType.Pinned).Free();
-                return true;
-            }
-            catch (ArgumentException)
-            {
-                return false;
-            }
+            return true;
+#endif
         }
     }
 
@@ -90,6 +100,6 @@ namespace ZeroLog.Utils
         public static readonly bool IsNullableEnum = _underlyingType?.IsEnum == true;
         public static readonly IntPtr UnderlyingTypeHandle = TypeUtil.GetTypeHandleSlow(_underlyingType);
         public static readonly TypeCode UnderlyingTypeCode = Type.GetTypeCode(_underlyingType);
-        public static readonly bool IsUnmanaged = TypeUtil.GetIsUnmanagedSlow(typeof(T));
+        public static readonly bool IsUnmanaged = TypeUtil.GetIsUnmanagedSlow<T>();
     }
 }
