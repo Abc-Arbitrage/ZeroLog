@@ -93,7 +93,7 @@ namespace ZeroLog
 
         public static ulong? ToUInt64Nullable<T>(T value) // T = Nullable<SomeEnum>
         {
-            switch (TypeUtilNullable<T>.UnderlyingTypeCode)
+            switch (TypeUtilSlow<T>.UnderlyingTypeCode)
             {
                 case TypeCode.SByte:
                     return ToUInt64Nullable<T, sbyte>(value);

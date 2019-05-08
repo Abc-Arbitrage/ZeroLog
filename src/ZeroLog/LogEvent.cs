@@ -58,9 +58,9 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.NoInlining)]
         private void AppendGenericSlow<T>(T arg)
         {
-            if (TypeUtilNullable<T>.IsNullableEnum)
+            if (TypeUtilSlow<T>.IsNullableEnum)
                 AppendNullableEnumInternal(arg);
-            else if (!TypeUtil.IsReferenceOrContainsReferences<T>())
+            else if (TypeUtilSlow<T>.IsUnmanaged)
                 AppendUnmanagedInternal(arg);
             else
                 throw new NotSupportedException($"Type {typeof(T)} is not supported ");
@@ -200,15 +200,18 @@ namespace ZeroLog
             }
 
             AppendArgumentType(ArgumentType.Enum);
-            *(EnumArg*)_dataPointer = new EnumArg(TypeUtilNullable<T>.UnderlyingTypeHandle, enumValue.GetValueOrDefault());
+            *(EnumArg*)_dataPointer = new EnumArg(TypeUtilSlow<T>.UnderlyingTypeHandle, enumValue.GetValueOrDefault());
             _dataPointer += sizeof(EnumArg);
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private void AppendUnmanagedInternal<T>(T arg) // T = unmanaged
+        private void AppendUnmanagedInternal<T>(T arg) // T = unmanaged or Nullable<unmanaged>
         {
             if (!PrepareAppend(sizeof(ArgumentType) + sizeof(UnmanagedArgHeader) + TypeUtil.SizeOf<T>()))
                 return;
+
+            // If T is a Nullable<unmanaged>, we copy it as-is and let the formatter deal with it.
+            // We're already in a slower execution path at this point.
 
             AppendArgumentType(ArgumentType.Unmanaged);
             *(UnmanagedArgHeader*)_dataPointer = new UnmanagedArgHeader(TypeUtil<T>.TypeHandle, TypeUtil.SizeOf<T>());

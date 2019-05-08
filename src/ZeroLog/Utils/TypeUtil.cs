@@ -50,34 +50,25 @@ namespace ZeroLog.Utils
             ).Compile();
         }
 
-        public static bool IsReferenceOrContainsReferences<T>()
-            => !ByTypeValues<T>.IsPinnable;
-
-        [SuppressMessage("ReSharper", "StaticMemberInGenericType")]
-        private static class ByTypeValues<T>
+        internal static bool GetIsUnmanagedSlow<T>()
         {
-            public static bool IsPinnable { get; } = GetIsPinnable();
+            if (!typeof(T).IsValueType)
+                return false;
 
-            private static bool GetIsPinnable()
+            if (typeof(T).IsPrimitive)
+                return true;
+
+            if (typeof(T).GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).Any(f => !f.FieldType.IsValueType))
+                return false;
+
+            try
             {
-                if (default(T) == null)
-                    return false;
-
-                if (typeof(T).IsPrimitive)
-                    return true;
-
-                if (typeof(T).GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).Any(f => !f.FieldType.IsValueType))
-                    return false;
-
-                try
-                {
-                    GCHandle.Alloc(default(T), GCHandleType.Pinned).Free();
-                    return true;
-                }
-                catch (ArgumentException)
-                {
-                    return false;
-                }
+                GCHandle.Alloc(default(T), GCHandleType.Pinned).Free();
+                return true;
+            }
+            catch (ArgumentException)
+            {
+                return false;
             }
         }
     }
@@ -89,9 +80,9 @@ namespace ZeroLog.Utils
     }
 
     [SuppressMessage("ReSharper", "StaticMemberInGenericType")]
-    internal static class TypeUtilNullable<T>
+    internal static class TypeUtilSlow<T>
     {
-        // Nullable-specific properties, initializing this type will allocate
+        // Initializing this type will allocate
 
         [CanBeNull]
         private static readonly Type _underlyingType = Nullable.GetUnderlyingType(typeof(T));
@@ -99,5 +90,6 @@ namespace ZeroLog.Utils
         public static readonly bool IsNullableEnum = _underlyingType?.IsEnum == true;
         public static readonly IntPtr UnderlyingTypeHandle = TypeUtil.GetTypeHandleSlow(_underlyingType);
         public static readonly TypeCode UnderlyingTypeCode = Type.GetTypeCode(_underlyingType);
+        public static readonly bool IsUnmanaged = TypeUtil.GetIsUnmanagedSlow<T>();
     }
 }

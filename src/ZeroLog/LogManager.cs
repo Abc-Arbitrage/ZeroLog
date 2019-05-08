@@ -368,5 +368,7 @@ namespace ZeroLog
         }
 
         BufferSegment IInternalLogManager.GetBufferSegment() => _bufferSegmentProvider.GetSegment();
+
+        internal ConcurrentQueue<IInternalLogEvent> GetInternalQueue() => _queue; // Used by unit tests
     }
 }
