@@ -31,7 +31,7 @@ namespace ZeroLog.Tests
                 C = 3,
             };
 
-            UnmanagedCache.Register<UnmanagedStruct>();
+            LogManager.RegisterUnmanaged<UnmanagedStruct>();
 
             _logEvent.AppendUnmanaged(o);
             _logEvent.WriteToStringBuffer(_output); 
@@ -49,7 +49,7 @@ namespace ZeroLog.Tests
                 C = 3,
             };
 
-            UnmanagedCache.Register<UnmanagedStruct>();
+            LogManager.RegisterUnmanaged<UnmanagedStruct>();
 
             _logEvent.AppendUnmanaged(ref o);
             _logEvent.WriteToStringBuffer(_output);
@@ -67,7 +67,7 @@ namespace ZeroLog.Tests
                 C = 3,
             };
 
-            UnmanagedCache.Register<UnmanagedStruct>();
+            LogManager.RegisterUnmanaged<UnmanagedStruct>();
 
             _logEvent.AppendUnmanaged(o);
             _logEvent.WriteToStringBuffer(_output);
@@ -80,7 +80,7 @@ namespace ZeroLog.Tests
         {
             UnmanagedStruct? o = null;
 
-            UnmanagedCache.Register<UnmanagedStruct>();
+            LogManager.RegisterUnmanaged<UnmanagedStruct>();
 
             _logEvent.AppendUnmanaged(o);
             _logEvent.WriteToStringBuffer(_output);
@@ -98,7 +98,7 @@ namespace ZeroLog.Tests
                 C = 3,
             };
 
-            UnmanagedCache.Register<UnmanagedStruct>();
+            LogManager.RegisterUnmanaged<UnmanagedStruct>();
 
             _logEvent.AppendUnmanaged(ref o);
             _logEvent.WriteToStringBuffer(_output);
@@ -111,7 +111,7 @@ namespace ZeroLog.Tests
         {
             UnmanagedStruct? o = null;
 
-            UnmanagedCache.Register<UnmanagedStruct>();
+            LogManager.RegisterUnmanaged<UnmanagedStruct>();
 
             _logEvent.AppendUnmanaged(ref o);
             _logEvent.WriteToStringBuffer(_output);
@@ -145,7 +145,7 @@ namespace ZeroLog.Tests
                 C = 3,
             };
 
-            UnmanagedCache.Register(typeof(UnmanagedStruct2));
+            LogManager.RegisterUnmanaged(typeof(UnmanagedStruct2));
 
             _logEvent.AppendUnmanaged(o);
             _logEvent.WriteToStringBuffer(_output);
@@ -181,7 +181,7 @@ namespace ZeroLog.Tests
                 C = 3,
             };
 
-            UnmanagedCache.Register<ExternalUnmanagedStruct>(ExternalUnmanagedStructFormatter);
+            LogManager.RegisterUnmanaged<ExternalUnmanagedStruct>(ExternalUnmanagedStructFormatter);
 
             _logEvent.AppendUnmanaged(o);
             _logEvent.WriteToStringBuffer(_output);
@@ -199,7 +199,7 @@ namespace ZeroLog.Tests
                 C = 3,
             };
 
-            UnmanagedCache.Register<ExternalUnmanagedStruct>(ExternalUnmanagedStructFormatter);
+            LogManager.RegisterUnmanaged<ExternalUnmanagedStruct>(ExternalUnmanagedStructFormatter);
 
             _logEvent.AppendUnmanaged(ref o);
             _logEvent.WriteToStringBuffer(_output);
@@ -217,7 +217,7 @@ namespace ZeroLog.Tests
                 C = 3,
             };
 
-            UnmanagedCache.Register<ExternalUnmanagedStruct>(ExternalUnmanagedStructFormatter);
+            LogManager.RegisterUnmanaged<ExternalUnmanagedStruct>(ExternalUnmanagedStructFormatter);
 
             _logEvent.AppendUnmanaged(o);
             _logEvent.WriteToStringBuffer(_output);
@@ -230,7 +230,7 @@ namespace ZeroLog.Tests
         {
             ExternalUnmanagedStruct? o = null;
 
-            UnmanagedCache.Register<ExternalUnmanagedStruct>(ExternalUnmanagedStructFormatter);
+            LogManager.RegisterUnmanaged<ExternalUnmanagedStruct>(ExternalUnmanagedStructFormatter);
 
             _logEvent.AppendUnmanaged(o);
             _logEvent.WriteToStringBuffer(_output);
@@ -248,7 +248,7 @@ namespace ZeroLog.Tests
                 C = 3,
             };
 
-            UnmanagedCache.Register<ExternalUnmanagedStruct>(ExternalUnmanagedStructFormatter);
+            LogManager.RegisterUnmanaged<ExternalUnmanagedStruct>(ExternalUnmanagedStructFormatter);
 
             _logEvent.AppendUnmanaged(ref o);
             _logEvent.WriteToStringBuffer(_output);
@@ -261,7 +261,7 @@ namespace ZeroLog.Tests
         {
             ExternalUnmanagedStruct? o = null;
 
-            UnmanagedCache.Register<ExternalUnmanagedStruct>(ExternalUnmanagedStructFormatter);
+            LogManager.RegisterUnmanaged<ExternalUnmanagedStruct>(ExternalUnmanagedStructFormatter);
 
             _logEvent.AppendUnmanaged(ref o);
             _logEvent.WriteToStringBuffer(_output);
@@ -387,7 +387,7 @@ namespace ZeroLog.Tests
                 A = 42
             };
 
-            UnmanagedCache.Register<UnmanagedStructWithFormatSupport>();
+            LogManager.RegisterUnmanaged<UnmanagedStructWithFormatSupport>();
 
             _logEvent.AppendUnmanaged(o, "foo");
             _logEvent.WriteToStringBuffer(_output);
@@ -403,7 +403,7 @@ namespace ZeroLog.Tests
                 A = 42
             };
 
-            UnmanagedCache.Register<UnmanagedStructWithFormatSupport>();
+            LogManager.RegisterUnmanaged<UnmanagedStructWithFormatSupport>();
 
             _logEvent.AppendUnmanaged(ref o, "foo");
             _logEvent.WriteToStringBuffer(_output);
@@ -419,7 +419,7 @@ namespace ZeroLog.Tests
                 A = 42
             };
 
-            UnmanagedCache.Register<UnmanagedStructWithFormatSupport>();
+            LogManager.RegisterUnmanaged<UnmanagedStructWithFormatSupport>();
 
             _logEvent.AppendUnmanaged(o, "foo");
             _logEvent.WriteToStringBuffer(_output);
@@ -432,7 +432,7 @@ namespace ZeroLog.Tests
         {
             UnmanagedStructWithFormatSupport? o = null;
 
-            UnmanagedCache.Register<UnmanagedStructWithFormatSupport>();
+            LogManager.RegisterUnmanaged<UnmanagedStructWithFormatSupport>();
 
             _logEvent.AppendUnmanaged(o, "foo");
             _logEvent.WriteToStringBuffer(_output);
@@ -448,7 +448,7 @@ namespace ZeroLog.Tests
                 A = 42
             };
 
-            UnmanagedCache.Register<UnmanagedStructWithFormatSupport>();
+            LogManager.RegisterUnmanaged<UnmanagedStructWithFormatSupport>();
 
             _logEvent.AppendUnmanaged(ref o, "foo");
             _logEvent.WriteToStringBuffer(_output);

@@ -114,6 +114,9 @@ namespace ZeroLog
                 RegisterEnum(type);
         }
 
+        public static void RegisterUnmanaged([NotNull] Type type)
+            => UnmanagedCache.Register(type);
+
         public static void RegisterUnmanaged<T>()
             where T : unmanaged, IStringFormattable
             => UnmanagedCache.Register<T>();
