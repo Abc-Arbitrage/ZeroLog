@@ -50,20 +50,20 @@ namespace ZeroLog.Utils
             ).Compile();
         }
 
-        internal static bool GetIsUnmanagedSlow<T>()
+        public static bool GetIsUnmanagedSlow(Type type)
         {
-            if (!typeof(T).IsValueType)
+            if (!type.IsValueType)
                 return false;
 
-            if (typeof(T).IsPrimitive)
+            if (type.IsPrimitive)
                 return true;
 
-            if (typeof(T).GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).Any(f => !f.FieldType.IsValueType))
+            if (type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).Any(f => !f.FieldType.IsValueType))
                 return false;
 
             try
             {
-                GCHandle.Alloc(default(T), GCHandleType.Pinned).Free();
+                GCHandle.Alloc(Activator.CreateInstance(type), GCHandleType.Pinned).Free();
                 return true;
             }
             catch (ArgumentException)
@@ -90,6 +90,6 @@ namespace ZeroLog.Utils
         public static readonly bool IsNullableEnum = _underlyingType?.IsEnum == true;
         public static readonly IntPtr UnderlyingTypeHandle = TypeUtil.GetTypeHandleSlow(_underlyingType);
         public static readonly TypeCode UnderlyingTypeCode = Type.GetTypeCode(_underlyingType);
-        public static readonly bool IsUnmanaged = TypeUtil.GetIsUnmanagedSlow<T>();
+        public static readonly bool IsUnmanaged = TypeUtil.GetIsUnmanagedSlow(typeof(T));
     }
 }
