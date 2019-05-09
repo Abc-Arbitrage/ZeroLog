@@ -123,7 +123,7 @@ namespace ZeroLog
 
         public static void RegisterUnmanaged<T>(UnmanagedFormatterDelegate<T> formatter)
             where T : unmanaged
-            => UnmanagedCache.Register<T>(formatter);
+            => UnmanagedCache.Register(formatter);
 
         public void Dispose()
         {

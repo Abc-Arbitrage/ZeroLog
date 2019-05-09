@@ -43,6 +43,12 @@ namespace ZeroLog.Tests.Utils
             Check.That(IsUnmanaged<UnmanagedAutoLayoutStruct>()).IsTrue();
             Check.That(IsUnmanaged<UnmanagedAutoLayoutStruct?>()).IsTrue();
 
+            Check.That(IsUnmanaged<GenericStruct<GenericStruct<int>>>()).IsTrue();
+            Check.That(IsUnmanaged<GenericStruct<GenericStruct<int?>>?>()).IsTrue();
+
+            Check.That(IsUnmanaged<GenericStruct<GenericStruct<string>>>()).IsFalse();
+            Check.That(IsUnmanaged<GenericStruct<GenericStruct<string>>?>()).IsFalse();
+
             bool IsUnmanaged<T>()
             {
                 var genericResult = TypeUtil.GetIsUnmanagedSlow<T>();
@@ -53,9 +59,10 @@ namespace ZeroLog.Tests.Utils
         }
 
         [StructLayout(LayoutKind.Sequential)]
-        private struct UnmanagedStruct
+        private unsafe struct UnmanagedStruct
         {
             public int Field;
+            public int* Field2;
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -80,6 +87,12 @@ namespace ZeroLog.Tests.Utils
         private struct UnmanagedAutoLayoutStruct
         {
             public int Field;
+        }
+
+        [StructLayout(LayoutKind.Auto)]
+        private struct GenericStruct<T>
+        {
+            public T Field;
         }
     }
 }

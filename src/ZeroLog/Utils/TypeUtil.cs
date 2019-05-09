@@ -64,13 +64,11 @@ namespace ZeroLog.Utils
                                                 .MakeGenericMethod(type)
                                                 .Invoke(null, null);
 #else
+            if (type.IsPrimitive || type.IsPointer || type.IsEnum)
+                return true;
+
             if (!type.IsValueType)
                 return false;
-
-            type = Nullable.GetUnderlyingType(type) ?? type;
-
-            if (type.IsPrimitive || type.IsEnum)
-                return true;
 
             foreach (var field in type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
             {
