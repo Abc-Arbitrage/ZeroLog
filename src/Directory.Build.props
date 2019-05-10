@@ -17,7 +17,7 @@
     <Description>A zero-allocation .NET logging library</Description>
     <Authors>Reda Bouallou;Mendel Monteiro-Beckerman;Romain Verdier;Lucas Trzesniewski;Serge Farny</Authors>
     <PackageProjectUrl>https://github.com/Abc-Arbitrage/ZeroLog</PackageProjectUrl>
-    <PackageLicenseUrl>https://github.com/Abc-Arbitrage/ZeroLog/blob/master/LICENSE.md</PackageLicenseUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Company>ABC arbitrage</Company>
     <Copyright>Copyright © ABC arbitrage 2017-2019</Copyright>
     <PackageTags>log;logging;zero-allocation</PackageTags>
