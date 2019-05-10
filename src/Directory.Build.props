@@ -8,6 +8,8 @@
     <DefaultItemExcludes>$(DefaultItemExcludes);*.DotSettings;*.ncrunchproject</DefaultItemExcludes>
     <DebugType>embedded</DebugType>
     <IsPackable>false</IsPackable>
+    <Deterministic>true</Deterministic>
+    <DeterministicSourcePaths>true</DeterministicSourcePaths>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -20,18 +22,6 @@
     <Copyright>Copyright © ABC arbitrage 2017-2019</Copyright>
     <PackageTags>log;logging;zero-allocation</PackageTags>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <ContinuousIntegrationBuild Condition="'$(ContinuousIntegrationBuild)' == ''">false</ContinuousIntegrationBuild>
-    <ContinuousIntegrationBuild Condition="'$(TEAMCITY_VERSION)' != ''">true</ContinuousIntegrationBuild>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="$(ContinuousIntegrationBuild)">
-    <Deterministic>true</Deterministic>
-    <DeterministicSourcePaths>true</DeterministicSourcePaths>
-    <PackageVersion Condition="'$(PackageVersion)' == ''">$(Version)</PackageVersion>
-    <PackageVersion Condition="'$(TEAMCITY_VERSION)' != '' and '$(BUILD_NUMBER)' != ''">$(PackageVersion)-pre$(BUILD_NUMBER)</PackageVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(NCrunch)' == '1'">
