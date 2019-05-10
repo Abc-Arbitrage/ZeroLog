@@ -9,7 +9,6 @@
     <DebugType>embedded</DebugType>
     <IsPackable>false</IsPackable>
     <Deterministic>true</Deterministic>
-    <DeterministicSourcePaths>true</DeterministicSourcePaths>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -27,6 +26,10 @@
   <PropertyGroup Condition="'$(NCrunch)' == '1'">
     <EnableSourceLink>false</EnableSourceLink>
     <EnableSourceControlManagerQueries>false</EnableSourceControlManagerQueries>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TF_BUILD)' != ''">
+    <DeterministicSourcePaths>true</DeterministicSourcePaths>
   </PropertyGroup>
 
   <ItemGroup>
