@@ -27,6 +27,13 @@ namespace ZeroLog.Utils
             return ref IL.ReturnRef<TTo>();
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int SizeOf<T>()
+        {
+            Sizeof(typeof(T));
+            return IL.Return<int>();
+        }
+
         private static Func<IntPtr, Type> BuildGetTypeFromHandleFunc()
         {
             var method = typeof(Type).GetMethod("GetTypeFromHandleUnsafe", BindingFlags.Static | BindingFlags.NonPublic, null, new[] { typeof(IntPtr) }, null);
@@ -40,6 +47,38 @@ namespace ZeroLog.Utils
                 param
             ).Compile();
         }
+
+        public static bool GetIsUnmanagedSlow<T>()
+        {
+#if NETCOREAPP
+             return !RuntimeHelpers.IsReferenceOrContainsReferences<T>();
+#else
+             return GetIsUnmanagedSlow(typeof(T));
+#endif
+        }
+
+        public static bool GetIsUnmanagedSlow(Type type)
+        {
+#if NETCOREAPP
+            return !(bool)typeof(RuntimeHelpers).GetMethod(nameof(RuntimeHelpers.IsReferenceOrContainsReferences), BindingFlags.Static | BindingFlags.Public)
+                                                .MakeGenericMethod(type)
+                                                .Invoke(null, null);
+#else
+            if (type.IsPrimitive || type.IsPointer || type.IsEnum)
+                return true;
+
+            if (!type.IsValueType)
+                return false;
+
+            foreach (var field in type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
+            {
+                if (!GetIsUnmanagedSlow(field.FieldType))
+                    return false;
+            }
+
+            return true;
+#endif
+        }
     }
 
     internal static class TypeUtil<T>
@@ -49,9 +88,9 @@ namespace ZeroLog.Utils
     }
 
     [SuppressMessage("ReSharper", "StaticMemberInGenericType")]
-    internal static class TypeUtilNullable<T>
+    internal static class TypeUtilSlow<T>
     {
-        // Nullable-specific properties, initializing this type will allocate
+        // Initializing this type will allocate
 
         [CanBeNull]
         private static readonly Type _underlyingType = Nullable.GetUnderlyingType(typeof(T));
@@ -59,5 +98,6 @@ namespace ZeroLog.Utils
         public static readonly bool IsNullableEnum = _underlyingType?.IsEnum == true;
         public static readonly IntPtr UnderlyingTypeHandle = TypeUtil.GetTypeHandleSlow(_underlyingType);
         public static readonly TypeCode UnderlyingTypeCode = Type.GetTypeCode(_underlyingType);
+        public static readonly bool IsUnmanaged = TypeUtil.GetIsUnmanagedSlow<T>();
     }
 }

@@ -125,6 +125,13 @@ namespace ZeroLog
                     stringBuffer.Append(LogManager.Config.NullDisplayString);
                     break;
 
+                case ArgumentType.Unmanaged:
+                    var unmanagedArgHeader = (UnmanagedArgHeader*)argPointer;
+                    argPointer += sizeof(UnmanagedArgHeader);
+                    unmanagedArgHeader->AppendTo(stringBuffer, argPointer, format);
+                    argPointer += unmanagedArgHeader->Size;
+                    break;
+
                 default:
                     throw new ArgumentOutOfRangeException();
             }

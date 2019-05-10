@@ -18,6 +18,7 @@ namespace ZeroLog
         TimeSpan,
         AsciiString,
         Enum,
-        Null
+        Null,
+        Unmanaged,
     }
 }

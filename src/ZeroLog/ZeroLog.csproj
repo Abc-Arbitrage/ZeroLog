@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net452;net47</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;netcoreapp2.0;net452;net47</TargetFrameworks>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -21,11 +21,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="LogEvent.Append.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>LogEvent.Append.tt</DependentUpon>
-    </Compile>
     <Compile Update="Log.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -35,9 +30,23 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Log.cs</LastGenOutput>
     </None>
+    <Compile Update="LogEvent.Append.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>LogEvent.Append.tt</DependentUpon>
+    </Compile>
     <None Update="LogEvent.Append.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>LogEvent.Append.cs</LastGenOutput>
+    </None>
+    <Compile Update="LogEvent.AppendUnmanaged.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>LogEvent.AppendUnmanaged.tt</DependentUpon>
+    </Compile>
+    <None Update="LogEvent.AppendUnmanaged.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>LogEvent.AppendUnmanaged.cs</LastGenOutput>
     </None>
   </ItemGroup>
 
