@@ -7,6 +7,13 @@ namespace ZeroLog.Utils
     internal static unsafe class Unsafe
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int SizeOf<T>()
+        {
+            Sizeof(typeof(T));
+            return IL.Return<int>();
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static T As<T>(object o)
             where T : class
         {
@@ -15,11 +22,17 @@ namespace ZeroLog.Utils
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ref TTo As<TFrom, TTo>(ref TFrom source)
+        {
+            Ldarg(nameof(source));
+            return ref IL.ReturnRef<TTo>();
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ref T AsRef<T>(void* source)
         {
             // For .NET Core the roundtrip via a local is no longer needed (update the constant as needed)
 #if NETCOREAPP
-
             IL.Push(source);
             return ref IL.ReturnRef<T>();
 #else

@@ -128,7 +128,7 @@ namespace ZeroLog
         private static ulong? ToUInt64Nullable<T, TBase>(T value) // T = Nullable<SomeEnum>
             where TBase : struct
         {
-            ref var nullable = ref TypeUtil.As<T, TBase?>(ref value);
+            ref var nullable = ref Unsafe.As<T, TBase?>(ref value);
             return nullable != null
                 ? ToUInt64(nullable.GetValueOrDefault())
                 : (ulong?)null;

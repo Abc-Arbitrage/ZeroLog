@@ -2,9 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using InlineIL;
 using JetBrains.Annotations;
-using static InlineIL.IL.Emit;
 using static System.Linq.Expressions.Expression;
 
 namespace ZeroLog.Utils
@@ -18,21 +16,6 @@ namespace ZeroLog.Utils
 
         public static Type GetTypeFromHandle(IntPtr typeHandle)
             => _getTypeFromHandleFunc?.Invoke(typeHandle);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [SuppressMessage("ReSharper", "UnusedParameter.Global")]
-        public static ref TTo As<TFrom, TTo>(ref TFrom source)
-        {
-            Ldarg(nameof(source));
-            return ref IL.ReturnRef<TTo>();
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int SizeOf<T>()
-        {
-            Sizeof(typeof(T));
-            return IL.Return<int>();
-        }
 
         private static Func<IntPtr, Type> BuildGetTypeFromHandleFunc()
         {

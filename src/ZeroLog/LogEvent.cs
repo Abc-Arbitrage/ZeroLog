@@ -207,19 +207,19 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.NoInlining)]
         private void AppendUnmanagedInternal<T>(T arg) // T = unmanaged or Nullable<unmanaged>
         {
-            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(UnmanagedArgHeader) + TypeUtil.SizeOf<T>()))
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(UnmanagedArgHeader) + Unsafe.SizeOf<T>()))
                 return;
 
             // If T is a Nullable<unmanaged>, we copy it as-is and let the formatter deal with it.
             // We're already in a slower execution path at this point.
 
             AppendArgumentType(ArgumentType.Unmanaged);
-            *(UnmanagedArgHeader*)_dataPointer = new UnmanagedArgHeader(TypeUtil<T>.TypeHandle, TypeUtil.SizeOf<T>());
+            *(UnmanagedArgHeader*)_dataPointer = new UnmanagedArgHeader(TypeUtil<T>.TypeHandle, Unsafe.SizeOf<T>());
             _dataPointer += sizeof(UnmanagedArgHeader);
             IL.Push(_dataPointer);
             IL.Push(arg);
             Stobj(typeof(T));
-            _dataPointer += TypeUtil.SizeOf<T>();
+            _dataPointer += Unsafe.SizeOf<T>();
         }
 
         public void Log()
