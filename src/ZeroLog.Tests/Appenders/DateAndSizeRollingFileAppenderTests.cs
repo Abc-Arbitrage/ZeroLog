@@ -45,7 +45,7 @@ namespace ZeroLog.Tests.Appenders
 
             var written = GetLastLine();
 
-            Check.That(written).IsEqualTo($"{logEventHeader.Timestamp.Date:yyyy-MM-dd} - {logEventHeader.Timestamp.TimeOfDay:hh\\:mm\\:ss\\.fff} - {logEventHeader.ThreadId} - INFO - TestLog || " + message);
+            Check.That(written).IsEqualTo($"{logEventHeader.Timestamp.Date:yyyy-MM-dd} - {logEventHeader.Timestamp.TimeOfDay:hh\\:mm\\:ss\\.fffffff} - {logEventHeader.ThreadId} - INFO - TestLog || " + message);
         }
 
         private string GetLastLine()
