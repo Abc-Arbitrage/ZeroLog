@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Text.Formatting;
 using JetBrains.Annotations;
 using ZeroLog.Utils;

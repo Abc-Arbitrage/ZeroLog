@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;netcoreapp2.0;net452;net47</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;netcoreapp2.0;net461</TargetFrameworks>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -12,7 +12,7 @@
     <PackageReference Include="Fody" Version="4.0.2" PrivateAssets="all" />
     <PackageReference Include="InlineIL.Fody" Version="1.1.0" PrivateAssets="all" />
     <PackageReference Include="Jil" Version="2.15.4" />
-    <PackageReference Include="StringFormatter" Version="1.0.0.11" />
+    <PackageReference Include="StringFormatter" Version="1.0.0.12" />
     <PackageReference Include="System.ValueTuple" Version="4.4.0" />
   </ItemGroup>
 

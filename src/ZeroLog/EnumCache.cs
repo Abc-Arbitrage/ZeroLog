@@ -191,7 +191,7 @@ namespace ZeroLog
             {
                 if (enumItems.Count == 0)
                 {
-                    _strings = ArrayUtil.Empty<string>();
+                    _strings = Array.Empty<string>();
                     return;
                 }
 
