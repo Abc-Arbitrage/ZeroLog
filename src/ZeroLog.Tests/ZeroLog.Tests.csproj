@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp2.0;net452;net47</TargetFrameworks>
+    <TargetFrameworks>netcoreapp2.0;net47</TargetFrameworks>
     <OutputType>Exe</OutputType>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <StartupObject>ZeroLog.Tests.Program</StartupObject>
@@ -11,19 +11,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Jil" Version="2.15.4" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.8.0" />
     <PackageReference Include="Moq" Version="4.10.0" />
     <PackageReference Include="NCrunch.Framework" Version="3.17.0" />
     <PackageReference Include="NFluent" Version="2.3.1" />
     <PackageReference Include="NUnit" Version="3.10.1" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.10.0" />
-    <PackageReference Include="StringFormatter" Version="1.0.0.11" />
-    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Net.Http" />
-  </ItemGroup>
 </Project>

@@ -31,7 +31,7 @@ namespace ZeroLog.Tests.Appenders
             appender.WriteEvent(logEventHeader, bytes, byteLength);
             appender.Flush();
 
-            var logLine = $"{logEventHeader.Timestamp.Date:yyyy-MM-dd} - {logEventHeader.Timestamp.TimeOfDay:hh\\:mm\\:ss\\.fff} - {logEventHeader.ThreadId} - INFO - TestLog || {message}{Environment.NewLine}";
+            var logLine = $"{logEventHeader.Timestamp.Date:yyyy-MM-dd} - {logEventHeader.Timestamp.TimeOfDay:hh\\:mm\\:ss\\.fffffff} - {logEventHeader.ThreadId} - INFO - TestLog || {message}{Environment.NewLine}";
 
             Check.That(appender.ToString()).IsEqualTo(logLine + logLine);
         }

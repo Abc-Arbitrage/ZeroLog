@@ -1,14 +1,13 @@
 using System;
 using System.IO;
 using System.Text;
-using ZeroLog.Utils;
 
 namespace ZeroLog.Appenders
 {
     public abstract class AppenderBase<T> : IAppender<T>
     {
         private Encoding _encoding;
-        private byte[] _newlineBytes = ArrayUtil.Empty<byte>();
+        private byte[] _newlineBytes = Array.Empty<byte>();
         private PrefixWriter _prefixWriter;
 
         protected void Configure(string prefixPattern)

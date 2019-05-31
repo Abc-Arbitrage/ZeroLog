@@ -1,5 +1,5 @@
-﻿using ZeroLog.Appenders;
-using ZeroLog.Utils;
+﻿using System;
+using ZeroLog.Appenders;
 
 namespace ZeroLog
 {
@@ -39,7 +39,7 @@ namespace ZeroLog
         {
             var config = _logManager?.ResolveLogConfig(Name);
 
-            Appenders = config?.Appenders ?? ArrayUtil.Empty<IAppender>();
+            Appenders = config?.Appenders ?? Array.Empty<IAppender>();
             LogEventPoolExhaustionStrategy = config?.LogEventPoolExhaustionStrategy ?? default;
             LogEventArgumentExhaustionStrategy = config?.LogEventArgumentExhaustionStrategy ?? default;
             _logLevel = config?.Level ?? Level.Fatal;

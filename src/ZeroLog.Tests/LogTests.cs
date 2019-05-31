@@ -103,6 +103,64 @@ namespace ZeroLog.Tests
         }
 
         [Test]
+        public void should_log_datetime_with_simple_api()
+        {
+            var log = new Log(_logManager, "logger");
+
+            var dateTime = new DateTime(2000, 1, 2, 3, 4, 5, 6);
+
+            log.InfoFormat("foo {0} bar", dateTime);
+            log.InfoFormat("foo {0:d} bar", dateTime);
+            log.InfoFormat("foo {0:yyyy-MM-dd} bar", dateTime);
+            log.InfoFormat("foo {0} bar", (DateTime?)dateTime);
+            log.InfoFormat("foo {0:d} bar", (DateTime?)dateTime);
+            log.InfoFormat("foo {0} bar", (DateTime?)null);
+            log.InfoFormat("foo {0:d} bar", (DateTime?)null);
+
+            WaitForEmptyQueue();
+
+            Check.That(_appender.LoggedMessages).ContainsExactly(
+                "foo 2000-01-02 03:04:05.006 bar",
+                "foo 2000-01-02 bar",
+                "foo 2000-01-02 bar",
+                "foo 2000-01-02 03:04:05.006 bar",
+                "foo 2000-01-02 bar",
+                "foo null bar",
+                "foo null bar"
+            );
+        }
+
+        [Test]
+        public void should_log_timespan_with_simple_api()
+        {
+            var log = new Log(_logManager, "logger");
+
+            var timeSpan = new TimeSpan(1, 2, 3, 4, 5);
+
+            log.InfoFormat("foo {0} bar", timeSpan);
+            log.InfoFormat("foo {0:c} bar", timeSpan);
+            log.InfoFormat("foo {0:g} bar", timeSpan);
+            log.InfoFormat("foo {0:G} bar", timeSpan);
+            log.InfoFormat("foo {0} bar", (TimeSpan?)timeSpan);
+            log.InfoFormat("foo {0:g} bar", (TimeSpan?)timeSpan);
+            log.InfoFormat("foo {0} bar", (TimeSpan?)null);
+            log.InfoFormat("foo {0:g} bar", (TimeSpan?)null);
+
+            WaitForEmptyQueue();
+
+            Check.That(_appender.LoggedMessages).ContainsExactly(
+                "foo 1.02:03:04.0050000 bar",
+                "foo 1.02:03:04.0050000 bar",
+                "foo 1:2:03:04.005 bar",
+                "foo 1:02:03:04.0050000 bar",
+                "foo 1.02:03:04.0050000 bar",
+                "foo 1:2:03:04.005 bar",
+                "foo null bar",
+                "foo null bar"
+            );
+        }
+
+        [Test]
         [SuppressMessage("ReSharper", "FormatStringProblem")]
         public void should_log_unmanaged_types_with_simple_api()
         {

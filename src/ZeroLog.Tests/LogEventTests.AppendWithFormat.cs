@@ -90,10 +90,12 @@ namespace ZeroLog.Tests
         [Test]
         public void should_append_time_span_with_format()
         {
-            _logEvent.Append(new TimeSpan(1, 2, 3, 4, 5), "TODO in StringFormatter");
+            _logEvent.Append(new TimeSpan(1, 2, 3, 4, 5), "g");
             _logEvent.WriteToStringBuffer(_output);
 
-            Assert.AreEqual("02:03:04.005", _output.ToString());
+            Assert.IsNotEmpty(_output.ToString());
+
+            Assert.AreEqual("1:2:03:04.005", _output.ToString());
         }
 
         [TestCase(typeof(byte), "X4")]
@@ -105,7 +107,7 @@ namespace ZeroLog.Tests
         [TestCase(typeof(decimal), "E04")]
         [TestCase(typeof(Guid), "X")]
         [TestCase(typeof(DateTime), "yyyy-MM-dd")]
-        [TestCase(typeof(TimeSpan), "TODO in StringFormatter")]
+        [TestCase(typeof(TimeSpan), "g")]
         public void should_append_nullable_with_format(Type type, string format)
         {
             typeof(LogEventTests).GetMethod(nameof(should_append_nullable_with_format), BindingFlags.Instance | BindingFlags.NonPublic, null, new[] { typeof(string) }, null)

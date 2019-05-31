@@ -22,8 +22,4 @@
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Reference Include="System.ComponentModel.Composition" />
-    <Reference Include="Microsoft.CSharp" />
-  </ItemGroup>
 </Project>

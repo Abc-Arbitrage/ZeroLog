@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Text.Formatting;
 using ZeroLog.Appenders;
-using ZeroLog.Utils;
 
 namespace ZeroLog
 {
@@ -13,7 +12,7 @@ namespace ZeroLog
         public DateTime Timestamp => default;
         public int ThreadId => 0;
         public string Name => null;
-        public IAppender[] Appenders { get; } = ArrayUtil.Empty<IAppender>();
+        public IAppender[] Appenders { get; } = Array.Empty<IAppender>();
 
         private NoopLogEvent()
         {

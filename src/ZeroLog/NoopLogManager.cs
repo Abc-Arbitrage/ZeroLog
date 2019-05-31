@@ -1,6 +1,5 @@
 using System;
 using ZeroLog.Appenders;
-using ZeroLog.Utils;
 
 namespace ZeroLog
 {
@@ -38,7 +37,7 @@ namespace ZeroLog
         {
             public static NoopLog Instance { get; } = new NoopLog();
 
-            public IAppender[] Appenders { get; } = ArrayUtil.Empty<IAppender>();
+            public IAppender[] Appenders { get; } = Array.Empty<IAppender>();
 
             public bool IsDebugEnabled => false;
             public bool IsInfoEnabled => false;

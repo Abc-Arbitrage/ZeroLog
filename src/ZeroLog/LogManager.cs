@@ -30,7 +30,7 @@ namespace ZeroLog
         private readonly Thread _writeThread;
 
         private bool _isRunning;
-        private IAppender[] _appenders = ArrayUtil.Empty<IAppender>();
+        private IAppender[] _appenders = Array.Empty<IAppender>();
 
         public static ZeroLogConfig Config { get; } = new ZeroLogConfig();
 

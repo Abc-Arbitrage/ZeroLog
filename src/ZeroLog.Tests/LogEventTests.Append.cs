@@ -261,7 +261,7 @@ namespace ZeroLog.Tests
             _logEvent.Append(new TimeSpan(1, 2, 3, 4, 5));
             _logEvent.WriteToStringBuffer(_output);
 
-            Assert.AreEqual("02:03:04.005", _output.ToString());
+            Assert.AreEqual("1.02:03:04.0050000", _output.ToString());
         }
 
         [Test]
@@ -284,7 +284,7 @@ namespace ZeroLog.Tests
 
             _logEvent.WriteToStringBuffer(_output);
 
-            Assert.AreEqual("AbCFalseTrue128£12345-128999999999999999999123.456789.012345.67890129ac124-e588-47e5-9d3d-fa3a4d174e292017-01-12 13:14:15.00002:03:04.005", _output.ToString());
+            Assert.AreEqual("AbCFalseTrue128£12345-128999999999999999999123.456789.012345.67890129ac124-e588-47e5-9d3d-fa3a4d174e292017-01-12 13:14:15.0001.02:03:04.0050000", _output.ToString());
         }
 
         [Test]
@@ -311,7 +311,7 @@ namespace ZeroLog.Tests
 
             _logEvent.WriteToStringBuffer(_output);
 
-            Assert.AreEqual("AbCFalseTrue128£12345-128999999999999999999123.456789.012345.67890129ac124-e588-47e5-9d3d-fa3a4d174e292017-01-12 13:14:15.00002:03:04.0051-2-3", _output.ToString());
+            Assert.AreEqual("AbCFalseTrue128£12345-128999999999999999999123.456789.012345.67890129ac124-e588-47e5-9d3d-fa3a4d174e292017-01-12 13:14:15.0001.02:03:04.00500001-2-3", _output.ToString());
         }
 
         [Test]
