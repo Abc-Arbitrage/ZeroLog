@@ -275,9 +275,9 @@ namespace ZeroLog
                     FormatLogMessage(stringBuffer, logEvent);
                     bytesWritten = CopyStringBufferToByteArray(stringBuffer, destination);
                 }
-                catch
+                catch (Exception ex)
                 {
-                    HandleFormattingError(stringBuffer, logEvent, destination, out bytesWritten);
+                    HandleFormattingError(stringBuffer, logEvent, destination, ex, out bytesWritten);
                 }
 
                 WriteMessageLogToAppenders(destination, logEvent, bytesWritten);
@@ -292,12 +292,14 @@ namespace ZeroLog
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private static void HandleFormattingError(StringBuffer stringBuffer, IInternalLogEvent logEvent, byte[] destination, out int bytesWritten)
+        private static void HandleFormattingError(StringBuffer stringBuffer, IInternalLogEvent logEvent, byte[] destination, Exception exception, out int bytesWritten)
         {
             try
             {
                 stringBuffer.Clear();
                 stringBuffer.Append("An error occured during formatting: ");
+                stringBuffer.Append(exception.Message);
+                stringBuffer.Append(" - Arguments: ");
 
                 logEvent.WriteToStringBufferUnformatted(stringBuffer);
                 bytesWritten = CopyStringBufferToByteArray(stringBuffer, destination);

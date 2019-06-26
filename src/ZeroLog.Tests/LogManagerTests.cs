@@ -189,7 +189,7 @@ namespace ZeroLog.Tests
             signal.Wait(TimeSpan.FromMilliseconds(100));
 
             var logMessage = _testAppender.LoggedMessages.Single();
-            Check.That(logMessage).Equals("An error occured during formatting: \"A good format: {0:X4}, A bad format: {1:lol}, Another good format: {2}\", -23805, " + guid + ", True");
+            Check.That(logMessage).Equals("An error occured during formatting: Unknown format specifier 'lol'. - Arguments: \"A good format: {0:X4}, A bad format: {1:lol}, Another good format: {2}\", -23805, " + guid + ", True");
         }
 
         [Test]
@@ -229,7 +229,7 @@ namespace ZeroLog.Tests
             signal.Wait(TimeSpan.FromMilliseconds(100));
 
             var logMessage = _testAppender.LoggedMessages.Single();
-            Check.That(logMessage).Equals("An error occured during formatting: \"Hello\", False, 1, 'a', 2, 3, 4, 5, 6, 7, " + guid + ", 2017-02-24 16:51:51.000, 16:51:51, \"abc\", \"abc\", Friday");
+            Check.That(logMessage).Equals("An error occured during formatting: Unknown format specifier 'meh, this is going to break formatting'. - Arguments: \"Hello\", False, 1, 'a', 2, 3, 4, 5, 6, 7, " + guid + ", 2017-02-24 16:51:51.000, 16:51:51, \"abc\", \"abc\", Friday");
         }
 
         [Test]
@@ -247,7 +247,7 @@ namespace ZeroLog.Tests
             signal.Wait(TimeSpan.FromMilliseconds(100));
 
             var logMessage = _testAppender.LoggedMessages.Single();
-            Check.That(logMessage).Equals("An error occured during formatting: Unmanaged(0x2a000000)");
+            Check.That(logMessage).Equals("An error occured during formatting: Simulated failure - Arguments: Unmanaged(0x2a000000)");
         }
 
         [Test]
