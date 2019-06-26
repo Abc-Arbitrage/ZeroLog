@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Text.Formatting;
 using System.Threading;
 using System.Threading.Tasks;
 using NFluent;
@@ -11,6 +13,8 @@ using ZeroLog.Config;
 namespace ZeroLog.Tests
 {
     [TestFixture]
+    [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+    [SuppressMessage("ReSharper", "NotAccessedField.Global")]
     public class LogManagerTests
     {
         private TestAppender _testAppender;
@@ -229,6 +233,24 @@ namespace ZeroLog.Tests
         }
 
         [Test]
+        public void should_write_unformatted_unmanaged_struct_when_formatting_fails()
+        {
+            LogManager.RegisterUnmanaged<FailingUnmanagedStruct>();
+
+            var log = LogManager.GetLogger(typeof(LogManagerTests));
+            var signal = _testAppender.SetMessageCountTarget(1);
+
+            log.Info()
+               .AppendUnmanaged(new FailingUnmanagedStruct { Value = 42 })
+               .Log();
+
+            signal.Wait(TimeSpan.FromMilliseconds(100));
+
+            var logMessage = _testAppender.LoggedMessages.Single();
+            Check.That(logMessage).Equals("An error occured during formatting: Unmanaged(0x2a000000)");
+        }
+
+        [Test]
         public void should_flush_appenders_when_not_logging_messages()
         {
             var log = LogManager.GetLogger(typeof(LogManagerTests));
@@ -269,6 +291,17 @@ namespace ZeroLog.Tests
             signal.Wait(TimeSpan.FromMilliseconds(100));
             var message = _testAppender.LoggedMessages.Single();
             Check.That(message).IsEqualTo(new string('.', LogManager.OutputBufferSize - LogManager.Config.TruncatedMessageSuffix.Length) + LogManager.Config.TruncatedMessageSuffix);
+        }
+
+        public struct FailingUnmanagedStruct : IStringFormattable
+        {
+            public int Value;
+
+            public void Format(StringBuffer buffer, StringView format)
+            {
+                buffer.Append("boom");
+                throw new InvalidOperationException("Simulated failure");
+            }
         }
     }
 }

@@ -25,18 +25,18 @@ namespace ZeroLog
         {
             if (!UnmanagedCache.TryGetFormatter(_typeHandle, out var formatter))
             {
-                AppendUnregistered(stringBuffer, valuePtr, _typeSize);
+                AppendUnformattedTo(stringBuffer, valuePtr);
                 return;
             }
 
             formatter(stringBuffer, valuePtr, format);
         }
 
-        private static void AppendUnregistered(StringBuffer buffer, byte* valuePtr, int size)
+        public void AppendUnformattedTo(StringBuffer stringBuffer, byte* valuePtr)
         {
-            buffer.Append("Unmanaged(0x");
-            HexUtils.AppendValueAsHex(buffer, valuePtr, size);
-            buffer.Append(")");
+            stringBuffer.Append("Unmanaged(0x");
+            HexUtils.AppendValueAsHex(stringBuffer, valuePtr, _typeSize);
+            stringBuffer.Append(")");
         }
     }
 }

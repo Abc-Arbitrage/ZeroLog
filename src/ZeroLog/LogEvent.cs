@@ -367,6 +367,13 @@ namespace ZeroLog
                     enumArg->AppendTo(stringBuffer);
                     break;
 
+                case ArgumentType.Unmanaged:
+                    var unmanagedArgHeader = (UnmanagedArgHeader*)dataPointer;
+                    dataPointer += sizeof(UnmanagedArgHeader);
+                    unmanagedArgHeader->AppendUnformattedTo(stringBuffer, dataPointer);
+                    dataPointer += unmanagedArgHeader->Size;
+                    break;
+
                 case ArgumentType.Null:
                     stringBuffer.Append(LogManager.Config.NullDisplayString);
                     break;

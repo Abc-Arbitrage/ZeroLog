@@ -1,8 +1,12 @@
-﻿using System.Text.Formatting;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Text.Formatting;
 using NUnit.Framework;
 
 namespace ZeroLog.Tests
 {
+    [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+    [SuppressMessage("ReSharper", "NotAccessedField.Global")]
     public partial class LogEventTests
     {
         public struct UnmanagedStruct : IStringFormattable
@@ -454,6 +458,37 @@ namespace ZeroLog.Tests
             _logEvent.WriteToStringBuffer(_output);
 
             Assert.AreEqual("42[foo]", _output.ToString());
+        }
+
+        public struct FailingUnmanagedStruct : IStringFormattable
+        {
+            public long A;
+            public int B;
+            public byte C;
+
+            public void Format(StringBuffer buffer, StringView format)
+            {
+                buffer.Append("boom");
+                throw new InvalidOperationException("Simulated failure");
+            }
+        }
+
+        [Test]
+        public void should_append_failing_unmanaged_as_unformatted()
+        {
+            var o = new FailingUnmanagedStruct
+            {
+                A = 1,
+                B = 2,
+                C = 3,
+            };
+
+            LogManager.RegisterUnmanaged<FailingUnmanagedStruct>();
+
+            _logEvent.AppendUnmanaged(o);
+            _logEvent.WriteToStringBufferUnformatted(_output);
+
+            Assert.AreEqual("Unmanaged(0x01000000000000000200000003000000)", _output.ToString());
         }
     }
 }
