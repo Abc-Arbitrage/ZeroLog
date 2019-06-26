@@ -26,6 +26,9 @@ namespace ZeroLog.Utils
         [DebuggerStepThrough]
         private static bool CheckAvailability()
         {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                return false;
+
             try
             {
 	            GetSystemTimePreciseAsFileTime(out _);
