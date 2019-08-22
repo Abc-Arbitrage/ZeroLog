@@ -1,12 +1,18 @@
 
 variables:
   BuildConfiguration: Release
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
 
 jobs:
   - job: Windows
     pool:
       vmImage: windows-2019
     steps:
+      - task: DotNetCoreInstaller@1
+        displayName: Install .NET Core SDK
+        inputs:
+          version: 2.2.x
+
       - task: DotNetCoreCLI@2
         displayName: Build
         inputs:
