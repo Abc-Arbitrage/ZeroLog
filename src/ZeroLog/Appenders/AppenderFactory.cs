@@ -28,10 +28,18 @@ namespace ZeroLog.Appenders
 
         private static Type GetAppenderType(AppenderDefinition definition)
         {
-            var appenderType = AppDomain.CurrentDomain.GetAssemblies()
-                                        .Select(x => x.GetType(definition.AppenderTypeName))
-                                        .FirstOrDefault(x => x != null);
-
+            Type appenderType;
+            // Check if we have an assembly-qualified name of a type
+            if (definition.AppenderTypeName.IndexOf(',') >= 0)
+            {
+                appenderType = Type.GetType(definition.AppenderTypeName, true, false);
+            }
+            else
+            {
+                appenderType = AppDomain.CurrentDomain.GetAssemblies()
+                    .Select(x => x.GetType(definition.AppenderTypeName))
+                    .FirstOrDefault(x => x != null);
+            }
             return appenderType;
         }
 
