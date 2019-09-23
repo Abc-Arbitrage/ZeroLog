@@ -6,21 +6,22 @@ namespace ZeroLog.Appenders
 {
     internal class GuardedAppender : IAppender
     {
-        private readonly IAppender _appender;
         private readonly TimeSpan _quarantineDelay;
         private DateTime? _nextActivationTime;
 
+        internal IAppender Appender { get; }
+
         public GuardedAppender(IAppender appender, TimeSpan quarantineDelay)
         {
-            _appender = appender;
+            Appender = appender;
             _quarantineDelay = quarantineDelay;
             _nextActivationTime = null;
         }
 
         public string Name
         {
-            get => _appender.Name;
-            set => _appender.Name = value;
+            get => Appender.Name;
+            set => Appender.Name = value;
         }
 
         public void WriteEvent(ILogEventHeader logEventHeader, byte[] messageBytes, int messageLength)
@@ -30,7 +31,7 @@ namespace ZeroLog.Appenders
 
             try
             {
-                _appender.WriteEvent(logEventHeader, messageBytes, messageLength);
+                Appender.WriteEvent(logEventHeader, messageBytes, messageLength);
                 _nextActivationTime = null;
             }
             catch (Exception)
@@ -40,12 +41,12 @@ namespace ZeroLog.Appenders
         }
 
         public void SetEncoding(Encoding encoding)
-            => _appender.SetEncoding(encoding);
+            => Appender.SetEncoding(encoding);
 
         public void Flush()
-            => _appender.Flush();
+            => Appender.Flush();
 
         public void Dispose()
-            => _appender.Dispose();
+            => Appender.Dispose();
     }
 }
