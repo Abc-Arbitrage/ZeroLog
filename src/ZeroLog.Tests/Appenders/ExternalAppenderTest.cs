@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using System.Linq;
+using NUnit.Framework;
 using ZeroLog.Appenders;
 using ZeroLog.Config;
 using ZeroLog.ConfigResolvers;
@@ -9,12 +10,12 @@ namespace ZeroLog.Tests.Appenders
     public class ExternalAppenderTest
     {
         [Test]
-        public void resolve_appender()
+        public void should_resolve_appender_from_assembly_qualified_name()
         {
             var appenderDef = new AppenderDefinition
             {
                 Name = "ExtApp1",
-                AppenderTypeName = "ZeroLog.Tests.ExternalAppender.TestAppender,ZeroLog.Tests.ExternalAppender",
+                AppenderTypeName = "ZeroLog.Tests.ExternalAppender.TestAppender, ZeroLog.Tests.ExternalAppender",
                 AppenderJsonConfig = new DefaultAppenderConfig { PrefixPattern = "[%level] @ %time - %logger: " }
             };
 
@@ -34,13 +35,9 @@ namespace ZeroLog.Tests.Appenders
             var configResolver = new HierarchicalResolver();
             configResolver.Build(config);
 
-            Assert.DoesNotThrow(() => LogManager.Initialize(configResolver));
-
-            ILog logger = null;
-            Assert.DoesNotThrow(() => logger = LogManager.GetLogger(typeof(ExternalAppenderTest)));
-            Assert.DoesNotThrow(() => logger.Info("Logger initialized."));
-
-            LogManager.Shutdown();
+            var appenders = configResolver.GetAllAppenders().ToList();
+            Assert.AreEqual(1, appenders.Count);
+            Assert.AreEqual("ZeroLog.Tests.ExternalAppender.TestAppender", ((GuardedAppender)appenders[0]).Appender.GetType().FullName);
         }
     }
 }
