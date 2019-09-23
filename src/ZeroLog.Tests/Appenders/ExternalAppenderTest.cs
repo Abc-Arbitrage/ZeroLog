@@ -1,5 +1,4 @@
-﻿using Jil;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using ZeroLog.Appenders;
 using ZeroLog.Config;
 using ZeroLog.ConfigResolvers;
@@ -18,6 +17,7 @@ namespace ZeroLog.Tests.Appenders
                 AppenderTypeName = "ZeroLog.Tests.ExternalAppender.TestAppender,ZeroLog.Tests.ExternalAppender",
                 AppenderJsonConfig = new DefaultAppenderConfig { PrefixPattern = "[%level] @ %time - %logger: " }
             };
+
             var config = new ZeroLogJsonConfiguration
             {
                 LogEventBufferSize = 5,
@@ -27,10 +27,10 @@ namespace ZeroLog.Tests.Appenders
                     Level = Level.Info,
                     LogEventPoolExhaustionStrategy = LogEventPoolExhaustionStrategy.DropLogMessage,
                     AppenderReferences = new[] { "ExtApp1" },
-
                 },
                 Appenders = new[] { appenderDef },
             };
+
             var configResolver = new HierarchicalResolver();
             configResolver.Build(config);
 
