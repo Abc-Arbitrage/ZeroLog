@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using InlineIL;
 using static InlineIL.IL.Emit;
@@ -32,7 +33,7 @@ namespace ZeroLog.Benchmarks.EnumTests
     }
 
     [MemoryDiagnoser]
-    [ClrJob, CoreJob]
+    [SimpleJob(RuntimeMoniker.Net48), SimpleJob(RuntimeMoniker.NetCoreApp30)]
     public unsafe class EnumBenchmarks
     {
         [Benchmark(Baseline = true)]
