@@ -113,6 +113,44 @@ namespace ZeroLog
         }
 #>
     }
+
+    partial class NoopLogManager
+    {
+        partial class NoopLog
+        {
+<#
+        foreach (var levelName in loggableLevelNames)
+        {
+#>
+            public bool Is<#= levelName #>Enabled => false;
+
+            public ILogEvent <#= levelName #>()
+                => NoopLogEvent.Instance;
+
+            public void <#= levelName #>(string? message)
+            {
+            }
+
+            public void <#= levelName #>(string? message, Exception? ex)
+            {
+            }
+
+<#
+            for (var argCount = 1; argCount <= formatMaxArgCount; ++argCount)
+            {
+#>
+            public <#= FormatMethodSignature(levelName, argCount) #>
+            {
+            }
+
+<#
+            }
+#>
+<#
+        }
+#>
+        }
+    }
 }
 <#
 
