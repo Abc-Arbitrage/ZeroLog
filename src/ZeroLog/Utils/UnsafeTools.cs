@@ -4,7 +4,7 @@ using static InlineIL.IL.Emit;
 
 namespace ZeroLog.Utils
 {
-    internal static unsafe class Unsafe
+    internal static unsafe class UnsafeTools
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int SizeOf<T>()

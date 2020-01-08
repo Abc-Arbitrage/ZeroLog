@@ -17,9 +17,11 @@ namespace ZeroLog
     {
         internal const int OutputBufferSize = 16 * 1024;
 
+        internal static readonly Encoding DefaultEncoding = Encoding.UTF8;
+        private static readonly Encoding _encoding = DefaultEncoding;
+
         private static readonly IInternalLogManager _noOpLogManager = new NoopLogManager();
         private static IInternalLogManager _logManager = _noOpLogManager;
-        private static readonly Encoding _encoding = Encoding.UTF8;
 
         private readonly ConcurrentDictionary<string, Log> _loggers = new ConcurrentDictionary<string, Log>();
         private readonly ConcurrentQueue<IInternalLogEvent> _queue;
@@ -68,7 +70,7 @@ namespace ZeroLog
 
         public Level Level { get; private set; }
 
-        public static ILogManager Initialize(IConfigurationResolver configResolver, [CanBeNull] ZeroLogInitializationConfig config = null)
+        public static ILogManager Initialize(IConfigurationResolver configResolver, ZeroLogInitializationConfig? config = null)
         {
             if (_logManager != _noOpLogManager)
                 throw new ApplicationException("LogManager is already initialized");
@@ -98,14 +100,14 @@ namespace ZeroLog
             logManager?.Dispose();
         }
 
-        public static void RegisterEnum([NotNull] Type enumType)
+        public static void RegisterEnum(Type enumType)
             => EnumCache.Register(enumType);
 
         public static void RegisterEnum<T>()
             where T : struct, Enum
             => RegisterEnum(typeof(T));
 
-        public static void RegisterAllEnumsFrom([NotNull] Assembly assembly)
+        public static void RegisterAllEnumsFrom(Assembly assembly)
         {
             if (assembly == null)
                 throw new ArgumentNullException(nameof(assembly));
@@ -114,7 +116,7 @@ namespace ZeroLog
                 RegisterEnum(type);
         }
 
-        public static void RegisterUnmanaged([NotNull] Type type)
+        public static void RegisterUnmanaged(Type type)
             => UnmanagedCache.Register(type);
 
         public static void RegisterUnmanaged<T>()
@@ -147,7 +149,7 @@ namespace ZeroLog
             => GetLogger(typeof(T));
 
         public static ILog GetLogger(Type type)
-            => GetLogger(type.FullName);
+            => GetLogger(type.FullName!);
 
         public static ILog GetLogger(string name)
         {
@@ -166,7 +168,7 @@ namespace ZeroLog
         LogConfig IInternalLogManager.ResolveLogConfig(string name)
             => _configResolver.ResolveLogConfig(name);
 
-        IInternalLogEvent IInternalLogManager.AcquireLogEvent(LogEventPoolExhaustionStrategy logEventPoolExhaustionStrategy)
+        IInternalLogEvent? IInternalLogManager.AcquireLogEvent(LogEventPoolExhaustionStrategy logEventPoolExhaustionStrategy)
         {
             if (_pool.TryAcquire(out var logEvent))
                 return logEvent;

@@ -18,7 +18,7 @@ namespace ZeroLog.Appenders
             _nextActivationTime = null;
         }
 
-        public string Name
+        public string? Name
         {
             get => Appender.Name;
             set => Appender.Name = value;

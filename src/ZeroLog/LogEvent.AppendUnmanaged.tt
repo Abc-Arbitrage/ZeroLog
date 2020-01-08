@@ -1,8 +1,6 @@
 ﻿<#@ template debug="false" hostspecific="false" language="C#" #>
 <#@ assembly name="System.Core" #>
 <#@ import namespace="System.Linq" #>
-<#@ import namespace="System.Text" #>
-<#@ import namespace="System.Collections.Generic" #>
 <#@ output extension=".cs" #>
 <#
     var bools = new[] { false, true };
@@ -12,7 +10,7 @@
                 from isFormattable in bools
                 select (isNullable, isRef, isFormattable);
 
-    string GetSignature(bool isNullable, bool isRef, bool isFormattable)
+    static string GetSignature(bool isNullable, bool isRef, bool isFormattable)
     {
         return $"ILogEvent AppendUnmanaged<T>({(isRef ? "ref " : "")}T{(isNullable ? "?" : "")} value{(isFormattable ? ", string format" : "")})";
     }

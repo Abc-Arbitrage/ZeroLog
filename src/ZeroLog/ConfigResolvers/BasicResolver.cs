@@ -49,7 +49,11 @@ namespace ZeroLog.ConfigResolvers
             }
         }
 
-        public event Action Updated = delegate { };
+        public event Action? Updated
+        {
+            add { }
+            remove { }
+        }
 
         public void Dispose()
         {

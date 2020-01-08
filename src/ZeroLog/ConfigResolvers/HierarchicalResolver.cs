@@ -9,8 +9,8 @@ namespace ZeroLog.ConfigResolvers
 {
     public class HierarchicalResolver : IConfigurationResolver
     {
-        private Node _root;
-        private Encoding AppenderEncoding { get; set; }
+        private Node? _root;
+        private Encoding AppenderEncoding { get; set; } = LogManager.DefaultEncoding;
 
         public IEnumerable<IAppender> GetAllAppenders()
         {
@@ -18,7 +18,7 @@ namespace ZeroLog.ConfigResolvers
             AddAppenders(_root);
             return appenders;
 
-            void AddAppenders(Node node)
+            void AddAppenders(Node? node)
             {
                 if (node == null)
                     return;
@@ -42,7 +42,7 @@ namespace ZeroLog.ConfigResolvers
             };
         }
 
-        public event Action Updated = delegate { };
+        public event Action? Updated;
 
         [Obsolete]
         public void Build(ZeroLogConfiguration config)
@@ -64,7 +64,7 @@ namespace ZeroLog.ConfigResolvers
 
             _root = newRoot;
 
-            Updated();
+            Updated?.Invoke();
 
             oldRoot?.Dispose();
         }
@@ -96,7 +96,7 @@ namespace ZeroLog.ConfigResolvers
 
         private static void AddNode(Node root, LoggerDefinition logger, IAppender[] appenders)
         {
-            var parts = logger.Name.Split(new[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
+            var parts = logger.Name?.Split(new[] { '.' }, StringSplitOptions.RemoveEmptyEntries) ?? Array.Empty<string>();
             var node = root;
             var path = "";
 
@@ -127,7 +127,7 @@ namespace ZeroLog.ConfigResolvers
         private Node Resolve(string name)
         {
             var parts = name.Split(new[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
-            var node = _root;
+            var node = _root ?? throw new InvalidOperationException("The configuration has not been built");
 
             foreach (var part in parts)
             {
@@ -147,8 +147,11 @@ namespace ZeroLog.ConfigResolvers
             ApplyEncodingToAllAppenders(_root);
         }
 
-        private void ApplyEncodingToAllAppenders(Node node)
+        private void ApplyEncodingToAllAppenders(Node? node)
         {
+            if (node is null)
+                return;
+
             if (AppenderEncoding != null && node.Appenders != null)
             {
                 foreach (var appender in node.Appenders)

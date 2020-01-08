@@ -16,7 +16,7 @@ namespace ZeroLog
         public string Name => _logEventToAppend.Name;
         public IAppender[] Appenders => _log.Appenders;
 
-        public ForwardingLogEvent([NotNull] IInternalLogEvent logEventToAppend, [NotNull] Log log)
+        public ForwardingLogEvent(IInternalLogEvent logEventToAppend, Log log)
         {
             _logEventToAppend = logEventToAppend;
             _log = log;
@@ -34,8 +34,8 @@ namespace ZeroLog
         {
         }
 
-        public ILogEvent Append(string s) => this;
-        public ILogEvent AppendAsciiString(byte[] bytes, int length) => this;
+        public ILogEvent Append(string? s) => this;
+        public ILogEvent AppendAsciiString(byte[]? bytes, int length) => this;
         public unsafe ILogEvent AppendAsciiString(byte* bytes, int length) => this;
 
         public ILogEvent AppendEnum<T>(T value)

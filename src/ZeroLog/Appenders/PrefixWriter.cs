@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -75,7 +74,7 @@ namespace ZeroLog.Appenders
                 switch (part.Type)
                 {
                     case PatternPartType.String:
-                        AddString(part.Value);
+                        AddString(part.Value!);
                         break;
 
                     case PatternPartType.Date:
@@ -103,7 +102,6 @@ namespace ZeroLog.Appenders
             return strings;
         }
 
-        [SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
         private static Action<PrefixWriter, ILogEventHeader> BuildAppendMethod(ICollection<PatternPart> parts, Dictionary<string, (int offset, int length)> stringMap)
         {
             var method = new DynamicMethod("WritePrefix", typeof(void), new[] { typeof(PrefixWriter), typeof(ILogEventHeader) }, typeof(PrefixWriter), false)
@@ -118,11 +116,11 @@ namespace ZeroLog.Appenders
             var dateTimeLocal = default(LocalBuilder);
 
             il.Emit(OpCodes.Ldarg_0);
-            il.Emit(OpCodes.Ldfld, typeof(PrefixWriter).GetField(nameof(_stringBuffer), BindingFlags.Instance | BindingFlags.NonPublic));
+            il.Emit(OpCodes.Ldfld, typeof(PrefixWriter).GetField(nameof(_stringBuffer), BindingFlags.Instance | BindingFlags.NonPublic)!);
             il.Emit(OpCodes.Stloc, stringBufferLocal);
 
             il.Emit(OpCodes.Ldarg_0);
-            il.Emit(OpCodes.Ldfld, typeof(PrefixWriter).GetField(nameof(_strings), BindingFlags.Instance | BindingFlags.NonPublic));
+            il.Emit(OpCodes.Ldfld, typeof(PrefixWriter).GetField(nameof(_strings), BindingFlags.Instance | BindingFlags.NonPublic)!);
             il.Emit(OpCodes.Ldc_I4_0);
             il.Emit(OpCodes.Ldelema, typeof(char));
             il.Emit(OpCodes.Stloc, stringsLocal);
@@ -135,7 +133,7 @@ namespace ZeroLog.Appenders
                     {
                         // _stringBuffer.Append(&_strings[0] + offset * sizeof(char), length);
 
-                        var (offset, length) = stringMap[part.Value];
+                        var (offset, length) = stringMap[part.Value!];
 
                         il.Emit(OpCodes.Ldloc, stringBufferLocal);
 
@@ -146,7 +144,7 @@ namespace ZeroLog.Appenders
 
                         il.Emit(OpCodes.Ldc_I4, length);
 
-                        il.Emit(OpCodes.Call, typeof(StringBuffer).GetMethod(nameof(StringBuffer.Append), new[] { typeof(char*), typeof(int) }));
+                        il.Emit(OpCodes.Call, typeof(StringBuffer).GetMethod(nameof(StringBuffer.Append), new[] { typeof(char*), typeof(int) })!);
                         break;
                     }
 
@@ -159,7 +157,7 @@ namespace ZeroLog.Appenders
                         il.Emit(OpCodes.Ldloc, stringBufferLocal);
 
                         il.Emit(OpCodes.Ldarg_1);
-                        il.Emit(OpCodes.Callvirt, typeof(ILogEventHeader).GetProperty(nameof(ILogEventHeader.Timestamp))?.GetGetMethod());
+                        il.Emit(OpCodes.Callvirt, typeof(ILogEventHeader).GetProperty(nameof(ILogEventHeader.Timestamp))?.GetGetMethod()!);
 
                         il.Emit(OpCodes.Ldloc, stringsLocal);
                         il.Emit(OpCodes.Conv_U);
@@ -168,9 +166,9 @@ namespace ZeroLog.Appenders
 
                         il.Emit(OpCodes.Ldc_I4, length);
 
-                        il.Emit(OpCodes.Newobj, typeof(StringView).GetConstructor(new[] { typeof(char*), typeof(int) }));
+                        il.Emit(OpCodes.Newobj, typeof(StringView).GetConstructor(new[] { typeof(char*), typeof(int) })!);
 
-                        il.Emit(OpCodes.Call, typeof(StringBuffer).GetMethod(nameof(StringBuffer.Append), new[] { typeof(DateTime), typeof(StringView) }));
+                        il.Emit(OpCodes.Call, typeof(StringBuffer).GetMethod(nameof(StringBuffer.Append), new[] { typeof(DateTime), typeof(StringView) })!);
                         break;
                     }
 
@@ -181,14 +179,14 @@ namespace ZeroLog.Appenders
                         il.Emit(OpCodes.Ldloc, stringBufferLocal);
 
                         il.Emit(OpCodes.Ldarg_1);
-                        il.Emit(OpCodes.Callvirt, typeof(ILogEventHeader).GetProperty(nameof(ILogEventHeader.Timestamp))?.GetGetMethod());
-                        il.Emit(OpCodes.Stloc, dateTimeLocal ?? (dateTimeLocal = il.DeclareLocal(typeof(DateTime))));
+                        il.Emit(OpCodes.Callvirt, typeof(ILogEventHeader).GetProperty(nameof(ILogEventHeader.Timestamp))?.GetGetMethod()!);
+                        il.Emit(OpCodes.Stloc, dateTimeLocal ??= il.DeclareLocal(typeof(DateTime)));
                         il.Emit(OpCodes.Ldloca, dateTimeLocal);
-                        il.Emit(OpCodes.Call, typeof(DateTime).GetProperty(nameof(DateTime.TimeOfDay))?.GetGetMethod());
+                        il.Emit(OpCodes.Call, typeof(DateTime).GetProperty(nameof(DateTime.TimeOfDay))?.GetGetMethod()!);
 
-                        il.Emit(OpCodes.Ldsfld, typeof(StringView).GetField(nameof(StringView.Empty)));
+                        il.Emit(OpCodes.Ldsfld, typeof(StringView).GetField(nameof(StringView.Empty))!);
 
-                        il.Emit(OpCodes.Call, typeof(StringBuffer).GetMethod(nameof(StringBuffer.Append), new[] { typeof(TimeSpan), typeof(StringView) }));
+                        il.Emit(OpCodes.Call, typeof(StringBuffer).GetMethod(nameof(StringBuffer.Append), new[] { typeof(TimeSpan), typeof(StringView) })!);
                         break;
                     }
 
@@ -199,11 +197,11 @@ namespace ZeroLog.Appenders
                         il.Emit(OpCodes.Ldloc, stringBufferLocal);
 
                         il.Emit(OpCodes.Ldarg_1);
-                        il.Emit(OpCodes.Callvirt, typeof(ILogEventHeader).GetProperty(nameof(ILogEventHeader.ThreadId))?.GetGetMethod());
+                        il.Emit(OpCodes.Callvirt, typeof(ILogEventHeader).GetProperty(nameof(ILogEventHeader.ThreadId))?.GetGetMethod()!);
 
-                        il.Emit(OpCodes.Ldsfld, typeof(StringView).GetField(nameof(StringView.Empty)));
+                        il.Emit(OpCodes.Ldsfld, typeof(StringView).GetField(nameof(StringView.Empty))!);
 
-                        il.Emit(OpCodes.Call, typeof(StringBuffer).GetMethod(nameof(StringBuffer.Append), new[] { typeof(int), typeof(StringView) }));
+                        il.Emit(OpCodes.Call, typeof(StringBuffer).GetMethod(nameof(StringBuffer.Append), new[] { typeof(int), typeof(StringView) })!);
                         break;
                     }
 
@@ -214,10 +212,10 @@ namespace ZeroLog.Appenders
                         il.Emit(OpCodes.Ldloc, stringBufferLocal);
 
                         il.Emit(OpCodes.Ldarg_1);
-                        il.Emit(OpCodes.Callvirt, typeof(ILogEventHeader).GetProperty(nameof(ILogEventHeader.Level))?.GetGetMethod());
-                        il.Emit(OpCodes.Call, typeof(LevelStringCache).GetMethod(nameof(LevelStringCache.GetLevelString)));
+                        il.Emit(OpCodes.Callvirt, typeof(ILogEventHeader).GetProperty(nameof(ILogEventHeader.Level))?.GetGetMethod()!);
+                        il.Emit(OpCodes.Call, typeof(LevelStringCache).GetMethod(nameof(LevelStringCache.GetLevelString))!);
 
-                        il.Emit(OpCodes.Call, typeof(StringBuffer).GetMethod(nameof(StringBuffer.Append), new[] { typeof(string) }));
+                        il.Emit(OpCodes.Call, typeof(StringBuffer).GetMethod(nameof(StringBuffer.Append), new[] { typeof(string) })!);
                         break;
                     }
 
@@ -228,9 +226,9 @@ namespace ZeroLog.Appenders
                         il.Emit(OpCodes.Ldloc, stringBufferLocal);
 
                         il.Emit(OpCodes.Ldarg_1);
-                        il.Emit(OpCodes.Callvirt, typeof(ILogEventHeader).GetProperty(nameof(ILogEventHeader.Name))?.GetGetMethod());
+                        il.Emit(OpCodes.Callvirt, typeof(ILogEventHeader).GetProperty(nameof(ILogEventHeader.Name))?.GetGetMethod()!);
 
-                        il.Emit(OpCodes.Call, typeof(StringBuffer).GetMethod(nameof(StringBuffer.Append), new[] { typeof(string) }));
+                        il.Emit(OpCodes.Call, typeof(StringBuffer).GetMethod(nameof(StringBuffer.Append), new[] { typeof(string) })!);
                         break;
                     }
 
@@ -270,7 +268,7 @@ namespace ZeroLog.Appenders
         private struct PatternPart
         {
             public PatternPartType Type { get; }
-            public string Value { get; }
+            public string? Value { get; }
 
             public PatternPart(PatternPartType type)
             {

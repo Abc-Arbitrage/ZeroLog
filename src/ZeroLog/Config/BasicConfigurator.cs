@@ -11,7 +11,7 @@ namespace ZeroLog.Config
     {
         public static ILogManager Configure(ZeroLogBasicConfiguration config)
         {
-            config = config ?? new ZeroLogBasicConfiguration();
+            config ??= new ZeroLogBasicConfiguration();
             var dummyResolver = new BasicResolver(config.Appenders, config.Level, config.LogEventPoolExhaustionStrategy, config.LogEventArgumentExhaustionStrategy);
             return LogManager.Initialize(dummyResolver, config.ToInitializationConfig());
         }

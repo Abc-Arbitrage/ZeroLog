@@ -6,9 +6,9 @@ namespace ZeroLog.Appenders
 {
     public abstract class AppenderBase<T> : IAppender<T>
     {
-        private Encoding _encoding;
+        private Encoding _encoding = LogManager.DefaultEncoding;
         private byte[] _newlineBytes = Array.Empty<byte>();
-        private PrefixWriter _prefixWriter;
+        private PrefixWriter? _prefixWriter;
 
         protected void Configure(string prefixPattern)
         {
@@ -18,8 +18,12 @@ namespace ZeroLog.Appenders
         protected int WriteEventToStream(Stream stream, ILogEventHeader logEventHeader, byte[] messageBytes, int messageLength)
         {
             var bytesWritten = 0;
-            bytesWritten += _prefixWriter.WritePrefix(stream, logEventHeader, _encoding);
+
+            if (_prefixWriter != null)
+                bytesWritten += _prefixWriter.WritePrefix(stream, logEventHeader, _encoding);
+
             bytesWritten += WriteLine(stream, messageBytes, messageLength);
+
             return bytesWritten;
         }
 
@@ -55,7 +59,7 @@ namespace ZeroLog.Appenders
         {
         }
 
-        public string Name { get; set; }
+        public string? Name { get; set; }
         public abstract void Configure(T parameters);
         public abstract void WriteEvent(ILogEventHeader logEventHeader, byte[] messageBytes, int messageLength);
     }

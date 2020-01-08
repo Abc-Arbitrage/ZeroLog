@@ -6,7 +6,7 @@
         public int LogEventBufferSize { get; set; }
         public int LogEventArgumentCapacity { get; set; }
         public bool LazyRegisterEnums { get; set; }
-        public string NullDisplayString { get; set; }
+        public string? NullDisplayString { get; set; }
 
         public AppenderDefinition[] Appenders { get; set; } = new AppenderDefinition[0];
 

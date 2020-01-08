@@ -16,7 +16,7 @@ namespace ZeroLog
         private static readonly ConcurrentDictionary<IntPtr, EnumStrings> _enums = new ConcurrentDictionary<IntPtr, EnumStrings>();
         private static readonly ConcurrentDictionary<IntPtr, bool> _isEnumSigned = new ConcurrentDictionary<IntPtr, bool>();
 
-        public static void Register([NotNull] Type enumType)
+        public static void Register(Type enumType)
         {
             if (enumType == null)
                 throw new ArgumentNullException(nameof(enumType));
@@ -30,11 +30,10 @@ namespace ZeroLog
             _enums.TryAdd(TypeUtil.GetTypeHandleSlow(enumType), EnumStrings.Create(enumType));
         }
 
-        public static bool IsRegistered([NotNull] Type enumType)
+        public static bool IsRegistered(Type enumType)
             => _enums.ContainsKey(TypeUtil.GetTypeHandleSlow(enumType));
 
-        [CanBeNull]
-        public static string GetString(IntPtr typeHandle, ulong value, out bool registered)
+        public static string? GetString(IntPtr typeHandle, ulong value, out bool registered)
         {
             if (_enums.TryGetValue(typeHandle, out var values))
             {
@@ -128,7 +127,7 @@ namespace ZeroLog
         private static ulong? ToUInt64Nullable<T, TBase>(T value) // T = Nullable<SomeEnum>
             where TBase : struct
         {
-            ref var nullable = ref Unsafe.As<T, TBase?>(ref value);
+            ref var nullable = ref UnsafeTools.As<T, TBase?>(ref value);
             return nullable != null
                 ? ToUInt64(nullable.GetValueOrDefault())
                 : (ulong?)null;
@@ -139,9 +138,10 @@ namespace ZeroLog
         {
             return _isEnumSigned.GetOrAdd(typeHandle, h => IsEnumSignedImpl(h));
 
-            bool IsEnumSignedImpl(IntPtr h)
+            static bool IsEnumSignedImpl(IntPtr h)
             {
-                var type = TypeUtil.GetTypeFromHandle(h);
+                var type = TypeUtil.GetTypeFromHandle(h) ?? throw new InvalidOperationException("Could not resolve type from handle");
+
                 switch (Type.GetTypeCode(Enum.GetUnderlyingType(type)))
                 {
                     case TypeCode.SByte:
@@ -176,8 +176,7 @@ namespace ZeroLog
                     : new DictionaryEnumStrings(enumItems);
             }
 
-            [CanBeNull]
-            public abstract string TryGetString(ulong value);
+            public abstract string? TryGetString(ulong value);
         }
 
         private sealed class ArrayEnumStrings : EnumStrings
@@ -202,7 +201,7 @@ namespace ZeroLog
                     _strings[item.Value] = item.Name;
             }
 
-            public override string TryGetString(ulong value)
+            public override string? TryGetString(ulong value)
                 => value < (ulong)_strings.Length
                     ? _strings[unchecked((int)value)]
                     : null;
@@ -218,7 +217,7 @@ namespace ZeroLog
                     _strings[item.Value] = item.Name;
             }
 
-            public override string TryGetString(ulong value)
+            public override string? TryGetString(ulong value)
             {
                 _strings.TryGetValue(value, out var str);
                 return str;

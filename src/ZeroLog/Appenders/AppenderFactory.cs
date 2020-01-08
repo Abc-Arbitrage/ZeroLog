@@ -9,9 +9,9 @@ namespace ZeroLog.Appenders
     {
         public static IAppender CreateAppender(AppenderDefinition definition)
         {
-            var appenderType = GetAppenderType(definition);
+            var appenderType = GetAppenderType(definition) ?? throw new InvalidOperationException($"Appender type not found: {definition.AppenderTypeName}");
 
-            var appender = (IAppender)Activator.CreateInstance(appenderType);
+            var appender = (IAppender)Activator.CreateInstance(appenderType)!;
             appender.Name = definition.Name;
 
             var appenderParameterType = GetAppenderParameterType(appenderType);
@@ -26,10 +26,13 @@ namespace ZeroLog.Appenders
             return appender;
         }
 
-        private static Type GetAppenderType(AppenderDefinition definition)
+        private static Type? GetAppenderType(AppenderDefinition definition)
         {
+            if (string.IsNullOrEmpty(definition.AppenderTypeName))
+                return null;
+
             // Check if we have an assembly-qualified name of a type
-            if (definition.AppenderTypeName.Contains(","))
+            if (definition.AppenderTypeName!.Contains(","))
                 return Type.GetType(definition.AppenderTypeName, true, false);
 
             return AppDomain.CurrentDomain.GetAssemblies()
@@ -44,11 +47,12 @@ namespace ZeroLog.Appenders
             return appenderParameters;
         }
 
-        private static Type GetAppenderParameterType(Type appenderType)
+        private static Type? GetAppenderParameterType(Type? appenderType)
         {
-            var type = appenderType;
+            if (appenderType is null)
+                return null;
 
-            var implementedInterfaceTypes = type.GetInterfaces();
+            var implementedInterfaceTypes = appenderType.GetInterfaces();
 
             foreach (var interfaceType in implementedInterfaceTypes)
             {

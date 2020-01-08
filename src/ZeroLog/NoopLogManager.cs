@@ -55,11 +55,11 @@ namespace ZeroLog
 
             public ILogEvent Debug() => NoopLogEvent.Instance;
 
-            public void Debug(string message)
+            public void Debug(string? message)
             {
             }
 
-            public void Debug(string message, Exception ex)
+            public void Debug(string? message, Exception? ex)
             {
             }
 
@@ -97,11 +97,11 @@ namespace ZeroLog
 
             public ILogEvent Info() => NoopLogEvent.Instance;
 
-            public void Info(string message)
+            public void Info(string? message)
             {
             }
 
-            public void Info(string message, Exception ex)
+            public void Info(string? message, Exception? ex)
             {
             }
 
@@ -139,11 +139,11 @@ namespace ZeroLog
 
             public ILogEvent Warn() => NoopLogEvent.Instance;
 
-            public void Warn(string message)
+            public void Warn(string? message)
             {
             }
 
-            public void Warn(string message, Exception ex)
+            public void Warn(string? message, Exception? ex)
             {
             }
 
@@ -181,11 +181,11 @@ namespace ZeroLog
 
             public ILogEvent Error() => NoopLogEvent.Instance;
 
-            public void Error(string message)
+            public void Error(string? message)
             {
             }
 
-            public void Error(string message, Exception ex)
+            public void Error(string? message, Exception? ex)
             {
             }
 
@@ -223,11 +223,11 @@ namespace ZeroLog
 
             public ILogEvent Fatal() => NoopLogEvent.Instance;
 
-            public void Fatal(string message)
+            public void Fatal(string? message)
             {
             }
 
-            public void Fatal(string message, Exception ex)
+            public void Fatal(string? message, Exception? ex)
             {
             }
 

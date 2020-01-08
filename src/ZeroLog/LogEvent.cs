@@ -34,6 +34,7 @@ namespace ZeroLog
             _startOfBuffer = bufferSegment.Data;
             _dataPointer = bufferSegment.Data;
             _endOfBuffer = bufferSegment.Data + bufferSegment.Length;
+            _log = default!;
         }
 
         public Level Level { get; private set; }
@@ -78,7 +79,7 @@ namespace ZeroLog
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ILogEvent Append(string s)
+        public ILogEvent Append(string? s)
         {
             if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte)))
                 return this;
@@ -95,7 +96,7 @@ namespace ZeroLog
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ILogEvent AppendAsciiString(byte[] bytes, int length)
+        public ILogEvent AppendAsciiString(byte[]? bytes, int length)
         {
             if (bytes == null)
             {
@@ -207,19 +208,19 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.NoInlining)]
         private void AppendUnmanagedInternal<T>(T arg) // T = unmanaged or Nullable<unmanaged>
         {
-            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(UnmanagedArgHeader) + Unsafe.SizeOf<T>()))
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(UnmanagedArgHeader) + UnsafeTools.SizeOf<T>()))
                 return;
 
             // If T is a Nullable<unmanaged>, we copy it as-is and let the formatter deal with it.
             // We're already in a slower execution path at this point.
 
             AppendArgumentType(ArgumentType.Unmanaged);
-            *(UnmanagedArgHeader*)_dataPointer = new UnmanagedArgHeader(TypeUtil<T>.TypeHandle, Unsafe.SizeOf<T>());
+            *(UnmanagedArgHeader*)_dataPointer = new UnmanagedArgHeader(TypeUtil<T>.TypeHandle, UnsafeTools.SizeOf<T>());
             _dataPointer += sizeof(UnmanagedArgHeader);
             IL.Push(_dataPointer);
             IL.Push(arg);
             Stobj(typeof(T));
-            _dataPointer += Unsafe.SizeOf<T>();
+            _dataPointer += UnsafeTools.SizeOf<T>();
         }
 
         public void Log()
@@ -436,14 +437,14 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void AppendBytes(byte[] bytes, int length)
         {
-            Unsafe.CopyBlockUnaligned(ref *_dataPointer, ref bytes[0], (uint)length);
+            UnsafeTools.CopyBlockUnaligned(ref *_dataPointer, ref bytes[0], (uint)length);
             _dataPointer += length;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void AppendBytes(byte* bytes, int length)
         {
-            Unsafe.CopyBlockUnaligned(_dataPointer, bytes, (uint)length);
+            UnsafeTools.CopyBlockUnaligned(_dataPointer, bytes, (uint)length);
             _dataPointer += length;
         }
 
