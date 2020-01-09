@@ -5,8 +5,7 @@ namespace ZeroLog
 {
     internal interface IInternalLogManager : ILogManager, IDisposable
     {
-        [CanBeNull]
-        IInternalLogEvent AcquireLogEvent(LogEventPoolExhaustionStrategy logEventPoolExhaustionStrategy);
+        IInternalLogEvent? AcquireLogEvent(LogEventPoolExhaustionStrategy logEventPoolExhaustionStrategy);
 
         void Enqueue(IInternalLogEvent logEvent);
         ILog GetLog(string name);

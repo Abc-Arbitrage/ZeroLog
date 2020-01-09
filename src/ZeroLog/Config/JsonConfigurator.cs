@@ -67,13 +67,13 @@ namespace ZeroLog.Config
             return DeserializeConfiguration(filecontent);
         }
 
-        internal static ZeroLogJsonConfiguration DeserializeConfiguration(string jsonConfiguration)
+        internal static ZeroLogJsonConfiguration DeserializeConfiguration(string? jsonConfiguration)
         {
             var config = JsonExtensions.DeserializeOrDefault(jsonConfiguration, new ZeroLogJsonConfiguration());
             return config;
         }
 
-        private static string ReadFileContentWithRetry(string filepath)
+        private static string? ReadFileContentWithRetry(string filepath)
         {
             const int numberOfRetries = 3;
             const int delayOnRetry = 1000;

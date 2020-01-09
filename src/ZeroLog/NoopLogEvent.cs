@@ -11,7 +11,7 @@ namespace ZeroLog
         public Level Level => default;
         public DateTime Timestamp => default;
         public int ThreadId => 0;
-        public string Name => null;
+        public string Name => string.Empty;
         public IAppender[] Appenders { get; } = Array.Empty<IAppender>();
 
         private NoopLogEvent()
@@ -30,8 +30,8 @@ namespace ZeroLog
         {
         }
 
-        public ILogEvent Append(string s) => this;
-        public ILogEvent AppendAsciiString(byte[] bytes, int length) => this;
+        public ILogEvent Append(string? s) => this;
+        public ILogEvent AppendAsciiString(byte[]? bytes, int length) => this;
         public unsafe ILogEvent AppendAsciiString(byte* bytes, int length) => this;
 
         public ILogEvent AppendEnum<T>(T value)

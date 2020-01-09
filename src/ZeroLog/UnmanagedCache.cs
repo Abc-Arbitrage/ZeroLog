@@ -16,9 +16,9 @@ namespace ZeroLog
         internal delegate void FormatterDelegate(StringBuffer stringBuffer, byte* valuePtr, StringView view);
 
         private static readonly Dictionary<IntPtr, FormatterDelegate> _unmanagedStructs = new Dictionary<IntPtr, FormatterDelegate>();
-        private static readonly MethodInfo _registerMethod = typeof(UnmanagedCache).GetMethod(nameof(Register), Type.EmptyTypes);
+        private static readonly MethodInfo _registerMethod = typeof(UnmanagedCache).GetMethod(nameof(Register), Type.EmptyTypes)!;
 
-        internal static void Register([NotNull] Type unmanagedType)
+        internal static void Register(Type unmanagedType)
         {
             if (unmanagedType == null)
                 throw new ArgumentNullException(nameof(unmanagedType));
@@ -58,13 +58,13 @@ namespace ZeroLog
         private static void FormatterGeneric<T>(StringBuffer stringBuffer, byte* valuePtr, StringView view, UnmanagedFormatterDelegate<T> typedFormatter)
             where T : unmanaged
         {
-            typedFormatter?.Invoke(ref Unsafe.AsRef<T>(valuePtr), stringBuffer, view);
+            typedFormatter?.Invoke(ref UnsafeTools.AsRef<T>(valuePtr), stringBuffer, view);
         }
 
         private static void FormatterGenericNullable<T>(StringBuffer stringBuffer, byte* valuePtr, StringView view, UnmanagedFormatterDelegate<T> typedFormatter)
             where T : unmanaged
         {
-            ref var typedValueRef = ref Unsafe.AsRef<T?>(valuePtr);
+            ref var typedValueRef = ref UnsafeTools.AsRef<T?>(valuePtr);
 
             if (typedValueRef != null)
             {
@@ -82,7 +82,7 @@ namespace ZeroLog
             // This is accessed from a single thread, there should be no contention
             lock (_unmanagedStructs)
             {
-                return _unmanagedStructs.TryGetValue(typeHandle, out formatter);
+                return _unmanagedStructs.TryGetValue(typeHandle, out formatter!);
             }
         }
     }

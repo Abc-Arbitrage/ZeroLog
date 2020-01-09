@@ -9,15 +9,15 @@ namespace ZeroLog.Utils
 {
     internal static class TypeUtil
     {
-        private static readonly Func<IntPtr, Type> _getTypeFromHandleFunc = BuildGetTypeFromHandleFunc();
+        private static readonly Func<IntPtr, Type>? _getTypeFromHandleFunc = BuildGetTypeFromHandleFunc();
 
-        public static IntPtr GetTypeHandleSlow(Type type)
+        public static IntPtr GetTypeHandleSlow(Type? type)
             => type?.TypeHandle.Value ?? IntPtr.Zero;
 
-        public static Type GetTypeFromHandle(IntPtr typeHandle)
+        public static Type? GetTypeFromHandle(IntPtr typeHandle)
             => _getTypeFromHandleFunc?.Invoke(typeHandle);
 
-        private static Func<IntPtr, Type> BuildGetTypeFromHandleFunc()
+        private static Func<IntPtr, Type>? BuildGetTypeFromHandleFunc()
         {
             var method = typeof(Type).GetMethod("GetTypeFromHandleUnsafe", BindingFlags.Static | BindingFlags.NonPublic, null, new[] { typeof(IntPtr) }, null);
             if (method == null)
@@ -43,9 +43,9 @@ namespace ZeroLog.Utils
         public static bool GetIsUnmanagedSlow(Type type)
         {
 #if NETCOREAPP
-            return !(bool)typeof(RuntimeHelpers).GetMethod(nameof(RuntimeHelpers.IsReferenceOrContainsReferences), BindingFlags.Static | BindingFlags.Public)
+            return !(bool)typeof(RuntimeHelpers).GetMethod(nameof(RuntimeHelpers.IsReferenceOrContainsReferences), BindingFlags.Static | BindingFlags.Public)!
                                                 .MakeGenericMethod(type)
-                                                .Invoke(null, null);
+                                                .Invoke(null, null)!;
 #else
             if (type.IsPrimitive || type.IsPointer || type.IsEnum)
                 return true;
@@ -75,8 +75,7 @@ namespace ZeroLog.Utils
     {
         // Initializing this type will allocate
 
-        [CanBeNull]
-        private static readonly Type _underlyingType = Nullable.GetUnderlyingType(typeof(T));
+        private static readonly Type? _underlyingType = Nullable.GetUnderlyingType(typeof(T));
 
         public static readonly bool IsNullableEnum = _underlyingType?.IsEnum == true;
         public static readonly IntPtr UnderlyingTypeHandle = TypeUtil.GetTypeHandleSlow(_underlyingType);

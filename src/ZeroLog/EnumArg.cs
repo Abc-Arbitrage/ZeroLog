@@ -38,7 +38,11 @@ namespace ZeroLog
         {
             if (!enumRegistered && LogManager.Config.LazyRegisterEnums)
             {
-                LogManager.RegisterEnum(TypeUtil.GetTypeFromHandle(_typeHandle));
+                var type = TypeUtil.GetTypeFromHandle(_typeHandle);
+                if (type is null)
+                    return;
+
+                LogManager.RegisterEnum(type);
                 var enumString = EnumCache.GetString(_typeHandle, _value, out _);
                 if (enumString != null)
                 {

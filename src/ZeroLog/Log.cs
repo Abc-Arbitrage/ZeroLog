@@ -4,14 +4,85 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+#nullable enable
+
 using System;
 using JetBrains.Annotations;
 
 namespace ZeroLog
 {
+    partial interface ILog
+    {
+        bool IsDebugEnabled { get; }
+        bool IsInfoEnabled { get; }
+        bool IsWarnEnabled { get; }
+        bool IsErrorEnabled { get; }
+        bool IsFatalEnabled { get; }
+
+        ILogEvent Debug();
+        void Debug(string? message);
+        void Debug(string? message, Exception? ex);
+        void DebugFormat<T0>(string format, T0 arg0);
+        void DebugFormat<T0, T1>(string format, T0 arg0, T1 arg1);
+        void DebugFormat<T0, T1, T2>(string format, T0 arg0, T1 arg1, T2 arg2);
+        void DebugFormat<T0, T1, T2, T3>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3);
+        void DebugFormat<T0, T1, T2, T3, T4>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4);
+        void DebugFormat<T0, T1, T2, T3, T4, T5>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5);
+        void DebugFormat<T0, T1, T2, T3, T4, T5, T6>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6);
+        void DebugFormat<T0, T1, T2, T3, T4, T5, T6, T7>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7);
+
+        ILogEvent Info();
+        void Info(string? message);
+        void Info(string? message, Exception? ex);
+        void InfoFormat<T0>(string format, T0 arg0);
+        void InfoFormat<T0, T1>(string format, T0 arg0, T1 arg1);
+        void InfoFormat<T0, T1, T2>(string format, T0 arg0, T1 arg1, T2 arg2);
+        void InfoFormat<T0, T1, T2, T3>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3);
+        void InfoFormat<T0, T1, T2, T3, T4>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4);
+        void InfoFormat<T0, T1, T2, T3, T4, T5>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5);
+        void InfoFormat<T0, T1, T2, T3, T4, T5, T6>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6);
+        void InfoFormat<T0, T1, T2, T3, T4, T5, T6, T7>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7);
+
+        ILogEvent Warn();
+        void Warn(string? message);
+        void Warn(string? message, Exception? ex);
+        void WarnFormat<T0>(string format, T0 arg0);
+        void WarnFormat<T0, T1>(string format, T0 arg0, T1 arg1);
+        void WarnFormat<T0, T1, T2>(string format, T0 arg0, T1 arg1, T2 arg2);
+        void WarnFormat<T0, T1, T2, T3>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3);
+        void WarnFormat<T0, T1, T2, T3, T4>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4);
+        void WarnFormat<T0, T1, T2, T3, T4, T5>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5);
+        void WarnFormat<T0, T1, T2, T3, T4, T5, T6>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6);
+        void WarnFormat<T0, T1, T2, T3, T4, T5, T6, T7>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7);
+
+        ILogEvent Error();
+        void Error(string? message);
+        void Error(string? message, Exception? ex);
+        void ErrorFormat<T0>(string format, T0 arg0);
+        void ErrorFormat<T0, T1>(string format, T0 arg0, T1 arg1);
+        void ErrorFormat<T0, T1, T2>(string format, T0 arg0, T1 arg1, T2 arg2);
+        void ErrorFormat<T0, T1, T2, T3>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3);
+        void ErrorFormat<T0, T1, T2, T3, T4>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4);
+        void ErrorFormat<T0, T1, T2, T3, T4, T5>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5);
+        void ErrorFormat<T0, T1, T2, T3, T4, T5, T6>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6);
+        void ErrorFormat<T0, T1, T2, T3, T4, T5, T6, T7>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7);
+
+        ILogEvent Fatal();
+        void Fatal(string? message);
+        void Fatal(string? message, Exception? ex);
+        void FatalFormat<T0>(string format, T0 arg0);
+        void FatalFormat<T0, T1>(string format, T0 arg0, T1 arg1);
+        void FatalFormat<T0, T1, T2>(string format, T0 arg0, T1 arg1, T2 arg2);
+        void FatalFormat<T0, T1, T2, T3>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3);
+        void FatalFormat<T0, T1, T2, T3, T4>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4);
+        void FatalFormat<T0, T1, T2, T3, T4, T5>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5);
+        void FatalFormat<T0, T1, T2, T3, T4, T5, T6>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6);
+        void FatalFormat<T0, T1, T2, T3, T4, T5, T6, T7>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7);
+
+    }
+
     partial class Log
     {
-                
         public bool IsDebugEnabled => Level.Debug >= _logLevel;
 
         public ILogEvent Debug()
@@ -20,8 +91,8 @@ namespace ZeroLog
                 ? GetLogEventFor(Level.Debug)
                 : NoopLogEvent.Instance;
         }
-        
-        public void Debug(string message)
+
+        public void Debug(string? message)
         {
             if (!IsDebugEnabled)
                 return;
@@ -29,22 +100,21 @@ namespace ZeroLog
             GetLogEventFor(Level.Debug).Append(message).Log();
         }
 
-        public void Debug(string message, Exception ex)
+        public void Debug(string? message, Exception? ex)
         {
             if (!IsDebugEnabled)
                 return;
 
             var logEvent = GetLogEventFor(Level.Debug);
             logEvent.Append(message);
-            logEvent.Append(ex.ToString());
+            logEvent.Append(ex?.ToString());
             logEvent.Log();
         }
 
-                    
-        [StringFormatMethod("format")]	
+        [StringFormatMethod("format")]
         public void DebugFormat<T0>(string format, T0 arg0)
         {
-            if (!IsDebugEnabled)
+            if (!IsDebugEnabled || format is null)
                 return;
 
             var logEvent = GetLogEventFor(Level.Debug);
@@ -52,11 +122,11 @@ namespace ZeroLog
             logEvent.AppendGeneric(arg0);
             logEvent.Log();
         }
-            
-        [StringFormatMethod("format")]	
+
+        [StringFormatMethod("format")]
         public void DebugFormat<T0, T1>(string format, T0 arg0, T1 arg1)
         {
-            if (!IsDebugEnabled)
+            if (!IsDebugEnabled || format is null)
                 return;
 
             var logEvent = GetLogEventFor(Level.Debug);
@@ -65,11 +135,11 @@ namespace ZeroLog
             logEvent.AppendGeneric(arg1);
             logEvent.Log();
         }
-            
-        [StringFormatMethod("format")]	
+
+        [StringFormatMethod("format")]
         public void DebugFormat<T0, T1, T2>(string format, T0 arg0, T1 arg1, T2 arg2)
         {
-            if (!IsDebugEnabled)
+            if (!IsDebugEnabled || format is null)
                 return;
 
             var logEvent = GetLogEventFor(Level.Debug);
@@ -79,11 +149,11 @@ namespace ZeroLog
             logEvent.AppendGeneric(arg2);
             logEvent.Log();
         }
-            
-        [StringFormatMethod("format")]	
+
+        [StringFormatMethod("format")]
         public void DebugFormat<T0, T1, T2, T3>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3)
         {
-            if (!IsDebugEnabled)
+            if (!IsDebugEnabled || format is null)
                 return;
 
             var logEvent = GetLogEventFor(Level.Debug);
@@ -94,11 +164,11 @@ namespace ZeroLog
             logEvent.AppendGeneric(arg3);
             logEvent.Log();
         }
-            
-        [StringFormatMethod("format")]	
+
+        [StringFormatMethod("format")]
         public void DebugFormat<T0, T1, T2, T3, T4>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
         {
-            if (!IsDebugEnabled)
+            if (!IsDebugEnabled || format is null)
                 return;
 
             var logEvent = GetLogEventFor(Level.Debug);
@@ -110,11 +180,11 @@ namespace ZeroLog
             logEvent.AppendGeneric(arg4);
             logEvent.Log();
         }
-            
-        [StringFormatMethod("format")]	
+
+        [StringFormatMethod("format")]
         public void DebugFormat<T0, T1, T2, T3, T4, T5>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
         {
-            if (!IsDebugEnabled)
+            if (!IsDebugEnabled || format is null)
                 return;
 
             var logEvent = GetLogEventFor(Level.Debug);
@@ -127,11 +197,11 @@ namespace ZeroLog
             logEvent.AppendGeneric(arg5);
             logEvent.Log();
         }
-            
-        [StringFormatMethod("format")]	
+
+        [StringFormatMethod("format")]
         public void DebugFormat<T0, T1, T2, T3, T4, T5, T6>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
         {
-            if (!IsDebugEnabled)
+            if (!IsDebugEnabled || format is null)
                 return;
 
             var logEvent = GetLogEventFor(Level.Debug);
@@ -145,11 +215,11 @@ namespace ZeroLog
             logEvent.AppendGeneric(arg6);
             logEvent.Log();
         }
-            
-        [StringFormatMethod("format")]	
+
+        [StringFormatMethod("format")]
         public void DebugFormat<T0, T1, T2, T3, T4, T5, T6, T7>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7)
         {
-            if (!IsDebugEnabled)
+            if (!IsDebugEnabled || format is null)
                 return;
 
             var logEvent = GetLogEventFor(Level.Debug);
@@ -164,7 +234,7 @@ namespace ZeroLog
             logEvent.AppendGeneric(arg7);
             logEvent.Log();
         }
-                    
+
         public bool IsInfoEnabled => Level.Info >= _logLevel;
 
         public ILogEvent Info()
@@ -173,8 +243,8 @@ namespace ZeroLog
                 ? GetLogEventFor(Level.Info)
                 : NoopLogEvent.Instance;
         }
-        
-        public void Info(string message)
+
+        public void Info(string? message)
         {
             if (!IsInfoEnabled)
                 return;
@@ -182,22 +252,21 @@ namespace ZeroLog
             GetLogEventFor(Level.Info).Append(message).Log();
         }
 
-        public void Info(string message, Exception ex)
+        public void Info(string? message, Exception? ex)
         {
             if (!IsInfoEnabled)
                 return;
 
             var logEvent = GetLogEventFor(Level.Info);
             logEvent.Append(message);
-            logEvent.Append(ex.ToString());
+            logEvent.Append(ex?.ToString());
             logEvent.Log();
         }
 
-                    
-        [StringFormatMethod("format")]	
+        [StringFormatMethod("format")]
         public void InfoFormat<T0>(string format, T0 arg0)
         {
-            if (!IsInfoEnabled)
+            if (!IsInfoEnabled || format is null)
                 return;
 
             var logEvent = GetLogEventFor(Level.Info);
@@ -205,11 +274,11 @@ namespace ZeroLog
             logEvent.AppendGeneric(arg0);
             logEvent.Log();
         }
-            
-        [StringFormatMethod("format")]	
+
+        [StringFormatMethod("format")]
         public void InfoFormat<T0, T1>(string format, T0 arg0, T1 arg1)
         {
-            if (!IsInfoEnabled)
+            if (!IsInfoEnabled || format is null)
                 return;
 
             var logEvent = GetLogEventFor(Level.Info);
@@ -218,11 +287,11 @@ namespace ZeroLog
             logEvent.AppendGeneric(arg1);
             logEvent.Log();
         }
-            
-        [StringFormatMethod("format")]	
+
+        [StringFormatMethod("format")]
         public void InfoFormat<T0, T1, T2>(string format, T0 arg0, T1 arg1, T2 arg2)
         {
-            if (!IsInfoEnabled)
+            if (!IsInfoEnabled || format is null)
                 return;
 
             var logEvent = GetLogEventFor(Level.Info);
@@ -232,11 +301,11 @@ namespace ZeroLog
             logEvent.AppendGeneric(arg2);
             logEvent.Log();
         }
-            
-        [StringFormatMethod("format")]	
+
+        [StringFormatMethod("format")]
         public void InfoFormat<T0, T1, T2, T3>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3)
         {
-            if (!IsInfoEnabled)
+            if (!IsInfoEnabled || format is null)
                 return;
 
             var logEvent = GetLogEventFor(Level.Info);
@@ -247,11 +316,11 @@ namespace ZeroLog
             logEvent.AppendGeneric(arg3);
             logEvent.Log();
         }
-            
-        [StringFormatMethod("format")]	
+
+        [StringFormatMethod("format")]
         public void InfoFormat<T0, T1, T2, T3, T4>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
         {
-            if (!IsInfoEnabled)
+            if (!IsInfoEnabled || format is null)
                 return;
 
             var logEvent = GetLogEventFor(Level.Info);
@@ -263,11 +332,11 @@ namespace ZeroLog
             logEvent.AppendGeneric(arg4);
             logEvent.Log();
         }
-            
-        [StringFormatMethod("format")]	
+
+        [StringFormatMethod("format")]
         public void InfoFormat<T0, T1, T2, T3, T4, T5>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
         {
-            if (!IsInfoEnabled)
+            if (!IsInfoEnabled || format is null)
                 return;
 
             var logEvent = GetLogEventFor(Level.Info);
@@ -280,11 +349,11 @@ namespace ZeroLog
             logEvent.AppendGeneric(arg5);
             logEvent.Log();
         }
-            
-        [StringFormatMethod("format")]	
+
+        [StringFormatMethod("format")]
         public void InfoFormat<T0, T1, T2, T3, T4, T5, T6>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
         {
-            if (!IsInfoEnabled)
+            if (!IsInfoEnabled || format is null)
                 return;
 
             var logEvent = GetLogEventFor(Level.Info);
@@ -298,11 +367,11 @@ namespace ZeroLog
             logEvent.AppendGeneric(arg6);
             logEvent.Log();
         }
-            
-        [StringFormatMethod("format")]	
+
+        [StringFormatMethod("format")]
         public void InfoFormat<T0, T1, T2, T3, T4, T5, T6, T7>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7)
         {
-            if (!IsInfoEnabled)
+            if (!IsInfoEnabled || format is null)
                 return;
 
             var logEvent = GetLogEventFor(Level.Info);
@@ -317,7 +386,7 @@ namespace ZeroLog
             logEvent.AppendGeneric(arg7);
             logEvent.Log();
         }
-                    
+
         public bool IsWarnEnabled => Level.Warn >= _logLevel;
 
         public ILogEvent Warn()
@@ -326,8 +395,8 @@ namespace ZeroLog
                 ? GetLogEventFor(Level.Warn)
                 : NoopLogEvent.Instance;
         }
-        
-        public void Warn(string message)
+
+        public void Warn(string? message)
         {
             if (!IsWarnEnabled)
                 return;
@@ -335,22 +404,21 @@ namespace ZeroLog
             GetLogEventFor(Level.Warn).Append(message).Log();
         }
 
-        public void Warn(string message, Exception ex)
+        public void Warn(string? message, Exception? ex)
         {
             if (!IsWarnEnabled)
                 return;
 
             var logEvent = GetLogEventFor(Level.Warn);
             logEvent.Append(message);
-            logEvent.Append(ex.ToString());
+            logEvent.Append(ex?.ToString());
             logEvent.Log();
         }
 
-                    
-        [StringFormatMethod("format")]	
+        [StringFormatMethod("format")]
         public void WarnFormat<T0>(string format, T0 arg0)
         {
-            if (!IsWarnEnabled)
+            if (!IsWarnEnabled || format is null)
                 return;
 
             var logEvent = GetLogEventFor(Level.Warn);
@@ -358,11 +426,11 @@ namespace ZeroLog
             logEvent.AppendGeneric(arg0);
             logEvent.Log();
         }
-            
-        [StringFormatMethod("format")]	
+
+        [StringFormatMethod("format")]
         public void WarnFormat<T0, T1>(string format, T0 arg0, T1 arg1)
         {
-            if (!IsWarnEnabled)
+            if (!IsWarnEnabled || format is null)
                 return;
 
             var logEvent = GetLogEventFor(Level.Warn);
@@ -371,11 +439,11 @@ namespace ZeroLog
             logEvent.AppendGeneric(arg1);
             logEvent.Log();
         }
-            
-        [StringFormatMethod("format")]	
+
+        [StringFormatMethod("format")]
         public void WarnFormat<T0, T1, T2>(string format, T0 arg0, T1 arg1, T2 arg2)
         {
-            if (!IsWarnEnabled)
+            if (!IsWarnEnabled || format is null)
                 return;
 
             var logEvent = GetLogEventFor(Level.Warn);
@@ -385,11 +453,11 @@ namespace ZeroLog
             logEvent.AppendGeneric(arg2);
             logEvent.Log();
         }
-            
-        [StringFormatMethod("format")]	
+
+        [StringFormatMethod("format")]
         public void WarnFormat<T0, T1, T2, T3>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3)
         {
-            if (!IsWarnEnabled)
+            if (!IsWarnEnabled || format is null)
                 return;
 
             var logEvent = GetLogEventFor(Level.Warn);
@@ -400,11 +468,11 @@ namespace ZeroLog
             logEvent.AppendGeneric(arg3);
             logEvent.Log();
         }
-            
-        [StringFormatMethod("format")]	
+
+        [StringFormatMethod("format")]
         public void WarnFormat<T0, T1, T2, T3, T4>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
         {
-            if (!IsWarnEnabled)
+            if (!IsWarnEnabled || format is null)
                 return;
 
             var logEvent = GetLogEventFor(Level.Warn);
@@ -416,11 +484,11 @@ namespace ZeroLog
             logEvent.AppendGeneric(arg4);
             logEvent.Log();
         }
-            
-        [StringFormatMethod("format")]	
+
+        [StringFormatMethod("format")]
         public void WarnFormat<T0, T1, T2, T3, T4, T5>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
         {
-            if (!IsWarnEnabled)
+            if (!IsWarnEnabled || format is null)
                 return;
 
             var logEvent = GetLogEventFor(Level.Warn);
@@ -433,11 +501,11 @@ namespace ZeroLog
             logEvent.AppendGeneric(arg5);
             logEvent.Log();
         }
-            
-        [StringFormatMethod("format")]	
+
+        [StringFormatMethod("format")]
         public void WarnFormat<T0, T1, T2, T3, T4, T5, T6>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
         {
-            if (!IsWarnEnabled)
+            if (!IsWarnEnabled || format is null)
                 return;
 
             var logEvent = GetLogEventFor(Level.Warn);
@@ -451,11 +519,11 @@ namespace ZeroLog
             logEvent.AppendGeneric(arg6);
             logEvent.Log();
         }
-            
-        [StringFormatMethod("format")]	
+
+        [StringFormatMethod("format")]
         public void WarnFormat<T0, T1, T2, T3, T4, T5, T6, T7>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7)
         {
-            if (!IsWarnEnabled)
+            if (!IsWarnEnabled || format is null)
                 return;
 
             var logEvent = GetLogEventFor(Level.Warn);
@@ -470,7 +538,7 @@ namespace ZeroLog
             logEvent.AppendGeneric(arg7);
             logEvent.Log();
         }
-                    
+
         public bool IsErrorEnabled => Level.Error >= _logLevel;
 
         public ILogEvent Error()
@@ -479,8 +547,8 @@ namespace ZeroLog
                 ? GetLogEventFor(Level.Error)
                 : NoopLogEvent.Instance;
         }
-        
-        public void Error(string message)
+
+        public void Error(string? message)
         {
             if (!IsErrorEnabled)
                 return;
@@ -488,22 +556,21 @@ namespace ZeroLog
             GetLogEventFor(Level.Error).Append(message).Log();
         }
 
-        public void Error(string message, Exception ex)
+        public void Error(string? message, Exception? ex)
         {
             if (!IsErrorEnabled)
                 return;
 
             var logEvent = GetLogEventFor(Level.Error);
             logEvent.Append(message);
-            logEvent.Append(ex.ToString());
+            logEvent.Append(ex?.ToString());
             logEvent.Log();
         }
 
-                    
-        [StringFormatMethod("format")]	
+        [StringFormatMethod("format")]
         public void ErrorFormat<T0>(string format, T0 arg0)
         {
-            if (!IsErrorEnabled)
+            if (!IsErrorEnabled || format is null)
                 return;
 
             var logEvent = GetLogEventFor(Level.Error);
@@ -511,11 +578,11 @@ namespace ZeroLog
             logEvent.AppendGeneric(arg0);
             logEvent.Log();
         }
-            
-        [StringFormatMethod("format")]	
+
+        [StringFormatMethod("format")]
         public void ErrorFormat<T0, T1>(string format, T0 arg0, T1 arg1)
         {
-            if (!IsErrorEnabled)
+            if (!IsErrorEnabled || format is null)
                 return;
 
             var logEvent = GetLogEventFor(Level.Error);
@@ -524,11 +591,11 @@ namespace ZeroLog
             logEvent.AppendGeneric(arg1);
             logEvent.Log();
         }
-            
-        [StringFormatMethod("format")]	
+
+        [StringFormatMethod("format")]
         public void ErrorFormat<T0, T1, T2>(string format, T0 arg0, T1 arg1, T2 arg2)
         {
-            if (!IsErrorEnabled)
+            if (!IsErrorEnabled || format is null)
                 return;
 
             var logEvent = GetLogEventFor(Level.Error);
@@ -538,11 +605,11 @@ namespace ZeroLog
             logEvent.AppendGeneric(arg2);
             logEvent.Log();
         }
-            
-        [StringFormatMethod("format")]	
+
+        [StringFormatMethod("format")]
         public void ErrorFormat<T0, T1, T2, T3>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3)
         {
-            if (!IsErrorEnabled)
+            if (!IsErrorEnabled || format is null)
                 return;
 
             var logEvent = GetLogEventFor(Level.Error);
@@ -553,11 +620,11 @@ namespace ZeroLog
             logEvent.AppendGeneric(arg3);
             logEvent.Log();
         }
-            
-        [StringFormatMethod("format")]	
+
+        [StringFormatMethod("format")]
         public void ErrorFormat<T0, T1, T2, T3, T4>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
         {
-            if (!IsErrorEnabled)
+            if (!IsErrorEnabled || format is null)
                 return;
 
             var logEvent = GetLogEventFor(Level.Error);
@@ -569,11 +636,11 @@ namespace ZeroLog
             logEvent.AppendGeneric(arg4);
             logEvent.Log();
         }
-            
-        [StringFormatMethod("format")]	
+
+        [StringFormatMethod("format")]
         public void ErrorFormat<T0, T1, T2, T3, T4, T5>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
         {
-            if (!IsErrorEnabled)
+            if (!IsErrorEnabled || format is null)
                 return;
 
             var logEvent = GetLogEventFor(Level.Error);
@@ -586,11 +653,11 @@ namespace ZeroLog
             logEvent.AppendGeneric(arg5);
             logEvent.Log();
         }
-            
-        [StringFormatMethod("format")]	
+
+        [StringFormatMethod("format")]
         public void ErrorFormat<T0, T1, T2, T3, T4, T5, T6>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
         {
-            if (!IsErrorEnabled)
+            if (!IsErrorEnabled || format is null)
                 return;
 
             var logEvent = GetLogEventFor(Level.Error);
@@ -604,11 +671,11 @@ namespace ZeroLog
             logEvent.AppendGeneric(arg6);
             logEvent.Log();
         }
-            
-        [StringFormatMethod("format")]	
+
+        [StringFormatMethod("format")]
         public void ErrorFormat<T0, T1, T2, T3, T4, T5, T6, T7>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7)
         {
-            if (!IsErrorEnabled)
+            if (!IsErrorEnabled || format is null)
                 return;
 
             var logEvent = GetLogEventFor(Level.Error);
@@ -623,7 +690,7 @@ namespace ZeroLog
             logEvent.AppendGeneric(arg7);
             logEvent.Log();
         }
-                    
+
         public bool IsFatalEnabled => Level.Fatal >= _logLevel;
 
         public ILogEvent Fatal()
@@ -632,8 +699,8 @@ namespace ZeroLog
                 ? GetLogEventFor(Level.Fatal)
                 : NoopLogEvent.Instance;
         }
-        
-        public void Fatal(string message)
+
+        public void Fatal(string? message)
         {
             if (!IsFatalEnabled)
                 return;
@@ -641,22 +708,21 @@ namespace ZeroLog
             GetLogEventFor(Level.Fatal).Append(message).Log();
         }
 
-        public void Fatal(string message, Exception ex)
+        public void Fatal(string? message, Exception? ex)
         {
             if (!IsFatalEnabled)
                 return;
 
             var logEvent = GetLogEventFor(Level.Fatal);
             logEvent.Append(message);
-            logEvent.Append(ex.ToString());
+            logEvent.Append(ex?.ToString());
             logEvent.Log();
         }
 
-                    
-        [StringFormatMethod("format")]	
+        [StringFormatMethod("format")]
         public void FatalFormat<T0>(string format, T0 arg0)
         {
-            if (!IsFatalEnabled)
+            if (!IsFatalEnabled || format is null)
                 return;
 
             var logEvent = GetLogEventFor(Level.Fatal);
@@ -664,11 +730,11 @@ namespace ZeroLog
             logEvent.AppendGeneric(arg0);
             logEvent.Log();
         }
-            
-        [StringFormatMethod("format")]	
+
+        [StringFormatMethod("format")]
         public void FatalFormat<T0, T1>(string format, T0 arg0, T1 arg1)
         {
-            if (!IsFatalEnabled)
+            if (!IsFatalEnabled || format is null)
                 return;
 
             var logEvent = GetLogEventFor(Level.Fatal);
@@ -677,11 +743,11 @@ namespace ZeroLog
             logEvent.AppendGeneric(arg1);
             logEvent.Log();
         }
-            
-        [StringFormatMethod("format")]	
+
+        [StringFormatMethod("format")]
         public void FatalFormat<T0, T1, T2>(string format, T0 arg0, T1 arg1, T2 arg2)
         {
-            if (!IsFatalEnabled)
+            if (!IsFatalEnabled || format is null)
                 return;
 
             var logEvent = GetLogEventFor(Level.Fatal);
@@ -691,11 +757,11 @@ namespace ZeroLog
             logEvent.AppendGeneric(arg2);
             logEvent.Log();
         }
-            
-        [StringFormatMethod("format")]	
+
+        [StringFormatMethod("format")]
         public void FatalFormat<T0, T1, T2, T3>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3)
         {
-            if (!IsFatalEnabled)
+            if (!IsFatalEnabled || format is null)
                 return;
 
             var logEvent = GetLogEventFor(Level.Fatal);
@@ -706,11 +772,11 @@ namespace ZeroLog
             logEvent.AppendGeneric(arg3);
             logEvent.Log();
         }
-            
-        [StringFormatMethod("format")]	
+
+        [StringFormatMethod("format")]
         public void FatalFormat<T0, T1, T2, T3, T4>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
         {
-            if (!IsFatalEnabled)
+            if (!IsFatalEnabled || format is null)
                 return;
 
             var logEvent = GetLogEventFor(Level.Fatal);
@@ -722,11 +788,11 @@ namespace ZeroLog
             logEvent.AppendGeneric(arg4);
             logEvent.Log();
         }
-            
-        [StringFormatMethod("format")]	
+
+        [StringFormatMethod("format")]
         public void FatalFormat<T0, T1, T2, T3, T4, T5>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
         {
-            if (!IsFatalEnabled)
+            if (!IsFatalEnabled || format is null)
                 return;
 
             var logEvent = GetLogEventFor(Level.Fatal);
@@ -739,11 +805,11 @@ namespace ZeroLog
             logEvent.AppendGeneric(arg5);
             logEvent.Log();
         }
-            
-        [StringFormatMethod("format")]	
+
+        [StringFormatMethod("format")]
         public void FatalFormat<T0, T1, T2, T3, T4, T5, T6>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
         {
-            if (!IsFatalEnabled)
+            if (!IsFatalEnabled || format is null)
                 return;
 
             var logEvent = GetLogEventFor(Level.Fatal);
@@ -757,11 +823,11 @@ namespace ZeroLog
             logEvent.AppendGeneric(arg6);
             logEvent.Log();
         }
-            
-        [StringFormatMethod("format")]	
+
+        [StringFormatMethod("format")]
         public void FatalFormat<T0, T1, T2, T3, T4, T5, T6, T7>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7)
         {
-            if (!IsFatalEnabled)
+            if (!IsFatalEnabled || format is null)
                 return;
 
             var logEvent = GetLogEventFor(Level.Fatal);
@@ -776,6 +842,238 @@ namespace ZeroLog
             logEvent.AppendGeneric(arg7);
             logEvent.Log();
         }
-                    
+
+    }
+
+    partial class NoopLogManager
+    {
+        partial class NoopLog
+        {
+            public bool IsDebugEnabled => false;
+
+            public ILogEvent Debug()
+                => NoopLogEvent.Instance;
+
+            public void Debug(string? message)
+            {
+            }
+
+            public void Debug(string? message, Exception? ex)
+            {
+            }
+
+            public void DebugFormat<T0>(string format, T0 arg0)
+            {
+            }
+
+            public void DebugFormat<T0, T1>(string format, T0 arg0, T1 arg1)
+            {
+            }
+
+            public void DebugFormat<T0, T1, T2>(string format, T0 arg0, T1 arg1, T2 arg2)
+            {
+            }
+
+            public void DebugFormat<T0, T1, T2, T3>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3)
+            {
+            }
+
+            public void DebugFormat<T0, T1, T2, T3, T4>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
+            {
+            }
+
+            public void DebugFormat<T0, T1, T2, T3, T4, T5>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
+            {
+            }
+
+            public void DebugFormat<T0, T1, T2, T3, T4, T5, T6>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
+            {
+            }
+
+            public void DebugFormat<T0, T1, T2, T3, T4, T5, T6, T7>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7)
+            {
+            }
+
+            public bool IsInfoEnabled => false;
+
+            public ILogEvent Info()
+                => NoopLogEvent.Instance;
+
+            public void Info(string? message)
+            {
+            }
+
+            public void Info(string? message, Exception? ex)
+            {
+            }
+
+            public void InfoFormat<T0>(string format, T0 arg0)
+            {
+            }
+
+            public void InfoFormat<T0, T1>(string format, T0 arg0, T1 arg1)
+            {
+            }
+
+            public void InfoFormat<T0, T1, T2>(string format, T0 arg0, T1 arg1, T2 arg2)
+            {
+            }
+
+            public void InfoFormat<T0, T1, T2, T3>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3)
+            {
+            }
+
+            public void InfoFormat<T0, T1, T2, T3, T4>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
+            {
+            }
+
+            public void InfoFormat<T0, T1, T2, T3, T4, T5>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
+            {
+            }
+
+            public void InfoFormat<T0, T1, T2, T3, T4, T5, T6>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
+            {
+            }
+
+            public void InfoFormat<T0, T1, T2, T3, T4, T5, T6, T7>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7)
+            {
+            }
+
+            public bool IsWarnEnabled => false;
+
+            public ILogEvent Warn()
+                => NoopLogEvent.Instance;
+
+            public void Warn(string? message)
+            {
+            }
+
+            public void Warn(string? message, Exception? ex)
+            {
+            }
+
+            public void WarnFormat<T0>(string format, T0 arg0)
+            {
+            }
+
+            public void WarnFormat<T0, T1>(string format, T0 arg0, T1 arg1)
+            {
+            }
+
+            public void WarnFormat<T0, T1, T2>(string format, T0 arg0, T1 arg1, T2 arg2)
+            {
+            }
+
+            public void WarnFormat<T0, T1, T2, T3>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3)
+            {
+            }
+
+            public void WarnFormat<T0, T1, T2, T3, T4>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
+            {
+            }
+
+            public void WarnFormat<T0, T1, T2, T3, T4, T5>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
+            {
+            }
+
+            public void WarnFormat<T0, T1, T2, T3, T4, T5, T6>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
+            {
+            }
+
+            public void WarnFormat<T0, T1, T2, T3, T4, T5, T6, T7>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7)
+            {
+            }
+
+            public bool IsErrorEnabled => false;
+
+            public ILogEvent Error()
+                => NoopLogEvent.Instance;
+
+            public void Error(string? message)
+            {
+            }
+
+            public void Error(string? message, Exception? ex)
+            {
+            }
+
+            public void ErrorFormat<T0>(string format, T0 arg0)
+            {
+            }
+
+            public void ErrorFormat<T0, T1>(string format, T0 arg0, T1 arg1)
+            {
+            }
+
+            public void ErrorFormat<T0, T1, T2>(string format, T0 arg0, T1 arg1, T2 arg2)
+            {
+            }
+
+            public void ErrorFormat<T0, T1, T2, T3>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3)
+            {
+            }
+
+            public void ErrorFormat<T0, T1, T2, T3, T4>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
+            {
+            }
+
+            public void ErrorFormat<T0, T1, T2, T3, T4, T5>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
+            {
+            }
+
+            public void ErrorFormat<T0, T1, T2, T3, T4, T5, T6>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
+            {
+            }
+
+            public void ErrorFormat<T0, T1, T2, T3, T4, T5, T6, T7>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7)
+            {
+            }
+
+            public bool IsFatalEnabled => false;
+
+            public ILogEvent Fatal()
+                => NoopLogEvent.Instance;
+
+            public void Fatal(string? message)
+            {
+            }
+
+            public void Fatal(string? message, Exception? ex)
+            {
+            }
+
+            public void FatalFormat<T0>(string format, T0 arg0)
+            {
+            }
+
+            public void FatalFormat<T0, T1>(string format, T0 arg0, T1 arg1)
+            {
+            }
+
+            public void FatalFormat<T0, T1, T2>(string format, T0 arg0, T1 arg1, T2 arg2)
+            {
+            }
+
+            public void FatalFormat<T0, T1, T2, T3>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3)
+            {
+            }
+
+            public void FatalFormat<T0, T1, T2, T3, T4>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
+            {
+            }
+
+            public void FatalFormat<T0, T1, T2, T3, T4, T5>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
+            {
+            }
+
+            public void FatalFormat<T0, T1, T2, T3, T4, T5, T6>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
+            {
+            }
+
+            public void FatalFormat<T0, T1, T2, T3, T4, T5, T6, T7>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7)
+            {
+            }
+
+        }
     }
 }

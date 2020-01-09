@@ -1,13 +1,8 @@
-﻿using JetBrains.Annotations;
-
-namespace ZeroLog
+﻿namespace ZeroLog
 {
     public class ZeroLogConfig
     {
-        [NotNull]
         private string _nullDisplayString = "null";
-
-        [NotNull]
         private string _truncatedMessageSuffix = " [TRUNCATED]";
 
         public bool LazyRegisterEnums { get; set; }
@@ -15,13 +10,13 @@ namespace ZeroLog
 
         public string NullDisplayString
         {
-            [NotNull] get => _nullDisplayString;
+            get => _nullDisplayString;
             set => _nullDisplayString = value ?? string.Empty;
         }
 
         public string TruncatedMessageSuffix
         {
-            [NotNull] get => _truncatedMessageSuffix;
+            get => _truncatedMessageSuffix;
             set => _truncatedMessageSuffix = value ?? string.Empty;
         }
 

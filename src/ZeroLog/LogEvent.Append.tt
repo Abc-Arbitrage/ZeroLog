@@ -27,6 +27,8 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+#nullable enable
+
 using System;
 using System.Runtime.CompilerServices;
 using ZeroLog.Utils;
@@ -63,19 +65,19 @@ namespace ZeroLog
             //   struct specific jitted version of this method.
             // - Since a jitted version of this method will be shared for all reference types, the optimisation
             //   we just mentionned earlier can't occur. That's why we put the test against string at the top.
-            // - Casting to "object" then to the desired value type will force the C# compiler to emit boxing and 
+            // - Casting to "object" then to the desired value type will force the C# compiler to emit boxing and
             //   unboxing IL opcodes, but the JIT is smart enough to prevent the actual boxing/unboxing from happening.
 
             if (typeof(T) == typeof(string))
-                Append((string)(object)arg);
+                Append((string?)(object?)arg);
 <#
     foreach (var type in types)
     {
 #>
             else if (typeof(T) == typeof(<#= type.name #>))
-                Append((<#= type.name #>)(object)arg);
+                Append((<#= type.name #>)(object)arg!);
             else if (typeof(T) == typeof(<#= type.name #>?))
-                Append((<#= type.name #>?)(object)arg);
+                Append((<#= type.name #>?)(object?)arg);
 <#
     }
 #>

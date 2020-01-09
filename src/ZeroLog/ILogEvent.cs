@@ -7,8 +7,8 @@ namespace ZeroLog
     {
         IAppender[] Appenders { get; }
 
-        ILogEvent Append(string s);
-        ILogEvent AppendAsciiString(byte[] bytes, int length);
+        ILogEvent Append(string? s);
+        ILogEvent AppendAsciiString(byte[]? bytes, int length);
         unsafe ILogEvent AppendAsciiString(byte* bytes, int length);
 
         ILogEvent AppendEnum<T>(T value)
