@@ -4,6 +4,8 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+#nullable enable
+
 using System;
 using System.Runtime.CompilerServices;
 using ZeroLog.Utils;
