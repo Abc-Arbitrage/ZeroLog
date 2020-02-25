@@ -10,13 +10,13 @@ namespace ZeroLog.Appenders
         private readonly Stream _output;
 
         public ConsoleAppender()
+            : this(DefaultPrefixPattern)
         {
-            _output = Console.OpenStandardOutput();
         }
 
-        public ConsoleAppender(string prefixPattern = DefaultPrefixPattern)
-            : this()
+        public ConsoleAppender(string prefixPattern)
         {
+            _output = Console.OpenStandardOutput();
             Configure(prefixPattern);
         }
 
