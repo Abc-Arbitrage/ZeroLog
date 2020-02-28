@@ -12,13 +12,13 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>1.4.2</Version>
+    <Version>1.4.3</Version>
     <Description>A zero-allocation .NET logging library</Description>
     <Authors>Reda Bouallou;Mendel Monteiro-Beckerman;Romain Verdier;Lucas Trzesniewski;Serge Farny</Authors>
     <PackageProjectUrl>https://github.com/Abc-Arbitrage/ZeroLog</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Company>ABC arbitrage</Company>
-    <Copyright>Copyright © ABC arbitrage 2017-2019</Copyright>
+    <Copyright>Copyright © ABC arbitrage 2017-2020</Copyright>
     <PackageTags>log;logging;zero-allocation</PackageTags>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
   </PropertyGroup>
