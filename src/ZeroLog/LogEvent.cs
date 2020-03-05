@@ -177,6 +177,32 @@ namespace ZeroLog
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ILogEvent AppendAsciiString(ReadOnlySpan<char> chars)
+        {
+            var remainingBytes = (int)(_endOfBuffer - _dataPointer);
+            remainingBytes -= sizeof(ArgumentType) + sizeof(int);
+
+            var length = chars.Length;
+
+            if (length > remainingBytes)
+            {
+                _isTruncated = true;
+                length = remainingBytes;
+            }
+
+            if (length <= 0 || !PrepareAppend(sizeof(ArgumentType) + sizeof(int) + length))
+                return this;
+
+            AppendArgumentType(ArgumentType.AsciiString);
+            AppendInt32(length);
+
+            foreach (var c in chars.Slice(0, length))
+                *_dataPointer++ = (byte)c;
+
+            return this;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent AppendEnum<T>(T value)
             where T : struct, Enum
         {

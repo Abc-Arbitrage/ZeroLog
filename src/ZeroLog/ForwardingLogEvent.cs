@@ -38,6 +38,7 @@ namespace ZeroLog
         public ILogEvent AppendAsciiString(byte[]? bytes, int length) => this;
         public unsafe ILogEvent AppendAsciiString(byte* bytes, int length) => this;
         public ILogEvent AppendAsciiString(ReadOnlySpan<byte> bytes) => this;
+        public ILogEvent AppendAsciiString(ReadOnlySpan<char> chars) => this;
 
         public ILogEvent AppendEnum<T>(T value)
             where T : struct, Enum
