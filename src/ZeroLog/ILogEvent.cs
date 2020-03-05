@@ -10,6 +10,7 @@ namespace ZeroLog
         ILogEvent Append(string? s);
         ILogEvent AppendAsciiString(byte[]? bytes, int length);
         unsafe ILogEvent AppendAsciiString(byte* bytes, int length);
+        ILogEvent AppendAsciiString(ReadOnlySpan<byte> bytes);
 
         ILogEvent AppendEnum<T>(T value)
             where T : struct, Enum;
