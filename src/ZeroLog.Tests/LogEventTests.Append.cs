@@ -64,6 +64,25 @@ namespace ZeroLog.Tests
         }
 
         [Test]
+        public void should_append_byte_span()
+        {
+            var bytes = Encoding.Default.GetBytes("abc");
+            _logEvent.AppendAsciiString(bytes.AsSpan());
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreEqual("abc", _output.ToString());
+        }
+
+        [Test]
+        public void should_append_char_span()
+        {
+            _logEvent.AppendAsciiString("abc".AsSpan());
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreEqual("abc", _output.ToString());
+        }
+
+        [Test]
         public void should_ignore_byte_array_with_negative_length()
         {
             var bytes = Encoding.Default.GetBytes("abc");
@@ -83,6 +102,24 @@ namespace ZeroLog.Tests
         }
 
         [Test]
+        public void should_ignore_empty_byte_span()
+        {
+            _logEvent.AppendAsciiString(ReadOnlySpan<byte>.Empty);
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreEqual("", _output.ToString());
+        }
+
+        [Test]
+        public void should_ignore_empty_char_span()
+        {
+            _logEvent.AppendAsciiString(ReadOnlySpan<char>.Empty);
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreEqual("", _output.ToString());
+        }
+
+        [Test]
         public void should_truncate_byte_array_after_too_many_args()
         {
             _logEvent.Initialize(Level.Info, null, LogEventArgumentExhaustionStrategy.TruncateMessage);
@@ -91,6 +128,33 @@ namespace ZeroLog.Tests
 
             var bytes = Encoding.Default.GetBytes("abc");
             _logEvent.AppendAsciiString(bytes, bytes.Length);
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreEqual(new string('.', _argCapacity) + LogManager.Config.TruncatedMessageSuffix, _output.ToString());
+        }
+
+        [Test]
+        public void should_truncate_byte_span_after_too_many_args()
+        {
+            _logEvent.Initialize(Level.Info, null, LogEventArgumentExhaustionStrategy.TruncateMessage);
+            for (var i = 0; i < _argCapacity; ++i)
+                _logEvent.Append(".");
+
+            var bytes = Encoding.Default.GetBytes("abc");
+            _logEvent.AppendAsciiString(bytes.AsSpan());
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreEqual(new string('.', _argCapacity) + LogManager.Config.TruncatedMessageSuffix, _output.ToString());
+        }
+
+        [Test]
+        public void should_truncate_char_span_after_too_many_args()
+        {
+            _logEvent.Initialize(Level.Info, null, LogEventArgumentExhaustionStrategy.TruncateMessage);
+            for (var i = 0; i < _argCapacity; ++i)
+                _logEvent.Append(".");
+
+            _logEvent.AppendAsciiString("abc".AsSpan());
             _logEvent.WriteToStringBuffer(_output);
 
             Assert.AreEqual(new string('.', _argCapacity) + LogManager.Config.TruncatedMessageSuffix, _output.ToString());
@@ -307,7 +371,7 @@ namespace ZeroLog.Tests
             _logEvent.Append(new Guid("129ac124-e588-47e5-9d3d-fa3a4d174e29"));
             _logEvent.Append(new DateTime(2017, 01, 12, 13, 14, 15));
             _logEvent.Append(new TimeSpan(1, 2, 3, 4, 5));
-            _logEvent.AppendUnmanaged(new UnmanagedStruct(){A = 1, B = 2, C = 3});
+            _logEvent.AppendUnmanaged(new UnmanagedStruct() { A = 1, B = 2, C = 3 });
 
             _logEvent.WriteToStringBuffer(_output);
 

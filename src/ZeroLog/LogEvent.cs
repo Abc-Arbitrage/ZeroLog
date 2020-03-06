@@ -154,6 +154,55 @@ namespace ZeroLog
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ILogEvent AppendAsciiString(ReadOnlySpan<byte> bytes)
+        {
+            var remainingBytes = (int)(_endOfBuffer - _dataPointer);
+            remainingBytes -= sizeof(ArgumentType) + sizeof(int);
+
+            var length = bytes.Length;
+
+            if (length > remainingBytes)
+            {
+                _isTruncated = true;
+                length = remainingBytes;
+            }
+
+            if (length <= 0 || !PrepareAppend(sizeof(ArgumentType) + sizeof(int) + length))
+                return this;
+
+            AppendArgumentType(ArgumentType.AsciiString);
+            AppendInt32(length);
+            AppendBytes(bytes.Slice(0, length));
+            return this;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ILogEvent AppendAsciiString(ReadOnlySpan<char> chars)
+        {
+            var remainingBytes = (int)(_endOfBuffer - _dataPointer);
+            remainingBytes -= sizeof(ArgumentType) + sizeof(int);
+
+            var length = chars.Length;
+
+            if (length > remainingBytes)
+            {
+                _isTruncated = true;
+                length = remainingBytes;
+            }
+
+            if (length <= 0 || !PrepareAppend(sizeof(ArgumentType) + sizeof(int) + length))
+                return this;
+
+            AppendArgumentType(ArgumentType.AsciiString);
+            AppendInt32(length);
+
+            foreach (var c in chars.Slice(0, length))
+                *_dataPointer++ = (byte)c;
+
+            return this;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent AppendEnum<T>(T value)
             where T : struct, Enum
         {
@@ -446,6 +495,13 @@ namespace ZeroLog
         {
             UnsafeTools.CopyBlockUnaligned(_dataPointer, bytes, (uint)length);
             _dataPointer += length;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void AppendBytes(ReadOnlySpan<byte> bytes)
+        {
+            bytes.CopyTo(new Span<byte>(_dataPointer, bytes.Length));
+            _dataPointer += bytes.Length;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
