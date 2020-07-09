@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using Newtonsoft.Json;
 using NFluent;
 using NUnit.Framework;
 using ZeroLog.Appenders;
@@ -32,43 +33,7 @@ namespace ZeroLog.Tests.Config
                 Loggers = new[] { new LoggerDefinition { Name = "Abc.Zebus", Level = Level.Debug, AppenderReferences = new[] { "B" } } }
             };
 
-            var configJson = @"
-            {
-              ""LazyRegisterEnums"": false,
-              ""LogEventArgumentCapacity"": 32,
-              ""LogEventBufferSize"": 5,
-              ""LogEventQueueSize"": 7,
-              ""Appenders"": [{
-                ""AppenderJsonConfig"": {
-                  ""PrefixPattern"": ""[%level] @ %time - %logger: ""
-               },
-               ""AppenderTypeName"": ""ConsoleAppender"",
-               ""Name"": ""A""
-              }, {
-                ""AppenderJsonConfig"": {
-                   ""FilePathRoot"": ""totopath ""
-               },
-               ""AppenderTypeName"": ""DateAndSizeRollingFileAppender"",
-               ""Name"": ""B""
-              }],
-              ""Loggers"": [{
-                ""IncludeParentAppenders"": false,
-                ""AppenderReferences"": [""B""],
-                ""Level"": ""Debug"",
-                ""LogEventPoolExhaustionStrategy"": ""DropLogMessageAndNotifyAppenders"",
-                ""LogEventArgumentExhaustionStrategy"": ""TruncateMessage"",
-                ""Name"": ""Abc.Zebus""
-              }],
-              ""RootLogger"": {
-                ""IncludeParentAppenders"": false,
-                ""AppenderReferences"": [""A""],
-                ""Level"": ""Warn"",
-                ""LogEventPoolExhaustionStrategy"": ""DropLogMessage"",
-                ""LogEventArgumentExhaustionStrategy"": ""TruncateMessage"",
-                ""Name"": null
-              },
-              ""NullDisplayString"": null
-            }";
+            var configJson = JsonConvert.SerializeObject(config);
 
             var loadedConfig = JsonConfigurator.DeserializeConfiguration(configJson);
 
