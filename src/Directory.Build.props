@@ -3,7 +3,7 @@
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <LangVersion>latest</LangVersion>
+    <LangVersion>8.0</LangVersion>
     <Prefer32Bit>false</Prefer32Bit>
     <DefaultItemExcludes>$(DefaultItemExcludes);*.DotSettings;*.ncrunchproject</DefaultItemExcludes>
     <DebugType>embedded</DebugType>
@@ -21,6 +21,7 @@
     <Copyright>Copyright © ABC arbitrage 2017-2020</Copyright>
     <PackageTags>log;logging;zero-allocation</PackageTags>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(NCrunch)' == '1'">
@@ -28,8 +29,9 @@
     <EnableSourceControlManagerQueries>false</EnableSourceControlManagerQueries>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(TF_BUILD)' != ''">
-    <DeterministicSourcePaths>true</DeterministicSourcePaths>
+  <PropertyGroup>
+    <ContinuousIntegrationBuild Condition="'$(TF_BUILD)' != ''">true</ContinuousIntegrationBuild>
+    <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' != ''">true</ContinuousIntegrationBuild>
   </PropertyGroup>
 
   <ItemGroup>
