@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
-using Jil;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using ZeroLog.Config;
 
 namespace ZeroLog.Appenders
@@ -40,11 +41,22 @@ namespace ZeroLog.Appenders
                             .FirstOrDefault(x => x != null);
         }
 
-        private static object GetAppenderParameters(AppenderDefinition definition, Type appenderParameterType)
+        internal static object? GetAppenderParameters(AppenderDefinition definition, Type appenderParameterType)
         {
-            var appenderParameterJson = JSON.SerializeDynamic(definition.AppenderJsonConfig);
-            var appenderParameters = (object)JSON.Deserialize(appenderParameterJson, appenderParameterType);
-            return appenderParameters;
+            switch (definition.AppenderJsonConfig)
+            {
+                case null:
+                    return null;
+
+                case JObject jObject:
+                    var json = jObject.ToString(Formatting.None);
+                    return JsonConvert.DeserializeObject(json, appenderParameterType);
+
+                case object obj:
+                    return appenderParameterType.IsInstanceOfType(obj)
+                        ? obj
+                        : null;
+            }
         }
 
         private static Type? GetAppenderParameterType(Type? appenderType)

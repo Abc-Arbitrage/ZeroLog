@@ -35,6 +35,30 @@
                 </xs:restriction>
               </xs:simpleType>
             </xs:attribute>
+            <xs:attribute name="Warnings">
+              <xs:annotation>
+                <xs:documentation>Defines how warnings should be handled. Default value: Warnings</xs:documentation>
+              </xs:annotation>
+              <xs:simpleType>
+                <xs:restriction base="xs:string">
+                  <xs:enumeration value="Warnings">
+                    <xs:annotation>
+                      <xs:documentation>Emit build warnings (this is the default).</xs:documentation>
+                    </xs:annotation>
+                  </xs:enumeration>
+                  <xs:enumeration value="Ignore">
+                    <xs:annotation>
+                      <xs:documentation>Do not emit warnings.</xs:documentation>
+                    </xs:annotation>
+                  </xs:enumeration>
+                  <xs:enumeration value="Errors">
+                    <xs:annotation>
+                      <xs:documentation>Treat warnings as errors.</xs:documentation>
+                    </xs:annotation>
+                  </xs:enumeration>
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:attribute>
           </xs:complexType>
         </xs:element>
       </xs:all>
