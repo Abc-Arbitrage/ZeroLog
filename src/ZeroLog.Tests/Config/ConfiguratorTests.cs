@@ -1,10 +1,8 @@
 ﻿using System.Linq;
-using Jil;
 using NFluent;
 using NUnit.Framework;
 using ZeroLog.Appenders;
 using ZeroLog.Config;
-using ZeroLog.ConfigResolvers;
 
 namespace ZeroLog.Tests.Config
 {
@@ -14,8 +12,12 @@ namespace ZeroLog.Tests.Config
         [Test]
         public void should_load_configuration()
         {
-            var appenderA = new AppenderDefinition { Name = "A", AppenderTypeName = nameof(ConsoleAppender), AppenderJsonConfig = JSON.Serialize(new DefaultAppenderConfig{PrefixPattern = "[%level] @ %time - %logger: " })};
-            var appenderB = new AppenderDefinition { Name = "B", AppenderTypeName = nameof(DateAndSizeRollingFileAppender), AppenderJsonConfig = JSON.Serialize(new DateAndSizeRollingFileAppenderConfig { FilePathRoot = "totopath " }) };
+            var appenderAConfig = new DefaultAppenderConfig { PrefixPattern = "[%level] @ %time - %logger: " };
+            var appenderBConfig = new DateAndSizeRollingFileAppenderConfig { FilePathRoot = "totopath " };
+
+            var appenderA = new AppenderDefinition { Name = "A", AppenderTypeName = nameof(ConsoleAppender), AppenderJsonConfig = appenderAConfig };
+            var appenderB = new AppenderDefinition { Name = "B", AppenderTypeName = nameof(DateAndSizeRollingFileAppender), AppenderJsonConfig = appenderBConfig };
+
             var config = new ZeroLogJsonConfiguration
             {
                 LogEventBufferSize = 5,
@@ -24,13 +26,49 @@ namespace ZeroLog.Tests.Config
                 {
                     Level = Level.Warn,
                     LogEventPoolExhaustionStrategy = LogEventPoolExhaustionStrategy.DropLogMessage,
-                    AppenderReferences = new []{ "A" },
-  
+                    AppenderReferences = new[] { "A" },
                 },
                 Appenders = new[] { appenderA, appenderB },
-                Loggers = new[] {new LoggerDefinition{ Name = "Abc.Zebus", Level = Level.Debug, AppenderReferences = new []{ "B" } }}
+                Loggers = new[] { new LoggerDefinition { Name = "Abc.Zebus", Level = Level.Debug, AppenderReferences = new[] { "B" } } }
             };
-            var configJson = JSON.Serialize(config, Options.PrettyPrint);
+
+            var configJson = @"
+            {
+              ""LazyRegisterEnums"": false,
+              ""LogEventArgumentCapacity"": 32,
+              ""LogEventBufferSize"": 5,
+              ""LogEventQueueSize"": 7,
+              ""Appenders"": [{
+                ""AppenderJsonConfig"": {
+                  ""PrefixPattern"": ""[%level] @ %time - %logger: ""
+               },
+               ""AppenderTypeName"": ""ConsoleAppender"",
+               ""Name"": ""A""
+              }, {
+                ""AppenderJsonConfig"": {
+                   ""FilePathRoot"": ""totopath ""
+               },
+               ""AppenderTypeName"": ""DateAndSizeRollingFileAppender"",
+               ""Name"": ""B""
+              }],
+              ""Loggers"": [{
+                ""IncludeParentAppenders"": false,
+                ""AppenderReferences"": [""B""],
+                ""Level"": ""Debug"",
+                ""LogEventPoolExhaustionStrategy"": ""DropLogMessageAndNotifyAppenders"",
+                ""LogEventArgumentExhaustionStrategy"": ""TruncateMessage"",
+                ""Name"": ""Abc.Zebus""
+              }],
+              ""RootLogger"": {
+                ""IncludeParentAppenders"": false,
+                ""AppenderReferences"": [""A""],
+                ""Level"": ""Warn"",
+                ""LogEventPoolExhaustionStrategy"": ""DropLogMessage"",
+                ""LogEventArgumentExhaustionStrategy"": ""TruncateMessage"",
+                ""Name"": null
+              },
+              ""NullDisplayString"": null
+            }";
 
             var loadedConfig = JsonConfigurator.DeserializeConfiguration(configJson);
 
@@ -42,11 +80,18 @@ namespace ZeroLog.Tests.Config
 
             Check.That(loadedConfig.Appenders.Single(a => a.Name == "A").Name).Equals(appenderA.Name);
             Check.That(loadedConfig.Appenders.Single(a => a.Name == "A").AppenderTypeName).Equals(appenderA.AppenderTypeName);
-            Check.That(loadedConfig.Appenders.Single(a => a.Name == "A").AppenderJsonConfig).Equals(appenderA.AppenderJsonConfig);
 
             Check.That(loadedConfig.Appenders.Single(a => a.Name == "B").Name).Equals(appenderB.Name);
             Check.That(loadedConfig.Appenders.Single(a => a.Name == "B").AppenderTypeName).Equals(appenderB.AppenderTypeName);
-            Check.That(loadedConfig.Appenders.Single(a => a.Name == "B").AppenderJsonConfig).Equals(appenderB.AppenderJsonConfig);
+
+            var appenderALoadedConfig = (DefaultAppenderConfig)AppenderFactory.GetAppenderParameters(loadedConfig.Appenders.Single(a => a.Name == "A"), typeof(DefaultAppenderConfig));
+            Check.That(appenderALoadedConfig.PrefixPattern).IsEqualTo(appenderAConfig.PrefixPattern);
+
+            var appenderBLoadedConfig = (DateAndSizeRollingFileAppenderConfig)AppenderFactory.GetAppenderParameters(loadedConfig.Appenders.Single(a => a.Name == "B"), typeof(DateAndSizeRollingFileAppenderConfig));
+            Check.That(appenderBLoadedConfig.Extension).IsEqualTo(appenderBConfig.Extension);
+            Check.That(appenderBLoadedConfig.PrefixPattern).IsEqualTo(appenderBConfig.PrefixPattern);
+            Check.That(appenderBLoadedConfig.FilePathRoot).IsEqualTo(appenderBConfig.FilePathRoot);
+            Check.That(appenderBLoadedConfig.MaxFileSizeInBytes).IsEqualTo(appenderBConfig.MaxFileSizeInBytes);
         }
 
         [Test]
@@ -68,7 +113,7 @@ namespace ZeroLog.Tests.Config
                                     {
                                         ""Name"": ""B"",
                                         ""AppenderTypeName"": ""DateAndSizeRollingFileAppender"",
-                                        ""AppenderJsonConfig"": ""{\""FilePathRoot\"":\""totopath \""}""
+                                        ""AppenderJsonConfig"": {""FilePathRoot"":""totopath ""}
                                     }
                                     ],
 
@@ -87,6 +132,9 @@ namespace ZeroLog.Tests.Config
             Check.That(config.RootLogger.LogEventPoolExhaustionStrategy).Equals(LogEventPoolExhaustionStrategy.Default);
             Check.That(config.LogEventBufferSize).Equals(new ZeroLogJsonConfiguration().LogEventBufferSize);
             Check.That(config.LogEventQueueSize).Equals(new ZeroLogJsonConfiguration().LogEventQueueSize);
+
+            var appenderConfig = (DateAndSizeRollingFileAppenderConfig)AppenderFactory.GetAppenderParameters(config.Appenders[1], typeof(DateAndSizeRollingFileAppenderConfig));
+            Check.That(appenderConfig.FilePathRoot).IsEqualTo("totopath ");
         }
     }
 }

@@ -40,7 +40,7 @@ namespace ZeroLog.Appenders
                             .FirstOrDefault(x => x != null);
         }
 
-        private static object GetAppenderParameters(AppenderDefinition definition, Type appenderParameterType)
+        internal static object GetAppenderParameters(AppenderDefinition definition, Type appenderParameterType)
         {
             var appenderParameterJson = JSON.SerializeDynamic(definition.AppenderJsonConfig);
             var appenderParameters = (object)JSON.Deserialize(appenderParameterJson, appenderParameterType);
