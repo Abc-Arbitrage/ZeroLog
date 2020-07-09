@@ -14,12 +14,11 @@
     <PackageReference Include="BenchmarkDotNet" Version="0.12.0" />
     <PackageReference Include="ConsoleTables" Version="2.3.0" />
     <PackageReference Include="HdrHistogram" Version="2.5.0" />
-    <PackageReference Include="Fody" Version="6.0.5" PrivateAssets="all" />
-    <PackageReference Include="InlineIL.Fody" Version="1.3.4" PrivateAssets="all" />
+    <PackageReference Include="Fody" Version="6.2.0" PrivateAssets="all" />
+    <PackageReference Include="InlineIL.Fody" Version="1.4.2" PrivateAssets="all" />
     <PackageReference Include="log4net" Version="2.0.8" />
     <PackageReference Include="NLog" Version="4.6.8" />
     <PackageReference Include="System.Net.Sockets" Version="4.3.0" />
-    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
   </ItemGroup>
 
 </Project>
