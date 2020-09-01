@@ -21,7 +21,6 @@ namespace ZeroLog.Tests.Appenders
         [TestCase("foo %level bar %logger baz", "foo INFO bar TestLog baz")]
         [TestCase("%level %level", "INFO INFO")]
         [TestCase("%LEVEL", "INFO")]
-        [TestCase("%level", "INFO")]
         [TestCase("%{level}", "INFO")]
         [TestCase("%{ level  }", "INFO")]
         [TestCase("foo%{thread}bar", "foo42bar")]
@@ -33,6 +32,7 @@ namespace ZeroLog.Tests.Appenders
         [TestCase("%FOO", "%FOO")]
         [TestCase("%{foo}", "%{foo}")]
         [TestCase("%foo%bar", "%foo%bar")]
+        [TestCase("%foo%bar%thread%baz", "%foo%bar42%baz")]
         [TestCase("<%foo>%bar|", "<%foo>%bar|")]
         public void should_write_prefix(string pattern, string expectedResult)
         {

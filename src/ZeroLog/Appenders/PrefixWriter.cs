@@ -23,7 +23,7 @@ namespace ZeroLog.Appenders
 
         public PrefixWriter(string pattern)
         {
-            var parts = ParsePattern(pattern).ToList();
+            var parts = OptimizeParts(ParsePattern(pattern)).ToList();
             _strings = BuildStrings(parts, out var stringMap);
             _appendMethod = BuildAppendMethod(parts, stringMap);
         }
@@ -52,6 +52,32 @@ namespace ZeroLog.Appenders
 
             if (position < pattern.Length)
                 yield return new PatternPart(pattern.Substring(position, pattern.Length - position));
+        }
+
+        private static IEnumerable<PatternPart> OptimizeParts(IEnumerable<PatternPart> parts)
+        {
+            var currentString = string.Empty;
+
+            foreach (var part in parts)
+            {
+                if (part.Type == PatternPartType.String)
+                {
+                    currentString += part.Value;
+                }
+                else
+                {
+                    if (currentString.Length != 0)
+                    {
+                        yield return new PatternPart(currentString);
+                        currentString = string.Empty;
+                    }
+
+                    yield return part;
+                }
+            }
+
+            if (currentString.Length != 0)
+                yield return new PatternPart(currentString);
         }
 
         private static char[] BuildStrings(IEnumerable<PatternPart> parts, out Dictionary<string, (int offset, int length)> map)
