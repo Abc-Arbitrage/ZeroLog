@@ -30,38 +30,28 @@ namespace ZeroLog.Appenders
 
         private static IEnumerable<PatternPart> ParsePattern(string pattern)
         {
-            foreach (var part in Regex.Split(pattern, @"(%(?:date|time|thread|level|logger)\b)", RegexOptions.CultureInvariant | RegexOptions.IgnoreCase))
+            var position = 0;
+
+            foreach (Match? match in Regex.Matches(pattern, @"%(?:(?<part>\w+)|\{\s*(?<part>\w+)\s*\})", RegexOptions.CultureInvariant | RegexOptions.IgnoreCase))
             {
-                switch (part.ToLowerInvariant())
+                if (position < match!.Index)
+                    yield return new PatternPart(pattern.Substring(position, match.Index - position));
+
+                yield return match.Groups["part"].Value.ToLowerInvariant() switch
                 {
-                    case "":
-                        break;
+                    "date"   => new PatternPart(PatternPartType.Date),
+                    "time"   => new PatternPart(PatternPartType.Time),
+                    "thread" => new PatternPart(PatternPartType.Thread),
+                    "level"  => new PatternPart(PatternPartType.Level),
+                    "logger" => new PatternPart(PatternPartType.Logger),
+                    _        => new PatternPart(match.Value)
+                };
 
-                    case "%date":
-                        yield return new PatternPart(PatternPartType.Date);
-                        break;
-
-                    case "%time":
-                        yield return new PatternPart(PatternPartType.Time);
-                        break;
-
-                    case "%thread":
-                        yield return new PatternPart(PatternPartType.Thread);
-                        break;
-
-                    case "%level":
-                        yield return new PatternPart(PatternPartType.Level);
-                        break;
-
-                    case "%logger":
-                        yield return new PatternPart(PatternPartType.Logger);
-                        break;
-
-                    default:
-                        yield return new PatternPart(part);
-                        break;
-                }
+                position = match.Index + match.Length;
             }
+
+            if (position < pattern.Length)
+                yield return new PatternPart(pattern.Substring(position, pattern.Length - position));
         }
 
         private static char[] BuildStrings(IEnumerable<PatternPart> parts, out Dictionary<string, (int offset, int length)> map)
