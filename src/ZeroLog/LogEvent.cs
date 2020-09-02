@@ -16,6 +16,7 @@ namespace ZeroLog
         private const int _maxArgCapacity = byte.MaxValue;
         private string[] _strings;
         private IntPtr[] _argPointers;
+        private IntPtr[] _keyValuePointers;
         private Log _log;
         private LogEventArgumentExhaustionStrategy _argumentExhaustionStrategy;
 
@@ -23,12 +24,16 @@ namespace ZeroLog
         protected readonly byte* _endOfBuffer;
         protected byte* _dataPointer;
         private byte _argCount;
+        private byte _keyValueCount;
         private bool _isTruncated;
 
         public LogEvent(BufferSegment bufferSegment, int argCapacity)
         {
             argCapacity = Math.Min(argCapacity, _maxArgCapacity);
             _argPointers = new IntPtr[argCapacity];
+            // Key value pairs consume two args, so we only can have x / 2 + 1 of them. The plus one is needed in case the last arg is a key
+            // because we ran out of _argPointers).
+            _keyValuePointers = new IntPtr[argCapacity / 2 + 1];
             _strings = new string[argCapacity];
 
             _startOfBuffer = bufferSegment.Data;
@@ -50,6 +55,7 @@ namespace ZeroLog
             Level = level;
             _log = log;
             _argCount = 0;
+            _keyValueCount = 0;
             _dataPointer = _startOfBuffer;
             _isTruncated = false;
             _argumentExhaustionStrategy = argumentExhaustionStrategy;
@@ -93,6 +99,18 @@ namespace ZeroLog
             AppendArgumentType(ArgumentType.String);
             AppendString(s);
             return this;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ILogEvent AppendKeyValue(string key, string? value)
+        {
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte)))
+                return this;
+
+            AppendArgumentType(ArgumentType.KeyString);
+            AppendString(key);
+
+            return Append(value);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -284,13 +302,141 @@ namespace ZeroLog
 
             while (dataPointer < endOfData)
             {
-                stringBuffer.Append(ref dataPointer, StringView.Empty, _strings, _argPointers, _argCount);
+                if (!ConsumeKeyValue(ref dataPointer, _keyValuePointers, ref _keyValueCount, endOfData))
+                    stringBuffer.Append(ref dataPointer, StringView.Empty, _strings, _argPointers, _argCount);
             }
 
             Debug.Assert(dataPointer == endOfData, "Buffer over-read");
 
+            if (_keyValueCount > 0)
+                WriteJsonToStringBuffer(stringBuffer);
+
             if (_isTruncated)
                 stringBuffer.Append(LogManager.Config.TruncatedMessageSuffix);
+        }
+
+        private static bool ConsumeKeyValue(ref byte* dataPointer, IntPtr[] keyValuePointers, ref byte keyValueCount, byte* endOfData)
+        {
+            var argumentType = (ArgumentType)(*dataPointer & ArgumentTypeMask.ArgumentType);
+
+            if (argumentType != ArgumentType.KeyString) return false;
+
+            // If the last item in the data is a key, that means there we ran out of space and couldn't include the value.
+            // In this case, skip the key, and don't use it to build JSON later.
+            if (dataPointer + sizeof(ArgumentType) + sizeof(byte) == endOfData)
+            {
+                SkipCurrentArgument(ref dataPointer);
+                return true;
+            }
+
+            // Save a pointer to the key for later when we append the Key/Value JSON.
+            keyValuePointers[keyValueCount++] = new IntPtr(dataPointer);
+
+            // Skip the key.
+            SkipCurrentArgument(ref dataPointer);
+
+            // Skip the value.
+            SkipCurrentArgument(ref dataPointer);
+
+            return true;
+        }
+
+        private static void SkipCurrentArgument(ref byte* dataPointer)
+        {
+            var argumentType = (ArgumentType)(*dataPointer & ArgumentTypeMask.ArgumentType);
+            dataPointer += sizeof(ArgumentType);
+            switch (argumentType)
+            {
+                case ArgumentType.String:
+                case ArgumentType.KeyString:
+                case ArgumentType.Byte:
+                    dataPointer += sizeof(byte);
+                    break;
+
+                case ArgumentType.AsciiString:
+                    var length = *(int*)dataPointer;
+                    dataPointer += sizeof(int) + length;
+                    break;
+
+                case ArgumentType.Boolean:
+                    dataPointer += sizeof(bool);
+                    break;
+
+                case ArgumentType.Char:
+                    dataPointer += sizeof(char);
+                    break;
+
+                case ArgumentType.Int16:
+                    dataPointer += sizeof(short);
+                    break;
+
+                case ArgumentType.Int32:
+                    dataPointer += sizeof(int);
+                    break;
+
+                case ArgumentType.Int64:
+                    dataPointer += sizeof(long);
+                    break;
+
+                case ArgumentType.Single:
+                    dataPointer += sizeof(float);
+                    break;
+
+                case ArgumentType.Double:
+                    dataPointer += sizeof(double);
+                    break;
+
+                case ArgumentType.Decimal:
+                    dataPointer += sizeof(decimal);
+                    break;
+
+                case ArgumentType.Guid:
+                    dataPointer += sizeof(Guid);
+                    break;
+
+                case ArgumentType.DateTime:
+                    dataPointer += sizeof(DateTime);
+                    break;
+
+                case ArgumentType.TimeSpan:
+                    dataPointer += sizeof(TimeSpan);
+                    break;
+
+                case ArgumentType.Enum:
+                    dataPointer += sizeof(EnumArg);
+                    break;
+
+                case ArgumentType.Null:
+                    break;
+                case ArgumentType.FormatString:
+                case ArgumentType.Unmanaged:
+                    throw new NotSupportedException($"Type is not supported {argumentType}");
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        private void WriteJsonToStringBuffer(StringBuffer stringBuffer)
+        {
+            stringBuffer.Append(" ~~ { ");
+            for (byte i = 0; i < _keyValueCount; i++)
+            {
+                var argPointer = (byte*)_keyValuePointers[i].ToPointer();
+                var dataPointer = argPointer;
+
+                // Key.
+                AppendJsonValue(stringBuffer, ref dataPointer);
+
+                stringBuffer.Append(": ");
+
+                // Value.
+                AppendJsonValue(stringBuffer, ref dataPointer);
+
+                if (i != _keyValueCount - 1)
+                    stringBuffer.Append(", ");
+            }
+
+            stringBuffer.Append(" }");
         }
 
         public void WriteToStringBufferUnformatted(StringBuffer stringBuffer)
@@ -312,6 +458,44 @@ namespace ZeroLog
                 stringBuffer.Append(LogManager.Config.TruncatedMessageSuffix);
         }
 
+        private void AppendJsonValue(StringBuffer stringBuffer, ref byte* dataPointer)
+        {
+            var argument = *dataPointer;
+            dataPointer += sizeof(ArgumentType);
+
+            var argumentType = (ArgumentType)(argument & ArgumentTypeMask.ArgumentType);
+
+            switch (argumentType)
+            {
+                case ArgumentType.KeyString:
+                    AppendUnformattedArgumentValue(stringBuffer, ArgumentType.String, ref dataPointer);
+                    break;
+                case ArgumentType.Guid:
+                case ArgumentType.DateTime:
+                case ArgumentType.TimeSpan:
+                    stringBuffer.Append('"');
+                    AppendUnformattedArgumentValue(stringBuffer, argumentType, ref dataPointer);
+                    stringBuffer.Append('"');
+                    break;
+                case ArgumentType.Char:
+                    stringBuffer.Append('"');
+                    stringBuffer.Append(*(char*)dataPointer);
+                    stringBuffer.Append('"');
+                    dataPointer += sizeof(char);
+                    break;
+                case ArgumentType.Boolean:
+                    stringBuffer.Append(*(bool*)dataPointer ? "\"true\"" : "\"false\"");
+                    dataPointer += sizeof(bool);
+                    break;
+                case ArgumentType.Null:
+                    stringBuffer.Append("\"null\"");
+                    break;
+                default:
+                    AppendUnformattedArgumentValue(stringBuffer, argumentType, ref dataPointer);
+                    break;
+            }
+        }
+
         private void AppendArgumentToStringBufferUnformatted(StringBuffer stringBuffer, ref byte* dataPointer)
         {
             var argument = *dataPointer;
@@ -323,6 +507,11 @@ namespace ZeroLog
             if (hasFormatSpecifier)
                 dataPointer += sizeof(byte); // Skip it
 
+            AppendUnformattedArgumentValue(stringBuffer, argumentType, ref dataPointer);
+        }
+
+        private void AppendUnformattedArgumentValue(StringBuffer stringBuffer, ArgumentType argumentType, ref byte* dataPointer)
+        {
             switch (argumentType)
             {
                 case ArgumentType.String:
@@ -449,6 +638,7 @@ namespace ZeroLog
                 {
                     Array.Resize(ref _argPointers, newCapacity);
                     Array.Resize(ref _strings, newCapacity);
+                    Array.Resize(ref _keyValuePointers, newCapacity / 2 + 1);
                     return true;
                 }
             }

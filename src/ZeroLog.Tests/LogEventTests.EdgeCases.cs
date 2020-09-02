@@ -40,7 +40,9 @@ namespace ZeroLog.Tests
         }
 
         [Test]
-        public void should_ignore_ascii_string_if_buffer_is_not_large_enough_for_header([Range(_bufferSize - 2 * _asciiHeaderSize, _bufferSize)] int firstStringLength)
+        public void should_ignore_ascii_string_if_buffer_is_not_large_enough_for_header(
+            [Range(_bufferSize - 2 * _asciiHeaderSize, _bufferSize)]
+            int firstStringLength)
         {
             var largeString1 = new string('a', firstStringLength);
             var asciiBytes1 = Encoding.ASCII.GetBytes(largeString1);
@@ -207,6 +209,18 @@ namespace ZeroLog.Tests
         {
             FillBufferWithWhiteSpaces();
             _logEvent.Append(new TimeSpan(1, 2, 3, 4, 5));
+            _logEvent.WriteToStringBuffer(_output);
+
+            Check.That(string.IsNullOrWhiteSpace(_output.ToString()));
+        }
+
+        [Test]
+        public void should_ignore_append_key_values_if_buffer_is_full()
+        {
+            FillBufferWithWhiteSpaces();
+            _logEvent.AppendKeyValue("key1", (string)null)
+                     .AppendKeyValue("key2", "val2")
+                     .AppendKeyValue("key3", 3);
             _logEvent.WriteToStringBuffer(_output);
 
             Check.That(string.IsNullOrWhiteSpace(_output.ToString()));

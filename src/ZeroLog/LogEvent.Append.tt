@@ -43,6 +43,8 @@ namespace ZeroLog
 #>
         ILogEvent Append(<#= type.name #> value);
         ILogEvent Append(<#= type.name #>? value);
+        ILogEvent AppendKeyValue(string key, <#= type.name #> value);
+        ILogEvent AppendKeyValue(string key, <#= type.name #>? value);
 <#
         if (type.isFormattable)
         {
@@ -121,6 +123,30 @@ namespace ZeroLog
             return this;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ILogEvent AppendKeyValue(string key, <#= type.name #> value)
+        {
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte)))
+                return this;
+
+            AppendArgumentType(ArgumentType.KeyString);
+            AppendString(key);
+
+            return Append(value);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ILogEvent AppendKeyValue(string key, <#= type.name #>? value)
+        {
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte)))
+                return this;
+
+            AppendArgumentType(ArgumentType.KeyString);
+            AppendString(key);
+
+            return Append(value);
+        }
+
 <#
         if (type.isFormattable)
         {
@@ -172,6 +198,8 @@ namespace ZeroLog
 #>
         public ILogEvent Append(<#= type.name #> value) => this;
         public ILogEvent Append(<#= type.name #>? value) => this;
+        public ILogEvent AppendKeyValue(string key, <#= type.name #> value) => this;
+        public ILogEvent AppendKeyValue(string key, <#= type.name #>? value) => this;
 <#
         if (type.isFormattable)
         {
@@ -192,6 +220,8 @@ namespace ZeroLog
 #>
         public ILogEvent Append(<#= type.name #> value) => this;
         public ILogEvent Append(<#= type.name #>? value) => this;
+        public ILogEvent AppendKeyValue(string key, <#= type.name #> value) => this;
+        public ILogEvent AppendKeyValue(string key, <#= type.name #>? value) => this;
 <#
         if (type.isFormattable)
         {

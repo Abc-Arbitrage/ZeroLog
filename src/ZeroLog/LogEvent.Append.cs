@@ -16,46 +16,70 @@ namespace ZeroLog
     {
         ILogEvent Append(bool value);
         ILogEvent Append(bool? value);
+        ILogEvent AppendKeyValue(string key, bool value);
+        ILogEvent AppendKeyValue(string key, bool? value);
         ILogEvent Append(byte value);
         ILogEvent Append(byte? value);
+        ILogEvent AppendKeyValue(string key, byte value);
+        ILogEvent AppendKeyValue(string key, byte? value);
         ILogEvent Append(byte value, string format);
         ILogEvent Append(byte? value, string format);
         ILogEvent Append(char value);
         ILogEvent Append(char? value);
+        ILogEvent AppendKeyValue(string key, char value);
+        ILogEvent AppendKeyValue(string key, char? value);
         ILogEvent Append(short value);
         ILogEvent Append(short? value);
+        ILogEvent AppendKeyValue(string key, short value);
+        ILogEvent AppendKeyValue(string key, short? value);
         ILogEvent Append(short value, string format);
         ILogEvent Append(short? value, string format);
         ILogEvent Append(int value);
         ILogEvent Append(int? value);
+        ILogEvent AppendKeyValue(string key, int value);
+        ILogEvent AppendKeyValue(string key, int? value);
         ILogEvent Append(int value, string format);
         ILogEvent Append(int? value, string format);
         ILogEvent Append(long value);
         ILogEvent Append(long? value);
+        ILogEvent AppendKeyValue(string key, long value);
+        ILogEvent AppendKeyValue(string key, long? value);
         ILogEvent Append(long value, string format);
         ILogEvent Append(long? value, string format);
         ILogEvent Append(float value);
         ILogEvent Append(float? value);
+        ILogEvent AppendKeyValue(string key, float value);
+        ILogEvent AppendKeyValue(string key, float? value);
         ILogEvent Append(float value, string format);
         ILogEvent Append(float? value, string format);
         ILogEvent Append(double value);
         ILogEvent Append(double? value);
+        ILogEvent AppendKeyValue(string key, double value);
+        ILogEvent AppendKeyValue(string key, double? value);
         ILogEvent Append(double value, string format);
         ILogEvent Append(double? value, string format);
         ILogEvent Append(decimal value);
         ILogEvent Append(decimal? value);
+        ILogEvent AppendKeyValue(string key, decimal value);
+        ILogEvent AppendKeyValue(string key, decimal? value);
         ILogEvent Append(decimal value, string format);
         ILogEvent Append(decimal? value, string format);
         ILogEvent Append(Guid value);
         ILogEvent Append(Guid? value);
+        ILogEvent AppendKeyValue(string key, Guid value);
+        ILogEvent AppendKeyValue(string key, Guid? value);
         ILogEvent Append(Guid value, string format);
         ILogEvent Append(Guid? value, string format);
         ILogEvent Append(DateTime value);
         ILogEvent Append(DateTime? value);
+        ILogEvent AppendKeyValue(string key, DateTime value);
+        ILogEvent AppendKeyValue(string key, DateTime? value);
         ILogEvent Append(DateTime value, string format);
         ILogEvent Append(DateTime? value, string format);
         ILogEvent Append(TimeSpan value);
         ILogEvent Append(TimeSpan? value);
+        ILogEvent AppendKeyValue(string key, TimeSpan value);
+        ILogEvent AppendKeyValue(string key, TimeSpan? value);
         ILogEvent Append(TimeSpan value, string format);
         ILogEvent Append(TimeSpan? value, string format);
     }
@@ -160,6 +184,30 @@ namespace ZeroLog
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ILogEvent AppendKeyValue(string key, bool value)
+        {
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte)))
+                return this;
+
+            AppendArgumentType(ArgumentType.KeyString);
+            AppendString(key);
+
+            return Append(value);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ILogEvent AppendKeyValue(string key, bool? value)
+        {
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte)))
+                return this;
+
+            AppendArgumentType(ArgumentType.KeyString);
+            AppendString(key);
+
+            return Append(value);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent Append(byte value)
         {
             if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte)))
@@ -187,6 +235,30 @@ namespace ZeroLog
             *(byte*)_dataPointer = value.GetValueOrDefault();
             _dataPointer += sizeof(byte);
             return this;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ILogEvent AppendKeyValue(string key, byte value)
+        {
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte)))
+                return this;
+
+            AppendArgumentType(ArgumentType.KeyString);
+            AppendString(key);
+
+            return Append(value);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ILogEvent AppendKeyValue(string key, byte? value)
+        {
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte)))
+                return this;
+
+            AppendArgumentType(ArgumentType.KeyString);
+            AppendString(key);
+
+            return Append(value);
         }
 
 
@@ -253,6 +325,30 @@ namespace ZeroLog
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ILogEvent AppendKeyValue(string key, char value)
+        {
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte)))
+                return this;
+
+            AppendArgumentType(ArgumentType.KeyString);
+            AppendString(key);
+
+            return Append(value);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ILogEvent AppendKeyValue(string key, char? value)
+        {
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte)))
+                return this;
+
+            AppendArgumentType(ArgumentType.KeyString);
+            AppendString(key);
+
+            return Append(value);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent Append(short value)
         {
             if (!PrepareAppend(sizeof(ArgumentType) + sizeof(short)))
@@ -280,6 +376,30 @@ namespace ZeroLog
             *(short*)_dataPointer = value.GetValueOrDefault();
             _dataPointer += sizeof(short);
             return this;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ILogEvent AppendKeyValue(string key, short value)
+        {
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte)))
+                return this;
+
+            AppendArgumentType(ArgumentType.KeyString);
+            AppendString(key);
+
+            return Append(value);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ILogEvent AppendKeyValue(string key, short? value)
+        {
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte)))
+                return this;
+
+            AppendArgumentType(ArgumentType.KeyString);
+            AppendString(key);
+
+            return Append(value);
         }
 
 
@@ -345,6 +465,30 @@ namespace ZeroLog
             return this;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ILogEvent AppendKeyValue(string key, int value)
+        {
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte)))
+                return this;
+
+            AppendArgumentType(ArgumentType.KeyString);
+            AppendString(key);
+
+            return Append(value);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ILogEvent AppendKeyValue(string key, int? value)
+        {
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte)))
+                return this;
+
+            AppendArgumentType(ArgumentType.KeyString);
+            AppendString(key);
+
+            return Append(value);
+        }
+
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent Append(int value, string format)
@@ -406,6 +550,30 @@ namespace ZeroLog
             *(long*)_dataPointer = value.GetValueOrDefault();
             _dataPointer += sizeof(long);
             return this;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ILogEvent AppendKeyValue(string key, long value)
+        {
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte)))
+                return this;
+
+            AppendArgumentType(ArgumentType.KeyString);
+            AppendString(key);
+
+            return Append(value);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ILogEvent AppendKeyValue(string key, long? value)
+        {
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte)))
+                return this;
+
+            AppendArgumentType(ArgumentType.KeyString);
+            AppendString(key);
+
+            return Append(value);
         }
 
 
@@ -471,6 +639,30 @@ namespace ZeroLog
             return this;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ILogEvent AppendKeyValue(string key, float value)
+        {
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte)))
+                return this;
+
+            AppendArgumentType(ArgumentType.KeyString);
+            AppendString(key);
+
+            return Append(value);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ILogEvent AppendKeyValue(string key, float? value)
+        {
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte)))
+                return this;
+
+            AppendArgumentType(ArgumentType.KeyString);
+            AppendString(key);
+
+            return Append(value);
+        }
+
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent Append(float value, string format)
@@ -532,6 +724,30 @@ namespace ZeroLog
             *(double*)_dataPointer = value.GetValueOrDefault();
             _dataPointer += sizeof(double);
             return this;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ILogEvent AppendKeyValue(string key, double value)
+        {
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte)))
+                return this;
+
+            AppendArgumentType(ArgumentType.KeyString);
+            AppendString(key);
+
+            return Append(value);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ILogEvent AppendKeyValue(string key, double? value)
+        {
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte)))
+                return this;
+
+            AppendArgumentType(ArgumentType.KeyString);
+            AppendString(key);
+
+            return Append(value);
         }
 
 
@@ -597,6 +813,30 @@ namespace ZeroLog
             return this;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ILogEvent AppendKeyValue(string key, decimal value)
+        {
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte)))
+                return this;
+
+            AppendArgumentType(ArgumentType.KeyString);
+            AppendString(key);
+
+            return Append(value);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ILogEvent AppendKeyValue(string key, decimal? value)
+        {
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte)))
+                return this;
+
+            AppendArgumentType(ArgumentType.KeyString);
+            AppendString(key);
+
+            return Append(value);
+        }
+
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent Append(decimal value, string format)
@@ -658,6 +898,30 @@ namespace ZeroLog
             *(Guid*)_dataPointer = value.GetValueOrDefault();
             _dataPointer += sizeof(Guid);
             return this;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ILogEvent AppendKeyValue(string key, Guid value)
+        {
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte)))
+                return this;
+
+            AppendArgumentType(ArgumentType.KeyString);
+            AppendString(key);
+
+            return Append(value);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ILogEvent AppendKeyValue(string key, Guid? value)
+        {
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte)))
+                return this;
+
+            AppendArgumentType(ArgumentType.KeyString);
+            AppendString(key);
+
+            return Append(value);
         }
 
 
@@ -723,6 +987,30 @@ namespace ZeroLog
             return this;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ILogEvent AppendKeyValue(string key, DateTime value)
+        {
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte)))
+                return this;
+
+            AppendArgumentType(ArgumentType.KeyString);
+            AppendString(key);
+
+            return Append(value);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ILogEvent AppendKeyValue(string key, DateTime? value)
+        {
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte)))
+                return this;
+
+            AppendArgumentType(ArgumentType.KeyString);
+            AppendString(key);
+
+            return Append(value);
+        }
+
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent Append(DateTime value, string format)
@@ -786,6 +1074,30 @@ namespace ZeroLog
             return this;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ILogEvent AppendKeyValue(string key, TimeSpan value)
+        {
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte)))
+                return this;
+
+            AppendArgumentType(ArgumentType.KeyString);
+            AppendString(key);
+
+            return Append(value);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ILogEvent AppendKeyValue(string key, TimeSpan? value)
+        {
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte)))
+                return this;
+
+            AppendArgumentType(ArgumentType.KeyString);
+            AppendString(key);
+
+            return Append(value);
+        }
+
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent Append(TimeSpan value, string format)
@@ -825,46 +1137,70 @@ namespace ZeroLog
     {
         public ILogEvent Append(bool value) => this;
         public ILogEvent Append(bool? value) => this;
+        public ILogEvent AppendKeyValue(string key, bool value) => this;
+        public ILogEvent AppendKeyValue(string key, bool? value) => this;
         public ILogEvent Append(byte value) => this;
         public ILogEvent Append(byte? value) => this;
+        public ILogEvent AppendKeyValue(string key, byte value) => this;
+        public ILogEvent AppendKeyValue(string key, byte? value) => this;
         public ILogEvent Append(byte value, string format) => this;
         public ILogEvent Append(byte? value, string format) => this;
         public ILogEvent Append(char value) => this;
         public ILogEvent Append(char? value) => this;
+        public ILogEvent AppendKeyValue(string key, char value) => this;
+        public ILogEvent AppendKeyValue(string key, char? value) => this;
         public ILogEvent Append(short value) => this;
         public ILogEvent Append(short? value) => this;
+        public ILogEvent AppendKeyValue(string key, short value) => this;
+        public ILogEvent AppendKeyValue(string key, short? value) => this;
         public ILogEvent Append(short value, string format) => this;
         public ILogEvent Append(short? value, string format) => this;
         public ILogEvent Append(int value) => this;
         public ILogEvent Append(int? value) => this;
+        public ILogEvent AppendKeyValue(string key, int value) => this;
+        public ILogEvent AppendKeyValue(string key, int? value) => this;
         public ILogEvent Append(int value, string format) => this;
         public ILogEvent Append(int? value, string format) => this;
         public ILogEvent Append(long value) => this;
         public ILogEvent Append(long? value) => this;
+        public ILogEvent AppendKeyValue(string key, long value) => this;
+        public ILogEvent AppendKeyValue(string key, long? value) => this;
         public ILogEvent Append(long value, string format) => this;
         public ILogEvent Append(long? value, string format) => this;
         public ILogEvent Append(float value) => this;
         public ILogEvent Append(float? value) => this;
+        public ILogEvent AppendKeyValue(string key, float value) => this;
+        public ILogEvent AppendKeyValue(string key, float? value) => this;
         public ILogEvent Append(float value, string format) => this;
         public ILogEvent Append(float? value, string format) => this;
         public ILogEvent Append(double value) => this;
         public ILogEvent Append(double? value) => this;
+        public ILogEvent AppendKeyValue(string key, double value) => this;
+        public ILogEvent AppendKeyValue(string key, double? value) => this;
         public ILogEvent Append(double value, string format) => this;
         public ILogEvent Append(double? value, string format) => this;
         public ILogEvent Append(decimal value) => this;
         public ILogEvent Append(decimal? value) => this;
+        public ILogEvent AppendKeyValue(string key, decimal value) => this;
+        public ILogEvent AppendKeyValue(string key, decimal? value) => this;
         public ILogEvent Append(decimal value, string format) => this;
         public ILogEvent Append(decimal? value, string format) => this;
         public ILogEvent Append(Guid value) => this;
         public ILogEvent Append(Guid? value) => this;
+        public ILogEvent AppendKeyValue(string key, Guid value) => this;
+        public ILogEvent AppendKeyValue(string key, Guid? value) => this;
         public ILogEvent Append(Guid value, string format) => this;
         public ILogEvent Append(Guid? value, string format) => this;
         public ILogEvent Append(DateTime value) => this;
         public ILogEvent Append(DateTime? value) => this;
+        public ILogEvent AppendKeyValue(string key, DateTime value) => this;
+        public ILogEvent AppendKeyValue(string key, DateTime? value) => this;
         public ILogEvent Append(DateTime value, string format) => this;
         public ILogEvent Append(DateTime? value, string format) => this;
         public ILogEvent Append(TimeSpan value) => this;
         public ILogEvent Append(TimeSpan? value) => this;
+        public ILogEvent AppendKeyValue(string key, TimeSpan value) => this;
+        public ILogEvent AppendKeyValue(string key, TimeSpan? value) => this;
         public ILogEvent Append(TimeSpan value, string format) => this;
         public ILogEvent Append(TimeSpan? value, string format) => this;
     }
@@ -873,46 +1209,70 @@ namespace ZeroLog
     {
         public ILogEvent Append(bool value) => this;
         public ILogEvent Append(bool? value) => this;
+        public ILogEvent AppendKeyValue(string key, bool value) => this;
+        public ILogEvent AppendKeyValue(string key, bool? value) => this;
         public ILogEvent Append(byte value) => this;
         public ILogEvent Append(byte? value) => this;
+        public ILogEvent AppendKeyValue(string key, byte value) => this;
+        public ILogEvent AppendKeyValue(string key, byte? value) => this;
         public ILogEvent Append(byte value, string format) => this;
         public ILogEvent Append(byte? value, string format) => this;
         public ILogEvent Append(char value) => this;
         public ILogEvent Append(char? value) => this;
+        public ILogEvent AppendKeyValue(string key, char value) => this;
+        public ILogEvent AppendKeyValue(string key, char? value) => this;
         public ILogEvent Append(short value) => this;
         public ILogEvent Append(short? value) => this;
+        public ILogEvent AppendKeyValue(string key, short value) => this;
+        public ILogEvent AppendKeyValue(string key, short? value) => this;
         public ILogEvent Append(short value, string format) => this;
         public ILogEvent Append(short? value, string format) => this;
         public ILogEvent Append(int value) => this;
         public ILogEvent Append(int? value) => this;
+        public ILogEvent AppendKeyValue(string key, int value) => this;
+        public ILogEvent AppendKeyValue(string key, int? value) => this;
         public ILogEvent Append(int value, string format) => this;
         public ILogEvent Append(int? value, string format) => this;
         public ILogEvent Append(long value) => this;
         public ILogEvent Append(long? value) => this;
+        public ILogEvent AppendKeyValue(string key, long value) => this;
+        public ILogEvent AppendKeyValue(string key, long? value) => this;
         public ILogEvent Append(long value, string format) => this;
         public ILogEvent Append(long? value, string format) => this;
         public ILogEvent Append(float value) => this;
         public ILogEvent Append(float? value) => this;
+        public ILogEvent AppendKeyValue(string key, float value) => this;
+        public ILogEvent AppendKeyValue(string key, float? value) => this;
         public ILogEvent Append(float value, string format) => this;
         public ILogEvent Append(float? value, string format) => this;
         public ILogEvent Append(double value) => this;
         public ILogEvent Append(double? value) => this;
+        public ILogEvent AppendKeyValue(string key, double value) => this;
+        public ILogEvent AppendKeyValue(string key, double? value) => this;
         public ILogEvent Append(double value, string format) => this;
         public ILogEvent Append(double? value, string format) => this;
         public ILogEvent Append(decimal value) => this;
         public ILogEvent Append(decimal? value) => this;
+        public ILogEvent AppendKeyValue(string key, decimal value) => this;
+        public ILogEvent AppendKeyValue(string key, decimal? value) => this;
         public ILogEvent Append(decimal value, string format) => this;
         public ILogEvent Append(decimal? value, string format) => this;
         public ILogEvent Append(Guid value) => this;
         public ILogEvent Append(Guid? value) => this;
+        public ILogEvent AppendKeyValue(string key, Guid value) => this;
+        public ILogEvent AppendKeyValue(string key, Guid? value) => this;
         public ILogEvent Append(Guid value, string format) => this;
         public ILogEvent Append(Guid? value, string format) => this;
         public ILogEvent Append(DateTime value) => this;
         public ILogEvent Append(DateTime? value) => this;
+        public ILogEvent AppendKeyValue(string key, DateTime value) => this;
+        public ILogEvent AppendKeyValue(string key, DateTime? value) => this;
         public ILogEvent Append(DateTime value, string format) => this;
         public ILogEvent Append(DateTime? value, string format) => this;
         public ILogEvent Append(TimeSpan value) => this;
         public ILogEvent Append(TimeSpan? value) => this;
+        public ILogEvent AppendKeyValue(string key, TimeSpan value) => this;
+        public ILogEvent AppendKeyValue(string key, TimeSpan? value) => this;
         public ILogEvent Append(TimeSpan value, string format) => this;
         public ILogEvent Append(TimeSpan? value, string format) => this;
     }

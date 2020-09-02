@@ -19,6 +19,8 @@ namespace ZeroLog
         ILogEvent AppendEnum<T>(T? value)
             where T : struct, Enum;
 
+        ILogEvent AppendKeyValue(string key, string? value);
+
         void Log();
     }
 }
