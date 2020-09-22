@@ -127,6 +127,7 @@ namespace ZeroLog.Appenders
         {
             CurrentFileName = GetCurrentFileName();
             _stream = OpenFile(CurrentFileName);
+            FileOpened(_stream);
             _fileSize = _stream.Length;
         }
 
@@ -136,10 +137,27 @@ namespace ZeroLog.Appenders
             if (stream == null)
                 return;
 
+            FileClosing(stream);
             Flush();
+
             _stream = null;
             _fileSize = 0;
             stream.Dispose();
+        }
+
+        /// <summary>
+        /// Called after a file is opened. You may use this to write a header.
+        /// </summary>
+        protected virtual void FileOpened(Stream stream)
+        {
+            // Unfortunately, this cannot be an event as the file is opened by the constructor :(
+        }
+
+        /// <summary>
+        /// Called before a file is closed. You may use this to write a footer.
+        /// </summary>
+        protected virtual void FileClosing(Stream stream)
+        {
         }
 
         /// <summary>
