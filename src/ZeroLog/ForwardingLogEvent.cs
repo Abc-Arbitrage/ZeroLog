@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text.Formatting;
 using JetBrains.Annotations;
 using ZeroLog.Appenders;
@@ -58,7 +59,7 @@ namespace ZeroLog
             _log.Enqueue(_logEventToAppend);
         }
 
-        public void WriteToStringBuffer(StringBuffer stringBuffer)
+        public void WriteToStringBuffer(StringBuffer stringBuffer, IList<IntPtr>? keyValuePtrList)
         {
         }
 

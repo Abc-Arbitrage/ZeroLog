@@ -34,7 +34,7 @@ namespace ZeroLog.Tests
             var asciiBytes = Encoding.ASCII.GetBytes(largeString);
 
             _logEvent.AppendAsciiString(asciiBytes, asciiBytes.Length);
-            _logEvent.WriteToStringBuffer(_output);
+            _logEvent.WriteToStringBuffer(_output, null);
 
             Check.That(_output.ToString().Length).Equals(_bufferSize - _asciiHeaderSize + LogManager.Config.TruncatedMessageSuffix.Length);
         }
@@ -52,7 +52,7 @@ namespace ZeroLog.Tests
             var asciiBytes2 = Encoding.ASCII.GetBytes(largeString2);
             _logEvent.AppendAsciiString(asciiBytes2, asciiBytes2.Length);
 
-            _logEvent.WriteToStringBuffer(_output);
+            _logEvent.WriteToStringBuffer(_output, null);
 
             var expectedTextLength = Math.Min(firstStringLength, _bufferSize - _asciiHeaderSize);
             Check.That(_output.ToString()).IsEqualTo(new string('a', expectedTextLength) + LogManager.Config.TruncatedMessageSuffix);
@@ -69,7 +69,7 @@ namespace ZeroLog.Tests
                 _logEvent.AppendAsciiString(pAsciiBytes, asciiBytes.Length);
             }
 
-            _logEvent.WriteToStringBuffer(_output);
+            _logEvent.WriteToStringBuffer(_output, null);
 
             Check.That(_output.ToString().Length).Equals(_bufferSize - _asciiHeaderSize + LogManager.Config.TruncatedMessageSuffix.Length);
         }
@@ -79,7 +79,7 @@ namespace ZeroLog.Tests
         {
             FillBufferWithWhiteSpaces();
             _logEvent.Append("abc");
-            _logEvent.WriteToStringBuffer(_output);
+            _logEvent.WriteToStringBuffer(_output, null);
 
             Check.That(string.IsNullOrWhiteSpace(_output.ToString()));
         }
@@ -89,7 +89,7 @@ namespace ZeroLog.Tests
         {
             FillBufferWithWhiteSpaces();
             _logEvent.Append(true);
-            _logEvent.WriteToStringBuffer(_output);
+            _logEvent.WriteToStringBuffer(_output, null);
 
             Check.That(string.IsNullOrWhiteSpace(_output.ToString()));
         }
@@ -99,7 +99,7 @@ namespace ZeroLog.Tests
         {
             FillBufferWithWhiteSpaces();
             _logEvent.Append(false);
-            _logEvent.WriteToStringBuffer(_output);
+            _logEvent.WriteToStringBuffer(_output, null);
 
             Check.That(string.IsNullOrWhiteSpace(_output.ToString()));
         }
@@ -109,7 +109,7 @@ namespace ZeroLog.Tests
         {
             FillBufferWithWhiteSpaces();
             _logEvent.Append((byte)255);
-            _logEvent.WriteToStringBuffer(_output);
+            _logEvent.WriteToStringBuffer(_output, null);
 
             Check.That(string.IsNullOrWhiteSpace(_output.ToString()));
         }
@@ -119,7 +119,7 @@ namespace ZeroLog.Tests
         {
             FillBufferWithWhiteSpaces();
             _logEvent.Append('€');
-            _logEvent.WriteToStringBuffer(_output);
+            _logEvent.WriteToStringBuffer(_output, null);
 
             Check.That(string.IsNullOrWhiteSpace(_output.ToString()));
         }
@@ -129,7 +129,7 @@ namespace ZeroLog.Tests
         {
             FillBufferWithWhiteSpaces();
             _logEvent.Append((short)4321);
-            _logEvent.WriteToStringBuffer(_output);
+            _logEvent.WriteToStringBuffer(_output, null);
 
             Check.That(string.IsNullOrWhiteSpace(_output.ToString()));
         }
@@ -139,7 +139,7 @@ namespace ZeroLog.Tests
         {
             FillBufferWithWhiteSpaces();
             _logEvent.Append(1234567890);
-            _logEvent.WriteToStringBuffer(_output);
+            _logEvent.WriteToStringBuffer(_output, null);
 
             Check.That(string.IsNullOrWhiteSpace(_output.ToString()));
         }
@@ -149,7 +149,7 @@ namespace ZeroLog.Tests
         {
             FillBufferWithWhiteSpaces();
             _logEvent.Append(1234567890123456789L);
-            _logEvent.WriteToStringBuffer(_output);
+            _logEvent.WriteToStringBuffer(_output, null);
 
             Check.That(string.IsNullOrWhiteSpace(_output.ToString()));
         }
@@ -159,7 +159,7 @@ namespace ZeroLog.Tests
         {
             FillBufferWithWhiteSpaces();
             _logEvent.Append(0.123f);
-            _logEvent.WriteToStringBuffer(_output);
+            _logEvent.WriteToStringBuffer(_output, null);
 
             Check.That(string.IsNullOrWhiteSpace(_output.ToString()));
         }
@@ -169,7 +169,7 @@ namespace ZeroLog.Tests
         {
             FillBufferWithWhiteSpaces();
             _logEvent.Append(0.123d);
-            _logEvent.WriteToStringBuffer(_output);
+            _logEvent.WriteToStringBuffer(_output, null);
 
             Check.That(string.IsNullOrWhiteSpace(_output.ToString()));
         }
@@ -179,7 +179,7 @@ namespace ZeroLog.Tests
         {
             FillBufferWithWhiteSpaces();
             _logEvent.Append(792281625142643.37593543950335m);
-            _logEvent.WriteToStringBuffer(_output);
+            _logEvent.WriteToStringBuffer(_output, null);
 
             Check.That(string.IsNullOrWhiteSpace(_output.ToString()));
         }
@@ -189,7 +189,7 @@ namespace ZeroLog.Tests
         {
             FillBufferWithWhiteSpaces();
             _logEvent.Append(new Guid("129ac124-e588-47e5-9d3d-fa3a4d174e29"));
-            _logEvent.WriteToStringBuffer(_output);
+            _logEvent.WriteToStringBuffer(_output, null);
 
             Check.That(string.IsNullOrWhiteSpace(_output.ToString()));
         }
@@ -199,7 +199,7 @@ namespace ZeroLog.Tests
         {
             FillBufferWithWhiteSpaces();
             _logEvent.Append(new DateTime(2017, 01, 12, 13, 14, 15));
-            _logEvent.WriteToStringBuffer(_output);
+            _logEvent.WriteToStringBuffer(_output, null);
 
             Check.That(string.IsNullOrWhiteSpace(_output.ToString()));
         }
@@ -209,7 +209,7 @@ namespace ZeroLog.Tests
         {
             FillBufferWithWhiteSpaces();
             _logEvent.Append(new TimeSpan(1, 2, 3, 4, 5));
-            _logEvent.WriteToStringBuffer(_output);
+            _logEvent.WriteToStringBuffer(_output, null);
 
             Check.That(string.IsNullOrWhiteSpace(_output.ToString()));
         }
@@ -221,7 +221,7 @@ namespace ZeroLog.Tests
             _logEvent.AppendKeyValue("key1", (string)null)
                      .AppendKeyValue("key2", "val2")
                      .AppendKeyValue("key3", 3);
-            _logEvent.WriteToStringBuffer(_output);
+            _logEvent.WriteToStringBuffer(_output, null);
 
             Check.That(string.IsNullOrWhiteSpace(_output.ToString()));
         }

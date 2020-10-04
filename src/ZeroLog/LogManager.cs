@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -33,6 +34,7 @@ namespace ZeroLog
 
         private bool _isRunning;
         private IAppender[] _appenders = Array.Empty<IAppender>();
+        private readonly List<IntPtr> _keyValuePointers = new List<IntPtr>(byte.MaxValue);
 
         public static ZeroLogConfig Config { get; } = new ZeroLogConfig();
 
@@ -324,10 +326,10 @@ namespace ZeroLog
             }
         }
 
-        private static void FormatLogMessage(StringBuffer stringBuffer, IInternalLogEvent logEvent)
+        private void FormatLogMessage(StringBuffer stringBuffer, IInternalLogEvent logEvent)
         {
             stringBuffer.Clear();
-            logEvent.WriteToStringBuffer(stringBuffer);
+            logEvent.WriteToStringBuffer(stringBuffer, _keyValuePointers);
         }
 
         private static unsafe int CopyStringBufferToByteArray(StringBuffer stringBuffer, byte[] destination)

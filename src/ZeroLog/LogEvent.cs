@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.Formatting;
 using System.Threading;
@@ -16,7 +18,6 @@ namespace ZeroLog
         private const int _maxArgCapacity = byte.MaxValue;
         private string[] _strings;
         private IntPtr[] _argPointers;
-        private IntPtr[] _keyValuePointers;
         private Log _log;
         private LogEventArgumentExhaustionStrategy _argumentExhaustionStrategy;
 
@@ -24,16 +25,12 @@ namespace ZeroLog
         protected readonly byte* _endOfBuffer;
         protected byte* _dataPointer;
         private byte _argCount;
-        private byte _keyValueCount;
         private bool _isTruncated;
 
         public LogEvent(BufferSegment bufferSegment, int argCapacity)
         {
             argCapacity = Math.Min(argCapacity, _maxArgCapacity);
             _argPointers = new IntPtr[argCapacity];
-            // Key value pairs consume two args, so we only can have x / 2 + 1 of them. The plus one is needed in case the last arg is a key
-            // because we ran out of _argPointers).
-            _keyValuePointers = new IntPtr[argCapacity / 2 + 1];
             _strings = new string[argCapacity];
 
             _startOfBuffer = bufferSegment.Data;
@@ -55,7 +52,6 @@ namespace ZeroLog
             Level = level;
             _log = log;
             _argCount = 0;
-            _keyValueCount = 0;
             _dataPointer = _startOfBuffer;
             _isTruncated = false;
             _argumentExhaustionStrategy = argumentExhaustionStrategy;
@@ -295,27 +291,36 @@ namespace ZeroLog
             _log.Enqueue(this);
         }
 
-        public void WriteToStringBuffer(StringBuffer stringBuffer)
+        public void WriteToStringBuffer(StringBuffer stringBuffer, IList<IntPtr>? keyValuePointers)
         {
+            if (keyValuePointers == null)
+            {
+                keyValuePointers = new List<IntPtr>();
+            }
+            else
+            {
+                keyValuePointers.Clear();
+            }
+
             var endOfData = _dataPointer;
             var dataPointer = _startOfBuffer;
 
             while (dataPointer < endOfData)
             {
-                if (!ConsumeKeyValue(ref dataPointer, _keyValuePointers, ref _keyValueCount, endOfData))
+                if (!ConsumeKeyValue(ref dataPointer, keyValuePointers, endOfData))
                     stringBuffer.Append(ref dataPointer, StringView.Empty, _strings, _argPointers, _argCount);
             }
 
             Debug.Assert(dataPointer == endOfData, "Buffer over-read");
 
-            if (_keyValueCount > 0)
-                WriteJsonToStringBuffer(stringBuffer);
+            if (keyValuePointers.Count > 0)
+                JsonWriter.WriteJsonToStringBuffer(stringBuffer, keyValuePointers, _strings);
 
             if (_isTruncated)
                 stringBuffer.Append(LogManager.Config.TruncatedMessageSuffix);
         }
 
-        private static bool ConsumeKeyValue(ref byte* dataPointer, IntPtr[] keyValuePointers, ref byte keyValueCount, byte* endOfData)
+        private static bool ConsumeKeyValue(ref byte* dataPointer, ICollection<IntPtr> keyValuePointers, byte* endOfData)
         {
             var argumentType = (ArgumentType)(*dataPointer & ArgumentTypeMask.ArgumentType);
 
@@ -330,7 +335,7 @@ namespace ZeroLog
             }
 
             // Save a pointer to the key for later when we append the Key/Value JSON.
-            keyValuePointers[keyValueCount++] = new IntPtr(dataPointer);
+            keyValuePointers.Add(new IntPtr(dataPointer));
 
             // Skip the key.
             SkipCurrentArgument(ref dataPointer);
@@ -416,29 +421,6 @@ namespace ZeroLog
             }
         }
 
-        private void WriteJsonToStringBuffer(StringBuffer stringBuffer)
-        {
-            stringBuffer.Append(" ~~ { ");
-            for (byte i = 0; i < _keyValueCount; i++)
-            {
-                var argPointer = (byte*)_keyValuePointers[i].ToPointer();
-                var dataPointer = argPointer;
-
-                // Key.
-                AppendJsonValue(stringBuffer, ref dataPointer);
-
-                stringBuffer.Append(": ");
-
-                // Value.
-                AppendJsonValue(stringBuffer, ref dataPointer);
-
-                if (i != _keyValueCount - 1)
-                    stringBuffer.Append(", ");
-            }
-
-            stringBuffer.Append(" }");
-        }
-
         public void WriteToStringBufferUnformatted(StringBuffer stringBuffer)
         {
             var endOfData = _dataPointer;
@@ -456,44 +438,6 @@ namespace ZeroLog
 
             if (_isTruncated)
                 stringBuffer.Append(LogManager.Config.TruncatedMessageSuffix);
-        }
-
-        private void AppendJsonValue(StringBuffer stringBuffer, ref byte* dataPointer)
-        {
-            var argument = *dataPointer;
-            dataPointer += sizeof(ArgumentType);
-
-            var argumentType = (ArgumentType)(argument & ArgumentTypeMask.ArgumentType);
-
-            switch (argumentType)
-            {
-                case ArgumentType.KeyString:
-                    AppendUnformattedArgumentValue(stringBuffer, ArgumentType.String, ref dataPointer);
-                    break;
-                case ArgumentType.Guid:
-                case ArgumentType.DateTime:
-                case ArgumentType.TimeSpan:
-                    stringBuffer.Append('"');
-                    AppendUnformattedArgumentValue(stringBuffer, argumentType, ref dataPointer);
-                    stringBuffer.Append('"');
-                    break;
-                case ArgumentType.Char:
-                    stringBuffer.Append('"');
-                    stringBuffer.Append(*(char*)dataPointer);
-                    stringBuffer.Append('"');
-                    dataPointer += sizeof(char);
-                    break;
-                case ArgumentType.Boolean:
-                    stringBuffer.Append(*(bool*)dataPointer ? "\"true\"" : "\"false\"");
-                    dataPointer += sizeof(bool);
-                    break;
-                case ArgumentType.Null:
-                    stringBuffer.Append("\"null\"");
-                    break;
-                default:
-                    AppendUnformattedArgumentValue(stringBuffer, argumentType, ref dataPointer);
-                    break;
-            }
         }
 
         private void AppendArgumentToStringBufferUnformatted(StringBuffer stringBuffer, ref byte* dataPointer)
@@ -592,18 +536,13 @@ namespace ZeroLog
                     dataPointer += sizeof(TimeSpan);
                     break;
 
-                case ArgumentType.FormatString:
-                    var formatStringIndex = *dataPointer;
-                    dataPointer += sizeof(byte) + sizeof(byte);
-                    stringBuffer.Append('"');
-                    stringBuffer.Append(_strings[formatStringIndex]);
-                    stringBuffer.Append('"');
-                    break;
-
+                // TODO(lmanners): Add full support for enums.
                 case ArgumentType.Enum:
                     var enumArg = (EnumArg*)dataPointer;
                     dataPointer += sizeof(EnumArg);
+                    stringBuffer.Append('"');
                     enumArg->AppendTo(stringBuffer);
+                    stringBuffer.Append('"');
                     break;
 
                 case ArgumentType.Unmanaged:
@@ -638,7 +577,6 @@ namespace ZeroLog
                 {
                     Array.Resize(ref _argPointers, newCapacity);
                     Array.Resize(ref _strings, newCapacity);
-                    Array.Resize(ref _keyValuePointers, newCapacity / 2 + 1);
                     return true;
                 }
             }

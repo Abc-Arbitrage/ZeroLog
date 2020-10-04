@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text.Formatting;
 using ZeroLog.Appenders;
 
@@ -53,7 +54,7 @@ namespace ZeroLog
         {
         }
 
-        public void WriteToStringBuffer(StringBuffer stringBuffer)
+        public void WriteToStringBuffer(StringBuffer stringBuffer, IList<IntPtr>? keyValuePtrList)
         {
         }
 
