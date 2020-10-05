@@ -329,6 +329,7 @@ namespace ZeroLog
         private void FormatLogMessage(StringBuffer stringBuffer, IInternalLogEvent logEvent)
         {
             stringBuffer.Clear();
+            _keyValuePointers.Clear();
             logEvent.WriteToStringBuffer(stringBuffer, _keyValuePointers);
         }
 

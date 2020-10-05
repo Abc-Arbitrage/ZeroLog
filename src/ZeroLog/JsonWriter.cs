@@ -62,15 +62,7 @@ namespace ZeroLog
                     dataPointer += sizeof(byte);
                     break;
 
-                case ArgumentType.AsciiString:
-                    var length = *(int*)dataPointer;
-                    dataPointer += sizeof(int);
-                    stringBuffer.Append('"');
-                    stringBuffer.Append(new AsciiString(dataPointer, length));
-                    stringBuffer.Append('"');
-                    dataPointer += length;
-                    break;
-
+                // TODO(lmanners): Support AsciiString?
                 case ArgumentType.Boolean:
                     stringBuffer.Append(*(bool*)dataPointer ? "true" : "false");
                     dataPointer += sizeof(bool);
@@ -140,11 +132,7 @@ namespace ZeroLog
                     dataPointer += sizeof(TimeSpan);
                     break;
 
-                case ArgumentType.Enum:
-                    var enumArg = (EnumArg*)dataPointer;
-                    dataPointer += sizeof(EnumArg);
-                    enumArg->AppendTo(stringBuffer);
-                    break;
+                // TODO(lmanners): Support enum
 
                 case ArgumentType.Null:
                     stringBuffer.Append("null");

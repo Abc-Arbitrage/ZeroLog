@@ -293,14 +293,7 @@ namespace ZeroLog
 
         public void WriteToStringBuffer(StringBuffer stringBuffer, IList<IntPtr>? keyValuePointers)
         {
-            if (keyValuePointers == null)
-            {
-                keyValuePointers = new List<IntPtr>();
-            }
-            else
-            {
-                keyValuePointers.Clear();
-            }
+            keyValuePointers ??= new List<IntPtr>();
 
             var endOfData = _dataPointer;
             var dataPointer = _startOfBuffer;
@@ -536,13 +529,18 @@ namespace ZeroLog
                     dataPointer += sizeof(TimeSpan);
                     break;
 
-                // TODO(lmanners): Add full support for enums.
+                case ArgumentType.FormatString:
+                    var formatStringIndex = *dataPointer;
+                    dataPointer += sizeof(byte) + sizeof(byte);
+                    stringBuffer.Append('"');
+                    stringBuffer.Append(_strings[formatStringIndex]);
+                    stringBuffer.Append('"');
+                    break;
+
                 case ArgumentType.Enum:
                     var enumArg = (EnumArg*)dataPointer;
                     dataPointer += sizeof(EnumArg);
-                    stringBuffer.Append('"');
                     enumArg->AppendTo(stringBuffer);
-                    stringBuffer.Append('"');
                     break;
 
                 case ArgumentType.Unmanaged:
