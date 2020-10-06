@@ -34,7 +34,7 @@ namespace ZeroLog
 
         private bool _isRunning;
         private IAppender[] _appenders = Array.Empty<IAppender>();
-        private readonly List<IntPtr> _keyValuePointers = new List<IntPtr>(byte.MaxValue);
+        private readonly KeyValuePointerBuffer _keyValuePointerBuffer = new KeyValuePointerBuffer();
 
         public static ZeroLogConfig Config { get; } = new ZeroLogConfig();
 
@@ -329,8 +329,8 @@ namespace ZeroLog
         private void FormatLogMessage(StringBuffer stringBuffer, IInternalLogEvent logEvent)
         {
             stringBuffer.Clear();
-            _keyValuePointers.Clear();
-            logEvent.WriteToStringBuffer(stringBuffer, _keyValuePointers);
+            _keyValuePointerBuffer.Clear();
+            logEvent.WriteToStringBuffer(stringBuffer, _keyValuePointerBuffer);
         }
 
         private static unsafe int CopyStringBufferToByteArray(StringBuffer stringBuffer, byte[] destination)

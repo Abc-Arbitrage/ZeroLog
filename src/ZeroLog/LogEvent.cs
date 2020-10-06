@@ -109,6 +109,28 @@ namespace ZeroLog
             return Append(value);
         }
 
+        public ILogEvent AppendKeyValue<T>(string key, T value) where T : struct, Enum
+        {
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte)))
+                return this;
+
+            AppendArgumentType(ArgumentType.KeyString);
+            AppendString(key);
+
+            return AppendEnum(value);
+        }
+
+        public ILogEvent AppendKeyValue<T>(string key, T? value) where T : struct, Enum
+        {
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte)))
+                return this;
+
+            AppendArgumentType(ArgumentType.KeyString);
+            AppendString(key);
+
+            return AppendEnum(value);
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent AppendAsciiString(byte[]? bytes, int length)
         {
@@ -291,29 +313,27 @@ namespace ZeroLog
             _log.Enqueue(this);
         }
 
-        public void WriteToStringBuffer(StringBuffer stringBuffer, IList<IntPtr>? keyValuePointers)
+        public void WriteToStringBuffer(StringBuffer stringBuffer, KeyValuePointerBuffer keyValuePointerBuffer)
         {
-            keyValuePointers ??= new List<IntPtr>();
-
             var endOfData = _dataPointer;
             var dataPointer = _startOfBuffer;
 
             while (dataPointer < endOfData)
             {
-                if (!ConsumeKeyValue(ref dataPointer, keyValuePointers, endOfData))
+                if (!ConsumeKeyValue(ref dataPointer, keyValuePointerBuffer, endOfData))
                     stringBuffer.Append(ref dataPointer, StringView.Empty, _strings, _argPointers, _argCount);
             }
 
             Debug.Assert(dataPointer == endOfData, "Buffer over-read");
 
-            if (keyValuePointers.Count > 0)
-                JsonWriter.WriteJsonToStringBuffer(stringBuffer, keyValuePointers, _strings);
+            if (keyValuePointerBuffer.PointerCount > 0)
+                JsonWriter.WriteJsonToStringBuffer(stringBuffer, keyValuePointerBuffer, _strings);
 
             if (_isTruncated)
                 stringBuffer.Append(LogManager.Config.TruncatedMessageSuffix);
         }
 
-        private static bool ConsumeKeyValue(ref byte* dataPointer, ICollection<IntPtr> keyValuePointers, byte* endOfData)
+        private static bool ConsumeKeyValue(ref byte* dataPointer, KeyValuePointerBuffer keyValuePointerBuffer, byte* endOfData)
         {
             var argumentType = (ArgumentType)(*dataPointer & ArgumentTypeMask.ArgumentType);
 
@@ -328,7 +348,7 @@ namespace ZeroLog
             }
 
             // Save a pointer to the key for later when we append the Key/Value JSON.
-            keyValuePointers.Add(new IntPtr(dataPointer));
+            keyValuePointerBuffer.AddUnsafePointer(dataPointer);
 
             // Skip the key.
             SkipCurrentArgument(ref dataPointer);

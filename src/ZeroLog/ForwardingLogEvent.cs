@@ -42,6 +42,16 @@ namespace ZeroLog
         public ILogEvent AppendAsciiString(ReadOnlySpan<char> chars) => this;
         public ILogEvent AppendKeyValue(string key, string? value) => this;
 
+        public ILogEvent AppendKeyValue<T>(string key, T value) where T : struct, Enum
+        {
+            return this;
+        }
+
+        public ILogEvent AppendKeyValue<T>(string key, T? value) where T : struct, Enum
+        {
+            return this;
+        }
+
         public ILogEvent AppendEnum<T>(T value)
             where T : struct, Enum
         {
@@ -59,7 +69,7 @@ namespace ZeroLog
             _log.Enqueue(_logEventToAppend);
         }
 
-        public void WriteToStringBuffer(StringBuffer stringBuffer, IList<IntPtr>? keyValuePtrList)
+        public void WriteToStringBuffer(StringBuffer stringBuffer, KeyValuePointerBuffer keyValuePointerBuffer)
         {
         }
 

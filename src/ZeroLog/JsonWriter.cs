@@ -1,20 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using System.Text.Formatting;
 
 namespace ZeroLog
 {
-    public static unsafe class JsonWriter
+    internal static unsafe class JsonWriter
     {
-        public static void WriteJsonToStringBuffer(StringBuffer stringBuffer, IList<IntPtr> keyValuePointers,
+        public static void WriteJsonToStringBuffer(StringBuffer stringBuffer, KeyValuePointerBuffer keyValuePointerBuffer,
                                                    string[] strings)
         {
             stringBuffer.Append(LogManager.Config.JsonSeparator);
             stringBuffer.Append("{ ");
-            for (var i = 0; i < keyValuePointers.Count; i++)
+            for (var i = 0; i < keyValuePointerBuffer.PointerCount; i++)
             {
-                var argPointer = (byte*)keyValuePointers[i].ToPointer();
+                var argPointer = keyValuePointerBuffer.GetUnsafePointer(i);
                 var dataPointer = argPointer;
 
                 // Key.
@@ -25,7 +24,7 @@ namespace ZeroLog
                 // Value.
                 AppendJsonValue(stringBuffer, strings, ref dataPointer);
 
-                if (i != keyValuePointers.Count - 1)
+                if (i != keyValuePointerBuffer.PointerCount - 1)
                     stringBuffer.Append(", ");
             }
 
@@ -44,25 +43,16 @@ namespace ZeroLog
                 case ArgumentType.KeyString:
                 case ArgumentType.String:
                     stringBuffer.Append('"');
-                    if (NeedsEscaping(strings[*dataPointer]))
+
+                    foreach (var c in strings[*dataPointer])
                     {
-                        // This might be kind of slow, but should be relatively rare.
-                        foreach (var c in strings[*dataPointer])
-                        {
-                            AppendEscapedJson(c, stringBuffer);
-                        }
-                    }
-                    else
-                    {
-                        // There is nothing to escape, we can append the entire string in one go.
-                        stringBuffer.Append(strings[*dataPointer]);
+                        AppendEscapedJson(c, stringBuffer);
                     }
 
                     stringBuffer.Append('"');
                     dataPointer += sizeof(byte);
                     break;
 
-                // TODO(lmanners): Support AsciiString?
                 case ArgumentType.Boolean:
                     stringBuffer.Append(*(bool*)dataPointer ? "true" : "false");
                     dataPointer += sizeof(bool);
@@ -132,7 +122,13 @@ namespace ZeroLog
                     dataPointer += sizeof(TimeSpan);
                     break;
 
-                // TODO(lmanners): Support enum
+                case ArgumentType.Enum:
+                    var enumArg = (EnumArg*)dataPointer;
+                    stringBuffer.Append('"');
+                    enumArg->AppendTo(stringBuffer);
+                    stringBuffer.Append('"');
+                    dataPointer += sizeof(EnumArg);
+                    break;
 
                 case ArgumentType.Null:
                     stringBuffer.Append("null");
@@ -143,33 +139,31 @@ namespace ZeroLog
             }
         }
 
-        private static bool NeedsEscaping(string s)
-        {
-            // Not using linq here since it (might) add overhead.
-            foreach (var c in s)
-            {
-                if (c < '\u001F' || c == '"' || c == '/')
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
         private static void AppendEscapedJson(char c, StringBuffer stringBuffer)
         {
             // Escape characters based on https://tools.ietf.org/html/rfc7159
+            if (c == '\\')
+            {
+                stringBuffer.Append("\\\\");
+            }
+            else if (c == '"')
+            {
+                stringBuffer.Append("\\\"");
+            }
+            else if (char.IsControl(c))
+            {
+                AppendControlChar(c, stringBuffer);
+            }
+            else
+            {
+                stringBuffer.Append(c);
+            }
+        }
+
+        private static void AppendControlChar(char c, StringBuffer stringBuffer)
+        {
             switch (c)
             {
-                case '/':
-                    stringBuffer.Append("\\/");
-                    break;
-
-                case '"':
-                    stringBuffer.Append("\\\"");
-                    break;
-
                 case '\u0000':
                     stringBuffer.Append("\\u0000");
                     break;
@@ -299,6 +293,7 @@ namespace ZeroLog
                     break;
 
                 default:
+                    // According to rfc7159, only control characters from U+0000 to U+001F must be escaped.
                     stringBuffer.Append(c);
                     break;
             }

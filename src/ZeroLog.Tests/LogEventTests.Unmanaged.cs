@@ -38,7 +38,7 @@ namespace ZeroLog.Tests
             LogManager.RegisterUnmanaged<UnmanagedStruct>();
 
             _logEvent.AppendUnmanaged(o);
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             Assert.AreEqual("1-2-3", _output.ToString());
         }
@@ -56,7 +56,7 @@ namespace ZeroLog.Tests
             LogManager.RegisterUnmanaged<UnmanagedStruct>();
 
             _logEvent.AppendUnmanaged(ref o);
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             Assert.AreEqual("1-2-3", _output.ToString());
         }
@@ -74,7 +74,7 @@ namespace ZeroLog.Tests
             LogManager.RegisterUnmanaged<UnmanagedStruct>();
 
             _logEvent.AppendUnmanaged(o);
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             Assert.AreEqual("1-2-3", _output.ToString());
         }
@@ -87,7 +87,7 @@ namespace ZeroLog.Tests
             LogManager.RegisterUnmanaged<UnmanagedStruct>();
 
             _logEvent.AppendUnmanaged(o);
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             Assert.AreEqual("null", _output.ToString());
         }
@@ -105,7 +105,7 @@ namespace ZeroLog.Tests
             LogManager.RegisterUnmanaged<UnmanagedStruct>();
 
             _logEvent.AppendUnmanaged(ref o);
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             Assert.AreEqual("1-2-3", _output.ToString());
         }
@@ -118,7 +118,7 @@ namespace ZeroLog.Tests
             LogManager.RegisterUnmanaged<UnmanagedStruct>();
 
             _logEvent.AppendUnmanaged(ref o);
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             Assert.AreEqual("null", _output.ToString());
         }
@@ -152,7 +152,7 @@ namespace ZeroLog.Tests
             LogManager.RegisterUnmanaged(typeof(UnmanagedStruct2));
 
             _logEvent.AppendUnmanaged(o);
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             Assert.AreEqual("1-2-3", _output.ToString());
         }
@@ -188,7 +188,7 @@ namespace ZeroLog.Tests
             LogManager.RegisterUnmanaged<ExternalUnmanagedStruct>(ExternalUnmanagedStructFormatter);
 
             _logEvent.AppendUnmanaged(o);
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             Assert.AreEqual("External(1-2-3)", _output.ToString());
         }
@@ -206,7 +206,7 @@ namespace ZeroLog.Tests
             LogManager.RegisterUnmanaged<ExternalUnmanagedStruct>(ExternalUnmanagedStructFormatter);
 
             _logEvent.AppendUnmanaged(ref o);
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             Assert.AreEqual("External(1-2-3)", _output.ToString());
         }
@@ -224,7 +224,7 @@ namespace ZeroLog.Tests
             LogManager.RegisterUnmanaged<ExternalUnmanagedStruct>(ExternalUnmanagedStructFormatter);
 
             _logEvent.AppendUnmanaged(o);
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             Assert.AreEqual("External(1-2-3)", _output.ToString());
         }
@@ -237,7 +237,7 @@ namespace ZeroLog.Tests
             LogManager.RegisterUnmanaged<ExternalUnmanagedStruct>(ExternalUnmanagedStructFormatter);
 
             _logEvent.AppendUnmanaged(o);
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             Assert.AreEqual("null", _output.ToString());
         }
@@ -255,7 +255,7 @@ namespace ZeroLog.Tests
             LogManager.RegisterUnmanaged<ExternalUnmanagedStruct>(ExternalUnmanagedStructFormatter);
 
             _logEvent.AppendUnmanaged(ref o);
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             Assert.AreEqual("External(1-2-3)", _output.ToString());
         }
@@ -268,7 +268,7 @@ namespace ZeroLog.Tests
             LogManager.RegisterUnmanaged<ExternalUnmanagedStruct>(ExternalUnmanagedStructFormatter);
 
             _logEvent.AppendUnmanaged(ref o);
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             Assert.AreEqual("null", _output.ToString());
         }
@@ -291,7 +291,7 @@ namespace ZeroLog.Tests
             };
 
             _logEvent.AppendUnmanaged(o);
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             Assert.AreEqual("Unmanaged(0x01000000000000000200000003000000)", _output.ToString());
         }
@@ -307,7 +307,7 @@ namespace ZeroLog.Tests
             };
 
             _logEvent.AppendUnmanaged(ref o);
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             Assert.AreEqual("Unmanaged(0x01000000000000000200000003000000)", _output.ToString());
         }
@@ -323,7 +323,7 @@ namespace ZeroLog.Tests
             };
 
             _logEvent.AppendUnmanaged(o);
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             Assert.AreEqual("Unmanaged(0x01000000000000000200000003000000)", _output.ToString());
         }
@@ -334,7 +334,7 @@ namespace ZeroLog.Tests
             UnregisteredUnmanagedStruct? o = null;
 
             _logEvent.AppendUnmanaged(o);
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             Assert.AreEqual("null", _output.ToString());
         }
@@ -350,7 +350,7 @@ namespace ZeroLog.Tests
             };
 
             _logEvent.AppendUnmanaged(ref o);
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             Assert.AreEqual("Unmanaged(0x01000000000000000200000003000000)", _output.ToString());
         }
@@ -361,7 +361,7 @@ namespace ZeroLog.Tests
             UnregisteredUnmanagedStruct? o = null;
 
             _logEvent.AppendUnmanaged(ref o);
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             Assert.AreEqual("null", _output.ToString());
         }
@@ -394,7 +394,7 @@ namespace ZeroLog.Tests
             LogManager.RegisterUnmanaged<UnmanagedStructWithFormatSupport>();
 
             _logEvent.AppendUnmanaged(o, "foo");
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             Assert.AreEqual("42[foo]", _output.ToString());
         }
@@ -410,7 +410,7 @@ namespace ZeroLog.Tests
             LogManager.RegisterUnmanaged<UnmanagedStructWithFormatSupport>();
 
             _logEvent.AppendUnmanaged(ref o, "foo");
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             Assert.AreEqual("42[foo]", _output.ToString());
         }
@@ -426,7 +426,7 @@ namespace ZeroLog.Tests
             LogManager.RegisterUnmanaged<UnmanagedStructWithFormatSupport>();
 
             _logEvent.AppendUnmanaged(o, "foo");
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             Assert.AreEqual("42[foo]", _output.ToString());
         }
@@ -439,7 +439,7 @@ namespace ZeroLog.Tests
             LogManager.RegisterUnmanaged<UnmanagedStructWithFormatSupport>();
 
             _logEvent.AppendUnmanaged(o, "foo");
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             Assert.AreEqual("null", _output.ToString());
         }
@@ -455,7 +455,7 @@ namespace ZeroLog.Tests
             LogManager.RegisterUnmanaged<UnmanagedStructWithFormatSupport>();
 
             _logEvent.AppendUnmanaged(ref o, "foo");
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             Assert.AreEqual("42[foo]", _output.ToString());
         }

@@ -9,7 +9,7 @@ namespace ZeroLog.Tests
         public void should_append_single_key_value()
         {
             _logEvent.AppendKeyValue("myKey", "myValue");
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             Assert.AreEqual(" ~~ { \"myKey\": \"myValue\" }", _output.ToString());
         }
@@ -19,7 +19,7 @@ namespace ZeroLog.Tests
         {
             _logEvent.AppendKeyValue("myKey", "myValue");
             _logEvent.AppendKeyValue("otherKey", 2);
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             Assert.AreEqual(" ~~ { \"myKey\": \"myValue\", \"otherKey\": 2 }", _output.ToString());
         }
@@ -32,7 +32,7 @@ namespace ZeroLog.Tests
             _logEvent.AppendFormat("Some {} message");
             _logEvent.Append("formatted");
             _logEvent.AppendKeyValue("otherKey", 2);
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             Assert.AreEqual("Some formatted message ~~ { \"myKey\": \"myValue\", \"otherKey\": 2 }", _output.ToString());
         }
@@ -42,7 +42,7 @@ namespace ZeroLog.Tests
         {
             _logEvent.AppendKeyValue("myKey", 1.1f).AppendKeyValue("otherKey", new Guid());
             _logEvent.Append("message");
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             Assert.AreEqual("message ~~ { \"myKey\": 1.1, \"otherKey\": \"00000000-0000-0000-0000-000000000000\" }", _output.ToString());
         }
@@ -51,7 +51,7 @@ namespace ZeroLog.Tests
         public void should_support_char()
         {
             _logEvent.AppendKeyValue("key1", 'a');
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
             Assert.AreEqual(" ~~ { \"key1\": \"a\" }", _output.ToString());
         }
 
@@ -59,7 +59,7 @@ namespace ZeroLog.Tests
         public void should_support_datetime()
         {
             _logEvent.AppendKeyValue("key1", DateTime.MinValue);
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
             Assert.AreEqual(" ~~ { \"key1\": \"0001-01-01 00:00:00.000\" }", _output.ToString());
         }
 
@@ -67,7 +67,7 @@ namespace ZeroLog.Tests
         public void should_support_boolean()
         {
             _logEvent.AppendKeyValue("key1", true).AppendKeyValue("key2", false);
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
             Assert.AreEqual(" ~~ { \"key1\": true, \"key2\": false }", _output.ToString());
         }
 
@@ -75,7 +75,7 @@ namespace ZeroLog.Tests
         public void should_support_single_null_key_value()
         {
             _logEvent.AppendKeyValue("key1", (int?)null);
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
             Assert.AreEqual(" ~~ { \"key1\": null }", _output.ToString());
         }
 
@@ -85,7 +85,7 @@ namespace ZeroLog.Tests
             _logEvent.AppendKeyValue("key1", "val1")
                      .AppendKeyValue("key2", (string)null)
                      .AppendKeyValue("key3", 3);
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
             Assert.AreEqual(" ~~ { \"key1\": \"val1\", \"key2\": null, \"key3\": 3 }", _output.ToString());
         }
 
@@ -100,7 +100,7 @@ namespace ZeroLog.Tests
                      .AppendKeyValue("double", 6.6d)
                      .AppendKeyValue("decimal", 6.6m);
 
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
             Assert.AreEqual(" ~~ { \"byte\": 1, \"short\": 2, \"int\": 3, \"long\": 4, \"float\": 5.5, \"double\": 6.6, \"decimal\": 6.6 }",
                             _output.ToString());
         }
@@ -114,7 +114,7 @@ namespace ZeroLog.Tests
                 _logEvent.AppendKeyValue($"key{i}", $"value{i}");
             }
 
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
             Assert.AreEqual(
                 " ~~ { \"key0\": \"value0\", \"key1\": \"value1\", \"key2\": \"value2\", \"key3\": \"value3\", \"key4\": \"value4\" } [TRUNCATED]",
                 _output.ToString());
@@ -128,13 +128,13 @@ namespace ZeroLog.Tests
                 _logEvent.AppendKeyValue($"key{i}", $"value{i}");
             }
 
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
             Assert.AreEqual(
                 " ~~ { \"key0\": \"value0\", \"key1\": \"value1\", \"key2\": \"value2\", \"key3\": \"value3\", \"key4\": \"value4\", \"key5\": \"value5\" }",
                 _output.ToString());
         }
 
-        [TestCase('/', "\\/")]
+        [TestCase('\\', "\\\\")]
         [TestCase('"', "\\\"")]
         [TestCase('\u0000', "\\u0000")]
         [TestCase('\u0000', "\\u0000")]
@@ -172,7 +172,7 @@ namespace ZeroLog.Tests
         public void should_handle_escaped_characters(char character, string expected)
         {
             _logEvent.AppendKeyValue("myKey", character);
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
             Assert.AreEqual(" ~~ { \"myKey\": \"" + expected + "\" }", _output.ToString());
         }
 
@@ -189,7 +189,7 @@ namespace ZeroLog.Tests
                 _logEvent.AppendKeyValue($"key{i}", $"value{i}");
             }
 
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             // 'key4' is not present because there wasn't space for its value.
             Assert.AreEqual(
@@ -200,9 +200,9 @@ namespace ZeroLog.Tests
         [TestCase]
         public void should_escape_strings_for_json()
         {
-            _logEvent.AppendKeyValue("key / \" \t \n", "Hello \u0001 \0 there");
-            _logEvent.WriteToStringBuffer(_output, null);
-            Assert.AreEqual(" ~~ { \"key \\/ \\\" \\t \\n\": \"Hello \\u0001 \\u0000 there\" }", _output.ToString());
+            _logEvent.AppendKeyValue("key \\ \" \t \n", "Hello \u0001 \0 there");
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
+            Assert.AreEqual(" ~~ { \"key \\\\ \\\" \\t \\n\": \"Hello \\u0001 \\u0000 there\" }", _output.ToString());
         }
     }
 }

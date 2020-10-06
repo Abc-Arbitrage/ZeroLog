@@ -39,7 +39,7 @@ namespace ZeroLog.Tests
         public void should_append_string()
         {
             _logEvent.Append("abc");
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             Assert.AreEqual("abc", _output.ToString());
         }
@@ -48,7 +48,7 @@ namespace ZeroLog.Tests
         public void should_append_null_string()
         {
             _logEvent.Append((string)null);
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             Assert.AreEqual("null", _output.ToString());
         }
@@ -58,7 +58,7 @@ namespace ZeroLog.Tests
         {
             var bytes = Encoding.Default.GetBytes("abc");
             _logEvent.AppendAsciiString(bytes, bytes.Length);
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             Assert.AreEqual("abc", _output.ToString());
         }
@@ -68,7 +68,7 @@ namespace ZeroLog.Tests
         {
             var bytes = Encoding.Default.GetBytes("abc");
             _logEvent.AppendAsciiString(bytes.AsSpan());
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             Assert.AreEqual("abc", _output.ToString());
         }
@@ -77,7 +77,7 @@ namespace ZeroLog.Tests
         public void should_append_char_span()
         {
             _logEvent.AppendAsciiString("abc".AsSpan());
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             Assert.AreEqual("abc", _output.ToString());
         }
@@ -87,7 +87,7 @@ namespace ZeroLog.Tests
         {
             var bytes = Encoding.Default.GetBytes("abc");
             _logEvent.AppendAsciiString(bytes, -1);
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             Assert.AreEqual("", _output.ToString());
         }
@@ -96,7 +96,7 @@ namespace ZeroLog.Tests
         public void should_ignore_empty_byte_array()
         {
             _logEvent.AppendAsciiString(new byte[0], 0);
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             Assert.AreEqual("", _output.ToString());
         }
@@ -105,7 +105,7 @@ namespace ZeroLog.Tests
         public void should_ignore_empty_byte_span()
         {
             _logEvent.AppendAsciiString(ReadOnlySpan<byte>.Empty);
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             Assert.AreEqual("", _output.ToString());
         }
@@ -114,7 +114,7 @@ namespace ZeroLog.Tests
         public void should_ignore_empty_char_span()
         {
             _logEvent.AppendAsciiString(ReadOnlySpan<char>.Empty);
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             Assert.AreEqual("", _output.ToString());
         }
@@ -128,7 +128,7 @@ namespace ZeroLog.Tests
 
             var bytes = Encoding.Default.GetBytes("abc");
             _logEvent.AppendAsciiString(bytes, bytes.Length);
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             Assert.AreEqual(new string('.', _argCapacity) + LogManager.Config.TruncatedMessageSuffix, _output.ToString());
         }
@@ -142,7 +142,7 @@ namespace ZeroLog.Tests
 
             var bytes = Encoding.Default.GetBytes("abc");
             _logEvent.AppendAsciiString(bytes.AsSpan());
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             Assert.AreEqual(new string('.', _argCapacity) + LogManager.Config.TruncatedMessageSuffix, _output.ToString());
         }
@@ -155,7 +155,7 @@ namespace ZeroLog.Tests
                 _logEvent.Append(".");
 
             _logEvent.AppendAsciiString("abc".AsSpan());
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             Assert.AreEqual(new string('.', _argCapacity) + LogManager.Config.TruncatedMessageSuffix, _output.ToString());
         }
@@ -164,7 +164,7 @@ namespace ZeroLog.Tests
         public void should_append_null_byte_array()
         {
             _logEvent.AppendAsciiString((byte[])null, 0);
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             Assert.AreEqual("null", _output.ToString());
         }
@@ -178,7 +178,7 @@ namespace ZeroLog.Tests
                 _logEvent.AppendAsciiString(b, bytes.Length);
             }
 
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             Assert.AreEqual("abc", _output.ToString());
         }
@@ -197,7 +197,7 @@ namespace ZeroLog.Tests
                 _logEvent.AppendAsciiString(b, bytes.Length);
             }
 
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             Assert.AreEqual(new string('.', _argCapacity) + LogManager.Config.TruncatedMessageSuffix, _output.ToString());
         }
@@ -206,7 +206,7 @@ namespace ZeroLog.Tests
         public void should_append_null_unsafe_byte_array()
         {
             _logEvent.AppendAsciiString((byte*)null, 0);
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             Assert.AreEqual("null", _output.ToString());
         }
@@ -215,7 +215,7 @@ namespace ZeroLog.Tests
         public void should_append_true()
         {
             _logEvent.Append(true);
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             Assert.AreEqual("True", _output.ToString());
         }
@@ -224,7 +224,7 @@ namespace ZeroLog.Tests
         public void should_append_false()
         {
             _logEvent.Append(false);
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             Assert.AreEqual("False", _output.ToString());
         }
@@ -233,7 +233,7 @@ namespace ZeroLog.Tests
         public void should_append_byte()
         {
             _logEvent.Append((byte)255);
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             Assert.AreEqual("255", _output.ToString());
         }
@@ -242,7 +242,7 @@ namespace ZeroLog.Tests
         public void should_append_char()
         {
             _logEvent.Append('€');
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             Assert.AreEqual("€", _output.ToString());
         }
@@ -251,7 +251,7 @@ namespace ZeroLog.Tests
         public void should_append_short()
         {
             _logEvent.Append((short)4321);
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             Assert.AreEqual("4321", _output.ToString());
         }
@@ -260,7 +260,7 @@ namespace ZeroLog.Tests
         public void should_append_int()
         {
             _logEvent.Append(1234567890);
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             Assert.AreEqual("1234567890", _output.ToString());
         }
@@ -269,7 +269,7 @@ namespace ZeroLog.Tests
         public void should_append_long()
         {
             _logEvent.Append(1234567890123456789L);
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             Assert.AreEqual("1234567890123456789", _output.ToString());
         }
@@ -278,7 +278,7 @@ namespace ZeroLog.Tests
         public void should_append_float()
         {
             _logEvent.Append(0.123f);
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             Assert.AreEqual("0.123", _output.ToString());
         }
@@ -287,7 +287,7 @@ namespace ZeroLog.Tests
         public void should_append_double()
         {
             _logEvent.Append(0.123d);
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             Assert.AreEqual("0.123", _output.ToString());
         }
@@ -296,7 +296,7 @@ namespace ZeroLog.Tests
         public void should_append_decimal()
         {
             _logEvent.Append(792281625142643.37593543950335m);
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             Assert.AreEqual("792281625142643.37593543950335", _output.ToString());
         }
@@ -305,7 +305,7 @@ namespace ZeroLog.Tests
         public void should_append_guid()
         {
             _logEvent.Append(new Guid("129ac124-e588-47e5-9d3d-fa3a4d174e29"));
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             Assert.AreEqual("129ac124-e588-47e5-9d3d-fa3a4d174e29", _output.ToString());
         }
@@ -314,7 +314,7 @@ namespace ZeroLog.Tests
         public void should_append_date_time()
         {
             _logEvent.Append(new DateTime(2017, 01, 12, 13, 14, 15));
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             Assert.AreEqual("2017-01-12 13:14:15.000", _output.ToString());
         }
@@ -323,7 +323,7 @@ namespace ZeroLog.Tests
         public void should_append_time_span()
         {
             _logEvent.Append(new TimeSpan(1, 2, 3, 4, 5));
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             Assert.AreEqual("1.02:03:04.0050000", _output.ToString());
         }
@@ -346,7 +346,7 @@ namespace ZeroLog.Tests
             _logEvent.Append(new DateTime(2017, 01, 12, 13, 14, 15));
             _logEvent.Append(new TimeSpan(1, 2, 3, 4, 5));
 
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             Assert.AreEqual("AbCFalseTrue128£12345-128999999999999999999123.456789.012345.67890129ac124-e588-47e5-9d3d-fa3a4d174e292017-01-12 13:14:15.0001.02:03:04.0050000", _output.ToString());
         }
@@ -373,7 +373,7 @@ namespace ZeroLog.Tests
             _logEvent.Append(new TimeSpan(1, 2, 3, 4, 5));
             _logEvent.AppendUnmanaged(new UnmanagedStruct() { A = 1, B = 2, C = 3 });
 
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             Assert.AreEqual("AbCFalseTrue128£12345-128999999999999999999123.456789.012345.67890129ac124-e588-47e5-9d3d-fa3a4d174e292017-01-12 13:14:15.0001.02:03:04.00500001-2-3", _output.ToString());
         }
@@ -390,7 +390,7 @@ namespace ZeroLog.Tests
             _logEvent.Append(10);
             _logEvent.Append("foo");
 
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             Assert.AreEqual("foo(bar42)[baz10]foo", _output.ToString());
         }
@@ -407,7 +407,7 @@ namespace ZeroLog.Tests
                 C = 3
             });
 
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             Assert.AreEqual("1-2-3", _output.ToString());
         }
@@ -435,7 +435,7 @@ namespace ZeroLog.Tests
             where T : struct
         {
             ((dynamic)_logEvent).Append((T?)null);
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             Assert.AreEqual("null", _output.ToString());
 
@@ -443,7 +443,7 @@ namespace ZeroLog.Tests
             _logEvent.Initialize(Level.Info, null, LogEventArgumentExhaustionStrategy.Default);
 
             ((dynamic)_logEvent).AppendGeneric((T?)null);
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             Assert.AreEqual("null", _output.ToString());
 
@@ -451,7 +451,7 @@ namespace ZeroLog.Tests
             _logEvent.Initialize(Level.Info, null, LogEventArgumentExhaustionStrategy.Default);
 
             ((dynamic)_logEvent).Append((T?)new T());
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             Assert.AreNotEqual("null", _output.ToString());
 
@@ -459,7 +459,7 @@ namespace ZeroLog.Tests
             _logEvent.Initialize(Level.Info, null, LogEventArgumentExhaustionStrategy.Default);
 
             ((dynamic)_logEvent).AppendGeneric((T?)new T());
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             Assert.AreNotEqual("null", _output.ToString());
         }
@@ -473,7 +473,7 @@ namespace ZeroLog.Tests
                 _logEvent.Append(".");
 
             _logEvent.Append("!");
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             Assert.AreEqual(new string('.', _argCapacity) + LogManager.Config.TruncatedMessageSuffix, _output.ToString());
         }
@@ -487,7 +487,7 @@ namespace ZeroLog.Tests
                 _logEvent.Append(".");
 
             _logEvent.Append("!");
-            _logEvent.WriteToStringBuffer(_output, null);
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
 
             Assert.AreEqual(new string('.', _argCapacity * 2) + "!", _output.ToString());
         }
