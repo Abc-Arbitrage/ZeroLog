@@ -46,7 +46,7 @@ namespace ZeroLog
         public ILogEvent AppendUnmanaged<T>(T value)
             where T : unmanaged
         {
-            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(UnmanagedArgHeader) + sizeof(T)))
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(UnmanagedArgHeader) + sizeof(T), 1))
                 return this;
 
             AppendArgumentType(ArgumentType.Unmanaged);
@@ -61,7 +61,7 @@ namespace ZeroLog
         public ILogEvent AppendUnmanaged<T>(T value, string format)
             where T : unmanaged
         {
-            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte) + sizeof(UnmanagedArgHeader) + sizeof(T)))
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte) + sizeof(UnmanagedArgHeader) + sizeof(T), 1))
                 return this;
 
             AppendArgumentTypeWithFormat(ArgumentType.Unmanaged);
@@ -77,7 +77,7 @@ namespace ZeroLog
         public ILogEvent AppendUnmanaged<T>(ref T value)
             where T : unmanaged
         {
-            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(UnmanagedArgHeader) + sizeof(T)))
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(UnmanagedArgHeader) + sizeof(T), 1))
                 return this;
 
             AppendArgumentType(ArgumentType.Unmanaged);
@@ -92,7 +92,7 @@ namespace ZeroLog
         public ILogEvent AppendUnmanaged<T>(ref T value, string format)
             where T : unmanaged
         {
-            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte) + sizeof(UnmanagedArgHeader) + sizeof(T)))
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte) + sizeof(UnmanagedArgHeader) + sizeof(T), 1))
                 return this;
 
             AppendArgumentTypeWithFormat(ArgumentType.Unmanaged);
@@ -108,7 +108,7 @@ namespace ZeroLog
         public ILogEvent AppendUnmanaged<T>(T? value)
             where T : unmanaged
         {
-            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(UnmanagedArgHeader) + sizeof(T)))
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(UnmanagedArgHeader) + sizeof(T), 1))
                 return this;
 
             if (value == null)
@@ -129,7 +129,7 @@ namespace ZeroLog
         public ILogEvent AppendUnmanaged<T>(T? value, string format)
             where T : unmanaged
         {
-            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte) + sizeof(UnmanagedArgHeader) + sizeof(T)))
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte) + sizeof(UnmanagedArgHeader) + sizeof(T), 1))
                 return this;
 
             if (value == null)
@@ -151,7 +151,7 @@ namespace ZeroLog
         public ILogEvent AppendUnmanaged<T>(ref T? value)
             where T : unmanaged
         {
-            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(UnmanagedArgHeader) + sizeof(T)))
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(UnmanagedArgHeader) + sizeof(T), 1))
                 return this;
 
             if (value == null)
@@ -172,7 +172,7 @@ namespace ZeroLog
         public ILogEvent AppendUnmanaged<T>(ref T? value, string format)
             where T : unmanaged
         {
-            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte) + sizeof(UnmanagedArgHeader) + sizeof(T)))
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte) + sizeof(UnmanagedArgHeader) + sizeof(T), 1))
                 return this;
 
             if (value == null)

@@ -96,7 +96,7 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent Append(<#= type.name #> value)
         {
-            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(<#= type.name #>)))
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(<#= type.name #>), 1))
                 return this;
 
             AppendArgumentType(ArgumentType.<#= type.argType #>);
@@ -108,7 +108,7 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent Append(<#= type.name #>? value)
         {
-            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(<#= type.name #>)))
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(<#= type.name #>), 1))
                 return this;
 
             if (value == null)
@@ -126,36 +126,47 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent AppendKeyValue(string key, <#= type.name #> value)
         {
-            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte)))
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(<#= type.name #>), 2))
                 return this;
 
             AppendArgumentType(ArgumentType.KeyString);
             AppendString(key);
 
-            return Append(value);
+            AppendArgumentType(ArgumentType.<#= type.argType #>);
+            *(<#= type.name #>*)_dataPointer = value;
+            _dataPointer += sizeof(<#= type.name #>);
+            return this;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent AppendKeyValue(string key, <#= type.name #>? value)
         {
-            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte)))
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(<#= type.name #>), 2))
                 return this;
 
             AppendArgumentType(ArgumentType.KeyString);
             AppendString(key);
 
-            return Append(value);
+            if (value == null)
+            {
+                AppendArgumentType(ArgumentType.Null);
+                return this;
+            }
+
+            AppendArgumentType(ArgumentType.<#= type.argType #>);
+            *(<#= type.name #>*)_dataPointer = value.GetValueOrDefault();
+            _dataPointer += sizeof(<#= type.name #>);
+            return this;
         }
 
 <#
         if (type.isFormattable)
         {
 #>
-
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent Append(<#= type.name #> value, string format)
         {
-            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte) + sizeof(<#= type.name #>)))
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte) + sizeof(<#= type.name #>), 1))
                 return this;
 
             AppendArgumentTypeWithFormat(ArgumentType.<#= type.argType #>);
@@ -168,7 +179,7 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent Append(<#= type.name #>? value, string format)
         {
-            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte) + sizeof(<#= type.name #>)))
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte) + sizeof(<#= type.name #>), 1))
                 return this;
 
             if (value == null)

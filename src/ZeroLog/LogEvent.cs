@@ -1,8 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.Formatting;
 using System.Threading;
@@ -72,7 +70,7 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void AppendFormat(string format)
         {
-            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte) + sizeof(byte)))
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte) + sizeof(byte), 1))
                 return;
 
             AppendArgumentType(ArgumentType.FormatString);
@@ -83,7 +81,7 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent Append(string? s)
         {
-            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte)))
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte), 1))
                 return this;
 
             if (s == null)
@@ -100,37 +98,57 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent AppendKeyValue(string key, string? value)
         {
-            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte)))
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(byte), 2))
                 return this;
 
             AppendArgumentType(ArgumentType.KeyString);
             AppendString(key);
 
-            return Append(value);
+            if (value == null)
+            {
+                AppendArgumentType(ArgumentType.Null);
+                return this;
+            }
+
+            AppendArgumentType(ArgumentType.String);
+            AppendString(value);
+            return this;
         }
 
         public ILogEvent AppendKeyValue<T>(string key, T value)
             where T : struct, Enum
         {
-            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte)))
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(EnumArg), 2))
                 return this;
 
             AppendArgumentType(ArgumentType.KeyString);
             AppendString(key);
 
-            return AppendEnum(value);
+            AppendArgumentType(ArgumentType.Enum);
+            *(EnumArg*)_dataPointer = new EnumArg(TypeUtil<T>.TypeHandle, EnumCache.ToUInt64(value));
+            _dataPointer += sizeof(EnumArg);
+            return this;
         }
 
         public ILogEvent AppendKeyValue<T>(string key, T? value)
             where T : struct, Enum
         {
-            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte)))
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(EnumArg), 2))
                 return this;
 
             AppendArgumentType(ArgumentType.KeyString);
             AppendString(key);
 
-            return AppendEnum(value);
+            if (value == null)
+            {
+                AppendArgumentType(ArgumentType.Null);
+                return this;
+            }
+
+            AppendArgumentType(ArgumentType.Enum);
+            *(EnumArg*)_dataPointer = new EnumArg(TypeUtil<T>.TypeHandle, EnumCache.ToUInt64(value.GetValueOrDefault()));
+            _dataPointer += sizeof(EnumArg);
+            return this;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -138,7 +156,7 @@ namespace ZeroLog
         {
             if (bytes == null)
             {
-                if (PrepareAppend(sizeof(ArgumentType)))
+                if (PrepareAppend(sizeof(ArgumentType), 1))
                     AppendArgumentType(ArgumentType.Null);
 
                 return this;
@@ -153,7 +171,7 @@ namespace ZeroLog
                 length = remainingBytes;
             }
 
-            if (length <= 0 || !PrepareAppend(sizeof(ArgumentType) + sizeof(int) + length))
+            if (length <= 0 || !PrepareAppend(sizeof(ArgumentType) + sizeof(int) + length, 1))
                 return this;
 
             AppendArgumentType(ArgumentType.AsciiString);
@@ -167,7 +185,7 @@ namespace ZeroLog
         {
             if (bytes == null)
             {
-                if (PrepareAppend(sizeof(ArgumentType)))
+                if (PrepareAppend(sizeof(ArgumentType), 1))
                     AppendArgumentType(ArgumentType.Null);
 
                 return this;
@@ -182,7 +200,7 @@ namespace ZeroLog
                 length = remainingBytes;
             }
 
-            if (length <= 0 || !PrepareAppend(sizeof(ArgumentType) + sizeof(int) + length))
+            if (length <= 0 || !PrepareAppend(sizeof(ArgumentType) + sizeof(int) + length, 1))
                 return this;
 
             AppendArgumentType(ArgumentType.AsciiString);
@@ -205,7 +223,7 @@ namespace ZeroLog
                 length = remainingBytes;
             }
 
-            if (length <= 0 || !PrepareAppend(sizeof(ArgumentType) + sizeof(int) + length))
+            if (length <= 0 || !PrepareAppend(sizeof(ArgumentType) + sizeof(int) + length, 1))
                 return this;
 
             AppendArgumentType(ArgumentType.AsciiString);
@@ -228,7 +246,7 @@ namespace ZeroLog
                 length = remainingBytes;
             }
 
-            if (length <= 0 || !PrepareAppend(sizeof(ArgumentType) + sizeof(int) + length))
+            if (length <= 0 || !PrepareAppend(sizeof(ArgumentType) + sizeof(int) + length, 1))
                 return this;
 
             AppendArgumentType(ArgumentType.AsciiString);
@@ -253,7 +271,7 @@ namespace ZeroLog
         {
             if (value == null)
             {
-                if (PrepareAppend(sizeof(ArgumentType)))
+                if (PrepareAppend(sizeof(ArgumentType), 1))
                     AppendArgumentType(ArgumentType.Null);
 
                 return this;
@@ -265,7 +283,7 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private ILogEvent AppendEnumInternal<T>(T value)
         {
-            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(EnumArg)))
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(EnumArg), 1))
                 return this;
 
             AppendArgumentType(ArgumentType.Enum);
@@ -277,7 +295,7 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.NoInlining)]
         private void AppendNullableEnumInternal<T>(T value) // T = Nullable<SomeEnum>
         {
-            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(EnumArg)))
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(EnumArg), 1))
                 return;
 
             var enumValue = EnumCache.ToUInt64Nullable(value);
@@ -295,7 +313,7 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.NoInlining)]
         private void AppendUnmanagedInternal<T>(T arg) // T = unmanaged or Nullable<unmanaged>
         {
-            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(UnmanagedArgHeader) + UnsafeTools.SizeOf<T>()))
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(UnmanagedArgHeader) + UnsafeTools.SizeOf<T>(), 1))
                 return;
 
             // If T is a Nullable<unmanaged>, we copy it as-is and let the formatter deal with it.
@@ -584,9 +602,9 @@ namespace ZeroLog
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private bool PrepareAppend(int requestedBytes)
+        private bool PrepareAppend(int requestedBytes, int requestedArgSlots)
             => _dataPointer + requestedBytes <= _endOfBuffer
-               && _argCount < _argPointers.Length
+               && _argCount + requestedArgSlots <= _argPointers.Length
                || PrepareAppendSlow(requestedBytes);
 
         [MethodImpl(MethodImplOptions.NoInlining)]
