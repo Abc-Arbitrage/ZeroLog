@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Text.Formatting;
 
 namespace ZeroLog
@@ -9,7 +10,7 @@ namespace ZeroLog
         void SetTimestamp(DateTime timestamp);
         void AppendFormat(string format);
         void AppendGeneric<T>(T arg);
-        void WriteToStringBuffer(StringBuffer stringBuffer);
+        void WriteToStringBuffer(StringBuffer stringBuffer, KeyValuePointerBuffer keyValuePointerBuffer);
         void WriteToStringBufferUnformatted(StringBuffer stringBuffer);
         bool IsPooled { get; }
     }

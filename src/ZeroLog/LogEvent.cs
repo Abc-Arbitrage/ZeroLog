@@ -70,7 +70,7 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void AppendFormat(string format)
         {
-            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte) + sizeof(byte)))
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte) + sizeof(byte), 1))
                 return;
 
             AppendArgumentType(ArgumentType.FormatString);
@@ -81,7 +81,7 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent Append(string? s)
         {
-            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte)))
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte), 1))
                 return this;
 
             if (s == null)
@@ -96,11 +96,67 @@ namespace ZeroLog
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ILogEvent AppendKeyValue(string key, string? value)
+        {
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(byte), 2))
+                return this;
+
+            AppendArgumentType(ArgumentType.KeyString);
+            AppendString(key);
+
+            if (value == null)
+            {
+                AppendArgumentType(ArgumentType.Null);
+                return this;
+            }
+
+            AppendArgumentType(ArgumentType.String);
+            AppendString(value);
+            return this;
+        }
+
+        public ILogEvent AppendKeyValue<T>(string key, T value)
+            where T : struct, Enum
+        {
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(EnumArg), 2))
+                return this;
+
+            AppendArgumentType(ArgumentType.KeyString);
+            AppendString(key);
+
+            AppendArgumentType(ArgumentType.Enum);
+            *(EnumArg*)_dataPointer = new EnumArg(TypeUtil<T>.TypeHandle, EnumCache.ToUInt64(value));
+            _dataPointer += sizeof(EnumArg);
+            return this;
+        }
+
+        public ILogEvent AppendKeyValue<T>(string key, T? value)
+            where T : struct, Enum
+        {
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(EnumArg), 2))
+                return this;
+
+            AppendArgumentType(ArgumentType.KeyString);
+            AppendString(key);
+
+            if (value == null)
+            {
+                AppendArgumentType(ArgumentType.Null);
+                return this;
+            }
+
+            AppendArgumentType(ArgumentType.Enum);
+            *(EnumArg*)_dataPointer = new EnumArg(TypeUtil<T>.TypeHandle, EnumCache.ToUInt64(value.GetValueOrDefault()));
+            _dataPointer += sizeof(EnumArg);
+            return this;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent AppendAsciiString(byte[]? bytes, int length)
         {
             if (bytes == null)
             {
-                if (PrepareAppend(sizeof(ArgumentType)))
+                if (PrepareAppend(sizeof(ArgumentType), 1))
                     AppendArgumentType(ArgumentType.Null);
 
                 return this;
@@ -115,7 +171,7 @@ namespace ZeroLog
                 length = remainingBytes;
             }
 
-            if (length <= 0 || !PrepareAppend(sizeof(ArgumentType) + sizeof(int) + length))
+            if (length <= 0 || !PrepareAppend(sizeof(ArgumentType) + sizeof(int) + length, 1))
                 return this;
 
             AppendArgumentType(ArgumentType.AsciiString);
@@ -129,7 +185,7 @@ namespace ZeroLog
         {
             if (bytes == null)
             {
-                if (PrepareAppend(sizeof(ArgumentType)))
+                if (PrepareAppend(sizeof(ArgumentType), 1))
                     AppendArgumentType(ArgumentType.Null);
 
                 return this;
@@ -144,7 +200,7 @@ namespace ZeroLog
                 length = remainingBytes;
             }
 
-            if (length <= 0 || !PrepareAppend(sizeof(ArgumentType) + sizeof(int) + length))
+            if (length <= 0 || !PrepareAppend(sizeof(ArgumentType) + sizeof(int) + length, 1))
                 return this;
 
             AppendArgumentType(ArgumentType.AsciiString);
@@ -167,7 +223,7 @@ namespace ZeroLog
                 length = remainingBytes;
             }
 
-            if (length <= 0 || !PrepareAppend(sizeof(ArgumentType) + sizeof(int) + length))
+            if (length <= 0 || !PrepareAppend(sizeof(ArgumentType) + sizeof(int) + length, 1))
                 return this;
 
             AppendArgumentType(ArgumentType.AsciiString);
@@ -190,7 +246,7 @@ namespace ZeroLog
                 length = remainingBytes;
             }
 
-            if (length <= 0 || !PrepareAppend(sizeof(ArgumentType) + sizeof(int) + length))
+            if (length <= 0 || !PrepareAppend(sizeof(ArgumentType) + sizeof(int) + length, 1))
                 return this;
 
             AppendArgumentType(ArgumentType.AsciiString);
@@ -215,7 +271,7 @@ namespace ZeroLog
         {
             if (value == null)
             {
-                if (PrepareAppend(sizeof(ArgumentType)))
+                if (PrepareAppend(sizeof(ArgumentType), 1))
                     AppendArgumentType(ArgumentType.Null);
 
                 return this;
@@ -227,7 +283,7 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private ILogEvent AppendEnumInternal<T>(T value)
         {
-            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(EnumArg)))
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(EnumArg), 1))
                 return this;
 
             AppendArgumentType(ArgumentType.Enum);
@@ -239,7 +295,7 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.NoInlining)]
         private void AppendNullableEnumInternal<T>(T value) // T = Nullable<SomeEnum>
         {
-            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(EnumArg)))
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(EnumArg), 1))
                 return;
 
             var enumValue = EnumCache.ToUInt64Nullable(value);
@@ -257,7 +313,7 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.NoInlining)]
         private void AppendUnmanagedInternal<T>(T arg) // T = unmanaged or Nullable<unmanaged>
         {
-            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(UnmanagedArgHeader) + UnsafeTools.SizeOf<T>()))
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(UnmanagedArgHeader) + UnsafeTools.SizeOf<T>(), 1))
                 return;
 
             // If T is a Nullable<unmanaged>, we copy it as-is and let the formatter deal with it.
@@ -277,20 +333,122 @@ namespace ZeroLog
             _log.Enqueue(this);
         }
 
-        public void WriteToStringBuffer(StringBuffer stringBuffer)
+        public void WriteToStringBuffer(StringBuffer stringBuffer, KeyValuePointerBuffer keyValuePointerBuffer)
         {
             var endOfData = _dataPointer;
             var dataPointer = _startOfBuffer;
 
+            keyValuePointerBuffer.Clear();
+
             while (dataPointer < endOfData)
             {
-                stringBuffer.Append(ref dataPointer, StringView.Empty, _strings, _argPointers, _argCount);
+                if (!ConsumeKeyValue(ref dataPointer, keyValuePointerBuffer))
+                    stringBuffer.Append(ref dataPointer, StringView.Empty, _strings, _argPointers, _argCount);
             }
 
             Debug.Assert(dataPointer == endOfData, "Buffer over-read");
 
+            if (keyValuePointerBuffer.KeyPointerCount > 0)
+                JsonWriter.WriteJsonToStringBuffer(stringBuffer, keyValuePointerBuffer, _strings);
+
             if (_isTruncated)
                 stringBuffer.Append(LogManager.Config.TruncatedMessageSuffix);
+        }
+
+        private static bool ConsumeKeyValue(ref byte* dataPointer, KeyValuePointerBuffer keyValuePointerBuffer)
+        {
+            var argumentType = (ArgumentType)(*dataPointer & ArgumentTypeMask.ArgumentType);
+            if (argumentType != ArgumentType.KeyString)
+                return false;
+
+            // Save a pointer to the key for later when we append the Key/Value JSON.
+            keyValuePointerBuffer.AddKeyPointer(dataPointer);
+
+            // Skip the key.
+            SkipCurrentArgument(ref dataPointer);
+
+            // Skip the value.
+            SkipCurrentArgument(ref dataPointer);
+
+            return true;
+        }
+
+        private static void SkipCurrentArgument(ref byte* dataPointer)
+        {
+            var argumentType = (ArgumentType)(*dataPointer & ArgumentTypeMask.ArgumentType);
+            dataPointer += sizeof(ArgumentType);
+
+            switch (argumentType)
+            {
+                case ArgumentType.String:
+                case ArgumentType.KeyString:
+                case ArgumentType.Byte:
+                    dataPointer += sizeof(byte);
+                    break;
+
+                case ArgumentType.AsciiString:
+                    var length = *(int*)dataPointer;
+                    dataPointer += sizeof(int) + length;
+                    break;
+
+                case ArgumentType.Boolean:
+                    dataPointer += sizeof(bool);
+                    break;
+
+                case ArgumentType.Char:
+                    dataPointer += sizeof(char);
+                    break;
+
+                case ArgumentType.Int16:
+                    dataPointer += sizeof(short);
+                    break;
+
+                case ArgumentType.Int32:
+                    dataPointer += sizeof(int);
+                    break;
+
+                case ArgumentType.Int64:
+                    dataPointer += sizeof(long);
+                    break;
+
+                case ArgumentType.Single:
+                    dataPointer += sizeof(float);
+                    break;
+
+                case ArgumentType.Double:
+                    dataPointer += sizeof(double);
+                    break;
+
+                case ArgumentType.Decimal:
+                    dataPointer += sizeof(decimal);
+                    break;
+
+                case ArgumentType.Guid:
+                    dataPointer += sizeof(Guid);
+                    break;
+
+                case ArgumentType.DateTime:
+                    dataPointer += sizeof(DateTime);
+                    break;
+
+                case ArgumentType.TimeSpan:
+                    dataPointer += sizeof(TimeSpan);
+                    break;
+
+                case ArgumentType.Enum:
+                    dataPointer += sizeof(EnumArg);
+                    break;
+
+                case ArgumentType.Null:
+                    break;
+
+                case ArgumentType.FormatString:
+                case ArgumentType.Unmanaged:
+                    throw new NotSupportedException($"Type is not supported {argumentType}");
+
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
 
         public void WriteToStringBufferUnformatted(StringBuffer stringBuffer)
@@ -326,6 +484,7 @@ namespace ZeroLog
             switch (argumentType)
             {
                 case ArgumentType.String:
+                case ArgumentType.KeyString:
                     stringBuffer.Append('"');
                     stringBuffer.Append(_strings[*dataPointer]);
                     stringBuffer.Append('"');
@@ -434,9 +593,9 @@ namespace ZeroLog
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private bool PrepareAppend(int requestedBytes)
+        private bool PrepareAppend(int requestedBytes, int requestedArgSlots)
             => _dataPointer + requestedBytes <= _endOfBuffer
-               && _argCount < _argPointers.Length
+               && _argCount + requestedArgSlots <= _argPointers.Length
                || PrepareAppendSlow(requestedBytes);
 
         [MethodImpl(MethodImplOptions.NoInlining)]

@@ -38,7 +38,7 @@ namespace ZeroLog.Tests
             LogManager.RegisterUnmanaged<UnmanagedStruct>();
 
             _logEvent.AppendUnmanaged(o);
-            _logEvent.WriteToStringBuffer(_output); 
+            _logEvent.WriteToStringBuffer(_output);
 
             Assert.AreEqual("1-2-3", _output.ToString());
         }

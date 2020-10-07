@@ -20,5 +20,6 @@ namespace ZeroLog
         Enum,
         Null,
         Unmanaged,
+        KeyString,
     }
 }

@@ -53,7 +53,7 @@ namespace ZeroLog
         public <#= GetSignature(isNullable, isRef, isFormattable) #>
             where T : unmanaged
         {
-            if (!PrepareAppend(sizeof(ArgumentType)<#= isFormattable ? " + sizeof(byte)" : "" #> + sizeof(UnmanagedArgHeader) + sizeof(T)))
+            if (!PrepareAppend(sizeof(ArgumentType)<#= isFormattable ? " + sizeof(byte)" : "" #> + sizeof(UnmanagedArgHeader) + sizeof(T), 1))
                 return this;
 
 <#
