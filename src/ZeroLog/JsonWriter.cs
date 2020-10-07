@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text.Formatting;
 using ZeroLog.Utils;
@@ -32,7 +31,7 @@ namespace ZeroLog
             stringBuffer.Append(" }");
         }
 
-        private static void AppendJsonValue(StringBuffer stringBuffer, IReadOnlyList<string> strings, ref byte* dataPointer)
+        private static void AppendJsonValue(StringBuffer stringBuffer, string[] strings, ref byte* dataPointer)
         {
             var argumentType = (ArgumentType)(*dataPointer & ArgumentTypeMask.ArgumentType);
             dataPointer += sizeof(ArgumentType);
@@ -41,13 +40,20 @@ namespace ZeroLog
             {
                 case ArgumentType.KeyString:
                 case ArgumentType.String:
-                    stringBuffer.Append('"');
-
-                    foreach (var c in strings[*dataPointer])
-                        AppendEscapedChar(c, stringBuffer);
-
-                    stringBuffer.Append('"');
+                    AppendString(strings[*dataPointer], stringBuffer);
                     dataPointer += sizeof(byte);
+                    break;
+
+                case ArgumentType.AsciiString:
+                    var length = *(int*)dataPointer;
+                    dataPointer += sizeof(int);
+                    stringBuffer.Append('"');
+
+                    for (var i = 0; i < length; ++i)
+                        AppendEscapedChar((char)*(dataPointer + i), stringBuffer);
+
+                    stringBuffer.Append('"');
+                    dataPointer += length;
                     break;
 
                 case ArgumentType.Boolean:
@@ -121,9 +127,13 @@ namespace ZeroLog
 
                 case ArgumentType.Enum:
                     var enumArg = (EnumArg*)dataPointer;
-                    stringBuffer.Append('"');
-                    enumArg->AppendTo(stringBuffer);
-                    stringBuffer.Append('"');
+                    var enumString = enumArg->GetString();
+
+                    if (enumString != null)
+                        AppendString(enumString, stringBuffer);
+                    else
+                        enumArg->AppendNumericValue(stringBuffer);
+
                     dataPointer += sizeof(EnumArg);
                     break;
 
@@ -134,6 +144,17 @@ namespace ZeroLog
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void AppendString(string value, StringBuffer stringBuffer)
+        {
+            stringBuffer.Append('"');
+
+            foreach (var c in value)
+                AppendEscapedChar(c, stringBuffer);
+
+            stringBuffer.Append('"');
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

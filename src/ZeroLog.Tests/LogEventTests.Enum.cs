@@ -73,6 +73,17 @@ namespace ZeroLog.Tests
         }
 
         [Test]
+        public void should_append_unknown_enum_key_value()
+        {
+            LogManager.RegisterEnum(typeof(TestEnum));
+
+            _logEvent.AppendKeyValue("myKey", (TestEnum)(-42));
+            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
+
+            Assert.AreEqual(" ~~ { \"myKey\": -42 }", _output.ToString());
+        }
+
+        [Test]
         public void should_append_enum_generic()
         {
             LogManager.RegisterEnum(typeof(TestEnum));

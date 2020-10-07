@@ -23,34 +23,17 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void AppendTo(StringBuffer stringBuffer)
         {
-            var enumString = EnumCache.GetString(_typeHandle, _value, out var enumRegistered);
-            if (enumString != null)
-            {
-                stringBuffer.Append(enumString);
-                return;
-            }
+            var enumString = GetString();
 
-            AppendToSlow(stringBuffer, enumRegistered);
+            if (enumString != null)
+                stringBuffer.Append(enumString);
+            else
+                AppendNumericValue(stringBuffer);
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private void AppendToSlow(StringBuffer stringBuffer, bool enumRegistered)
+        public void AppendNumericValue(StringBuffer stringBuffer)
         {
-            if (!enumRegistered && LogManager.Config.LazyRegisterEnums)
-            {
-                var type = TypeUtil.GetTypeFromHandle(_typeHandle);
-                if (type is null)
-                    return;
-
-                LogManager.RegisterEnum(type);
-                var enumString = EnumCache.GetString(_typeHandle, _value, out _);
-                if (enumString != null)
-                {
-                    stringBuffer.Append(enumString);
-                    return;
-                }
-            }
-
             if (_value <= long.MaxValue)
             {
                 stringBuffer.Append(_value, StringView.Empty);
@@ -61,6 +44,25 @@ namespace ZeroLog
                 stringBuffer.Append(unchecked((long)_value), StringView.Empty);
             else
                 stringBuffer.Append(_value, StringView.Empty);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public string? GetString()
+            => EnumCache.GetString(_typeHandle, _value, out var enumRegistered)
+               ?? GetStringSlow(enumRegistered);
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private string? GetStringSlow(bool enumRegistered)
+        {
+            if (enumRegistered || !LogManager.Config.LazyRegisterEnums)
+                return null;
+
+            var type = TypeUtil.GetTypeFromHandle(_typeHandle);
+            if (type is null)
+                return null;
+
+            LogManager.RegisterEnum(type);
+            return EnumCache.GetString(_typeHandle, _value, out _);
         }
     }
 }
