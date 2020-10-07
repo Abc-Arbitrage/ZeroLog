@@ -38,12 +38,14 @@ namespace ZeroLog
         public ILogEvent AppendAsciiString(ReadOnlySpan<char> chars) => this;
         public ILogEvent AppendKeyValue(string key, string? value) => this;
 
-        public ILogEvent AppendKeyValue<T>(string key, T value) where T : struct, Enum
+        public ILogEvent AppendKeyValue<T>(string key, T value)
+            where T : struct, Enum
         {
             return this;
         }
 
-        public ILogEvent AppendKeyValue<T>(string key, T? value) where T : struct, Enum
+        public ILogEvent AppendKeyValue<T>(string key, T? value)
+            where T : struct, Enum
         {
             return this;
         }

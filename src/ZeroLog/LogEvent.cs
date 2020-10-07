@@ -109,7 +109,8 @@ namespace ZeroLog
             return Append(value);
         }
 
-        public ILogEvent AppendKeyValue<T>(string key, T value) where T : struct, Enum
+        public ILogEvent AppendKeyValue<T>(string key, T value)
+            where T : struct, Enum
         {
             if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte)))
                 return this;
@@ -120,7 +121,8 @@ namespace ZeroLog
             return AppendEnum(value);
         }
 
-        public ILogEvent AppendKeyValue<T>(string key, T? value) where T : struct, Enum
+        public ILogEvent AppendKeyValue<T>(string key, T? value)
+            where T : struct, Enum
         {
             if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte)))
                 return this;
@@ -326,7 +328,7 @@ namespace ZeroLog
 
             Debug.Assert(dataPointer == endOfData, "Buffer over-read");
 
-            if (keyValuePointerBuffer.PointerCount > 0)
+            if (keyValuePointerBuffer.KeyPointerCount > 0)
                 JsonWriter.WriteJsonToStringBuffer(stringBuffer, keyValuePointerBuffer, _strings);
 
             if (_isTruncated)
@@ -337,7 +339,8 @@ namespace ZeroLog
         {
             var argumentType = (ArgumentType)(*dataPointer & ArgumentTypeMask.ArgumentType);
 
-            if (argumentType != ArgumentType.KeyString) return false;
+            if (argumentType != ArgumentType.KeyString)
+                return false;
 
             // If the last item in the data is a key, that means there we ran out of space and couldn't include the value.
             // In this case, skip the key, and don't use it to build JSON later.
@@ -348,7 +351,7 @@ namespace ZeroLog
             }
 
             // Save a pointer to the key for later when we append the Key/Value JSON.
-            keyValuePointerBuffer.AddUnsafePointer(dataPointer);
+            keyValuePointerBuffer.AddKeyPointer(dataPointer);
 
             // Skip the key.
             SkipCurrentArgument(ref dataPointer);
@@ -363,6 +366,7 @@ namespace ZeroLog
         {
             var argumentType = (ArgumentType)(*dataPointer & ArgumentTypeMask.ArgumentType);
             dataPointer += sizeof(ArgumentType);
+
             switch (argumentType)
             {
                 case ArgumentType.String:

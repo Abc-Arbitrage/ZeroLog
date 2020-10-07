@@ -5,23 +5,17 @@ namespace ZeroLog
 {
     internal class KeyValuePointerBuffer
     {
-        private readonly List<IntPtr> _keyValuePointers = new List<IntPtr>(byte.MaxValue);
+        private readonly List<IntPtr> _keyPointers = new List<IntPtr>(byte.MaxValue);
 
-        public int PointerCount => _keyValuePointers.Count;
+        public int KeyPointerCount => _keyPointers.Count;
 
-        public unsafe byte* GetUnsafePointer(int index)
-        {
-            return (byte*)_keyValuePointers[index].ToPointer();
-        }
+        public unsafe byte* GetKeyPointer(int index)
+            => (byte*)_keyPointers[index].ToPointer();
 
-        public unsafe void AddUnsafePointer(byte* pointer)
-        {
-            _keyValuePointers.Add(new IntPtr(pointer));
-        }
+        public unsafe void AddKeyPointer(byte* pointer)
+            => _keyPointers.Add(new IntPtr(pointer));
 
         public void Clear()
-        {
-            _keyValuePointers.Clear();
-        }
+            => _keyPointers.Clear();
     }
 }

@@ -21,12 +21,11 @@ namespace ZeroLog
 
         ILogEvent AppendKeyValue(string key, string? value);
 
-         ILogEvent AppendKeyValue<T>(string key, T value)
-             where T : struct, Enum;
+        ILogEvent AppendKeyValue<T>(string key, T value)
+            where T : struct, Enum;
 
         ILogEvent AppendKeyValue<T>(string key, T? value)
             where T : struct, Enum;
-
 
         void Log();
     }
