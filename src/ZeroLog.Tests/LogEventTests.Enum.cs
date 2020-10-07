@@ -12,7 +12,7 @@ namespace ZeroLog.Tests
             LogManager.RegisterEnum(typeof(TestEnum));
 
             _logEvent.AppendEnum(TestEnum.Bar);
-            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
+            _logEvent.WriteToStringBuffer(_output);
 
             Assert.AreEqual("Bar", _output.ToString());
         }
@@ -23,7 +23,7 @@ namespace ZeroLog.Tests
             LogManager.RegisterEnum(typeof(TestEnum));
 
             _logEvent.AppendEnum((TestEnum?)TestEnum.Bar);
-            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
+            _logEvent.WriteToStringBuffer(_output);
 
             Assert.AreEqual("Bar", _output.ToString());
         }
@@ -34,7 +34,7 @@ namespace ZeroLog.Tests
             LogManager.RegisterEnum(typeof(TestEnum));
 
             _logEvent.AppendEnum((TestEnum?)null);
-            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
+            _logEvent.WriteToStringBuffer(_output);
 
             Assert.AreEqual("null", _output.ToString());
         }
@@ -45,7 +45,7 @@ namespace ZeroLog.Tests
             LogManager.RegisterEnum(typeof(TestEnum));
 
             _logEvent.AppendKeyValue("myKey", TestEnum.Bar);
-            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
+            _logEvent.WriteToStringBuffer(_output);
 
             Assert.AreEqual(" ~~ { \"myKey\": \"Bar\" }", _output.ToString());
         }
@@ -56,7 +56,7 @@ namespace ZeroLog.Tests
             LogManager.RegisterEnum(typeof(TestEnum));
 
             _logEvent.AppendKeyValue("myKey", (TestEnum?)TestEnum.Bar);
-            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
+            _logEvent.WriteToStringBuffer(_output);
 
             Assert.AreEqual(" ~~ { \"myKey\": \"Bar\" }", _output.ToString());
         }
@@ -67,7 +67,7 @@ namespace ZeroLog.Tests
             LogManager.RegisterEnum(typeof(TestEnum));
 
             _logEvent.AppendKeyValue("myKey", (TestEnum?)null);
-            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
+            _logEvent.WriteToStringBuffer(_output);
 
             Assert.AreEqual(" ~~ { \"myKey\": null }", _output.ToString());
         }
@@ -78,7 +78,7 @@ namespace ZeroLog.Tests
             LogManager.RegisterEnum(typeof(TestEnum));
 
             _logEvent.AppendKeyValue("myKey", (TestEnum)(-42));
-            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
+            _logEvent.WriteToStringBuffer(_output);
 
             Assert.AreEqual(" ~~ { \"myKey\": -42 }", _output.ToString());
         }
@@ -89,7 +89,7 @@ namespace ZeroLog.Tests
             LogManager.RegisterEnum(typeof(TestEnum));
 
             _logEvent.AppendGeneric(TestEnum.Baz);
-            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
+            _logEvent.WriteToStringBuffer(_output);
 
             Assert.AreEqual("Baz", _output.ToString());
         }
@@ -100,7 +100,7 @@ namespace ZeroLog.Tests
             LogManager.RegisterEnum(typeof(TestEnum));
 
             _logEvent.AppendGeneric((TestEnum?)TestEnum.Baz);
-            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
+            _logEvent.WriteToStringBuffer(_output);
 
             Assert.AreEqual("Baz", _output.ToString());
         }
@@ -111,7 +111,7 @@ namespace ZeroLog.Tests
             LogManager.RegisterEnum(typeof(TestEnum));
 
             _logEvent.AppendGeneric((TestEnum?)null);
-            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
+            _logEvent.WriteToStringBuffer(_output);
 
             Assert.AreEqual("null", _output.ToString());
         }
@@ -121,7 +121,7 @@ namespace ZeroLog.Tests
         public void should_append_unregistered_enum()
         {
             _logEvent.AppendEnum(UnregisteredEnum.Bar);
-            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
+            _logEvent.WriteToStringBuffer(_output);
 
             Assert.AreEqual("1", _output.ToString());
         }
@@ -131,7 +131,7 @@ namespace ZeroLog.Tests
         public void should_append_unregistered_enum_negative()
         {
             _logEvent.AppendEnum(UnregisteredEnum.Neg);
-            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
+            _logEvent.WriteToStringBuffer(_output);
 
             Assert.AreEqual("-1", _output.ToString());
         }
@@ -141,7 +141,7 @@ namespace ZeroLog.Tests
         public void should_append_unregistered_enum_large()
         {
             _logEvent.AppendEnum(UnregisteredEnumLarge.LargeValue);
-            _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
+            _logEvent.WriteToStringBuffer(_output);
 
             Assert.AreEqual(((ulong)UnregisteredEnumLarge.LargeValue).ToString(CultureInfo.InvariantCulture), _output.ToString());
         }
@@ -155,7 +155,7 @@ namespace ZeroLog.Tests
                 LogManager.Config.LazyRegisterEnums = true;
 
                 _logEvent.AppendEnum(AutoRegisterEnum.Bar);
-                _logEvent.WriteToStringBuffer(_output, new KeyValuePointerBuffer());
+                _logEvent.WriteToStringBuffer(_output);
 
                 Assert.AreEqual("Bar", _output.ToString());
             }

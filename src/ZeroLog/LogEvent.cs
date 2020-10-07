@@ -338,9 +338,11 @@ namespace ZeroLog
             var endOfData = _dataPointer;
             var dataPointer = _startOfBuffer;
 
+            keyValuePointerBuffer.Clear();
+
             while (dataPointer < endOfData)
             {
-                if (!ConsumeKeyValue(ref dataPointer, keyValuePointerBuffer, endOfData))
+                if (!ConsumeKeyValue(ref dataPointer, keyValuePointerBuffer))
                     stringBuffer.Append(ref dataPointer, StringView.Empty, _strings, _argPointers, _argCount);
             }
 
@@ -353,20 +355,11 @@ namespace ZeroLog
                 stringBuffer.Append(LogManager.Config.TruncatedMessageSuffix);
         }
 
-        private static bool ConsumeKeyValue(ref byte* dataPointer, KeyValuePointerBuffer keyValuePointerBuffer, byte* endOfData)
+        private static bool ConsumeKeyValue(ref byte* dataPointer, KeyValuePointerBuffer keyValuePointerBuffer)
         {
             var argumentType = (ArgumentType)(*dataPointer & ArgumentTypeMask.ArgumentType);
-
             if (argumentType != ArgumentType.KeyString)
                 return false;
-
-            // If the last item in the data is a key, that means there we ran out of space and couldn't include the value.
-            // In this case, skip the key, and don't use it to build JSON later.
-            if (dataPointer + sizeof(ArgumentType) + sizeof(byte) == endOfData)
-            {
-                SkipCurrentArgument(ref dataPointer);
-                return true;
-            }
 
             // Save a pointer to the key for later when we append the Key/Value JSON.
             keyValuePointerBuffer.AddKeyPointer(dataPointer);
@@ -448,9 +441,11 @@ namespace ZeroLog
 
                 case ArgumentType.Null:
                     break;
+
                 case ArgumentType.FormatString:
                 case ArgumentType.Unmanaged:
                     throw new NotSupportedException($"Type is not supported {argumentType}");
+
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -486,14 +481,10 @@ namespace ZeroLog
             if (hasFormatSpecifier)
                 dataPointer += sizeof(byte); // Skip it
 
-            AppendUnformattedArgumentValue(stringBuffer, argumentType, ref dataPointer);
-        }
-
-        private void AppendUnformattedArgumentValue(StringBuffer stringBuffer, ArgumentType argumentType, ref byte* dataPointer)
-        {
             switch (argumentType)
             {
                 case ArgumentType.String:
+                case ArgumentType.KeyString:
                     stringBuffer.Append('"');
                     stringBuffer.Append(_strings[*dataPointer]);
                     stringBuffer.Append('"');

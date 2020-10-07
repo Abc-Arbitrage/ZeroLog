@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text.Formatting;
-using JetBrains.Annotations;
 using ZeroLog.Appenders;
 
 namespace ZeroLog

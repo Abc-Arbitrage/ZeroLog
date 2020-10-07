@@ -54,9 +54,7 @@ namespace ZeroLog.Config
                 LogManager.Config.NullDisplayString = config.NullDisplayString;
 
             if (config.JsonSeparator != null)
-            {
                 LogManager.Config.JsonSeparator = config.JsonSeparator;
-            }
         }
 
         private static ZeroLogJsonConfiguration ConfigureResolver(string configFileFullPath, HierarchicalResolver resolver)

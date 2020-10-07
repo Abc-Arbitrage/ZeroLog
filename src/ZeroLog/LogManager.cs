@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Formatting;
 using System.Threading;
-using JetBrains.Annotations;
 using ZeroLog.Appenders;
 using ZeroLog.ConfigResolvers;
 using ZeroLog.Utils;
@@ -34,7 +32,6 @@ namespace ZeroLog
 
         private bool _isRunning;
         private IAppender[] _appenders = Array.Empty<IAppender>();
-        private readonly KeyValuePointerBuffer _keyValuePointerBuffer = new KeyValuePointerBuffer();
 
         public static ZeroLogConfig Config { get; } = new ZeroLogConfig();
 
@@ -234,11 +231,12 @@ namespace ZeroLog
             var spinWait = new SpinWait();
             var stringBuffer = new StringBuffer(OutputBufferSize);
             var destination = new byte[OutputBufferSize];
+            var keyValuePointerBuffer = new KeyValuePointerBuffer();
             var flush = false;
 
             while (_isRunning || !_queue.IsEmpty)
             {
-                if (TryToProcessQueue(stringBuffer, destination))
+                if (TryToProcessQueue(stringBuffer, destination, keyValuePointerBuffer))
                 {
                     spinWait.Reset();
                     flush = true;
@@ -259,7 +257,7 @@ namespace ZeroLog
             FlushAppenders();
         }
 
-        private bool TryToProcessQueue(StringBuffer stringBuffer, byte[] destination)
+        private bool TryToProcessQueue(StringBuffer stringBuffer, byte[] destination, KeyValuePointerBuffer keyValuePointerBuffer)
         {
             if (!_queue.TryDequeue(out var logEvent))
                 return false;
@@ -276,7 +274,8 @@ namespace ZeroLog
 
                 try
                 {
-                    FormatLogMessage(stringBuffer, logEvent);
+                    stringBuffer.Clear();
+                    logEvent.WriteToStringBuffer(stringBuffer, keyValuePointerBuffer);
                     bytesWritten = CopyStringBufferToByteArray(stringBuffer, destination);
                 }
                 catch (Exception ex)
@@ -324,13 +323,6 @@ namespace ZeroLog
                 // if (logEvent.Level >= Level) // TODO Check this ? log event should not be in queue if not > Level
                 appender.WriteEvent(logEvent, destination, bytesWritten);
             }
-        }
-
-        private void FormatLogMessage(StringBuffer stringBuffer, IInternalLogEvent logEvent)
-        {
-            stringBuffer.Clear();
-            _keyValuePointerBuffer.Clear();
-            logEvent.WriteToStringBuffer(stringBuffer, _keyValuePointerBuffer);
         }
 
         private static unsafe int CopyStringBufferToByteArray(StringBuffer stringBuffer, byte[] destination)
