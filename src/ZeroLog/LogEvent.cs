@@ -39,7 +39,7 @@ namespace ZeroLog
 
         public Level Level { get; private set; }
         public DateTime Timestamp { get; private set; }
-        public int ThreadId { get; private set; }
+        public Thread? Thread { get; private set; }
         public string Name => _log.Name;
         public IAppender[] Appenders => _log.Appenders;
         public virtual bool IsPooled => true;
@@ -53,7 +53,7 @@ namespace ZeroLog
             _dataPointer = _startOfBuffer;
             _isTruncated = false;
             _argumentExhaustionStrategy = argumentExhaustionStrategy;
-            ThreadId = Thread.CurrentThread.ManagedThreadId;
+            Thread = Thread.CurrentThread;
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]

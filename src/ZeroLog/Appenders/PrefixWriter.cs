@@ -7,6 +7,7 @@ using System.Reflection.Emit;
 using System.Text;
 using System.Text.Formatting;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace ZeroLog.Appenders
 {
@@ -208,16 +209,14 @@ namespace ZeroLog.Appenders
 
                     case PatternPartType.Thread:
                     {
-                        // _stringBuffer.Append(logEventHeader.ThreadId, StringView.Empty);
+                        // AppendThread(logEventHeader.Thread);
 
-                        il.Emit(OpCodes.Ldloc, stringBufferLocal);
+                        il.Emit(OpCodes.Ldarg_0);
 
                         il.Emit(OpCodes.Ldarg_1);
-                        il.Emit(OpCodes.Callvirt, typeof(ILogEventHeader).GetProperty(nameof(ILogEventHeader.ThreadId))?.GetGetMethod()!);
+                        il.Emit(OpCodes.Callvirt, typeof(ILogEventHeader).GetProperty(nameof(ILogEventHeader.Thread))?.GetGetMethod()!);
 
-                        il.Emit(OpCodes.Ldsfld, typeof(StringView).GetField(nameof(StringView.Empty))!);
-
-                        il.Emit(OpCodes.Call, typeof(StringBuffer).GetMethod(nameof(StringBuffer.Append), new[] { typeof(int), typeof(StringView) })!);
+                        il.Emit(OpCodes.Call, typeof(PrefixWriter).GetMethod(nameof(AppendThread), BindingFlags.Instance | BindingFlags.NonPublic)!);
                         break;
                     }
 
@@ -271,6 +270,21 @@ namespace ZeroLog.Appenders
             return bytesWritten;
         }
 
+        internal void AppendThread(Thread? thread)
+        {
+            if (thread != null)
+            {
+                if (thread.Name != null)
+                    _stringBuffer.Append(thread.Name);
+                else
+                    _stringBuffer.Append(thread.ManagedThreadId, StringView.Empty);
+            }
+            else
+            {
+                _stringBuffer.Append('0');
+            }
+        }
+
         private enum PatternPartType
         {
             String,
@@ -281,7 +295,7 @@ namespace ZeroLog.Appenders
             Logger
         }
 
-        private struct PatternPart
+        private readonly struct PatternPart
         {
             public PatternPartType Type { get; }
             public string? Value { get; }

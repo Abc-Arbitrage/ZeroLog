@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using System.Threading;
 using NFluent;
 using NUnit.Framework;
 using ZeroLog.Appenders;
@@ -25,7 +26,7 @@ namespace ZeroLog.Tests.Appenders
             _appender.Dispose();
         }
 
-        [Test]
+        [Test, RequiresThread]
         public void should_log_to_file()
         {
             var bytes = new byte[256];
@@ -36,7 +37,7 @@ namespace ZeroLog.Tests.Appenders
             {
                 Level = Level.Info,
                 Name = "TestLog",
-                ThreadId = 42,
+                Thread = Thread.CurrentThread,
                 Timestamp = DateTime.UtcNow,
             };
 
@@ -45,7 +46,7 @@ namespace ZeroLog.Tests.Appenders
 
             var written = GetLastLine();
 
-            Check.That(written).IsEqualTo($"{logEventHeader.Timestamp.Date:yyyy-MM-dd} - {logEventHeader.Timestamp.TimeOfDay:hh\\:mm\\:ss\\.fffffff} - {logEventHeader.ThreadId} - INFO - TestLog || " + message);
+            Check.That(written).IsEqualTo($"{logEventHeader.Timestamp.Date:yyyy-MM-dd} - {logEventHeader.Timestamp.TimeOfDay:hh\\:mm\\:ss\\.fffffff} - {Thread.CurrentThread.ManagedThreadId} - INFO - TestLog || " + message);
         }
 
         private string GetLastLine()

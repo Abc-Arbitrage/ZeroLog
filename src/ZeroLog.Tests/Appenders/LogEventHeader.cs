@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 
 namespace ZeroLog.Tests.Appenders
 {
@@ -6,7 +7,7 @@ namespace ZeroLog.Tests.Appenders
     {
         public Level Level { get; set; }
         public DateTime Timestamp { get; set; }
-        public int ThreadId { get; set; }
+        public Thread Thread { get; set; }
         public string Name { get; set; }
     }
 }

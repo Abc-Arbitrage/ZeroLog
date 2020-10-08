@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 
 namespace ZeroLog
 {
@@ -6,7 +7,7 @@ namespace ZeroLog
     {
         Level Level { get; }
         DateTime Timestamp { get; }
-        int ThreadId { get; }
+        Thread? Thread { get; }
         string Name { get; }
     }
 }

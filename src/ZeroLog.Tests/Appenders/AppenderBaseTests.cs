@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using System.Threading;
 using NFluent;
 using NUnit.Framework;
 using ZeroLog.Appenders;
@@ -10,7 +11,7 @@ namespace ZeroLog.Tests.Appenders
     [TestFixture]
     public class AppenderBaseTests
     {
-        [Test]
+        [Test, RequiresThread]
         public void should_append()
         {
             var bytes = new byte[256];
@@ -21,7 +22,7 @@ namespace ZeroLog.Tests.Appenders
             {
                 Level = Level.Info,
                 Name = "TestLog",
-                ThreadId = 42,
+                Thread = Thread.CurrentThread,
                 Timestamp = DateTime.UtcNow,
             };
 
@@ -31,7 +32,7 @@ namespace ZeroLog.Tests.Appenders
             appender.WriteEvent(logEventHeader, bytes, byteLength);
             appender.Flush();
 
-            var logLine = $"{logEventHeader.Timestamp.Date:yyyy-MM-dd} - {logEventHeader.Timestamp.TimeOfDay:hh\\:mm\\:ss\\.fffffff} - {logEventHeader.ThreadId} - INFO - TestLog || {message}{Environment.NewLine}";
+            var logLine = $"{logEventHeader.Timestamp.Date:yyyy-MM-dd} - {logEventHeader.Timestamp.TimeOfDay:hh\\:mm\\:ss\\.fffffff} - {Thread.CurrentThread.ManagedThreadId} - INFO - TestLog || {message}{Environment.NewLine}";
 
             Check.That(appender.ToString()).IsEqualTo(logLine + logLine);
         }

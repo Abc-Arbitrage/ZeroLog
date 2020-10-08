@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text.Formatting;
+using System.Threading;
 using ZeroLog.Appenders;
 
 namespace ZeroLog
@@ -10,7 +11,7 @@ namespace ZeroLog
 
         public Level Level => default;
         public DateTime Timestamp => default;
-        public int ThreadId => 0;
+        public Thread? Thread => null;
         public string Name => string.Empty;
         public IAppender[] Appenders { get; } = Array.Empty<IAppender>();
 

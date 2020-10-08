@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text.Formatting;
+using System.Threading;
 using ZeroLog.Appenders;
 
 namespace ZeroLog
@@ -11,7 +12,7 @@ namespace ZeroLog
 
         public Level Level => _logEventToAppend.Level;
         public DateTime Timestamp => default;
-        public int ThreadId => 0;
+        public Thread? Thread => null;
         public string Name => _logEventToAppend.Name;
         public IAppender[] Appenders => _log.Appenders;
 
