@@ -13,8 +13,8 @@ namespace ZeroLog.Benchmarks
         private static void Throughput()
         {
             var config = ManualConfig.Create(DefaultConfig.Instance);
-            config.Add(StatisticColumn.P90);
-            config.Add(StatisticColumn.P95);
+            config.AddColumn(StatisticColumn.P90);
+            config.AddColumn(StatisticColumn.P95);
 
             var benchs = BenchmarkConverter.TypeToBenchmarks(typeof(ThroughputBenchmarks), config);
 
