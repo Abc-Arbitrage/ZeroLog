@@ -18,10 +18,11 @@
     <PackageProjectUrl>https://github.com/Abc-Arbitrage/ZeroLog</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Company>ABC arbitrage</Company>
-    <Copyright>Copyright © ABC arbitrage 2017-2020</Copyright>
+    <Copyright>Copyright © ABC arbitrage 2017-$([System.DateTime]::Now.ToString('yyyy'))</Copyright>
     <PackageTags>log;logging;zero-allocation</PackageTags>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <PackageOutputPath>$(MSBuildThisFileDirectory)..\output</PackageOutputPath>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(NCrunch)' == '1'">
