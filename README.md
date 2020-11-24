@@ -1,6 +1,6 @@
 # ZeroLog
 
-[![Build Status](https://abc-arbitrage.visualstudio.com/ZeroLog/_apis/build/status/ZeroLog?branchName=master)](https://abc-arbitrage.visualstudio.com/ZeroLog/_build/latest?definitionId=6&branchName=master)
+[![Build](https://github.com/Abc-Arbitrage/ZeroLog/workflows/Build/badge.svg)](https://github.com/Abc-Arbitrage/ZeroLog/actions?query=workflow%3ABuild)
 [![NuGet](https://img.shields.io/nuget/v/ZeroLog.svg?label=NuGet&logo=NuGet)](http://www.nuget.org/packages/ZeroLog/)
 
 ZeroLog is a **zero-allocation .NET logging library**. It uses the excellent formatting library [StringFormatter](https://github.com/MikePopoloski/StringFormatter).

@@ -33,7 +33,7 @@ namespace ZeroLog.Benchmarks.EnumTests
     }
 
     [MemoryDiagnoser]
-    [SimpleJob(RuntimeMoniker.Net48), SimpleJob(RuntimeMoniker.NetCoreApp30)]
+    [SimpleJob(RuntimeMoniker.Net48), SimpleJob(RuntimeMoniker.NetCoreApp31)]
     public unsafe class EnumBenchmarks
     {
         [Benchmark(Baseline = true)]
