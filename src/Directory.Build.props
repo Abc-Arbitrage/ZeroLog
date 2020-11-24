@@ -9,6 +9,7 @@
     <DebugType>embedded</DebugType>
     <IsPackable>false</IsPackable>
     <Deterministic>true</Deterministic>
+    <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' != ''">true</ContinuousIntegrationBuild>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -28,11 +29,6 @@
   <PropertyGroup Condition="'$(NCrunch)' == '1'">
     <EnableSourceLink>false</EnableSourceLink>
     <EnableSourceControlManagerQueries>false</EnableSourceControlManagerQueries>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <ContinuousIntegrationBuild Condition="'$(TF_BUILD)' != ''">true</ContinuousIntegrationBuild>
-    <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' != ''">true</ContinuousIntegrationBuild>
   </PropertyGroup>
 
   <ItemGroup>

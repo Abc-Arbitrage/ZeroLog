@@ -17,7 +17,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Misc", "Misc", "{44EDCA3A-D
 		..\LICENSE.md = ..\LICENSE.md
 		..\README.md = ..\README.md
 		Directory.Build.targets = Directory.Build.targets
-		..\azure-pipelines.yml = ..\azure-pipelines.yml
 		..\.github\workflows\build.yml = ..\.github\workflows\build.yml
 	EndProjectSection
 EndProject
