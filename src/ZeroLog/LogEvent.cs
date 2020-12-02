@@ -152,6 +152,60 @@ namespace ZeroLog
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ILogEvent AppendKeyValueAscii(string key, byte[]? bytes, int length)
+        {
+            if (length <= 0 || !PrepareAppend(sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(int) + length, 2))
+                return this;
+
+            AppendArgumentType(ArgumentType.KeyString);
+            AppendString(key);
+
+            AppendAsciiString(bytes, length);
+            return this;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ILogEvent AppendKeyValueAscii(string key, byte* bytes, int length)
+        {
+            if (length <= 0 || !PrepareAppend(sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(int) + length, 2))
+                return this;
+
+            AppendArgumentType(ArgumentType.KeyString);
+            AppendString(key);
+
+            AppendAsciiString(bytes, length);
+            return this;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ILogEvent AppendKeyValueAscii(string key, ReadOnlySpan<byte> bytes)
+        {
+            var length = bytes.Length;
+            if (length <= 0 || !PrepareAppend(sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(int) + length, 2))
+                return this;
+
+            AppendArgumentType(ArgumentType.KeyString);
+            AppendString(key);
+
+            AppendAsciiString(bytes);
+            return this;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ILogEvent AppendKeyValueAscii(string key, ReadOnlySpan<char> bytes)
+        {
+            var length = bytes.Length;
+            if (length <= 0 || !PrepareAppend(sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(int) + length, 2))
+                return this;
+
+            AppendArgumentType(ArgumentType.KeyString);
+            AppendString(key);
+
+            AppendAsciiString(bytes);
+            return this;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent AppendAsciiString(byte[]? bytes, int length)
         {
             if (bytes == null)
