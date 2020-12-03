@@ -78,30 +78,47 @@ namespace ZeroLog.Tests
         }
 
         [Test]
-        public void should_ignore_byte_array_value_that_is_empty()
+        public void should_support_byte_array_value_that_is_empty()
         {
             _logEvent.AppendKeyValueAscii("myKey", new byte[0], 0);
             _logEvent.WriteToStringBuffer(_output);
 
-            Assert.AreEqual("", _output.ToString());
+            Assert.AreEqual(" ~~ { \"myKey\": \"\" }", _output.ToString());
         }
 
         [Test]
-        public void should_ignore_byte_span_value_that_is_empty()
+        public void should_support_raw_byte_value_that_is_empty()
+        {
+            var bytes = new byte[0];
+            unsafe
+            {
+                fixed (byte* pBytes = bytes)
+                {
+                    _logEvent.AppendKeyValueAscii("myKey", pBytes, 0);
+                }
+            }
+
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreEqual(" ~~ { \"myKey\": \"\" }", _output.ToString());
+        }
+
+        [Test]
+        public void should_support_byte_span_value_that_is_empty()
         {
             _logEvent.AppendKeyValueAscii("myKey", ReadOnlySpan<byte>.Empty);
             _logEvent.WriteToStringBuffer(_output);
 
-            Assert.AreEqual("", _output.ToString());
+            Assert.AreEqual(" ~~ { \"myKey\": \"\" }", _output.ToString());
         }
 
         [Test]
-        public void should_ignore_char_span_value_that_is_empty()
+        public void should_support_char_span_value_that_is_empty()
         {
             _logEvent.AppendKeyValueAscii("myKey", ReadOnlySpan<char>.Empty);
             _logEvent.WriteToStringBuffer(_output);
 
-            Assert.AreEqual("", _output.ToString());
+            Assert.AreEqual(" ~~ { \"myKey\": \"\" }", _output.ToString());
         }
 
         [Test]

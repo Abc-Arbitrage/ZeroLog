@@ -154,11 +154,18 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent AppendKeyValueAscii(string key, byte[]? bytes, int length)
         {
-            if (length <= 0 || !PrepareAppend(sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(int) + length, 2))
+            if (length < 0 || !PrepareAppend(sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(int) + length, 2))
                 return this;
 
             AppendArgumentType(ArgumentType.KeyString);
             AppendString(key);
+
+            if (length == 0)
+            {
+                AppendArgumentType(ArgumentType.AsciiString);
+                AppendInt32(0);
+                return this;
+            }
 
             AppendAsciiString(bytes, length);
             return this;
@@ -167,11 +174,18 @@ namespace ZeroLog
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent AppendKeyValueAscii(string key, byte* bytes, int length)
         {
-            if (length <= 0 || !PrepareAppend(sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(int) + length, 2))
+            if (length < 0 || !PrepareAppend(sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(int) + length, 2))
                 return this;
 
             AppendArgumentType(ArgumentType.KeyString);
             AppendString(key);
+
+            if (length == 0)
+            {
+                AppendArgumentType(ArgumentType.AsciiString);
+                AppendInt32(0);
+                return this;
+            }
 
             AppendAsciiString(bytes, length);
             return this;
@@ -181,11 +195,18 @@ namespace ZeroLog
         public ILogEvent AppendKeyValueAscii(string key, ReadOnlySpan<byte> bytes)
         {
             var length = bytes.Length;
-            if (length <= 0 || !PrepareAppend(sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(int) + length, 2))
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(int) + length, 2))
                 return this;
 
             AppendArgumentType(ArgumentType.KeyString);
             AppendString(key);
+
+            if (length == 0)
+            {
+                AppendArgumentType(ArgumentType.AsciiString);
+                AppendInt32(0);
+                return this;
+            }
 
             AppendAsciiString(bytes);
             return this;
@@ -195,11 +216,18 @@ namespace ZeroLog
         public ILogEvent AppendKeyValueAscii(string key, ReadOnlySpan<char> bytes)
         {
             var length = bytes.Length;
-            if (length <= 0 || !PrepareAppend(sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(int) + length, 2))
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(int) + length, 2))
                 return this;
 
             AppendArgumentType(ArgumentType.KeyString);
             AppendString(key);
+
+            if (length == 0)
+            {
+                AppendArgumentType(ArgumentType.AsciiString);
+                AppendInt32(0);
+                return this;
+            }
 
             AppendAsciiString(bytes);
             return this;
