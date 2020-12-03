@@ -41,8 +41,7 @@ namespace ZeroLog.Tests
 
         [Test]
         public void should_ignore_ascii_string_if_buffer_is_not_large_enough_for_header(
-            [Range(_bufferSize - 2 * _asciiHeaderSize, _bufferSize)]
-            int firstStringLength)
+            [Range(_bufferSize - 2 * _asciiHeaderSize, _bufferSize)] int firstStringLength)
         {
             var largeString1 = new string('a', firstStringLength);
             var asciiBytes1 = Encoding.ASCII.GetBytes(largeString1);
@@ -212,6 +211,54 @@ namespace ZeroLog.Tests
             _logEvent.WriteToStringBuffer(_output);
 
             Check.That(string.IsNullOrWhiteSpace(_output.ToString()));
+        }
+
+        [Test]
+        public void should_truncate_key_value_ascii_if_too_long_bytes()
+        {
+            var largeString = new string('a', 2000);
+            var bytes = Encoding.ASCII.GetBytes(largeString);
+            _logEvent.AppendKeyValue("key1", "value1");
+            _logEvent.AppendKeyValueAscii("key2", bytes, bytes.Length);
+            _logEvent.WriteToStringBuffer(_output);
+            Assert.AreEqual(" ~~ { \"key1\": \"value1\" } [TRUNCATED]", _output.ToString());
+        }
+
+        [Test]
+        public void should_truncate_key_value_ascii_if_too_long_raw_bytes()
+        {
+            var largeString = new string('a', 2000);
+            var asciiBytes = Encoding.ASCII.GetBytes(largeString);
+            _logEvent.AppendKeyValue("key1", "value1");
+
+            fixed (byte* pAsciiBytes = asciiBytes)
+            {
+                _logEvent.AppendKeyValueAscii("key2", pAsciiBytes, asciiBytes.Length);
+            }
+
+            _logEvent.WriteToStringBuffer(_output);
+            Assert.AreEqual(" ~~ { \"key1\": \"value1\" } [TRUNCATED]", _output.ToString());
+        }
+
+        [Test]
+        public void should_truncate_key_value_ascii_if_too_long_byte_span()
+        {
+            var largeString = new string('a', 2000);
+            var bytes = Encoding.ASCII.GetBytes(largeString);
+            _logEvent.AppendKeyValue("key1", "value1");
+            _logEvent.AppendKeyValueAscii("key2", bytes.AsSpan());
+            _logEvent.WriteToStringBuffer(_output);
+            Assert.AreEqual(" ~~ { \"key1\": \"value1\" } [TRUNCATED]", _output.ToString());
+        }
+
+        [Test]
+        public void should_truncate_key_value_ascii_if_too_long_char_span()
+        {
+            var largeString = new string('a', 2000);
+            _logEvent.AppendKeyValue("key1", "value1");
+            _logEvent.AppendKeyValueAscii("key2", largeString.AsSpan());
+            _logEvent.WriteToStringBuffer(_output);
+            Assert.AreEqual(" ~~ { \"key1\": \"value1\" } [TRUNCATED]", _output.ToString());
         }
 
         [Test]

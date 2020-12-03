@@ -152,6 +152,86 @@ namespace ZeroLog
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ILogEvent AppendKeyValueAscii(string key, byte[]? bytes, int length)
+        {
+            if (length < 0 || !PrepareAppend(sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(int) + length, 2))
+                return this;
+
+            AppendArgumentType(ArgumentType.KeyString);
+            AppendString(key);
+
+            if (bytes is null)
+            {
+                AppendArgumentType(ArgumentType.Null);
+                return this;
+            }
+
+            AppendArgumentType(ArgumentType.AsciiString);
+            AppendInt32(length);
+
+            if (length != 0)
+                AppendBytes(bytes, length);
+
+            return this;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ILogEvent AppendKeyValueAscii(string key, byte* bytes, int length)
+        {
+            if (length < 0 || !PrepareAppend(sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(int) + length, 2))
+                return this;
+
+            AppendArgumentType(ArgumentType.KeyString);
+            AppendString(key);
+
+            if (bytes == null)
+            {
+                AppendArgumentType(ArgumentType.Null);
+                return this;
+            }
+
+            AppendArgumentType(ArgumentType.AsciiString);
+            AppendInt32(length);
+            AppendBytes(bytes, length);
+            return this;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ILogEvent AppendKeyValueAscii(string key, ReadOnlySpan<byte> bytes)
+        {
+            var length = bytes.Length;
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(int) + length, 2))
+                return this;
+
+            AppendArgumentType(ArgumentType.KeyString);
+            AppendString(key);
+
+            AppendArgumentType(ArgumentType.AsciiString);
+            AppendInt32(length);
+            AppendBytes(bytes);
+            return this;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ILogEvent AppendKeyValueAscii(string key, ReadOnlySpan<char> chars)
+        {
+            var length = chars.Length;
+            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(int) + length, 2))
+                return this;
+
+            AppendArgumentType(ArgumentType.KeyString);
+            AppendString(key);
+
+            AppendArgumentType(ArgumentType.AsciiString);
+            AppendInt32(length);
+
+            foreach (var c in chars)
+                *_dataPointer++ = (byte)c;
+
+            return this;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent AppendAsciiString(byte[]? bytes, int length)
         {
             if (bytes == null)

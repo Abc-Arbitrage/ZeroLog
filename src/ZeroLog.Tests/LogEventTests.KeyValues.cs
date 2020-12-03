@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using NUnit.Framework;
 
 namespace ZeroLog.Tests
@@ -27,14 +28,115 @@ namespace ZeroLog.Tests
         [Test]
         public void should_append_formatted_string_mixed_with_key_values()
         {
-            // TODO(lmanners): There are more edge cases here.
             _logEvent.AppendKeyValue("myKey", "myValue");
             _logEvent.AppendFormat("Some {} message");
             _logEvent.Append("formatted");
             _logEvent.AppendKeyValue("otherKey", 2);
+            _logEvent.Append("...");
             _logEvent.WriteToStringBuffer(_output);
 
-            Assert.AreEqual("Some formatted message ~~ { \"myKey\": \"myValue\", \"otherKey\": 2 }", _output.ToString());
+            Assert.AreEqual("Some formatted message... ~~ { \"myKey\": \"myValue\", \"otherKey\": 2 }", _output.ToString());
+        }
+
+        [Test]
+        public void should_append_key_byte_array_value()
+        {
+            var bytes = Encoding.ASCII.GetBytes("myValue");
+            _logEvent.AppendKeyValueAscii("myKey", bytes, bytes.Length);
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreEqual(" ~~ { \"myKey\": \"myValue\" }", _output.ToString());
+        }
+
+        [Test]
+        public void should_append_key_byte_span_value()
+        {
+            var bytes = Encoding.ASCII.GetBytes("myValue");
+            _logEvent.AppendKeyValueAscii("myKey", bytes.AsSpan());
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreEqual(" ~~ { \"myKey\": \"myValue\" }", _output.ToString());
+        }
+
+        [Test]
+        public void should_append_key_char_span_value()
+        {
+            _logEvent.AppendKeyValueAscii("myKey", "myValue".AsSpan());
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreEqual(" ~~ { \"myKey\": \"myValue\" }", _output.ToString());
+        }
+
+        [Test]
+        public void should_ignore_byte_array_value_with_negative_length()
+        {
+            var bytes = Encoding.Default.GetBytes("myValue");
+            _logEvent.AppendKeyValueAscii("myKey", bytes, -1);
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreEqual("", _output.ToString());
+        }
+
+        [Test]
+        public void should_support_byte_array_value_that_is_empty()
+        {
+            _logEvent.AppendKeyValueAscii("myKey", new byte[0], 0);
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreEqual(" ~~ { \"myKey\": \"\" }", _output.ToString());
+        }
+
+        [Test]
+        public void should_support_null_byte_array()
+        {
+            _logEvent.AppendKeyValueAscii("myKey", (byte[])null, 0);
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreEqual(" ~~ { \"myKey\": null }", _output.ToString());
+        }
+
+        [Test]
+        public void should_support_empty_byte_pointer()
+        {
+            var bytes = new byte[1];
+            unsafe
+            {
+                fixed (byte* pBytes = bytes)
+                {
+                    _logEvent.AppendKeyValueAscii("myKey", pBytes, 0);
+                }
+            }
+
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreEqual(" ~~ { \"myKey\": \"\" }", _output.ToString());
+        }
+
+        [Test]
+        public unsafe void should_support_null_byte_pointer()
+        {
+            _logEvent.AppendKeyValueAscii("myKey", (byte*)null, 0);
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreEqual(" ~~ { \"myKey\": null }", _output.ToString());
+        }
+
+        [Test]
+        public void should_support_byte_span_value_that_is_empty()
+        {
+            _logEvent.AppendKeyValueAscii("myKey", ReadOnlySpan<byte>.Empty);
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreEqual(" ~~ { \"myKey\": \"\" }", _output.ToString());
+        }
+
+        [Test]
+        public void should_support_char_span_value_that_is_empty()
+        {
+            _logEvent.AppendKeyValueAscii("myKey", ReadOnlySpan<char>.Empty);
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreEqual(" ~~ { \"myKey\": \"\" }", _output.ToString());
         }
 
         [Test]
