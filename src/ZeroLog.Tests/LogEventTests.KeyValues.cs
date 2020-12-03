@@ -87,9 +87,18 @@ namespace ZeroLog.Tests
         }
 
         [Test]
-        public void should_support_raw_byte_value_that_is_empty()
+        public void should_support_null_byte_array()
         {
-            var bytes = new byte[0];
+            _logEvent.AppendKeyValueAscii("myKey", (byte[])null, 0);
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreEqual(" ~~ { \"myKey\": null }", _output.ToString());
+        }
+
+        [Test]
+        public void should_support_empty_byte_pointer()
+        {
+            var bytes = new byte[1];
             unsafe
             {
                 fixed (byte* pBytes = bytes)
@@ -101,6 +110,15 @@ namespace ZeroLog.Tests
             _logEvent.WriteToStringBuffer(_output);
 
             Assert.AreEqual(" ~~ { \"myKey\": \"\" }", _output.ToString());
+        }
+
+        [Test]
+        public unsafe void should_support_null_byte_pointer()
+        {
+            _logEvent.AppendKeyValueAscii("myKey", (byte*)null, 0);
+            _logEvent.WriteToStringBuffer(_output);
+
+            Assert.AreEqual(" ~~ { \"myKey\": null }", _output.ToString());
         }
 
         [Test]
