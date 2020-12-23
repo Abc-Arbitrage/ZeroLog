@@ -12,6 +12,10 @@ namespace ZeroLog
         unsafe ILogEvent AppendAsciiString(byte* bytes, int length);
         ILogEvent AppendAsciiString(ReadOnlySpan<byte> bytes);
         ILogEvent AppendAsciiString(ReadOnlySpan<char> chars);
+        ILogEvent AppendKeyValueAscii(string key, byte[]? bytes, int length);
+        unsafe ILogEvent AppendKeyValueAscii(string key, byte* bytes, int length);
+        ILogEvent AppendKeyValueAscii(string key, ReadOnlySpan<byte> bytes);
+        ILogEvent AppendKeyValueAscii(string key, ReadOnlySpan<char> chars);
 
         ILogEvent AppendEnum<T>(T value)
             where T : struct, Enum;
