@@ -66,6 +66,19 @@ log.InfoFormat("Tomorrow ({0}) will occur in {1} seconds", tomorrow, numberOfSec
 
 Both APIs can be used in a zero allocation fashion, but not all formatting options are currently supported (notably for DateTimes and TimeSpans).
 
+### Structured Data
+ZeroLog supports appending structured data (formatted as JSON) to log messages.
+
+Structured data can be appended by calling AppendKeyValue, like so:
+
+```csharp
+log.Info()
+   .Append("Tomorrow is another day.")
+   .AppendKeyValue("NumSecondsUntilTomorrow", numberOfSecondsUntilTomorrow)
+   .Log();
+```
+
+
 ## Configuration
 
 Zero log supports hierarchical loggers and can be configured using a Json configuration file: 
@@ -135,6 +148,7 @@ Some settings can be set globally on the `LogManager.Config` object:
 - **FlushAppenders** (default: `true`) Automatically flushes appenders when there is a pause in the log event stream.
 - **NullDisplayString** (default: `"null"`) The string which should be logged instead of a `null` value
 - **TruncatedMessageSuffix** (default: `" [TRUNCATED]"`) The string which is appended to a message when it is truncated
+- **JsonSeparator** (default: `"  ~~ "`) The string which is appended before structured data in log messages (when structured data is present).
 
 ## What's next
 
