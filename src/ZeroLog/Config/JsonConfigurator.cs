@@ -18,7 +18,7 @@ namespace ZeroLog.Config
 
             var watcher = new FileSystemWatcher
             {
-                Path = Path.GetDirectoryName(configFileFullPath),
+                Path = Path.GetDirectoryName(configFileFullPath)!,
                 NotifyFilter = NotifyFilters.LastWrite,
                 EnableRaisingEvents = true
             };

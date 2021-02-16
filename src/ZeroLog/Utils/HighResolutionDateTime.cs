@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Security;
 
 namespace ZeroLog.Utils
 {
@@ -8,8 +9,12 @@ namespace ZeroLog.Utils
     {
         private static readonly bool _isAvailable = CheckAvailability();
 
+#if NET5_PLUS
+        [SuppressGCTransition]
+#endif
+        [SuppressUnmanagedCodeSecurity]
         [DllImport("Kernel32.dll", CallingConvention = CallingConvention.Winapi)]
-        private static extern void GetSystemTimePreciseAsFileTime(out long filetime);
+        private static extern void GetSystemTimePreciseAsFileTime(out long fileTime);
 
         public static DateTime UtcNow
         {
@@ -18,8 +23,8 @@ namespace ZeroLog.Utils
                 if (!_isAvailable)
                     return DateTime.UtcNow;
 
-	            GetSystemTimePreciseAsFileTime(out var filetime);
-                return DateTime.FromFileTimeUtc(filetime);
+                GetSystemTimePreciseAsFileTime(out var fileTime);
+                return DateTime.FromFileTimeUtc(fileTime);
             }
         }
 
@@ -31,13 +36,13 @@ namespace ZeroLog.Utils
 
             try
             {
-	            GetSystemTimePreciseAsFileTime(out _);
+                GetSystemTimePreciseAsFileTime(out _);
                 return true;
             }
             catch (DllNotFoundException)
             {
-	            // Not running Windows 8 or higher.
-	            return false;
+                // Not running Windows 8 or higher.
+                return false;
             }
             catch (EntryPointNotFoundException)
             {

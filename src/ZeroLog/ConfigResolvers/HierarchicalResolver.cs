@@ -71,7 +71,7 @@ namespace ZeroLog.ConfigResolvers
 
         private static List<(LoggerDefinition logger, IAppender[] appenders)> CreateLoggersWithAppenders(IHierarchicalConfiguration config)
         {
-            var appendersByNames = config.Appenders.ToDictionary(x => x.Name, CreateAppender);
+            var appendersByNames = config.Appenders.Where(x => x.Name != null).ToDictionary(x => x.Name!, CreateAppender);
 
             var loggerWithAppenders = new List<(LoggerDefinition, IAppender[])>();
 

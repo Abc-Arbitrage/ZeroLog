@@ -45,8 +45,14 @@ namespace ZeroLog.Benchmarks
             //LatencyMultiProducer(8, 8 * 25_000, 8 * 250_000, 1024);
 
             //EnumBenchmarksRunner.Run();
-            ThroughputToFileBench.Run();
+            //ThroughputToFileBench.Run();
 
+            BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run();
+
+            while (Console.KeyAvailable)
+                Console.ReadKey(true);
+
+            Console.WriteLine("Press enter to exit");
             Console.ReadLine();
         }
     }
