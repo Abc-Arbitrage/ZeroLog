@@ -12,7 +12,6 @@
 
   <ItemGroup>
     <PackageReference Include="BenchmarkDotNet" Version="0.12.1" />
-    <PackageReference Include="ConsoleTables" Version="2.4.2" />
     <PackageReference Include="HdrHistogram" Version="2.5.0" />
     <PackageReference Include="Fody" Version="6.3.0" PrivateAssets="all" />
     <PackageReference Include="InlineIL.Fody" Version="1.6.0" PrivateAssets="all" />
