@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security;
 
@@ -7,11 +8,18 @@ namespace ZeroLog.Utils
 {
     internal static class HighResolutionDateTime
     {
+#if NETCOREAPP
+
+        public static DateTime UtcNow
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => DateTime.UtcNow;
+        }
+
+#else
+
         private static readonly bool _isAvailable = CheckAvailability();
 
-#if NET5_PLUS
-        [SuppressGCTransition]
-#endif
         [SuppressUnmanagedCodeSecurity]
         [DllImport("Kernel32.dll", CallingConvention = CallingConvention.Winapi)]
         private static extern void GetSystemTimePreciseAsFileTime(out long fileTime);
@@ -50,5 +58,6 @@ namespace ZeroLog.Utils
                 return false;
             }
         }
+#endif
     }
 }
