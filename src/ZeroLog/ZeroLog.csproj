@@ -45,6 +45,15 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>LogEvent.AppendUnmanaged.cs</LastGenOutput>
     </None>
+    <None Update="LogMessage.Append.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>LogMessage.Append.cs</LastGenOutput>
+    </None>
+    <Compile Update="LogMessage.Append.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>LogMessage.Append.tt</DependentUpon>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>
