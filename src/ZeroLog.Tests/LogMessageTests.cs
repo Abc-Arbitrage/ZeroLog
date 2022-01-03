@@ -1,37 +1,45 @@
+using System;
 using System.Runtime.InteropServices;
 using NUnit.Framework;
+using ZeroLog.Tests.Support;
 
 namespace ZeroLog.Tests;
 
 [TestFixture]
-public unsafe class LogMessageTests
+public unsafe partial class LogMessageTests
 {
     private const int _bufferLength = 1024;
-    private const int _stringCapacity = 16;
+    private const int _stringCapacity = 4;
 
     private LogMessage _logMessage;
-    private GCHandle _bufferHandler;
+    private byte* _buffer;
 
     [SetUp]
     public void SetUp()
     {
-        var buffer = new byte[_bufferLength];
-        _bufferHandler = GCHandle.Alloc(buffer, GCHandleType.Pinned);
+        _buffer = (byte*)NativeMemory.Alloc(_bufferLength);
 
-        var bufferSegment = new BufferSegment((byte*)_bufferHandler.AddrOfPinnedObject().ToPointer(), buffer.Length);
-        _logMessage = new LogMessage(bufferSegment, _stringCapacity);
+        _logMessage = new LogMessage(new BufferSegment(_buffer, _bufferLength), _stringCapacity);
         _logMessage.Initialize(null, Level.Info);
     }
 
     [TearDown]
     public void Teardown()
     {
-        _bufferHandler.Free();
+        NativeMemory.Free(_buffer);
     }
 
-    [Test]
-    public void should_append_string()
+    private void ShouldNotAllocate(Action action)
     {
-        _logMessage.InternalAppend("foo");
+        var output = new char[1024];
+
+        GcTester.ShouldNotAllocate(
+            () =>
+            {
+                action.Invoke();
+                _logMessage.WriteTo(output);
+            },
+            () => _logMessage.Initialize(null, Level.Info)
+        );
     }
 }

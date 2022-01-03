@@ -10,7 +10,7 @@ public sealed unsafe partial class LogMessage
 
     private readonly byte* _startOfBuffer;
     private readonly byte* _endOfBuffer;
-    private readonly string[] _strings;
+    private readonly string?[] _strings;
 
     private byte* _dataPointer;
     private byte _stringIndex;
@@ -20,7 +20,6 @@ public sealed unsafe partial class LogMessage
     public Level Level { get; private set; }
     public DateTime Timestamp { get; private set; }
     public Thread? Thread { get; private set; }
-    public bool IsTruncated => _isTruncated;
 
     private LogMessage()
     {
