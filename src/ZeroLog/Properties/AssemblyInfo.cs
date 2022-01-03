@@ -3,6 +3,6 @@
 [assembly: InternalsVisibleTo("ZeroLog.Tests")]
 [assembly: InternalsVisibleTo("ZeroLog.Benchmarks")]
 
-#if NETCOREAPP && !NETCOREAPP2_1
+#if NETCOREAPP
 [module: SkipLocalsInit]
 #endif
