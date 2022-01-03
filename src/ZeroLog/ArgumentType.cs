@@ -1,24 +1,35 @@
-namespace ZeroLog
+using System;
+
+namespace ZeroLog;
+
+[Flags]
+internal enum ArgumentType : byte
 {
-    internal enum ArgumentType : byte
-    {
-        String,
-        Boolean,
-        Byte,
-        Char,
-        Int16,
-        Int32,
-        Int64,
-        Single,
-        Double,
-        Decimal,
-        Guid,
-        DateTime,
-        TimeSpan,
-        AsciiString,
-        Enum,
-        Null,
-        Unmanaged,
-        KeyString,
-    }
+    None,
+    String,
+    Null,
+    Boolean,
+    Byte,
+    SByte,
+    Char,
+    Int16,
+    UInt16,
+    Int32,
+    UInt32,
+    Int64,
+    UInt64,
+    IntPtr,
+    UIntPtr,
+    Single,
+    Double,
+    Decimal,
+    Guid,
+    DateTime,
+    TimeSpan,
+    AsciiString,
+    Enum,
+    Unmanaged,
+    KeyString,
+
+    FormatFlag = 1 << 7
 }

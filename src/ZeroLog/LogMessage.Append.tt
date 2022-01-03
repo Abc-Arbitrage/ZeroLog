@@ -4,10 +4,16 @@
     {
         ("bool", "Boolean", false),
         ("byte", "Byte", true),
+        ("sbyte", "SByte", true),
         ("char", "Char", false),
         ("short", "Int16", true),
+        ("ushort", "UInt16", true),
         ("int", "Int32", true),
+        ("uint", "UInt32", true),
         ("long", "Int64", true),
+        ("ulong", "UInt64", true),
+        ("nint", "IntPtr", true),
+        ("nuint", "UIntPtr", true),
         ("float", "Single", true),
         ("double", "Double", true),
         ("decimal", "Decimal", true),
@@ -160,7 +166,7 @@ unsafe partial class LogMessage
     {
         if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(<#= type.name #>) <= _endOfBuffer && _stringIndex < _strings.Length)
         {
-            *(ArgumentType*)_dataPointer = ArgumentType.<#= type.argType #> | (ArgumentType)ArgumentTypeMask.FormatSpecifier;
+            *(ArgumentType*)_dataPointer = ArgumentType.<#= type.argType #> | ArgumentType.FormatFlag;
             _dataPointer += sizeof(ArgumentType);
 
             _strings[_stringIndex] = format;
