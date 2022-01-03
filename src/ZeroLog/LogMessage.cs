@@ -20,6 +20,7 @@ public sealed unsafe partial class LogMessage
     public Level Level { get; private set; }
     public DateTime Timestamp { get; private set; }
     public Thread? Thread { get; private set; }
+    internal bool IsTruncated => _isTruncated;
 
     private LogMessage()
     {

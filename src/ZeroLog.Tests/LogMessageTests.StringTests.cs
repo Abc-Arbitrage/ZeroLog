@@ -1,10 +1,13 @@
+using System;
 using System.Diagnostics.CodeAnalysis;
 using NUnit.Framework;
 using ZeroLog.Tests.Support;
 
 namespace ZeroLog.Tests;
 
-partial class LogMessageTests
+#nullable enable
+
+unsafe partial class LogMessageTests
 {
     [TestFixture]
     public class StringTests : LogMessageTests
@@ -15,6 +18,14 @@ partial class LogMessageTests
             _logMessage.InternalAppend("foo");
 
             _logMessage.ToString().ShouldEqual("foo");
+        }
+
+        [Test]
+        public void should_append_null_string()
+        {
+            _logMessage.InternalAppend((string?)null);
+
+            _logMessage.ToString().ShouldEqual(LogManager.Config.NullDisplayString);
         }
 
         [Test]
@@ -37,6 +48,16 @@ partial class LogMessageTests
             _logMessage.InternalAppend("6");
 
             _logMessage.ToString().ShouldEqual("1,2,3,4, [TRUNCATED]");
+        }
+
+        [Test]
+        public void should_truncate_null_string_when_output_buffer_is_not_large_enough()
+        {
+            _logMessage.InternalAppend((string?)null);
+
+            Span<char> outputBuffer = stackalloc char[2];
+            _logMessage.WriteTo(outputBuffer).ShouldEqual(outputBuffer.Length);
+            outputBuffer.SequenceEqual(LogManager.Config.NullDisplayString.AsSpan(0, outputBuffer.Length));
         }
 
         [Test]

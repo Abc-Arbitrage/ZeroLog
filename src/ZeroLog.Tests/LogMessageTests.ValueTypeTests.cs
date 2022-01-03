@@ -1,30 +1,68 @@
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using NUnit.Framework;
 using ZeroLog.Tests.Support;
 
 namespace ZeroLog.Tests;
 
-partial class LogMessageTests
+unsafe partial class LogMessageTests
 {
-    public class ValueTypeTests : LogMessageTests
+    public class ValueTypeTests<T> : LogMessageTests
+        where T : unmanaged
     {
+        protected void ShouldTruncateValue(Action action, bool formatted)
+        {
+            var requiredBufferSize = sizeof(ArgumentType) + sizeof(T) + (formatted ? sizeof(byte) : 0);
+
+            // Ensure the message fits in the buffer as a sanity check
+            _logMessage = new LogMessage(new BufferSegment(_buffer, requiredBufferSize), _stringCapacity);
+            _logMessage.Initialize(null, Level.Info);
+
+            action.Invoke();
+
+            _logMessage.IsTruncated.ShouldBeFalse();
+
+            if (typeof(T) != typeof(byte) && typeof(T) != typeof(sbyte) && typeof(T) != typeof(char))
+            {
+                // Truncate because the output buffer is too small
+                Span<char> smallBuffer = stackalloc char[2];
+                _logMessage.WriteTo(smallBuffer).ShouldEqual(smallBuffer.Length);
+                smallBuffer.SequenceEqual(LogManager.Config.TruncatedMessageSuffix.AsSpan(0, smallBuffer.Length)).ShouldBeTrue();
+            }
+
+            // Edge case: empty output buffer
+            _logMessage.WriteTo(Span<char>.Empty).ShouldEqual(0);
+
+            // Truncate because the log message buffer is too small
+            _logMessage = new LogMessage(new BufferSegment(_buffer, requiredBufferSize - 1), _stringCapacity);
+            _logMessage.Initialize(null, Level.Info);
+
+            action.Invoke();
+
+            _logMessage.IsTruncated.ShouldBeTrue();
+            _logMessage.ToString().ShouldEqual(LogManager.Config.TruncatedMessageSuffix);
+
+            // Edge case: empty log message buffer
+            _logMessage = new LogMessage(new BufferSegment(_buffer, 0), _stringCapacity);
+            _logMessage.Initialize(null, Level.Info);
+
+            action.Invoke();
+
+            _logMessage.IsTruncated.ShouldBeTrue();
+        }
+
         // The following methods help reduce the number of casts in the code,
         // which ensures the correct overload is called after the code is copied from one type to another.
 
-        protected static T? AsNullable<T>(T value)
-            where T : struct
+        protected static T? AsNullable(T value)
             => value;
 
-        [SuppressMessage("ReSharper", "UnusedParameter.Global")]
-        protected static T? GetNullValue<T>(T value)
-            where T : struct
+        protected static T? GetNullValue()
             => null;
     }
 
     [TestFixture]
-    public class BoolTests : ValueTypeTests
+    public class BoolTests : ValueTypeTests<bool>
     {
         private const bool _value = true;
 
@@ -38,15 +76,19 @@ partial class LogMessageTests
 
         [Test]
         public void should_append_null()
-            => _logMessage.Append(GetNullValue(_value)).ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+
+        [Test]
+        public void should_truncate_value()
+            => ShouldTruncateValue(() => _logMessage.Append(_value), false);
 
         [Test]
         public void should_not_allocate()
-            => ShouldNotAllocate(() => _logMessage.Append(true));
+            => ShouldNotAllocate(() => _logMessage.Append(_value));
     }
 
     [TestFixture]
-    public class ByteTests : ValueTypeTests
+    public class ByteTests : ValueTypeTests<byte>
     {
         private const byte _value = 42;
 
@@ -60,15 +102,27 @@ partial class LogMessageTests
 
         [Test]
         public void should_append_null()
-            => _logMessage.Append(GetNullValue(_value)).ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(LogManager.Config.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value()
             => _logMessage.Append(_value, "X").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
 
         [Test]
+        public void should_append_formatted_null()
+            => _logMessage.Append(GetNullValue(), "X").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+
+        [Test]
         public void should_append_nullable_formatted_value()
             => _logMessage.Append(AsNullable(_value), "X").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_truncate_value()
+            => ShouldTruncateValue(() => _logMessage.Append(_value), false);
+
+        [Test]
+        public void should_truncate_formatted_value()
+            => ShouldTruncateValue(() => _logMessage.Append(_value, "X"), true);
 
         [Test]
         public void should_not_allocate()
@@ -80,7 +134,7 @@ partial class LogMessageTests
     }
 
     [TestFixture]
-    public class SByteTests : ValueTypeTests
+    public class SByteTests : ValueTypeTests<sbyte>
     {
         private const sbyte _value = -42;
 
@@ -94,15 +148,27 @@ partial class LogMessageTests
 
         [Test]
         public void should_append_null()
-            => _logMessage.Append(GetNullValue(_value)).ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(LogManager.Config.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value()
             => _logMessage.Append(_value, "X").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
 
         [Test]
+        public void should_append_formatted_null()
+            => _logMessage.Append(GetNullValue(), "X").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+
+        [Test]
         public void should_append_nullable_formatted_value()
             => _logMessage.Append(AsNullable(_value), "X").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_truncate_value()
+            => ShouldTruncateValue(() => _logMessage.Append(_value), false);
+
+        [Test]
+        public void should_truncate_formatted_value()
+            => ShouldTruncateValue(() => _logMessage.Append(_value, "X"), true);
 
         [Test]
         public void should_not_allocate()
@@ -114,7 +180,7 @@ partial class LogMessageTests
     }
 
     [TestFixture]
-    public class CharTests : ValueTypeTests
+    public class CharTests : ValueTypeTests<char>
     {
         private const char _value = 'x';
 
@@ -128,7 +194,11 @@ partial class LogMessageTests
 
         [Test]
         public void should_append_null()
-            => _logMessage.Append(GetNullValue(_value)).ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+
+        [Test]
+        public void should_truncate_value()
+            => ShouldTruncateValue(() => _logMessage.Append(_value), false);
 
         [Test]
         public void should_not_allocate()
@@ -136,7 +206,7 @@ partial class LogMessageTests
     }
 
     [TestFixture]
-    public class ShortTests : ValueTypeTests
+    public class ShortTests : ValueTypeTests<short>
     {
         private const short _value = short.MaxValue;
 
@@ -150,15 +220,27 @@ partial class LogMessageTests
 
         [Test]
         public void should_append_null()
-            => _logMessage.Append(GetNullValue(_value)).ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(LogManager.Config.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value()
             => _logMessage.Append(_value, "X").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
 
         [Test]
+        public void should_append_formatted_null()
+            => _logMessage.Append(GetNullValue(), "X").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+
+        [Test]
         public void should_append_nullable_formatted_value()
             => _logMessage.Append(AsNullable(_value), "X").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_truncate_value()
+            => ShouldTruncateValue(() => _logMessage.Append(_value), false);
+
+        [Test]
+        public void should_truncate_formatted_value()
+            => ShouldTruncateValue(() => _logMessage.Append(_value, "X"), true);
 
         [Test]
         public void should_not_allocate()
@@ -172,7 +254,7 @@ partial class LogMessageTests
     }
 
     [TestFixture]
-    public class UShortTests : ValueTypeTests
+    public class UShortTests : ValueTypeTests<ushort>
     {
         private const ushort _value = ushort.MaxValue;
 
@@ -186,15 +268,27 @@ partial class LogMessageTests
 
         [Test]
         public void should_append_null()
-            => _logMessage.Append(GetNullValue(_value)).ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(LogManager.Config.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value()
             => _logMessage.Append(_value, "X").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
 
         [Test]
+        public void should_append_formatted_null()
+            => _logMessage.Append(GetNullValue(), "X").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+
+        [Test]
         public void should_append_nullable_formatted_value()
             => _logMessage.Append(AsNullable(_value), "X").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_truncate_value()
+            => ShouldTruncateValue(() => _logMessage.Append(_value), false);
+
+        [Test]
+        public void should_truncate_formatted_value()
+            => ShouldTruncateValue(() => _logMessage.Append(_value, "X"), true);
 
         [Test]
         public void should_not_allocate()
@@ -208,7 +302,7 @@ partial class LogMessageTests
     }
 
     [TestFixture]
-    public class Int32Tests : ValueTypeTests
+    public class Int32Tests : ValueTypeTests<int>
     {
         private const int _value = int.MaxValue;
 
@@ -222,15 +316,27 @@ partial class LogMessageTests
 
         [Test]
         public void should_append_null()
-            => _logMessage.Append(GetNullValue(_value)).ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(LogManager.Config.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value()
             => _logMessage.Append(_value, "X").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
 
         [Test]
+        public void should_append_formatted_null()
+            => _logMessage.Append(GetNullValue(), "X").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+
+        [Test]
         public void should_append_nullable_formatted_value()
             => _logMessage.Append(AsNullable(_value), "X").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_truncate_value()
+            => ShouldTruncateValue(() => _logMessage.Append(_value), false);
+
+        [Test]
+        public void should_truncate_formatted_value()
+            => ShouldTruncateValue(() => _logMessage.Append(_value, "X"), true);
 
         [Test]
         public void should_not_allocate()
@@ -244,7 +350,7 @@ partial class LogMessageTests
     }
 
     [TestFixture]
-    public class UInt32Tests : ValueTypeTests
+    public class UInt32Tests : ValueTypeTests<uint>
     {
         private const uint _value = uint.MaxValue;
 
@@ -258,15 +364,27 @@ partial class LogMessageTests
 
         [Test]
         public void should_append_null()
-            => _logMessage.Append(GetNullValue(_value)).ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(LogManager.Config.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value()
             => _logMessage.Append(_value, "X").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
 
         [Test]
+        public void should_append_formatted_null()
+            => _logMessage.Append(GetNullValue(), "X").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+
+        [Test]
         public void should_append_nullable_formatted_value()
             => _logMessage.Append(AsNullable(_value), "X").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_truncate_value()
+            => ShouldTruncateValue(() => _logMessage.Append(_value), false);
+
+        [Test]
+        public void should_truncate_formatted_value()
+            => ShouldTruncateValue(() => _logMessage.Append(_value, "X"), true);
 
         [Test]
         public void should_not_allocate()
@@ -280,7 +398,7 @@ partial class LogMessageTests
     }
 
     [TestFixture]
-    public class Int64Tests : ValueTypeTests
+    public class Int64Tests : ValueTypeTests<long>
     {
         private const long _value = long.MaxValue;
 
@@ -294,15 +412,27 @@ partial class LogMessageTests
 
         [Test]
         public void should_append_null()
-            => _logMessage.Append(GetNullValue(_value)).ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(LogManager.Config.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value()
             => _logMessage.Append(_value, "X").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
 
         [Test]
+        public void should_append_formatted_null()
+            => _logMessage.Append(GetNullValue(), "X").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+
+        [Test]
         public void should_append_nullable_formatted_value()
             => _logMessage.Append(AsNullable(_value), "X").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_truncate_value()
+            => ShouldTruncateValue(() => _logMessage.Append(_value), false);
+
+        [Test]
+        public void should_truncate_formatted_value()
+            => ShouldTruncateValue(() => _logMessage.Append(_value, "X"), true);
 
         [Test]
         public void should_not_allocate()
@@ -316,7 +446,7 @@ partial class LogMessageTests
     }
 
     [TestFixture]
-    public class UInt64Tests : ValueTypeTests
+    public class UInt64Tests : ValueTypeTests<ulong>
     {
         private const ulong _value = ulong.MaxValue;
 
@@ -330,15 +460,27 @@ partial class LogMessageTests
 
         [Test]
         public void should_append_null()
-            => _logMessage.Append(GetNullValue(_value)).ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(LogManager.Config.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value()
             => _logMessage.Append(_value, "X").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
 
         [Test]
+        public void should_append_formatted_null()
+            => _logMessage.Append(GetNullValue(), "X").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+
+        [Test]
         public void should_append_nullable_formatted_value()
             => _logMessage.Append(AsNullable(_value), "X").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_truncate_value()
+            => ShouldTruncateValue(() => _logMessage.Append(_value), false);
+
+        [Test]
+        public void should_truncate_formatted_value()
+            => ShouldTruncateValue(() => _logMessage.Append(_value, "X"), true);
 
         [Test]
         public void should_not_allocate()
@@ -352,7 +494,7 @@ partial class LogMessageTests
     }
 
     [TestFixture]
-    public class IntPtrTests : ValueTypeTests
+    public class IntPtrTests : ValueTypeTests<nint>
     {
         private static readonly nint _value = nint.MaxValue;
 
@@ -366,15 +508,27 @@ partial class LogMessageTests
 
         [Test]
         public void should_append_null()
-            => _logMessage.Append(GetNullValue(_value)).ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(LogManager.Config.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value()
             => _logMessage.Append(_value, "X").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
 
         [Test]
+        public void should_append_formatted_null()
+            => _logMessage.Append(GetNullValue(), "X").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+
+        [Test]
         public void should_append_nullable_formatted_value()
             => _logMessage.Append(AsNullable(_value), "X").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_truncate_value()
+            => ShouldTruncateValue(() => _logMessage.Append(_value), false);
+
+        [Test]
+        public void should_truncate_formatted_value()
+            => ShouldTruncateValue(() => _logMessage.Append(_value, "X"), true);
 
         [Test]
         public void should_not_allocate()
@@ -388,7 +542,7 @@ partial class LogMessageTests
     }
 
     [TestFixture]
-    public class UIntPtrTests : ValueTypeTests
+    public class UIntPtrTests : ValueTypeTests<nuint>
     {
         private static readonly nuint _value = nuint.MaxValue;
 
@@ -402,15 +556,27 @@ partial class LogMessageTests
 
         [Test]
         public void should_append_null()
-            => _logMessage.Append(GetNullValue(_value)).ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(LogManager.Config.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value()
             => _logMessage.Append(_value, "X").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
 
         [Test]
+        public void should_append_formatted_null()
+            => _logMessage.Append(GetNullValue(), "X").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+
+        [Test]
         public void should_append_nullable_formatted_value()
             => _logMessage.Append(AsNullable(_value), "X").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_truncate_value()
+            => ShouldTruncateValue(() => _logMessage.Append(_value), false);
+
+        [Test]
+        public void should_truncate_formatted_value()
+            => ShouldTruncateValue(() => _logMessage.Append(_value, "X"), true);
 
         [Test]
         public void should_not_allocate()
@@ -424,7 +590,7 @@ partial class LogMessageTests
     }
 
     [TestFixture]
-    public class SingleTests : ValueTypeTests
+    public class SingleTests : ValueTypeTests<float>
     {
         private const float _value = float.MaxValue;
 
@@ -438,15 +604,27 @@ partial class LogMessageTests
 
         [Test]
         public void should_append_null()
-            => _logMessage.Append(GetNullValue(_value)).ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(LogManager.Config.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value()
             => _logMessage.Append(_value, "F2").ToString().ShouldEqual(_value.ToString("F2", CultureInfo.InvariantCulture));
 
         [Test]
+        public void should_append_formatted_null()
+            => _logMessage.Append(GetNullValue(), "F2").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+
+        [Test]
         public void should_append_nullable_formatted_value()
             => _logMessage.Append(AsNullable(_value), "F2").ToString().ShouldEqual(_value.ToString("F2", CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_truncate_value()
+            => ShouldTruncateValue(() => _logMessage.Append(_value), false);
+
+        [Test]
+        public void should_truncate_formatted_value()
+            => ShouldTruncateValue(() => _logMessage.Append(_value, "F2"), true);
 
         [Test]
         public void should_not_allocate()
@@ -460,7 +638,7 @@ partial class LogMessageTests
     }
 
     [TestFixture]
-    public class DoubleTests : ValueTypeTests
+    public class DoubleTests : ValueTypeTests<double>
     {
         private const double _value = double.MaxValue;
 
@@ -474,15 +652,27 @@ partial class LogMessageTests
 
         [Test]
         public void should_append_null()
-            => _logMessage.Append(GetNullValue(_value)).ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(LogManager.Config.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value()
             => _logMessage.Append(_value, "F2").ToString().ShouldEqual(_value.ToString("F2", CultureInfo.InvariantCulture));
 
         [Test]
+        public void should_append_formatted_null()
+            => _logMessage.Append(GetNullValue(), "F2").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+
+        [Test]
         public void should_append_nullable_formatted_value()
             => _logMessage.Append(AsNullable(_value), "F2").ToString().ShouldEqual(_value.ToString("F2", CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_truncate_value()
+            => ShouldTruncateValue(() => _logMessage.Append(_value), false);
+
+        [Test]
+        public void should_truncate_formatted_value()
+            => ShouldTruncateValue(() => _logMessage.Append(_value, "F2"), true);
 
         [Test]
         public void should_not_allocate()
@@ -496,7 +686,7 @@ partial class LogMessageTests
     }
 
     [TestFixture]
-    public class DecimalTests : ValueTypeTests
+    public class DecimalTests : ValueTypeTests<decimal>
     {
         private const decimal _value = decimal.MaxValue;
 
@@ -510,15 +700,27 @@ partial class LogMessageTests
 
         [Test]
         public void should_append_null()
-            => _logMessage.Append(GetNullValue(_value)).ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(LogManager.Config.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value()
             => _logMessage.Append(_value, "F2").ToString().ShouldEqual(_value.ToString("F2", CultureInfo.InvariantCulture));
 
         [Test]
+        public void should_append_formatted_null()
+            => _logMessage.Append(GetNullValue(), "F2").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+
+        [Test]
         public void should_append_nullable_formatted_value()
             => _logMessage.Append(AsNullable(_value), "F2").ToString().ShouldEqual(_value.ToString("F2", CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_truncate_value()
+            => ShouldTruncateValue(() => _logMessage.Append(_value), false);
+
+        [Test]
+        public void should_truncate_formatted_value()
+            => ShouldTruncateValue(() => _logMessage.Append(_value, "F2"), true);
 
         [Test]
         public void should_not_allocate()
@@ -532,7 +734,7 @@ partial class LogMessageTests
     }
 
     [TestFixture]
-    public class GuidTests : ValueTypeTests
+    public class GuidTests : ValueTypeTests<Guid>
     {
         private static readonly Guid _value = Guid.NewGuid();
 
@@ -546,7 +748,7 @@ partial class LogMessageTests
 
         [Test]
         public void should_append_null()
-            => _logMessage.Append(GetNullValue(_value)).ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(LogManager.Config.NullDisplayString);
 
         [Test]
         [TestCase("N")]
@@ -556,8 +758,20 @@ partial class LogMessageTests
             => _logMessage.Append(_value, format).ToString().ShouldEqual(_value.ToString(format, CultureInfo.InvariantCulture));
 
         [Test]
+        public void should_append_formatted_null()
+            => _logMessage.Append(GetNullValue(), "D").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+
+        [Test]
         public void should_append_nullable_formatted_value()
             => _logMessage.Append(_value, "D").ToString().ShouldEqual(_value.ToString("D", CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_truncate_value()
+            => ShouldTruncateValue(() => _logMessage.Append(_value), false);
+
+        [Test]
+        public void should_truncate_formatted_value()
+            => ShouldTruncateValue(() => _logMessage.Append(_value, "D"), true);
 
         [Test]
         public void should_not_allocate()
@@ -572,7 +786,7 @@ partial class LogMessageTests
     }
 
     [TestFixture]
-    public class DateTimeTests : ValueTypeTests
+    public class DateTimeTests : ValueTypeTests<DateTime>
     {
         private static readonly DateTime _value = DateTime.UtcNow;
 
@@ -586,7 +800,7 @@ partial class LogMessageTests
 
         [Test]
         public void should_append_null()
-            => _logMessage.Append(GetNullValue(_value)).ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(LogManager.Config.NullDisplayString);
 
         [Test]
         [TestCase("d")]
@@ -596,8 +810,20 @@ partial class LogMessageTests
             => _logMessage.Append(_value, format).ToString().ShouldEqual(_value.ToString(format, CultureInfo.InvariantCulture));
 
         [Test]
+        public void should_append_formatted_null()
+            => _logMessage.Append(GetNullValue(), "D").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+
+        [Test]
         public void should_append_nullable_formatted_value()
             => _logMessage.Append(_value, "D").ToString().ShouldEqual(_value.ToString("D", CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_truncate_value()
+            => ShouldTruncateValue(() => _logMessage.Append(_value), false);
+
+        [Test]
+        public void should_truncate_formatted_value()
+            => ShouldTruncateValue(() => _logMessage.Append(_value, "D"), true);
 
         [Test]
         public void should_not_allocate()
@@ -612,7 +838,7 @@ partial class LogMessageTests
     }
 
     [TestFixture]
-    public class TimeSpanTests : ValueTypeTests
+    public class TimeSpanTests : ValueTypeTests<TimeSpan>
     {
         private static readonly TimeSpan _value = DateTime.UtcNow.TimeOfDay;
 
@@ -626,7 +852,7 @@ partial class LogMessageTests
 
         [Test]
         public void should_append_null()
-            => _logMessage.Append(GetNullValue(_value)).ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(LogManager.Config.NullDisplayString);
 
         [Test]
         [TestCase("c")]
@@ -635,8 +861,20 @@ partial class LogMessageTests
             => _logMessage.Append(_value, format).ToString().ShouldEqual(_value.ToString(format, CultureInfo.InvariantCulture));
 
         [Test]
+        public void should_append_formatted_null()
+            => _logMessage.Append(GetNullValue(), "G").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+
+        [Test]
         public void should_append_nullable_formatted_value()
             => _logMessage.Append(_value, "c").ToString().ShouldEqual(_value.ToString("c", CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_truncate_value()
+            => ShouldTruncateValue(() => _logMessage.Append(_value), false);
+
+        [Test]
+        public void should_truncate_formatted_value()
+            => ShouldTruncateValue(() => _logMessage.Append(_value, "c"), true);
 
         [Test]
         public void should_not_allocate()
