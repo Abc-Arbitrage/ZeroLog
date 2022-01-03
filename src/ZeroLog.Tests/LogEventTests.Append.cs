@@ -352,50 +352,6 @@ namespace ZeroLog.Tests
         }
 
         [Test]
-        public void should_append_format()
-        {
-            LogManager.RegisterUnmanaged<UnmanagedStruct>();
-
-            _logEvent.AppendFormat("{0}{1}{2}{3}{4}{5}{6}{7}{8}{9}{10}{11}{12}{13}{14}");
-            _logEvent.Append("AbC");
-            _logEvent.Append(false);
-            _logEvent.Append(true);
-            _logEvent.Append((byte)128);
-            _logEvent.Append('£');
-            _logEvent.Append((short)12345);
-            _logEvent.Append(-128);
-            _logEvent.Append(999999999999999999L);
-            _logEvent.Append(123.456f);
-            _logEvent.Append(789.012d);
-            _logEvent.Append(345.67890m);
-            _logEvent.Append(new Guid("129ac124-e588-47e5-9d3d-fa3a4d174e29"));
-            _logEvent.Append(new DateTime(2017, 01, 12, 13, 14, 15));
-            _logEvent.Append(new TimeSpan(1, 2, 3, 4, 5));
-            _logEvent.AppendUnmanaged(new UnmanagedStruct() { A = 1, B = 2, C = 3 });
-
-            _logEvent.WriteToStringBuffer(_output);
-
-            Assert.AreEqual("AbCFalseTrue128£12345-128999999999999999999123.456789.012345.67890129ac124-e588-47e5-9d3d-fa3a4d174e292017-01-12 13:14:15.0001.02:03:04.00500001-2-3", _output.ToString());
-        }
-
-        [Test]
-        public void should_append_format_multiple_times()
-        {
-            _logEvent.Append("foo");
-            _logEvent.AppendFormat("({0}{1})");
-            _logEvent.Append("bar");
-            _logEvent.Append(42);
-            _logEvent.AppendFormat("[{0}{1}]");
-            _logEvent.Append("baz");
-            _logEvent.Append(10);
-            _logEvent.Append("foo");
-
-            _logEvent.WriteToStringBuffer(_output);
-
-            Assert.AreEqual("foo(bar42)[baz10]foo", _output.ToString());
-        }
-
-        [Test]
         public void should_append_unmanaged_from_append_generic()
         {
             LogManager.RegisterUnmanaged<UnmanagedStruct>();

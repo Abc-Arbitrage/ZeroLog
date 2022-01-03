@@ -62,11 +62,11 @@ namespace ZeroLog.Tests
 
             Parallel.For(0, _nbThreads, threadId =>
             {
-                var logger = LogManager.GetLogger(typeof(IntegrationTests).Name + threadId.ToString());
+                var logger = LogManager.GetLogger($"{nameof(IntegrationTests)}{threadId}");
                 for (var i = 0; i < _count; i++)
                 {
                     var timestamp = Stopwatch.GetTimestamp();
-                    logger.InfoFormat("{0}", timestamp);
+                    logger.Info().Append(timestamp).Log();
                     _enqueueMicros[threadId][i] = ToMicroseconds(Stopwatch.GetTimestamp() - timestamp);
                 }
             });

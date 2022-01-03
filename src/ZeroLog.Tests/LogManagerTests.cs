@@ -117,7 +117,7 @@ namespace ZeroLog.Tests
         public void should_completely_drop_log_event_when_log_event_pool_is_exhausted()
         {
             LogManager.Shutdown();
-            
+
             BasicConfigurator.Configure(new ZeroLogBasicConfiguration
             {
                 Appenders = { _testAppender },
@@ -175,21 +175,6 @@ namespace ZeroLog.Tests
 
             Check.That(logCompletedSignal.WaitOne(TimeSpan.FromMilliseconds(100))).IsTrue();
             Check.That(signal.Wait(TimeSpan.FromMilliseconds(100))).IsTrue();
-        }
-
-        [Test]
-        public void should_not_throw_if_formatting_fails_when_using_format_string()
-        {
-            var log = LogManager.GetLogger(typeof(LogManagerTests));
-            var signal = _testAppender.SetMessageCountTarget(1);
-
-            var guid = Guid.NewGuid();
-            log.InfoFormat("A good format: {0:X4}, A bad format: {1:lol}, Another good format: {2}", (short)-23805, guid, true);
-
-            signal.Wait(TimeSpan.FromMilliseconds(100));
-
-            var logMessage = _testAppender.LoggedMessages.Single();
-            Check.That(logMessage).Equals("An error occured during formatting: Unknown format specifier 'lol'. - Arguments: \"A good format: {0:X4}, A bad format: {1:lol}, Another good format: {2}\", -23805, " + guid + ", True");
         }
 
         [Test]

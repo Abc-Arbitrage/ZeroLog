@@ -2,7 +2,6 @@ namespace ZeroLog
 {
     internal enum ArgumentType : byte
     {
-        FormatString,
         String,
         Boolean,
         Byte,

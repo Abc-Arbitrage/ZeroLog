@@ -82,18 +82,20 @@ namespace ZeroLog.Benchmarks.ThroughputTests
         [Benchmark]
         public void ZeroLog()
         {
-            var signal = _zeroLogTestAppender.SetMessageCountTarget(TotalMessageCount);
+            throw new NotImplementedException();
 
-            var produce = new Action(() =>
-            {
-                for (var i = 0; i < TotalMessageCount / ProducingThreadCount; i++)
-                    _zeroLogLogger.InfoFormat("Hi {0} ! It's {1:HH:mm:ss}, and the message is #{2}", "dude", DateTime.UtcNow, i);
-            });
-
-            for (var i = 0; i < ProducingThreadCount; i++)
-                Task.Factory.StartNew(produce, TaskCreationOptions.LongRunning);
-
-            signal.Wait(TimeSpan.FromSeconds(30));
+            // var signal = _zeroLogTestAppender.SetMessageCountTarget(TotalMessageCount);
+            //
+            // var produce = new Action(() =>
+            // {
+            //     for (var i = 0; i < TotalMessageCount / ProducingThreadCount; i++)
+            //         _zeroLogLogger.InfoFormat("Hi {0} ! It's {1:HH:mm:ss}, and the message is #{2}", "dude", DateTime.UtcNow, i);
+            // });
+            //
+            // for (var i = 0; i < ProducingThreadCount; i++)
+            //     Task.Factory.StartNew(produce, TaskCreationOptions.LongRunning);
+            //
+            // signal.Wait(TimeSpan.FromSeconds(30));
         }
 
 
@@ -161,7 +163,7 @@ namespace ZeroLog.Benchmarks.ThroughputTests
 
         private void TearDownNLog()
         {
-            
+
         }
 
         [Benchmark]

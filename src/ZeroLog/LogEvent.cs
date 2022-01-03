@@ -68,17 +68,6 @@ namespace ZeroLog
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void AppendFormat(string format)
-        {
-            if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte) + sizeof(byte), 1))
-                return;
-
-            AppendArgumentType(ArgumentType.FormatString);
-            AppendString(format);
-            AppendByte(_argCount);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ILogEvent Append(string? s)
         {
             if (!PrepareAppend(sizeof(ArgumentType) + sizeof(byte), 1))
@@ -522,7 +511,6 @@ namespace ZeroLog
                 case ArgumentType.Null:
                     break;
 
-                case ArgumentType.FormatString:
                 case ArgumentType.Unmanaged:
                     throw new NotSupportedException($"Type is not supported {argumentType}");
 
@@ -640,14 +628,6 @@ namespace ZeroLog
                 case ArgumentType.TimeSpan:
                     stringBuffer.Append(*(TimeSpan*)dataPointer, StringView.Empty);
                     dataPointer += sizeof(TimeSpan);
-                    break;
-
-                case ArgumentType.FormatString:
-                    var formatStringIndex = *dataPointer;
-                    dataPointer += sizeof(byte) + sizeof(byte);
-                    stringBuffer.Append('"');
-                    stringBuffer.Append(_strings[formatStringIndex]);
-                    stringBuffer.Append('"');
                     break;
 
                 case ArgumentType.Enum:

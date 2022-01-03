@@ -23,14 +23,6 @@ namespace ZeroLog
         {
         }
 
-        public void AppendFormat(string format)
-        {
-        }
-
-        public void AppendGeneric<T>(T arg)
-        {
-        }
-
         public ILogEvent Append(string? s) => this;
         public ILogEvent AppendAsciiString(byte[]? bytes, int length) => this;
         public unsafe ILogEvent AppendAsciiString(byte* bytes, int length) => this;

@@ -107,14 +107,6 @@ namespace ZeroLog
                     argPointer += sizeof(TimeSpan);
                     break;
 
-                case ArgumentType.FormatString:
-                    var formatStringIndex = *argPointer++;
-                    var argOffset = *argPointer++;
-                    var argSet = new ArgSet(argPointers, strings, argOffset, argCount);
-                    stringBuffer.AppendArgSet(strings[formatStringIndex], ref argSet);
-                    argPointer += argSet.BytesRead;
-                    break;
-
                 case ArgumentType.Enum:
                     var enumArg = (EnumArg*)argPointer;
                     argPointer += sizeof(EnumArg);

@@ -97,6 +97,8 @@ namespace ZeroLog
             // - Casting to "object" then to the desired value type will force the C# compiler to emit boxing and
             //   unboxing IL opcodes, but the JIT is smart enough to prevent the actual boxing/unboxing from happening.
 
+            // TODO: Remove?
+
             if (typeof(T) == typeof(string))
                 Append((string?)(object?)arg);
             else if (typeof(T) == typeof(bool))

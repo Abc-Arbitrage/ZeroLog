@@ -9,32 +9,34 @@ namespace ZeroLog.Benchmarks.LatencyTests
     {
         public SimpleLatencyBenchmarkResult Bench(int queueSize, int warmingMessageCount, int totalMessageCount, int producingThreadCount)
         {
-            var appender = new Tests.TestAppender(false);
-            BasicConfigurator.Configure(new ZeroLogBasicConfiguration
-            {
-                Appenders = { appender },
-                LogEventQueueSize = queueSize,
-                LogEventPoolExhaustionStrategy = LogEventPoolExhaustionStrategy.WaitForLogEvent
-            });
-            var logger = LogManager.GetLogger(nameof(ZeroLog));
+            throw new NotImplementedException();
 
-            var signal = appender.SetMessageCountTarget(warmingMessageCount + totalMessageCount);
-
-            var produce = new Func<HistogramBase>(() =>
-            {
-                var warmingMessageByProducer = warmingMessageCount / producingThreadCount;
-                int[] counter = { 0 };
-                var warmingResult = SimpleLatencyBenchmark.Bench(() => logger.InfoFormat("Hi {0} ! It's {1:HH:mm:ss}, and the message is #{2}", "dude", DateTime.UtcNow, counter[0]++), warmingMessageByProducer);
-
-                var messageByProducer = totalMessageCount / producingThreadCount;
-                counter[0] = 0;
-                return SimpleLatencyBenchmark.Bench(() => logger.InfoFormat("Hi {0} ! It's {1:HH:mm:ss}, and the message is #{2}", "dude", DateTime.UtcNow, counter[0]++), messageByProducer);
-            });
-
-            var result = SimpleLatencyBenchmark.RunBench(producingThreadCount, produce, signal);
-            LogManager.Shutdown();
-
-            return result;
+            // var appender = new Tests.TestAppender(false);
+            // BasicConfigurator.Configure(new ZeroLogBasicConfiguration
+            // {
+            //     Appenders = { appender },
+            //     LogEventQueueSize = queueSize,
+            //     LogEventPoolExhaustionStrategy = LogEventPoolExhaustionStrategy.WaitForLogEvent
+            // });
+            // var logger = LogManager.GetLogger(nameof(ZeroLog));
+            //
+            // var signal = appender.SetMessageCountTarget(warmingMessageCount + totalMessageCount);
+            //
+            // var produce = new Func<HistogramBase>(() =>
+            // {
+            //     var warmingMessageByProducer = warmingMessageCount / producingThreadCount;
+            //     int[] counter = { 0 };
+            //     var warmingResult = SimpleLatencyBenchmark.Bench(() => logger.InfoFormat("Hi {0} ! It's {1:HH:mm:ss}, and the message is #{2}", "dude", DateTime.UtcNow, counter[0]++), warmingMessageByProducer);
+            //
+            //     var messageByProducer = totalMessageCount / producingThreadCount;
+            //     counter[0] = 0;
+            //     return SimpleLatencyBenchmark.Bench(() => logger.InfoFormat("Hi {0} ! It's {1:HH:mm:ss}, and the message is #{2}", "dude", DateTime.UtcNow, counter[0]++), messageByProducer);
+            // });
+            //
+            // var result = SimpleLatencyBenchmark.RunBench(producingThreadCount, produce, signal);
+            // LogManager.Shutdown();
+            //
+            // return result;
         }
     }
 }

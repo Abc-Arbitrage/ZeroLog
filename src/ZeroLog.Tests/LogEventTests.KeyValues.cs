@@ -26,19 +26,6 @@ namespace ZeroLog.Tests
         }
 
         [Test]
-        public void should_append_formatted_string_mixed_with_key_values()
-        {
-            _logEvent.AppendKeyValue("myKey", "myValue");
-            _logEvent.AppendFormat("Some {} message");
-            _logEvent.Append("formatted");
-            _logEvent.AppendKeyValue("otherKey", 2);
-            _logEvent.Append("...");
-            _logEvent.WriteToStringBuffer(_output);
-
-            Assert.AreEqual("Some formatted message... ~~ { \"myKey\": \"myValue\", \"otherKey\": 2 }", _output.ToString());
-        }
-
-        [Test]
         public void should_append_key_byte_array_value()
         {
             var bytes = Encoding.ASCII.GetBytes("myValue");

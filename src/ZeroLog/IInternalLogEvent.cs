@@ -8,8 +8,6 @@ namespace ZeroLog
     {
         void Initialize(Level level, Log log, LogEventArgumentExhaustionStrategy argumentExhaustionStrategy);
         void SetTimestamp(DateTime timestamp);
-        void AppendFormat(string format);
-        void AppendGeneric<T>(T arg);
         void WriteToStringBuffer(StringBuffer stringBuffer, KeyValuePointerBuffer keyValuePointerBuffer);
         void WriteToStringBufferUnformatted(StringBuffer stringBuffer);
         bool IsPooled { get; }

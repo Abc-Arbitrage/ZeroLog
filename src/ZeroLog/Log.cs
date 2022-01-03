@@ -22,62 +22,22 @@ namespace ZeroLog
         ILogEvent Debug();
         void Debug(string? message);
         void Debug(string? message, Exception? ex);
-        void DebugFormat<T0>(string format, T0 arg0);
-        void DebugFormat<T0, T1>(string format, T0 arg0, T1 arg1);
-        void DebugFormat<T0, T1, T2>(string format, T0 arg0, T1 arg1, T2 arg2);
-        void DebugFormat<T0, T1, T2, T3>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3);
-        void DebugFormat<T0, T1, T2, T3, T4>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4);
-        void DebugFormat<T0, T1, T2, T3, T4, T5>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5);
-        void DebugFormat<T0, T1, T2, T3, T4, T5, T6>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6);
-        void DebugFormat<T0, T1, T2, T3, T4, T5, T6, T7>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7);
 
         ILogEvent Info();
         void Info(string? message);
         void Info(string? message, Exception? ex);
-        void InfoFormat<T0>(string format, T0 arg0);
-        void InfoFormat<T0, T1>(string format, T0 arg0, T1 arg1);
-        void InfoFormat<T0, T1, T2>(string format, T0 arg0, T1 arg1, T2 arg2);
-        void InfoFormat<T0, T1, T2, T3>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3);
-        void InfoFormat<T0, T1, T2, T3, T4>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4);
-        void InfoFormat<T0, T1, T2, T3, T4, T5>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5);
-        void InfoFormat<T0, T1, T2, T3, T4, T5, T6>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6);
-        void InfoFormat<T0, T1, T2, T3, T4, T5, T6, T7>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7);
 
         ILogEvent Warn();
         void Warn(string? message);
         void Warn(string? message, Exception? ex);
-        void WarnFormat<T0>(string format, T0 arg0);
-        void WarnFormat<T0, T1>(string format, T0 arg0, T1 arg1);
-        void WarnFormat<T0, T1, T2>(string format, T0 arg0, T1 arg1, T2 arg2);
-        void WarnFormat<T0, T1, T2, T3>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3);
-        void WarnFormat<T0, T1, T2, T3, T4>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4);
-        void WarnFormat<T0, T1, T2, T3, T4, T5>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5);
-        void WarnFormat<T0, T1, T2, T3, T4, T5, T6>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6);
-        void WarnFormat<T0, T1, T2, T3, T4, T5, T6, T7>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7);
 
         ILogEvent Error();
         void Error(string? message);
         void Error(string? message, Exception? ex);
-        void ErrorFormat<T0>(string format, T0 arg0);
-        void ErrorFormat<T0, T1>(string format, T0 arg0, T1 arg1);
-        void ErrorFormat<T0, T1, T2>(string format, T0 arg0, T1 arg1, T2 arg2);
-        void ErrorFormat<T0, T1, T2, T3>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3);
-        void ErrorFormat<T0, T1, T2, T3, T4>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4);
-        void ErrorFormat<T0, T1, T2, T3, T4, T5>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5);
-        void ErrorFormat<T0, T1, T2, T3, T4, T5, T6>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6);
-        void ErrorFormat<T0, T1, T2, T3, T4, T5, T6, T7>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7);
 
         ILogEvent Fatal();
         void Fatal(string? message);
         void Fatal(string? message, Exception? ex);
-        void FatalFormat<T0>(string format, T0 arg0);
-        void FatalFormat<T0, T1>(string format, T0 arg0, T1 arg1);
-        void FatalFormat<T0, T1, T2>(string format, T0 arg0, T1 arg1, T2 arg2);
-        void FatalFormat<T0, T1, T2, T3>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3);
-        void FatalFormat<T0, T1, T2, T3, T4>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4);
-        void FatalFormat<T0, T1, T2, T3, T4, T5>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5);
-        void FatalFormat<T0, T1, T2, T3, T4, T5, T6>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6);
-        void FatalFormat<T0, T1, T2, T3, T4, T5, T6, T7>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7);
 
     }
 
@@ -111,130 +71,6 @@ namespace ZeroLog
             logEvent.Log();
         }
 
-        [StringFormatMethod("format")]
-        public void DebugFormat<T0>(string format, T0 arg0)
-        {
-            if (!IsDebugEnabled || format is null)
-                return;
-
-            var logEvent = GetLogEventFor(Level.Debug);
-            logEvent.AppendFormat(format);
-            logEvent.AppendGeneric(arg0);
-            logEvent.Log();
-        }
-
-        [StringFormatMethod("format")]
-        public void DebugFormat<T0, T1>(string format, T0 arg0, T1 arg1)
-        {
-            if (!IsDebugEnabled || format is null)
-                return;
-
-            var logEvent = GetLogEventFor(Level.Debug);
-            logEvent.AppendFormat(format);
-            logEvent.AppendGeneric(arg0);
-            logEvent.AppendGeneric(arg1);
-            logEvent.Log();
-        }
-
-        [StringFormatMethod("format")]
-        public void DebugFormat<T0, T1, T2>(string format, T0 arg0, T1 arg1, T2 arg2)
-        {
-            if (!IsDebugEnabled || format is null)
-                return;
-
-            var logEvent = GetLogEventFor(Level.Debug);
-            logEvent.AppendFormat(format);
-            logEvent.AppendGeneric(arg0);
-            logEvent.AppendGeneric(arg1);
-            logEvent.AppendGeneric(arg2);
-            logEvent.Log();
-        }
-
-        [StringFormatMethod("format")]
-        public void DebugFormat<T0, T1, T2, T3>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3)
-        {
-            if (!IsDebugEnabled || format is null)
-                return;
-
-            var logEvent = GetLogEventFor(Level.Debug);
-            logEvent.AppendFormat(format);
-            logEvent.AppendGeneric(arg0);
-            logEvent.AppendGeneric(arg1);
-            logEvent.AppendGeneric(arg2);
-            logEvent.AppendGeneric(arg3);
-            logEvent.Log();
-        }
-
-        [StringFormatMethod("format")]
-        public void DebugFormat<T0, T1, T2, T3, T4>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
-        {
-            if (!IsDebugEnabled || format is null)
-                return;
-
-            var logEvent = GetLogEventFor(Level.Debug);
-            logEvent.AppendFormat(format);
-            logEvent.AppendGeneric(arg0);
-            logEvent.AppendGeneric(arg1);
-            logEvent.AppendGeneric(arg2);
-            logEvent.AppendGeneric(arg3);
-            logEvent.AppendGeneric(arg4);
-            logEvent.Log();
-        }
-
-        [StringFormatMethod("format")]
-        public void DebugFormat<T0, T1, T2, T3, T4, T5>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
-        {
-            if (!IsDebugEnabled || format is null)
-                return;
-
-            var logEvent = GetLogEventFor(Level.Debug);
-            logEvent.AppendFormat(format);
-            logEvent.AppendGeneric(arg0);
-            logEvent.AppendGeneric(arg1);
-            logEvent.AppendGeneric(arg2);
-            logEvent.AppendGeneric(arg3);
-            logEvent.AppendGeneric(arg4);
-            logEvent.AppendGeneric(arg5);
-            logEvent.Log();
-        }
-
-        [StringFormatMethod("format")]
-        public void DebugFormat<T0, T1, T2, T3, T4, T5, T6>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
-        {
-            if (!IsDebugEnabled || format is null)
-                return;
-
-            var logEvent = GetLogEventFor(Level.Debug);
-            logEvent.AppendFormat(format);
-            logEvent.AppendGeneric(arg0);
-            logEvent.AppendGeneric(arg1);
-            logEvent.AppendGeneric(arg2);
-            logEvent.AppendGeneric(arg3);
-            logEvent.AppendGeneric(arg4);
-            logEvent.AppendGeneric(arg5);
-            logEvent.AppendGeneric(arg6);
-            logEvent.Log();
-        }
-
-        [StringFormatMethod("format")]
-        public void DebugFormat<T0, T1, T2, T3, T4, T5, T6, T7>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7)
-        {
-            if (!IsDebugEnabled || format is null)
-                return;
-
-            var logEvent = GetLogEventFor(Level.Debug);
-            logEvent.AppendFormat(format);
-            logEvent.AppendGeneric(arg0);
-            logEvent.AppendGeneric(arg1);
-            logEvent.AppendGeneric(arg2);
-            logEvent.AppendGeneric(arg3);
-            logEvent.AppendGeneric(arg4);
-            logEvent.AppendGeneric(arg5);
-            logEvent.AppendGeneric(arg6);
-            logEvent.AppendGeneric(arg7);
-            logEvent.Log();
-        }
-
         public bool IsInfoEnabled => Level.Info >= _logLevel;
 
         public ILogEvent Info()
@@ -260,130 +96,6 @@ namespace ZeroLog
             var logEvent = GetLogEventFor(Level.Info);
             logEvent.Append(message);
             logEvent.Append(ex?.ToString());
-            logEvent.Log();
-        }
-
-        [StringFormatMethod("format")]
-        public void InfoFormat<T0>(string format, T0 arg0)
-        {
-            if (!IsInfoEnabled || format is null)
-                return;
-
-            var logEvent = GetLogEventFor(Level.Info);
-            logEvent.AppendFormat(format);
-            logEvent.AppendGeneric(arg0);
-            logEvent.Log();
-        }
-
-        [StringFormatMethod("format")]
-        public void InfoFormat<T0, T1>(string format, T0 arg0, T1 arg1)
-        {
-            if (!IsInfoEnabled || format is null)
-                return;
-
-            var logEvent = GetLogEventFor(Level.Info);
-            logEvent.AppendFormat(format);
-            logEvent.AppendGeneric(arg0);
-            logEvent.AppendGeneric(arg1);
-            logEvent.Log();
-        }
-
-        [StringFormatMethod("format")]
-        public void InfoFormat<T0, T1, T2>(string format, T0 arg0, T1 arg1, T2 arg2)
-        {
-            if (!IsInfoEnabled || format is null)
-                return;
-
-            var logEvent = GetLogEventFor(Level.Info);
-            logEvent.AppendFormat(format);
-            logEvent.AppendGeneric(arg0);
-            logEvent.AppendGeneric(arg1);
-            logEvent.AppendGeneric(arg2);
-            logEvent.Log();
-        }
-
-        [StringFormatMethod("format")]
-        public void InfoFormat<T0, T1, T2, T3>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3)
-        {
-            if (!IsInfoEnabled || format is null)
-                return;
-
-            var logEvent = GetLogEventFor(Level.Info);
-            logEvent.AppendFormat(format);
-            logEvent.AppendGeneric(arg0);
-            logEvent.AppendGeneric(arg1);
-            logEvent.AppendGeneric(arg2);
-            logEvent.AppendGeneric(arg3);
-            logEvent.Log();
-        }
-
-        [StringFormatMethod("format")]
-        public void InfoFormat<T0, T1, T2, T3, T4>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
-        {
-            if (!IsInfoEnabled || format is null)
-                return;
-
-            var logEvent = GetLogEventFor(Level.Info);
-            logEvent.AppendFormat(format);
-            logEvent.AppendGeneric(arg0);
-            logEvent.AppendGeneric(arg1);
-            logEvent.AppendGeneric(arg2);
-            logEvent.AppendGeneric(arg3);
-            logEvent.AppendGeneric(arg4);
-            logEvent.Log();
-        }
-
-        [StringFormatMethod("format")]
-        public void InfoFormat<T0, T1, T2, T3, T4, T5>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
-        {
-            if (!IsInfoEnabled || format is null)
-                return;
-
-            var logEvent = GetLogEventFor(Level.Info);
-            logEvent.AppendFormat(format);
-            logEvent.AppendGeneric(arg0);
-            logEvent.AppendGeneric(arg1);
-            logEvent.AppendGeneric(arg2);
-            logEvent.AppendGeneric(arg3);
-            logEvent.AppendGeneric(arg4);
-            logEvent.AppendGeneric(arg5);
-            logEvent.Log();
-        }
-
-        [StringFormatMethod("format")]
-        public void InfoFormat<T0, T1, T2, T3, T4, T5, T6>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
-        {
-            if (!IsInfoEnabled || format is null)
-                return;
-
-            var logEvent = GetLogEventFor(Level.Info);
-            logEvent.AppendFormat(format);
-            logEvent.AppendGeneric(arg0);
-            logEvent.AppendGeneric(arg1);
-            logEvent.AppendGeneric(arg2);
-            logEvent.AppendGeneric(arg3);
-            logEvent.AppendGeneric(arg4);
-            logEvent.AppendGeneric(arg5);
-            logEvent.AppendGeneric(arg6);
-            logEvent.Log();
-        }
-
-        [StringFormatMethod("format")]
-        public void InfoFormat<T0, T1, T2, T3, T4, T5, T6, T7>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7)
-        {
-            if (!IsInfoEnabled || format is null)
-                return;
-
-            var logEvent = GetLogEventFor(Level.Info);
-            logEvent.AppendFormat(format);
-            logEvent.AppendGeneric(arg0);
-            logEvent.AppendGeneric(arg1);
-            logEvent.AppendGeneric(arg2);
-            logEvent.AppendGeneric(arg3);
-            logEvent.AppendGeneric(arg4);
-            logEvent.AppendGeneric(arg5);
-            logEvent.AppendGeneric(arg6);
-            logEvent.AppendGeneric(arg7);
             logEvent.Log();
         }
 
@@ -415,130 +127,6 @@ namespace ZeroLog
             logEvent.Log();
         }
 
-        [StringFormatMethod("format")]
-        public void WarnFormat<T0>(string format, T0 arg0)
-        {
-            if (!IsWarnEnabled || format is null)
-                return;
-
-            var logEvent = GetLogEventFor(Level.Warn);
-            logEvent.AppendFormat(format);
-            logEvent.AppendGeneric(arg0);
-            logEvent.Log();
-        }
-
-        [StringFormatMethod("format")]
-        public void WarnFormat<T0, T1>(string format, T0 arg0, T1 arg1)
-        {
-            if (!IsWarnEnabled || format is null)
-                return;
-
-            var logEvent = GetLogEventFor(Level.Warn);
-            logEvent.AppendFormat(format);
-            logEvent.AppendGeneric(arg0);
-            logEvent.AppendGeneric(arg1);
-            logEvent.Log();
-        }
-
-        [StringFormatMethod("format")]
-        public void WarnFormat<T0, T1, T2>(string format, T0 arg0, T1 arg1, T2 arg2)
-        {
-            if (!IsWarnEnabled || format is null)
-                return;
-
-            var logEvent = GetLogEventFor(Level.Warn);
-            logEvent.AppendFormat(format);
-            logEvent.AppendGeneric(arg0);
-            logEvent.AppendGeneric(arg1);
-            logEvent.AppendGeneric(arg2);
-            logEvent.Log();
-        }
-
-        [StringFormatMethod("format")]
-        public void WarnFormat<T0, T1, T2, T3>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3)
-        {
-            if (!IsWarnEnabled || format is null)
-                return;
-
-            var logEvent = GetLogEventFor(Level.Warn);
-            logEvent.AppendFormat(format);
-            logEvent.AppendGeneric(arg0);
-            logEvent.AppendGeneric(arg1);
-            logEvent.AppendGeneric(arg2);
-            logEvent.AppendGeneric(arg3);
-            logEvent.Log();
-        }
-
-        [StringFormatMethod("format")]
-        public void WarnFormat<T0, T1, T2, T3, T4>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
-        {
-            if (!IsWarnEnabled || format is null)
-                return;
-
-            var logEvent = GetLogEventFor(Level.Warn);
-            logEvent.AppendFormat(format);
-            logEvent.AppendGeneric(arg0);
-            logEvent.AppendGeneric(arg1);
-            logEvent.AppendGeneric(arg2);
-            logEvent.AppendGeneric(arg3);
-            logEvent.AppendGeneric(arg4);
-            logEvent.Log();
-        }
-
-        [StringFormatMethod("format")]
-        public void WarnFormat<T0, T1, T2, T3, T4, T5>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
-        {
-            if (!IsWarnEnabled || format is null)
-                return;
-
-            var logEvent = GetLogEventFor(Level.Warn);
-            logEvent.AppendFormat(format);
-            logEvent.AppendGeneric(arg0);
-            logEvent.AppendGeneric(arg1);
-            logEvent.AppendGeneric(arg2);
-            logEvent.AppendGeneric(arg3);
-            logEvent.AppendGeneric(arg4);
-            logEvent.AppendGeneric(arg5);
-            logEvent.Log();
-        }
-
-        [StringFormatMethod("format")]
-        public void WarnFormat<T0, T1, T2, T3, T4, T5, T6>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
-        {
-            if (!IsWarnEnabled || format is null)
-                return;
-
-            var logEvent = GetLogEventFor(Level.Warn);
-            logEvent.AppendFormat(format);
-            logEvent.AppendGeneric(arg0);
-            logEvent.AppendGeneric(arg1);
-            logEvent.AppendGeneric(arg2);
-            logEvent.AppendGeneric(arg3);
-            logEvent.AppendGeneric(arg4);
-            logEvent.AppendGeneric(arg5);
-            logEvent.AppendGeneric(arg6);
-            logEvent.Log();
-        }
-
-        [StringFormatMethod("format")]
-        public void WarnFormat<T0, T1, T2, T3, T4, T5, T6, T7>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7)
-        {
-            if (!IsWarnEnabled || format is null)
-                return;
-
-            var logEvent = GetLogEventFor(Level.Warn);
-            logEvent.AppendFormat(format);
-            logEvent.AppendGeneric(arg0);
-            logEvent.AppendGeneric(arg1);
-            logEvent.AppendGeneric(arg2);
-            logEvent.AppendGeneric(arg3);
-            logEvent.AppendGeneric(arg4);
-            logEvent.AppendGeneric(arg5);
-            logEvent.AppendGeneric(arg6);
-            logEvent.AppendGeneric(arg7);
-            logEvent.Log();
-        }
-
         public bool IsErrorEnabled => Level.Error >= _logLevel;
 
         public ILogEvent Error()
@@ -564,130 +152,6 @@ namespace ZeroLog
             var logEvent = GetLogEventFor(Level.Error);
             logEvent.Append(message);
             logEvent.Append(ex?.ToString());
-            logEvent.Log();
-        }
-
-        [StringFormatMethod("format")]
-        public void ErrorFormat<T0>(string format, T0 arg0)
-        {
-            if (!IsErrorEnabled || format is null)
-                return;
-
-            var logEvent = GetLogEventFor(Level.Error);
-            logEvent.AppendFormat(format);
-            logEvent.AppendGeneric(arg0);
-            logEvent.Log();
-        }
-
-        [StringFormatMethod("format")]
-        public void ErrorFormat<T0, T1>(string format, T0 arg0, T1 arg1)
-        {
-            if (!IsErrorEnabled || format is null)
-                return;
-
-            var logEvent = GetLogEventFor(Level.Error);
-            logEvent.AppendFormat(format);
-            logEvent.AppendGeneric(arg0);
-            logEvent.AppendGeneric(arg1);
-            logEvent.Log();
-        }
-
-        [StringFormatMethod("format")]
-        public void ErrorFormat<T0, T1, T2>(string format, T0 arg0, T1 arg1, T2 arg2)
-        {
-            if (!IsErrorEnabled || format is null)
-                return;
-
-            var logEvent = GetLogEventFor(Level.Error);
-            logEvent.AppendFormat(format);
-            logEvent.AppendGeneric(arg0);
-            logEvent.AppendGeneric(arg1);
-            logEvent.AppendGeneric(arg2);
-            logEvent.Log();
-        }
-
-        [StringFormatMethod("format")]
-        public void ErrorFormat<T0, T1, T2, T3>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3)
-        {
-            if (!IsErrorEnabled || format is null)
-                return;
-
-            var logEvent = GetLogEventFor(Level.Error);
-            logEvent.AppendFormat(format);
-            logEvent.AppendGeneric(arg0);
-            logEvent.AppendGeneric(arg1);
-            logEvent.AppendGeneric(arg2);
-            logEvent.AppendGeneric(arg3);
-            logEvent.Log();
-        }
-
-        [StringFormatMethod("format")]
-        public void ErrorFormat<T0, T1, T2, T3, T4>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
-        {
-            if (!IsErrorEnabled || format is null)
-                return;
-
-            var logEvent = GetLogEventFor(Level.Error);
-            logEvent.AppendFormat(format);
-            logEvent.AppendGeneric(arg0);
-            logEvent.AppendGeneric(arg1);
-            logEvent.AppendGeneric(arg2);
-            logEvent.AppendGeneric(arg3);
-            logEvent.AppendGeneric(arg4);
-            logEvent.Log();
-        }
-
-        [StringFormatMethod("format")]
-        public void ErrorFormat<T0, T1, T2, T3, T4, T5>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
-        {
-            if (!IsErrorEnabled || format is null)
-                return;
-
-            var logEvent = GetLogEventFor(Level.Error);
-            logEvent.AppendFormat(format);
-            logEvent.AppendGeneric(arg0);
-            logEvent.AppendGeneric(arg1);
-            logEvent.AppendGeneric(arg2);
-            logEvent.AppendGeneric(arg3);
-            logEvent.AppendGeneric(arg4);
-            logEvent.AppendGeneric(arg5);
-            logEvent.Log();
-        }
-
-        [StringFormatMethod("format")]
-        public void ErrorFormat<T0, T1, T2, T3, T4, T5, T6>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
-        {
-            if (!IsErrorEnabled || format is null)
-                return;
-
-            var logEvent = GetLogEventFor(Level.Error);
-            logEvent.AppendFormat(format);
-            logEvent.AppendGeneric(arg0);
-            logEvent.AppendGeneric(arg1);
-            logEvent.AppendGeneric(arg2);
-            logEvent.AppendGeneric(arg3);
-            logEvent.AppendGeneric(arg4);
-            logEvent.AppendGeneric(arg5);
-            logEvent.AppendGeneric(arg6);
-            logEvent.Log();
-        }
-
-        [StringFormatMethod("format")]
-        public void ErrorFormat<T0, T1, T2, T3, T4, T5, T6, T7>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7)
-        {
-            if (!IsErrorEnabled || format is null)
-                return;
-
-            var logEvent = GetLogEventFor(Level.Error);
-            logEvent.AppendFormat(format);
-            logEvent.AppendGeneric(arg0);
-            logEvent.AppendGeneric(arg1);
-            logEvent.AppendGeneric(arg2);
-            logEvent.AppendGeneric(arg3);
-            logEvent.AppendGeneric(arg4);
-            logEvent.AppendGeneric(arg5);
-            logEvent.AppendGeneric(arg6);
-            logEvent.AppendGeneric(arg7);
             logEvent.Log();
         }
 
@@ -719,130 +183,6 @@ namespace ZeroLog
             logEvent.Log();
         }
 
-        [StringFormatMethod("format")]
-        public void FatalFormat<T0>(string format, T0 arg0)
-        {
-            if (!IsFatalEnabled || format is null)
-                return;
-
-            var logEvent = GetLogEventFor(Level.Fatal);
-            logEvent.AppendFormat(format);
-            logEvent.AppendGeneric(arg0);
-            logEvent.Log();
-        }
-
-        [StringFormatMethod("format")]
-        public void FatalFormat<T0, T1>(string format, T0 arg0, T1 arg1)
-        {
-            if (!IsFatalEnabled || format is null)
-                return;
-
-            var logEvent = GetLogEventFor(Level.Fatal);
-            logEvent.AppendFormat(format);
-            logEvent.AppendGeneric(arg0);
-            logEvent.AppendGeneric(arg1);
-            logEvent.Log();
-        }
-
-        [StringFormatMethod("format")]
-        public void FatalFormat<T0, T1, T2>(string format, T0 arg0, T1 arg1, T2 arg2)
-        {
-            if (!IsFatalEnabled || format is null)
-                return;
-
-            var logEvent = GetLogEventFor(Level.Fatal);
-            logEvent.AppendFormat(format);
-            logEvent.AppendGeneric(arg0);
-            logEvent.AppendGeneric(arg1);
-            logEvent.AppendGeneric(arg2);
-            logEvent.Log();
-        }
-
-        [StringFormatMethod("format")]
-        public void FatalFormat<T0, T1, T2, T3>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3)
-        {
-            if (!IsFatalEnabled || format is null)
-                return;
-
-            var logEvent = GetLogEventFor(Level.Fatal);
-            logEvent.AppendFormat(format);
-            logEvent.AppendGeneric(arg0);
-            logEvent.AppendGeneric(arg1);
-            logEvent.AppendGeneric(arg2);
-            logEvent.AppendGeneric(arg3);
-            logEvent.Log();
-        }
-
-        [StringFormatMethod("format")]
-        public void FatalFormat<T0, T1, T2, T3, T4>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
-        {
-            if (!IsFatalEnabled || format is null)
-                return;
-
-            var logEvent = GetLogEventFor(Level.Fatal);
-            logEvent.AppendFormat(format);
-            logEvent.AppendGeneric(arg0);
-            logEvent.AppendGeneric(arg1);
-            logEvent.AppendGeneric(arg2);
-            logEvent.AppendGeneric(arg3);
-            logEvent.AppendGeneric(arg4);
-            logEvent.Log();
-        }
-
-        [StringFormatMethod("format")]
-        public void FatalFormat<T0, T1, T2, T3, T4, T5>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
-        {
-            if (!IsFatalEnabled || format is null)
-                return;
-
-            var logEvent = GetLogEventFor(Level.Fatal);
-            logEvent.AppendFormat(format);
-            logEvent.AppendGeneric(arg0);
-            logEvent.AppendGeneric(arg1);
-            logEvent.AppendGeneric(arg2);
-            logEvent.AppendGeneric(arg3);
-            logEvent.AppendGeneric(arg4);
-            logEvent.AppendGeneric(arg5);
-            logEvent.Log();
-        }
-
-        [StringFormatMethod("format")]
-        public void FatalFormat<T0, T1, T2, T3, T4, T5, T6>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
-        {
-            if (!IsFatalEnabled || format is null)
-                return;
-
-            var logEvent = GetLogEventFor(Level.Fatal);
-            logEvent.AppendFormat(format);
-            logEvent.AppendGeneric(arg0);
-            logEvent.AppendGeneric(arg1);
-            logEvent.AppendGeneric(arg2);
-            logEvent.AppendGeneric(arg3);
-            logEvent.AppendGeneric(arg4);
-            logEvent.AppendGeneric(arg5);
-            logEvent.AppendGeneric(arg6);
-            logEvent.Log();
-        }
-
-        [StringFormatMethod("format")]
-        public void FatalFormat<T0, T1, T2, T3, T4, T5, T6, T7>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7)
-        {
-            if (!IsFatalEnabled || format is null)
-                return;
-
-            var logEvent = GetLogEventFor(Level.Fatal);
-            logEvent.AppendFormat(format);
-            logEvent.AppendGeneric(arg0);
-            logEvent.AppendGeneric(arg1);
-            logEvent.AppendGeneric(arg2);
-            logEvent.AppendGeneric(arg3);
-            logEvent.AppendGeneric(arg4);
-            logEvent.AppendGeneric(arg5);
-            logEvent.AppendGeneric(arg6);
-            logEvent.AppendGeneric(arg7);
-            logEvent.Log();
-        }
-
     }
 
     partial class NoopLogManager
@@ -861,39 +201,6 @@ namespace ZeroLog
             public void Debug(string? message, Exception? ex)
             {
             }
-
-            public void DebugFormat<T0>(string format, T0 arg0)
-            {
-            }
-
-            public void DebugFormat<T0, T1>(string format, T0 arg0, T1 arg1)
-            {
-            }
-
-            public void DebugFormat<T0, T1, T2>(string format, T0 arg0, T1 arg1, T2 arg2)
-            {
-            }
-
-            public void DebugFormat<T0, T1, T2, T3>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3)
-            {
-            }
-
-            public void DebugFormat<T0, T1, T2, T3, T4>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
-            {
-            }
-
-            public void DebugFormat<T0, T1, T2, T3, T4, T5>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
-            {
-            }
-
-            public void DebugFormat<T0, T1, T2, T3, T4, T5, T6>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
-            {
-            }
-
-            public void DebugFormat<T0, T1, T2, T3, T4, T5, T6, T7>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7)
-            {
-            }
-
             public bool IsInfoEnabled => false;
 
             public ILogEvent Info()
@@ -906,39 +213,6 @@ namespace ZeroLog
             public void Info(string? message, Exception? ex)
             {
             }
-
-            public void InfoFormat<T0>(string format, T0 arg0)
-            {
-            }
-
-            public void InfoFormat<T0, T1>(string format, T0 arg0, T1 arg1)
-            {
-            }
-
-            public void InfoFormat<T0, T1, T2>(string format, T0 arg0, T1 arg1, T2 arg2)
-            {
-            }
-
-            public void InfoFormat<T0, T1, T2, T3>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3)
-            {
-            }
-
-            public void InfoFormat<T0, T1, T2, T3, T4>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
-            {
-            }
-
-            public void InfoFormat<T0, T1, T2, T3, T4, T5>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
-            {
-            }
-
-            public void InfoFormat<T0, T1, T2, T3, T4, T5, T6>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
-            {
-            }
-
-            public void InfoFormat<T0, T1, T2, T3, T4, T5, T6, T7>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7)
-            {
-            }
-
             public bool IsWarnEnabled => false;
 
             public ILogEvent Warn()
@@ -951,39 +225,6 @@ namespace ZeroLog
             public void Warn(string? message, Exception? ex)
             {
             }
-
-            public void WarnFormat<T0>(string format, T0 arg0)
-            {
-            }
-
-            public void WarnFormat<T0, T1>(string format, T0 arg0, T1 arg1)
-            {
-            }
-
-            public void WarnFormat<T0, T1, T2>(string format, T0 arg0, T1 arg1, T2 arg2)
-            {
-            }
-
-            public void WarnFormat<T0, T1, T2, T3>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3)
-            {
-            }
-
-            public void WarnFormat<T0, T1, T2, T3, T4>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
-            {
-            }
-
-            public void WarnFormat<T0, T1, T2, T3, T4, T5>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
-            {
-            }
-
-            public void WarnFormat<T0, T1, T2, T3, T4, T5, T6>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
-            {
-            }
-
-            public void WarnFormat<T0, T1, T2, T3, T4, T5, T6, T7>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7)
-            {
-            }
-
             public bool IsErrorEnabled => false;
 
             public ILogEvent Error()
@@ -996,39 +237,6 @@ namespace ZeroLog
             public void Error(string? message, Exception? ex)
             {
             }
-
-            public void ErrorFormat<T0>(string format, T0 arg0)
-            {
-            }
-
-            public void ErrorFormat<T0, T1>(string format, T0 arg0, T1 arg1)
-            {
-            }
-
-            public void ErrorFormat<T0, T1, T2>(string format, T0 arg0, T1 arg1, T2 arg2)
-            {
-            }
-
-            public void ErrorFormat<T0, T1, T2, T3>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3)
-            {
-            }
-
-            public void ErrorFormat<T0, T1, T2, T3, T4>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
-            {
-            }
-
-            public void ErrorFormat<T0, T1, T2, T3, T4, T5>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
-            {
-            }
-
-            public void ErrorFormat<T0, T1, T2, T3, T4, T5, T6>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
-            {
-            }
-
-            public void ErrorFormat<T0, T1, T2, T3, T4, T5, T6, T7>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7)
-            {
-            }
-
             public bool IsFatalEnabled => false;
 
             public ILogEvent Fatal()
@@ -1041,39 +249,6 @@ namespace ZeroLog
             public void Fatal(string? message, Exception? ex)
             {
             }
-
-            public void FatalFormat<T0>(string format, T0 arg0)
-            {
-            }
-
-            public void FatalFormat<T0, T1>(string format, T0 arg0, T1 arg1)
-            {
-            }
-
-            public void FatalFormat<T0, T1, T2>(string format, T0 arg0, T1 arg1, T2 arg2)
-            {
-            }
-
-            public void FatalFormat<T0, T1, T2, T3>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3)
-            {
-            }
-
-            public void FatalFormat<T0, T1, T2, T3, T4>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
-            {
-            }
-
-            public void FatalFormat<T0, T1, T2, T3, T4, T5>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
-            {
-            }
-
-            public void FatalFormat<T0, T1, T2, T3, T4, T5, T6>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
-            {
-            }
-
-            public void FatalFormat<T0, T1, T2, T3, T4, T5, T6, T7>(string format, T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7)
-            {
-            }
-
         }
     }
 }
