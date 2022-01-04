@@ -146,4 +146,124 @@ public sealed unsafe partial class LogMessage
             _isTruncated = true;
         }
     }
+
+    private void InternalAppend<T>(T value, ArgumentType argType)
+        where T : unmanaged
+    {
+        if (_dataPointer + sizeof(ArgumentType) + sizeof(T) <= _endOfBuffer)
+        {
+            *(ArgumentType*)_dataPointer = argType;
+            _dataPointer += sizeof(ArgumentType);
+
+            *(T*)_dataPointer = value;
+            _dataPointer += sizeof(T);
+        }
+        else
+        {
+            _isTruncated = true;
+        }
+    }
+
+    private void InternalAppend<T>(T? value, ArgumentType argType)
+        where T : unmanaged
+    {
+        if (value is not null)
+            InternalAppend(value.GetValueOrDefault(), argType);
+        else
+            InternalAppendNull();
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private void InternalAppend<T>(T value, string format, ArgumentType argType)
+        where T : unmanaged
+    {
+        if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(T) <= _endOfBuffer && _stringIndex < _strings.Length)
+        {
+            *(ArgumentType*)_dataPointer = argType | ArgumentType.FormatFlag;
+            _dataPointer += sizeof(ArgumentType);
+
+            _strings[_stringIndex] = format;
+
+            *_dataPointer = _stringIndex;
+            ++_dataPointer;
+
+            ++_stringIndex;
+
+            *(T*)_dataPointer = value;
+            _dataPointer += sizeof(T);
+        }
+        else
+        {
+            _isTruncated = true;
+        }
+    }
+
+    private void InternalAppend<T>(T? value, string format, ArgumentType argType)
+        where T : unmanaged
+    {
+        if (value is not null)
+            InternalAppend(value.GetValueOrDefault(), format, argType);
+        else
+            InternalAppendNull();
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private void InternalAppendKeyValue<T>(string key, T value, ArgumentType argType)
+        where T : unmanaged
+    {
+        if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(T) <= _endOfBuffer && _stringIndex < _strings.Length)
+        {
+            *(ArgumentType*)_dataPointer = ArgumentType.KeyString;
+            _dataPointer += sizeof(ArgumentType);
+
+            _strings[_stringIndex] = key;
+
+            *_dataPointer = _stringIndex;
+            ++_stringIndex;
+
+            *(ArgumentType*)_dataPointer = argType;
+            _dataPointer += sizeof(ArgumentType);
+
+            *(T*)_dataPointer = value;
+            _dataPointer += sizeof(T);
+        }
+        else
+        {
+            _isTruncated = true;
+        }
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private void InternalAppendKeyValue<T>(string key, T? value, ArgumentType argType)
+        where T : unmanaged
+    {
+        if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(T) <= _endOfBuffer && _stringIndex < _strings.Length)
+        {
+            *(ArgumentType*)_dataPointer = ArgumentType.KeyString;
+            _dataPointer += sizeof(ArgumentType);
+
+            _strings[_stringIndex] = key;
+
+            *_dataPointer = _stringIndex;
+            ++_stringIndex;
+
+            if (value is not null)
+            {
+                *(ArgumentType*)_dataPointer = argType;
+                _dataPointer += sizeof(ArgumentType);
+
+                *(T*)_dataPointer = value.GetValueOrDefault();
+                _dataPointer += sizeof(T);
+            }
+            else
+            {
+                *(ArgumentType*)_dataPointer = ArgumentType.Null;
+                _dataPointer += sizeof(ArgumentType);
+            }
+        }
+        else
+        {
+            _isTruncated = true;
+        }
+    }
 }

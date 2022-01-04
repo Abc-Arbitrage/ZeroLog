@@ -12,2594 +12,734 @@ namespace ZeroLog;
 
 #nullable enable
 
-unsafe partial class LogMessage
+partial class LogMessage
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(bool value)
     {
-        InternalAppend(value);
+        InternalAppend(value, ArgumentType.Boolean);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(bool? value)
     {
-        InternalAppend(value);
+        InternalAppend(value, ArgumentType.Boolean);
         return this;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(bool value)
-    {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(bool) <= _endOfBuffer)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.Boolean;
-            _dataPointer += sizeof(ArgumentType);
-
-            *(bool*)_dataPointer = value;
-            _dataPointer += sizeof(bool);
-        }
-        else
-        {
-            _isTruncated = true;
-        }
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(bool? value)
-    {
-        if (value is not null)
-            InternalAppend(value.GetValueOrDefault());
-        else
-            InternalAppendNull();
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage AppendKeyValue(string key, bool value)
     {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(bool) <= _endOfBuffer && _stringIndex < _strings.Length)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.KeyString;
-            _dataPointer += sizeof(ArgumentType);
-
-            _strings[_stringIndex] = key;
-
-            *_dataPointer = _stringIndex;
-            ++_stringIndex;
-
-            *(ArgumentType*)_dataPointer = ArgumentType.Boolean;
-            _dataPointer += sizeof(ArgumentType);
-
-            *(bool*)_dataPointer = value;
-            _dataPointer += sizeof(bool);
-        }
-        else
-        {
-            _isTruncated = true;
-        }
-
+        InternalAppendKeyValue(key, value, ArgumentType.Boolean);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage AppendKeyValue(string key, bool? value)
     {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(bool) <= _endOfBuffer && _stringIndex < _strings.Length)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.KeyString;
-            _dataPointer += sizeof(ArgumentType);
-
-            _strings[_stringIndex] = key;
-
-            *_dataPointer = _stringIndex;
-            ++_stringIndex;
-
-            if (value is not null)
-            {
-                *(ArgumentType*)_dataPointer = ArgumentType.Boolean;
-                _dataPointer += sizeof(ArgumentType);
-
-                *(bool*)_dataPointer = value.GetValueOrDefault();
-                _dataPointer += sizeof(bool);
-            }
-            else
-            {
-                *(ArgumentType*)_dataPointer = ArgumentType.Null;
-                _dataPointer += sizeof(ArgumentType);
-            }
-        }
-        else
-        {
-            _isTruncated = true;
-        }
-
+        InternalAppendKeyValue(key, value, ArgumentType.Boolean);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(byte value)
     {
-        InternalAppend(value);
+        InternalAppend(value, ArgumentType.Byte);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(byte? value)
     {
-        InternalAppend(value);
-        return this;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(byte value)
-    {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) <= _endOfBuffer)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.Byte;
-            _dataPointer += sizeof(ArgumentType);
-
-            *(byte*)_dataPointer = value;
-            _dataPointer += sizeof(byte);
-        }
-        else
-        {
-            _isTruncated = true;
-        }
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(byte? value)
-    {
-        if (value is not null)
-            InternalAppend(value.GetValueOrDefault());
-        else
-            InternalAppendNull();
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public LogMessage AppendKeyValue(string key, byte value)
-    {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(byte) <= _endOfBuffer && _stringIndex < _strings.Length)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.KeyString;
-            _dataPointer += sizeof(ArgumentType);
-
-            _strings[_stringIndex] = key;
-
-            *_dataPointer = _stringIndex;
-            ++_stringIndex;
-
-            *(ArgumentType*)_dataPointer = ArgumentType.Byte;
-            _dataPointer += sizeof(ArgumentType);
-
-            *(byte*)_dataPointer = value;
-            _dataPointer += sizeof(byte);
-        }
-        else
-        {
-            _isTruncated = true;
-        }
-
-        return this;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public LogMessage AppendKeyValue(string key, byte? value)
-    {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(byte) <= _endOfBuffer && _stringIndex < _strings.Length)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.KeyString;
-            _dataPointer += sizeof(ArgumentType);
-
-            _strings[_stringIndex] = key;
-
-            *_dataPointer = _stringIndex;
-            ++_stringIndex;
-
-            if (value is not null)
-            {
-                *(ArgumentType*)_dataPointer = ArgumentType.Byte;
-                _dataPointer += sizeof(ArgumentType);
-
-                *(byte*)_dataPointer = value.GetValueOrDefault();
-                _dataPointer += sizeof(byte);
-            }
-            else
-            {
-                *(ArgumentType*)_dataPointer = ArgumentType.Null;
-                _dataPointer += sizeof(ArgumentType);
-            }
-        }
-        else
-        {
-            _isTruncated = true;
-        }
-
+        InternalAppend(value, ArgumentType.Byte);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(byte value, string format)
     {
-        InternalAppend(value, format);
+        InternalAppend(value, format, ArgumentType.Byte);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(byte? value, string format)
     {
-        InternalAppend(value, format);
+        InternalAppend(value, format, ArgumentType.Byte);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(byte value, string format)
+    public LogMessage AppendKeyValue(string key, byte value)
     {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(byte) <= _endOfBuffer && _stringIndex < _strings.Length)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.Byte | ArgumentType.FormatFlag;
-            _dataPointer += sizeof(ArgumentType);
-
-            _strings[_stringIndex] = format;
-
-            *_dataPointer = _stringIndex;
-            ++_dataPointer;
-
-            ++_stringIndex;
-
-            *(byte*)_dataPointer = value;
-            _dataPointer += sizeof(byte);
-        }
-        else
-        {
-            _isTruncated = true;
-        }
+        InternalAppendKeyValue(key, value, ArgumentType.Byte);
+        return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(byte? value, string format)
+    public LogMessage AppendKeyValue(string key, byte? value)
     {
-        if (value is not null)
-            InternalAppend(value.GetValueOrDefault(), format);
-        else
-            InternalAppendNull();
+        InternalAppendKeyValue(key, value, ArgumentType.Byte);
+        return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(sbyte value)
     {
-        InternalAppend(value);
+        InternalAppend(value, ArgumentType.SByte);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(sbyte? value)
     {
-        InternalAppend(value);
-        return this;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(sbyte value)
-    {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(sbyte) <= _endOfBuffer)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.SByte;
-            _dataPointer += sizeof(ArgumentType);
-
-            *(sbyte*)_dataPointer = value;
-            _dataPointer += sizeof(sbyte);
-        }
-        else
-        {
-            _isTruncated = true;
-        }
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(sbyte? value)
-    {
-        if (value is not null)
-            InternalAppend(value.GetValueOrDefault());
-        else
-            InternalAppendNull();
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public LogMessage AppendKeyValue(string key, sbyte value)
-    {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(sbyte) <= _endOfBuffer && _stringIndex < _strings.Length)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.KeyString;
-            _dataPointer += sizeof(ArgumentType);
-
-            _strings[_stringIndex] = key;
-
-            *_dataPointer = _stringIndex;
-            ++_stringIndex;
-
-            *(ArgumentType*)_dataPointer = ArgumentType.SByte;
-            _dataPointer += sizeof(ArgumentType);
-
-            *(sbyte*)_dataPointer = value;
-            _dataPointer += sizeof(sbyte);
-        }
-        else
-        {
-            _isTruncated = true;
-        }
-
-        return this;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public LogMessage AppendKeyValue(string key, sbyte? value)
-    {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(sbyte) <= _endOfBuffer && _stringIndex < _strings.Length)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.KeyString;
-            _dataPointer += sizeof(ArgumentType);
-
-            _strings[_stringIndex] = key;
-
-            *_dataPointer = _stringIndex;
-            ++_stringIndex;
-
-            if (value is not null)
-            {
-                *(ArgumentType*)_dataPointer = ArgumentType.SByte;
-                _dataPointer += sizeof(ArgumentType);
-
-                *(sbyte*)_dataPointer = value.GetValueOrDefault();
-                _dataPointer += sizeof(sbyte);
-            }
-            else
-            {
-                *(ArgumentType*)_dataPointer = ArgumentType.Null;
-                _dataPointer += sizeof(ArgumentType);
-            }
-        }
-        else
-        {
-            _isTruncated = true;
-        }
-
+        InternalAppend(value, ArgumentType.SByte);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(sbyte value, string format)
     {
-        InternalAppend(value, format);
+        InternalAppend(value, format, ArgumentType.SByte);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(sbyte? value, string format)
     {
-        InternalAppend(value, format);
+        InternalAppend(value, format, ArgumentType.SByte);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(sbyte value, string format)
+    public LogMessage AppendKeyValue(string key, sbyte value)
     {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(sbyte) <= _endOfBuffer && _stringIndex < _strings.Length)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.SByte | ArgumentType.FormatFlag;
-            _dataPointer += sizeof(ArgumentType);
-
-            _strings[_stringIndex] = format;
-
-            *_dataPointer = _stringIndex;
-            ++_dataPointer;
-
-            ++_stringIndex;
-
-            *(sbyte*)_dataPointer = value;
-            _dataPointer += sizeof(sbyte);
-        }
-        else
-        {
-            _isTruncated = true;
-        }
+        InternalAppendKeyValue(key, value, ArgumentType.SByte);
+        return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(sbyte? value, string format)
+    public LogMessage AppendKeyValue(string key, sbyte? value)
     {
-        if (value is not null)
-            InternalAppend(value.GetValueOrDefault(), format);
-        else
-            InternalAppendNull();
+        InternalAppendKeyValue(key, value, ArgumentType.SByte);
+        return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(char value)
     {
-        InternalAppend(value);
+        InternalAppend(value, ArgumentType.Char);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(char? value)
     {
-        InternalAppend(value);
+        InternalAppend(value, ArgumentType.Char);
         return this;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(char value)
-    {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(char) <= _endOfBuffer)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.Char;
-            _dataPointer += sizeof(ArgumentType);
-
-            *(char*)_dataPointer = value;
-            _dataPointer += sizeof(char);
-        }
-        else
-        {
-            _isTruncated = true;
-        }
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(char? value)
-    {
-        if (value is not null)
-            InternalAppend(value.GetValueOrDefault());
-        else
-            InternalAppendNull();
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage AppendKeyValue(string key, char value)
     {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(char) <= _endOfBuffer && _stringIndex < _strings.Length)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.KeyString;
-            _dataPointer += sizeof(ArgumentType);
-
-            _strings[_stringIndex] = key;
-
-            *_dataPointer = _stringIndex;
-            ++_stringIndex;
-
-            *(ArgumentType*)_dataPointer = ArgumentType.Char;
-            _dataPointer += sizeof(ArgumentType);
-
-            *(char*)_dataPointer = value;
-            _dataPointer += sizeof(char);
-        }
-        else
-        {
-            _isTruncated = true;
-        }
-
+        InternalAppendKeyValue(key, value, ArgumentType.Char);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage AppendKeyValue(string key, char? value)
     {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(char) <= _endOfBuffer && _stringIndex < _strings.Length)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.KeyString;
-            _dataPointer += sizeof(ArgumentType);
-
-            _strings[_stringIndex] = key;
-
-            *_dataPointer = _stringIndex;
-            ++_stringIndex;
-
-            if (value is not null)
-            {
-                *(ArgumentType*)_dataPointer = ArgumentType.Char;
-                _dataPointer += sizeof(ArgumentType);
-
-                *(char*)_dataPointer = value.GetValueOrDefault();
-                _dataPointer += sizeof(char);
-            }
-            else
-            {
-                *(ArgumentType*)_dataPointer = ArgumentType.Null;
-                _dataPointer += sizeof(ArgumentType);
-            }
-        }
-        else
-        {
-            _isTruncated = true;
-        }
-
+        InternalAppendKeyValue(key, value, ArgumentType.Char);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(short value)
     {
-        InternalAppend(value);
+        InternalAppend(value, ArgumentType.Int16);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(short? value)
     {
-        InternalAppend(value);
-        return this;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(short value)
-    {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(short) <= _endOfBuffer)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.Int16;
-            _dataPointer += sizeof(ArgumentType);
-
-            *(short*)_dataPointer = value;
-            _dataPointer += sizeof(short);
-        }
-        else
-        {
-            _isTruncated = true;
-        }
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(short? value)
-    {
-        if (value is not null)
-            InternalAppend(value.GetValueOrDefault());
-        else
-            InternalAppendNull();
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public LogMessage AppendKeyValue(string key, short value)
-    {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(short) <= _endOfBuffer && _stringIndex < _strings.Length)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.KeyString;
-            _dataPointer += sizeof(ArgumentType);
-
-            _strings[_stringIndex] = key;
-
-            *_dataPointer = _stringIndex;
-            ++_stringIndex;
-
-            *(ArgumentType*)_dataPointer = ArgumentType.Int16;
-            _dataPointer += sizeof(ArgumentType);
-
-            *(short*)_dataPointer = value;
-            _dataPointer += sizeof(short);
-        }
-        else
-        {
-            _isTruncated = true;
-        }
-
-        return this;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public LogMessage AppendKeyValue(string key, short? value)
-    {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(short) <= _endOfBuffer && _stringIndex < _strings.Length)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.KeyString;
-            _dataPointer += sizeof(ArgumentType);
-
-            _strings[_stringIndex] = key;
-
-            *_dataPointer = _stringIndex;
-            ++_stringIndex;
-
-            if (value is not null)
-            {
-                *(ArgumentType*)_dataPointer = ArgumentType.Int16;
-                _dataPointer += sizeof(ArgumentType);
-
-                *(short*)_dataPointer = value.GetValueOrDefault();
-                _dataPointer += sizeof(short);
-            }
-            else
-            {
-                *(ArgumentType*)_dataPointer = ArgumentType.Null;
-                _dataPointer += sizeof(ArgumentType);
-            }
-        }
-        else
-        {
-            _isTruncated = true;
-        }
-
+        InternalAppend(value, ArgumentType.Int16);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(short value, string format)
     {
-        InternalAppend(value, format);
+        InternalAppend(value, format, ArgumentType.Int16);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(short? value, string format)
     {
-        InternalAppend(value, format);
+        InternalAppend(value, format, ArgumentType.Int16);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(short value, string format)
+    public LogMessage AppendKeyValue(string key, short value)
     {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(short) <= _endOfBuffer && _stringIndex < _strings.Length)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.Int16 | ArgumentType.FormatFlag;
-            _dataPointer += sizeof(ArgumentType);
-
-            _strings[_stringIndex] = format;
-
-            *_dataPointer = _stringIndex;
-            ++_dataPointer;
-
-            ++_stringIndex;
-
-            *(short*)_dataPointer = value;
-            _dataPointer += sizeof(short);
-        }
-        else
-        {
-            _isTruncated = true;
-        }
+        InternalAppendKeyValue(key, value, ArgumentType.Int16);
+        return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(short? value, string format)
+    public LogMessage AppendKeyValue(string key, short? value)
     {
-        if (value is not null)
-            InternalAppend(value.GetValueOrDefault(), format);
-        else
-            InternalAppendNull();
+        InternalAppendKeyValue(key, value, ArgumentType.Int16);
+        return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(ushort value)
     {
-        InternalAppend(value);
+        InternalAppend(value, ArgumentType.UInt16);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(ushort? value)
     {
-        InternalAppend(value);
-        return this;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(ushort value)
-    {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(ushort) <= _endOfBuffer)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.UInt16;
-            _dataPointer += sizeof(ArgumentType);
-
-            *(ushort*)_dataPointer = value;
-            _dataPointer += sizeof(ushort);
-        }
-        else
-        {
-            _isTruncated = true;
-        }
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(ushort? value)
-    {
-        if (value is not null)
-            InternalAppend(value.GetValueOrDefault());
-        else
-            InternalAppendNull();
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public LogMessage AppendKeyValue(string key, ushort value)
-    {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(ushort) <= _endOfBuffer && _stringIndex < _strings.Length)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.KeyString;
-            _dataPointer += sizeof(ArgumentType);
-
-            _strings[_stringIndex] = key;
-
-            *_dataPointer = _stringIndex;
-            ++_stringIndex;
-
-            *(ArgumentType*)_dataPointer = ArgumentType.UInt16;
-            _dataPointer += sizeof(ArgumentType);
-
-            *(ushort*)_dataPointer = value;
-            _dataPointer += sizeof(ushort);
-        }
-        else
-        {
-            _isTruncated = true;
-        }
-
-        return this;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public LogMessage AppendKeyValue(string key, ushort? value)
-    {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(ushort) <= _endOfBuffer && _stringIndex < _strings.Length)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.KeyString;
-            _dataPointer += sizeof(ArgumentType);
-
-            _strings[_stringIndex] = key;
-
-            *_dataPointer = _stringIndex;
-            ++_stringIndex;
-
-            if (value is not null)
-            {
-                *(ArgumentType*)_dataPointer = ArgumentType.UInt16;
-                _dataPointer += sizeof(ArgumentType);
-
-                *(ushort*)_dataPointer = value.GetValueOrDefault();
-                _dataPointer += sizeof(ushort);
-            }
-            else
-            {
-                *(ArgumentType*)_dataPointer = ArgumentType.Null;
-                _dataPointer += sizeof(ArgumentType);
-            }
-        }
-        else
-        {
-            _isTruncated = true;
-        }
-
+        InternalAppend(value, ArgumentType.UInt16);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(ushort value, string format)
     {
-        InternalAppend(value, format);
+        InternalAppend(value, format, ArgumentType.UInt16);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(ushort? value, string format)
     {
-        InternalAppend(value, format);
+        InternalAppend(value, format, ArgumentType.UInt16);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(ushort value, string format)
+    public LogMessage AppendKeyValue(string key, ushort value)
     {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(ushort) <= _endOfBuffer && _stringIndex < _strings.Length)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.UInt16 | ArgumentType.FormatFlag;
-            _dataPointer += sizeof(ArgumentType);
-
-            _strings[_stringIndex] = format;
-
-            *_dataPointer = _stringIndex;
-            ++_dataPointer;
-
-            ++_stringIndex;
-
-            *(ushort*)_dataPointer = value;
-            _dataPointer += sizeof(ushort);
-        }
-        else
-        {
-            _isTruncated = true;
-        }
+        InternalAppendKeyValue(key, value, ArgumentType.UInt16);
+        return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(ushort? value, string format)
+    public LogMessage AppendKeyValue(string key, ushort? value)
     {
-        if (value is not null)
-            InternalAppend(value.GetValueOrDefault(), format);
-        else
-            InternalAppendNull();
+        InternalAppendKeyValue(key, value, ArgumentType.UInt16);
+        return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(int value)
     {
-        InternalAppend(value);
+        InternalAppend(value, ArgumentType.Int32);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(int? value)
     {
-        InternalAppend(value);
-        return this;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(int value)
-    {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(int) <= _endOfBuffer)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.Int32;
-            _dataPointer += sizeof(ArgumentType);
-
-            *(int*)_dataPointer = value;
-            _dataPointer += sizeof(int);
-        }
-        else
-        {
-            _isTruncated = true;
-        }
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(int? value)
-    {
-        if (value is not null)
-            InternalAppend(value.GetValueOrDefault());
-        else
-            InternalAppendNull();
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public LogMessage AppendKeyValue(string key, int value)
-    {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(int) <= _endOfBuffer && _stringIndex < _strings.Length)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.KeyString;
-            _dataPointer += sizeof(ArgumentType);
-
-            _strings[_stringIndex] = key;
-
-            *_dataPointer = _stringIndex;
-            ++_stringIndex;
-
-            *(ArgumentType*)_dataPointer = ArgumentType.Int32;
-            _dataPointer += sizeof(ArgumentType);
-
-            *(int*)_dataPointer = value;
-            _dataPointer += sizeof(int);
-        }
-        else
-        {
-            _isTruncated = true;
-        }
-
-        return this;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public LogMessage AppendKeyValue(string key, int? value)
-    {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(int) <= _endOfBuffer && _stringIndex < _strings.Length)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.KeyString;
-            _dataPointer += sizeof(ArgumentType);
-
-            _strings[_stringIndex] = key;
-
-            *_dataPointer = _stringIndex;
-            ++_stringIndex;
-
-            if (value is not null)
-            {
-                *(ArgumentType*)_dataPointer = ArgumentType.Int32;
-                _dataPointer += sizeof(ArgumentType);
-
-                *(int*)_dataPointer = value.GetValueOrDefault();
-                _dataPointer += sizeof(int);
-            }
-            else
-            {
-                *(ArgumentType*)_dataPointer = ArgumentType.Null;
-                _dataPointer += sizeof(ArgumentType);
-            }
-        }
-        else
-        {
-            _isTruncated = true;
-        }
-
+        InternalAppend(value, ArgumentType.Int32);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(int value, string format)
     {
-        InternalAppend(value, format);
+        InternalAppend(value, format, ArgumentType.Int32);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(int? value, string format)
     {
-        InternalAppend(value, format);
+        InternalAppend(value, format, ArgumentType.Int32);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(int value, string format)
+    public LogMessage AppendKeyValue(string key, int value)
     {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(int) <= _endOfBuffer && _stringIndex < _strings.Length)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.Int32 | ArgumentType.FormatFlag;
-            _dataPointer += sizeof(ArgumentType);
-
-            _strings[_stringIndex] = format;
-
-            *_dataPointer = _stringIndex;
-            ++_dataPointer;
-
-            ++_stringIndex;
-
-            *(int*)_dataPointer = value;
-            _dataPointer += sizeof(int);
-        }
-        else
-        {
-            _isTruncated = true;
-        }
+        InternalAppendKeyValue(key, value, ArgumentType.Int32);
+        return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(int? value, string format)
+    public LogMessage AppendKeyValue(string key, int? value)
     {
-        if (value is not null)
-            InternalAppend(value.GetValueOrDefault(), format);
-        else
-            InternalAppendNull();
+        InternalAppendKeyValue(key, value, ArgumentType.Int32);
+        return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(uint value)
     {
-        InternalAppend(value);
+        InternalAppend(value, ArgumentType.UInt32);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(uint? value)
     {
-        InternalAppend(value);
-        return this;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(uint value)
-    {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(uint) <= _endOfBuffer)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.UInt32;
-            _dataPointer += sizeof(ArgumentType);
-
-            *(uint*)_dataPointer = value;
-            _dataPointer += sizeof(uint);
-        }
-        else
-        {
-            _isTruncated = true;
-        }
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(uint? value)
-    {
-        if (value is not null)
-            InternalAppend(value.GetValueOrDefault());
-        else
-            InternalAppendNull();
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public LogMessage AppendKeyValue(string key, uint value)
-    {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(uint) <= _endOfBuffer && _stringIndex < _strings.Length)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.KeyString;
-            _dataPointer += sizeof(ArgumentType);
-
-            _strings[_stringIndex] = key;
-
-            *_dataPointer = _stringIndex;
-            ++_stringIndex;
-
-            *(ArgumentType*)_dataPointer = ArgumentType.UInt32;
-            _dataPointer += sizeof(ArgumentType);
-
-            *(uint*)_dataPointer = value;
-            _dataPointer += sizeof(uint);
-        }
-        else
-        {
-            _isTruncated = true;
-        }
-
-        return this;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public LogMessage AppendKeyValue(string key, uint? value)
-    {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(uint) <= _endOfBuffer && _stringIndex < _strings.Length)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.KeyString;
-            _dataPointer += sizeof(ArgumentType);
-
-            _strings[_stringIndex] = key;
-
-            *_dataPointer = _stringIndex;
-            ++_stringIndex;
-
-            if (value is not null)
-            {
-                *(ArgumentType*)_dataPointer = ArgumentType.UInt32;
-                _dataPointer += sizeof(ArgumentType);
-
-                *(uint*)_dataPointer = value.GetValueOrDefault();
-                _dataPointer += sizeof(uint);
-            }
-            else
-            {
-                *(ArgumentType*)_dataPointer = ArgumentType.Null;
-                _dataPointer += sizeof(ArgumentType);
-            }
-        }
-        else
-        {
-            _isTruncated = true;
-        }
-
+        InternalAppend(value, ArgumentType.UInt32);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(uint value, string format)
     {
-        InternalAppend(value, format);
+        InternalAppend(value, format, ArgumentType.UInt32);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(uint? value, string format)
     {
-        InternalAppend(value, format);
+        InternalAppend(value, format, ArgumentType.UInt32);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(uint value, string format)
+    public LogMessage AppendKeyValue(string key, uint value)
     {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(uint) <= _endOfBuffer && _stringIndex < _strings.Length)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.UInt32 | ArgumentType.FormatFlag;
-            _dataPointer += sizeof(ArgumentType);
-
-            _strings[_stringIndex] = format;
-
-            *_dataPointer = _stringIndex;
-            ++_dataPointer;
-
-            ++_stringIndex;
-
-            *(uint*)_dataPointer = value;
-            _dataPointer += sizeof(uint);
-        }
-        else
-        {
-            _isTruncated = true;
-        }
+        InternalAppendKeyValue(key, value, ArgumentType.UInt32);
+        return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(uint? value, string format)
+    public LogMessage AppendKeyValue(string key, uint? value)
     {
-        if (value is not null)
-            InternalAppend(value.GetValueOrDefault(), format);
-        else
-            InternalAppendNull();
+        InternalAppendKeyValue(key, value, ArgumentType.UInt32);
+        return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(long value)
     {
-        InternalAppend(value);
+        InternalAppend(value, ArgumentType.Int64);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(long? value)
     {
-        InternalAppend(value);
-        return this;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(long value)
-    {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(long) <= _endOfBuffer)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.Int64;
-            _dataPointer += sizeof(ArgumentType);
-
-            *(long*)_dataPointer = value;
-            _dataPointer += sizeof(long);
-        }
-        else
-        {
-            _isTruncated = true;
-        }
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(long? value)
-    {
-        if (value is not null)
-            InternalAppend(value.GetValueOrDefault());
-        else
-            InternalAppendNull();
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public LogMessage AppendKeyValue(string key, long value)
-    {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(long) <= _endOfBuffer && _stringIndex < _strings.Length)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.KeyString;
-            _dataPointer += sizeof(ArgumentType);
-
-            _strings[_stringIndex] = key;
-
-            *_dataPointer = _stringIndex;
-            ++_stringIndex;
-
-            *(ArgumentType*)_dataPointer = ArgumentType.Int64;
-            _dataPointer += sizeof(ArgumentType);
-
-            *(long*)_dataPointer = value;
-            _dataPointer += sizeof(long);
-        }
-        else
-        {
-            _isTruncated = true;
-        }
-
-        return this;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public LogMessage AppendKeyValue(string key, long? value)
-    {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(long) <= _endOfBuffer && _stringIndex < _strings.Length)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.KeyString;
-            _dataPointer += sizeof(ArgumentType);
-
-            _strings[_stringIndex] = key;
-
-            *_dataPointer = _stringIndex;
-            ++_stringIndex;
-
-            if (value is not null)
-            {
-                *(ArgumentType*)_dataPointer = ArgumentType.Int64;
-                _dataPointer += sizeof(ArgumentType);
-
-                *(long*)_dataPointer = value.GetValueOrDefault();
-                _dataPointer += sizeof(long);
-            }
-            else
-            {
-                *(ArgumentType*)_dataPointer = ArgumentType.Null;
-                _dataPointer += sizeof(ArgumentType);
-            }
-        }
-        else
-        {
-            _isTruncated = true;
-        }
-
+        InternalAppend(value, ArgumentType.Int64);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(long value, string format)
     {
-        InternalAppend(value, format);
+        InternalAppend(value, format, ArgumentType.Int64);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(long? value, string format)
     {
-        InternalAppend(value, format);
+        InternalAppend(value, format, ArgumentType.Int64);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(long value, string format)
+    public LogMessage AppendKeyValue(string key, long value)
     {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(long) <= _endOfBuffer && _stringIndex < _strings.Length)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.Int64 | ArgumentType.FormatFlag;
-            _dataPointer += sizeof(ArgumentType);
-
-            _strings[_stringIndex] = format;
-
-            *_dataPointer = _stringIndex;
-            ++_dataPointer;
-
-            ++_stringIndex;
-
-            *(long*)_dataPointer = value;
-            _dataPointer += sizeof(long);
-        }
-        else
-        {
-            _isTruncated = true;
-        }
+        InternalAppendKeyValue(key, value, ArgumentType.Int64);
+        return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(long? value, string format)
+    public LogMessage AppendKeyValue(string key, long? value)
     {
-        if (value is not null)
-            InternalAppend(value.GetValueOrDefault(), format);
-        else
-            InternalAppendNull();
+        InternalAppendKeyValue(key, value, ArgumentType.Int64);
+        return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(ulong value)
     {
-        InternalAppend(value);
+        InternalAppend(value, ArgumentType.UInt64);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(ulong? value)
     {
-        InternalAppend(value);
-        return this;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(ulong value)
-    {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(ulong) <= _endOfBuffer)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.UInt64;
-            _dataPointer += sizeof(ArgumentType);
-
-            *(ulong*)_dataPointer = value;
-            _dataPointer += sizeof(ulong);
-        }
-        else
-        {
-            _isTruncated = true;
-        }
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(ulong? value)
-    {
-        if (value is not null)
-            InternalAppend(value.GetValueOrDefault());
-        else
-            InternalAppendNull();
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public LogMessage AppendKeyValue(string key, ulong value)
-    {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(ulong) <= _endOfBuffer && _stringIndex < _strings.Length)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.KeyString;
-            _dataPointer += sizeof(ArgumentType);
-
-            _strings[_stringIndex] = key;
-
-            *_dataPointer = _stringIndex;
-            ++_stringIndex;
-
-            *(ArgumentType*)_dataPointer = ArgumentType.UInt64;
-            _dataPointer += sizeof(ArgumentType);
-
-            *(ulong*)_dataPointer = value;
-            _dataPointer += sizeof(ulong);
-        }
-        else
-        {
-            _isTruncated = true;
-        }
-
-        return this;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public LogMessage AppendKeyValue(string key, ulong? value)
-    {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(ulong) <= _endOfBuffer && _stringIndex < _strings.Length)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.KeyString;
-            _dataPointer += sizeof(ArgumentType);
-
-            _strings[_stringIndex] = key;
-
-            *_dataPointer = _stringIndex;
-            ++_stringIndex;
-
-            if (value is not null)
-            {
-                *(ArgumentType*)_dataPointer = ArgumentType.UInt64;
-                _dataPointer += sizeof(ArgumentType);
-
-                *(ulong*)_dataPointer = value.GetValueOrDefault();
-                _dataPointer += sizeof(ulong);
-            }
-            else
-            {
-                *(ArgumentType*)_dataPointer = ArgumentType.Null;
-                _dataPointer += sizeof(ArgumentType);
-            }
-        }
-        else
-        {
-            _isTruncated = true;
-        }
-
+        InternalAppend(value, ArgumentType.UInt64);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(ulong value, string format)
     {
-        InternalAppend(value, format);
+        InternalAppend(value, format, ArgumentType.UInt64);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(ulong? value, string format)
     {
-        InternalAppend(value, format);
+        InternalAppend(value, format, ArgumentType.UInt64);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(ulong value, string format)
+    public LogMessage AppendKeyValue(string key, ulong value)
     {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(ulong) <= _endOfBuffer && _stringIndex < _strings.Length)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.UInt64 | ArgumentType.FormatFlag;
-            _dataPointer += sizeof(ArgumentType);
-
-            _strings[_stringIndex] = format;
-
-            *_dataPointer = _stringIndex;
-            ++_dataPointer;
-
-            ++_stringIndex;
-
-            *(ulong*)_dataPointer = value;
-            _dataPointer += sizeof(ulong);
-        }
-        else
-        {
-            _isTruncated = true;
-        }
+        InternalAppendKeyValue(key, value, ArgumentType.UInt64);
+        return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(ulong? value, string format)
+    public LogMessage AppendKeyValue(string key, ulong? value)
     {
-        if (value is not null)
-            InternalAppend(value.GetValueOrDefault(), format);
-        else
-            InternalAppendNull();
+        InternalAppendKeyValue(key, value, ArgumentType.UInt64);
+        return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(nint value)
     {
-        InternalAppend(value);
+        InternalAppend(value, ArgumentType.IntPtr);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(nint? value)
     {
-        InternalAppend(value);
-        return this;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(nint value)
-    {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(nint) <= _endOfBuffer)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.IntPtr;
-            _dataPointer += sizeof(ArgumentType);
-
-            *(nint*)_dataPointer = value;
-            _dataPointer += sizeof(nint);
-        }
-        else
-        {
-            _isTruncated = true;
-        }
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(nint? value)
-    {
-        if (value is not null)
-            InternalAppend(value.GetValueOrDefault());
-        else
-            InternalAppendNull();
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public LogMessage AppendKeyValue(string key, nint value)
-    {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(nint) <= _endOfBuffer && _stringIndex < _strings.Length)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.KeyString;
-            _dataPointer += sizeof(ArgumentType);
-
-            _strings[_stringIndex] = key;
-
-            *_dataPointer = _stringIndex;
-            ++_stringIndex;
-
-            *(ArgumentType*)_dataPointer = ArgumentType.IntPtr;
-            _dataPointer += sizeof(ArgumentType);
-
-            *(nint*)_dataPointer = value;
-            _dataPointer += sizeof(nint);
-        }
-        else
-        {
-            _isTruncated = true;
-        }
-
-        return this;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public LogMessage AppendKeyValue(string key, nint? value)
-    {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(nint) <= _endOfBuffer && _stringIndex < _strings.Length)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.KeyString;
-            _dataPointer += sizeof(ArgumentType);
-
-            _strings[_stringIndex] = key;
-
-            *_dataPointer = _stringIndex;
-            ++_stringIndex;
-
-            if (value is not null)
-            {
-                *(ArgumentType*)_dataPointer = ArgumentType.IntPtr;
-                _dataPointer += sizeof(ArgumentType);
-
-                *(nint*)_dataPointer = value.GetValueOrDefault();
-                _dataPointer += sizeof(nint);
-            }
-            else
-            {
-                *(ArgumentType*)_dataPointer = ArgumentType.Null;
-                _dataPointer += sizeof(ArgumentType);
-            }
-        }
-        else
-        {
-            _isTruncated = true;
-        }
-
+        InternalAppend(value, ArgumentType.IntPtr);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(nint value, string format)
     {
-        InternalAppend(value, format);
+        InternalAppend(value, format, ArgumentType.IntPtr);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(nint? value, string format)
     {
-        InternalAppend(value, format);
+        InternalAppend(value, format, ArgumentType.IntPtr);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(nint value, string format)
+    public LogMessage AppendKeyValue(string key, nint value)
     {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(nint) <= _endOfBuffer && _stringIndex < _strings.Length)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.IntPtr | ArgumentType.FormatFlag;
-            _dataPointer += sizeof(ArgumentType);
-
-            _strings[_stringIndex] = format;
-
-            *_dataPointer = _stringIndex;
-            ++_dataPointer;
-
-            ++_stringIndex;
-
-            *(nint*)_dataPointer = value;
-            _dataPointer += sizeof(nint);
-        }
-        else
-        {
-            _isTruncated = true;
-        }
+        InternalAppendKeyValue(key, value, ArgumentType.IntPtr);
+        return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(nint? value, string format)
+    public LogMessage AppendKeyValue(string key, nint? value)
     {
-        if (value is not null)
-            InternalAppend(value.GetValueOrDefault(), format);
-        else
-            InternalAppendNull();
+        InternalAppendKeyValue(key, value, ArgumentType.IntPtr);
+        return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(nuint value)
     {
-        InternalAppend(value);
+        InternalAppend(value, ArgumentType.UIntPtr);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(nuint? value)
     {
-        InternalAppend(value);
-        return this;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(nuint value)
-    {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(nuint) <= _endOfBuffer)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.UIntPtr;
-            _dataPointer += sizeof(ArgumentType);
-
-            *(nuint*)_dataPointer = value;
-            _dataPointer += sizeof(nuint);
-        }
-        else
-        {
-            _isTruncated = true;
-        }
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(nuint? value)
-    {
-        if (value is not null)
-            InternalAppend(value.GetValueOrDefault());
-        else
-            InternalAppendNull();
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public LogMessage AppendKeyValue(string key, nuint value)
-    {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(nuint) <= _endOfBuffer && _stringIndex < _strings.Length)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.KeyString;
-            _dataPointer += sizeof(ArgumentType);
-
-            _strings[_stringIndex] = key;
-
-            *_dataPointer = _stringIndex;
-            ++_stringIndex;
-
-            *(ArgumentType*)_dataPointer = ArgumentType.UIntPtr;
-            _dataPointer += sizeof(ArgumentType);
-
-            *(nuint*)_dataPointer = value;
-            _dataPointer += sizeof(nuint);
-        }
-        else
-        {
-            _isTruncated = true;
-        }
-
-        return this;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public LogMessage AppendKeyValue(string key, nuint? value)
-    {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(nuint) <= _endOfBuffer && _stringIndex < _strings.Length)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.KeyString;
-            _dataPointer += sizeof(ArgumentType);
-
-            _strings[_stringIndex] = key;
-
-            *_dataPointer = _stringIndex;
-            ++_stringIndex;
-
-            if (value is not null)
-            {
-                *(ArgumentType*)_dataPointer = ArgumentType.UIntPtr;
-                _dataPointer += sizeof(ArgumentType);
-
-                *(nuint*)_dataPointer = value.GetValueOrDefault();
-                _dataPointer += sizeof(nuint);
-            }
-            else
-            {
-                *(ArgumentType*)_dataPointer = ArgumentType.Null;
-                _dataPointer += sizeof(ArgumentType);
-            }
-        }
-        else
-        {
-            _isTruncated = true;
-        }
-
+        InternalAppend(value, ArgumentType.UIntPtr);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(nuint value, string format)
     {
-        InternalAppend(value, format);
+        InternalAppend(value, format, ArgumentType.UIntPtr);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(nuint? value, string format)
     {
-        InternalAppend(value, format);
+        InternalAppend(value, format, ArgumentType.UIntPtr);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(nuint value, string format)
+    public LogMessage AppendKeyValue(string key, nuint value)
     {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(nuint) <= _endOfBuffer && _stringIndex < _strings.Length)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.UIntPtr | ArgumentType.FormatFlag;
-            _dataPointer += sizeof(ArgumentType);
-
-            _strings[_stringIndex] = format;
-
-            *_dataPointer = _stringIndex;
-            ++_dataPointer;
-
-            ++_stringIndex;
-
-            *(nuint*)_dataPointer = value;
-            _dataPointer += sizeof(nuint);
-        }
-        else
-        {
-            _isTruncated = true;
-        }
+        InternalAppendKeyValue(key, value, ArgumentType.UIntPtr);
+        return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(nuint? value, string format)
+    public LogMessage AppendKeyValue(string key, nuint? value)
     {
-        if (value is not null)
-            InternalAppend(value.GetValueOrDefault(), format);
-        else
-            InternalAppendNull();
+        InternalAppendKeyValue(key, value, ArgumentType.UIntPtr);
+        return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(float value)
     {
-        InternalAppend(value);
+        InternalAppend(value, ArgumentType.Single);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(float? value)
     {
-        InternalAppend(value);
-        return this;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(float value)
-    {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(float) <= _endOfBuffer)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.Single;
-            _dataPointer += sizeof(ArgumentType);
-
-            *(float*)_dataPointer = value;
-            _dataPointer += sizeof(float);
-        }
-        else
-        {
-            _isTruncated = true;
-        }
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(float? value)
-    {
-        if (value is not null)
-            InternalAppend(value.GetValueOrDefault());
-        else
-            InternalAppendNull();
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public LogMessage AppendKeyValue(string key, float value)
-    {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(float) <= _endOfBuffer && _stringIndex < _strings.Length)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.KeyString;
-            _dataPointer += sizeof(ArgumentType);
-
-            _strings[_stringIndex] = key;
-
-            *_dataPointer = _stringIndex;
-            ++_stringIndex;
-
-            *(ArgumentType*)_dataPointer = ArgumentType.Single;
-            _dataPointer += sizeof(ArgumentType);
-
-            *(float*)_dataPointer = value;
-            _dataPointer += sizeof(float);
-        }
-        else
-        {
-            _isTruncated = true;
-        }
-
-        return this;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public LogMessage AppendKeyValue(string key, float? value)
-    {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(float) <= _endOfBuffer && _stringIndex < _strings.Length)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.KeyString;
-            _dataPointer += sizeof(ArgumentType);
-
-            _strings[_stringIndex] = key;
-
-            *_dataPointer = _stringIndex;
-            ++_stringIndex;
-
-            if (value is not null)
-            {
-                *(ArgumentType*)_dataPointer = ArgumentType.Single;
-                _dataPointer += sizeof(ArgumentType);
-
-                *(float*)_dataPointer = value.GetValueOrDefault();
-                _dataPointer += sizeof(float);
-            }
-            else
-            {
-                *(ArgumentType*)_dataPointer = ArgumentType.Null;
-                _dataPointer += sizeof(ArgumentType);
-            }
-        }
-        else
-        {
-            _isTruncated = true;
-        }
-
+        InternalAppend(value, ArgumentType.Single);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(float value, string format)
     {
-        InternalAppend(value, format);
+        InternalAppend(value, format, ArgumentType.Single);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(float? value, string format)
     {
-        InternalAppend(value, format);
+        InternalAppend(value, format, ArgumentType.Single);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(float value, string format)
+    public LogMessage AppendKeyValue(string key, float value)
     {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(float) <= _endOfBuffer && _stringIndex < _strings.Length)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.Single | ArgumentType.FormatFlag;
-            _dataPointer += sizeof(ArgumentType);
-
-            _strings[_stringIndex] = format;
-
-            *_dataPointer = _stringIndex;
-            ++_dataPointer;
-
-            ++_stringIndex;
-
-            *(float*)_dataPointer = value;
-            _dataPointer += sizeof(float);
-        }
-        else
-        {
-            _isTruncated = true;
-        }
+        InternalAppendKeyValue(key, value, ArgumentType.Single);
+        return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(float? value, string format)
+    public LogMessage AppendKeyValue(string key, float? value)
     {
-        if (value is not null)
-            InternalAppend(value.GetValueOrDefault(), format);
-        else
-            InternalAppendNull();
+        InternalAppendKeyValue(key, value, ArgumentType.Single);
+        return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(double value)
     {
-        InternalAppend(value);
+        InternalAppend(value, ArgumentType.Double);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(double? value)
     {
-        InternalAppend(value);
-        return this;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(double value)
-    {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(double) <= _endOfBuffer)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.Double;
-            _dataPointer += sizeof(ArgumentType);
-
-            *(double*)_dataPointer = value;
-            _dataPointer += sizeof(double);
-        }
-        else
-        {
-            _isTruncated = true;
-        }
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(double? value)
-    {
-        if (value is not null)
-            InternalAppend(value.GetValueOrDefault());
-        else
-            InternalAppendNull();
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public LogMessage AppendKeyValue(string key, double value)
-    {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(double) <= _endOfBuffer && _stringIndex < _strings.Length)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.KeyString;
-            _dataPointer += sizeof(ArgumentType);
-
-            _strings[_stringIndex] = key;
-
-            *_dataPointer = _stringIndex;
-            ++_stringIndex;
-
-            *(ArgumentType*)_dataPointer = ArgumentType.Double;
-            _dataPointer += sizeof(ArgumentType);
-
-            *(double*)_dataPointer = value;
-            _dataPointer += sizeof(double);
-        }
-        else
-        {
-            _isTruncated = true;
-        }
-
-        return this;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public LogMessage AppendKeyValue(string key, double? value)
-    {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(double) <= _endOfBuffer && _stringIndex < _strings.Length)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.KeyString;
-            _dataPointer += sizeof(ArgumentType);
-
-            _strings[_stringIndex] = key;
-
-            *_dataPointer = _stringIndex;
-            ++_stringIndex;
-
-            if (value is not null)
-            {
-                *(ArgumentType*)_dataPointer = ArgumentType.Double;
-                _dataPointer += sizeof(ArgumentType);
-
-                *(double*)_dataPointer = value.GetValueOrDefault();
-                _dataPointer += sizeof(double);
-            }
-            else
-            {
-                *(ArgumentType*)_dataPointer = ArgumentType.Null;
-                _dataPointer += sizeof(ArgumentType);
-            }
-        }
-        else
-        {
-            _isTruncated = true;
-        }
-
+        InternalAppend(value, ArgumentType.Double);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(double value, string format)
     {
-        InternalAppend(value, format);
+        InternalAppend(value, format, ArgumentType.Double);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(double? value, string format)
     {
-        InternalAppend(value, format);
+        InternalAppend(value, format, ArgumentType.Double);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(double value, string format)
+    public LogMessage AppendKeyValue(string key, double value)
     {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(double) <= _endOfBuffer && _stringIndex < _strings.Length)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.Double | ArgumentType.FormatFlag;
-            _dataPointer += sizeof(ArgumentType);
-
-            _strings[_stringIndex] = format;
-
-            *_dataPointer = _stringIndex;
-            ++_dataPointer;
-
-            ++_stringIndex;
-
-            *(double*)_dataPointer = value;
-            _dataPointer += sizeof(double);
-        }
-        else
-        {
-            _isTruncated = true;
-        }
+        InternalAppendKeyValue(key, value, ArgumentType.Double);
+        return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(double? value, string format)
+    public LogMessage AppendKeyValue(string key, double? value)
     {
-        if (value is not null)
-            InternalAppend(value.GetValueOrDefault(), format);
-        else
-            InternalAppendNull();
+        InternalAppendKeyValue(key, value, ArgumentType.Double);
+        return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(decimal value)
     {
-        InternalAppend(value);
+        InternalAppend(value, ArgumentType.Decimal);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(decimal? value)
     {
-        InternalAppend(value);
-        return this;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(decimal value)
-    {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(decimal) <= _endOfBuffer)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.Decimal;
-            _dataPointer += sizeof(ArgumentType);
-
-            *(decimal*)_dataPointer = value;
-            _dataPointer += sizeof(decimal);
-        }
-        else
-        {
-            _isTruncated = true;
-        }
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(decimal? value)
-    {
-        if (value is not null)
-            InternalAppend(value.GetValueOrDefault());
-        else
-            InternalAppendNull();
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public LogMessage AppendKeyValue(string key, decimal value)
-    {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(decimal) <= _endOfBuffer && _stringIndex < _strings.Length)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.KeyString;
-            _dataPointer += sizeof(ArgumentType);
-
-            _strings[_stringIndex] = key;
-
-            *_dataPointer = _stringIndex;
-            ++_stringIndex;
-
-            *(ArgumentType*)_dataPointer = ArgumentType.Decimal;
-            _dataPointer += sizeof(ArgumentType);
-
-            *(decimal*)_dataPointer = value;
-            _dataPointer += sizeof(decimal);
-        }
-        else
-        {
-            _isTruncated = true;
-        }
-
-        return this;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public LogMessage AppendKeyValue(string key, decimal? value)
-    {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(decimal) <= _endOfBuffer && _stringIndex < _strings.Length)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.KeyString;
-            _dataPointer += sizeof(ArgumentType);
-
-            _strings[_stringIndex] = key;
-
-            *_dataPointer = _stringIndex;
-            ++_stringIndex;
-
-            if (value is not null)
-            {
-                *(ArgumentType*)_dataPointer = ArgumentType.Decimal;
-                _dataPointer += sizeof(ArgumentType);
-
-                *(decimal*)_dataPointer = value.GetValueOrDefault();
-                _dataPointer += sizeof(decimal);
-            }
-            else
-            {
-                *(ArgumentType*)_dataPointer = ArgumentType.Null;
-                _dataPointer += sizeof(ArgumentType);
-            }
-        }
-        else
-        {
-            _isTruncated = true;
-        }
-
+        InternalAppend(value, ArgumentType.Decimal);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(decimal value, string format)
     {
-        InternalAppend(value, format);
+        InternalAppend(value, format, ArgumentType.Decimal);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(decimal? value, string format)
     {
-        InternalAppend(value, format);
+        InternalAppend(value, format, ArgumentType.Decimal);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(decimal value, string format)
+    public LogMessage AppendKeyValue(string key, decimal value)
     {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(decimal) <= _endOfBuffer && _stringIndex < _strings.Length)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.Decimal | ArgumentType.FormatFlag;
-            _dataPointer += sizeof(ArgumentType);
-
-            _strings[_stringIndex] = format;
-
-            *_dataPointer = _stringIndex;
-            ++_dataPointer;
-
-            ++_stringIndex;
-
-            *(decimal*)_dataPointer = value;
-            _dataPointer += sizeof(decimal);
-        }
-        else
-        {
-            _isTruncated = true;
-        }
+        InternalAppendKeyValue(key, value, ArgumentType.Decimal);
+        return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(decimal? value, string format)
+    public LogMessage AppendKeyValue(string key, decimal? value)
     {
-        if (value is not null)
-            InternalAppend(value.GetValueOrDefault(), format);
-        else
-            InternalAppendNull();
+        InternalAppendKeyValue(key, value, ArgumentType.Decimal);
+        return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(Guid value)
     {
-        InternalAppend(value);
+        InternalAppend(value, ArgumentType.Guid);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(Guid? value)
     {
-        InternalAppend(value);
-        return this;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(Guid value)
-    {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(Guid) <= _endOfBuffer)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.Guid;
-            _dataPointer += sizeof(ArgumentType);
-
-            *(Guid*)_dataPointer = value;
-            _dataPointer += sizeof(Guid);
-        }
-        else
-        {
-            _isTruncated = true;
-        }
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(Guid? value)
-    {
-        if (value is not null)
-            InternalAppend(value.GetValueOrDefault());
-        else
-            InternalAppendNull();
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public LogMessage AppendKeyValue(string key, Guid value)
-    {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(Guid) <= _endOfBuffer && _stringIndex < _strings.Length)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.KeyString;
-            _dataPointer += sizeof(ArgumentType);
-
-            _strings[_stringIndex] = key;
-
-            *_dataPointer = _stringIndex;
-            ++_stringIndex;
-
-            *(ArgumentType*)_dataPointer = ArgumentType.Guid;
-            _dataPointer += sizeof(ArgumentType);
-
-            *(Guid*)_dataPointer = value;
-            _dataPointer += sizeof(Guid);
-        }
-        else
-        {
-            _isTruncated = true;
-        }
-
-        return this;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public LogMessage AppendKeyValue(string key, Guid? value)
-    {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(Guid) <= _endOfBuffer && _stringIndex < _strings.Length)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.KeyString;
-            _dataPointer += sizeof(ArgumentType);
-
-            _strings[_stringIndex] = key;
-
-            *_dataPointer = _stringIndex;
-            ++_stringIndex;
-
-            if (value is not null)
-            {
-                *(ArgumentType*)_dataPointer = ArgumentType.Guid;
-                _dataPointer += sizeof(ArgumentType);
-
-                *(Guid*)_dataPointer = value.GetValueOrDefault();
-                _dataPointer += sizeof(Guid);
-            }
-            else
-            {
-                *(ArgumentType*)_dataPointer = ArgumentType.Null;
-                _dataPointer += sizeof(ArgumentType);
-            }
-        }
-        else
-        {
-            _isTruncated = true;
-        }
-
+        InternalAppend(value, ArgumentType.Guid);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(Guid value, string format)
     {
-        InternalAppend(value, format);
+        InternalAppend(value, format, ArgumentType.Guid);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(Guid? value, string format)
     {
-        InternalAppend(value, format);
+        InternalAppend(value, format, ArgumentType.Guid);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(Guid value, string format)
+    public LogMessage AppendKeyValue(string key, Guid value)
     {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(Guid) <= _endOfBuffer && _stringIndex < _strings.Length)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.Guid | ArgumentType.FormatFlag;
-            _dataPointer += sizeof(ArgumentType);
-
-            _strings[_stringIndex] = format;
-
-            *_dataPointer = _stringIndex;
-            ++_dataPointer;
-
-            ++_stringIndex;
-
-            *(Guid*)_dataPointer = value;
-            _dataPointer += sizeof(Guid);
-        }
-        else
-        {
-            _isTruncated = true;
-        }
+        InternalAppendKeyValue(key, value, ArgumentType.Guid);
+        return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(Guid? value, string format)
+    public LogMessage AppendKeyValue(string key, Guid? value)
     {
-        if (value is not null)
-            InternalAppend(value.GetValueOrDefault(), format);
-        else
-            InternalAppendNull();
+        InternalAppendKeyValue(key, value, ArgumentType.Guid);
+        return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(DateTime value)
     {
-        InternalAppend(value);
+        InternalAppend(value, ArgumentType.DateTime);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(DateTime? value)
     {
-        InternalAppend(value);
-        return this;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(DateTime value)
-    {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(DateTime) <= _endOfBuffer)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.DateTime;
-            _dataPointer += sizeof(ArgumentType);
-
-            *(DateTime*)_dataPointer = value;
-            _dataPointer += sizeof(DateTime);
-        }
-        else
-        {
-            _isTruncated = true;
-        }
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(DateTime? value)
-    {
-        if (value is not null)
-            InternalAppend(value.GetValueOrDefault());
-        else
-            InternalAppendNull();
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public LogMessage AppendKeyValue(string key, DateTime value)
-    {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(DateTime) <= _endOfBuffer && _stringIndex < _strings.Length)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.KeyString;
-            _dataPointer += sizeof(ArgumentType);
-
-            _strings[_stringIndex] = key;
-
-            *_dataPointer = _stringIndex;
-            ++_stringIndex;
-
-            *(ArgumentType*)_dataPointer = ArgumentType.DateTime;
-            _dataPointer += sizeof(ArgumentType);
-
-            *(DateTime*)_dataPointer = value;
-            _dataPointer += sizeof(DateTime);
-        }
-        else
-        {
-            _isTruncated = true;
-        }
-
-        return this;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public LogMessage AppendKeyValue(string key, DateTime? value)
-    {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(DateTime) <= _endOfBuffer && _stringIndex < _strings.Length)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.KeyString;
-            _dataPointer += sizeof(ArgumentType);
-
-            _strings[_stringIndex] = key;
-
-            *_dataPointer = _stringIndex;
-            ++_stringIndex;
-
-            if (value is not null)
-            {
-                *(ArgumentType*)_dataPointer = ArgumentType.DateTime;
-                _dataPointer += sizeof(ArgumentType);
-
-                *(DateTime*)_dataPointer = value.GetValueOrDefault();
-                _dataPointer += sizeof(DateTime);
-            }
-            else
-            {
-                *(ArgumentType*)_dataPointer = ArgumentType.Null;
-                _dataPointer += sizeof(ArgumentType);
-            }
-        }
-        else
-        {
-            _isTruncated = true;
-        }
-
+        InternalAppend(value, ArgumentType.DateTime);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(DateTime value, string format)
     {
-        InternalAppend(value, format);
+        InternalAppend(value, format, ArgumentType.DateTime);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(DateTime? value, string format)
     {
-        InternalAppend(value, format);
+        InternalAppend(value, format, ArgumentType.DateTime);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(DateTime value, string format)
+    public LogMessage AppendKeyValue(string key, DateTime value)
     {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(DateTime) <= _endOfBuffer && _stringIndex < _strings.Length)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.DateTime | ArgumentType.FormatFlag;
-            _dataPointer += sizeof(ArgumentType);
-
-            _strings[_stringIndex] = format;
-
-            *_dataPointer = _stringIndex;
-            ++_dataPointer;
-
-            ++_stringIndex;
-
-            *(DateTime*)_dataPointer = value;
-            _dataPointer += sizeof(DateTime);
-        }
-        else
-        {
-            _isTruncated = true;
-        }
+        InternalAppendKeyValue(key, value, ArgumentType.DateTime);
+        return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(DateTime? value, string format)
+    public LogMessage AppendKeyValue(string key, DateTime? value)
     {
-        if (value is not null)
-            InternalAppend(value.GetValueOrDefault(), format);
-        else
-            InternalAppendNull();
+        InternalAppendKeyValue(key, value, ArgumentType.DateTime);
+        return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(TimeSpan value)
     {
-        InternalAppend(value);
+        InternalAppend(value, ArgumentType.TimeSpan);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(TimeSpan? value)
     {
-        InternalAppend(value);
-        return this;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(TimeSpan value)
-    {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(TimeSpan) <= _endOfBuffer)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.TimeSpan;
-            _dataPointer += sizeof(ArgumentType);
-
-            *(TimeSpan*)_dataPointer = value;
-            _dataPointer += sizeof(TimeSpan);
-        }
-        else
-        {
-            _isTruncated = true;
-        }
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(TimeSpan? value)
-    {
-        if (value is not null)
-            InternalAppend(value.GetValueOrDefault());
-        else
-            InternalAppendNull();
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public LogMessage AppendKeyValue(string key, TimeSpan value)
-    {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(TimeSpan) <= _endOfBuffer && _stringIndex < _strings.Length)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.KeyString;
-            _dataPointer += sizeof(ArgumentType);
-
-            _strings[_stringIndex] = key;
-
-            *_dataPointer = _stringIndex;
-            ++_stringIndex;
-
-            *(ArgumentType*)_dataPointer = ArgumentType.TimeSpan;
-            _dataPointer += sizeof(ArgumentType);
-
-            *(TimeSpan*)_dataPointer = value;
-            _dataPointer += sizeof(TimeSpan);
-        }
-        else
-        {
-            _isTruncated = true;
-        }
-
-        return this;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public LogMessage AppendKeyValue(string key, TimeSpan? value)
-    {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(TimeSpan) <= _endOfBuffer && _stringIndex < _strings.Length)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.KeyString;
-            _dataPointer += sizeof(ArgumentType);
-
-            _strings[_stringIndex] = key;
-
-            *_dataPointer = _stringIndex;
-            ++_stringIndex;
-
-            if (value is not null)
-            {
-                *(ArgumentType*)_dataPointer = ArgumentType.TimeSpan;
-                _dataPointer += sizeof(ArgumentType);
-
-                *(TimeSpan*)_dataPointer = value.GetValueOrDefault();
-                _dataPointer += sizeof(TimeSpan);
-            }
-            else
-            {
-                *(ArgumentType*)_dataPointer = ArgumentType.Null;
-                _dataPointer += sizeof(ArgumentType);
-            }
-        }
-        else
-        {
-            _isTruncated = true;
-        }
-
+        InternalAppend(value, ArgumentType.TimeSpan);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(TimeSpan value, string format)
     {
-        InternalAppend(value, format);
+        InternalAppend(value, format, ArgumentType.TimeSpan);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(TimeSpan? value, string format)
     {
-        InternalAppend(value, format);
+        InternalAppend(value, format, ArgumentType.TimeSpan);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(TimeSpan value, string format)
+    public LogMessage AppendKeyValue(string key, TimeSpan value)
     {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(TimeSpan) <= _endOfBuffer && _stringIndex < _strings.Length)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.TimeSpan | ArgumentType.FormatFlag;
-            _dataPointer += sizeof(ArgumentType);
-
-            _strings[_stringIndex] = format;
-
-            *_dataPointer = _stringIndex;
-            ++_dataPointer;
-
-            ++_stringIndex;
-
-            *(TimeSpan*)_dataPointer = value;
-            _dataPointer += sizeof(TimeSpan);
-        }
-        else
-        {
-            _isTruncated = true;
-        }
+        InternalAppendKeyValue(key, value, ArgumentType.TimeSpan);
+        return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(TimeSpan? value, string format)
+    public LogMessage AppendKeyValue(string key, TimeSpan? value)
     {
-        if (value is not null)
-            InternalAppend(value.GetValueOrDefault(), format);
-        else
-            InternalAppendNull();
+        InternalAppendKeyValue(key, value, ArgumentType.TimeSpan);
+        return this;
     }
 
 }
