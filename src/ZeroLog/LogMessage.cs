@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using ZeroLog.Utils;
@@ -308,5 +309,75 @@ public sealed unsafe partial class LogMessage
         {
             _isTruncated = true;
         }
+    }
+
+    [SuppressMessage("ReSharper", "ReplaceSliceWithRangeIndexer")]
+    public LogMessage AppendAsciiString(ReadOnlySpan<char> value)
+    {
+        if (value.Length > 0)
+        {
+            var remainingBytes = (int)(_endOfBuffer - _dataPointer) - sizeof(ArgumentType) - sizeof(int);
+
+            if (remainingBytes > 0)
+            {
+                var length = value.Length;
+
+                if (length > remainingBytes)
+                {
+                    _isTruncated = true;
+                    length = remainingBytes;
+                }
+
+                *(ArgumentType*)_dataPointer = ArgumentType.AsciiString;
+                _dataPointer += sizeof(ArgumentType);
+
+                *(int*)_dataPointer = length;
+                _dataPointer += sizeof(int);
+
+                foreach (var c in value.Slice(0, length))
+                    *_dataPointer++ = (byte)c;
+            }
+            else
+            {
+                _isTruncated = true;
+            }
+        }
+
+        return this;
+    }
+
+    [SuppressMessage("ReSharper", "ReplaceSliceWithRangeIndexer")]
+    public LogMessage AppendAsciiString(ReadOnlySpan<byte> value)
+    {
+        if (value.Length > 0)
+        {
+            var remainingBytes = (int)(_endOfBuffer - _dataPointer) - sizeof(ArgumentType) - sizeof(int);
+
+            if (remainingBytes > 0)
+            {
+                var length = value.Length;
+
+                if (length > remainingBytes)
+                {
+                    _isTruncated = true;
+                    length = remainingBytes;
+                }
+
+                *(ArgumentType*)_dataPointer = ArgumentType.AsciiString;
+                _dataPointer += sizeof(ArgumentType);
+
+                *(int*)_dataPointer = length;
+                _dataPointer += sizeof(int);
+
+                value.Slice(0, length).CopyTo(new Span<byte>(_dataPointer, length));
+                _dataPointer += length;
+            }
+            else
+            {
+                _isTruncated = true;
+            }
+        }
+
+        return this;
     }
 }

@@ -313,6 +313,25 @@ unsafe partial class LogMessage
                 }
 
                 case ArgumentType.AsciiString:
+                {
+                    var valueLength = *(int*)dataPointer;
+                    dataPointer += sizeof(int);
+
+                    var bufferLength = outputBuffer.Length - bufferIndex;
+                    var lengthToCopy = Math.Min(valueLength, bufferLength);
+
+                    for (var i = 0; i < lengthToCopy; ++i)
+                        outputBuffer[bufferIndex + i] = (char)dataPointer[i];
+
+                    bufferIndex += lengthToCopy;
+                    dataPointer += valueLength;
+
+                    if (valueLength > bufferLength)
+                        goto outputTruncated;
+
+                    break;
+                }
+
                 case ArgumentType.Unmanaged:
                 case ArgumentType.KeyString:
                     throw new NotImplementedException();
