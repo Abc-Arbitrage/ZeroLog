@@ -9,6 +9,8 @@ using ZeroLog.Appenders;
 using ZeroLog.Utils;
 using static InlineIL.IL.Emit;
 
+#if false
+
 namespace ZeroLog
 {
     internal unsafe partial class LogEvent : IInternalLogEvent
@@ -743,3 +745,5 @@ namespace ZeroLog
         }
     }
 }
+
+#endif

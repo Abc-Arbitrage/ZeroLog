@@ -33,20 +33,15 @@ namespace ZeroLog.Tests.Appenders
             var message = "Test log message";
             var byteLength = Encoding.Default.GetBytes(message, 0, message.Length, bytes, 0);
 
-            var logEventHeader = new LogEventHeader
-            {
-                Level = Level.Info,
-                Name = "TestLog",
-                Thread = Thread.CurrentThread,
-                Timestamp = DateTime.UtcNow,
-            };
+            var logMessage = new LogMessage("Foo");
+            logMessage.Initialize(new Log(null! , "TestLog"), Level.Info);
 
-            _appender.WriteEvent(logEventHeader, bytes, byteLength);
+            _appender.WriteMessage(logMessage, bytes, byteLength);
             _appender.Flush();
 
             var written = GetLastLine();
 
-            Check.That(written).IsEqualTo($"{logEventHeader.Timestamp.Date:yyyy-MM-dd} - {logEventHeader.Timestamp.TimeOfDay:hh\\:mm\\:ss\\.fffffff} - {Thread.CurrentThread.ManagedThreadId} - INFO - TestLog || " + message);
+            Check.That(written).IsEqualTo($"{logMessage.Timestamp.Date:yyyy-MM-dd} - {logMessage.Timestamp.TimeOfDay:hh\\:mm\\:ss\\.fffffff} - {Thread.CurrentThread.ManagedThreadId} - INFO - TestLog || " + message);
         }
 
         private string GetLastLine()

@@ -3,6 +3,8 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text.Formatting;
 using NUnit.Framework;
 
+#if false
+
 namespace ZeroLog.Tests
 {
     [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
@@ -492,3 +494,5 @@ namespace ZeroLog.Tests
         }
     }
 }
+
+#endif

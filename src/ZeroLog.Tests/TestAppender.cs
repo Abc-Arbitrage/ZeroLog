@@ -36,7 +36,7 @@ namespace ZeroLog.Tests
 
         public string Name { get; set; }
 
-        public void WriteEvent(ILogEventHeader logEventHeader, byte[] messageBytes, int messageLength)
+        public void WriteMessage(LogMessage message, byte[] messageBytes, int messageLength)
         {
             if (_captureLoggedMessages)
                 LoggedMessages.Add(Encoding.ASCII.GetString(messageBytes, 0, messageLength));

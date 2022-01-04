@@ -1,6 +1,8 @@
 using System;
 using System.Threading;
 
+#if false
+
 namespace ZeroLog
 {
     public interface ILogEventHeader
@@ -11,3 +13,5 @@ namespace ZeroLog
         string Name { get; }
     }
 }
+
+#endif

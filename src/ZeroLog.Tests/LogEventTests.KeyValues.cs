@@ -2,6 +2,8 @@
 using System.Text;
 using NUnit.Framework;
 
+#if false
+
 namespace ZeroLog.Tests
 {
     public partial class LogEventTests
@@ -295,3 +297,5 @@ namespace ZeroLog.Tests
         }
     }
 }
+
+#endif

@@ -6,6 +6,8 @@ using System.Text.Formatting;
 using NFluent;
 using NUnit.Framework;
 
+#if false
+
 namespace ZeroLog.Tests
 {
     public unsafe class LogEventEdgeCaseTests
@@ -282,3 +284,5 @@ namespace ZeroLog.Tests
         }
     }
 }
+
+#endif

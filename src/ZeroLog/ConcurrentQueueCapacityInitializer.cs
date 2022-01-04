@@ -10,7 +10,7 @@ namespace ZeroLog
     /// - Has a Count property set to the desired initial capacity
     /// - Has a noop iterator
     /// </summary>
-    internal class ConcurrentQueueCapacityInitializer : ICollection<LogEvent>
+    internal class ConcurrentQueueCapacityInitializer : ICollection<LogMessage>
     {
         public int Count { get; }
         public bool IsReadOnly => true;
@@ -21,12 +21,12 @@ namespace ZeroLog
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-        public IEnumerator<LogEvent> GetEnumerator() => Enumerable.Empty<LogEvent>().GetEnumerator();
+        public IEnumerator<LogMessage> GetEnumerator() => Enumerable.Empty<LogMessage>().GetEnumerator();
 
-        public void Add(LogEvent item) => throw new NotSupportedException();
+        public void Add(LogMessage item) => throw new NotSupportedException();
         public void Clear() => throw new NotSupportedException();
-        public bool Contains(LogEvent item) => throw new NotSupportedException();
-        public void CopyTo(LogEvent[] array, int arrayIndex) => throw new NotSupportedException();
-        public bool Remove(LogEvent item) => throw new NotSupportedException();
+        public bool Contains(LogMessage item) => throw new NotSupportedException();
+        public void CopyTo(LogMessage[] array, int arrayIndex) => throw new NotSupportedException();
+        public bool Remove(LogMessage item) => throw new NotSupportedException();
     }
 }

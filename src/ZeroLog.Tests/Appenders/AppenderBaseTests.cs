@@ -18,21 +18,16 @@ namespace ZeroLog.Tests.Appenders
             const string message = "Test log message";
             var byteLength = Encoding.Default.GetBytes(message, 0, message.Length, bytes, 0);
 
-            var logEventHeader = new LogEventHeader
-            {
-                Level = Level.Info,
-                Name = "TestLog",
-                Thread = Thread.CurrentThread,
-                Timestamp = DateTime.UtcNow,
-            };
+            var logMessage = new LogMessage("Foo");
+            logMessage.Initialize(new Log(null! , "TestLog"), Level.Info);
 
             var appender = new MemoryAppender("%date - %time - %thread - %level - %logger || ");
 
-            appender.WriteEvent(logEventHeader, bytes, byteLength);
-            appender.WriteEvent(logEventHeader, bytes, byteLength);
+            appender.WriteMessage(logMessage, bytes, byteLength);
+            appender.WriteMessage(logMessage, bytes, byteLength);
             appender.Flush();
 
-            var logLine = $"{logEventHeader.Timestamp.Date:yyyy-MM-dd} - {logEventHeader.Timestamp.TimeOfDay:hh\\:mm\\:ss\\.fffffff} - {Thread.CurrentThread.ManagedThreadId} - INFO - TestLog || {message}{Environment.NewLine}";
+            var logLine = $"{logMessage.Timestamp.Date:yyyy-MM-dd} - {logMessage.Timestamp.TimeOfDay:hh\\:mm\\:ss\\.fffffff} - {Thread.CurrentThread.ManagedThreadId} - INFO - TestLog || {message}{Environment.NewLine}";
 
             Check.That(appender.ToString()).IsEqualTo(logLine + logLine);
         }
@@ -44,11 +39,13 @@ namespace ZeroLog.Tests.Appenders
             const string message = "Test log message";
             var byteLength = Encoding.Default.GetBytes(message, 0, message.Length, bytes, 0);
 
-            var logEventHeader = new LogEventHeader();
+            var logMessage = new LogMessage("Foo");
+            logMessage.Initialize(new Log(null! , "TestLog"), Level.Info);
+
             var appender = new MemoryAppender("");
 
-            appender.WriteEvent(logEventHeader, bytes, byteLength);
-            appender.WriteEvent(logEventHeader, bytes, byteLength);
+            appender.WriteMessage(logMessage, bytes, byteLength);
+            appender.WriteMessage(logMessage, bytes, byteLength);
             appender.Flush();
 
             var logLine = $"{message}{Environment.NewLine}";
@@ -62,17 +59,19 @@ namespace ZeroLog.Tests.Appenders
             var bytes = new byte[4];
             const string message = "Fooo";
 
-            var logEventHeader = new LogEventHeader();
+            var logMessage = new LogMessage("Foo");
+            logMessage.Initialize(new Log(null! , "TestLog"), Level.Info);
+
             var appender = new MemoryAppender("");
 
             Encoding.Default.GetBytes(message, 0, message.Length, bytes, 0);
-            appender.WriteEvent(logEventHeader, bytes, 2);
+            appender.WriteMessage(logMessage, bytes, 2);
 
             Encoding.Default.GetBytes(message, 0, message.Length, bytes, 0);
-            appender.WriteEvent(logEventHeader, bytes, 3);
+            appender.WriteMessage(logMessage, bytes, 3);
 
             Encoding.Default.GetBytes(message, 0, message.Length, bytes, 0);
-            appender.WriteEvent(logEventHeader, bytes, 4);
+            appender.WriteMessage(logMessage, bytes, 4);
 
             appender.Flush();
 
@@ -93,8 +92,8 @@ namespace ZeroLog.Tests.Appenders
             public override void Configure(DefaultAppenderConfig parameters)
                 => Configure(parameters.PrefixPattern);
 
-            public override void WriteEvent(ILogEventHeader logEventHeader, byte[] messageBytes, int messageLength)
-                => WriteEventToStream(_stream, logEventHeader, messageBytes, messageLength);
+            public override void WriteMessage(LogMessage message, byte[] messageBytes, int messageLength)
+                => WriteMessageToStream(_stream, message, messageBytes, messageLength);
 
             public override string ToString()
                 => _encoding.GetString(_stream.GetBuffer(), 0, (int)_stream.Length);

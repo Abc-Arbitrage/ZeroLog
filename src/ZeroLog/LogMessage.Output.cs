@@ -8,6 +8,13 @@ unsafe partial class LogMessage
 {
     internal int WriteTo(Span<char> outputBuffer)
     {
+        if (ConstantMessage is not null)
+        {
+            var length = Math.Min(ConstantMessage.Length, outputBuffer.Length);
+            ConstantMessage.AsSpan(0, length).CopyTo(outputBuffer);
+            return length;
+        }
+
         var dataPointer = _startOfBuffer;
         var endOfData = _dataPointer;
         var bufferIndex = 0;
@@ -336,6 +343,9 @@ unsafe partial class LogMessage
 
     public override string ToString()
     {
+        if (ConstantMessage is not null)
+            return ConstantMessage;
+
         var buffer = ArrayPool<char>.Shared.Rent(4 * 1024);
 
         var chars = WriteTo(buffer);

@@ -22,55 +22,55 @@ namespace ZeroLog.Tests.Appenders
         [Test]
         public void should_append()
         {
-            var logEvent = new Mock<ILogEvent>().Object;
+            var logMessage = new LogMessage("Test");
             var message = new byte[4];
 
-            _guardedAppender.WriteEvent(logEvent, message, message.Length);
+            _guardedAppender.WriteMessage(logMessage, message, message.Length);
 
-            _appenderMock.Verify(x => x.WriteEvent(logEvent, message, message.Length), Times.Once);
+            _appenderMock.Verify(x => x.WriteMessage(logMessage, message, message.Length), Times.Once);
         }
 
         [Test]
         public void should_not_throw_if_inner_appender_throws()
         {
-            var logEvent = new Mock<ILogEvent>().Object;
+            var logMessage = new LogMessage("Test");
             var message = new byte[4];
-            _appenderMock.Setup(x => x.WriteEvent(logEvent, message, message.Length)).Throws<Exception>();
+            _appenderMock.Setup(x => x.WriteMessage(logMessage, message, message.Length)).Throws<Exception>();
 
-            Assert.DoesNotThrow(() => _guardedAppender.WriteEvent(logEvent, message, message.Length));
+            Assert.DoesNotThrow(() => _guardedAppender.WriteMessage(logMessage, message, message.Length));
         }
 
         [Test]
         public void should_disable_appender_if_it_throws()
         {
-            var logEvent = new Mock<ILogEvent>().Object;
+            var logMessage = new LogMessage("Test");
             var message = new byte[4];
-            _appenderMock.Setup(x => x.WriteEvent(logEvent, message, message.Length)).Throws<Exception>();
+            _appenderMock.Setup(x => x.WriteMessage(logMessage, message, message.Length)).Throws<Exception>();
 
-            _guardedAppender.WriteEvent(logEvent, message, message.Length);
-            _guardedAppender.WriteEvent(logEvent, message, message.Length);
+            _guardedAppender.WriteMessage(logMessage, message, message.Length);
+            _guardedAppender.WriteMessage(logMessage, message, message.Length);
 
-            _appenderMock.Verify(x => x.WriteEvent(logEvent, message, message.Length), Times.Once);
+            _appenderMock.Verify(x => x.WriteMessage(logMessage, message, message.Length), Times.Once);
         }
 
         [Test]
         public void should_reenable_appender_after_quarantine_delay()
         {
-            var logEvent = new Mock<ILogEvent>().Object;
+            var logMessage = new LogMessage("Test");
             var message = new byte[4];
-            _appenderMock.Setup(x => x.WriteEvent(logEvent, message, message.Length)).Throws<Exception>();
+            _appenderMock.Setup(x => x.WriteMessage(logMessage, message, message.Length)).Throws<Exception>();
 
             SystemDateTime.PauseTime();
-            _guardedAppender.WriteEvent(logEvent, message, message.Length);
-            _appenderMock.Verify(x => x.WriteEvent(logEvent, message, message.Length), Times.Once);
+            _guardedAppender.WriteMessage(logMessage, message, message.Length);
+            _appenderMock.Verify(x => x.WriteMessage(logMessage, message, message.Length), Times.Once);
 
             SystemDateTime.AddToPausedTime(TimeSpan.FromSeconds(2));
-            _guardedAppender.WriteEvent(logEvent, message, message.Length);
-            _appenderMock.Verify(x => x.WriteEvent(logEvent, message, message.Length), Times.Once);
+            _guardedAppender.WriteMessage(logMessage, message, message.Length);
+            _appenderMock.Verify(x => x.WriteMessage(logMessage, message, message.Length), Times.Once);
 
             SystemDateTime.AddToPausedTime(TimeSpan.FromSeconds(20));
-            _guardedAppender.WriteEvent(logEvent, message, message.Length);
-            _appenderMock.Verify(x => x.WriteEvent(logEvent, message, message.Length), Times.Exactly(2));
+            _guardedAppender.WriteMessage(logMessage, message, message.Length);
+            _appenderMock.Verify(x => x.WriteMessage(logMessage, message, message.Length), Times.Exactly(2));
         }
     }
 }

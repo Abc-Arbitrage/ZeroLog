@@ -1,6 +1,8 @@
 using System;
 using ZeroLog.Appenders;
 
+#if false
+
 namespace ZeroLog
 {
     public partial interface ILogEvent : ILogEventHeader
@@ -34,3 +36,5 @@ namespace ZeroLog
         void Log();
     }
 }
+
+#endif

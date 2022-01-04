@@ -37,10 +37,7 @@ namespace ZeroLog.Config
                 catch (Exception e)
                 {
                     LogManager.GetLogger(typeof(JsonConfigurator))
-                              .Fatal()
-                              .Append("Updating config failed with: ")
-                              .Append(e.Message)
-                              .Log();
+                              .Fatal("Updating config failed with: ", e);
                 }
             };
 

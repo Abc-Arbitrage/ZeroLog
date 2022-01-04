@@ -6,7 +6,7 @@ namespace ZeroLog;
 
 public sealed unsafe partial class LogMessage
 {
-    internal static LogMessage Empty { get; } = new();
+    internal static LogMessage Empty { get; } = new(string.Empty);
 
     private readonly byte* _startOfBuffer;
     private readonly byte* _endOfBuffer;
@@ -15,15 +15,20 @@ public sealed unsafe partial class LogMessage
     private byte* _dataPointer;
     private byte _stringIndex;
     private bool _isTruncated;
-    private Log? _log;
 
     public Level Level { get; private set; }
-    public DateTime Timestamp { get; private set; }
+    public DateTime Timestamp { get; internal set; }
     public Thread? Thread { get; private set; }
+
+    internal Log? Logger { get; private set; }
     internal bool IsTruncated => _isTruncated;
 
-    private LogMessage()
+    internal string? ConstantMessage { get; }
+    internal bool IsPooled => ConstantMessage is null;
+
+    internal LogMessage(string message)
     {
+        ConstantMessage = message;
         _strings = Array.Empty<string>();
     }
 
@@ -42,11 +47,17 @@ public sealed unsafe partial class LogMessage
         Timestamp = DateTime.UtcNow; // TODO clock in Log
         Level = level;
         Thread = Thread.CurrentThread;
+        Logger = log;
 
         _dataPointer = _startOfBuffer;
         _stringIndex = 0;
         _isTruncated = false;
-        _log = log;
+    }
+
+    public void Log()
+    {
+        if (!ReferenceEquals(this, Empty))
+            Logger?.Enqueue(this);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -83,6 +94,15 @@ public sealed unsafe partial class LogMessage
             _isTruncated = true;
         }
 
+        return this;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal LogMessage Append(string? value)
+    {
+        // TODO remove this method
+
+        InternalAppend(value);
         return this;
     }
 

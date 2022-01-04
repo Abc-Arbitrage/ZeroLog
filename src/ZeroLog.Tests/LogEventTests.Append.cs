@@ -6,6 +6,8 @@ using System.Text;
 using System.Text.Formatting;
 using NUnit.Framework;
 
+#if false
+
 namespace ZeroLog.Tests
 {
     public unsafe partial class LogEventTests
@@ -449,3 +451,5 @@ namespace ZeroLog.Tests
         }
     }
 }
+
+#endif

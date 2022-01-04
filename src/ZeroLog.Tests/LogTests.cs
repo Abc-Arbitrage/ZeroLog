@@ -37,8 +37,7 @@ namespace ZeroLog.Tests
             _logManager.Dispose();
         }
 
-        [TestCase(Level.Finest, true, true, true, true, true)]
-        [TestCase(Level.Verbose, true, true, true, true, true)]
+        [TestCase(Level.Trace, true, true, true, true, true)]
         [TestCase(Level.Debug, true, true, true, true, true)]
         [TestCase(Level.Info, false, true, true, true, true)]
         [TestCase(Level.Warn, false, false, true, true, true)]
@@ -57,11 +56,11 @@ namespace ZeroLog.Tests
             Check.That(log.IsErrorEnabled).Equals(isError);
             Check.That(log.IsFatalEnabled).Equals(isFatal);
 
-            Check.That(log.IsLevelEnabled(logLevel)).IsTrue();
-            if (logLevel > Level.Finest)
-                Check.That(log.IsLevelEnabled(logLevel - 1)).IsFalse();
+            Check.That(log.IsEnabled(logLevel)).IsTrue();
+            if (logLevel > Level.Trace)
+                Check.That(log.IsEnabled(logLevel - 1)).IsFalse();
             if (logLevel < Level.Fatal)
-                Check.That(log.IsLevelEnabled(logLevel + 1)).IsTrue();
+                Check.That(log.IsEnabled(logLevel + 1)).IsTrue();
         }
     }
 }

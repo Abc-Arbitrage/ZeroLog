@@ -5,6 +5,7 @@
 //------------------------------------------------------------------------------
 
 #nullable enable
+#if false
 
 using System;
 using System.Runtime.CompilerServices;
@@ -1413,3 +1414,5 @@ namespace ZeroLog
         public ILogEvent Append(TimeSpan? value, string format) => this;
     }
 }
+
+#endif

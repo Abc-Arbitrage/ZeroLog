@@ -15,12 +15,12 @@ namespace ZeroLog.Appenders
             _prefixWriter = new PrefixWriter(prefixPattern);
         }
 
-        protected int WriteEventToStream(Stream stream, ILogEventHeader logEventHeader, byte[] messageBytes, int messageLength)
+        protected int WriteMessageToStream(Stream stream, LogMessage message, byte[] messageBytes, int messageLength)
         {
             var bytesWritten = 0;
 
             if (_prefixWriter != null)
-                bytesWritten += _prefixWriter.WritePrefix(stream, logEventHeader, _encoding);
+                bytesWritten += _prefixWriter.WritePrefix(stream, message, _encoding);
 
             bytesWritten += WriteLine(stream, messageBytes, messageLength);
 
@@ -61,6 +61,6 @@ namespace ZeroLog.Appenders
 
         public string? Name { get; set; }
         public abstract void Configure(T parameters);
-        public abstract void WriteEvent(ILogEventHeader logEventHeader, byte[] messageBytes, int messageLength);
+        public abstract void WriteMessage(LogMessage message, byte[] messageBytes, int messageLength);
     }
 }

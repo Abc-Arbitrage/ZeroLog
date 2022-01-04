@@ -22,7 +22,7 @@ namespace ZeroLog.Tests
                 Appenders = { _testAppender },
                 LogEventQueueSize = 16384,
                 LogEventBufferSize = 512,
-                Level = Level.Finest,
+                Level = Level.Trace,
                 LogEventPoolExhaustionStrategy = LogEventPoolExhaustionStrategy.WaitForLogEvent
             });
         }

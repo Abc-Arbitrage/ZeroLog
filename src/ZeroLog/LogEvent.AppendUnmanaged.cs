@@ -5,6 +5,7 @@
 //------------------------------------------------------------------------------
 
 #nullable enable
+#if false
 
 using System;
 using System.Runtime.CompilerServices;
@@ -264,3 +265,5 @@ namespace ZeroLog
 
     }
 }
+
+#endif

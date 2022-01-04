@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Text.Formatting;
 
+#if false
+
 namespace ZeroLog
 {
     internal interface IInternalLogEvent : ILogEvent
@@ -13,3 +15,5 @@ namespace ZeroLog
         bool IsPooled { get; }
     }
 }
+
+#endif

@@ -1,13 +1,11 @@
-namespace ZeroLog
+namespace ZeroLog;
+
+public enum Level
 {
-    public enum Level
-    {
-        Finest,
-        Verbose,
-        Debug,
-        Info,
-        Warn,
-        Error,
-        Fatal,
-    }
+    Trace,
+    Debug,
+    Info,
+    Warn,
+    Error,
+    Fatal,
 }

@@ -71,14 +71,14 @@ namespace ZeroLog.Appenders
             Open();
         }
 
-        public override void WriteEvent(ILogEventHeader logEventHeader, byte[] messageBytes, int messageLength)
+        public override void WriteMessage(LogMessage message, byte[] messageBytes, int messageLength)
         {
             var stream = _stream;
             if (stream == null)
                 return;
 
-            _fileSize += WriteEventToStream(stream, logEventHeader, messageBytes, messageLength);
-            CheckRollFile(logEventHeader.Timestamp);
+            _fileSize += WriteMessageToStream(stream, message, messageBytes, messageLength);
+            CheckRollFile(message.Timestamp);
         }
 
         private void Open()

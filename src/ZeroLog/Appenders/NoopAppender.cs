@@ -6,7 +6,7 @@
         {
         }
 
-        public override void WriteEvent(ILogEventHeader logEventHeader, byte[] messageBytes, int messageLength)
+        public override void WriteMessage(LogMessage message, byte[] messageBytes, int messageLength)
         {
         }
     }

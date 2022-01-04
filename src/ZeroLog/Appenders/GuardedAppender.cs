@@ -24,14 +24,14 @@ namespace ZeroLog.Appenders
             set => Appender.Name = value;
         }
 
-        public void WriteEvent(ILogEventHeader logEventHeader, byte[] messageBytes, int messageLength)
+        public void WriteMessage(LogMessage message, byte[] messageBytes, int messageLength)
         {
             if (_nextActivationTime.HasValue && _nextActivationTime.Value > SystemDateTime.UtcNow)
                 return;
 
             try
             {
-                Appender.WriteEvent(logEventHeader, messageBytes, messageLength);
+                Appender.WriteMessage(message, messageBytes, messageLength);
                 _nextActivationTime = null;
             }
             catch (Exception)

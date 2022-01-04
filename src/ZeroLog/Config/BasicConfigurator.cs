@@ -34,7 +34,7 @@ namespace ZeroLog.Config
 
         [Obsolete("Use the overload with the " + nameof(ZeroLogBasicConfiguration) + " parameter")]
         [SuppressMessage("ReSharper", "MethodOverloadWithOptionalParameter")]
-        public static ILogManager Configure(IEnumerable<IAppender> appenders, int logEventQueueSize = 1024, int logEventBufferSize = 128, Level level = Level.Finest, LogEventPoolExhaustionStrategy logEventPoolExhaustionStrategy = LogEventPoolExhaustionStrategy.Default)
+        public static ILogManager Configure(IEnumerable<IAppender> appenders, int logEventQueueSize = 1024, int logEventBufferSize = 128, Level level = Level.Trace, LogEventPoolExhaustionStrategy logEventPoolExhaustionStrategy = LogEventPoolExhaustionStrategy.Default)
         {
             return Configure(new ZeroLogBasicConfiguration
             {

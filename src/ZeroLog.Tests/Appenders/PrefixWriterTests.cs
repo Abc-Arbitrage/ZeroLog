@@ -39,14 +39,11 @@ namespace ZeroLog.Tests.Appenders
         {
             var prefixWriter = new PrefixWriter(pattern);
 
-            var logEventHeader = new LogEventHeader
-            {
-                Level = Level.Info,
-                Name = "TestLog",
-                Timestamp = new DateTime(2020, 01, 02, 03, 04, 05, 06)
-            };
+            var logMessage = new LogMessage("Foo");
+            logMessage.Initialize(new Log(null! , "TestLog"), Level.Info);
+            logMessage.Timestamp = new DateTime(2020, 01, 02, 03, 04, 05, 06);
 
-            var result = GetResult(prefixWriter, logEventHeader);
+            var result = GetResult(prefixWriter, logMessage);
             Check.That(result).IsEqualTo(expectedResult);
         }
 
@@ -57,12 +54,10 @@ namespace ZeroLog.Tests.Appenders
 
             var prefixWriter = new PrefixWriter("%thread world!");
 
-            var logEventHeader = new LogEventHeader
-            {
-                Thread = Thread.CurrentThread
-            };
+            var logMessage = new LogMessage("Foo");
+            logMessage.Initialize(null, Level.Info);
 
-            var result = GetResult(prefixWriter, logEventHeader);
+            var result = GetResult(prefixWriter, logMessage);
             Check.That(result).IsEqualTo("Hello world!");
         }
 
@@ -71,12 +66,10 @@ namespace ZeroLog.Tests.Appenders
         {
             var prefixWriter = new PrefixWriter("%thread");
 
-            var logEventHeader = new LogEventHeader
-            {
-                Thread = Thread.CurrentThread
-            };
+            var logMessage = new LogMessage("Foo");
+            logMessage.Initialize(null, Level.Info);
 
-            var result = GetResult(prefixWriter, logEventHeader);
+            var result = GetResult(prefixWriter, logMessage);
             Check.That(result).IsEqualTo(Thread.CurrentThread.ManagedThreadId.ToString(CultureInfo.InvariantCulture));
         }
 
@@ -85,19 +78,16 @@ namespace ZeroLog.Tests.Appenders
         {
             var prefixWriter = new PrefixWriter("%thread");
 
-            var logEventHeader = new LogEventHeader
-            {
-                Thread = null
-            };
+            var logMessage = new LogMessage("Foo");
 
-            var result = GetResult(prefixWriter, logEventHeader);
+            var result = GetResult(prefixWriter, logMessage);
             Check.That(result).IsEqualTo("0");
         }
 
-        private static string GetResult(PrefixWriter prefixWriter, ILogEventHeader logEventHeader)
+        private static string GetResult(PrefixWriter prefixWriter, LogMessage logMessage)
         {
             using var stream = new MemoryStream();
-            var bytesWritten = prefixWriter.WritePrefix(stream, logEventHeader, Encoding.UTF8);
+            var bytesWritten = prefixWriter.WritePrefix(stream, logMessage, Encoding.UTF8);
             Check.That(bytesWritten).IsEqualTo((int)stream.Position);
 
             return Encoding.UTF8.GetString(stream.GetBuffer(), 0, bytesWritten);

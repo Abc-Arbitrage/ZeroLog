@@ -30,4 +30,10 @@ internal static class AssertExtensions
         Assert.That(actual, Is.Not.Null);
         return actual ?? throw new AssertionException("Expected non-null");
     }
+
+    public static void ShouldBeEmpty<T>(this T actual)
+        => Assert.That(actual, Is.Empty);
+
+    public static void ShouldNotBeEmpty<T>(this T actual)
+        => Assert.That(actual, Is.Not.Empty);
 }

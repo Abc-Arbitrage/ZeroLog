@@ -22,7 +22,7 @@ namespace ZeroLog.Tests
 
         public string Name { get; set; }
 
-        public void WriteEvent(ILogEventHeader logEventHeader, byte[] messageBytes, int messageLength)
+        public void WriteMessage(LogMessage message, byte[] messageBytes, int messageLength)
         {
             Array.Copy(messageBytes, _messages[_count].StartTimestampInChars, messageLength);
             _messages[_count].MessageLength = messageLength;

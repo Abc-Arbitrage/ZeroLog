@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Formatting;
 using System.Text.RegularExpressions;
@@ -20,7 +21,7 @@ namespace ZeroLog.Appenders
         private readonly byte[] _buffer = new byte[_maxLength * sizeof(char)];
         private readonly char[] _strings;
 
-        private readonly Action<PrefixWriter, ILogEventHeader> _appendMethod;
+        private readonly Action<PrefixWriter, LogMessage> _appendMethod;
 
         public PrefixWriter(string pattern)
         {
@@ -119,9 +120,9 @@ namespace ZeroLog.Appenders
             return strings;
         }
 
-        private static Action<PrefixWriter, ILogEventHeader> BuildAppendMethod(ICollection<PatternPart> parts, Dictionary<string, (int offset, int length)> stringMap)
+        private static Action<PrefixWriter, LogMessage> BuildAppendMethod(ICollection<PatternPart> parts, Dictionary<string, (int offset, int length)> stringMap)
         {
-            var method = new DynamicMethod("WritePrefix", typeof(void), new[] { typeof(PrefixWriter), typeof(ILogEventHeader) }, typeof(PrefixWriter), false)
+            var method = new DynamicMethod("WritePrefix", typeof(void), new[] { typeof(PrefixWriter), typeof(LogMessage) }, typeof(PrefixWriter), false)
             {
                 InitLocals = false
             };
@@ -167,14 +168,14 @@ namespace ZeroLog.Appenders
 
                     case PatternPartType.Date:
                     {
-                        // _stringBuffer.Append(logEventHeader.Timestamp, new StringView(&_strings[0] + offset * sizeof(char), length));
+                        // _stringBuffer.Append(message.Timestamp, new StringView(&_strings[0] + offset * sizeof(char), length));
 
                         var (offset, length) = stringMap[_dateFormat];
 
                         il.Emit(OpCodes.Ldloc, stringBufferLocal);
 
                         il.Emit(OpCodes.Ldarg_1);
-                        il.Emit(OpCodes.Callvirt, typeof(ILogEventHeader).GetProperty(nameof(ILogEventHeader.Timestamp))?.GetGetMethod()!);
+                        il.Emit(OpCodes.Callvirt, typeof(LogMessage).GetProperty(nameof(LogMessage.Timestamp))?.GetGetMethod()!);
 
                         il.Emit(OpCodes.Ldloc, stringsLocal);
                         il.Emit(OpCodes.Conv_U);
@@ -191,12 +192,12 @@ namespace ZeroLog.Appenders
 
                     case PatternPartType.Time:
                     {
-                        // _stringBuffer.Append(logEventHeader.Timestamp.TimeOfDay, StringView.Empty);
+                        // _stringBuffer.Append(message.Timestamp.TimeOfDay, StringView.Empty);
 
                         il.Emit(OpCodes.Ldloc, stringBufferLocal);
 
                         il.Emit(OpCodes.Ldarg_1);
-                        il.Emit(OpCodes.Callvirt, typeof(ILogEventHeader).GetProperty(nameof(ILogEventHeader.Timestamp))?.GetGetMethod()!);
+                        il.Emit(OpCodes.Callvirt, typeof(LogMessage).GetProperty(nameof(LogMessage.Timestamp))?.GetGetMethod()!);
                         il.Emit(OpCodes.Stloc, dateTimeLocal ??= il.DeclareLocal(typeof(DateTime)));
                         il.Emit(OpCodes.Ldloca, dateTimeLocal);
                         il.Emit(OpCodes.Call, typeof(DateTime).GetProperty(nameof(DateTime.TimeOfDay))?.GetGetMethod()!);
@@ -209,12 +210,12 @@ namespace ZeroLog.Appenders
 
                     case PatternPartType.Thread:
                     {
-                        // AppendThread(logEventHeader.Thread);
+                        // AppendThread(message.Thread);
 
                         il.Emit(OpCodes.Ldarg_0);
 
                         il.Emit(OpCodes.Ldarg_1);
-                        il.Emit(OpCodes.Callvirt, typeof(ILogEventHeader).GetProperty(nameof(ILogEventHeader.Thread))?.GetGetMethod()!);
+                        il.Emit(OpCodes.Callvirt, typeof(LogMessage).GetProperty(nameof(LogMessage.Thread))?.GetGetMethod()!);
 
                         il.Emit(OpCodes.Call, typeof(PrefixWriter).GetMethod(nameof(AppendThread), BindingFlags.Instance | BindingFlags.NonPublic)!);
                         break;
@@ -222,12 +223,12 @@ namespace ZeroLog.Appenders
 
                     case PatternPartType.Level:
                     {
-                        // _stringBuffer.Append(LevelStringCache.GetLevelString(logEventHeader.Level));
+                        // _stringBuffer.Append(LevelStringCache.GetLevelString(message.Level));
 
                         il.Emit(OpCodes.Ldloc, stringBufferLocal);
 
                         il.Emit(OpCodes.Ldarg_1);
-                        il.Emit(OpCodes.Callvirt, typeof(ILogEventHeader).GetProperty(nameof(ILogEventHeader.Level))?.GetGetMethod()!);
+                        il.Emit(OpCodes.Callvirt, typeof(LogMessage).GetProperty(nameof(LogMessage.Level))?.GetGetMethod()!);
                         il.Emit(OpCodes.Call, typeof(LevelStringCache).GetMethod(nameof(LevelStringCache.GetLevelString))!);
 
                         il.Emit(OpCodes.Call, typeof(StringBuffer).GetMethod(nameof(StringBuffer.Append), new[] { typeof(string) })!);
@@ -236,14 +237,11 @@ namespace ZeroLog.Appenders
 
                     case PatternPartType.Logger:
                     {
-                        // _stringBuffer.Append(logEventHeader.Name);
+                        // AppendLoggerName(message);
 
-                        il.Emit(OpCodes.Ldloc, stringBufferLocal);
-
+                        il.Emit(OpCodes.Ldarg_0);
                         il.Emit(OpCodes.Ldarg_1);
-                        il.Emit(OpCodes.Callvirt, typeof(ILogEventHeader).GetProperty(nameof(ILogEventHeader.Name))?.GetGetMethod()!);
-
-                        il.Emit(OpCodes.Call, typeof(StringBuffer).GetMethod(nameof(StringBuffer.Append), new[] { typeof(string) })!);
+                        il.Emit(OpCodes.Call, typeof(PrefixWriter).GetMethod(nameof(AppendLoggerName), BindingFlags.Instance | BindingFlags.NonPublic)!);
                         break;
                     }
 
@@ -254,13 +252,13 @@ namespace ZeroLog.Appenders
 
             il.Emit(OpCodes.Ret);
 
-            return (Action<PrefixWriter, ILogEventHeader>)method.CreateDelegate(typeof(Action<PrefixWriter, ILogEventHeader>));
+            return (Action<PrefixWriter, LogMessage>)method.CreateDelegate(typeof(Action<PrefixWriter, LogMessage>));
         }
 
-        public unsafe int WritePrefix(Stream stream, ILogEventHeader logEventHeader, Encoding encoding)
+        public unsafe int WritePrefix(Stream stream, LogMessage message, Encoding encoding)
         {
             _stringBuffer.Clear();
-            _appendMethod(this, logEventHeader);
+            _appendMethod(this, message);
 
             int bytesWritten;
             fixed (byte* buf = &_buffer[0])
@@ -284,6 +282,10 @@ namespace ZeroLog.Appenders
                 _stringBuffer.Append('0');
             }
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal void AppendLoggerName(LogMessage logMessage)
+            => _stringBuffer.Append(logMessage.Logger?.Name);
 
         private enum PatternPartType
         {
