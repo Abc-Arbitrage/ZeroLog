@@ -1,11 +1,13 @@
 using System;
 using System.Buffers;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
 namespace ZeroLog;
 
 unsafe partial class LogMessage
 {
+    [SuppressMessage("ReSharper", "ReplaceSliceWithRangeIndexer")]
     internal int WriteTo(Span<char> outputBuffer)
     {
         if (ConstantMessage is not null)
@@ -50,13 +52,13 @@ unsafe partial class LogMessage
 
                     if (value.Length <= outputBuffer.Length - bufferIndex)
                     {
-                        value.CopyTo(outputBuffer[bufferIndex..]);
+                        value.CopyTo(outputBuffer.Slice(bufferIndex));
                         bufferIndex += value.Length;
                     }
                     else
                     {
                         var length = outputBuffer.Length - bufferIndex;
-                        value.AsSpan(0, length).CopyTo(outputBuffer[bufferIndex..]);
+                        value.AsSpan(0, length).CopyTo(outputBuffer.Slice(bufferIndex));
                         bufferIndex += length;
                         goto outputTruncated;
                     }
@@ -70,7 +72,7 @@ unsafe partial class LogMessage
 
                     if (value.Length <= outputBuffer.Length - bufferIndex)
                     {
-                        value.CopyTo(outputBuffer[bufferIndex..]);
+                        value.CopyTo(outputBuffer.Slice(bufferIndex));
                         bufferIndex += value.Length;
                     }
                     else
@@ -80,12 +82,13 @@ unsafe partial class LogMessage
 
                     break;
                 }
+
                 case ArgumentType.Boolean:
                 {
-                    var value = *(bool*)dataPointer;
+                    var valuePtr = (bool*)dataPointer;
                     dataPointer += sizeof(bool);
 
-                    if (!value.TryFormat(outputBuffer[bufferIndex..], out var charsWritten))
+                    if (!valuePtr->TryFormat(outputBuffer.Slice(bufferIndex), out var charsWritten))
                         goto outputTruncated;
 
                     bufferIndex += charsWritten;
@@ -94,10 +97,10 @@ unsafe partial class LogMessage
 
                 case ArgumentType.Byte:
                 {
-                    var value = *dataPointer;
+                    var valuePtr = dataPointer;
                     dataPointer += sizeof(byte);
 
-                    if (!value.TryFormat(outputBuffer[bufferIndex..], out var charsWritten, format, CultureInfo.InvariantCulture))
+                    if (!valuePtr->TryFormat(outputBuffer.Slice(bufferIndex), out var charsWritten, format, CultureInfo.InvariantCulture))
                         goto outputTruncated;
 
                     bufferIndex += charsWritten;
@@ -106,10 +109,10 @@ unsafe partial class LogMessage
 
                 case ArgumentType.SByte:
                 {
-                    var value = *(sbyte*)dataPointer;
+                    var valuePtr = (sbyte*)dataPointer;
                     dataPointer += sizeof(sbyte);
 
-                    if (!value.TryFormat(outputBuffer[bufferIndex..], out var charsWritten, format, CultureInfo.InvariantCulture))
+                    if (!valuePtr->TryFormat(outputBuffer.Slice(bufferIndex), out var charsWritten, format, CultureInfo.InvariantCulture))
                         goto outputTruncated;
 
                     bufferIndex += charsWritten;
@@ -118,23 +121,23 @@ unsafe partial class LogMessage
 
                 case ArgumentType.Char:
                 {
-                    var value = *(char*)dataPointer;
+                    var valuePtr = (char*)dataPointer;
                     dataPointer += sizeof(char);
 
                     if (bufferIndex >= outputBuffer.Length)
                         goto outputTruncated;
 
-                    outputBuffer[bufferIndex] = value;
+                    outputBuffer[bufferIndex] = *valuePtr;
                     ++bufferIndex;
                     break;
                 }
 
                 case ArgumentType.Int16:
                 {
-                    var value = *(short*)dataPointer;
+                    var valuePtr = (short*)dataPointer;
                     dataPointer += sizeof(short);
 
-                    if (!value.TryFormat(outputBuffer[bufferIndex..], out var charsWritten, format, CultureInfo.InvariantCulture))
+                    if (!valuePtr->TryFormat(outputBuffer.Slice(bufferIndex), out var charsWritten, format, CultureInfo.InvariantCulture))
                         goto outputTruncated;
 
                     bufferIndex += charsWritten;
@@ -143,10 +146,10 @@ unsafe partial class LogMessage
 
                 case ArgumentType.UInt16:
                 {
-                    var value = *(ushort*)dataPointer;
+                    var valuePtr = (ushort*)dataPointer;
                     dataPointer += sizeof(ushort);
 
-                    if (!value.TryFormat(outputBuffer[bufferIndex..], out var charsWritten, format, CultureInfo.InvariantCulture))
+                    if (!valuePtr->TryFormat(outputBuffer.Slice(bufferIndex), out var charsWritten, format, CultureInfo.InvariantCulture))
                         goto outputTruncated;
 
                     bufferIndex += charsWritten;
@@ -155,10 +158,10 @@ unsafe partial class LogMessage
 
                 case ArgumentType.Int32:
                 {
-                    var value = *(int*)dataPointer;
+                    var valuePtr = (int*)dataPointer;
                     dataPointer += sizeof(int);
 
-                    if (!value.TryFormat(outputBuffer[bufferIndex..], out var charsWritten, format, CultureInfo.InvariantCulture))
+                    if (!valuePtr->TryFormat(outputBuffer.Slice(bufferIndex), out var charsWritten, format, CultureInfo.InvariantCulture))
                         goto outputTruncated;
 
                     bufferIndex += charsWritten;
@@ -167,10 +170,10 @@ unsafe partial class LogMessage
 
                 case ArgumentType.UInt32:
                 {
-                    var value = *(uint*)dataPointer;
+                    var valuePtr = (uint*)dataPointer;
                     dataPointer += sizeof(uint);
 
-                    if (!value.TryFormat(outputBuffer[bufferIndex..], out var charsWritten, format, CultureInfo.InvariantCulture))
+                    if (!valuePtr->TryFormat(outputBuffer.Slice(bufferIndex), out var charsWritten, format, CultureInfo.InvariantCulture))
                         goto outputTruncated;
 
                     bufferIndex += charsWritten;
@@ -179,10 +182,10 @@ unsafe partial class LogMessage
 
                 case ArgumentType.Int64:
                 {
-                    var value = *(long*)dataPointer;
+                    var valuePtr = (long*)dataPointer;
                     dataPointer += sizeof(long);
 
-                    if (!value.TryFormat(outputBuffer[bufferIndex..], out var charsWritten, format, CultureInfo.InvariantCulture))
+                    if (!valuePtr->TryFormat(outputBuffer.Slice(bufferIndex), out var charsWritten, format, CultureInfo.InvariantCulture))
                         goto outputTruncated;
 
                     bufferIndex += charsWritten;
@@ -191,10 +194,10 @@ unsafe partial class LogMessage
 
                 case ArgumentType.UInt64:
                 {
-                    var value = *(ulong*)dataPointer;
+                    var valuePtr = (ulong*)dataPointer;
                     dataPointer += sizeof(ulong);
 
-                    if (!value.TryFormat(outputBuffer[bufferIndex..], out var charsWritten, format, CultureInfo.InvariantCulture))
+                    if (!valuePtr->TryFormat(outputBuffer.Slice(bufferIndex), out var charsWritten, format, CultureInfo.InvariantCulture))
                         goto outputTruncated;
 
                     bufferIndex += charsWritten;
@@ -203,10 +206,10 @@ unsafe partial class LogMessage
 
                 case ArgumentType.IntPtr:
                 {
-                    var value = *(nint*)dataPointer;
+                    var valuePtr = (nint*)dataPointer;
                     dataPointer += sizeof(nint);
 
-                    if (!value.TryFormat(outputBuffer[bufferIndex..], out var charsWritten, format, CultureInfo.InvariantCulture))
+                    if (!valuePtr->TryFormat(outputBuffer.Slice(bufferIndex), out var charsWritten, format, CultureInfo.InvariantCulture))
                         goto outputTruncated;
 
                     bufferIndex += charsWritten;
@@ -215,10 +218,10 @@ unsafe partial class LogMessage
 
                 case ArgumentType.UIntPtr:
                 {
-                    var value = *(nuint*)dataPointer;
+                    var valuePtr = (nuint*)dataPointer;
                     dataPointer += sizeof(nuint);
 
-                    if (!value.TryFormat(outputBuffer[bufferIndex..], out var charsWritten, format, CultureInfo.InvariantCulture))
+                    if (!valuePtr->TryFormat(outputBuffer.Slice(bufferIndex), out var charsWritten, format, CultureInfo.InvariantCulture))
                         goto outputTruncated;
 
                     bufferIndex += charsWritten;
@@ -227,10 +230,10 @@ unsafe partial class LogMessage
 
                 case ArgumentType.Single:
                 {
-                    var value = *(float*)dataPointer;
+                    var valuePtr = (float*)dataPointer;
                     dataPointer += sizeof(float);
 
-                    if (!value.TryFormat(outputBuffer[bufferIndex..], out var charsWritten, format, CultureInfo.InvariantCulture))
+                    if (!valuePtr->TryFormat(outputBuffer.Slice(bufferIndex), out var charsWritten, format, CultureInfo.InvariantCulture))
                         goto outputTruncated;
 
                     bufferIndex += charsWritten;
@@ -239,10 +242,10 @@ unsafe partial class LogMessage
 
                 case ArgumentType.Double:
                 {
-                    var value = *(double*)dataPointer;
+                    var valuePtr = (double*)dataPointer;
                     dataPointer += sizeof(double);
 
-                    if (!value.TryFormat(outputBuffer[bufferIndex..], out var charsWritten, format, CultureInfo.InvariantCulture))
+                    if (!valuePtr->TryFormat(outputBuffer.Slice(bufferIndex), out var charsWritten, format, CultureInfo.InvariantCulture))
                         goto outputTruncated;
 
                     bufferIndex += charsWritten;
@@ -251,10 +254,10 @@ unsafe partial class LogMessage
 
                 case ArgumentType.Decimal:
                 {
-                    var value = *(decimal*)dataPointer;
+                    var valuePtr = (decimal*)dataPointer;
                     dataPointer += sizeof(decimal);
 
-                    if (!value.TryFormat(outputBuffer[bufferIndex..], out var charsWritten, format, CultureInfo.InvariantCulture))
+                    if (!valuePtr->TryFormat(outputBuffer.Slice(bufferIndex), out var charsWritten, format, CultureInfo.InvariantCulture))
                         goto outputTruncated;
 
                     bufferIndex += charsWritten;
@@ -263,10 +266,10 @@ unsafe partial class LogMessage
 
                 case ArgumentType.Guid:
                 {
-                    var value = *(Guid*)dataPointer;
+                    var valuePtr = (Guid*)dataPointer;
                     dataPointer += sizeof(Guid);
 
-                    if (!value.TryFormat(outputBuffer[bufferIndex..], out var charsWritten, format))
+                    if (!valuePtr->TryFormat(outputBuffer.Slice(bufferIndex), out var charsWritten, format))
                         goto outputTruncated;
 
                     bufferIndex += charsWritten;
@@ -275,10 +278,10 @@ unsafe partial class LogMessage
 
                 case ArgumentType.DateTime:
                 {
-                    var value = *(DateTime*)dataPointer;
+                    var valuePtr = (DateTime*)dataPointer;
                     dataPointer += sizeof(DateTime);
 
-                    if (!value.TryFormat(outputBuffer[bufferIndex..], out var charsWritten, format, CultureInfo.InvariantCulture))
+                    if (!valuePtr->TryFormat(outputBuffer.Slice(bufferIndex), out var charsWritten, format, CultureInfo.InvariantCulture))
                         goto outputTruncated;
 
                     bufferIndex += charsWritten;
@@ -287,10 +290,10 @@ unsafe partial class LogMessage
 
                 case ArgumentType.TimeSpan:
                 {
-                    var value = *(TimeSpan*)dataPointer;
+                    var valuePtr = (TimeSpan*)dataPointer;
                     dataPointer += sizeof(TimeSpan);
 
-                    if (!value.TryFormat(outputBuffer[bufferIndex..], out var charsWritten, format, CultureInfo.InvariantCulture))
+                    if (!valuePtr->TryFormat(outputBuffer.Slice(bufferIndex), out var charsWritten, format, CultureInfo.InvariantCulture))
                         goto outputTruncated;
 
                     bufferIndex += charsWritten;
@@ -320,7 +323,7 @@ unsafe partial class LogMessage
             if (bufferIndex + suffix.Length <= outputBuffer.Length)
             {
                 // The suffix fits in the remaining buffer.
-                suffix.CopyTo(outputBuffer[bufferIndex..]);
+                suffix.CopyTo(outputBuffer.Slice(bufferIndex));
                 return bufferIndex + suffix.Length;
             }
 
