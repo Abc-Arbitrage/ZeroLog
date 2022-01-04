@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text.Formatting;
@@ -31,6 +32,27 @@ namespace ZeroLog
                 AppendNumericValue(stringBuffer);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool TryFormat(Span<char> destination, out int charsWritten)
+        {
+            var enumString = GetString();
+
+            if (enumString != null)
+            {
+                if (enumString.Length <= destination.Length)
+                {
+                    enumString.CopyTo(destination);
+                    charsWritten = enumString.Length;
+                    return true;
+                }
+
+                charsWritten = 0;
+                return false;
+            }
+
+            return TryAppendNumericValue(destination, out charsWritten);
+        }
+
         [MethodImpl(MethodImplOptions.NoInlining)]
         public void AppendNumericValue(StringBuffer stringBuffer)
         {
@@ -44,6 +66,15 @@ namespace ZeroLog
                 stringBuffer.Append(unchecked((long)_value), StringView.Empty);
             else
                 stringBuffer.Append(_value, StringView.Empty);
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private bool TryAppendNumericValue(Span<char> destination, out int charsWritten)
+        {
+            if (_value <= long.MaxValue || !EnumCache.IsEnumSigned(_typeHandle))
+                return _value.TryFormat(destination, out charsWritten, default, CultureInfo.InvariantCulture);
+
+            return unchecked((long)_value).TryFormat(destination, out charsWritten, default, CultureInfo.InvariantCulture);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -23,14 +23,14 @@ partial class LogMessage
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(<#= type.name #> value)
     {
-        InternalAppend(value, ArgumentType.<#= type.argType #>);
+        InternalAppendValueType(value, ArgumentType.<#= type.argType #>);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(<#= type.name #>? value)
     {
-        InternalAppend(value, ArgumentType.<#= type.argType #>);
+        InternalAppendValueType(value, ArgumentType.<#= type.argType #>);
         return this;
     }
 
@@ -41,14 +41,14 @@ partial class LogMessage
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(<#= type.name #> value, string format)
     {
-        InternalAppend(value, format, ArgumentType.<#= type.argType #>);
+        InternalAppendValueType(value, format, ArgumentType.<#= type.argType #>);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(<#= type.name #>? value, string format)
     {
-        InternalAppend(value, format, ArgumentType.<#= type.argType #>);
+        InternalAppendValueType(value, format, ArgumentType.<#= type.argType #>);
         return this;
     }
 

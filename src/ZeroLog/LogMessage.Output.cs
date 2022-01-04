@@ -300,8 +300,19 @@ unsafe partial class LogMessage
                     break;
                 }
 
-                case ArgumentType.AsciiString:
                 case ArgumentType.Enum:
+                {
+                    var valuePtr = (EnumArg*)dataPointer;
+                    dataPointer += sizeof(EnumArg);
+
+                    if (!valuePtr->TryFormat(outputBuffer[bufferIndex..], out var charsWritten))
+                        goto outputTruncated;
+
+                    bufferIndex += charsWritten;
+                    break;
+                }
+
+                case ArgumentType.AsciiString:
                 case ArgumentType.Unmanaged:
                 case ArgumentType.KeyString:
                     throw new NotImplementedException();

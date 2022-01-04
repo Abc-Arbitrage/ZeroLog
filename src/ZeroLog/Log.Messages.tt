@@ -58,7 +58,7 @@ partial class Log
             return;
 
         var logMessage = GetLogMessage(Level.<#= levelName #>);
-        logMessage.InternalAppend(message);
+        logMessage.InternalAppendString(message);
         logMessage.Log();
     }
 
@@ -68,8 +68,8 @@ partial class Log
             return;
 
         var logMessage = GetLogMessage(Level.<#= levelName #>);
-        logMessage.InternalAppend(message);
-        logMessage.InternalAppend(ex?.ToString());
+        logMessage.InternalAppendString(message);
+        logMessage.InternalAppendString(ex?.ToString());
         logMessage.Log();
     }
 

@@ -1,6 +1,7 @@
 using System;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using ZeroLog.Utils;
 
 namespace ZeroLog;
 
@@ -102,12 +103,28 @@ public sealed unsafe partial class LogMessage
     {
         // TODO remove this method
 
-        InternalAppend(value);
+        InternalAppendString(value);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppend(string? value)
+    public LogMessage AppendEnum<T>(T value)
+        where T : struct, Enum
+    {
+        InternalAppendEnum(value);
+        return this;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public LogMessage AppendEnum<T>(T? value)
+        where T : struct, Enum
+    {
+        InternalAppendEnum(value);
+        return this;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal void InternalAppendString(string? value)
     {
         if (value is not null)
         {
@@ -147,7 +164,7 @@ public sealed unsafe partial class LogMessage
         }
     }
 
-    private void InternalAppend<T>(T value, ArgumentType argType)
+    private void InternalAppendValueType<T>(T value, ArgumentType argType)
         where T : unmanaged
     {
         if (_dataPointer + sizeof(ArgumentType) + sizeof(T) <= _endOfBuffer)
@@ -164,17 +181,17 @@ public sealed unsafe partial class LogMessage
         }
     }
 
-    private void InternalAppend<T>(T? value, ArgumentType argType)
+    private void InternalAppendValueType<T>(T? value, ArgumentType argType)
         where T : unmanaged
     {
         if (value is not null)
-            InternalAppend(value.GetValueOrDefault(), argType);
+            InternalAppendValueType(value.GetValueOrDefault(), argType);
         else
             InternalAppendNull();
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private void InternalAppend<T>(T value, string format, ArgumentType argType)
+    private void InternalAppendValueType<T>(T value, string format, ArgumentType argType)
         where T : unmanaged
     {
         if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(T) <= _endOfBuffer && _stringIndex < _strings.Length)
@@ -198,11 +215,37 @@ public sealed unsafe partial class LogMessage
         }
     }
 
-    private void InternalAppend<T>(T? value, string format, ArgumentType argType)
+    private void InternalAppendValueType<T>(T? value, string format, ArgumentType argType)
         where T : unmanaged
     {
         if (value is not null)
-            InternalAppend(value.GetValueOrDefault(), format, argType);
+            InternalAppendValueType(value.GetValueOrDefault(), format, argType);
+        else
+            InternalAppendNull();
+    }
+
+    private void InternalAppendEnum<T>(T value)
+        where T : struct, Enum
+    {
+        if (_dataPointer + sizeof(ArgumentType) + sizeof(EnumArg) <= _endOfBuffer && _stringIndex < _strings.Length)
+        {
+            *(ArgumentType*)_dataPointer = ArgumentType.Enum;
+            _dataPointer += sizeof(ArgumentType);
+
+            *(EnumArg*)_dataPointer = new EnumArg(TypeUtil<T>.TypeHandle, EnumCache.ToUInt64(value));
+            _dataPointer += sizeof(EnumArg);
+        }
+        else
+        {
+            _isTruncated = true;
+        }
+    }
+
+    private void InternalAppendEnum<T>(T? value)
+        where T : struct, Enum
+    {
+        if (value is not null)
+            InternalAppendEnum(value.GetValueOrDefault());
         else
             InternalAppendNull();
     }

@@ -17,14 +17,14 @@ partial class LogMessage
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(bool value)
     {
-        InternalAppend(value, ArgumentType.Boolean);
+        InternalAppendValueType(value, ArgumentType.Boolean);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(bool? value)
     {
-        InternalAppend(value, ArgumentType.Boolean);
+        InternalAppendValueType(value, ArgumentType.Boolean);
         return this;
     }
 
@@ -45,28 +45,28 @@ partial class LogMessage
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(byte value)
     {
-        InternalAppend(value, ArgumentType.Byte);
+        InternalAppendValueType(value, ArgumentType.Byte);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(byte? value)
     {
-        InternalAppend(value, ArgumentType.Byte);
+        InternalAppendValueType(value, ArgumentType.Byte);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(byte value, string format)
     {
-        InternalAppend(value, format, ArgumentType.Byte);
+        InternalAppendValueType(value, format, ArgumentType.Byte);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(byte? value, string format)
     {
-        InternalAppend(value, format, ArgumentType.Byte);
+        InternalAppendValueType(value, format, ArgumentType.Byte);
         return this;
     }
 
@@ -87,28 +87,28 @@ partial class LogMessage
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(sbyte value)
     {
-        InternalAppend(value, ArgumentType.SByte);
+        InternalAppendValueType(value, ArgumentType.SByte);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(sbyte? value)
     {
-        InternalAppend(value, ArgumentType.SByte);
+        InternalAppendValueType(value, ArgumentType.SByte);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(sbyte value, string format)
     {
-        InternalAppend(value, format, ArgumentType.SByte);
+        InternalAppendValueType(value, format, ArgumentType.SByte);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(sbyte? value, string format)
     {
-        InternalAppend(value, format, ArgumentType.SByte);
+        InternalAppendValueType(value, format, ArgumentType.SByte);
         return this;
     }
 
@@ -129,14 +129,14 @@ partial class LogMessage
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(char value)
     {
-        InternalAppend(value, ArgumentType.Char);
+        InternalAppendValueType(value, ArgumentType.Char);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(char? value)
     {
-        InternalAppend(value, ArgumentType.Char);
+        InternalAppendValueType(value, ArgumentType.Char);
         return this;
     }
 
@@ -157,28 +157,28 @@ partial class LogMessage
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(short value)
     {
-        InternalAppend(value, ArgumentType.Int16);
+        InternalAppendValueType(value, ArgumentType.Int16);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(short? value)
     {
-        InternalAppend(value, ArgumentType.Int16);
+        InternalAppendValueType(value, ArgumentType.Int16);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(short value, string format)
     {
-        InternalAppend(value, format, ArgumentType.Int16);
+        InternalAppendValueType(value, format, ArgumentType.Int16);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(short? value, string format)
     {
-        InternalAppend(value, format, ArgumentType.Int16);
+        InternalAppendValueType(value, format, ArgumentType.Int16);
         return this;
     }
 
@@ -199,28 +199,28 @@ partial class LogMessage
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(ushort value)
     {
-        InternalAppend(value, ArgumentType.UInt16);
+        InternalAppendValueType(value, ArgumentType.UInt16);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(ushort? value)
     {
-        InternalAppend(value, ArgumentType.UInt16);
+        InternalAppendValueType(value, ArgumentType.UInt16);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(ushort value, string format)
     {
-        InternalAppend(value, format, ArgumentType.UInt16);
+        InternalAppendValueType(value, format, ArgumentType.UInt16);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(ushort? value, string format)
     {
-        InternalAppend(value, format, ArgumentType.UInt16);
+        InternalAppendValueType(value, format, ArgumentType.UInt16);
         return this;
     }
 
@@ -241,28 +241,28 @@ partial class LogMessage
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(int value)
     {
-        InternalAppend(value, ArgumentType.Int32);
+        InternalAppendValueType(value, ArgumentType.Int32);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(int? value)
     {
-        InternalAppend(value, ArgumentType.Int32);
+        InternalAppendValueType(value, ArgumentType.Int32);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(int value, string format)
     {
-        InternalAppend(value, format, ArgumentType.Int32);
+        InternalAppendValueType(value, format, ArgumentType.Int32);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(int? value, string format)
     {
-        InternalAppend(value, format, ArgumentType.Int32);
+        InternalAppendValueType(value, format, ArgumentType.Int32);
         return this;
     }
 
@@ -283,28 +283,28 @@ partial class LogMessage
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(uint value)
     {
-        InternalAppend(value, ArgumentType.UInt32);
+        InternalAppendValueType(value, ArgumentType.UInt32);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(uint? value)
     {
-        InternalAppend(value, ArgumentType.UInt32);
+        InternalAppendValueType(value, ArgumentType.UInt32);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(uint value, string format)
     {
-        InternalAppend(value, format, ArgumentType.UInt32);
+        InternalAppendValueType(value, format, ArgumentType.UInt32);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(uint? value, string format)
     {
-        InternalAppend(value, format, ArgumentType.UInt32);
+        InternalAppendValueType(value, format, ArgumentType.UInt32);
         return this;
     }
 
@@ -325,28 +325,28 @@ partial class LogMessage
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(long value)
     {
-        InternalAppend(value, ArgumentType.Int64);
+        InternalAppendValueType(value, ArgumentType.Int64);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(long? value)
     {
-        InternalAppend(value, ArgumentType.Int64);
+        InternalAppendValueType(value, ArgumentType.Int64);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(long value, string format)
     {
-        InternalAppend(value, format, ArgumentType.Int64);
+        InternalAppendValueType(value, format, ArgumentType.Int64);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(long? value, string format)
     {
-        InternalAppend(value, format, ArgumentType.Int64);
+        InternalAppendValueType(value, format, ArgumentType.Int64);
         return this;
     }
 
@@ -367,28 +367,28 @@ partial class LogMessage
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(ulong value)
     {
-        InternalAppend(value, ArgumentType.UInt64);
+        InternalAppendValueType(value, ArgumentType.UInt64);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(ulong? value)
     {
-        InternalAppend(value, ArgumentType.UInt64);
+        InternalAppendValueType(value, ArgumentType.UInt64);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(ulong value, string format)
     {
-        InternalAppend(value, format, ArgumentType.UInt64);
+        InternalAppendValueType(value, format, ArgumentType.UInt64);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(ulong? value, string format)
     {
-        InternalAppend(value, format, ArgumentType.UInt64);
+        InternalAppendValueType(value, format, ArgumentType.UInt64);
         return this;
     }
 
@@ -409,28 +409,28 @@ partial class LogMessage
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(nint value)
     {
-        InternalAppend(value, ArgumentType.IntPtr);
+        InternalAppendValueType(value, ArgumentType.IntPtr);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(nint? value)
     {
-        InternalAppend(value, ArgumentType.IntPtr);
+        InternalAppendValueType(value, ArgumentType.IntPtr);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(nint value, string format)
     {
-        InternalAppend(value, format, ArgumentType.IntPtr);
+        InternalAppendValueType(value, format, ArgumentType.IntPtr);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(nint? value, string format)
     {
-        InternalAppend(value, format, ArgumentType.IntPtr);
+        InternalAppendValueType(value, format, ArgumentType.IntPtr);
         return this;
     }
 
@@ -451,28 +451,28 @@ partial class LogMessage
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(nuint value)
     {
-        InternalAppend(value, ArgumentType.UIntPtr);
+        InternalAppendValueType(value, ArgumentType.UIntPtr);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(nuint? value)
     {
-        InternalAppend(value, ArgumentType.UIntPtr);
+        InternalAppendValueType(value, ArgumentType.UIntPtr);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(nuint value, string format)
     {
-        InternalAppend(value, format, ArgumentType.UIntPtr);
+        InternalAppendValueType(value, format, ArgumentType.UIntPtr);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(nuint? value, string format)
     {
-        InternalAppend(value, format, ArgumentType.UIntPtr);
+        InternalAppendValueType(value, format, ArgumentType.UIntPtr);
         return this;
     }
 
@@ -493,28 +493,28 @@ partial class LogMessage
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(float value)
     {
-        InternalAppend(value, ArgumentType.Single);
+        InternalAppendValueType(value, ArgumentType.Single);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(float? value)
     {
-        InternalAppend(value, ArgumentType.Single);
+        InternalAppendValueType(value, ArgumentType.Single);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(float value, string format)
     {
-        InternalAppend(value, format, ArgumentType.Single);
+        InternalAppendValueType(value, format, ArgumentType.Single);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(float? value, string format)
     {
-        InternalAppend(value, format, ArgumentType.Single);
+        InternalAppendValueType(value, format, ArgumentType.Single);
         return this;
     }
 
@@ -535,28 +535,28 @@ partial class LogMessage
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(double value)
     {
-        InternalAppend(value, ArgumentType.Double);
+        InternalAppendValueType(value, ArgumentType.Double);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(double? value)
     {
-        InternalAppend(value, ArgumentType.Double);
+        InternalAppendValueType(value, ArgumentType.Double);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(double value, string format)
     {
-        InternalAppend(value, format, ArgumentType.Double);
+        InternalAppendValueType(value, format, ArgumentType.Double);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(double? value, string format)
     {
-        InternalAppend(value, format, ArgumentType.Double);
+        InternalAppendValueType(value, format, ArgumentType.Double);
         return this;
     }
 
@@ -577,28 +577,28 @@ partial class LogMessage
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(decimal value)
     {
-        InternalAppend(value, ArgumentType.Decimal);
+        InternalAppendValueType(value, ArgumentType.Decimal);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(decimal? value)
     {
-        InternalAppend(value, ArgumentType.Decimal);
+        InternalAppendValueType(value, ArgumentType.Decimal);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(decimal value, string format)
     {
-        InternalAppend(value, format, ArgumentType.Decimal);
+        InternalAppendValueType(value, format, ArgumentType.Decimal);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(decimal? value, string format)
     {
-        InternalAppend(value, format, ArgumentType.Decimal);
+        InternalAppendValueType(value, format, ArgumentType.Decimal);
         return this;
     }
 
@@ -619,28 +619,28 @@ partial class LogMessage
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(Guid value)
     {
-        InternalAppend(value, ArgumentType.Guid);
+        InternalAppendValueType(value, ArgumentType.Guid);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(Guid? value)
     {
-        InternalAppend(value, ArgumentType.Guid);
+        InternalAppendValueType(value, ArgumentType.Guid);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(Guid value, string format)
     {
-        InternalAppend(value, format, ArgumentType.Guid);
+        InternalAppendValueType(value, format, ArgumentType.Guid);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(Guid? value, string format)
     {
-        InternalAppend(value, format, ArgumentType.Guid);
+        InternalAppendValueType(value, format, ArgumentType.Guid);
         return this;
     }
 
@@ -661,28 +661,28 @@ partial class LogMessage
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(DateTime value)
     {
-        InternalAppend(value, ArgumentType.DateTime);
+        InternalAppendValueType(value, ArgumentType.DateTime);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(DateTime? value)
     {
-        InternalAppend(value, ArgumentType.DateTime);
+        InternalAppendValueType(value, ArgumentType.DateTime);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(DateTime value, string format)
     {
-        InternalAppend(value, format, ArgumentType.DateTime);
+        InternalAppendValueType(value, format, ArgumentType.DateTime);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(DateTime? value, string format)
     {
-        InternalAppend(value, format, ArgumentType.DateTime);
+        InternalAppendValueType(value, format, ArgumentType.DateTime);
         return this;
     }
 
@@ -703,28 +703,28 @@ partial class LogMessage
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(TimeSpan value)
     {
-        InternalAppend(value, ArgumentType.TimeSpan);
+        InternalAppendValueType(value, ArgumentType.TimeSpan);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(TimeSpan? value)
     {
-        InternalAppend(value, ArgumentType.TimeSpan);
+        InternalAppendValueType(value, ArgumentType.TimeSpan);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(TimeSpan value, string format)
     {
-        InternalAppend(value, format, ArgumentType.TimeSpan);
+        InternalAppendValueType(value, format, ArgumentType.TimeSpan);
         return this;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(TimeSpan? value, string format)
     {
-        InternalAppend(value, format, ArgumentType.TimeSpan);
+        InternalAppendValueType(value, format, ArgumentType.TimeSpan);
         return this;
     }
 
