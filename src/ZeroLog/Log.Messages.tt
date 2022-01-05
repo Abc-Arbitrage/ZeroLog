@@ -35,8 +35,11 @@ partial class Log
     public void <#= levelName #>([InterpolatedStringHandlerArgument("")] <#= levelName #>InterpolatedStringHandler message)
         => message.Message.Log();
 
-    public void <#= levelName #>([InterpolatedStringHandlerArgument("")] <#= levelName #>InterpolatedStringHandler message, Exception? ex) // TODO handle Exception
-        => message.Message.Log();
+    public void <#= levelName #>([InterpolatedStringHandlerArgument("")] <#= levelName #>InterpolatedStringHandler message, Exception? ex)
+    {
+        message.Message.Exception = ex;
+        message.Message.Log();
+    }
 
 <#
     }

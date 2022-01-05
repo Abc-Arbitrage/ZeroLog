@@ -19,6 +19,17 @@ partial class LogTests
     }
 
     [Test]
+    public void should_log_with_append_Trace()
+    {
+        _log.Trace().Append("Foo").Log();
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(Level.Trace);
+        message.ToString().ShouldEqual("Foo");
+        message.Exception.ShouldBeNull();
+    }
+
+    [Test]
     public void should_log_String_Trace()
     {
         _log.Trace($"foo {NoInline("bar")} baz {NoInline("foobar")}");
@@ -26,6 +37,18 @@ partial class LogTests
         var message = _provider.GetSubmittedMessage();
         message.Level.ShouldEqual(Level.Trace);
         message.ToString().ShouldEqual("foo bar baz foobar");
+        message.Exception.ShouldBeNull();
+    }
+
+    [Test]
+    public void should_log_Exception_Trace()
+    {
+        var exception = new InvalidOperationException();
+        _log.Trace($"Foo", exception);
+
+        var message = _provider.GetSubmittedMessage();
+        message.ToString().ShouldEqual("Foo");
+        message.Exception.ShouldBeTheSameAs(exception);
     }
 
     [Test]
@@ -857,6 +880,17 @@ partial class LogTests
     }
 
     [Test]
+    public void should_log_with_append_Debug()
+    {
+        _log.Debug().Append("Foo").Log();
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(Level.Debug);
+        message.ToString().ShouldEqual("Foo");
+        message.Exception.ShouldBeNull();
+    }
+
+    [Test]
     public void should_log_String_Debug()
     {
         _log.Debug($"foo {NoInline("bar")} baz {NoInline("foobar")}");
@@ -864,6 +898,18 @@ partial class LogTests
         var message = _provider.GetSubmittedMessage();
         message.Level.ShouldEqual(Level.Debug);
         message.ToString().ShouldEqual("foo bar baz foobar");
+        message.Exception.ShouldBeNull();
+    }
+
+    [Test]
+    public void should_log_Exception_Debug()
+    {
+        var exception = new InvalidOperationException();
+        _log.Debug($"Foo", exception);
+
+        var message = _provider.GetSubmittedMessage();
+        message.ToString().ShouldEqual("Foo");
+        message.Exception.ShouldBeTheSameAs(exception);
     }
 
     [Test]
@@ -1695,6 +1741,17 @@ partial class LogTests
     }
 
     [Test]
+    public void should_log_with_append_Info()
+    {
+        _log.Info().Append("Foo").Log();
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(Level.Info);
+        message.ToString().ShouldEqual("Foo");
+        message.Exception.ShouldBeNull();
+    }
+
+    [Test]
     public void should_log_String_Info()
     {
         _log.Info($"foo {NoInline("bar")} baz {NoInline("foobar")}");
@@ -1702,6 +1759,18 @@ partial class LogTests
         var message = _provider.GetSubmittedMessage();
         message.Level.ShouldEqual(Level.Info);
         message.ToString().ShouldEqual("foo bar baz foobar");
+        message.Exception.ShouldBeNull();
+    }
+
+    [Test]
+    public void should_log_Exception_Info()
+    {
+        var exception = new InvalidOperationException();
+        _log.Info($"Foo", exception);
+
+        var message = _provider.GetSubmittedMessage();
+        message.ToString().ShouldEqual("Foo");
+        message.Exception.ShouldBeTheSameAs(exception);
     }
 
     [Test]
@@ -2533,6 +2602,17 @@ partial class LogTests
     }
 
     [Test]
+    public void should_log_with_append_Warn()
+    {
+        _log.Warn().Append("Foo").Log();
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(Level.Warn);
+        message.ToString().ShouldEqual("Foo");
+        message.Exception.ShouldBeNull();
+    }
+
+    [Test]
     public void should_log_String_Warn()
     {
         _log.Warn($"foo {NoInline("bar")} baz {NoInline("foobar")}");
@@ -2540,6 +2620,18 @@ partial class LogTests
         var message = _provider.GetSubmittedMessage();
         message.Level.ShouldEqual(Level.Warn);
         message.ToString().ShouldEqual("foo bar baz foobar");
+        message.Exception.ShouldBeNull();
+    }
+
+    [Test]
+    public void should_log_Exception_Warn()
+    {
+        var exception = new InvalidOperationException();
+        _log.Warn($"Foo", exception);
+
+        var message = _provider.GetSubmittedMessage();
+        message.ToString().ShouldEqual("Foo");
+        message.Exception.ShouldBeTheSameAs(exception);
     }
 
     [Test]
@@ -3371,6 +3463,17 @@ partial class LogTests
     }
 
     [Test]
+    public void should_log_with_append_Error()
+    {
+        _log.Error().Append("Foo").Log();
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(Level.Error);
+        message.ToString().ShouldEqual("Foo");
+        message.Exception.ShouldBeNull();
+    }
+
+    [Test]
     public void should_log_String_Error()
     {
         _log.Error($"foo {NoInline("bar")} baz {NoInline("foobar")}");
@@ -3378,6 +3481,18 @@ partial class LogTests
         var message = _provider.GetSubmittedMessage();
         message.Level.ShouldEqual(Level.Error);
         message.ToString().ShouldEqual("foo bar baz foobar");
+        message.Exception.ShouldBeNull();
+    }
+
+    [Test]
+    public void should_log_Exception_Error()
+    {
+        var exception = new InvalidOperationException();
+        _log.Error($"Foo", exception);
+
+        var message = _provider.GetSubmittedMessage();
+        message.ToString().ShouldEqual("Foo");
+        message.Exception.ShouldBeTheSameAs(exception);
     }
 
     [Test]
@@ -4209,6 +4324,17 @@ partial class LogTests
     }
 
     [Test]
+    public void should_log_with_append_Fatal()
+    {
+        _log.Fatal().Append("Foo").Log();
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(Level.Fatal);
+        message.ToString().ShouldEqual("Foo");
+        message.Exception.ShouldBeNull();
+    }
+
+    [Test]
     public void should_log_String_Fatal()
     {
         _log.Fatal($"foo {NoInline("bar")} baz {NoInline("foobar")}");
@@ -4216,6 +4342,18 @@ partial class LogTests
         var message = _provider.GetSubmittedMessage();
         message.Level.ShouldEqual(Level.Fatal);
         message.ToString().ShouldEqual("foo bar baz foobar");
+        message.Exception.ShouldBeNull();
+    }
+
+    [Test]
+    public void should_log_Exception_Fatal()
+    {
+        var exception = new InvalidOperationException();
+        _log.Fatal($"Foo", exception);
+
+        var message = _provider.GetSubmittedMessage();
+        message.ToString().ShouldEqual("Foo");
+        message.Exception.ShouldBeTheSameAs(exception);
     }
 
     [Test]

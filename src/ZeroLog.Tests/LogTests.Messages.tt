@@ -47,6 +47,17 @@ partial class LogTests
     }
 
     [Test]
+    public void should_log_with_append_<#= logLevel #>()
+    {
+        _log.<#= logLevel #>().Append("Foo").Log();
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(Level.<#= logLevel #>);
+        message.ToString().ShouldEqual("Foo");
+        message.Exception.ShouldBeNull();
+    }
+
+    [Test]
     public void should_log_String_<#= logLevel #>()
     {
         _log.<#= logLevel #>($"foo {NoInline("bar")} baz {NoInline("foobar")}");
@@ -54,6 +65,18 @@ partial class LogTests
         var message = _provider.GetSubmittedMessage();
         message.Level.ShouldEqual(Level.<#= logLevel #>);
         message.ToString().ShouldEqual("foo bar baz foobar");
+        message.Exception.ShouldBeNull();
+    }
+
+    [Test]
+    public void should_log_Exception_<#= logLevel #>()
+    {
+        var exception = new InvalidOperationException();
+        _log.<#= logLevel #>($"Foo", exception);
+
+        var message = _provider.GetSubmittedMessage();
+        message.ToString().ShouldEqual("Foo");
+        message.Exception.ShouldBeTheSameAs(exception);
     }
 
     [Test]

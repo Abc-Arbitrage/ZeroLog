@@ -31,6 +31,10 @@ internal static class AssertExtensions
         return actual ?? throw new AssertionException("Expected non-null");
     }
 
+    public static void ShouldBeTheSameAs<T>(this T? actual, T? expected)
+        where T : class
+        => Assert.That(actual, Is.SameAs(expected));
+
     public static void ShouldBeEmpty<T>(this T actual)
         => Assert.That(actual, Is.Empty);
 

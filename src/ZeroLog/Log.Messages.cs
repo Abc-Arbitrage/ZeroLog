@@ -27,8 +27,11 @@ partial class Log
     public void Trace([InterpolatedStringHandlerArgument("")] TraceInterpolatedStringHandler message)
         => message.Message.Log();
 
-    public void Trace([InterpolatedStringHandlerArgument("")] TraceInterpolatedStringHandler message, Exception? ex) // TODO handle Exception
-        => message.Message.Log();
+    public void Trace([InterpolatedStringHandlerArgument("")] TraceInterpolatedStringHandler message, Exception? ex)
+    {
+        message.Message.Exception = ex;
+        message.Message.Log();
+    }
 
     public LogMessage Debug()
         => ForLevel(Level.Debug);
@@ -36,8 +39,11 @@ partial class Log
     public void Debug([InterpolatedStringHandlerArgument("")] DebugInterpolatedStringHandler message)
         => message.Message.Log();
 
-    public void Debug([InterpolatedStringHandlerArgument("")] DebugInterpolatedStringHandler message, Exception? ex) // TODO handle Exception
-        => message.Message.Log();
+    public void Debug([InterpolatedStringHandlerArgument("")] DebugInterpolatedStringHandler message, Exception? ex)
+    {
+        message.Message.Exception = ex;
+        message.Message.Log();
+    }
 
     public LogMessage Info()
         => ForLevel(Level.Info);
@@ -45,8 +51,11 @@ partial class Log
     public void Info([InterpolatedStringHandlerArgument("")] InfoInterpolatedStringHandler message)
         => message.Message.Log();
 
-    public void Info([InterpolatedStringHandlerArgument("")] InfoInterpolatedStringHandler message, Exception? ex) // TODO handle Exception
-        => message.Message.Log();
+    public void Info([InterpolatedStringHandlerArgument("")] InfoInterpolatedStringHandler message, Exception? ex)
+    {
+        message.Message.Exception = ex;
+        message.Message.Log();
+    }
 
     public LogMessage Warn()
         => ForLevel(Level.Warn);
@@ -54,8 +63,11 @@ partial class Log
     public void Warn([InterpolatedStringHandlerArgument("")] WarnInterpolatedStringHandler message)
         => message.Message.Log();
 
-    public void Warn([InterpolatedStringHandlerArgument("")] WarnInterpolatedStringHandler message, Exception? ex) // TODO handle Exception
-        => message.Message.Log();
+    public void Warn([InterpolatedStringHandlerArgument("")] WarnInterpolatedStringHandler message, Exception? ex)
+    {
+        message.Message.Exception = ex;
+        message.Message.Log();
+    }
 
     public LogMessage Error()
         => ForLevel(Level.Error);
@@ -63,8 +75,11 @@ partial class Log
     public void Error([InterpolatedStringHandlerArgument("")] ErrorInterpolatedStringHandler message)
         => message.Message.Log();
 
-    public void Error([InterpolatedStringHandlerArgument("")] ErrorInterpolatedStringHandler message, Exception? ex) // TODO handle Exception
-        => message.Message.Log();
+    public void Error([InterpolatedStringHandlerArgument("")] ErrorInterpolatedStringHandler message, Exception? ex)
+    {
+        message.Message.Exception = ex;
+        message.Message.Log();
+    }
 
     public LogMessage Fatal()
         => ForLevel(Level.Fatal);
@@ -72,8 +87,11 @@ partial class Log
     public void Fatal([InterpolatedStringHandlerArgument("")] FatalInterpolatedStringHandler message)
         => message.Message.Log();
 
-    public void Fatal([InterpolatedStringHandlerArgument("")] FatalInterpolatedStringHandler message, Exception? ex) // TODO handle Exception
-        => message.Message.Log();
+    public void Fatal([InterpolatedStringHandlerArgument("")] FatalInterpolatedStringHandler message, Exception? ex)
+    {
+        message.Message.Exception = ex;
+        message.Message.Log();
+    }
 
     [InterpolatedStringHandler]
     public readonly ref struct TraceInterpolatedStringHandler

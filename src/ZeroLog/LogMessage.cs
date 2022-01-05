@@ -21,6 +21,7 @@ public sealed unsafe partial class LogMessage
     public Level Level { get; private set; }
     public DateTime Timestamp { get; internal set; }
     public Thread? Thread { get; private set; }
+    public Exception? Exception { get; internal set; }
 
     internal Log? Logger { get; private set; }
     internal bool IsTruncated => _isTruncated;
@@ -49,6 +50,7 @@ public sealed unsafe partial class LogMessage
         Timestamp = DateTime.UtcNow; // TODO clock in Log
         Level = level;
         Thread = Thread.CurrentThread;
+        Exception = null;
         Logger = log;
 
         _dataPointer = _startOfBuffer;
