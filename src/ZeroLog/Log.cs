@@ -5,8 +5,9 @@ namespace ZeroLog;
 
 public sealed partial class Log : ILog
 {
-    private readonly IInternalLogManager _logManager;
     private readonly LogMessage _poolExhaustedMessage = new("Log message skipped due to pool exhaustion.");
+
+    private ILogMessageProvider? _logMessageProvider;
     private Level _logLevel;
 
     internal string Name { get; }
@@ -15,19 +16,16 @@ public sealed partial class Log : ILog
     internal LogEventPoolExhaustionStrategy LogEventPoolExhaustionStrategy { get; private set; }
     internal LogEventArgumentExhaustionStrategy LogEventArgumentExhaustionStrategy { get; private set; }
 
-    internal Log(IInternalLogManager logManager, string name)
+    internal Log(string name)
     {
         Name = name;
-        _logManager = logManager;
-
-        ResetConfiguration();
     }
 
-    internal void ResetConfiguration()
+    internal void UpdateConfiguration(ILogMessageProvider? provider, LogConfig config)
     {
-        var config = _logManager?.ResolveLogConfig(Name) ?? default;
+        _logMessageProvider = provider;
 
-        Appenders = config.Appenders;
+        Appenders = config.Appenders ?? Array.Empty<IAppender>();
         LogEventPoolExhaustionStrategy = config.LogEventPoolExhaustionStrategy;
         LogEventArgumentExhaustionStrategy = config.LogEventArgumentExhaustionStrategy;
         _logLevel = config.Level;
@@ -41,36 +39,17 @@ public sealed partial class Log : ILog
 
     private LogMessage GetLogMessage(Level level)
     {
-        var logMessage = _logManager.AcquireLogMessage(LogEventPoolExhaustionStrategy) ?? _poolExhaustedMessage;
+        var provider = _logMessageProvider;
+
+        if (provider is null)
+            return LogMessage.Empty;
+
+        var logMessage = provider.AcquireLogMessage(LogEventPoolExhaustionStrategy) ?? _poolExhaustedMessage;
         logMessage.Initialize(this, level);
 
         return logMessage;
     }
 
     internal void Enqueue(LogMessage message)
-        => _logManager.Enqueue(message);
-
-    internal static Log CreateEmpty(string name)
-        => new(EmptyLogManager.Instance, name);
-
-    private class EmptyLogManager : IInternalLogManager
-    {
-        public static EmptyLogManager Instance { get; } = new();
-
-        public Level Level => Level.Fatal;
-
-        public void Dispose()
-        {
-        }
-
-        public LogMessage? AcquireLogMessage(LogEventPoolExhaustionStrategy logEventPoolExhaustionStrategy)
-            => LogMessage.Empty;
-
-        public void Enqueue(LogMessage logEvent)
-        {
-        }
-
-        public LogConfig ResolveLogConfig(string name)
-            => default;
-    }
+        => _logMessageProvider?.Enqueue(message);
 }

@@ -19,7 +19,7 @@ namespace ZeroLog.Tests.Appenders
             var byteLength = Encoding.Default.GetBytes(message, 0, message.Length, bytes, 0);
 
             var logMessage = new LogMessage("Foo");
-            logMessage.Initialize(new Log(null! , "TestLog"), Level.Info);
+            logMessage.Initialize(new Log("TestLog"), Level.Info);
 
             var appender = new MemoryAppender("%date - %time - %thread - %level - %logger || ");
 
@@ -40,7 +40,7 @@ namespace ZeroLog.Tests.Appenders
             var byteLength = Encoding.Default.GetBytes(message, 0, message.Length, bytes, 0);
 
             var logMessage = new LogMessage("Foo");
-            logMessage.Initialize(new Log(null! , "TestLog"), Level.Info);
+            logMessage.Initialize(new Log("TestLog"), Level.Info);
 
             var appender = new MemoryAppender("");
 
@@ -60,7 +60,7 @@ namespace ZeroLog.Tests.Appenders
             const string message = "Fooo";
 
             var logMessage = new LogMessage("Foo");
-            logMessage.Initialize(new Log(null! , "TestLog"), Level.Info);
+            logMessage.Initialize(new Log("TestLog"), Level.Info);
 
             var appender = new MemoryAppender("");
 

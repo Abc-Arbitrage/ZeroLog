@@ -40,7 +40,7 @@ namespace ZeroLog.Tests.Appenders
             var prefixWriter = new PrefixWriter(pattern);
 
             var logMessage = new LogMessage("Foo");
-            logMessage.Initialize(new Log(null! , "TestLog"), Level.Info);
+            logMessage.Initialize(new Log("TestLog"), Level.Info);
             logMessage.Timestamp = new DateTime(2020, 01, 02, 03, 04, 05, 06);
 
             var result = GetResult(prefixWriter, logMessage);

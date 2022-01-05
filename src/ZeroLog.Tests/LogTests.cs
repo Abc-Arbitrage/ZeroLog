@@ -1,6 +1,4 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
-using Moq;
+﻿using Moq;
 using NFluent;
 using NUnit.Framework;
 using ZeroLog.Appenders;
@@ -8,7 +6,7 @@ using ZeroLog.ConfigResolvers;
 
 namespace ZeroLog.Tests
 {
-    [TestFixture]
+    [TestFixture, NonParallelizable]
     public class LogTests
     {
         private TestAppender _appender;
@@ -48,7 +46,8 @@ namespace ZeroLog.Tests
             _configResolver.Setup(x => x.ResolveLogConfig(It.IsAny<string>()))
                            .Returns(new LogConfig { Level = logLevel });
 
-            var log = new Log(_logManager, "logger");
+            var log = new Log("logger");
+            _logManager.UpdateLogConfiguration(log);
 
             Check.That(log.IsDebugEnabled).Equals(isDebug);
             Check.That(log.IsInfoEnabled).Equals(isInfo);

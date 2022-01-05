@@ -11,7 +11,7 @@ using ZeroLog.ConfigResolvers;
 
 namespace ZeroLog
 {
-    public sealed class LogManager : IInternalLogManager
+    public sealed class LogManager : ILogManager, ILogMessageProvider
     {
         internal const int OutputBufferSize = 16 * 1024;
 
@@ -19,8 +19,8 @@ namespace ZeroLog
         private static readonly Encoding _encoding = DefaultEncoding;
 
         private static LogManager? _logManager;
+        private static readonly ConcurrentDictionary<string, Log> _loggers = new();
 
-        private readonly ConcurrentDictionary<string, Log> _loggers = new();
         private readonly ConcurrentQueue<LogMessage> _queue;
         private readonly ObjectPool<LogMessage> _pool;
 
@@ -48,12 +48,11 @@ namespace ZeroLog
             configResolver.Initialize(_encoding);
             configResolver.Updated += () =>
             {
-                foreach (var logger in _loggers.Values)
-                    logger.ResetConfiguration();
-
+                UpdateAllLogConfigurations();
                 UpdateAppenders();
             };
 
+            UpdateAllLogConfigurations();
             UpdateAppenders();
 
             _isRunning = true;
@@ -64,6 +63,26 @@ namespace ZeroLog
             };
 
             _writeThread.Start();
+        }
+
+        public void Dispose()
+        {
+            if (!_isRunning)
+                return;
+
+            _isRunning = false;
+
+            ResetAllLogConfigurations();
+
+            _pool.Clear();
+            _writeThread.Join();
+            _pool.Clear();
+
+            if (_pool.IsAnyItemAcquired())
+                Thread.Sleep(100); // Can't really do much better here
+
+            _configResolver.Dispose();
+            _bufferSegmentProvider.Dispose();
         }
 
         public static ILogManager Initialize(IConfigurationResolver configResolver, ZeroLogInitializationConfig? config = null)
@@ -110,24 +129,6 @@ namespace ZeroLog
             where T : unmanaged
             => UnmanagedCache.Register(formatter);
 
-        public void Dispose()
-        {
-            if (!_isRunning)
-                return;
-
-            _isRunning = false;
-
-            _pool.Clear();
-            _writeThread.Join();
-            _pool.Clear();
-
-            if (_pool.IsAnyItemAcquired())
-                Thread.Sleep(100); // Can't really do much better here
-
-            _configResolver.Dispose();
-            _bufferSegmentProvider.Dispose();
-        }
-
         public static Log GetLogger<T>()
             => GetLogger(typeof(T));
 
@@ -135,20 +136,42 @@ namespace ZeroLog
             => GetLogger(type.FullName!);
 
         public static Log GetLogger(string name)
-            => _logManager != null
-                ? _logManager.GetLog(name)
-                : Log.CreateEmpty(name);
+        {
+            var logManager = _logManager;
 
-        private Log GetLog(string name)
-            => _loggers.GetOrAdd(name, static (n, mgr) => new Log(mgr, n), this);
+            return logManager != null
+                ? _loggers.GetOrAdd(
+                    name,
+                    static (n, mgr) =>
+                    {
+                        var log = new Log(n);
+                        mgr.UpdateLogConfiguration(log);
+                        return log;
+                    },
+                    logManager
+                )
+                : _loggers.GetOrAdd(
+                    name,
+                    static n => new Log(n)
+                );
+        }
 
-        void IInternalLogManager.Enqueue(LogMessage message)
-            => _queue.Enqueue(message);
+        internal void UpdateLogConfiguration(Log log)
+            => log.UpdateConfiguration(this, _configResolver.ResolveLogConfig(log.Name));
 
-        LogConfig IInternalLogManager.ResolveLogConfig(string name)
-            => _configResolver.ResolveLogConfig(name);
+        private void UpdateAllLogConfigurations()
+        {
+            foreach (var log in _loggers.Values)
+                UpdateLogConfiguration(log);
+        }
 
-        LogMessage? IInternalLogManager.AcquireLogMessage(LogEventPoolExhaustionStrategy logEventPoolExhaustionStrategy)
+        private static void ResetAllLogConfigurations()
+        {
+            foreach (var log in _loggers.Values)
+                log.UpdateConfiguration(null, default);
+        }
+
+        LogMessage? ILogMessageProvider.AcquireLogMessage(LogEventPoolExhaustionStrategy logEventPoolExhaustionStrategy)
         {
             if (_pool.TryAcquire(out var logMessage))
                 return logMessage;
@@ -180,6 +203,9 @@ namespace ZeroLog
                     return null;
             }
         }
+
+        void ILogMessageProvider.Enqueue(LogMessage message)
+            => _queue.Enqueue(message);
 
         private void WriteThread()
         {
@@ -334,8 +360,5 @@ namespace ZeroLog
             foreach (var appender in _appenders)
                 appender.Flush();
         }
-
-        internal ConcurrentQueue<LogMessage> GetInternalQueue()
-            => _queue; // Used by unit tests
     }
 }
