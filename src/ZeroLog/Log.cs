@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using ZeroLog.Appenders;
 
 namespace ZeroLog;
@@ -39,17 +40,48 @@ public sealed partial class Log : ILog
 
     private LogMessage GetLogMessage(Level level)
     {
-        var provider = _logMessageProvider;
-
-        if (provider is null)
-            return LogMessage.Empty;
-
-        var logMessage = provider.AcquireLogMessage(LogEventPoolExhaustionStrategy) ?? _poolExhaustedMessage;
+        var logMessage = AcquireLogMessage();
         logMessage.Initialize(this, level);
-
         return logMessage;
+
+        LogMessage AcquireLogMessage()
+        {
+            var provider = _logMessageProvider;
+            if (provider is null)
+                return LogMessage.Empty;
+
+            var message = provider.TryAcquireLogMessage();
+            if (message is not null)
+                return message;
+
+            switch (LogEventPoolExhaustionStrategy)
+            {
+                case LogEventPoolExhaustionStrategy.DropLogMessageAndNotifyAppenders:
+                    return _poolExhaustedMessage;
+
+                case LogEventPoolExhaustionStrategy.DropLogMessage:
+                    return LogMessage.Empty;
+
+                case LogEventPoolExhaustionStrategy.WaitForLogEvent:
+                {
+                    var spinWait = new SpinWait();
+
+                    while (true)
+                    {
+                        spinWait.SpinOnce();
+
+                        message = provider.TryAcquireLogMessage();
+                        if (message is not null)
+                            return message;
+                    }
+                }
+
+                default:
+                    return LogMessage.Empty;
+            }
+        }
     }
 
-    internal void Enqueue(LogMessage message)
-        => _logMessageProvider?.Enqueue(message);
+    internal void Submit(LogMessage message)
+        => _logMessageProvider?.Submit(message);
 }

@@ -8,7 +8,7 @@ namespace ZeroLog;
 
 public sealed unsafe partial class LogMessage
 {
-    internal static LogMessage Empty { get; } = new(string.Empty);
+    internal static readonly LogMessage Empty = new(string.Empty);
 
     private readonly byte* _startOfBuffer;
     private readonly byte* _endOfBuffer;
@@ -59,7 +59,7 @@ public sealed unsafe partial class LogMessage
     public void Log()
     {
         if (!ReferenceEquals(this, Empty))
-            Logger?.Enqueue(this);
+            Logger?.Submit(this);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -171,7 +171,7 @@ namespace ZeroLog
                 log.UpdateConfiguration(null, default);
         }
 
-        LogMessage? ILogMessageProvider.AcquireLogMessage(LogEventPoolExhaustionStrategy logEventPoolExhaustionStrategy)
+        LogMessage? ILogMessageProvider.TryAcquireLogMessage()
         {
             if (_pool.TryAcquire(out var logMessage))
                 return logMessage;
@@ -179,32 +179,10 @@ namespace ZeroLog
             if (!_isRunning)
                 return LogMessage.Empty;
 
-            switch (logEventPoolExhaustionStrategy)
-            {
-                case LogEventPoolExhaustionStrategy.WaitForLogEvent:
-                {
-                    var spinWait = new SpinWait();
-
-                    while (!_pool.TryAcquire(out logMessage))
-                    {
-                        spinWait.SpinOnce();
-
-                        if (!_isRunning)
-                            return LogMessage.Empty;
-                    }
-
-                    return logMessage;
-                }
-
-                case LogEventPoolExhaustionStrategy.DropLogMessage:
-                    return LogMessage.Empty;
-
-                default:
-                    return null;
-            }
+            return null;
         }
 
-        void ILogMessageProvider.Enqueue(LogMessage message)
+        void ILogMessageProvider.Submit(LogMessage message)
             => _queue.Enqueue(message);
 
         private void WriteThread()

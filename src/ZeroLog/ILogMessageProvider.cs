@@ -2,6 +2,6 @@
 
 internal interface ILogMessageProvider
 {
-    LogMessage? AcquireLogMessage(LogEventPoolExhaustionStrategy logEventPoolExhaustionStrategy);
-    void Enqueue(LogMessage logEvent);
+    LogMessage? TryAcquireLogMessage();
+    void Submit(LogMessage message);
 }
