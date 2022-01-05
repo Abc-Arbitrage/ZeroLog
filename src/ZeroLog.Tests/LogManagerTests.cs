@@ -236,16 +236,16 @@ namespace ZeroLog.Tests
             var signal = _testAppender.SetMessageCountTarget(3);
             _testAppender.WaitOnWriteEvent = new ManualResetEventSlim(false);
 
-            log.Info("Foo");
-            log.Info("Bar");
-            log.Info("Baz");
+            log.Info($"Foo");
+            log.Info($"Bar");
+            log.Info($"Baz");
 
             _testAppender.WaitOnWriteEvent.Set();
             signal.Wait(TimeSpan.FromMilliseconds(500));
 
             Wait.Until(() => _testAppender.FlushCount == 1, TimeSpan.FromSeconds(1));
 
-            log.Info("Foo");
+            log.Info($"Foo");
             Wait.Until(() => _testAppender.FlushCount == 2, TimeSpan.FromSeconds(1));
         }
 

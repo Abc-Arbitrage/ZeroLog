@@ -100,10 +100,8 @@ public sealed unsafe partial class LogMessage
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal LogMessage Append(string? value)
+    public LogMessage Append(string? value)
     {
-        // TODO remove this method
-
         InternalAppendString(value);
         return this;
     }
@@ -152,6 +150,7 @@ public sealed unsafe partial class LogMessage
         }
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void InternalAppendNull()
     {
         if (_dataPointer + sizeof(ArgumentType) <= _endOfBuffer)
@@ -165,7 +164,8 @@ public sealed unsafe partial class LogMessage
         }
     }
 
-    private void InternalAppendValueType<T>(T value, ArgumentType argType)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal void InternalAppendValueType<T>(T value, ArgumentType argType)
         where T : unmanaged
     {
         if (_dataPointer + sizeof(ArgumentType) + sizeof(T) <= _endOfBuffer)
@@ -182,7 +182,8 @@ public sealed unsafe partial class LogMessage
         }
     }
 
-    private void InternalAppendValueType<T>(T? value, ArgumentType argType)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal void InternalAppendValueType<T>(T? value, ArgumentType argType)
         where T : unmanaged
     {
         if (value is not null)
@@ -192,7 +193,7 @@ public sealed unsafe partial class LogMessage
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private void InternalAppendValueType<T>(T value, string format, ArgumentType argType)
+    internal void InternalAppendValueType<T>(T value, string format, ArgumentType argType)
         where T : unmanaged
     {
         if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(T) <= _endOfBuffer && _stringIndex < _strings.Length)
@@ -216,7 +217,8 @@ public sealed unsafe partial class LogMessage
         }
     }
 
-    private void InternalAppendValueType<T>(T? value, string format, ArgumentType argType)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal void InternalAppendValueType<T>(T? value, string format, ArgumentType argType)
         where T : unmanaged
     {
         if (value is not null)
@@ -225,7 +227,8 @@ public sealed unsafe partial class LogMessage
             InternalAppendNull();
     }
 
-    private void InternalAppendEnum<T>(T value)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal void InternalAppendEnum<T>(T value)
         where T : struct, Enum
     {
         if (_dataPointer + sizeof(ArgumentType) + sizeof(EnumArg) <= _endOfBuffer && _stringIndex < _strings.Length)
@@ -242,7 +245,8 @@ public sealed unsafe partial class LogMessage
         }
     }
 
-    private void InternalAppendEnum<T>(T? value)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal void InternalAppendEnum<T>(T? value)
         where T : struct, Enum
     {
         if (value is not null)

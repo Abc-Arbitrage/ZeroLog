@@ -27,7 +27,7 @@ namespace ZeroLog.Benchmarks.ThroughputTests
 
         // ZeroLog
         private ZeroLog.Tests.TestAppender _zeroLogTestAppender;
-        private ILog _zeroLogLogger;
+        private Log _zeroLogLogger;
 
         // Log4Net
         private log4net.ILog _log4NetLogger;

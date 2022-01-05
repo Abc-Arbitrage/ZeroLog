@@ -14,7 +14,7 @@ namespace ZeroLog.Tests
         [Test]
         public void should_log_without_initialize()
         {
-            LogManager.GetLogger("Test").Info("Test");
+            LogManager.GetLogger("Test").Info($"Test");
         }
     }
 }

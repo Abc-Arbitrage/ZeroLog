@@ -23,6 +23,7 @@
 
     private static readonly string[] _logLevels =
     {
+        "Trace",
         "Debug",
         "Info",
         "Warn",
