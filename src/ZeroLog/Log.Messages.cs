@@ -12,41 +12,6 @@ namespace ZeroLog;
 
 #nullable enable
 
-partial interface ILog
-{
-    bool IsTraceEnabled { get; }
-    bool IsDebugEnabled { get; }
-    bool IsInfoEnabled { get; }
-    bool IsWarnEnabled { get; }
-    bool IsErrorEnabled { get; }
-    bool IsFatalEnabled { get; }
-
-    LogMessage Trace();
-    void Trace(Log.TraceInterpolatedStringHandler message);
-    void Trace(Log.TraceInterpolatedStringHandler message, Exception? ex);
-
-    LogMessage Debug();
-    void Debug(Log.DebugInterpolatedStringHandler message);
-    void Debug(Log.DebugInterpolatedStringHandler message, Exception? ex);
-
-    LogMessage Info();
-    void Info(Log.InfoInterpolatedStringHandler message);
-    void Info(Log.InfoInterpolatedStringHandler message, Exception? ex);
-
-    LogMessage Warn();
-    void Warn(Log.WarnInterpolatedStringHandler message);
-    void Warn(Log.WarnInterpolatedStringHandler message, Exception? ex);
-
-    LogMessage Error();
-    void Error(Log.ErrorInterpolatedStringHandler message);
-    void Error(Log.ErrorInterpolatedStringHandler message, Exception? ex);
-
-    LogMessage Fatal();
-    void Fatal(Log.FatalInterpolatedStringHandler message);
-    void Fatal(Log.FatalInterpolatedStringHandler message, Exception? ex);
-
-}
-
 partial class Log
 {
     public bool IsTraceEnabled => Level.Trace >= _logLevel;
@@ -57,11 +22,7 @@ partial class Log
     public bool IsFatalEnabled => Level.Fatal >= _logLevel;
 
     public LogMessage Trace()
-    {
-        return IsTraceEnabled
-            ? GetLogMessage(Level.Trace)
-            : LogMessage.Empty;
-    }
+        => ForLevel(Level.Trace);
 
     public void Trace([InterpolatedStringHandlerArgument("")] TraceInterpolatedStringHandler message)
         => message.Message.Log();
@@ -70,11 +31,7 @@ partial class Log
         => message.Message.Log();
 
     public LogMessage Debug()
-    {
-        return IsDebugEnabled
-            ? GetLogMessage(Level.Debug)
-            : LogMessage.Empty;
-    }
+        => ForLevel(Level.Debug);
 
     public void Debug([InterpolatedStringHandlerArgument("")] DebugInterpolatedStringHandler message)
         => message.Message.Log();
@@ -83,11 +40,7 @@ partial class Log
         => message.Message.Log();
 
     public LogMessage Info()
-    {
-        return IsInfoEnabled
-            ? GetLogMessage(Level.Info)
-            : LogMessage.Empty;
-    }
+        => ForLevel(Level.Info);
 
     public void Info([InterpolatedStringHandlerArgument("")] InfoInterpolatedStringHandler message)
         => message.Message.Log();
@@ -96,11 +49,7 @@ partial class Log
         => message.Message.Log();
 
     public LogMessage Warn()
-    {
-        return IsWarnEnabled
-            ? GetLogMessage(Level.Warn)
-            : LogMessage.Empty;
-    }
+        => ForLevel(Level.Warn);
 
     public void Warn([InterpolatedStringHandlerArgument("")] WarnInterpolatedStringHandler message)
         => message.Message.Log();
@@ -109,11 +58,7 @@ partial class Log
         => message.Message.Log();
 
     public LogMessage Error()
-    {
-        return IsErrorEnabled
-            ? GetLogMessage(Level.Error)
-            : LogMessage.Empty;
-    }
+        => ForLevel(Level.Error);
 
     public void Error([InterpolatedStringHandlerArgument("")] ErrorInterpolatedStringHandler message)
         => message.Message.Log();
@@ -122,11 +67,7 @@ partial class Log
         => message.Message.Log();
 
     public LogMessage Fatal()
-    {
-        return IsFatalEnabled
-            ? GetLogMessage(Level.Fatal)
-            : LogMessage.Empty;
-    }
+        => ForLevel(Level.Fatal);
 
     public void Fatal([InterpolatedStringHandlerArgument("")] FatalInterpolatedStringHandler message)
         => message.Message.Log();

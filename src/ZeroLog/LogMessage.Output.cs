@@ -305,7 +305,7 @@ unsafe partial class LogMessage
                     var valuePtr = (EnumArg*)dataPointer;
                     dataPointer += sizeof(EnumArg);
 
-                    if (!valuePtr->TryFormat(outputBuffer[bufferIndex..], out var charsWritten))
+                    if (!valuePtr->TryFormat(outputBuffer.Slice(bufferIndex), out var charsWritten))
                         goto outputTruncated;
 
                     bufferIndex += charsWritten;
@@ -362,7 +362,7 @@ unsafe partial class LogMessage
             if (idx >= 0)
             {
                 // The suffix fits at the end of the buffer, but overwrites output data.
-                suffix.CopyTo(outputBuffer[idx..]);
+                suffix.CopyTo(outputBuffer.Slice(idx));
             }
             else
             {

@@ -14,30 +14,6 @@ namespace ZeroLog;
 
 #nullable enable
 
-partial interface ILog
-{
-<#
-    foreach (var levelName in _logLevels)
-    {
-#>
-    bool Is<#= levelName #>Enabled { get; }
-<#
-    }
-#>
-
-<#
-    foreach (var levelName in _logLevels)
-    {
-#>
-    LogMessage <#= levelName #>();
-    void <#= levelName #>(Log.<#= levelName #>InterpolatedStringHandler message);
-    void <#= levelName #>(Log.<#= levelName #>InterpolatedStringHandler message, Exception? ex);
-
-<#
-    }
-#>
-}
-
 partial class Log
 {
 <#
@@ -54,11 +30,7 @@ partial class Log
     {
 #>
     public LogMessage <#= levelName #>()
-    {
-        return Is<#= levelName #>Enabled
-            ? GetLogMessage(Level.<#= levelName #>)
-            : LogMessage.Empty;
-    }
+        => ForLevel(Level.<#= levelName #>);
 
     public void <#= levelName #>([InterpolatedStringHandlerArgument("")] <#= levelName #>InterpolatedStringHandler message)
         => message.Message.Log();

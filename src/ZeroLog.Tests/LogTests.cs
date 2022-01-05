@@ -1,65 +1,31 @@
-﻿using Moq;
-using NFluent;
-using NUnit.Framework;
-using ZeroLog.Appenders;
-using ZeroLog.ConfigResolvers;
+﻿using NUnit.Framework;
+using ZeroLog.Tests.Support;
 
-namespace ZeroLog.Tests
+namespace ZeroLog.Tests;
+
+[TestFixture]
+public class LogTests
 {
-    [TestFixture, NonParallelizable]
-    public class LogTests
+    [TestCase(Level.Trace, true, true, true, true, true, true)]
+    [TestCase(Level.Debug, false, true, true, true, true, true)]
+    [TestCase(Level.Info, false, false, true, true, true, true)]
+    [TestCase(Level.Warn, false, false, false, true, true, true)]
+    [TestCase(Level.Error, false, false, false, false, true, true)]
+    [TestCase(Level.Fatal, false, false, false, false, false, true)]
+    public void should_tell_if_log_level_is_enabled(Level logLevel, bool isTrace, bool isDebug, bool isInfo, bool isWarn, bool isError, bool isFatal)
     {
-        private TestAppender _appender;
-        private Mock<IConfigurationResolver> _configResolver;
-        private LogManager _logManager;
+        var log = new Log("logger");
+        log.UpdateConfiguration(null, new LogConfig { Level = logLevel });
 
-        [SetUp]
-        public void SetUp()
-        {
-            _appender = new TestAppender(true);
+        log.IsTraceEnabled.ShouldEqual(isTrace);
+        log.IsDebugEnabled.ShouldEqual(isDebug);
+        log.IsInfoEnabled.ShouldEqual(isInfo);
+        log.IsWarnEnabled.ShouldEqual(isWarn);
+        log.IsErrorEnabled.ShouldEqual(isError);
+        log.IsFatalEnabled.ShouldEqual(isFatal);
 
-            _configResolver = new Mock<IConfigurationResolver>();
-            _configResolver.Setup(x => x.ResolveLogConfig(It.IsAny<string>()))
-                           .Returns(new LogConfig
-                           {
-                               Level = Level.Debug,
-                               Appenders = new IAppender[] { _appender }
-                           });
-
-            _logManager = new LogManager(_configResolver.Object, new ZeroLogInitializationConfig { LogEventQueueSize = 16, LogEventBufferSize = 128 });
-        }
-
-        [TearDown]
-        public void Teardown()
-        {
-            _logManager.Dispose();
-        }
-
-        [TestCase(Level.Trace, true, true, true, true, true)]
-        [TestCase(Level.Debug, true, true, true, true, true)]
-        [TestCase(Level.Info, false, true, true, true, true)]
-        [TestCase(Level.Warn, false, false, true, true, true)]
-        [TestCase(Level.Error, false, false, false, true, true)]
-        [TestCase(Level.Fatal, false, false, false, false, true)]
-        public void should_return_if_log_level_is_enabled(Level logLevel, bool isDebug, bool isInfo, bool isWarn, bool isError, bool isFatal)
-        {
-            _configResolver.Setup(x => x.ResolveLogConfig(It.IsAny<string>()))
-                           .Returns(new LogConfig { Level = logLevel });
-
-            var log = new Log("logger");
-            _logManager.UpdateLogConfiguration(log);
-
-            Check.That(log.IsDebugEnabled).Equals(isDebug);
-            Check.That(log.IsInfoEnabled).Equals(isInfo);
-            Check.That(log.IsWarnEnabled).Equals(isWarn);
-            Check.That(log.IsErrorEnabled).Equals(isError);
-            Check.That(log.IsFatalEnabled).Equals(isFatal);
-
-            Check.That(log.IsEnabled(logLevel)).IsTrue();
-            if (logLevel > Level.Trace)
-                Check.That(log.IsEnabled(logLevel - 1)).IsFalse();
-            if (logLevel < Level.Fatal)
-                Check.That(log.IsEnabled(logLevel + 1)).IsTrue();
-        }
+        log.IsEnabled(logLevel).ShouldBeTrue();
+        log.IsEnabled(logLevel - 1).ShouldBeFalse();
+        log.IsEnabled(logLevel + 1).ShouldBeTrue();
     }
 }
