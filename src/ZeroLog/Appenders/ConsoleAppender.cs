@@ -22,7 +22,7 @@ public class ConsoleAppender : StreamAppender
     {
         Console.BackgroundColor = ConsoleColor.Black;
 
-        switch (message.Message.Level)
+        switch (message.Level)
         {
             case Level.Fatal:
                 Console.ForegroundColor = ConsoleColor.Black;

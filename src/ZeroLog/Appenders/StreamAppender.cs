@@ -34,7 +34,7 @@ public abstract class StreamAppender : IAppender
 
         if (_prefixWriter != null)
         {
-            var prefixLength = _prefixWriter.WritePrefix(message.Message, _charBuffer);
+            var prefixLength = _prefixWriter.WritePrefix(message, _charBuffer);
             Write(_charBuffer.AsSpan(0, prefixLength));
         }
 

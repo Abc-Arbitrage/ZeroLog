@@ -241,8 +241,7 @@ namespace ZeroLog
                     return true;
 
                 formattedLogMessage.SetMessage(logMessage);
-
-                WriteMessageLogToAppenders(formattedLogMessage);
+                WriteMessageLogToAppenders(logMessage, formattedLogMessage);
             }
             finally
             {
@@ -253,9 +252,9 @@ namespace ZeroLog
             return true;
         }
 
-        private static void WriteMessageLogToAppenders(FormattedLogMessage message)
+        private static void WriteMessageLogToAppenders(LogMessage logMessage, FormattedLogMessage message)
         {
-            foreach (var appender in message.Message.Logger?.Appenders ?? Array.Empty<IAppender>())
+            foreach (var appender in logMessage.Logger?.Appenders ?? Array.Empty<IAppender>())
             {
                 // if (logEvent.Level >= Level) // TODO Check this ? log event should not be in queue if not > Level
                 appender.WriteMessage(message);

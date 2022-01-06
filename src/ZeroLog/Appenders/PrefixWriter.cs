@@ -69,7 +69,7 @@ internal class PrefixWriter
     }
 
     [SuppressMessage("ReSharper", "ReplaceSliceWithRangeIndexer")]
-    public int WritePrefix(LogMessage message, Span<char> buffer)
+    public int WritePrefix(FormattedLogMessage message, Span<char> buffer)
     {
         // TODO optimize this?
 
@@ -139,7 +139,7 @@ internal class PrefixWriter
 
                 case PatternPartType.Logger:
                 {
-                    if (!builder.TryAppendPartial(message.Logger?.Name))
+                    if (!builder.TryAppendPartial(message.LoggerName))
                         goto endOfLoop;
 
                     break;

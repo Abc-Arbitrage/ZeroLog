@@ -85,7 +85,9 @@ namespace ZeroLog.Tests.Appenders
         private static string GetResult(PrefixWriter prefixWriter, LogMessage logMessage)
         {
             var buffer = new char[256];
-            var prefixLength = prefixWriter.WritePrefix(logMessage, buffer);
+            var formattedLogMessage = new FormattedLogMessage(256);
+            formattedLogMessage.SetMessage(logMessage);
+            var prefixLength = prefixWriter.WritePrefix(formattedLogMessage, buffer);
             return buffer.AsSpan(0, prefixLength).ToString();
         }
     }

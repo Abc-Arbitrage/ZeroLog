@@ -80,7 +80,7 @@ namespace ZeroLog.Appenders
 
         public override void WriteMessage(FormattedLogMessage message)
         {
-            CheckRollFile(message.Message.Timestamp);
+            CheckRollFile(message.Timestamp);
 
             base.WriteMessage(message);
         }

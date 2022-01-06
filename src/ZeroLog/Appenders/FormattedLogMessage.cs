@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using ZeroLog.Utils;
 
 namespace ZeroLog.Appenders;
@@ -7,10 +8,15 @@ namespace ZeroLog.Appenders;
 public class FormattedLogMessage
 {
     private readonly char[] _charBuffer;
-
     private int _charLength;
 
-    internal LogMessage Message = LogMessage.Empty; // TODO make private
+    private LogMessage _message = LogMessage.Empty;
+
+    public Level Level  => _message.Level;
+    public DateTime Timestamp  => _message.Timestamp;
+    public Thread? Thread  => _message.Thread;
+    public Exception? Exception  => _message.Exception;
+    public string? LoggerName => _message.Logger?.Name;
 
     internal FormattedLogMessage(int bufferSize)
     {
@@ -21,11 +27,11 @@ public class FormattedLogMessage
 
     internal void SetMessage(LogMessage message)
     {
-        Message = message;
+        _message = message;
 
         try
         {
-            _charLength = Message.WriteTo(_charBuffer);
+            _charLength = _message.WriteTo(_charBuffer);
         }
         catch (Exception ex)
         {
@@ -43,7 +49,7 @@ public class FormattedLogMessage
             builder.TryAppendPartial(ex.Message);
             builder.TryAppendPartial(" - Unformatted message: ");
 
-            var length = Message.WriteTo(builder.GetRemainingBuffer(), true);
+            var length = _message.WriteTo(builder.GetRemainingBuffer(), true);
             _charLength = builder.Length + length;
         }
         catch
