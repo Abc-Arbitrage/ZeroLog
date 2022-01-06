@@ -21,6 +21,9 @@ internal ref struct CharBufferBuilder
     public ReadOnlySpan<char> GetOutput()
         => _buffer.Slice(0, _pos);
 
+    public Span<char> GetRemainingBuffer()
+        => _buffer.Slice(_pos);
+
     public bool TryAppendWhole(ReadOnlySpan<char> value)
     {
         if (value.Length <= _buffer.Length - _pos)

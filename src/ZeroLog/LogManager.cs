@@ -240,15 +240,7 @@ namespace ZeroLog
                 if ((logMessage.Logger?.Appenders.Length ?? 0) <= 0)
                     return true;
 
-                try
-                {
-                    formattedLogMessage.SetMessage(logMessage);
-                }
-                catch (Exception)
-                {
-                    // TODO Handle formatting errors
-                    return true;
-                }
+                formattedLogMessage.SetMessage(logMessage);
 
                 WriteMessageLogToAppenders(formattedLogMessage);
             }

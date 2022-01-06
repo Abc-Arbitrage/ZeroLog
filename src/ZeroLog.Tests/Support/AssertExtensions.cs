@@ -40,4 +40,7 @@ internal static class AssertExtensions
 
     public static void ShouldNotBeEmpty<T>(this T actual)
         => Assert.That(actual, Is.Not.Empty);
+
+    public static void ShouldContain(this string actual, string expected)
+        => Assert.That(actual, Contains.Substring(expected));
 }

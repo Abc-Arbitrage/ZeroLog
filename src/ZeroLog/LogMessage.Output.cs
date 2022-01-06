@@ -8,7 +8,7 @@ namespace ZeroLog;
 unsafe partial class LogMessage
 {
     [SuppressMessage("ReSharper", "ReplaceSliceWithRangeIndexer")]
-    internal int WriteTo(Span<char> outputBuffer)
+    internal int WriteTo(Span<char> outputBuffer, bool skipFormat = false)
     {
         if (ConstantMessage is not null)
         {
@@ -35,7 +35,8 @@ unsafe partial class LogMessage
                 var stringIndex = *dataPointer;
                 ++dataPointer;
 
-                format = _strings[stringIndex];
+                if (!skipFormat)
+                    format = _strings[stringIndex];
             }
 
             switch (argType)

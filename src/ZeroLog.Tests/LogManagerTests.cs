@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Linq;
 using System.Text.Formatting;
 using System.Threading;
@@ -9,6 +10,7 @@ using NFluent;
 using NUnit.Framework;
 using ZeroLog.Appenders;
 using ZeroLog.Config;
+using ZeroLog.Tests.Support;
 
 namespace ZeroLog.Tests
 {
@@ -98,7 +100,6 @@ namespace ZeroLog.Tests
 
             var log = LogManager.GetLogger(typeof(LogManagerTests));
 
-
             for (var i = 0; i < 10; i++)
                 log.Debug();
 
@@ -171,7 +172,7 @@ namespace ZeroLog.Tests
         }
 
         [Test]
-        public unsafe void should_not_throw_if_formatting_fails_when_appending_formatted_arguments()
+        public void should_not_throw_if_formatting_fails_when_appending_formatted_arguments()
         {
             LogManager.RegisterEnum<DayOfWeek>();
             var log = LogManager.GetLogger(typeof(LogManagerTests));
@@ -180,35 +181,32 @@ namespace ZeroLog.Tests
             var guid = Guid.NewGuid();
             var date = new DateTime(2017, 02, 24, 16, 51, 51);
             var timespan = date.TimeOfDay;
-            var asciiString = new[] { (byte)'a', (byte)'b', (byte)'c' };
 
-            fixed (byte* pAsciiString = asciiString)
-            {
-                log.Info()
-                   .Append("Hello")
-                   .Append(false)
-                   .Append((byte)1)
-                   .Append('a')
-                   .Append((short)2)
-                   .Append(3)
-                   .Append((long)4)
-                   .Append(5f)
-                   .Append(6d)
-                   .Append(7m)
-                   .Append(guid, "meh, this is going to break formatting")
-                   .Append(date)
-                   .Append(timespan)
-                   //.AppendAsciiString(asciiString, asciiString.Length) // TODO
-                   //.AppendAsciiString(pAsciiString, asciiString.Length)
-                   //.AppendEnum(DayOfWeek.Friday)
-                   .Log();
-            }
+            log.Info()
+               .Append("Hello")
+               .Append(false)
+               .Append((byte)1)
+               .Append('a')
+               .Append((short)2)
+               .Append(3)
+               .Append((long)4)
+               .Append(5f)
+               .Append(6d)
+               .Append(7m)
+               .Append(guid, "meh, this is going to break formatting")
+               .Append(date)
+               .Append(timespan)
+               .AppendAsciiString(new[] { (byte)'a', (byte)'b', (byte)'c' })
+               .AppendEnum(DayOfWeek.Friday)
+               .Log();
 
             signal.Wait(TimeSpan.FromMilliseconds(100));
 
-            // TODO
-            //var logMessage = _testAppender.LoggedMessages.Single();
-            //Check.That(logMessage).Equals("An error occured during formatting: Unknown format specifier 'meh, this is going to break formatting'. - Arguments: \"Hello\", False, 1, 'a', 2, 3, 4, 5, 6, 7, " + guid + ", 2017-02-24 16:51:51.000, 16:51:51, \"abc\", \"abc\", Friday");
+            var logMessage = _testAppender.LoggedMessages.Single();
+            logMessage.ShouldContain("An error occured during formatting:");
+            logMessage.ShouldContain(guid.ToString(null, CultureInfo.InvariantCulture));
+            logMessage.ShouldContain("abc");
+            logMessage.ShouldContain(nameof(DayOfWeek.Friday));
         }
 
         [Test]
@@ -226,7 +224,7 @@ namespace ZeroLog.Tests
             signal.Wait(TimeSpan.FromMilliseconds(100));
 
             var logMessage = _testAppender.LoggedMessages.Single();
-//            Check.That(logMessage).Equals("An error occured during formatting: Simulated failure - Arguments: Unmanaged(0x2a000000)"); // TODO
+            // Check.That(logMessage).Equals("An error occured during formatting: Simulated failure - Arguments: Unmanaged(0x2a000000)"); // TODO
         }
 
         [Test]
