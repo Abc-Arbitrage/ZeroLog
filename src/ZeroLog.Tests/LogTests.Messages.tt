@@ -42,7 +42,15 @@ partial class LogTests
     public void should_not_log_above_level_<#= logLevel #>()
     {
         _log.UpdateConfiguration(_provider, new LogConfig { Level = Level.<#= logLevel #> + 1 });
-        _log.<#= logLevel #>($"Foo");
+        _log.<#= logLevel #>("Foo");
+        _provider.ShouldNotBeLogged();
+    }
+
+    [Test]
+    public void should_not_log_above_level_<#= logLevel #>_interpolated()
+    {
+        _log.UpdateConfiguration(_provider, new LogConfig { Level = Level.<#= logLevel #> + 1 });
+        _log.<#= logLevel #>($"Foo {42}");
         _provider.ShouldNotBeLogged();
     }
 
@@ -60,6 +68,28 @@ partial class LogTests
     [Test]
     public void should_log_String_<#= logLevel #>()
     {
+        _log.<#= logLevel #>("foo");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(Level.<#= logLevel #>);
+        message.ToString().ShouldEqual("foo");
+        message.Exception.ShouldBeNull();
+    }
+
+    [Test]
+    public void should_log_Exception_<#= logLevel #>()
+    {
+        var exception = new InvalidOperationException();
+        _log.<#= logLevel #>("Foo", exception);
+
+        var message = _provider.GetSubmittedMessage();
+        message.ToString().ShouldEqual("Foo");
+        message.Exception.ShouldBeTheSameAs(exception);
+    }
+
+    [Test]
+    public void should_log_interpolated_String_<#= logLevel #>()
+    {
         _log.<#= logLevel #>($"foo {NoInline("bar")} baz {NoInline("foobar")}");
 
         var message = _provider.GetSubmittedMessage();
@@ -69,18 +99,24 @@ partial class LogTests
     }
 
     [Test]
-    public void should_log_Exception_<#= logLevel #>()
+    public void should_log_interpolated_Exception_<#= logLevel #>()
     {
         var exception = new InvalidOperationException();
-        _log.<#= logLevel #>($"Foo", exception);
+        _log.<#= logLevel #>($"Foo {42}", exception);
 
         var message = _provider.GetSubmittedMessage();
-        message.ToString().ShouldEqual("Foo");
+        message.ToString().ShouldEqual("Foo 42");
         message.Exception.ShouldBeTheSameAs(exception);
     }
 
     [Test]
     public void should_not_allocate_String_<#= logLevel #>()
+    {
+        GcTester.ShouldNotAllocate(() => _log.<#= logLevel #>("Foo"));
+    }
+
+    [Test]
+    public void should_not_allocate_interpolated_String_<#= logLevel #>()
     {
         GcTester.ShouldNotAllocate(() => _log.<#= logLevel #>($"foo {NoInline("bar")} baz {NoInline("foobar")}"));
     }

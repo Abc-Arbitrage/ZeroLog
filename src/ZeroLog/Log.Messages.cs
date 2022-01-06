@@ -24,6 +24,21 @@ partial class Log
     public LogMessage Trace()
         => ForLevel(Level.Trace);
 
+    public void Trace(string? message)
+    {
+        var logMessage = ForLevel(Level.Trace);
+        logMessage.InternalAppendString(message);
+        logMessage.Log();
+    }
+
+    public void Trace(string? message, Exception? ex)
+    {
+        var logMessage = ForLevel(Level.Trace);
+        logMessage.InternalAppendString(message);
+        logMessage.Exception = ex;
+        logMessage.Log();
+    }
+
     public void Trace([InterpolatedStringHandlerArgument("")] TraceInterpolatedStringHandler message)
         => message.Message.Log();
 
@@ -35,6 +50,21 @@ partial class Log
 
     public LogMessage Debug()
         => ForLevel(Level.Debug);
+
+    public void Debug(string? message)
+    {
+        var logMessage = ForLevel(Level.Debug);
+        logMessage.InternalAppendString(message);
+        logMessage.Log();
+    }
+
+    public void Debug(string? message, Exception? ex)
+    {
+        var logMessage = ForLevel(Level.Debug);
+        logMessage.InternalAppendString(message);
+        logMessage.Exception = ex;
+        logMessage.Log();
+    }
 
     public void Debug([InterpolatedStringHandlerArgument("")] DebugInterpolatedStringHandler message)
         => message.Message.Log();
@@ -48,6 +78,21 @@ partial class Log
     public LogMessage Info()
         => ForLevel(Level.Info);
 
+    public void Info(string? message)
+    {
+        var logMessage = ForLevel(Level.Info);
+        logMessage.InternalAppendString(message);
+        logMessage.Log();
+    }
+
+    public void Info(string? message, Exception? ex)
+    {
+        var logMessage = ForLevel(Level.Info);
+        logMessage.InternalAppendString(message);
+        logMessage.Exception = ex;
+        logMessage.Log();
+    }
+
     public void Info([InterpolatedStringHandlerArgument("")] InfoInterpolatedStringHandler message)
         => message.Message.Log();
 
@@ -59,6 +104,21 @@ partial class Log
 
     public LogMessage Warn()
         => ForLevel(Level.Warn);
+
+    public void Warn(string? message)
+    {
+        var logMessage = ForLevel(Level.Warn);
+        logMessage.InternalAppendString(message);
+        logMessage.Log();
+    }
+
+    public void Warn(string? message, Exception? ex)
+    {
+        var logMessage = ForLevel(Level.Warn);
+        logMessage.InternalAppendString(message);
+        logMessage.Exception = ex;
+        logMessage.Log();
+    }
 
     public void Warn([InterpolatedStringHandlerArgument("")] WarnInterpolatedStringHandler message)
         => message.Message.Log();
@@ -72,6 +132,21 @@ partial class Log
     public LogMessage Error()
         => ForLevel(Level.Error);
 
+    public void Error(string? message)
+    {
+        var logMessage = ForLevel(Level.Error);
+        logMessage.InternalAppendString(message);
+        logMessage.Log();
+    }
+
+    public void Error(string? message, Exception? ex)
+    {
+        var logMessage = ForLevel(Level.Error);
+        logMessage.InternalAppendString(message);
+        logMessage.Exception = ex;
+        logMessage.Log();
+    }
+
     public void Error([InterpolatedStringHandlerArgument("")] ErrorInterpolatedStringHandler message)
         => message.Message.Log();
 
@@ -83,6 +158,21 @@ partial class Log
 
     public LogMessage Fatal()
         => ForLevel(Level.Fatal);
+
+    public void Fatal(string? message)
+    {
+        var logMessage = ForLevel(Level.Fatal);
+        logMessage.InternalAppendString(message);
+        logMessage.Log();
+    }
+
+    public void Fatal(string? message, Exception? ex)
+    {
+        var logMessage = ForLevel(Level.Fatal);
+        logMessage.InternalAppendString(message);
+        logMessage.Exception = ex;
+        logMessage.Log();
+    }
 
     public void Fatal([InterpolatedStringHandlerArgument("")] FatalInterpolatedStringHandler message)
         => message.Message.Log();

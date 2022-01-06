@@ -32,6 +32,21 @@ partial class Log
     public LogMessage <#= levelName #>()
         => ForLevel(Level.<#= levelName #>);
 
+    public void <#= levelName #>(string? message)
+    {
+        var logMessage = ForLevel(Level.<#= levelName #>);
+        logMessage.InternalAppendString(message);
+        logMessage.Log();
+    }
+
+    public void <#= levelName #>(string? message, Exception? ex)
+    {
+        var logMessage = ForLevel(Level.<#= levelName #>);
+        logMessage.InternalAppendString(message);
+        logMessage.Exception = ex;
+        logMessage.Log();
+    }
+
     public void <#= levelName #>([InterpolatedStringHandlerArgument("")] <#= levelName #>InterpolatedStringHandler message)
         => message.Message.Log();
 

@@ -14,7 +14,15 @@ partial class LogTests
     public void should_not_log_above_level_Trace()
     {
         _log.UpdateConfiguration(_provider, new LogConfig { Level = Level.Trace + 1 });
-        _log.Trace($"Foo");
+        _log.Trace("Foo");
+        _provider.ShouldNotBeLogged();
+    }
+
+    [Test]
+    public void should_not_log_above_level_Trace_interpolated()
+    {
+        _log.UpdateConfiguration(_provider, new LogConfig { Level = Level.Trace + 1 });
+        _log.Trace($"Foo {42}");
         _provider.ShouldNotBeLogged();
     }
 
@@ -32,6 +40,28 @@ partial class LogTests
     [Test]
     public void should_log_String_Trace()
     {
+        _log.Trace("foo");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(Level.Trace);
+        message.ToString().ShouldEqual("foo");
+        message.Exception.ShouldBeNull();
+    }
+
+    [Test]
+    public void should_log_Exception_Trace()
+    {
+        var exception = new InvalidOperationException();
+        _log.Trace("Foo", exception);
+
+        var message = _provider.GetSubmittedMessage();
+        message.ToString().ShouldEqual("Foo");
+        message.Exception.ShouldBeTheSameAs(exception);
+    }
+
+    [Test]
+    public void should_log_interpolated_String_Trace()
+    {
         _log.Trace($"foo {NoInline("bar")} baz {NoInline("foobar")}");
 
         var message = _provider.GetSubmittedMessage();
@@ -41,18 +71,24 @@ partial class LogTests
     }
 
     [Test]
-    public void should_log_Exception_Trace()
+    public void should_log_interpolated_Exception_Trace()
     {
         var exception = new InvalidOperationException();
-        _log.Trace($"Foo", exception);
+        _log.Trace($"Foo {42}", exception);
 
         var message = _provider.GetSubmittedMessage();
-        message.ToString().ShouldEqual("Foo");
+        message.ToString().ShouldEqual("Foo 42");
         message.Exception.ShouldBeTheSameAs(exception);
     }
 
     [Test]
     public void should_not_allocate_String_Trace()
+    {
+        GcTester.ShouldNotAllocate(() => _log.Trace("Foo"));
+    }
+
+    [Test]
+    public void should_not_allocate_interpolated_String_Trace()
     {
         GcTester.ShouldNotAllocate(() => _log.Trace($"foo {NoInline("bar")} baz {NoInline("foobar")}"));
     }
@@ -875,7 +911,15 @@ partial class LogTests
     public void should_not_log_above_level_Debug()
     {
         _log.UpdateConfiguration(_provider, new LogConfig { Level = Level.Debug + 1 });
-        _log.Debug($"Foo");
+        _log.Debug("Foo");
+        _provider.ShouldNotBeLogged();
+    }
+
+    [Test]
+    public void should_not_log_above_level_Debug_interpolated()
+    {
+        _log.UpdateConfiguration(_provider, new LogConfig { Level = Level.Debug + 1 });
+        _log.Debug($"Foo {42}");
         _provider.ShouldNotBeLogged();
     }
 
@@ -893,6 +937,28 @@ partial class LogTests
     [Test]
     public void should_log_String_Debug()
     {
+        _log.Debug("foo");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(Level.Debug);
+        message.ToString().ShouldEqual("foo");
+        message.Exception.ShouldBeNull();
+    }
+
+    [Test]
+    public void should_log_Exception_Debug()
+    {
+        var exception = new InvalidOperationException();
+        _log.Debug("Foo", exception);
+
+        var message = _provider.GetSubmittedMessage();
+        message.ToString().ShouldEqual("Foo");
+        message.Exception.ShouldBeTheSameAs(exception);
+    }
+
+    [Test]
+    public void should_log_interpolated_String_Debug()
+    {
         _log.Debug($"foo {NoInline("bar")} baz {NoInline("foobar")}");
 
         var message = _provider.GetSubmittedMessage();
@@ -902,18 +968,24 @@ partial class LogTests
     }
 
     [Test]
-    public void should_log_Exception_Debug()
+    public void should_log_interpolated_Exception_Debug()
     {
         var exception = new InvalidOperationException();
-        _log.Debug($"Foo", exception);
+        _log.Debug($"Foo {42}", exception);
 
         var message = _provider.GetSubmittedMessage();
-        message.ToString().ShouldEqual("Foo");
+        message.ToString().ShouldEqual("Foo 42");
         message.Exception.ShouldBeTheSameAs(exception);
     }
 
     [Test]
     public void should_not_allocate_String_Debug()
+    {
+        GcTester.ShouldNotAllocate(() => _log.Debug("Foo"));
+    }
+
+    [Test]
+    public void should_not_allocate_interpolated_String_Debug()
     {
         GcTester.ShouldNotAllocate(() => _log.Debug($"foo {NoInline("bar")} baz {NoInline("foobar")}"));
     }
@@ -1736,7 +1808,15 @@ partial class LogTests
     public void should_not_log_above_level_Info()
     {
         _log.UpdateConfiguration(_provider, new LogConfig { Level = Level.Info + 1 });
-        _log.Info($"Foo");
+        _log.Info("Foo");
+        _provider.ShouldNotBeLogged();
+    }
+
+    [Test]
+    public void should_not_log_above_level_Info_interpolated()
+    {
+        _log.UpdateConfiguration(_provider, new LogConfig { Level = Level.Info + 1 });
+        _log.Info($"Foo {42}");
         _provider.ShouldNotBeLogged();
     }
 
@@ -1754,6 +1834,28 @@ partial class LogTests
     [Test]
     public void should_log_String_Info()
     {
+        _log.Info("foo");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(Level.Info);
+        message.ToString().ShouldEqual("foo");
+        message.Exception.ShouldBeNull();
+    }
+
+    [Test]
+    public void should_log_Exception_Info()
+    {
+        var exception = new InvalidOperationException();
+        _log.Info("Foo", exception);
+
+        var message = _provider.GetSubmittedMessage();
+        message.ToString().ShouldEqual("Foo");
+        message.Exception.ShouldBeTheSameAs(exception);
+    }
+
+    [Test]
+    public void should_log_interpolated_String_Info()
+    {
         _log.Info($"foo {NoInline("bar")} baz {NoInline("foobar")}");
 
         var message = _provider.GetSubmittedMessage();
@@ -1763,18 +1865,24 @@ partial class LogTests
     }
 
     [Test]
-    public void should_log_Exception_Info()
+    public void should_log_interpolated_Exception_Info()
     {
         var exception = new InvalidOperationException();
-        _log.Info($"Foo", exception);
+        _log.Info($"Foo {42}", exception);
 
         var message = _provider.GetSubmittedMessage();
-        message.ToString().ShouldEqual("Foo");
+        message.ToString().ShouldEqual("Foo 42");
         message.Exception.ShouldBeTheSameAs(exception);
     }
 
     [Test]
     public void should_not_allocate_String_Info()
+    {
+        GcTester.ShouldNotAllocate(() => _log.Info("Foo"));
+    }
+
+    [Test]
+    public void should_not_allocate_interpolated_String_Info()
     {
         GcTester.ShouldNotAllocate(() => _log.Info($"foo {NoInline("bar")} baz {NoInline("foobar")}"));
     }
@@ -2597,7 +2705,15 @@ partial class LogTests
     public void should_not_log_above_level_Warn()
     {
         _log.UpdateConfiguration(_provider, new LogConfig { Level = Level.Warn + 1 });
-        _log.Warn($"Foo");
+        _log.Warn("Foo");
+        _provider.ShouldNotBeLogged();
+    }
+
+    [Test]
+    public void should_not_log_above_level_Warn_interpolated()
+    {
+        _log.UpdateConfiguration(_provider, new LogConfig { Level = Level.Warn + 1 });
+        _log.Warn($"Foo {42}");
         _provider.ShouldNotBeLogged();
     }
 
@@ -2615,6 +2731,28 @@ partial class LogTests
     [Test]
     public void should_log_String_Warn()
     {
+        _log.Warn("foo");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(Level.Warn);
+        message.ToString().ShouldEqual("foo");
+        message.Exception.ShouldBeNull();
+    }
+
+    [Test]
+    public void should_log_Exception_Warn()
+    {
+        var exception = new InvalidOperationException();
+        _log.Warn("Foo", exception);
+
+        var message = _provider.GetSubmittedMessage();
+        message.ToString().ShouldEqual("Foo");
+        message.Exception.ShouldBeTheSameAs(exception);
+    }
+
+    [Test]
+    public void should_log_interpolated_String_Warn()
+    {
         _log.Warn($"foo {NoInline("bar")} baz {NoInline("foobar")}");
 
         var message = _provider.GetSubmittedMessage();
@@ -2624,18 +2762,24 @@ partial class LogTests
     }
 
     [Test]
-    public void should_log_Exception_Warn()
+    public void should_log_interpolated_Exception_Warn()
     {
         var exception = new InvalidOperationException();
-        _log.Warn($"Foo", exception);
+        _log.Warn($"Foo {42}", exception);
 
         var message = _provider.GetSubmittedMessage();
-        message.ToString().ShouldEqual("Foo");
+        message.ToString().ShouldEqual("Foo 42");
         message.Exception.ShouldBeTheSameAs(exception);
     }
 
     [Test]
     public void should_not_allocate_String_Warn()
+    {
+        GcTester.ShouldNotAllocate(() => _log.Warn("Foo"));
+    }
+
+    [Test]
+    public void should_not_allocate_interpolated_String_Warn()
     {
         GcTester.ShouldNotAllocate(() => _log.Warn($"foo {NoInline("bar")} baz {NoInline("foobar")}"));
     }
@@ -3458,7 +3602,15 @@ partial class LogTests
     public void should_not_log_above_level_Error()
     {
         _log.UpdateConfiguration(_provider, new LogConfig { Level = Level.Error + 1 });
-        _log.Error($"Foo");
+        _log.Error("Foo");
+        _provider.ShouldNotBeLogged();
+    }
+
+    [Test]
+    public void should_not_log_above_level_Error_interpolated()
+    {
+        _log.UpdateConfiguration(_provider, new LogConfig { Level = Level.Error + 1 });
+        _log.Error($"Foo {42}");
         _provider.ShouldNotBeLogged();
     }
 
@@ -3476,6 +3628,28 @@ partial class LogTests
     [Test]
     public void should_log_String_Error()
     {
+        _log.Error("foo");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(Level.Error);
+        message.ToString().ShouldEqual("foo");
+        message.Exception.ShouldBeNull();
+    }
+
+    [Test]
+    public void should_log_Exception_Error()
+    {
+        var exception = new InvalidOperationException();
+        _log.Error("Foo", exception);
+
+        var message = _provider.GetSubmittedMessage();
+        message.ToString().ShouldEqual("Foo");
+        message.Exception.ShouldBeTheSameAs(exception);
+    }
+
+    [Test]
+    public void should_log_interpolated_String_Error()
+    {
         _log.Error($"foo {NoInline("bar")} baz {NoInline("foobar")}");
 
         var message = _provider.GetSubmittedMessage();
@@ -3485,18 +3659,24 @@ partial class LogTests
     }
 
     [Test]
-    public void should_log_Exception_Error()
+    public void should_log_interpolated_Exception_Error()
     {
         var exception = new InvalidOperationException();
-        _log.Error($"Foo", exception);
+        _log.Error($"Foo {42}", exception);
 
         var message = _provider.GetSubmittedMessage();
-        message.ToString().ShouldEqual("Foo");
+        message.ToString().ShouldEqual("Foo 42");
         message.Exception.ShouldBeTheSameAs(exception);
     }
 
     [Test]
     public void should_not_allocate_String_Error()
+    {
+        GcTester.ShouldNotAllocate(() => _log.Error("Foo"));
+    }
+
+    [Test]
+    public void should_not_allocate_interpolated_String_Error()
     {
         GcTester.ShouldNotAllocate(() => _log.Error($"foo {NoInline("bar")} baz {NoInline("foobar")}"));
     }
@@ -4319,7 +4499,15 @@ partial class LogTests
     public void should_not_log_above_level_Fatal()
     {
         _log.UpdateConfiguration(_provider, new LogConfig { Level = Level.Fatal + 1 });
-        _log.Fatal($"Foo");
+        _log.Fatal("Foo");
+        _provider.ShouldNotBeLogged();
+    }
+
+    [Test]
+    public void should_not_log_above_level_Fatal_interpolated()
+    {
+        _log.UpdateConfiguration(_provider, new LogConfig { Level = Level.Fatal + 1 });
+        _log.Fatal($"Foo {42}");
         _provider.ShouldNotBeLogged();
     }
 
@@ -4337,6 +4525,28 @@ partial class LogTests
     [Test]
     public void should_log_String_Fatal()
     {
+        _log.Fatal("foo");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(Level.Fatal);
+        message.ToString().ShouldEqual("foo");
+        message.Exception.ShouldBeNull();
+    }
+
+    [Test]
+    public void should_log_Exception_Fatal()
+    {
+        var exception = new InvalidOperationException();
+        _log.Fatal("Foo", exception);
+
+        var message = _provider.GetSubmittedMessage();
+        message.ToString().ShouldEqual("Foo");
+        message.Exception.ShouldBeTheSameAs(exception);
+    }
+
+    [Test]
+    public void should_log_interpolated_String_Fatal()
+    {
         _log.Fatal($"foo {NoInline("bar")} baz {NoInline("foobar")}");
 
         var message = _provider.GetSubmittedMessage();
@@ -4346,18 +4556,24 @@ partial class LogTests
     }
 
     [Test]
-    public void should_log_Exception_Fatal()
+    public void should_log_interpolated_Exception_Fatal()
     {
         var exception = new InvalidOperationException();
-        _log.Fatal($"Foo", exception);
+        _log.Fatal($"Foo {42}", exception);
 
         var message = _provider.GetSubmittedMessage();
-        message.ToString().ShouldEqual("Foo");
+        message.ToString().ShouldEqual("Foo 42");
         message.Exception.ShouldBeTheSameAs(exception);
     }
 
     [Test]
     public void should_not_allocate_String_Fatal()
+    {
+        GcTester.ShouldNotAllocate(() => _log.Fatal("Foo"));
+    }
+
+    [Test]
+    public void should_not_allocate_interpolated_String_Fatal()
     {
         GcTester.ShouldNotAllocate(() => _log.Fatal($"foo {NoInline("bar")} baz {NoInline("foobar")}"));
     }
