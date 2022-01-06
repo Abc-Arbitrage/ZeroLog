@@ -40,6 +40,13 @@ public abstract class StreamAppender : IAppender
 
         Write(message.GetMessage());
         Write(Environment.NewLine);
+
+        if (message.Exception != null)
+        {
+            // This allocates, but there's no better way to get the details.
+            Write(message.Exception.ToString());
+            Write(Environment.NewLine);
+        }
     }
 
     private void Write(ReadOnlySpan<char> value)

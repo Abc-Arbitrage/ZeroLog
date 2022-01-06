@@ -1,9 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Threading;
-using NFluent;
 using NUnit.Framework;
 using ZeroLog.Appenders;
+using ZeroLog.Tests.Support;
 
 namespace ZeroLog.Tests.Appenders;
 
@@ -34,7 +34,7 @@ public class StreamAppenderTests
 
         var logLine = $"{logMessage.Timestamp.Date:yyyy-MM-dd} - {logMessage.Timestamp.TimeOfDay:hh\\:mm\\:ss\\.fffffff} - {Thread.CurrentThread.ManagedThreadId} - INFO - TestLog || {message}{Environment.NewLine}";
 
-        Check.That(appender.ToString()).IsEqualTo(logLine + logLine);
+        appender.ToString().ShouldEqual(logLine + logLine);
     }
 
     [Test]
@@ -42,7 +42,7 @@ public class StreamAppenderTests
     {
         var message = GetFormattedMessage("Test log message", out _);
 
-        var appender = new MemoryAppender("");
+        var appender = new MemoryAppender();
 
         appender.WriteMessage(message);
         appender.WriteMessage(message);
@@ -50,7 +50,25 @@ public class StreamAppenderTests
 
         var logLine = $"{message}{Environment.NewLine}";
 
-        Check.That(appender.ToString()).IsEqualTo(logLine + logLine);
+        appender.ToString().ShouldEqual(logLine + logLine);
+    }
+
+    [Test]
+    public void should_append_exceptions()
+    {
+        var logMessage = new LogMessage("Test log message");
+        logMessage.Initialize(new Log("TestLog"), Level.Info);
+        logMessage.Exception = new InvalidOperationException("Simulated exception");
+
+        var formattedMessage = new FormattedLogMessage(logMessage.ToString().Length);
+        formattedMessage.SetMessage(logMessage);
+
+        var appender = new MemoryAppender();
+
+        appender.WriteMessage(formattedMessage);
+        appender.Flush();
+
+        appender.ToString().ShouldEqual($"Test log message{Environment.NewLine}{logMessage.Exception}{Environment.NewLine}");
     }
 
     // TODO
@@ -81,7 +99,7 @@ public class StreamAppenderTests
 
     private sealed class MemoryAppender : StreamAppender
     {
-        public MemoryAppender(string prefixPattern)
+        public MemoryAppender(string prefixPattern = "")
             : base(prefixPattern)
         {
             _stream = new MemoryStream();
