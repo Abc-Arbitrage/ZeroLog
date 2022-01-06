@@ -1,42 +1,52 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
-using System.Text.Formatting;
 using ZeroLog.Utils;
 
-namespace ZeroLog
+namespace ZeroLog;
+
+[StructLayout(LayoutKind.Sequential)]
+[SuppressMessage("ReSharper", "FieldCanBeMadeReadOnly.Local")]
+[SuppressMessage("ReSharper", "ReplaceSliceWithRangeIndexer")]
+internal unsafe struct UnmanagedArgHeader
 {
-    [StructLayout(LayoutKind.Sequential)]
-    [SuppressMessage("ReSharper", "FieldCanBeMadeReadOnly.Local")]
-    internal unsafe struct UnmanagedArgHeader
+    private IntPtr _typeHandle;
+    private int _typeSize;
+
+    public int Size => _typeSize;
+
+    public UnmanagedArgHeader(IntPtr typeHandle, int typeSize)
     {
-        private IntPtr _typeHandle;
-        private int _typeSize;
+        _typeHandle = typeHandle;
+        _typeSize = typeSize;
+    }
 
-        public int Size => _typeSize;
+    public bool TryAppendTo(byte* valuePtr, Span<char> destination, out int charsWritten, string? format)
+    {
+        if (UnmanagedCache.TryGetFormatter(_typeHandle, out var formatter))
+            return formatter.Invoke(valuePtr, destination, out charsWritten, format);
 
-        public UnmanagedArgHeader(IntPtr typeHandle, int typeSize)
+        return TryAppendUnformattedTo(valuePtr, destination, out charsWritten);
+    }
+
+    public bool TryAppendUnformattedTo(byte* valuePtr, Span<char> destination, out int charsWritten)
+    {
+        const string prefix = "Unmanaged(0x";
+        const string suffix = ")";
+
+        var outputSize = prefix.Length + suffix.Length + 2 * _typeSize;
+
+        if (destination.Length < outputSize)
         {
-            _typeHandle = typeHandle;
-            _typeSize = typeSize;
+            charsWritten = 0;
+            return false;
         }
 
-        public void AppendTo(StringBuffer stringBuffer, byte* valuePtr, StringView format)
-        {
-            if (!UnmanagedCache.TryGetFormatter(_typeHandle, out var formatter))
-            {
-                AppendUnformattedTo(stringBuffer, valuePtr);
-                return;
-            }
+        prefix.CopyTo(destination);
+        HexUtils.AppendValueAsHex(valuePtr, _typeSize, destination.Slice(prefix.Length));
+        suffix.CopyTo(destination.Slice(prefix.Length + 2 * _typeSize));
 
-            formatter(stringBuffer, valuePtr, format);
-        }
-
-        public void AppendUnformattedTo(StringBuffer stringBuffer, byte* valuePtr)
-        {
-            stringBuffer.Append("Unmanaged(0x");
-            HexUtils.AppendValueAsHex(stringBuffer, valuePtr, _typeSize);
-            stringBuffer.Append(")");
-        }
+        charsWritten = outputSize;
+        return true;
     }
 }

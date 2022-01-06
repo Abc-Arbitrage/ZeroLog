@@ -2,7 +2,6 @@
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Reflection;
-using System.Text.Formatting;
 using System.Threading;
 using ZeroLog.Appenders;
 using ZeroLog.ConfigResolvers;
@@ -116,7 +115,7 @@ namespace ZeroLog
             => UnmanagedCache.Register(type);
 
         public static void RegisterUnmanaged<T>()
-            where T : unmanaged, IStringFormattable
+            where T : unmanaged, ISpanFormattable
             => UnmanagedCache.Register<T>();
 
         public static void RegisterUnmanaged<T>(UnmanagedFormatterDelegate<T> formatter)

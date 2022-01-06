@@ -1,89 +1,112 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Reflection;
-using System.Text.Formatting;
-using JetBrains.Annotations;
 using ZeroLog.Utils;
 
-namespace ZeroLog
+namespace ZeroLog;
+
+public delegate bool UnmanagedFormatterDelegate<T>(
+    ref T value,
+    Span<char> destination,
+    out int charsWritten,
+    ReadOnlySpan<char> format
+)
+    where T : unmanaged;
+
+internal static unsafe class UnmanagedCache
 {
-    public delegate void UnmanagedFormatterDelegate<T>(ref T value, StringBuffer stringBuffer, StringView view)
-        where T : unmanaged;
+    internal delegate bool FormatterDelegate(
+        byte* valuePtr,
+        Span<char> destination,
+        out int charsWritten,
+        ReadOnlySpan<char> format
+    );
 
-    internal static unsafe class UnmanagedCache
+    private static readonly Dictionary<IntPtr, FormatterDelegate> _unmanagedStructs = new();
+    private static readonly MethodInfo _registerMethod = typeof(UnmanagedCache).GetMethod(nameof(Register), Type.EmptyTypes)!;
+
+    internal static void Register(Type unmanagedType)
     {
-        internal delegate void FormatterDelegate(StringBuffer stringBuffer, byte* valuePtr, StringView view);
+        if (unmanagedType == null)
+            throw new ArgumentNullException(nameof(unmanagedType));
 
-        private static readonly Dictionary<IntPtr, FormatterDelegate> _unmanagedStructs = new Dictionary<IntPtr, FormatterDelegate>();
-        private static readonly MethodInfo _registerMethod = typeof(UnmanagedCache).GetMethod(nameof(Register), Type.EmptyTypes)!;
+        if (!typeof(ISpanFormattable).IsAssignableFrom(unmanagedType))
+            throw new ArgumentException($"Not an {nameof(ISpanFormattable)} type: {unmanagedType}");
 
-        internal static void Register(Type unmanagedType)
+        if (!TypeUtil.GetIsUnmanagedSlow(unmanagedType))
+            throw new ArgumentException($"Not an unmanaged type: {unmanagedType}");
+
+        _registerMethod.MakeGenericMethod(unmanagedType).Invoke(null, null);
+    }
+
+    public static void Register<T>(UnmanagedFormatterDelegate<T> formatter)
+        where T : unmanaged
+    {
+        lock (_unmanagedStructs)
         {
-            if (unmanagedType == null)
-                throw new ArgumentNullException(nameof(unmanagedType));
+            _unmanagedStructs[typeof(T).TypeHandle.Value] = (byte* valuePtr, Span<char> destination, out int charsWritten, ReadOnlySpan<char> format)
+                => FormatterGeneric(valuePtr, destination, out charsWritten, format, formatter);
 
-            if (!typeof(IStringFormattable).IsAssignableFrom(unmanagedType))
-                throw new ArgumentException($"Not an {nameof(IStringFormattable)} type: {unmanagedType}");
-
-            if (!TypeUtil.GetIsUnmanagedSlow(unmanagedType))
-                throw new ArgumentException($"Not an unmanaged type: {unmanagedType}");
-
-            _registerMethod.MakeGenericMethod(unmanagedType).Invoke(null, null);
+            _unmanagedStructs[typeof(T?).TypeHandle.Value] = (byte* valuePtr, Span<char> destination, out int charsWritten, ReadOnlySpan<char> format)
+                => FormatterGenericNullable(valuePtr, destination, out charsWritten, format, formatter);
         }
+    }
 
-        public static void Register<T>(UnmanagedFormatterDelegate<T> formatter)
-            where T : unmanaged
+    [SuppressMessage("ReSharper", "ConvertToLocalFunction")]
+    public static void Register<T>()
+        where T : unmanaged, ISpanFormattable
+    {
+        UnmanagedFormatterDelegate<T> formatter = static (ref T input, Span<char> destination, out int charsWritten, ReadOnlySpan<char> format)
+            => input.TryFormat(destination, out charsWritten, format, CultureInfo.InvariantCulture);
+
+        Register(formatter);
+    }
+
+    private static bool FormatterGeneric<T>(byte* valuePtr, Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, UnmanagedFormatterDelegate<T>? typedFormatter)
+        where T : unmanaged
+    {
+        if (typedFormatter != null)
+            return typedFormatter.Invoke(ref UnsafeTools.AsRef<T>(valuePtr), destination, out charsWritten, format);
+
+        charsWritten = 0;
+        return true;
+    }
+
+    private static bool FormatterGenericNullable<T>(byte* valuePtr, Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, UnmanagedFormatterDelegate<T>? typedFormatter)
+        where T : unmanaged
+    {
+        ref var typedValueRef = ref UnsafeTools.AsRef<T?>(valuePtr);
+
+        if (typedValueRef != null)
         {
-            lock (_unmanagedStructs)
-            {
-                _unmanagedStructs[typeof(T).TypeHandle.Value] = (b, vp, view) => FormatterGeneric(b, vp, view, formatter);
-                _unmanagedStructs[typeof(T?).TypeHandle.Value] = (b, vp, view) => FormatterGenericNullable(b, vp, view, formatter);
-            }
+            var value = typedValueRef.GetValueOrDefault(); // This copies the value, but this is the slower execution path anyway.
+
+            if (typedFormatter != null)
+                return typedFormatter.Invoke(ref value, destination, out charsWritten, format);
+
+            charsWritten = 0;
+            return true;
         }
-
-        [SuppressMessage("ReSharper", "ConvertToLocalFunction")]
-        public static void Register<T>()
-            where T : unmanaged, IStringFormattable
+        else
         {
-            UnmanagedFormatterDelegate<T> formatter = (ref T input, StringBuffer buffer, StringView view) => input.Format(buffer, view);
+            var value = LogManager.Config.NullDisplayString;
+            charsWritten = 0;
 
-            lock (_unmanagedStructs)
-            {
-                _unmanagedStructs[typeof(T).TypeHandle.Value] = (b, vp, view) => FormatterGeneric(b, vp, view, formatter);
-                _unmanagedStructs[typeof(T?).TypeHandle.Value] = (b, vp, view) => FormatterGenericNullable(b, vp, view, formatter);
-            }
+            if (value.TryCopyTo(destination))
+                charsWritten = value.Length;
+
+            return true;
         }
+    }
 
-        private static void FormatterGeneric<T>(StringBuffer stringBuffer, byte* valuePtr, StringView view, UnmanagedFormatterDelegate<T> typedFormatter)
-            where T : unmanaged
+    public static bool TryGetFormatter(IntPtr typeHandle, out FormatterDelegate formatter)
+    {
+        // This is accessed from a single thread, there should be no contention
+        lock (_unmanagedStructs)
         {
-            typedFormatter?.Invoke(ref UnsafeTools.AsRef<T>(valuePtr), stringBuffer, view);
-        }
-
-        private static void FormatterGenericNullable<T>(StringBuffer stringBuffer, byte* valuePtr, StringView view, UnmanagedFormatterDelegate<T> typedFormatter)
-            where T : unmanaged
-        {
-            ref var typedValueRef = ref UnsafeTools.AsRef<T?>(valuePtr);
-
-            if (typedValueRef != null)
-            {
-                var value = typedValueRef.GetValueOrDefault(); // This copies the value, but this is the slower execution path anyway.
-                typedFormatter?.Invoke(ref value, stringBuffer, view);
-            }
-            else
-            {
-                stringBuffer.Append(LogManager.Config.NullDisplayString);
-            }
-        }
-
-        public static bool TryGetFormatter(IntPtr typeHandle, out FormatterDelegate formatter)
-        {
-            // This is accessed from a single thread, there should be no contention
-            lock (_unmanagedStructs)
-            {
-                return _unmanagedStructs.TryGetValue(typeHandle, out formatter!);
-            }
+            return _unmanagedStructs.TryGetValue(typeHandle, out formatter!);
         }
     }
 }

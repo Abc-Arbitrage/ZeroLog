@@ -204,7 +204,7 @@ namespace ZeroLog
                 default:
                     stringBuffer.Append(@"\u00");
                     var byteValue = unchecked((byte)c);
-                    HexUtils.AppendValueAsHex(stringBuffer, &byteValue, 1);
+                    //HexUtils.AppendValueAsHex(stringBuffer, &byteValue, 1); // TODO
                     break;
             }
         }

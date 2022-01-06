@@ -270,15 +270,13 @@ namespace ZeroLog.Tests
             Check.That(message).IsEqualTo(new string('.', LogManager.OutputBufferSize - LogManager.Config.TruncatedMessageSuffix.Length) + LogManager.Config.TruncatedMessageSuffix);
         }
 
-        public struct FailingUnmanagedStruct : IStringFormattable
+        public struct FailingUnmanagedStruct : ISpanFormattable
         {
-            public int Value;
+            public string ToString(string format, IFormatProvider formatProvider)
+                => throw new InvalidOperationException("Simulated failure");
 
-            public void Format(StringBuffer buffer, StringView format)
-            {
-                buffer.Append("boom");
-                throw new InvalidOperationException("Simulated failure");
-            }
+            public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider provider)
+                => throw new InvalidOperationException("Simulated failure");
         }
     }
 }

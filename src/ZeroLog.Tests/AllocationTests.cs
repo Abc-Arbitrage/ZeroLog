@@ -48,7 +48,7 @@ namespace ZeroLog.Tests
             });
 
             LogManager.RegisterEnum<DayOfWeek>();
-            LogManager.RegisterUnmanaged<UnmanagedStruct>();
+            //LogManager.RegisterUnmanaged<UnmanagedStruct>(); // TODO
         }
 
         [TearDown]

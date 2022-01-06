@@ -233,7 +233,7 @@ public sealed unsafe partial class LogMessage
     internal void InternalAppendEnum<T>(T value)
         where T : struct, Enum
     {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(EnumArg) <= _endOfBuffer && _stringIndex < _strings.Length)
+        if (_dataPointer + sizeof(ArgumentType) + sizeof(EnumArg) <= _endOfBuffer)
         {
             *(ArgumentType*)_dataPointer = ArgumentType.Enum;
             _dataPointer += sizeof(ArgumentType);

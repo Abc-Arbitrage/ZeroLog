@@ -334,6 +334,29 @@ unsafe partial class LogMessage
                 }
 
                 case ArgumentType.Unmanaged:
+                {
+                    var headerPtr = (UnmanagedArgHeader*)dataPointer;
+                    dataPointer += sizeof(UnmanagedArgHeader);
+
+                    if (!skipFormat)
+                    {
+                        if (!headerPtr->TryAppendTo(dataPointer, outputBuffer.Slice(bufferIndex), out var charsWritten, format))
+                            goto outputTruncated;
+
+                        bufferIndex += charsWritten;
+                    }
+                    else
+                    {
+                        if (!headerPtr->TryAppendUnformattedTo(dataPointer, outputBuffer.Slice(bufferIndex), out var charsWritten))
+                            goto outputTruncated;
+
+                        bufferIndex += charsWritten;
+                    }
+
+                    dataPointer += headerPtr->Size;
+                    break;
+                }
+
                 case ArgumentType.KeyString:
                     throw new NotImplementedException();
 
