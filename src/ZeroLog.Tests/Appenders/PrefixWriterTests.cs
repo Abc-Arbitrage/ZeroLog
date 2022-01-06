@@ -1,7 +1,5 @@
 using System;
 using System.Globalization;
-using System.IO;
-using System.Text;
 using System.Threading;
 using NFluent;
 using NUnit.Framework;
@@ -86,11 +84,9 @@ namespace ZeroLog.Tests.Appenders
 
         private static string GetResult(PrefixWriter prefixWriter, LogMessage logMessage)
         {
-            using var stream = new MemoryStream();
-            var bytesWritten = prefixWriter.WritePrefix(stream, logMessage, Encoding.UTF8);
-            Check.That(bytesWritten).IsEqualTo((int)stream.Position);
-
-            return Encoding.UTF8.GetString(stream.GetBuffer(), 0, bytesWritten);
+            var buffer = new char[256];
+            var prefixLength = prefixWriter.WritePrefix(logMessage, buffer);
+            return buffer.AsSpan(0, prefixLength).ToString();
         }
     }
 }

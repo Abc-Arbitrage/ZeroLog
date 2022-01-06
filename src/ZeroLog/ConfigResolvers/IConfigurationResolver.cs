@@ -7,8 +7,6 @@ namespace ZeroLog.ConfigResolvers
 {
     public interface IConfigurationResolver : IDisposable
     {
-        void Initialize(Encoding encoding);
-
         IEnumerable<IAppender> GetAllAppenders();
         LogConfig ResolveLogConfig(string name);
 

@@ -2,8 +2,6 @@
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Text;
 using System.Text.Formatting;
 using System.Threading;
 using ZeroLog.Appenders;
@@ -11,12 +9,9 @@ using ZeroLog.ConfigResolvers;
 
 namespace ZeroLog
 {
-    public sealed class LogManager : ILogManager, ILogMessageProvider
+    public sealed class LogManager : ILogManager, ILogMessageProvider, IDisposable
     {
         internal const int OutputBufferSize = 16 * 1024;
-
-        internal static readonly Encoding DefaultEncoding = Encoding.UTF8;
-        private static readonly Encoding _encoding = DefaultEncoding;
 
         private static LogManager? _logManager;
         private static readonly ConcurrentDictionary<string, Log> _loggers = new();
@@ -34,7 +29,7 @@ namespace ZeroLog
         public Level Level { get; private set; }
         public static ZeroLogConfig Config { get; } = new();
 
-        internal LogManager(IConfigurationResolver configResolver, ZeroLogInitializationConfig config)
+        private LogManager(IConfigurationResolver configResolver, ZeroLogInitializationConfig config)
         {
             config.Validate();
 
@@ -45,7 +40,6 @@ namespace ZeroLog
             _bufferSegmentProvider = new BufferSegmentProvider(config.LogEventQueueSize * config.LogEventBufferSize, config.LogEventBufferSize);
             _pool = new ObjectPool<LogMessage>(config.LogEventQueueSize, () => new LogMessage(_bufferSegmentProvider.GetSegment(), config.LogEventArgumentCapacity));
 
-            configResolver.Initialize(_encoding);
             configResolver.Updated += () =>
             {
                 UpdateAllLogConfigurations();
@@ -210,15 +204,12 @@ namespace ZeroLog
         private void WriteToAppenders()
         {
             var spinWait = new SpinWait();
-            var stringBuffer = new StringBuffer(OutputBufferSize);
-            var charBuffer = GC.AllocateUninitializedArray<char>(OutputBufferSize);
-            var destination = GC.AllocateUninitializedArray<byte>(OutputBufferSize);
-            var keyValuePointerBuffer = new KeyValuePointerBuffer();
+            var formattedMessage = new FormattedLogMessage(OutputBufferSize);
             var flush = false;
 
             while (_isRunning || !_queue.IsEmpty)
             {
-                if (TryToProcessQueue(stringBuffer, charBuffer, destination, keyValuePointerBuffer))
+                if (TryToProcessQueue(formattedMessage))
                 {
                     spinWait.Reset();
                     flush = true;
@@ -239,7 +230,7 @@ namespace ZeroLog
             FlushAppenders();
         }
 
-        private bool TryToProcessQueue(StringBuffer stringBuffer, char[] charBuffer, byte[] destination, KeyValuePointerBuffer keyValuePointerBuffer)
+        private bool TryToProcessQueue(FormattedLogMessage formattedLogMessage)
         {
             if (!_queue.TryDequeue(out var logMessage))
                 return false;
@@ -249,24 +240,17 @@ namespace ZeroLog
                 if ((logMessage.Logger?.Appenders.Length ?? 0) <= 0)
                     return true;
 
-                int bytesWritten;
-
                 try
                 {
-                    // TODO : Rewrite this without StringBuffer
-
-                    stringBuffer.Clear();
-                    var messageLength = logMessage.WriteTo(charBuffer);
-                    stringBuffer.Append(charBuffer.AsSpan(0, messageLength));
-                    //logMessage.WriteToStringBuffer(stringBuffer, keyValuePointerBuffer);
-                    bytesWritten = CopyStringBufferToByteArray(stringBuffer, destination);
+                    formattedLogMessage.SetMessage(logMessage);
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
-                    HandleFormattingError(stringBuffer, destination, ex, out bytesWritten);
+                    // TODO Handle formatting errors
+                    return true;
                 }
 
-                WriteMessageLogToAppenders(destination, logMessage, bytesWritten);
+                WriteMessageLogToAppenders(formattedLogMessage);
             }
             finally
             {
@@ -277,50 +261,12 @@ namespace ZeroLog
             return true;
         }
 
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        private static void HandleFormattingError(StringBuffer stringBuffer, byte[] destination, Exception exception, out int bytesWritten)
+        private static void WriteMessageLogToAppenders(FormattedLogMessage message)
         {
-            stringBuffer.Clear();
-            stringBuffer.Append("An error occured during formatting: ");
-            stringBuffer.Append(exception.Message);
-            bytesWritten = CopyStringBufferToByteArray(stringBuffer, destination);
-        }
-
-        private static void WriteMessageLogToAppenders(byte[] destination, LogMessage logMessage, int bytesWritten)
-        {
-            foreach (var appender in logMessage.Logger?.Appenders ?? Array.Empty<IAppender>())
+            foreach (var appender in message.Message.Logger?.Appenders ?? Array.Empty<IAppender>())
             {
                 // if (logEvent.Level >= Level) // TODO Check this ? log event should not be in queue if not > Level
-                appender.WriteMessage(logMessage, destination, bytesWritten);
-            }
-        }
-
-        private static unsafe int CopyStringBufferToByteArray(StringBuffer stringBuffer, byte[] destination)
-        {
-            fixed (byte* dest = &destination[0])
-            {
-                // This works only for ASCII strings, but doing the real check would be expensive, and it's an edge case...
-                if (stringBuffer.Count > destination.Length)
-                    TruncateMessage(stringBuffer, destination.Length);
-
-                return stringBuffer.CopyTo(dest, destination.Length, 0, stringBuffer.Count, _encoding);
-            }
-        }
-
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        private static void TruncateMessage(StringBuffer stringBuffer, int maxLength)
-        {
-            var suffix = Config.TruncatedMessageSuffix;
-            var maxMessageLength = maxLength - suffix.Length;
-
-            if (maxMessageLength > 0)
-            {
-                stringBuffer.Count = maxMessageLength;
-                stringBuffer.Append(suffix);
-            }
-            else
-            {
-                stringBuffer.Count = maxLength;
+                appender.WriteMessage(message);
             }
         }
 

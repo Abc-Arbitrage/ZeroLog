@@ -25,10 +25,10 @@ namespace ZeroLog.Tests
             {
             }
 
-            public override void WriteMessage(LogMessage message, byte[] messageBytes, int messageLength)
+            public override void WriteMessage(FormattedLogMessage message)
             {
                 WrittenEventCount++;
-                base.WriteMessage(message, messageBytes, messageLength);
+                base.WriteMessage(message);
             }
         }
 

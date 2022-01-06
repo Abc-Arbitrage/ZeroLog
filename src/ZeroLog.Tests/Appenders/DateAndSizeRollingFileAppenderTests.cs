@@ -1,6 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Text;
+﻿using System.IO;
 using System.Threading;
 using NFluent;
 using NUnit.Framework;
@@ -17,7 +15,6 @@ namespace ZeroLog.Tests.Appenders
         public void SetUp()
         {
             _appender = new DateAndSizeRollingFileAppender("TestLog", prefixPattern: "%date - %time - %thread - %level - %logger || ");
-            _appender.SetEncoding(Encoding.Default);
         }
 
         [TearDown]
@@ -29,19 +26,18 @@ namespace ZeroLog.Tests.Appenders
         [Test, RequiresThread]
         public void should_log_to_file()
         {
-            var bytes = new byte[256];
-            var message = "Test log message";
-            var byteLength = Encoding.Default.GetBytes(message, 0, message.Length, bytes, 0);
-
-            var logMessage = new LogMessage("Foo");
+            var logMessage = new LogMessage("Test log message");
             logMessage.Initialize(new Log("TestLog"), Level.Info);
 
-            _appender.WriteMessage(logMessage, bytes, byteLength);
+            var formattedMessage = new FormattedLogMessage(logMessage.ToString().Length);
+            formattedMessage.SetMessage(logMessage);
+
+            _appender.WriteMessage(formattedMessage);
             _appender.Flush();
 
             var written = GetLastLine();
 
-            Check.That(written).IsEqualTo($"{logMessage.Timestamp.Date:yyyy-MM-dd} - {logMessage.Timestamp.TimeOfDay:hh\\:mm\\:ss\\.fffffff} - {Thread.CurrentThread.ManagedThreadId} - INFO - TestLog || " + message);
+            Check.That(written).IsEqualTo($"{logMessage.Timestamp.Date:yyyy-MM-dd} - {logMessage.Timestamp.TimeOfDay:hh\\:mm\\:ss\\.fffffff} - {Thread.CurrentThread.ManagedThreadId} - INFO - TestLog || {logMessage}");
         }
 
         private string GetLastLine()

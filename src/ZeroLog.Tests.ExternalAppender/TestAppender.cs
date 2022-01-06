@@ -14,11 +14,5 @@ namespace ZeroLog.Tests.ExternalAppender
             : base(prefixPattern)
         {
         }
-
-        public override void Configure(DefaultAppenderConfig parameters)
-        {
-            parameters.PrefixPattern = $"({Name}): {parameters.PrefixPattern}";
-            base.Configure(parameters);
-        }
     }
 }

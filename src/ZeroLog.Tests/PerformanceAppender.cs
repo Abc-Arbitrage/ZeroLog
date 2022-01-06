@@ -16,22 +16,17 @@ namespace ZeroLog.Tests
             _messages = new MessageReceived[expectedEntries];
             for (int i = 0; i < expectedEntries; i++)
             {
-                _messages[i] = new MessageReceived(new byte[30]);
+                _messages[i] = new MessageReceived(new char[30]);
             }
         }
 
-        public string Name { get; set; }
-
-        public void WriteMessage(LogMessage message, byte[] messageBytes, int messageLength)
+        public void WriteMessage(FormattedLogMessage message)
         {
-            Array.Copy(messageBytes, _messages[_count].StartTimestampInChars, messageLength);
-            _messages[_count].MessageLength = messageLength;
+            var messageSpan = message.GetMessage();
+            messageSpan.CopyTo(_messages[_count].StartTimestampInChars);
+            _messages[_count].MessageLength = messageSpan.Length;
             _messages[_count].EndTimestamp = Stopwatch.GetTimestamp();
             _count++;
-        }
-
-        public void SetEncoding(Encoding encoding)
-        {
         }
 
         public void Flush()
@@ -44,11 +39,11 @@ namespace ZeroLog.Tests
 
         private struct MessageReceived
         {
-            public readonly byte[] StartTimestampInChars;
+            public readonly char[] StartTimestampInChars;
             public int MessageLength;
             public long EndTimestamp;
 
-            public MessageReceived(byte[] startTimestampInChars)
+            public MessageReceived(char[] startTimestampInChars)
             {
                 StartTimestampInChars = startTimestampInChars;
                 EndTimestamp = 0;
@@ -67,8 +62,7 @@ namespace ZeroLog.Tests
                 for (int i = 0; i < _count; i++)
                 {
                     var messageReceived = _messages[i];
-                    var timestampString = Encoding.Default.GetString(messageReceived.StartTimestampInChars, 0, messageReceived.MessageLength);
-                    var startTime = long.Parse(timestampString);
+                    var startTime = long.Parse(messageReceived.StartTimestampInChars.AsSpan(0, messageReceived.MessageLength));
                     fileStream.WriteLine(ToMicroseconds(messageReceived.EndTimestamp - startTime));
                 }
             }

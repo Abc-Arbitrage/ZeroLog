@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Text;
 using ZeroLog.Appenders;
 
 namespace ZeroLog.ConfigResolvers
@@ -39,14 +38,6 @@ namespace ZeroLog.ConfigResolvers
                 LogEventPoolExhaustionStrategy = _logEventPoolExhaustionStrategy,
                 LogEventArgumentExhaustionStrategy = _logEventArgumentExhaustionStrategy
             };
-        }
-
-        public void Initialize(Encoding encoding)
-        {
-            foreach (var appender in _appenders)
-            {
-                appender.SetEncoding(encoding);
-            }
         }
 
         public event Action? Updated

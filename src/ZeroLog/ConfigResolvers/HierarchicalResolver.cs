@@ -10,7 +10,6 @@ namespace ZeroLog.ConfigResolvers
     public class HierarchicalResolver : IConfigurationResolver
     {
         private Node? _root;
-        private Encoding AppenderEncoding { get; set; } = LogManager.DefaultEncoding;
 
         public IEnumerable<IAppender> GetAllAppenders()
         {
@@ -59,8 +58,6 @@ namespace ZeroLog.ConfigResolvers
             {
                 AddNode(newRoot, loggerWithAppenders.logger, loggerWithAppenders.appenders);
             }
-
-            ApplyEncodingToAllAppenders(newRoot);
 
             _root = newRoot;
 
@@ -138,32 +135,6 @@ namespace ZeroLog.ConfigResolvers
             }
 
             return node;
-        }
-
-        public void Initialize(Encoding encoding)
-        {
-            AppenderEncoding = encoding;
-
-            ApplyEncodingToAllAppenders(_root);
-        }
-
-        private void ApplyEncodingToAllAppenders(Node? node)
-        {
-            if (node is null)
-                return;
-
-            if (AppenderEncoding != null && node.Appenders != null)
-            {
-                foreach (var appender in node.Appenders)
-                {
-                    appender.SetEncoding(AppenderEncoding);
-                }
-            }
-
-            foreach (var n in node.Children)
-            {
-                ApplyEncodingToAllAppenders(n.Value);
-            }
         }
 
         public void Dispose()

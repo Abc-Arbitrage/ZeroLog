@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
+using JetBrains.Annotations;
 using ZeroLog.Appenders;
 
 namespace ZeroLog.Tests
@@ -12,16 +13,17 @@ namespace ZeroLog.Tests
         private ManualResetEventSlim _signal;
         private int _messageCountTarget;
 
-        public List<string> LoggedMessages { get; } = new List<string>();
+        public List<string> LoggedMessages { get; } = new();
         public int FlushCount { get; set; }
 
         public ManualResetEventSlim WaitOnWriteEvent { get; set; }
 
+        [UsedImplicitly]
         public TestAppender()
         {
         }
 
-        public TestAppender(bool captureLoggedMessages = true)
+        public TestAppender(bool captureLoggedMessages)
         {
             _captureLoggedMessages = captureLoggedMessages;
         }
@@ -34,21 +36,15 @@ namespace ZeroLog.Tests
             return _signal;
         }
 
-        public string Name { get; set; }
-
-        public void WriteMessage(LogMessage message, byte[] messageBytes, int messageLength)
+        public void WriteMessage(FormattedLogMessage message)
         {
             if (_captureLoggedMessages)
-                LoggedMessages.Add(Encoding.ASCII.GetString(messageBytes, 0, messageLength));
+                LoggedMessages.Add(message.ToString());
 
             if (++_messageCount == _messageCountTarget)
                 _signal.Set();
 
             WaitOnWriteEvent?.Wait();
-        }
-
-        public void SetEncoding(Encoding encoding)
-        {
         }
 
         public void Flush()

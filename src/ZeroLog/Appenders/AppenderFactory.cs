@@ -13,7 +13,6 @@ namespace ZeroLog.Appenders
             var appenderType = GetAppenderType(definition) ?? throw new InvalidOperationException($"Appender type not found: {definition.AppenderTypeName}");
 
             var appender = (IAppender)Activator.CreateInstance(appenderType)!;
-            appender.Name = definition.Name;
 
             var appenderParameterType = GetAppenderParameterType(appenderType);
             if (appenderParameterType != null)

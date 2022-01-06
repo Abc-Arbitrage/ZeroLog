@@ -1,13 +1,16 @@
-﻿namespace ZeroLog.Appenders
-{
-    public class NoopAppender : AppenderBase<object>
-    {
-        public override void Configure(object parameters)
-        {
-        }
+﻿namespace ZeroLog.Appenders;
 
-        public override void WriteMessage(LogMessage message, byte[] messageBytes, int messageLength)
-        {
-        }
+public class NoopAppender : IAppender
+{
+    public void Dispose()
+    {
+    }
+
+    public void WriteMessage(FormattedLogMessage message)
+    {
+    }
+
+    public void Flush()
+    {
     }
 }

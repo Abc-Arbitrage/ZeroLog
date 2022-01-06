@@ -1,318 +1,185 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Reflection;
-using System.Reflection.Emit;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Text.Formatting;
 using System.Text.RegularExpressions;
-using System.Threading;
+using ZeroLog.Utils;
 
-namespace ZeroLog.Appenders
+namespace ZeroLog.Appenders;
+
+internal class PrefixWriter
 {
-    internal class PrefixWriter
+    private readonly List<PatternPart> _parts;
+
+    public PrefixWriter(string pattern)
     {
-        private const int _maxLength = 512;
-        private const string _dateFormat = "yyyy-MM-dd";
+        _parts = OptimizeParts(ParsePattern(pattern)).ToList();
+    }
 
-        private readonly StringBuffer _stringBuffer = new StringBuffer(_maxLength);
-        private readonly byte[] _buffer = new byte[_maxLength * sizeof(char)];
-        private readonly char[] _strings;
+    private static IEnumerable<PatternPart> ParsePattern(string pattern)
+    {
+        var position = 0;
 
-        private readonly Action<PrefixWriter, LogMessage> _appendMethod;
-
-        public PrefixWriter(string pattern)
+        foreach (Match? match in Regex.Matches(pattern, @"%(?:(?<part>\w+)|\{\s*(?<part>\w+)\s*\})", RegexOptions.CultureInvariant | RegexOptions.IgnoreCase))
         {
-            var parts = OptimizeParts(ParsePattern(pattern)).ToList();
-            _strings = BuildStrings(parts, out var stringMap);
-            _appendMethod = BuildAppendMethod(parts, stringMap);
-        }
+            if (position < match!.Index)
+                yield return new PatternPart(pattern.Substring(position, match.Index - position));
 
-        private static IEnumerable<PatternPart> ParsePattern(string pattern)
-        {
-            var position = 0;
-
-            foreach (Match? match in Regex.Matches(pattern, @"%(?:(?<part>\w+)|\{\s*(?<part>\w+)\s*\})", RegexOptions.CultureInvariant | RegexOptions.IgnoreCase))
+            yield return match.Groups["part"].Value.ToLowerInvariant() switch
             {
-                if (position < match!.Index)
-                    yield return new PatternPart(pattern.Substring(position, match.Index - position));
-
-                yield return match.Groups["part"].Value.ToLowerInvariant() switch
-                {
-                    "date"   => new PatternPart(PatternPartType.Date),
-                    "time"   => new PatternPart(PatternPartType.Time),
-                    "thread" => new PatternPart(PatternPartType.Thread),
-                    "level"  => new PatternPart(PatternPartType.Level),
-                    "logger" => new PatternPart(PatternPartType.Logger),
-                    _        => new PatternPart(match.Value)
-                };
-
-                position = match.Index + match.Length;
-            }
-
-            if (position < pattern.Length)
-                yield return new PatternPart(pattern.Substring(position, pattern.Length - position));
-        }
-
-        private static IEnumerable<PatternPart> OptimizeParts(IEnumerable<PatternPart> parts)
-        {
-            var currentString = string.Empty;
-
-            foreach (var part in parts)
-            {
-                if (part.Type == PatternPartType.String)
-                {
-                    currentString += part.Value;
-                }
-                else
-                {
-                    if (currentString.Length != 0)
-                    {
-                        yield return new PatternPart(currentString);
-                        currentString = string.Empty;
-                    }
-
-                    yield return part;
-                }
-            }
-
-            if (currentString.Length != 0)
-                yield return new PatternPart(currentString);
-        }
-
-        private static char[] BuildStrings(IEnumerable<PatternPart> parts, out Dictionary<string, (int offset, int length)> map)
-        {
-            var stringOffsets = new Dictionary<string, (int offset, int length)>();
-            var stringsBuilder = new StringBuilder();
-
-            foreach (var part in parts)
-            {
-                switch (part.Type)
-                {
-                    case PatternPartType.String:
-                        AddString(part.Value!);
-                        break;
-
-                    case PatternPartType.Date:
-                        AddString(_dateFormat);
-                        break;
-                }
-            }
-
-            void AddString(string value)
-            {
-                if (stringOffsets.ContainsKey(value))
-                    return;
-
-                var offset = stringsBuilder.Length;
-                stringsBuilder.Append(value);
-                stringOffsets[value] = (offset, value.Length);
-            }
-
-            if (stringsBuilder.Length == 0)
-                AddString(" ");
-
-            var strings = new char[stringsBuilder.Length];
-            stringsBuilder.CopyTo(0, strings, 0, stringsBuilder.Length);
-            map = stringOffsets;
-            return strings;
-        }
-
-        private static Action<PrefixWriter, LogMessage> BuildAppendMethod(ICollection<PatternPart> parts, Dictionary<string, (int offset, int length)> stringMap)
-        {
-            var method = new DynamicMethod("WritePrefix", typeof(void), new[] { typeof(PrefixWriter), typeof(LogMessage) }, typeof(PrefixWriter), false)
-            {
-                InitLocals = false
+                "date"   => new PatternPart(PatternPartType.Date),
+                "time"   => new PatternPart(PatternPartType.Time),
+                "thread" => new PatternPart(PatternPartType.Thread),
+                "level"  => new PatternPart(PatternPartType.Level),
+                "logger" => new PatternPart(PatternPartType.Logger),
+                _        => new PatternPart(match.Value)
             };
 
-            var il = method.GetILGenerator();
-
-            var stringBufferLocal = il.DeclareLocal(typeof(StringBuffer));
-            var stringsLocal = il.DeclareLocal(typeof(char).MakeByRefType(), true);
-            var dateTimeLocal = default(LocalBuilder);
-
-            il.Emit(OpCodes.Ldarg_0);
-            il.Emit(OpCodes.Ldfld, typeof(PrefixWriter).GetField(nameof(_stringBuffer), BindingFlags.Instance | BindingFlags.NonPublic)!);
-            il.Emit(OpCodes.Stloc, stringBufferLocal);
-
-            il.Emit(OpCodes.Ldarg_0);
-            il.Emit(OpCodes.Ldfld, typeof(PrefixWriter).GetField(nameof(_strings), BindingFlags.Instance | BindingFlags.NonPublic)!);
-            il.Emit(OpCodes.Ldc_I4_0);
-            il.Emit(OpCodes.Ldelema, typeof(char));
-            il.Emit(OpCodes.Stloc, stringsLocal);
-
-            foreach (var part in parts)
-            {
-                switch (part.Type)
-                {
-                    case PatternPartType.String:
-                    {
-                        // _stringBuffer.Append(&_strings[0] + offset * sizeof(char), length);
-
-                        var (offset, length) = stringMap[part.Value!];
-
-                        il.Emit(OpCodes.Ldloc, stringBufferLocal);
-
-                        il.Emit(OpCodes.Ldloc, stringsLocal);
-                        il.Emit(OpCodes.Conv_U);
-                        il.Emit(OpCodes.Ldc_I4, offset * sizeof(char));
-                        il.Emit(OpCodes.Add);
-
-                        il.Emit(OpCodes.Ldc_I4, length);
-
-                        il.Emit(OpCodes.Call, typeof(StringBuffer).GetMethod(nameof(StringBuffer.Append), new[] { typeof(char*), typeof(int) })!);
-                        break;
-                    }
-
-                    case PatternPartType.Date:
-                    {
-                        // _stringBuffer.Append(message.Timestamp, new StringView(&_strings[0] + offset * sizeof(char), length));
-
-                        var (offset, length) = stringMap[_dateFormat];
-
-                        il.Emit(OpCodes.Ldloc, stringBufferLocal);
-
-                        il.Emit(OpCodes.Ldarg_1);
-                        il.Emit(OpCodes.Callvirt, typeof(LogMessage).GetProperty(nameof(LogMessage.Timestamp))?.GetGetMethod()!);
-
-                        il.Emit(OpCodes.Ldloc, stringsLocal);
-                        il.Emit(OpCodes.Conv_U);
-                        il.Emit(OpCodes.Ldc_I4, offset * sizeof(char));
-                        il.Emit(OpCodes.Add);
-
-                        il.Emit(OpCodes.Ldc_I4, length);
-
-                        il.Emit(OpCodes.Newobj, typeof(StringView).GetConstructor(new[] { typeof(char*), typeof(int) })!);
-
-                        il.Emit(OpCodes.Call, typeof(StringBuffer).GetMethod(nameof(StringBuffer.Append), new[] { typeof(DateTime), typeof(StringView) })!);
-                        break;
-                    }
-
-                    case PatternPartType.Time:
-                    {
-                        // _stringBuffer.Append(message.Timestamp.TimeOfDay, StringView.Empty);
-
-                        il.Emit(OpCodes.Ldloc, stringBufferLocal);
-
-                        il.Emit(OpCodes.Ldarg_1);
-                        il.Emit(OpCodes.Callvirt, typeof(LogMessage).GetProperty(nameof(LogMessage.Timestamp))?.GetGetMethod()!);
-                        il.Emit(OpCodes.Stloc, dateTimeLocal ??= il.DeclareLocal(typeof(DateTime)));
-                        il.Emit(OpCodes.Ldloca, dateTimeLocal);
-                        il.Emit(OpCodes.Call, typeof(DateTime).GetProperty(nameof(DateTime.TimeOfDay))?.GetGetMethod()!);
-
-                        il.Emit(OpCodes.Ldsfld, typeof(StringView).GetField(nameof(StringView.Empty))!);
-
-                        il.Emit(OpCodes.Call, typeof(StringBuffer).GetMethod(nameof(StringBuffer.Append), new[] { typeof(TimeSpan), typeof(StringView) })!);
-                        break;
-                    }
-
-                    case PatternPartType.Thread:
-                    {
-                        // AppendThread(message.Thread);
-
-                        il.Emit(OpCodes.Ldarg_0);
-
-                        il.Emit(OpCodes.Ldarg_1);
-                        il.Emit(OpCodes.Callvirt, typeof(LogMessage).GetProperty(nameof(LogMessage.Thread))?.GetGetMethod()!);
-
-                        il.Emit(OpCodes.Call, typeof(PrefixWriter).GetMethod(nameof(AppendThread), BindingFlags.Instance | BindingFlags.NonPublic)!);
-                        break;
-                    }
-
-                    case PatternPartType.Level:
-                    {
-                        // _stringBuffer.Append(LevelStringCache.GetLevelString(message.Level));
-
-                        il.Emit(OpCodes.Ldloc, stringBufferLocal);
-
-                        il.Emit(OpCodes.Ldarg_1);
-                        il.Emit(OpCodes.Callvirt, typeof(LogMessage).GetProperty(nameof(LogMessage.Level))?.GetGetMethod()!);
-                        il.Emit(OpCodes.Call, typeof(LevelStringCache).GetMethod(nameof(LevelStringCache.GetLevelString))!);
-
-                        il.Emit(OpCodes.Call, typeof(StringBuffer).GetMethod(nameof(StringBuffer.Append), new[] { typeof(string) })!);
-                        break;
-                    }
-
-                    case PatternPartType.Logger:
-                    {
-                        // AppendLoggerName(message);
-
-                        il.Emit(OpCodes.Ldarg_0);
-                        il.Emit(OpCodes.Ldarg_1);
-                        il.Emit(OpCodes.Call, typeof(PrefixWriter).GetMethod(nameof(AppendLoggerName), BindingFlags.Instance | BindingFlags.NonPublic)!);
-                        break;
-                    }
-
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-            }
-
-            il.Emit(OpCodes.Ret);
-
-            return (Action<PrefixWriter, LogMessage>)method.CreateDelegate(typeof(Action<PrefixWriter, LogMessage>));
+            position = match.Index + match.Length;
         }
 
-        public unsafe int WritePrefix(Stream stream, LogMessage message, Encoding encoding)
+        if (position < pattern.Length)
+            yield return new PatternPart(pattern.Substring(position, pattern.Length - position));
+    }
+
+    private static IEnumerable<PatternPart> OptimizeParts(IEnumerable<PatternPart> parts)
+    {
+        var currentString = string.Empty;
+
+        foreach (var part in parts)
         {
-            _stringBuffer.Clear();
-            _appendMethod(this, message);
-
-            int bytesWritten;
-            fixed (byte* buf = &_buffer[0])
-                bytesWritten = _stringBuffer.CopyTo(buf, _buffer.Length, 0, _stringBuffer.Count, encoding);
-
-            stream.Write(_buffer, 0, bytesWritten);
-            return bytesWritten;
-        }
-
-        internal void AppendThread(Thread? thread)
-        {
-            if (thread != null)
+            if (part.Type == PatternPartType.String)
             {
-                if (thread.Name != null)
-                    _stringBuffer.Append(thread.Name);
-                else
-                    _stringBuffer.Append(thread.ManagedThreadId, StringView.Empty);
+                currentString += part.Value;
             }
             else
             {
-                _stringBuffer.Append('0');
+                if (currentString.Length != 0)
+                {
+                    yield return new PatternPart(currentString);
+                    currentString = string.Empty;
+                }
+
+                yield return part;
             }
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal void AppendLoggerName(LogMessage logMessage)
-            => _stringBuffer.Append(logMessage.Logger?.Name);
+        if (currentString.Length != 0)
+            yield return new PatternPart(currentString);
+    }
 
-        private enum PatternPartType
+    [SuppressMessage("ReSharper", "ReplaceSliceWithRangeIndexer")]
+    public int WritePrefix(LogMessage message, Span<char> buffer)
+    {
+        // TODO optimize this?
+
+        var builder = new CharBufferBuilder(buffer);
+
+        foreach (var part in _parts)
         {
-            String,
-            Date,
-            Time,
-            Thread,
-            Level,
-            Logger
+            switch (part.Type)
+            {
+                case PatternPartType.String:
+                {
+                    if (!builder.TryAppendPartial(part.Value))
+                        goto endOfLoop;
+
+                    break;
+                }
+
+                case PatternPartType.Date:
+                {
+                    if (!builder.TryAppend(message.Timestamp, "yyyy-MM-dd"))
+                        goto endOfLoop;
+
+                    break;
+                }
+
+                case PatternPartType.Time:
+                {
+                    if (!builder.TryAppend(message.Timestamp.TimeOfDay, @"hh\:mm\:ss\.fffffff"))
+                        goto endOfLoop;
+
+                    break;
+                }
+
+                case PatternPartType.Thread:
+                {
+                    var thread = message.Thread;
+
+                    if (thread != null)
+                    {
+                        if (thread.Name != null)
+                        {
+                            if (!builder.TryAppendPartial(thread.Name))
+                                goto endOfLoop;
+                        }
+                        else
+                        {
+                            if (!builder.TryAppend(thread.ManagedThreadId))
+                                goto endOfLoop;
+                        }
+                    }
+                    else
+                    {
+                        if (!builder.TryAppend('0'))
+                            goto endOfLoop;
+                    }
+
+                    break;
+                }
+
+                case PatternPartType.Level:
+                {
+                    if (!builder.TryAppendWhole(LevelStringCache.GetLevelString(message.Level)))
+                        goto endOfLoop;
+
+                    break;
+                }
+
+                case PatternPartType.Logger:
+                {
+                    if (!builder.TryAppendPartial(message.Logger?.Name))
+                        goto endOfLoop;
+
+                    break;
+                }
+
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
 
-        private readonly struct PatternPart
+        endOfLoop:
+
+        return builder.Length;
+    }
+
+    private enum PatternPartType
+    {
+        String,
+        Date,
+        Time,
+        Thread,
+        Level,
+        Logger
+    }
+
+    private readonly struct PatternPart
+    {
+        public PatternPartType Type { get; }
+        public string? Value { get; }
+
+        public PatternPart(PatternPartType type)
         {
-            public PatternPartType Type { get; }
-            public string? Value { get; }
+            Type = type;
+            Value = null;
+        }
 
-            public PatternPart(PatternPartType type)
-            {
-                Type = type;
-                Value = null;
-            }
-
-            public PatternPart(string value)
-            {
-                Type = PatternPartType.String;
-                Value = value;
-            }
+        public PatternPart(string value)
+        {
+            Type = PatternPartType.String;
+            Value = value;
         }
     }
 }

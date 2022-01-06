@@ -1,11 +1,10 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using JetBrains.Annotations;
 
 namespace ZeroLog.Appenders
 {
-    public class DateAndSizeRollingFileAppender : AppenderBase<DateAndSizeRollingFileAppenderConfig>
+    public class DateAndSizeRollingFileAppender : StreamAppender
     {
         public const int DefaultMaxSize = 200 * 1024 * 1024;
         public const string DefaultExtension = "log";
@@ -13,7 +12,6 @@ namespace ZeroLog.Appenders
 
         private DateTime _currentDate = DateTime.UtcNow.Date;
         private int _rollingFileNumber;
-        private Stream? _stream;
         private long _fileSize;
 
         /// <summary>
@@ -38,50 +36,17 @@ namespace ZeroLog.Appenders
         /// <summary>
         /// Initializes a new instance of the class.
         /// </summary>
-        public DateAndSizeRollingFileAppender(string filePathRoot, int maxFileSizeInBytes = DefaultMaxSize, string extension = DefaultExtension, string prefixPattern = DefaultPrefixPattern)
+        public DateAndSizeRollingFileAppender(string filePathRoot, int maxFileSizeInBytes = DefaultMaxSize, string? extension = DefaultExtension, string prefixPattern = DefaultPrefixPattern)
+            : base(prefixPattern)
         {
-            var config = new DateAndSizeRollingFileAppenderConfig
-            {
-                FilePathRoot = filePathRoot,
-                MaxFileSizeInBytes = maxFileSizeInBytes,
-                Extension = extension,
-                PrefixPattern = prefixPattern
-            };
+            FilenameRoot = filePathRoot;
+            MaxFileSizeInBytes = maxFileSizeInBytes;
+            FilenameExtension = extension ?? string.Empty;
 
-            Configure(config);
+            Init();
         }
 
-        /// <summary>
-        /// Initializes a new instance of the class.
-        /// </summary>
-        [UsedImplicitly]
-        public DateAndSizeRollingFileAppender()
-        {
-            Configure(DefaultPrefixPattern);
-        }
-
-        public override void Configure(DateAndSizeRollingFileAppenderConfig parameters)
-        {
-            Configure(parameters.PrefixPattern);
-
-            FilenameRoot = parameters.FilePathRoot;
-            MaxFileSizeInBytes = parameters.MaxFileSizeInBytes;
-            FilenameExtension = parameters.Extension;
-
-            Open();
-        }
-
-        public override void WriteMessage(LogMessage message, byte[] messageBytes, int messageLength)
-        {
-            var stream = _stream;
-            if (stream == null)
-                return;
-
-            _fileSize += WriteMessageToStream(stream, message, messageBytes, messageLength);
-            CheckRollFile(message.Timestamp);
-        }
-
-        private void Open()
+        private void Init()
         {
             if (FilenameRoot == "")
                 throw new ArgumentException("FilenameRoot name was not supplied for RollingFileAppender");
@@ -111,16 +76,19 @@ namespace ZeroLog.Appenders
 
             FilenameExtension ??= "";
             _rollingFileNumber = FindLastRollingFileNumber(directory);
+        }
 
-            OpenStream();
-            CheckRollFile(DateTime.UtcNow);
+        public override void WriteMessage(FormattedLogMessage message)
+        {
+            CheckRollFile(message.Message.Timestamp);
+
+            base.WriteMessage(message);
         }
 
         public override void Dispose()
         {
-            base.Dispose();
-
             CloseStream();
+            base.Dispose();
         }
 
         private void OpenStream()
@@ -150,7 +118,6 @@ namespace ZeroLog.Appenders
         /// </summary>
         protected virtual void FileOpened(Stream stream)
         {
-            // Unfortunately, this cannot be an event as the file is opened by the constructor :(
         }
 
         /// <summary>
@@ -160,18 +127,12 @@ namespace ZeroLog.Appenders
         {
         }
 
-        /// <summary>
-        /// Flushes the current log file writer.
-        /// </summary>
-        public override void Flush()
-            => _stream?.Flush();
-
         private void CheckRollFile(DateTime timestamp)
         {
             var maxSizeReached = MaxFileSizeInBytes > 0 && _fileSize >= MaxFileSizeInBytes;
             var dateReached = _currentDate != timestamp.Date;
 
-            if (!maxSizeReached && !dateReached)
+            if (!maxSizeReached && !dateReached && _stream != null)
                 return;
 
             CloseStream();
