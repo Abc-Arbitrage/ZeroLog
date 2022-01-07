@@ -25,24 +25,6 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Log.Messages.cs</LastGenOutput>
     </None>
-    <Compile Update="LogEvent.Append.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>LogEvent.Append.tt</DependentUpon>
-    </Compile>
-    <None Update="LogEvent.Append.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>LogEvent.Append.cs</LastGenOutput>
-    </None>
-    <Compile Update="LogEvent.AppendUnmanaged.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>LogEvent.AppendUnmanaged.tt</DependentUpon>
-    </Compile>
-    <None Update="LogEvent.AppendUnmanaged.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>LogEvent.AppendUnmanaged.cs</LastGenOutput>
-    </None>
     <None Update="LogMessage.Append.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>LogMessage.Append.cs</LastGenOutput>
