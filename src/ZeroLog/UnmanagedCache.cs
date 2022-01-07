@@ -54,6 +54,7 @@ internal static unsafe class UnmanagedCache
         }
     }
 
+#if NETCOREAPP
     [SuppressMessage("ReSharper", "ConvertToLocalFunction")]
     public static void Register<T>()
         where T : unmanaged, ISpanFormattable
@@ -63,6 +64,7 @@ internal static unsafe class UnmanagedCache
 
         Register(formatter);
     }
+#endif
 
     private static bool FormatterGeneric<T>(byte* valuePtr, Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, UnmanagedFormatterDelegate<T>? typedFormatter)
         where T : unmanaged

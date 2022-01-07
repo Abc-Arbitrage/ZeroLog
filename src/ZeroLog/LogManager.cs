@@ -78,6 +78,10 @@ namespace ZeroLog
             _bufferSegmentProvider.Dispose();
         }
 
+#if NETCOREAPP
+
+        // The Initialize/Shutdown methods should not be available in .NET Standard, as ZeroLog is only implemented for .NET 6+.
+
         public static ILogManager Initialize(IConfigurationResolver configResolver, ZeroLogInitializationConfig? config = null)
         {
             if (_logManager is not null)
@@ -94,6 +98,8 @@ namespace ZeroLog
 
             logManager?.Dispose();
         }
+
+#endif
 
         public static void RegisterEnum(Type enumType)
             => EnumCache.Register(enumType);
@@ -114,9 +120,13 @@ namespace ZeroLog
         public static void RegisterUnmanaged(Type type)
             => UnmanagedCache.Register(type);
 
+#if NETCOREAPP
+
         public static void RegisterUnmanaged<T>()
             where T : unmanaged, ISpanFormattable
             => UnmanagedCache.Register<T>();
+
+#endif
 
         public static void RegisterUnmanaged<T>(UnmanagedFormatterDelegate<T> formatter)
             where T : unmanaged
