@@ -1,12 +1,12 @@
-﻿using System;
+﻿#if false
+
+using System;
 using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Formatting;
 using NFluent;
 using NUnit.Framework;
-
-#if false
 
 namespace ZeroLog.Tests
 {

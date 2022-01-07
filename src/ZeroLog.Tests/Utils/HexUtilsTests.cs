@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Text.Formatting;
 using NUnit.Framework;
 using ZeroLog.Utils;
 

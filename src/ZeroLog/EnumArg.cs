@@ -3,7 +3,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Text.Formatting;
 using ZeroLog.Utils;
 
 namespace ZeroLog
@@ -19,17 +18,6 @@ namespace ZeroLog
         {
             _typeHandle = typeHandle;
             _value = value;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void AppendTo(StringBuffer stringBuffer)
-        {
-            var enumString = GetString();
-
-            if (enumString != null)
-                stringBuffer.Append(enumString);
-            else
-                AppendNumericValue(stringBuffer);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -51,21 +39,6 @@ namespace ZeroLog
             }
 
             return TryAppendNumericValue(destination, out charsWritten);
-        }
-
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        public void AppendNumericValue(StringBuffer stringBuffer)
-        {
-            if (_value <= long.MaxValue)
-            {
-                stringBuffer.Append(_value, StringView.Empty);
-                return;
-            }
-
-            if (EnumCache.IsEnumSigned(_typeHandle))
-                stringBuffer.Append(unchecked((long)_value), StringView.Empty);
-            else
-                stringBuffer.Append(_value, StringView.Empty);
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]

@@ -1,9 +1,9 @@
-﻿using System;
+﻿#if false
+
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Formatting;
 using NUnit.Framework;
-
-#if false
 
 namespace ZeroLog.Tests
 {

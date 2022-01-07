@@ -1,3 +1,5 @@
+#if false
+
 using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -8,8 +10,6 @@ using InlineIL;
 using ZeroLog.Appenders;
 using ZeroLog.Utils;
 using static InlineIL.IL.Emit;
-
-#if false
 
 namespace ZeroLog
 {
