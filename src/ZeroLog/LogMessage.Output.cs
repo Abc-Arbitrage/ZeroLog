@@ -23,346 +23,11 @@ unsafe partial class LogMessage
 
         while (dataPointer < endOfData)
         {
-            var argType = *(ArgumentType*)dataPointer;
-            dataPointer += sizeof(ArgumentType);
-
-            var format = default(string);
-
-            if ((argType & ArgumentType.FormatFlag) != 0)
-            {
-                argType &= ~ArgumentType.FormatFlag;
-
-                var stringIndex = *dataPointer;
-                ++dataPointer;
-
-                if (!skipFormat)
-                    format = _strings[stringIndex];
-            }
-
-            switch (argType)
-            {
-                case ArgumentType.None:
-                    break;
-
-                case ArgumentType.String:
-                {
-                    var stringIndex = *dataPointer;
-                    ++dataPointer;
-
-                    var value = _strings[stringIndex] ?? string.Empty;
-
-                    if (value.Length <= outputBuffer.Length - bufferIndex)
-                    {
-                        value.CopyTo(outputBuffer.Slice(bufferIndex));
-                        bufferIndex += value.Length;
-                    }
-                    else
-                    {
-                        var length = outputBuffer.Length - bufferIndex;
-                        value.AsSpan(0, length).CopyTo(outputBuffer.Slice(bufferIndex));
-                        bufferIndex += length;
-                        goto outputTruncated;
-                    }
-
-                    break;
-                }
-
-                case ArgumentType.Null:
-                {
-                    var value = LogManager.Config.NullDisplayString;
-
-                    if (value.Length <= outputBuffer.Length - bufferIndex)
-                    {
-                        value.CopyTo(outputBuffer.Slice(bufferIndex));
-                        bufferIndex += value.Length;
-                    }
-                    else
-                    {
-                        goto outputTruncated;
-                    }
-
-                    break;
-                }
-
-                case ArgumentType.Boolean:
-                {
-                    var valuePtr = (bool*)dataPointer;
-                    dataPointer += sizeof(bool);
-
-                    if (!valuePtr->TryFormat(outputBuffer.Slice(bufferIndex), out var charsWritten))
-                        goto outputTruncated;
-
-                    bufferIndex += charsWritten;
-                    break;
-                }
-
-                case ArgumentType.Byte:
-                {
-                    var valuePtr = dataPointer;
-                    dataPointer += sizeof(byte);
-
-                    if (!valuePtr->TryFormat(outputBuffer.Slice(bufferIndex), out var charsWritten, format, CultureInfo.InvariantCulture))
-                        goto outputTruncated;
-
-                    bufferIndex += charsWritten;
-                    break;
-                }
-
-                case ArgumentType.SByte:
-                {
-                    var valuePtr = (sbyte*)dataPointer;
-                    dataPointer += sizeof(sbyte);
-
-                    if (!valuePtr->TryFormat(outputBuffer.Slice(bufferIndex), out var charsWritten, format, CultureInfo.InvariantCulture))
-                        goto outputTruncated;
-
-                    bufferIndex += charsWritten;
-                    break;
-                }
-
-                case ArgumentType.Char:
-                {
-                    var valuePtr = (char*)dataPointer;
-                    dataPointer += sizeof(char);
-
-                    if (bufferIndex >= outputBuffer.Length)
-                        goto outputTruncated;
-
-                    outputBuffer[bufferIndex] = *valuePtr;
-                    ++bufferIndex;
-                    break;
-                }
-
-                case ArgumentType.Int16:
-                {
-                    var valuePtr = (short*)dataPointer;
-                    dataPointer += sizeof(short);
-
-                    if (!valuePtr->TryFormat(outputBuffer.Slice(bufferIndex), out var charsWritten, format, CultureInfo.InvariantCulture))
-                        goto outputTruncated;
-
-                    bufferIndex += charsWritten;
-                    break;
-                }
-
-                case ArgumentType.UInt16:
-                {
-                    var valuePtr = (ushort*)dataPointer;
-                    dataPointer += sizeof(ushort);
-
-                    if (!valuePtr->TryFormat(outputBuffer.Slice(bufferIndex), out var charsWritten, format, CultureInfo.InvariantCulture))
-                        goto outputTruncated;
-
-                    bufferIndex += charsWritten;
-                    break;
-                }
-
-                case ArgumentType.Int32:
-                {
-                    var valuePtr = (int*)dataPointer;
-                    dataPointer += sizeof(int);
-
-                    if (!valuePtr->TryFormat(outputBuffer.Slice(bufferIndex), out var charsWritten, format, CultureInfo.InvariantCulture))
-                        goto outputTruncated;
-
-                    bufferIndex += charsWritten;
-                    break;
-                }
-
-                case ArgumentType.UInt32:
-                {
-                    var valuePtr = (uint*)dataPointer;
-                    dataPointer += sizeof(uint);
-
-                    if (!valuePtr->TryFormat(outputBuffer.Slice(bufferIndex), out var charsWritten, format, CultureInfo.InvariantCulture))
-                        goto outputTruncated;
-
-                    bufferIndex += charsWritten;
-                    break;
-                }
-
-                case ArgumentType.Int64:
-                {
-                    var valuePtr = (long*)dataPointer;
-                    dataPointer += sizeof(long);
-
-                    if (!valuePtr->TryFormat(outputBuffer.Slice(bufferIndex), out var charsWritten, format, CultureInfo.InvariantCulture))
-                        goto outputTruncated;
-
-                    bufferIndex += charsWritten;
-                    break;
-                }
-
-                case ArgumentType.UInt64:
-                {
-                    var valuePtr = (ulong*)dataPointer;
-                    dataPointer += sizeof(ulong);
-
-                    if (!valuePtr->TryFormat(outputBuffer.Slice(bufferIndex), out var charsWritten, format, CultureInfo.InvariantCulture))
-                        goto outputTruncated;
-
-                    bufferIndex += charsWritten;
-                    break;
-                }
-
-                case ArgumentType.IntPtr:
-                {
-                    var valuePtr = (nint*)dataPointer;
-                    dataPointer += sizeof(nint);
-
-                    if (!valuePtr->TryFormat(outputBuffer.Slice(bufferIndex), out var charsWritten, format, CultureInfo.InvariantCulture))
-                        goto outputTruncated;
-
-                    bufferIndex += charsWritten;
-                    break;
-                }
-
-                case ArgumentType.UIntPtr:
-                {
-                    var valuePtr = (nuint*)dataPointer;
-                    dataPointer += sizeof(nuint);
-
-                    if (!valuePtr->TryFormat(outputBuffer.Slice(bufferIndex), out var charsWritten, format, CultureInfo.InvariantCulture))
-                        goto outputTruncated;
-
-                    bufferIndex += charsWritten;
-                    break;
-                }
-
-                case ArgumentType.Single:
-                {
-                    var valuePtr = (float*)dataPointer;
-                    dataPointer += sizeof(float);
-
-                    if (!valuePtr->TryFormat(outputBuffer.Slice(bufferIndex), out var charsWritten, format, CultureInfo.InvariantCulture))
-                        goto outputTruncated;
-
-                    bufferIndex += charsWritten;
-                    break;
-                }
-
-                case ArgumentType.Double:
-                {
-                    var valuePtr = (double*)dataPointer;
-                    dataPointer += sizeof(double);
-
-                    if (!valuePtr->TryFormat(outputBuffer.Slice(bufferIndex), out var charsWritten, format, CultureInfo.InvariantCulture))
-                        goto outputTruncated;
-
-                    bufferIndex += charsWritten;
-                    break;
-                }
-
-                case ArgumentType.Decimal:
-                {
-                    var valuePtr = (decimal*)dataPointer;
-                    dataPointer += sizeof(decimal);
-
-                    if (!valuePtr->TryFormat(outputBuffer.Slice(bufferIndex), out var charsWritten, format, CultureInfo.InvariantCulture))
-                        goto outputTruncated;
-
-                    bufferIndex += charsWritten;
-                    break;
-                }
-
-                case ArgumentType.Guid:
-                {
-                    var valuePtr = (Guid*)dataPointer;
-                    dataPointer += sizeof(Guid);
-
-                    if (!valuePtr->TryFormat(outputBuffer.Slice(bufferIndex), out var charsWritten, format))
-                        goto outputTruncated;
-
-                    bufferIndex += charsWritten;
-                    break;
-                }
-
-                case ArgumentType.DateTime:
-                {
-                    var valuePtr = (DateTime*)dataPointer;
-                    dataPointer += sizeof(DateTime);
-
-                    if (!valuePtr->TryFormat(outputBuffer.Slice(bufferIndex), out var charsWritten, format, CultureInfo.InvariantCulture))
-                        goto outputTruncated;
-
-                    bufferIndex += charsWritten;
-                    break;
-                }
-
-                case ArgumentType.TimeSpan:
-                {
-                    var valuePtr = (TimeSpan*)dataPointer;
-                    dataPointer += sizeof(TimeSpan);
-
-                    if (!valuePtr->TryFormat(outputBuffer.Slice(bufferIndex), out var charsWritten, format, CultureInfo.InvariantCulture))
-                        goto outputTruncated;
-
-                    bufferIndex += charsWritten;
-                    break;
-                }
-
-                case ArgumentType.Enum:
-                {
-                    var valuePtr = (EnumArg*)dataPointer;
-                    dataPointer += sizeof(EnumArg);
-
-                    if (!valuePtr->TryFormat(outputBuffer.Slice(bufferIndex), out var charsWritten))
-                        goto outputTruncated;
-
-                    bufferIndex += charsWritten;
-                    break;
-                }
-
-                case ArgumentType.AsciiString:
-                {
-                    var valueLength = *(int*)dataPointer;
-                    dataPointer += sizeof(int);
-
-                    var bufferLength = outputBuffer.Length - bufferIndex;
-                    var lengthToCopy = Math.Min(valueLength, bufferLength);
-
-                    for (var i = 0; i < lengthToCopy; ++i)
-                        outputBuffer[bufferIndex + i] = (char)dataPointer[i];
-
-                    bufferIndex += lengthToCopy;
-                    dataPointer += valueLength;
-
-                    if (valueLength > bufferLength)
-                        goto outputTruncated;
-
-                    break;
-                }
-
-                case ArgumentType.Unmanaged:
-                {
-                    var headerPtr = (UnmanagedArgHeader*)dataPointer;
-                    dataPointer += sizeof(UnmanagedArgHeader);
-
-                    if (!skipFormat)
-                    {
-                        if (!headerPtr->TryAppendTo(dataPointer, outputBuffer.Slice(bufferIndex), out var charsWritten, format))
-                            goto outputTruncated;
-
-                        bufferIndex += charsWritten;
-                    }
-                    else
-                    {
-                        if (!headerPtr->TryAppendUnformattedTo(dataPointer, outputBuffer.Slice(bufferIndex), out var charsWritten))
-                            goto outputTruncated;
-
-                        bufferIndex += charsWritten;
-                    }
-
-                    dataPointer += headerPtr->Size;
-                    break;
-                }
-
-                case ArgumentType.KeyString:
-                    throw new NotImplementedException();
-
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+            var isTruncated = !TryWriteArg(ref dataPointer, outputBuffer.Slice(bufferIndex), out var charsWritten, skipFormat);
+            bufferIndex += charsWritten;
+
+            if (isTruncated)
+                goto outputTruncated;
         }
 
         if (_isTruncated)
@@ -395,6 +60,278 @@ unsafe partial class LogMessage
             }
 
             return outputBuffer.Length;
+        }
+    }
+
+    private bool TryWriteArg(ref byte* dataPointer, Span<char> outputBuffer, out int charsWritten, bool skipFormat)
+    {
+        var argType = *(ArgumentType*)dataPointer;
+        dataPointer += sizeof(ArgumentType);
+
+        var format = default(string);
+
+        if ((argType & ArgumentType.FormatFlag) != 0)
+        {
+            argType &= ~ArgumentType.FormatFlag;
+
+            var stringIndex = *dataPointer;
+            ++dataPointer;
+
+            if (!skipFormat)
+                format = _strings[stringIndex];
+        }
+
+        switch (argType)
+        {
+            case ArgumentType.None:
+            {
+                charsWritten = 0;
+                return true;
+            }
+
+            case ArgumentType.String:
+            {
+                var stringIndex = *dataPointer;
+                ++dataPointer;
+
+                var value = _strings[stringIndex] ?? string.Empty;
+
+                if (value.Length <= outputBuffer.Length)
+                {
+                    value.CopyTo(outputBuffer);
+                    charsWritten = value.Length;
+                }
+                else
+                {
+                    var length = outputBuffer.Length;
+                    value.AsSpan(0, length).CopyTo(outputBuffer);
+                    charsWritten = length;
+                    return false;
+                }
+
+                return true;
+            }
+
+            case ArgumentType.Null:
+            {
+                var value = LogManager.Config.NullDisplayString;
+
+                if (value.Length <= outputBuffer.Length)
+                {
+                    value.CopyTo(outputBuffer);
+                    charsWritten = value.Length;
+                }
+                else
+                {
+                    charsWritten = 0;
+                    return false;
+                }
+
+                return true;
+            }
+
+            case ArgumentType.Boolean:
+            {
+                var valuePtr = (bool*)dataPointer;
+                dataPointer += sizeof(bool);
+
+                return valuePtr->TryFormat(outputBuffer, out charsWritten);
+            }
+
+            case ArgumentType.Byte:
+            {
+                var valuePtr = dataPointer;
+                dataPointer += sizeof(byte);
+
+                return valuePtr->TryFormat(outputBuffer, out charsWritten, format, CultureInfo.InvariantCulture);
+            }
+
+            case ArgumentType.SByte:
+            {
+                var valuePtr = (sbyte*)dataPointer;
+                dataPointer += sizeof(sbyte);
+
+                return valuePtr->TryFormat(outputBuffer, out charsWritten, format, CultureInfo.InvariantCulture);
+            }
+
+            case ArgumentType.Char:
+            {
+                var valuePtr = (char*)dataPointer;
+                dataPointer += sizeof(char);
+
+                if (outputBuffer.Length < 1)
+                {
+                    charsWritten = 0;
+                    return false;
+                }
+
+                outputBuffer[0] = *valuePtr;
+                charsWritten = 1;
+                return true;
+            }
+
+            case ArgumentType.Int16:
+            {
+                var valuePtr = (short*)dataPointer;
+                dataPointer += sizeof(short);
+
+                return valuePtr->TryFormat(outputBuffer, out charsWritten, format, CultureInfo.InvariantCulture);
+            }
+
+            case ArgumentType.UInt16:
+            {
+                var valuePtr = (ushort*)dataPointer;
+                dataPointer += sizeof(ushort);
+
+                return valuePtr->TryFormat(outputBuffer, out charsWritten, format, CultureInfo.InvariantCulture);
+            }
+
+            case ArgumentType.Int32:
+            {
+                var valuePtr = (int*)dataPointer;
+                dataPointer += sizeof(int);
+
+                return valuePtr->TryFormat(outputBuffer, out charsWritten, format, CultureInfo.InvariantCulture);
+            }
+
+            case ArgumentType.UInt32:
+            {
+                var valuePtr = (uint*)dataPointer;
+                dataPointer += sizeof(uint);
+
+                return valuePtr->TryFormat(outputBuffer, out charsWritten, format, CultureInfo.InvariantCulture);
+            }
+
+            case ArgumentType.Int64:
+            {
+                var valuePtr = (long*)dataPointer;
+                dataPointer += sizeof(long);
+
+                return valuePtr->TryFormat(outputBuffer, out charsWritten, format, CultureInfo.InvariantCulture);
+            }
+
+            case ArgumentType.UInt64:
+            {
+                var valuePtr = (ulong*)dataPointer;
+                dataPointer += sizeof(ulong);
+
+                return valuePtr->TryFormat(outputBuffer, out charsWritten, format, CultureInfo.InvariantCulture);
+            }
+
+            case ArgumentType.IntPtr:
+            {
+                var valuePtr = (nint*)dataPointer;
+                dataPointer += sizeof(nint);
+
+                return valuePtr->TryFormat(outputBuffer, out charsWritten, format, CultureInfo.InvariantCulture);
+            }
+
+            case ArgumentType.UIntPtr:
+            {
+                var valuePtr = (nuint*)dataPointer;
+                dataPointer += sizeof(nuint);
+
+                return valuePtr->TryFormat(outputBuffer, out charsWritten, format, CultureInfo.InvariantCulture);
+            }
+
+            case ArgumentType.Single:
+            {
+                var valuePtr = (float*)dataPointer;
+                dataPointer += sizeof(float);
+
+                return valuePtr->TryFormat(outputBuffer, out charsWritten, format, CultureInfo.InvariantCulture);
+            }
+
+            case ArgumentType.Double:
+            {
+                var valuePtr = (double*)dataPointer;
+                dataPointer += sizeof(double);
+
+                return valuePtr->TryFormat(outputBuffer, out charsWritten, format, CultureInfo.InvariantCulture);
+            }
+
+            case ArgumentType.Decimal:
+            {
+                var valuePtr = (decimal*)dataPointer;
+                dataPointer += sizeof(decimal);
+
+                return valuePtr->TryFormat(outputBuffer, out charsWritten, format, CultureInfo.InvariantCulture);
+            }
+
+            case ArgumentType.Guid:
+            {
+                var valuePtr = (Guid*)dataPointer;
+                dataPointer += sizeof(Guid);
+
+                return valuePtr->TryFormat(outputBuffer, out charsWritten, format);
+            }
+
+            case ArgumentType.DateTime:
+            {
+                var valuePtr = (DateTime*)dataPointer;
+                dataPointer += sizeof(DateTime);
+
+                return valuePtr->TryFormat(outputBuffer, out charsWritten, format, CultureInfo.InvariantCulture);
+            }
+
+            case ArgumentType.TimeSpan:
+            {
+                var valuePtr = (TimeSpan*)dataPointer;
+                dataPointer += sizeof(TimeSpan);
+
+                return valuePtr->TryFormat(outputBuffer, out charsWritten, format, CultureInfo.InvariantCulture);
+            }
+
+            case ArgumentType.Enum:
+            {
+                var valuePtr = (EnumArg*)dataPointer;
+                dataPointer += sizeof(EnumArg);
+
+                return valuePtr->TryFormat(outputBuffer, out charsWritten);
+            }
+
+            case ArgumentType.AsciiString:
+            {
+                var valueLength = *(int*)dataPointer;
+                dataPointer += sizeof(int);
+
+                var bufferLength = outputBuffer.Length;
+                var lengthToCopy = Math.Min(valueLength, bufferLength);
+
+                for (var i = 0; i < lengthToCopy; ++i)
+                    outputBuffer[i] = (char)dataPointer[i];
+
+                charsWritten = lengthToCopy;
+                dataPointer += valueLength;
+
+                return valueLength <= bufferLength;
+            }
+
+            case ArgumentType.Unmanaged:
+            {
+                var headerPtr = (UnmanagedArgHeader*)dataPointer;
+                dataPointer += sizeof(UnmanagedArgHeader);
+
+                if (!skipFormat)
+                {
+                    if (!headerPtr->TryAppendTo(dataPointer, outputBuffer, out charsWritten, format))
+                        return false;
+                }
+                else
+                {
+                    if (!headerPtr->TryAppendUnformattedTo(dataPointer, outputBuffer, out charsWritten))
+                        return false;
+                }
+
+                dataPointer += headerPtr->Size;
+                return true;
+            }
+
+            case ArgumentType.KeyString:
+                throw new NotImplementedException();
+
+            default:
+                throw new ArgumentOutOfRangeException();
         }
     }
 
