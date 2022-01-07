@@ -7,11 +7,11 @@ namespace ZeroLog.Config
     {
         public ICollection<IAppender> Appenders { get; set; } = new List<IAppender>();
         public Level Level { get; set; } = Level.Trace;
-        public LogEventPoolExhaustionStrategy LogEventPoolExhaustionStrategy { get; set; } = LogEventPoolExhaustionStrategy.Default;
+        public LogMessagePoolExhaustionStrategy LogMessagePoolExhaustionStrategy { get; set; } = LogMessagePoolExhaustionStrategy.Default;
 
-        public int LogEventQueueSize { get; set; }
-        public int LogEventBufferSize { get; set; }
-        public int LogEventArgumentCapacity { get; set; }
+        public int LogMessagePoolSize { get; set; }
+        public int LogMessageBufferSize { get; set; }
+        public int LogMessageArgumentCapacity { get; set; }
 
         public ZeroLogBasicConfiguration()
         {
@@ -20,18 +20,18 @@ namespace ZeroLog.Config
 
         internal void ApplyInitializationConfig(ZeroLogInitializationConfig config)
         {
-            LogEventQueueSize = config.LogEventQueueSize;
-            LogEventBufferSize = config.LogEventBufferSize;
-            LogEventArgumentCapacity = config.LogEventArgumentCapacity;
+            LogMessagePoolSize = config.LogMessagePoolSize;
+            LogMessageBufferSize = config.LogMessageBufferSize;
+            LogMessageArgumentCapacity = config.LogMessageArgumentCapacity;
         }
 
         internal ZeroLogInitializationConfig ToInitializationConfig()
         {
             return new ZeroLogInitializationConfig
             {
-                LogEventQueueSize = LogEventQueueSize,
-                LogEventBufferSize = LogEventBufferSize,
-                LogEventArgumentCapacity = LogEventArgumentCapacity
+                LogMessagePoolSize = LogMessagePoolSize,
+                LogMessageBufferSize = LogMessageBufferSize,
+                LogMessageArgumentCapacity = LogMessageArgumentCapacity
             };
         }
     }

@@ -66,8 +66,8 @@ namespace ZeroLog.Benchmarks.ThroughputTests
             BasicConfigurator.Configure(new ZeroLogBasicConfiguration
             {
                 Appenders = { _zeroLogTestAppender },
-                LogEventQueueSize = QueueSize,
-                LogEventPoolExhaustionStrategy = LogEventPoolExhaustionStrategy.WaitForLogEvent
+                LogMessagePoolSize = QueueSize,
+                LogMessagePoolExhaustionStrategy = LogMessagePoolExhaustionStrategy.WaitUntilAvailable
             });
 
             _zeroLogLogger = LogManager.GetLogger(nameof(ZeroLog));

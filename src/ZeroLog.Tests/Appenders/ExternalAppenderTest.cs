@@ -21,12 +21,12 @@ namespace ZeroLog.Tests.Appenders
 
             var config = new ZeroLogJsonConfiguration
             {
-                LogEventBufferSize = 5,
-                LogEventQueueSize = 7,
+                LogMessageBufferSize = 5,
+                LogMessagePoolSize = 7,
                 RootLogger = new LoggerDefinition
                 {
                     Level = Level.Info,
-                    LogEventPoolExhaustionStrategy = LogEventPoolExhaustionStrategy.DropLogMessage,
+                    LogMessagePoolExhaustionStrategy = LogMessagePoolExhaustionStrategy.DropLogMessage,
                     AppenderReferences = new[] { "ExtApp1" },
                 },
                 Appenders = new[] { appenderDef },

@@ -24,7 +24,7 @@ namespace ZeroLog.Tests
         public void SetUpFixture()
         {
             _testAppender = new TestAppender(true);
-            BasicConfigurator.Configure(new List<IAppender> { _testAppender }, new ZeroLogInitializationConfig { LogEventQueueSize = 10 });
+            BasicConfigurator.Configure(new List<IAppender> { _testAppender }, new ZeroLogInitializationConfig { LogMessagePoolSize = 10 });
         }
 
         [TearDown]
@@ -76,8 +76,8 @@ namespace ZeroLog.Tests
 
             for (var i = 0; i < actualLogMessages.Count; i++)
             {
-                var actualLogEvent = actualLogMessages[i];
-                actualLogEvent.Append(i).Log();
+                var actualLogMessage = actualLogMessages[i];
+                actualLogMessage.Append(i).Log();
             }
 
             signal.Wait(TimeSpan.FromMilliseconds(100));
@@ -93,8 +93,8 @@ namespace ZeroLog.Tests
             BasicConfigurator.Configure(new ZeroLogBasicConfiguration
             {
                 Appenders = { _testAppender },
-                LogEventQueueSize = 10,
-                LogEventPoolExhaustionStrategy = LogEventPoolExhaustionStrategy.DropLogMessageAndNotifyAppenders
+                LogMessagePoolSize = 10,
+                LogMessagePoolExhaustionStrategy = LogMessagePoolExhaustionStrategy.DropLogMessageAndNotifyAppenders
             });
 
             var log = LogManager.GetLogger(typeof(LogManagerTests));
@@ -119,8 +119,8 @@ namespace ZeroLog.Tests
             BasicConfigurator.Configure(new ZeroLogBasicConfiguration
             {
                 Appenders = { _testAppender },
-                LogEventQueueSize = 10,
-                LogEventPoolExhaustionStrategy = LogEventPoolExhaustionStrategy.DropLogMessage
+                LogMessagePoolSize = 10,
+                LogMessagePoolExhaustionStrategy = LogMessagePoolExhaustionStrategy.DropLogMessage
             });
 
             var log = LogManager.GetLogger(typeof(LogManagerTests));
@@ -143,8 +143,8 @@ namespace ZeroLog.Tests
             BasicConfigurator.Configure(new ZeroLogBasicConfiguration
             {
                 Appenders = { _testAppender },
-                LogEventQueueSize = 10,
-                LogEventPoolExhaustionStrategy = LogEventPoolExhaustionStrategy.WaitForLogEvent
+                LogMessagePoolSize = 10,
+                LogMessagePoolExhaustionStrategy = LogMessagePoolExhaustionStrategy.WaitUntilAvailable
             });
 
             var log = LogManager.GetLogger(typeof(LogManagerTests));

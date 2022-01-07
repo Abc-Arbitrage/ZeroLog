@@ -6,6 +6,6 @@ namespace ZeroLog
     {
         public IAppender[]? Appenders { get; set; }
         public Level Level { get; set; }
-        public LogEventPoolExhaustionStrategy LogEventPoolExhaustionStrategy { get; set; }
+        public LogMessagePoolExhaustionStrategy LogMessagePoolExhaustionStrategy { get; set; }
     }
 }

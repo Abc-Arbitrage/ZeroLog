@@ -22,7 +22,7 @@ ZeroLog is a **zero-allocation .NET logging library**.
 
 The second goal implies a major design choice: the actual logging is completely asynchronous. It means that writing messages to the appenders obviously occurs in a background thread, but also that *all formatting operations are delayed to be performed just before the appending*. **No formatting occurs in the calling thread**; the log data is merely marshalled to the background logging thread in the more efficient way possible.
 
- Internally, each logging call data (context, log messages, arguments, etc.) will be serialized to a pooled log event, before being enqueued in a concurrent data structure the background logging thread consumes. The logging thread will then format the log messages and append them to the configured appenders.
+Internally, each logging call data (context, log messages, arguments, etc.) will be serialized to a pooled log message, before being enqueued in a concurrent data structure the background logging thread consumes. The logging thread will then format the log messages and append them to the configured appenders.
 
 ## Getting started
 
@@ -109,23 +109,22 @@ A logger configuration is composed of a *Name*, a *Level*, a list of *AppenderRe
  - **Level** is the minimal level the logger will work on
  - **AppenderReferences** is a list of appenders names the logger will use
  - **IncludeParentAppenders** (optional) will, if set to true, copy the parent appenders into the current logger
- - **LogEventPoolExhaustionStrategy** (optional) is used to specify what to do when the log event queue is full
- - **LogEventArgumentExhaustionStrategy** (optional) is used to specify what to do when the maximum number of `Append` calls is exceeded
+ - **LogMessagePoolExhaustionStrategy** (optional) is used to specify what to do when the log message queue is full
 
 ### RootLogger
 
 The root logger is the default logger. If a GetLogger is called on an unconfigured namespace, it will fallback to the root logger.
 Same parameters as other loggers.
 
-### Log Event Pool Exhaustion Strategy
+### Log Message Pool Exhaustion Strategy
 
 There are currently three strategies to handle a full queue scenario:
 
 - **DropLogMessageAndNotifyAppenders** (default) Drop the log message and log an error instead
 - **DropLogMessage** Forget about the message
-- **WaitForLogEvent** Block until it's possible to log
+- **WaitUntilAvailable** Block until it's possible to log
 
-### Log Event Argument Exhaustion Strategy
+### Log Message Argument Exhaustion Strategy
 
 If the maximum number of `Append` calls is exceeded, the available strategies which handle that are:
 
@@ -136,16 +135,16 @@ If the maximum number of `Append` calls is exceeded, the available strategies wh
 
 These values can be configured at the root of the json configuration file:
 
-- **LogEventQueueSize** (default: `1024`) Count of pooled log events. A log event is acquired from the pool on demand, and released by the logging thread.
-- **LogEventBufferSize** (default: `128`) The size of the buffer used to serialize log event arguments. Once exceeded, the message is truncated. All `Append` calls use a few bytes, except for `AppendAsciiString` which copies the whole string into the buffer.
-- **LogEventArgumentCapacity** (default: `32`) The maximum number of `Append` calls that can be made for a log event. Additional calls will behave based on the configured `LogEventArgumentExhaustionStrategy`.
+- **LogMessagePoolSize** (default: `1024`) Count of pooled log messages. A log message is acquired from the pool on demand, and released by the logging thread.
+- **LogMessageBufferSize** (default: `128`) The size of the buffer used to serialize log message arguments. Once exceeded, the message is truncated. All `Append` calls use a few bytes, except for `AppendAsciiString` which copies the whole string into the buffer.
+- **LogMessageArgumentCapacity** (default: `32`) The maximum number of `Append` calls which involve `string` objects that can be made for a log message.
 
 ### Global Configuration
 
 Some settings can be set globally on the `LogManager.Config` object:
 
 - **LazyRegisterEnums** (default: `false`) Automatically registers an enum type when first logged. This causes some allocations. Use `LogManager.RegisterEnum` when automatic registration is disabled.
-- **FlushAppenders** (default: `true`) Automatically flushes appenders when there is a pause in the log event stream.
+- **FlushAppenders** (default: `true`) Automatically flushes appenders when there is a pause in the log message stream.
 - **NullDisplayString** (default: `"null"`) The string which should be logged instead of a `null` value
 - **TruncatedMessageSuffix** (default: `" [TRUNCATED]"`) The string which is appended to a message when it is truncated
 - **JsonSeparator** (default: `"  ~~ "`) The string which is appended before structured data in log messages (when structured data is present).

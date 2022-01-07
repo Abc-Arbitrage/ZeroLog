@@ -31,7 +31,7 @@ namespace ZeroLog.Tests
             _resolver = new HierarchicalResolver();
 
             _config = new ZeroLogJsonConfiguration();
-            _config.RootLogger = new LoggerDefinition(string.Empty, Level.Info, false, LogEventPoolExhaustionStrategy.Default, "A");
+            _config.RootLogger = new LoggerDefinition(string.Empty, Level.Info, false, LogMessagePoolExhaustionStrategy.Default, "A");
 
             _config.Appenders = new[]
             {
@@ -57,8 +57,8 @@ namespace ZeroLog.Tests
         {
             _config.Loggers = new[]
             {
-                new LoggerDefinition("Abc.Zebus", Level.Info, false, LogEventPoolExhaustionStrategy.Default),
-                new LoggerDefinition("Abc.Zebus.Dispatch", Level.Info, false, LogEventPoolExhaustionStrategy.Default, "A")
+                new LoggerDefinition("Abc.Zebus", Level.Info, false, LogMessagePoolExhaustionStrategy.Default),
+                new LoggerDefinition("Abc.Zebus.Dispatch", Level.Info, false, LogMessagePoolExhaustionStrategy.Default, "A")
             };
 
             _resolver.Build(_config);
@@ -75,9 +75,9 @@ namespace ZeroLog.Tests
         {
             _config.Loggers = new[]
             {
-                new LoggerDefinition("Abc.Zebus", Level.Info, false, LogEventPoolExhaustionStrategy.Default, "B"),
-                new LoggerDefinition("Abc.Zebus.Dispatch", Level.Error, includeParents, LogEventPoolExhaustionStrategy.Default, "A"),
-                new LoggerDefinition("Abc", Level.Info, false, LogEventPoolExhaustionStrategy.Default, "C")
+                new LoggerDefinition("Abc.Zebus", Level.Info, false, LogMessagePoolExhaustionStrategy.Default, "B"),
+                new LoggerDefinition("Abc.Zebus.Dispatch", Level.Error, includeParents, LogMessagePoolExhaustionStrategy.Default, "A"),
+                new LoggerDefinition("Abc", Level.Info, false, LogMessagePoolExhaustionStrategy.Default, "C")
             };
 
             _resolver.Build(_config);
@@ -95,8 +95,8 @@ namespace ZeroLog.Tests
         {
             _config.Loggers = new[]
             {
-                new LoggerDefinition("Abc.Zebus", Level.Info, true, LogEventPoolExhaustionStrategy.Default, "A"),
-                new LoggerDefinition("Abc", Level.Info, false, LogEventPoolExhaustionStrategy.Default, "A", "B")
+                new LoggerDefinition("Abc.Zebus", Level.Info, true, LogMessagePoolExhaustionStrategy.Default, "A"),
+                new LoggerDefinition("Abc", Level.Info, false, LogMessagePoolExhaustionStrategy.Default, "A", "B")
             };
 
             _resolver.Build(_config);

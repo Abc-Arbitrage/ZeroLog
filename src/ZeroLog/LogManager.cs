@@ -34,10 +34,10 @@ namespace ZeroLog
 
             _configResolver = configResolver;
 
-            _queue = new ConcurrentQueue<LogMessage>(new ConcurrentQueueCapacityInitializer(config.LogEventQueueSize));
+            _queue = new ConcurrentQueue<LogMessage>(new ConcurrentQueueCapacityInitializer(config.LogMessagePoolSize));
 
-            _bufferSegmentProvider = new BufferSegmentProvider(config.LogEventQueueSize * config.LogEventBufferSize, config.LogEventBufferSize);
-            _pool = new ObjectPool<LogMessage>(config.LogEventQueueSize, () => new LogMessage(_bufferSegmentProvider.GetSegment(), config.LogEventArgumentCapacity));
+            _bufferSegmentProvider = new BufferSegmentProvider(config.LogMessagePoolSize * config.LogMessageBufferSize, config.LogMessageBufferSize);
+            _pool = new ObjectPool<LogMessage>(config.LogMessagePoolSize, () => new LogMessage(_bufferSegmentProvider.GetSegment(), config.LogMessageArgumentCapacity));
 
             configResolver.Updated += () =>
             {
@@ -255,7 +255,6 @@ namespace ZeroLog
         {
             foreach (var appender in logMessage.Logger?.Appenders ?? Array.Empty<IAppender>())
             {
-                // if (logEvent.Level >= Level) // TODO Check this ? log event should not be in queue if not > Level
                 appender.WriteMessage(message);
             }
         }

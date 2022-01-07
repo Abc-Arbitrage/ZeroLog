@@ -7,19 +7,19 @@ namespace ZeroLog.Config
         public string? Name { get; set; }
         public Level Level { get; set; }
         public bool IncludeParentAppenders { get; set; }
-        public LogEventPoolExhaustionStrategy LogEventPoolExhaustionStrategy { get; set; }
+        public LogMessagePoolExhaustionStrategy LogMessagePoolExhaustionStrategy { get; set; }
         public string[] AppenderReferences { get; set; } = Array.Empty<string>();
 
         public LoggerDefinition()
         {
         }
 
-        public LoggerDefinition(string name, Level level, bool includeParentAppenders, LogEventPoolExhaustionStrategy logEventPoolExhaustionStrategy, params string[] appenderReferences)
+        public LoggerDefinition(string name, Level level, bool includeParentAppenders, LogMessagePoolExhaustionStrategy logMessagePoolExhaustionStrategy, params string[] appenderReferences)
         {
             Name = name;
             Level = level;
             IncludeParentAppenders = includeParentAppenders;
-            LogEventPoolExhaustionStrategy = logEventPoolExhaustionStrategy;
+            LogMessagePoolExhaustionStrategy = logMessagePoolExhaustionStrategy;
             AppenderReferences = appenderReferences;
         }
     }

@@ -21,8 +21,8 @@ namespace ZeroLog.Benchmarks.ThroughputTests
                     new ZeroLogBasicConfiguration
                     {
                         Appenders = { new DateAndSizeRollingFileAppender(Path.Combine(dir, "Output")), },
-                        LogEventQueueSize = 1000 * 4096 * 4,
-                        LogEventPoolExhaustionStrategy = LogEventPoolExhaustionStrategy.WaitForLogEvent
+                        LogMessagePoolSize = 1000 * 4096 * 4,
+                        LogMessagePoolExhaustionStrategy = LogMessagePoolExhaustionStrategy.WaitUntilAvailable
                     }
                 );
 

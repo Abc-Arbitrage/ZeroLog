@@ -20,10 +20,10 @@ namespace ZeroLog.Tests
             BasicConfigurator.Configure(new ZeroLogBasicConfiguration
             {
                 Appenders = { _testAppender },
-                LogEventQueueSize = 16384,
-                LogEventBufferSize = 512,
+                LogMessagePoolSize = 16384,
+                LogMessageBufferSize = 512,
                 Level = Level.Trace,
-                LogEventPoolExhaustionStrategy = LogEventPoolExhaustionStrategy.WaitForLogEvent
+                LogMessagePoolExhaustionStrategy = LogMessagePoolExhaustionStrategy.WaitUntilAvailable
             });
         }
 

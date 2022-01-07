@@ -4,20 +4,20 @@ namespace ZeroLog
 {
     public class ZeroLogInitializationConfig
     {
-        public int LogEventQueueSize { get; set; } = 1024;
-        public int LogEventBufferSize { get; set; } = 128;
-        public int LogEventArgumentCapacity { get; set; } = 32;
+        public int LogMessagePoolSize { get; set; } = 1024;
+        public int LogMessageBufferSize { get; set; } = 128;
+        public int LogMessageArgumentCapacity { get; set; } = 32;
 
         internal void Validate()
         {
-            if (LogEventQueueSize <= 0)
-                throw new InvalidOperationException($"{nameof(LogEventQueueSize)} must be positive");
+            if (LogMessagePoolSize <= 0)
+                throw new InvalidOperationException($"{nameof(LogMessagePoolSize)} must be positive");
 
-            if (LogEventBufferSize <= 0)
-                throw new InvalidOperationException($"{nameof(LogEventBufferSize)} must be positive");
+            if (LogMessageBufferSize <= 0)
+                throw new InvalidOperationException($"{nameof(LogMessageBufferSize)} must be positive");
 
-            if (LogEventArgumentCapacity <= 0)
-                throw new InvalidOperationException($"{nameof(LogEventArgumentCapacity)} must be positive");
+            if (LogMessageArgumentCapacity <= 0)
+                throw new InvalidOperationException($"{nameof(LogMessageArgumentCapacity)} must be positive");
         }
     }
 }

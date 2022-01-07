@@ -21,12 +21,12 @@ namespace ZeroLog.Tests.Config
 
             var config = new ZeroLogJsonConfiguration
             {
-                LogEventBufferSize = 5,
-                LogEventQueueSize = 7,
+                LogMessageBufferSize = 5,
+                LogMessagePoolSize = 7,
                 RootLogger = new LoggerDefinition
                 {
                     Level = Level.Warn,
-                    LogEventPoolExhaustionStrategy = LogEventPoolExhaustionStrategy.DropLogMessage,
+                    LogMessagePoolExhaustionStrategy = LogMessagePoolExhaustionStrategy.DropLogMessage,
                     AppenderReferences = new[] { "A" },
                 },
                 Appenders = new[] { appenderA, appenderB },
@@ -37,8 +37,8 @@ namespace ZeroLog.Tests.Config
 
             var loadedConfig = JsonConfigurator.DeserializeConfiguration(configJson);
 
-            Check.That(loadedConfig.LogEventBufferSize).Equals(config.LogEventBufferSize);
-            Check.That(loadedConfig.LogEventQueueSize).Equals(config.LogEventQueueSize);
+            Check.That(loadedConfig.LogMessageBufferSize).Equals(config.LogMessageBufferSize);
+            Check.That(loadedConfig.LogMessagePoolSize).Equals(config.LogMessagePoolSize);
 
             Check.That(loadedConfig.RootLogger.Level).Equals(config.RootLogger.Level);
             Check.That(loadedConfig.RootLogger.AppenderReferences.Single()).Equals(config.RootLogger.AppenderReferences.Single());
@@ -88,15 +88,15 @@ namespace ZeroLog.Tests.Config
                                             ""B""
                                         ],
                                         ""Level"": ""Debug"",
-                                        ""LogEventPoolExhaustionStrategy"": ""DropLogMessageAndNotifyAppenders""
+                                        ""LogMessagePoolExhaustionStrategy"": ""DropLogMessageAndNotifyAppenders""
                                     }]
                                }";
 
             var config = JsonConfigurator.DeserializeConfiguration(configJson);
 
-            Check.That(config.RootLogger.LogEventPoolExhaustionStrategy).Equals(LogEventPoolExhaustionStrategy.Default);
-            Check.That(config.LogEventBufferSize).Equals(new ZeroLogJsonConfiguration().LogEventBufferSize);
-            Check.That(config.LogEventQueueSize).Equals(new ZeroLogJsonConfiguration().LogEventQueueSize);
+            Check.That(config.RootLogger.LogMessagePoolExhaustionStrategy).Equals(LogMessagePoolExhaustionStrategy.Default);
+            Check.That(config.LogMessageBufferSize).Equals(new ZeroLogJsonConfiguration().LogMessageBufferSize);
+            Check.That(config.LogMessagePoolSize).Equals(new ZeroLogJsonConfiguration().LogMessagePoolSize);
 
             var appenderConfig = (DateAndSizeRollingFileAppenderConfig)AppenderFactory.GetAppenderParameters(config.Appenders[1], typeof(DateAndSizeRollingFileAppenderConfig));
             Check.That(appenderConfig.FilePathRoot).IsEqualTo("totopath ");

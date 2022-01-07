@@ -42,8 +42,8 @@ namespace ZeroLog.Tests
             BasicConfigurator.Configure(new ZeroLogBasicConfiguration
             {
                 Appenders = { _waitableAppender },
-                LogEventQueueSize = 2048 * 10,
-                LogEventBufferSize = 512
+                LogMessagePoolSize = 2048 * 10,
+                LogMessageBufferSize = 512
             });
 
             LogManager.RegisterEnum<DayOfWeek>();

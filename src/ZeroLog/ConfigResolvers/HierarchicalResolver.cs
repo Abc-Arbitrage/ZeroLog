@@ -35,7 +35,7 @@ namespace ZeroLog.ConfigResolvers
             {
                 Appenders = node.Appenders.ToArray(),
                 Level = node.Level,
-                LogEventPoolExhaustionStrategy = node.LogEventPoolExhaustionStrategy
+                LogMessagePoolExhaustionStrategy = node.LogMessagePoolExhaustionStrategy
             };
         }
 
@@ -105,7 +105,7 @@ namespace ZeroLog.ConfigResolvers
                     {
                         Appenders = node.Appenders,
                         Level = node.Level,
-                        LogEventPoolExhaustionStrategy = node.LogEventPoolExhaustionStrategy
+                        LogMessagePoolExhaustionStrategy = node.LogMessagePoolExhaustionStrategy
                     };
                 }
 
@@ -113,7 +113,7 @@ namespace ZeroLog.ConfigResolvers
             }
 
             node.Appenders = (logger.IncludeParentAppenders ? appenders.Union(node.Appenders) : appenders).Distinct();
-            node.LogEventPoolExhaustionStrategy = logger.LogEventPoolExhaustionStrategy;
+            node.LogMessagePoolExhaustionStrategy = logger.LogMessagePoolExhaustionStrategy;
             node.Level = logger.Level;
         }
 
@@ -143,7 +143,7 @@ namespace ZeroLog.ConfigResolvers
             public readonly Dictionary<string, Node> Children = new Dictionary<string, Node>();
             public IEnumerable<IAppender> Appenders = Enumerable.Empty<IAppender>();
             public Level Level;
-            public LogEventPoolExhaustionStrategy LogEventPoolExhaustionStrategy;
+            public LogMessagePoolExhaustionStrategy LogMessagePoolExhaustionStrategy;
 
             public void Dispose()
             {

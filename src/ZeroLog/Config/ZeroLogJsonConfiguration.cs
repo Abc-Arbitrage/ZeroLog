@@ -2,9 +2,9 @@
 {
     public class ZeroLogJsonConfiguration : IHierarchicalConfiguration
     {
-        public int LogEventQueueSize { get; set; }
-        public int LogEventBufferSize { get; set; }
-        public int LogEventArgumentCapacity { get; set; }
+        public int LogMessagePoolSize { get; set; }
+        public int LogMessageBufferSize { get; set; }
+        public int LogMessageArgumentCapacity { get; set; }
         public bool LazyRegisterEnums { get; set; }
         public string? NullDisplayString { get; set; }
         public string? JsonSeparator { get; set; }
@@ -21,17 +21,17 @@
 
         internal void ApplyInitializationConfig(ZeroLogInitializationConfig config)
         {
-            LogEventQueueSize = config.LogEventQueueSize;
-            LogEventBufferSize = config.LogEventBufferSize;
-            LogEventArgumentCapacity = config.LogEventArgumentCapacity;
+            LogMessagePoolSize = config.LogMessagePoolSize;
+            LogMessageBufferSize = config.LogMessageBufferSize;
+            LogMessageArgumentCapacity = config.LogMessageArgumentCapacity;
         }
 
         internal ZeroLogInitializationConfig GetInitializationConfig()
             => new ZeroLogInitializationConfig
             {
-                LogEventQueueSize = LogEventQueueSize,
-                LogEventBufferSize = LogEventBufferSize,
-                LogEventArgumentCapacity = LogEventArgumentCapacity,
+                LogMessagePoolSize = LogMessagePoolSize,
+                LogMessageBufferSize = LogMessageBufferSize,
+                LogMessageArgumentCapacity = LogMessageArgumentCapacity,
             };
     }
 }

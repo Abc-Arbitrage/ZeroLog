@@ -1,11 +1,11 @@
 namespace ZeroLog
 {
-    public enum LogEventPoolExhaustionStrategy
+    public enum LogMessagePoolExhaustionStrategy
     {
         DropLogMessageAndNotifyAppenders = 0,
         DropLogMessage = 1,
-        WaitForLogEvent = 2,
-        
+        WaitUntilAvailable = 2,
+
         Default = DropLogMessageAndNotifyAppenders,
     }
 }

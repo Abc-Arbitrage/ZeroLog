@@ -28,7 +28,7 @@ namespace ZeroLog.Tests
             BasicConfigurator.Configure(new ZeroLogBasicConfiguration
             {
                 Appenders = { new ConsoleAppender(), },
-                LogEventQueueSize = _queueSize
+                LogMessagePoolSize = _queueSize
             });
 
             for (int i = 0; i < _nbThreads; i++)

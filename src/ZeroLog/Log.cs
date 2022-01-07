@@ -11,7 +11,7 @@ public sealed partial class Log
 
     private ILogMessageProvider? _logMessageProvider;
     private Level _logLevel;
-    private LogEventPoolExhaustionStrategy _logEventPoolExhaustionStrategy;
+    private LogMessagePoolExhaustionStrategy _logMessagePoolExhaustionStrategy;
 
     internal string Name { get; }
 
@@ -27,7 +27,7 @@ public sealed partial class Log
         _logMessageProvider = provider;
 
         Appenders = config.Appenders ?? Array.Empty<IAppender>();
-        _logEventPoolExhaustionStrategy = config.LogEventPoolExhaustionStrategy;
+        _logMessagePoolExhaustionStrategy = config.LogMessagePoolExhaustionStrategy;
         _logLevel = config.Level;
     }
 
@@ -57,15 +57,15 @@ public sealed partial class Log
             if (message is not null)
                 return message;
 
-            switch (_logEventPoolExhaustionStrategy)
+            switch (_logMessagePoolExhaustionStrategy)
             {
-                case LogEventPoolExhaustionStrategy.DropLogMessageAndNotifyAppenders:
+                case LogMessagePoolExhaustionStrategy.DropLogMessageAndNotifyAppenders:
                     return _poolExhaustedMessage;
 
-                case LogEventPoolExhaustionStrategy.DropLogMessage:
+                case LogMessagePoolExhaustionStrategy.DropLogMessage:
                     return LogMessage.Empty;
 
-                case LogEventPoolExhaustionStrategy.WaitForLogEvent:
+                case LogMessagePoolExhaustionStrategy.WaitUntilAvailable:
                 {
                     var spinWait = new SpinWait();
 
