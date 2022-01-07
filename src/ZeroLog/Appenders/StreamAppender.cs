@@ -6,8 +6,8 @@ namespace ZeroLog.Appenders;
 
 public abstract class StreamAppender : IAppender
 {
-    private readonly char[] _charBuffer = GC.AllocateUninitializedArray<char>(16 * 1024);
-    private readonly byte[] _byteBuffer = GC.AllocateUninitializedArray<byte>(16 * 1024 * 4);
+    private readonly char[] _charBuffer = GC.AllocateUninitializedArray<char>(LogManager.OutputBufferSize);
+    private readonly byte[] _byteBuffer = GC.AllocateUninitializedArray<byte>(4 * LogManager.OutputBufferSize);
 
     private readonly PrefixWriter? _prefixWriter;
     protected Stream? _stream;

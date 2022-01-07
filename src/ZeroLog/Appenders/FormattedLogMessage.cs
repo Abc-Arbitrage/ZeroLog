@@ -8,14 +8,15 @@ namespace ZeroLog.Appenders;
 public class FormattedLogMessage
 {
     private readonly char[] _charBuffer;
+    private readonly KeyValuePointerBuffer _keyValuePointerBuffer = new();
     private int _charLength;
 
     private LogMessage _message = LogMessage.Empty;
 
-    public Level Level  => _message.Level;
-    public DateTime Timestamp  => _message.Timestamp;
-    public Thread? Thread  => _message.Thread;
-    public Exception? Exception  => _message.Exception;
+    public Level Level => _message.Level;
+    public DateTime Timestamp => _message.Timestamp;
+    public Thread? Thread => _message.Thread;
+    public Exception? Exception => _message.Exception;
     public string? LoggerName => _message.Logger?.Name;
 
     internal FormattedLogMessage(int bufferSize)
@@ -31,12 +32,25 @@ public class FormattedLogMessage
 
         try
         {
-            _charLength = _message.WriteTo(_charBuffer);
+            _charLength = _message.WriteTo(_charBuffer, false, _keyValuePointerBuffer);
+
+            if (_keyValuePointerBuffer.KeyPointerCount != 0)
+                AppendKeyValues();
         }
         catch (Exception ex)
         {
             HandleFormattingError(ex);
         }
+    }
+
+    private void AppendKeyValues()
+    {
+        var builder = new CharBufferBuilder(_charBuffer.AsSpan(_charLength));
+        if (!builder.TryAppendWhole(LogManager.Config.JsonSeparator))
+            return;
+
+        JsonWriter.WriteJsonToStringBuffer(ref builder, _keyValuePointerBuffer);
+        _charLength += builder.Length;
     }
 
     [MethodImpl(MethodImplOptions.NoInlining)]

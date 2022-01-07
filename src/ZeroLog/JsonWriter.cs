@@ -1,211 +1,238 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
-using System.Text.Formatting;
 using ZeroLog.Utils;
 
 namespace ZeroLog
 {
     internal static unsafe class JsonWriter
     {
-        public static void WriteJsonToStringBuffer(StringBuffer stringBuffer, KeyValuePointerBuffer keyValuePointerBuffer, string[] strings)
+        public static void WriteJsonToStringBuffer(ref CharBufferBuilder builder, KeyValuePointerBuffer keyValuePointerBuffer)
         {
-            stringBuffer.Append(LogManager.Config.JsonSeparator);
-            stringBuffer.Append("{ ");
+            builder.TryAppendWhole("{ ");
 
             for (var i = 0; i < keyValuePointerBuffer.KeyPointerCount; i++)
             {
                 if (i != 0)
-                    stringBuffer.Append(", ");
+                    builder.TryAppendWhole(", ");
 
                 var dataPointer = keyValuePointerBuffer.GetKeyPointer(i);
 
-                // Key.
-                AppendJsonValue(stringBuffer, strings, ref dataPointer);
+                AppendJsonKey(ref builder, keyValuePointerBuffer.Strings, ref dataPointer);
 
-                stringBuffer.Append(": ");
+                builder.TryAppendWhole(": ");
 
-                // Value.
-                AppendJsonValue(stringBuffer, strings, ref dataPointer);
+                AppendJsonValue(ref builder, keyValuePointerBuffer.Strings, ref dataPointer);
             }
 
-            stringBuffer.Append(" }");
+            builder.TryAppendWhole(" }");
         }
 
-        private static void AppendJsonValue(StringBuffer stringBuffer, string[] strings, ref byte* dataPointer)
+        private static void AppendJsonKey(ref CharBufferBuilder builder, string?[] strings, ref byte* dataPointer)
         {
-            var argumentType = (ArgumentType)(*dataPointer & ArgumentTypeMask.ArgumentType);
+            ++dataPointer; // ArgType
+            var keyIndex = *dataPointer;
+            ++dataPointer; // Key index
+
+            var key = strings[keyIndex] ?? string.Empty;
+            AppendString(key, ref builder);
+        }
+
+        private static void AppendJsonValue(ref CharBufferBuilder builder, string?[] strings, ref byte* dataPointer)
+        {
+            var argumentType = *(ArgumentType*)dataPointer;
             dataPointer += sizeof(ArgumentType);
+
+            if ((argumentType & ArgumentType.FormatFlag) != 0)
+            {
+                argumentType &= ~ArgumentType.FormatFlag;
+                ++dataPointer;
+            }
 
             switch (argumentType)
             {
                 case ArgumentType.KeyString:
                 case ArgumentType.String:
-                    AppendString(strings[*dataPointer], stringBuffer);
-                    dataPointer += sizeof(byte);
+                    AppendString(strings[*dataPointer], ref builder);
                     break;
 
                 case ArgumentType.AsciiString:
                     var length = *(int*)dataPointer;
-                    dataPointer += sizeof(int);
-                    stringBuffer.Append('"');
+                    builder.TryAppend('"');
 
                     for (var i = 0; i < length; ++i)
-                        AppendEscapedChar((char)*(dataPointer + i), stringBuffer);
+                        AppendEscapedChar((char)*(dataPointer + i), ref builder);
 
-                    stringBuffer.Append('"');
-                    dataPointer += length;
+                    builder.TryAppend('"');
                     break;
 
                 case ArgumentType.Boolean:
-                    stringBuffer.Append(*(bool*)dataPointer ? "true" : "false");
-                    dataPointer += sizeof(bool);
+                    builder.TryAppendWhole(*(bool*)dataPointer ? "true" : "false");
                     break;
 
                 case ArgumentType.Byte:
-                    stringBuffer.Append(*dataPointer, StringView.Empty);
-                    dataPointer += sizeof(byte);
+                    builder.TryAppend(*dataPointer);
+                    break;
+
+                case ArgumentType.SByte:
+                    builder.TryAppend(*(sbyte*)dataPointer);
                     break;
 
                 case ArgumentType.Char:
-                    stringBuffer.Append('"');
-                    AppendEscapedChar(*(char*)dataPointer, stringBuffer);
-                    stringBuffer.Append('"');
-
-                    dataPointer += sizeof(char);
+                    builder.TryAppend('"');
+                    AppendEscapedChar(*(char*)dataPointer, ref builder);
+                    builder.TryAppend('"');
                     break;
 
                 case ArgumentType.Int16:
-                    stringBuffer.Append(*(short*)dataPointer, StringView.Empty);
-                    dataPointer += sizeof(short);
+                    builder.TryAppend(*(short*)dataPointer);
+                    break;
+
+                case ArgumentType.UInt16:
+                    builder.TryAppend(*(ushort*)dataPointer);
                     break;
 
                 case ArgumentType.Int32:
-                    stringBuffer.Append(*(int*)dataPointer, StringView.Empty);
-                    dataPointer += sizeof(int);
+                    builder.TryAppend(*(int*)dataPointer);
+                    break;
+
+                case ArgumentType.UInt32:
+                    builder.TryAppend(*(uint*)dataPointer);
                     break;
 
                 case ArgumentType.Int64:
-                    stringBuffer.Append(*(long*)dataPointer, StringView.Empty);
-                    dataPointer += sizeof(long);
+                    builder.TryAppend(*(long*)dataPointer);
+                    break;
+
+                case ArgumentType.UInt64:
+                    builder.TryAppend(*(ulong*)dataPointer);
+                    break;
+
+                case ArgumentType.IntPtr:
+                    builder.TryAppend(*(nint*)dataPointer);
+                    break;
+
+                case ArgumentType.UIntPtr:
+                    builder.TryAppend(*(nuint*)dataPointer);
                     break;
 
                 case ArgumentType.Single:
-                    stringBuffer.Append(*(float*)dataPointer, StringView.Empty);
-                    dataPointer += sizeof(float);
+                    builder.TryAppend(*(float*)dataPointer);
                     break;
 
                 case ArgumentType.Double:
-                    stringBuffer.Append(*(double*)dataPointer, StringView.Empty);
-                    dataPointer += sizeof(double);
+                    builder.TryAppend(*(double*)dataPointer);
                     break;
 
                 case ArgumentType.Decimal:
-                    stringBuffer.Append(*(decimal*)dataPointer, StringView.Empty);
-                    dataPointer += sizeof(decimal);
+                    builder.TryAppend(*(decimal*)dataPointer);
                     break;
 
                 case ArgumentType.Guid:
-                    stringBuffer.Append('"');
-                    stringBuffer.Append(*(Guid*)dataPointer, StringView.Empty);
-                    stringBuffer.Append('"');
-                    dataPointer += sizeof(Guid);
+                    builder.TryAppend('"');
+                    builder.TryAppend(*(Guid*)dataPointer);
+                    builder.TryAppend('"');
                     break;
 
                 case ArgumentType.DateTime:
-                    stringBuffer.Append('"');
-                    stringBuffer.Append(*(DateTime*)dataPointer, StringView.Empty);
-                    stringBuffer.Append('"');
-                    dataPointer += sizeof(DateTime);
+                    builder.TryAppend('"');
+                    builder.TryAppend(*(DateTime*)dataPointer, "yyyy-MM-dd HH:mm:ss");
+                    builder.TryAppend('"');
                     break;
 
                 case ArgumentType.TimeSpan:
-                    stringBuffer.Append('"');
-                    stringBuffer.Append(*(TimeSpan*)dataPointer, StringView.Empty);
-                    stringBuffer.Append('"');
-                    dataPointer += sizeof(TimeSpan);
+                    builder.TryAppend('"');
+                    builder.TryAppend(*(TimeSpan*)dataPointer, @"hh\:mm\:ss\.fffffff");
+                    builder.TryAppend('"');
                     break;
 
                 case ArgumentType.Enum:
+                {
                     var enumArg = (EnumArg*)dataPointer;
-                    var enumString = enumArg->GetString();
 
-                    if (enumString != null)
-                        AppendString(enumString, stringBuffer);
-                    else
-                        enumArg->AppendNumericValue(stringBuffer);
+                    var destination = builder.GetRemainingBuffer();
+                    enumArg->TryFormat(destination, out var charsWritten);
+                    builder.IncrementPos(charsWritten);
 
-                    dataPointer += sizeof(EnumArg);
                     break;
+                }
 
                 case ArgumentType.Null:
-                    stringBuffer.Append("null");
+                    builder.TryAppendWhole("null");
                     break;
-
-                default:
-                    throw new ArgumentOutOfRangeException();
             }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void AppendString(string value, StringBuffer stringBuffer)
+        private static void AppendString(string? value, ref CharBufferBuilder builder)
         {
-            stringBuffer.Append('"');
+            builder.TryAppend('"');
 
-            foreach (var c in value)
-                AppendEscapedChar(c, stringBuffer);
+            foreach (var c in value ?? string.Empty)
+                AppendEscapedChar(c, ref builder);
 
-            stringBuffer.Append('"');
+            builder.TryAppend('"');
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void AppendEscapedChar(char c, StringBuffer stringBuffer)
+        private static void AppendEscapedChar(char c, ref CharBufferBuilder builder)
         {
             // Escape characters based on https://tools.ietf.org/html/rfc7159
 
-            if (c == '\\' || c == '"' || c <= '\u001F')
-                AppendControlChar(c, stringBuffer);
+            if (c is '\\' or '"' or <= '\u001F')
+                AppendControlChar(c, ref builder);
             else
-                stringBuffer.Append(c);
+                builder.TryAppend(c);
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private static void AppendControlChar(char c, StringBuffer stringBuffer)
+        private static void AppendControlChar(char c, ref CharBufferBuilder builder)
         {
             switch (c)
             {
                 case '"':
-                    stringBuffer.Append(@"\""");
+                    builder.TryAppendWhole(@"\""");
                     break;
 
                 case '\\':
-                    stringBuffer.Append(@"\\");
+                    builder.TryAppendWhole(@"\\");
                     break;
 
                 case '\b':
-                    stringBuffer.Append(@"\b");
+                    builder.TryAppendWhole(@"\b");
                     break;
 
                 case '\t':
-                    stringBuffer.Append(@"\t");
+                    builder.TryAppendWhole(@"\t");
                     break;
 
                 case '\n':
-                    stringBuffer.Append(@"\n");
+                    builder.TryAppendWhole(@"\n");
                     break;
 
                 case '\f':
-                    stringBuffer.Append(@"\f");
+                    builder.TryAppendWhole(@"\f");
                     break;
 
                 case '\r':
-                    stringBuffer.Append(@"\r");
+                    builder.TryAppendWhole(@"\r");
                     break;
 
                 default:
-                    stringBuffer.Append(@"\u00");
-                    var byteValue = unchecked((byte)c);
-                    //HexUtils.AppendValueAsHex(stringBuffer, &byteValue, 1); // TODO
+                {
+                    const string prefix = @"\u00";
+                    var destination = builder.GetRemainingBuffer();
+
+                    if (destination.Length >= prefix.Length + 2)
+                    {
+                        builder.TryAppendWhole(prefix);
+
+                        var byteValue = unchecked((byte)c);
+                        HexUtils.AppendValueAsHex(&byteValue, 1, builder.GetRemainingBuffer());
+                        builder.IncrementPos(2);
+                    }
+
                     break;
+                }
             }
         }
     }

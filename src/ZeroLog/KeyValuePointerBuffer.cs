@@ -1,21 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace ZeroLog
+namespace ZeroLog;
+
+internal class KeyValuePointerBuffer
 {
-    internal class KeyValuePointerBuffer
+    private readonly List<IntPtr> _keyPointers = new(byte.MaxValue);
+
+    public string?[] Strings = Array.Empty<string?>();
+
+    public int KeyPointerCount => _keyPointers.Count;
+
+    public void Init(string?[] strings)
     {
-        private readonly List<IntPtr> _keyPointers = new List<IntPtr>(byte.MaxValue);
-
-        public int KeyPointerCount => _keyPointers.Count;
-
-        public unsafe byte* GetKeyPointer(int index)
-            => (byte*)_keyPointers[index].ToPointer();
-
-        public unsafe void AddKeyPointer(byte* pointer)
-            => _keyPointers.Add(new IntPtr(pointer));
-
-        public void Clear()
-            => _keyPointers.Clear();
+        Strings = strings;
+        _keyPointers.Clear();
     }
+
+    public unsafe byte* GetKeyPointer(int index)
+        => (byte*)_keyPointers[index].ToPointer();
+
+    public unsafe void AddKeyPointer(byte* pointer)
+        => _keyPointers.Add(new IntPtr(pointer));
 }

@@ -8,8 +8,10 @@ namespace ZeroLog;
 unsafe partial class LogMessage
 {
     [SuppressMessage("ReSharper", "ReplaceSliceWithRangeIndexer")]
-    internal int WriteTo(Span<char> outputBuffer, bool skipFormat = false)
+    internal int WriteTo(Span<char> outputBuffer, bool skipFormat = false, KeyValuePointerBuffer? keyValueBuffer = null)
     {
+        keyValueBuffer?.Init(_strings);
+
         if (ConstantMessage is not null)
         {
             var length = Math.Min(ConstantMessage.Length, outputBuffer.Length);
@@ -23,6 +25,13 @@ unsafe partial class LogMessage
 
         while (dataPointer < endOfData)
         {
+            if (keyValueBuffer != null)
+            {
+                var argType = *(ArgumentType*)dataPointer;
+                if (argType == ArgumentType.KeyString) // KeyString never has a format flag
+                    keyValueBuffer.AddKeyPointer(dataPointer);
+            }
+
             var isTruncated = !TryWriteArg(ref dataPointer, outputBuffer.Slice(bufferIndex), out var charsWritten, skipFormat);
             bufferIndex += charsWritten;
 
@@ -329,10 +338,7 @@ unsafe partial class LogMessage
 
             case ArgumentType.KeyString:
             {
-                var stringIndex = *dataPointer;
                 ++dataPointer;
-
-                var key = _strings[stringIndex] ?? string.Empty;
                 SkipArg(ref dataPointer);
 
                 charsWritten = 0;
@@ -344,7 +350,7 @@ unsafe partial class LogMessage
         }
     }
 
-    private void SkipArg(ref byte* dataPointer)
+    private static void SkipArg(ref byte* dataPointer)
     {
         var argType = *(ArgumentType*)dataPointer;
         dataPointer += sizeof(ArgumentType);

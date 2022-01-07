@@ -24,6 +24,9 @@ internal ref struct CharBufferBuilder
     public Span<char> GetRemainingBuffer()
         => _buffer.Slice(_pos);
 
+    public void IncrementPos(int chars)
+        => _pos += chars;
+
     public bool TryAppendWhole(ReadOnlySpan<char> value)
     {
         if (value.Length <= _buffer.Length - _pos)
@@ -82,6 +85,16 @@ internal ref struct CharBufferBuilder
     }
 
     public bool TryAppend(TimeSpan value, string? format)
+    {
+        if (!value.TryFormat(_buffer.Slice(_pos), out var charsWritten, format, CultureInfo.InvariantCulture))
+            return false;
+
+        _pos += charsWritten;
+        return true;
+    }
+
+    public bool TryAppend<T>(T value, string? format = null)
+        where T : struct, ISpanFormattable
     {
         if (!value.TryFormat(_buffer.Slice(_pos), out var charsWritten, format, CultureInfo.InvariantCulture))
             return false;

@@ -75,6 +75,8 @@ public sealed unsafe partial class LogMessage
             _strings[_stringIndex] = key;
 
             *_dataPointer = _stringIndex;
+            ++_dataPointer;
+
             ++_stringIndex;
 
             if (value is not null)
@@ -85,6 +87,8 @@ public sealed unsafe partial class LogMessage
                 _strings[_stringIndex] = value;
 
                 *_dataPointer = _stringIndex;
+                ++_dataPointer;
+
                 ++_stringIndex;
             }
             else
@@ -269,6 +273,8 @@ public sealed unsafe partial class LogMessage
             _strings[_stringIndex] = key;
 
             *_dataPointer = _stringIndex;
+            ++_dataPointer;
+
             ++_stringIndex;
 
             *(ArgumentType*)_dataPointer = argType;
@@ -295,6 +301,8 @@ public sealed unsafe partial class LogMessage
             _strings[_stringIndex] = key;
 
             *_dataPointer = _stringIndex;
+            ++_dataPointer;
+
             ++_stringIndex;
 
             if (value is not null)
