@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using ZeroLog.Appenders;
 using ZeroLog.Config;
 
@@ -36,8 +35,7 @@ namespace ZeroLog.ConfigResolvers
             {
                 Appenders = node.Appenders.ToArray(),
                 Level = node.Level,
-                LogEventPoolExhaustionStrategy = node.LogEventPoolExhaustionStrategy,
-                LogEventArgumentExhaustionStrategy = node.LogEventArgumentExhaustionStrategy
+                LogEventPoolExhaustionStrategy = node.LogEventPoolExhaustionStrategy
             };
         }
 
@@ -107,8 +105,7 @@ namespace ZeroLog.ConfigResolvers
                     {
                         Appenders = node.Appenders,
                         Level = node.Level,
-                        LogEventPoolExhaustionStrategy = node.LogEventPoolExhaustionStrategy,
-                        LogEventArgumentExhaustionStrategy = node.LogEventArgumentExhaustionStrategy
+                        LogEventPoolExhaustionStrategy = node.LogEventPoolExhaustionStrategy
                     };
                 }
 
@@ -117,7 +114,6 @@ namespace ZeroLog.ConfigResolvers
 
             node.Appenders = (logger.IncludeParentAppenders ? appenders.Union(node.Appenders) : appenders).Distinct();
             node.LogEventPoolExhaustionStrategy = logger.LogEventPoolExhaustionStrategy;
-            node.LogEventArgumentExhaustionStrategy = logger.LogEventArgumentExhaustionStrategy;
             node.Level = logger.Level;
         }
 
@@ -148,7 +144,6 @@ namespace ZeroLog.ConfigResolvers
             public IEnumerable<IAppender> Appenders = Enumerable.Empty<IAppender>();
             public Level Level;
             public LogEventPoolExhaustionStrategy LogEventPoolExhaustionStrategy;
-            public LogEventArgumentExhaustionStrategy LogEventArgumentExhaustionStrategy;
 
             public void Dispose()
             {

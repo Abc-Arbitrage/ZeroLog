@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using ZeroLog.Appenders;
 
@@ -11,19 +10,11 @@ namespace ZeroLog.ConfigResolvers
         private readonly IAppender[] _appenders;
         private readonly Level _level;
         private readonly LogEventPoolExhaustionStrategy _logEventPoolExhaustionStrategy;
-        private readonly LogEventArgumentExhaustionStrategy _logEventArgumentExhaustionStrategy;
 
-        [SuppressMessage("ReSharper", "IntroduceOptionalParameters.Global", Justification = "For compatibility")]
         public BasicResolver(IEnumerable<IAppender> appenders, Level level, LogEventPoolExhaustionStrategy logEventPoolExhaustionStrategy)
-            : this(appenders, level, logEventPoolExhaustionStrategy, LogEventArgumentExhaustionStrategy.Default)
-        {
-        }
-
-        public BasicResolver(IEnumerable<IAppender> appenders, Level level, LogEventPoolExhaustionStrategy logEventPoolExhaustionStrategy, LogEventArgumentExhaustionStrategy logEventArgumentExhaustionStrategy)
         {
             _level = level;
             _logEventPoolExhaustionStrategy = logEventPoolExhaustionStrategy;
-            _logEventArgumentExhaustionStrategy = logEventArgumentExhaustionStrategy;
             _appenders = appenders.Select(x => new GuardedAppender(x, TimeSpan.FromSeconds(15))).ToArray<IAppender>();
         }
 
@@ -35,8 +26,7 @@ namespace ZeroLog.ConfigResolvers
             {
                 Appenders = _appenders,
                 Level = _level,
-                LogEventPoolExhaustionStrategy = _logEventPoolExhaustionStrategy,
-                LogEventArgumentExhaustionStrategy = _logEventArgumentExhaustionStrategy
+                LogEventPoolExhaustionStrategy = _logEventPoolExhaustionStrategy
             };
         }
 
