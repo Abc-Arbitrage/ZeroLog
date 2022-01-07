@@ -328,7 +328,187 @@ unsafe partial class LogMessage
             }
 
             case ArgumentType.KeyString:
-                throw new NotImplementedException();
+            {
+                var stringIndex = *dataPointer;
+                ++dataPointer;
+
+                var key = _strings[stringIndex] ?? string.Empty;
+                SkipArg(ref dataPointer);
+
+                charsWritten = 0;
+                return true;
+            }
+
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+    }
+
+    private void SkipArg(ref byte* dataPointer)
+    {
+        var argType = *(ArgumentType*)dataPointer;
+        dataPointer += sizeof(ArgumentType);
+
+        if ((argType & ArgumentType.FormatFlag) != 0)
+        {
+            argType &= ~ArgumentType.FormatFlag;
+            ++dataPointer;
+        }
+
+        switch (argType)
+        {
+            case ArgumentType.None:
+            {
+                return;
+            }
+
+            case ArgumentType.String:
+            {
+                ++dataPointer;
+                return;
+            }
+
+            case ArgumentType.Null:
+            {
+                return;
+            }
+
+            case ArgumentType.Boolean:
+            {
+                dataPointer += sizeof(bool);
+                return;
+            }
+
+            case ArgumentType.Byte:
+            {
+                dataPointer += sizeof(byte);
+                return;
+            }
+
+            case ArgumentType.SByte:
+            {
+                dataPointer += sizeof(sbyte);
+                return;
+            }
+
+            case ArgumentType.Char:
+            {
+                dataPointer += sizeof(char);
+                return;
+            }
+
+            case ArgumentType.Int16:
+            {
+                dataPointer += sizeof(short);
+                return;
+            }
+
+            case ArgumentType.UInt16:
+            {
+                dataPointer += sizeof(ushort);
+                return;
+            }
+
+            case ArgumentType.Int32:
+            {
+                dataPointer += sizeof(int);
+                return;
+            }
+
+            case ArgumentType.UInt32:
+            {
+                dataPointer += sizeof(uint);
+                return;
+            }
+
+            case ArgumentType.Int64:
+            {
+                dataPointer += sizeof(long);
+                return;
+            }
+
+            case ArgumentType.UInt64:
+            {
+                dataPointer += sizeof(ulong);
+                return;
+            }
+
+            case ArgumentType.IntPtr:
+            {
+                dataPointer += sizeof(nint);
+                return;
+            }
+
+            case ArgumentType.UIntPtr:
+            {
+                dataPointer += sizeof(nuint);
+                return;
+            }
+
+            case ArgumentType.Single:
+            {
+                dataPointer += sizeof(float);
+                return;
+            }
+
+            case ArgumentType.Double:
+            {
+                dataPointer += sizeof(double);
+                return;
+            }
+
+            case ArgumentType.Decimal:
+            {
+                dataPointer += sizeof(decimal);
+                return;
+            }
+
+            case ArgumentType.Guid:
+            {
+                dataPointer += sizeof(Guid);
+                return;
+            }
+
+            case ArgumentType.DateTime:
+            {
+                dataPointer += sizeof(DateTime);
+                return;
+            }
+
+            case ArgumentType.TimeSpan:
+            {
+                dataPointer += sizeof(TimeSpan);
+                return;
+            }
+
+            case ArgumentType.Enum:
+            {
+                dataPointer += sizeof(EnumArg);
+                return;
+            }
+
+            case ArgumentType.AsciiString:
+            {
+                var valueLength = *(int*)dataPointer;
+                dataPointer += sizeof(int);
+                dataPointer += valueLength;
+                return;
+            }
+
+            case ArgumentType.Unmanaged:
+            {
+                var headerPtr = (UnmanagedArgHeader*)dataPointer;
+                dataPointer += sizeof(UnmanagedArgHeader);
+                dataPointer += headerPtr->Size;
+                return;
+            }
+
+            case ArgumentType.KeyString: // Should not happen
+            {
+                ++dataPointer;
+                SkipArg(ref dataPointer);
+                return;
+            }
 
             default:
                 throw new ArgumentOutOfRangeException();
