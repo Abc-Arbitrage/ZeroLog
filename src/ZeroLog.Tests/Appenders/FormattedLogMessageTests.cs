@@ -15,6 +15,11 @@ public unsafe class FormattedLogMessageTests
     private LogMessage _logMessage;
     private byte* _buffer;
 
+    static FormattedLogMessageTests()
+    {
+        LogManager.RegisterEnum<DayOfWeek>();
+    }
+
     [SetUp]
     public void SetUp()
     {
@@ -280,6 +285,18 @@ public unsafe class FormattedLogMessageTests
                    .Append("Bar");
 
         GetFormatted().ToString().ShouldEqual(@"FooBar ~~ { ""Hello"": ""01:02:03.0040000"", ""World"": ""01:02:03.0040000"", ""Null"": null }");
+    }
+
+    [Test]
+    public void should_format_json_enum()
+    {
+        _logMessage.Append("Foo")
+                   .AppendKeyValue("Hello", DayOfWeek.Friday)
+                   .AppendKeyValue("World", (DayOfWeek?)DayOfWeek.Saturday)
+                   .AppendKeyValue("Null", (DayOfWeek?)null)
+                   .Append("Bar");
+
+        GetFormatted().ToString().ShouldEqual(@"FooBar ~~ { ""Hello"": ""Friday"", ""World"": ""Saturday"", ""Null"": null }");
     }
 
     private FormattedLogMessage GetFormatted()

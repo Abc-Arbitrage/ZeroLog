@@ -148,11 +148,11 @@ namespace ZeroLog
                 case ArgumentType.Enum:
                 {
                     var enumArg = (EnumArg*)dataPointer;
-
+                    builder.TryAppend('"');
                     var destination = builder.GetRemainingBuffer();
                     enumArg->TryFormat(destination, out var charsWritten);
                     builder.IncrementPos(charsWritten);
-
+                    builder.TryAppend('"');
                     break;
                 }
 
