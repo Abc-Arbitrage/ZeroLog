@@ -57,6 +57,8 @@ namespace ZeroLog
 
                 case ArgumentType.AsciiString:
                     var length = *(int*)dataPointer;
+                    dataPointer += sizeof(int);
+
                     builder.TryAppend('"');
 
                     for (var i = 0; i < length; ++i)

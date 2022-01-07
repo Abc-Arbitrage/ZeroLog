@@ -339,7 +339,9 @@ unsafe partial class LogMessage
             case ArgumentType.KeyString:
             {
                 ++dataPointer;
-                SkipArg(ref dataPointer);
+
+                if (dataPointer < _dataPointer)
+                    SkipArg(ref dataPointer);
 
                 charsWritten = 0;
                 return true;

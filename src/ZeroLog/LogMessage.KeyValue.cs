@@ -116,6 +116,56 @@ public sealed unsafe partial class LogMessage
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public LogMessage AppendKeyValueAscii(string key, ReadOnlySpan<char> value)
+    {
+        if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(int) + value.Length <= _endOfBuffer && _stringIndex < _strings.Length)
+        {
+            *(ArgumentType*)_dataPointer = ArgumentType.KeyString;
+            _dataPointer += sizeof(ArgumentType);
+
+            _strings[_stringIndex] = key;
+
+            *_dataPointer = _stringIndex;
+            ++_dataPointer;
+
+            ++_stringIndex;
+
+            AppendAsciiString(value);
+        }
+        else
+        {
+            _isTruncated = true;
+        }
+
+        return this;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public LogMessage AppendKeyValueAscii(string key, ReadOnlySpan<byte> value)
+    {
+        if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(int) + value.Length <= _endOfBuffer && _stringIndex < _strings.Length)
+        {
+            *(ArgumentType*)_dataPointer = ArgumentType.KeyString;
+            _dataPointer += sizeof(ArgumentType);
+
+            _strings[_stringIndex] = key;
+
+            *_dataPointer = _stringIndex;
+            ++_dataPointer;
+
+            ++_stringIndex;
+
+            AppendAsciiString(value);
+        }
+        else
+        {
+            _isTruncated = true;
+        }
+
+        return this;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void InternalAppendKeyValue<T>(string key, T value, ArgumentType argType)
         where T : unmanaged
     {

@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.InteropServices;
+using System.Text;
 using NUnit.Framework;
 using ZeroLog.Appenders;
 using ZeroLog.Tests.Support;
@@ -64,6 +65,26 @@ public unsafe class FormattedLogMessageTests
                    .Append("Bar");
 
         GetFormatted().ToString().ShouldEqual(@"FooBar ~~ { ""Hello"": ""...\u0001..."", ""Escapes"": ""\""\\\b\t\n\f\r"" }");
+    }
+
+    [Test]
+    public void should_format_json_ascii_string_char()
+    {
+        _logMessage.Append("Foo")
+                   .AppendKeyValueAscii("Hello", "World")
+                   .Append("Bar");
+
+        GetFormatted().ToString().ShouldEqual(@"FooBar ~~ { ""Hello"": ""World"" }");
+    }
+
+    [Test]
+    public void should_format_json_ascii_string_byte()
+    {
+        _logMessage.Append("Foo")
+                   .AppendKeyValueAscii("Hello", Encoding.ASCII.GetBytes("World"))
+                   .Append("Bar");
+
+        GetFormatted().ToString().ShouldEqual(@"FooBar ~~ { ""Hello"": ""World"" }");
     }
 
     [Test]
