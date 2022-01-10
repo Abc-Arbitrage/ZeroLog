@@ -93,8 +93,6 @@ internal ref struct CharBufferBuilder
         return true;
     }
 
-#if NETCOREAPP
-
     public bool TryAppend<T>(T value, string? format = null)
         where T : struct, ISpanFormattable
     {
@@ -104,6 +102,4 @@ internal ref struct CharBufferBuilder
         _pos += charsWritten;
         return true;
     }
-
-#endif
 }

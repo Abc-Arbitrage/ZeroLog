@@ -19,7 +19,7 @@ jobs:
           dotnet-version: 6.0.x
 
       - name: Restore
-        run: dotnet restore -p:Configuration=Release src/ZeroLog.sln
+        run: dotnet restore src/ZeroLog.sln
 
       - name: Build
         run: dotnet build --configuration Release --no-restore src/ZeroLog.sln
