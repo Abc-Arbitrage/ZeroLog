@@ -79,12 +79,28 @@ unsafe partial class LogMessageTests
             => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(LogManager.Config.NullDisplayString);
 
         [Test]
+        public void should_append_value_through_interpolation([Values] bool value)
+            => _logMessage.Append($"{value}").ToString().ShouldEqual(value.ToString());
+
+        [Test]
+        public void should_append_nullable_value_through_interpolation([Values] bool value)
+            => _logMessage.Append($"{AsNullable(value)}").ToString().ShouldEqual(value.ToString());
+
+        [Test]
+        public void should_append_null_value_through_interpolation()
+            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+
+        [Test]
         public void should_truncate_value()
             => ShouldTruncateValue(() => _logMessage.Append(_value), false);
 
         [Test]
         public void should_not_allocate()
             => ShouldNotAllocate(() => _logMessage.Append(_value));
+
+        [Test]
+        public void should_not_allocate_interpolation()
+            => ShouldNotAllocate(() => _logMessage.Append($"{_value}"));
     }
 
     [TestFixture]
@@ -117,6 +133,30 @@ unsafe partial class LogMessageTests
             => _logMessage.Append(AsNullable(_value), "X").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
 
         [Test]
+        public void should_append_value_through_interpolation()
+            => _logMessage.Append($"{_value}").ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_nullable_value_through_interpolation()
+            => _logMessage.Append($"{AsNullable(_value)}").ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_null_value_through_interpolation()
+            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+
+        [Test]
+        public void should_append_formatted_value_through_interpolation()
+            => _logMessage.Append($"{_value:X}").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_nullable_formatted_value_through_interpolation()
+            => _logMessage.Append($"{AsNullable(_value):X}").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_formatted_null_value_through_interpolation()
+            => _logMessage.Append($"{GetNullValue():X}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+
+        [Test]
         public void should_truncate_value()
             => ShouldTruncateValue(() => _logMessage.Append(_value), false);
 
@@ -131,6 +171,14 @@ unsafe partial class LogMessageTests
         [Test]
         public void should_not_allocate_formatted()
             => ShouldNotAllocate(() => _logMessage.Append(_value, "X"));
+
+        [Test]
+        public void should_not_allocate_interpolation()
+            => ShouldNotAllocate(() => _logMessage.Append($"{_value}"));
+
+        [Test]
+        public void should_not_allocate_interpolation_formatted()
+            => ShouldNotAllocate(() => _logMessage.Append($"{_value:X}"));
     }
 
     [TestFixture]
@@ -163,6 +211,30 @@ unsafe partial class LogMessageTests
             => _logMessage.Append(AsNullable(_value), "X").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
 
         [Test]
+        public void should_append_value_through_interpolation()
+            => _logMessage.Append($"{_value}").ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_nullable_value_through_interpolation()
+            => _logMessage.Append($"{AsNullable(_value)}").ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_null_value_through_interpolation()
+            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+
+        [Test]
+        public void should_append_formatted_value_through_interpolation()
+            => _logMessage.Append($"{_value:X}").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_nullable_formatted_value_through_interpolation()
+            => _logMessage.Append($"{AsNullable(_value):X}").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_formatted_null_value_through_interpolation()
+            => _logMessage.Append($"{GetNullValue():X}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+
+        [Test]
         public void should_truncate_value()
             => ShouldTruncateValue(() => _logMessage.Append(_value), false);
 
@@ -177,6 +249,14 @@ unsafe partial class LogMessageTests
         [Test]
         public void should_not_allocate_formatted()
             => ShouldNotAllocate(() => _logMessage.Append(_value, "X"));
+
+        [Test]
+        public void should_not_allocate_interpolation()
+            => ShouldNotAllocate(() => _logMessage.Append($"{_value}"));
+
+        [Test]
+        public void should_not_allocate_interpolation_formatted()
+            => ShouldNotAllocate(() => _logMessage.Append($"{_value:X}"));
     }
 
     [TestFixture]
@@ -197,12 +277,28 @@ unsafe partial class LogMessageTests
             => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(LogManager.Config.NullDisplayString);
 
         [Test]
+        public void should_append_value_through_interpolation()
+            => _logMessage.Append($"{_value}").ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_nullable_value_through_interpolation()
+            => _logMessage.Append($"{AsNullable(_value)}").ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_null_value_through_interpolation()
+            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+
+        [Test]
         public void should_truncate_value()
             => ShouldTruncateValue(() => _logMessage.Append(_value), false);
 
         [Test]
         public void should_not_allocate()
             => ShouldNotAllocate(() => _logMessage.Append(_value));
+
+        [Test]
+        public void should_not_allocate_interpolation()
+            => ShouldNotAllocate(() => _logMessage.Append($"{_value}"));
     }
 
     [TestFixture]
@@ -235,6 +331,30 @@ unsafe partial class LogMessageTests
             => _logMessage.Append(AsNullable(_value), "X").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
 
         [Test]
+        public void should_append_value_through_interpolation()
+            => _logMessage.Append($"{_value}").ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_nullable_value_through_interpolation()
+            => _logMessage.Append($"{AsNullable(_value)}").ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_null_value_through_interpolation()
+            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+
+        [Test]
+        public void should_append_formatted_value_through_interpolation()
+            => _logMessage.Append($"{_value:X}").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_nullable_formatted_value_through_interpolation()
+            => _logMessage.Append($"{AsNullable(_value):X}").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_formatted_null_value_through_interpolation()
+            => _logMessage.Append($"{GetNullValue():X}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+
+        [Test]
         public void should_truncate_value()
             => ShouldTruncateValue(() => _logMessage.Append(_value), false);
 
@@ -251,6 +371,14 @@ unsafe partial class LogMessageTests
         [TestCase("F2")]
         public void should_not_allocate_formatted(string format)
             => ShouldNotAllocate(() => _logMessage.Append(_value, format));
+
+        [Test]
+        public void should_not_allocate_interpolation()
+            => ShouldNotAllocate(() => _logMessage.Append($"{_value}"));
+
+        [Test]
+        public void should_not_allocate_interpolation_formatted()
+            => ShouldNotAllocate(() => _logMessage.Append($"{_value:X}"));
     }
 
     [TestFixture]
@@ -283,6 +411,30 @@ unsafe partial class LogMessageTests
             => _logMessage.Append(AsNullable(_value), "X").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
 
         [Test]
+        public void should_append_value_through_interpolation()
+            => _logMessage.Append($"{_value}").ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_nullable_value_through_interpolation()
+            => _logMessage.Append($"{AsNullable(_value)}").ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_null_value_through_interpolation()
+            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+
+        [Test]
+        public void should_append_formatted_value_through_interpolation()
+            => _logMessage.Append($"{_value:X}").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_nullable_formatted_value_through_interpolation()
+            => _logMessage.Append($"{AsNullable(_value):X}").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_formatted_null_value_through_interpolation()
+            => _logMessage.Append($"{GetNullValue():X}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+
+        [Test]
         public void should_truncate_value()
             => ShouldTruncateValue(() => _logMessage.Append(_value), false);
 
@@ -299,6 +451,14 @@ unsafe partial class LogMessageTests
         [TestCase("F2")]
         public void should_not_allocate_formatted(string format)
             => ShouldNotAllocate(() => _logMessage.Append(_value, format));
+
+        [Test]
+        public void should_not_allocate_interpolation()
+            => ShouldNotAllocate(() => _logMessage.Append($"{_value}"));
+
+        [Test]
+        public void should_not_allocate_interpolation_formatted()
+            => ShouldNotAllocate(() => _logMessage.Append($"{_value:X}"));
     }
 
     [TestFixture]
@@ -331,6 +491,30 @@ unsafe partial class LogMessageTests
             => _logMessage.Append(AsNullable(_value), "X").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
 
         [Test]
+        public void should_append_value_through_interpolation()
+            => _logMessage.Append($"{_value}").ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_nullable_value_through_interpolation()
+            => _logMessage.Append($"{AsNullable(_value)}").ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_null_value_through_interpolation()
+            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+
+        [Test]
+        public void should_append_formatted_value_through_interpolation()
+            => _logMessage.Append($"{_value:X}").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_nullable_formatted_value_through_interpolation()
+            => _logMessage.Append($"{AsNullable(_value):X}").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_formatted_null_value_through_interpolation()
+            => _logMessage.Append($"{GetNullValue():X}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+
+        [Test]
         public void should_truncate_value()
             => ShouldTruncateValue(() => _logMessage.Append(_value), false);
 
@@ -347,6 +531,14 @@ unsafe partial class LogMessageTests
         [TestCase("F2")]
         public void should_not_allocate_formatted(string format)
             => ShouldNotAllocate(() => _logMessage.Append(_value, format));
+
+        [Test]
+        public void should_not_allocate_interpolation()
+            => ShouldNotAllocate(() => _logMessage.Append($"{_value}"));
+
+        [Test]
+        public void should_not_allocate_interpolation_formatted()
+            => ShouldNotAllocate(() => _logMessage.Append($"{_value:X}"));
     }
 
     [TestFixture]
@@ -379,6 +571,30 @@ unsafe partial class LogMessageTests
             => _logMessage.Append(AsNullable(_value), "X").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
 
         [Test]
+        public void should_append_value_through_interpolation()
+            => _logMessage.Append($"{_value}").ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_nullable_value_through_interpolation()
+            => _logMessage.Append($"{AsNullable(_value)}").ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_null_value_through_interpolation()
+            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+
+        [Test]
+        public void should_append_formatted_value_through_interpolation()
+            => _logMessage.Append($"{_value:X}").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_nullable_formatted_value_through_interpolation()
+            => _logMessage.Append($"{AsNullable(_value):X}").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_formatted_null_value_through_interpolation()
+            => _logMessage.Append($"{GetNullValue():X}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+
+        [Test]
         public void should_truncate_value()
             => ShouldTruncateValue(() => _logMessage.Append(_value), false);
 
@@ -395,6 +611,14 @@ unsafe partial class LogMessageTests
         [TestCase("F2")]
         public void should_not_allocate_formatted(string format)
             => ShouldNotAllocate(() => _logMessage.Append(_value, format));
+
+        [Test]
+        public void should_not_allocate_interpolation()
+            => ShouldNotAllocate(() => _logMessage.Append($"{_value}"));
+
+        [Test]
+        public void should_not_allocate_interpolation_formatted()
+            => ShouldNotAllocate(() => _logMessage.Append($"{_value:X}"));
     }
 
     [TestFixture]
@@ -427,6 +651,30 @@ unsafe partial class LogMessageTests
             => _logMessage.Append(AsNullable(_value), "X").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
 
         [Test]
+        public void should_append_value_through_interpolation()
+            => _logMessage.Append($"{_value}").ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_nullable_value_through_interpolation()
+            => _logMessage.Append($"{AsNullable(_value)}").ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_null_value_through_interpolation()
+            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+
+        [Test]
+        public void should_append_formatted_value_through_interpolation()
+            => _logMessage.Append($"{_value:X}").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_nullable_formatted_value_through_interpolation()
+            => _logMessage.Append($"{AsNullable(_value):X}").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_formatted_null_value_through_interpolation()
+            => _logMessage.Append($"{GetNullValue():X}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+
+        [Test]
         public void should_truncate_value()
             => ShouldTruncateValue(() => _logMessage.Append(_value), false);
 
@@ -443,6 +691,14 @@ unsafe partial class LogMessageTests
         [TestCase("F2")]
         public void should_not_allocate_formatted(string format)
             => ShouldNotAllocate(() => _logMessage.Append(_value, format));
+
+        [Test]
+        public void should_not_allocate_interpolation()
+            => ShouldNotAllocate(() => _logMessage.Append($"{_value}"));
+
+        [Test]
+        public void should_not_allocate_interpolation_formatted()
+            => ShouldNotAllocate(() => _logMessage.Append($"{_value:X}"));
     }
 
     [TestFixture]
@@ -475,6 +731,30 @@ unsafe partial class LogMessageTests
             => _logMessage.Append(AsNullable(_value), "X").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
 
         [Test]
+        public void should_append_value_through_interpolation()
+            => _logMessage.Append($"{_value}").ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_nullable_value_through_interpolation()
+            => _logMessage.Append($"{AsNullable(_value)}").ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_null_value_through_interpolation()
+            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+
+        [Test]
+        public void should_append_formatted_value_through_interpolation()
+            => _logMessage.Append($"{_value:X}").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_nullable_formatted_value_through_interpolation()
+            => _logMessage.Append($"{AsNullable(_value):X}").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_formatted_null_value_through_interpolation()
+            => _logMessage.Append($"{GetNullValue():X}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+
+        [Test]
         public void should_truncate_value()
             => ShouldTruncateValue(() => _logMessage.Append(_value), false);
 
@@ -491,6 +771,14 @@ unsafe partial class LogMessageTests
         [TestCase("F2")]
         public void should_not_allocate_formatted(string format)
             => ShouldNotAllocate(() => _logMessage.Append(_value, format));
+
+        [Test]
+        public void should_not_allocate_interpolation()
+            => ShouldNotAllocate(() => _logMessage.Append($"{_value}"));
+
+        [Test]
+        public void should_not_allocate_interpolation_formatted()
+            => ShouldNotAllocate(() => _logMessage.Append($"{_value:X}"));
     }
 
     [TestFixture]
@@ -523,6 +811,30 @@ unsafe partial class LogMessageTests
             => _logMessage.Append(AsNullable(_value), "X").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
 
         [Test]
+        public void should_append_value_through_interpolation()
+            => _logMessage.Append($"{_value}").ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_nullable_value_through_interpolation()
+            => _logMessage.Append($"{AsNullable(_value)}").ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_null_value_through_interpolation()
+            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+
+        [Test]
+        public void should_append_formatted_value_through_interpolation()
+            => _logMessage.Append($"{_value:X}").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_nullable_formatted_value_through_interpolation()
+            => _logMessage.Append($"{AsNullable(_value):X}").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_formatted_null_value_through_interpolation()
+            => _logMessage.Append($"{GetNullValue():X}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+
+        [Test]
         public void should_truncate_value()
             => ShouldTruncateValue(() => _logMessage.Append(_value), false);
 
@@ -539,6 +851,14 @@ unsafe partial class LogMessageTests
         [TestCase("F2")]
         public void should_not_allocate_formatted(string format)
             => ShouldNotAllocate(() => _logMessage.Append(_value, format));
+
+        [Test]
+        public void should_not_allocate_interpolation()
+            => ShouldNotAllocate(() => _logMessage.Append($"{_value}"));
+
+        [Test]
+        public void should_not_allocate_interpolation_formatted()
+            => ShouldNotAllocate(() => _logMessage.Append($"{_value:X}"));
     }
 
     [TestFixture]
@@ -571,6 +891,30 @@ unsafe partial class LogMessageTests
             => _logMessage.Append(AsNullable(_value), "X").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
 
         [Test]
+        public void should_append_value_through_interpolation()
+            => _logMessage.Append($"{_value}").ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_nullable_value_through_interpolation()
+            => _logMessage.Append($"{AsNullable(_value)}").ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_null_value_through_interpolation()
+            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+
+        [Test]
+        public void should_append_formatted_value_through_interpolation()
+            => _logMessage.Append($"{_value:X}").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_nullable_formatted_value_through_interpolation()
+            => _logMessage.Append($"{AsNullable(_value):X}").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_formatted_null_value_through_interpolation()
+            => _logMessage.Append($"{GetNullValue():X}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+
+        [Test]
         public void should_truncate_value()
             => ShouldTruncateValue(() => _logMessage.Append(_value), false);
 
@@ -587,6 +931,14 @@ unsafe partial class LogMessageTests
         [TestCase("F2")]
         public void should_not_allocate_formatted(string format)
             => ShouldNotAllocate(() => _logMessage.Append(_value, format));
+
+        [Test]
+        public void should_not_allocate_interpolation()
+            => ShouldNotAllocate(() => _logMessage.Append($"{_value}"));
+
+        [Test]
+        public void should_not_allocate_interpolation_formatted()
+            => ShouldNotAllocate(() => _logMessage.Append($"{_value:X}"));
     }
 
     [TestFixture]
@@ -619,6 +971,30 @@ unsafe partial class LogMessageTests
             => _logMessage.Append(AsNullable(_value), "F2").ToString().ShouldEqual(_value.ToString("F2", CultureInfo.InvariantCulture));
 
         [Test]
+        public void should_append_value_through_interpolation()
+            => _logMessage.Append($"{_value}").ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_nullable_value_through_interpolation()
+            => _logMessage.Append($"{AsNullable(_value)}").ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_null_value_through_interpolation()
+            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+
+        [Test]
+        public void should_append_formatted_value_through_interpolation()
+            => _logMessage.Append($"{_value:F2}").ToString().ShouldEqual(_value.ToString("F2", CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_nullable_formatted_value_through_interpolation()
+            => _logMessage.Append($"{AsNullable(_value):F2}").ToString().ShouldEqual(_value.ToString("F2", CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_formatted_null_value_through_interpolation()
+            => _logMessage.Append($"{GetNullValue():F2}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+
+        [Test]
         public void should_truncate_value()
             => ShouldTruncateValue(() => _logMessage.Append(_value), false);
 
@@ -635,6 +1011,14 @@ unsafe partial class LogMessageTests
         [TestCase("F2")]
         public void should_not_allocate_formatted(string format)
             => ShouldNotAllocate(() => _logMessage.Append(_value, format));
+
+        [Test]
+        public void should_not_allocate_interpolation()
+            => ShouldNotAllocate(() => _logMessage.Append($"{_value}"));
+
+        [Test]
+        public void should_not_allocate_interpolation_formatted()
+            => ShouldNotAllocate(() => _logMessage.Append($"{_value:F2}"));
     }
 
     [TestFixture]
@@ -667,6 +1051,30 @@ unsafe partial class LogMessageTests
             => _logMessage.Append(AsNullable(_value), "F2").ToString().ShouldEqual(_value.ToString("F2", CultureInfo.InvariantCulture));
 
         [Test]
+        public void should_append_value_through_interpolation()
+            => _logMessage.Append($"{_value}").ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_nullable_value_through_interpolation()
+            => _logMessage.Append($"{AsNullable(_value)}").ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_null_value_through_interpolation()
+            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+
+        [Test]
+        public void should_append_formatted_value_through_interpolation()
+            => _logMessage.Append($"{_value:F2}").ToString().ShouldEqual(_value.ToString("F2", CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_nullable_formatted_value_through_interpolation()
+            => _logMessage.Append($"{AsNullable(_value):F2}").ToString().ShouldEqual(_value.ToString("F2", CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_formatted_null_value_through_interpolation()
+            => _logMessage.Append($"{GetNullValue():F2}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+
+        [Test]
         public void should_truncate_value()
             => ShouldTruncateValue(() => _logMessage.Append(_value), false);
 
@@ -683,6 +1091,14 @@ unsafe partial class LogMessageTests
         [TestCase("F2")]
         public void should_not_allocate_formatted(string format)
             => ShouldNotAllocate(() => _logMessage.Append(_value, format));
+
+        [Test]
+        public void should_not_allocate_interpolation()
+            => ShouldNotAllocate(() => _logMessage.Append($"{_value}"));
+
+        [Test]
+        public void should_not_allocate_interpolation_formatted()
+            => ShouldNotAllocate(() => _logMessage.Append($"{_value:F2}"));
     }
 
     [TestFixture]
@@ -715,6 +1131,30 @@ unsafe partial class LogMessageTests
             => _logMessage.Append(AsNullable(_value), "F2").ToString().ShouldEqual(_value.ToString("F2", CultureInfo.InvariantCulture));
 
         [Test]
+        public void should_append_value_through_interpolation()
+            => _logMessage.Append($"{_value}").ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_nullable_value_through_interpolation()
+            => _logMessage.Append($"{AsNullable(_value)}").ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_null_value_through_interpolation()
+            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+
+        [Test]
+        public void should_append_formatted_value_through_interpolation()
+            => _logMessage.Append($"{_value:F2}").ToString().ShouldEqual(_value.ToString("F2", CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_nullable_formatted_value_through_interpolation()
+            => _logMessage.Append($"{AsNullable(_value):F2}").ToString().ShouldEqual(_value.ToString("F2", CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_formatted_null_value_through_interpolation()
+            => _logMessage.Append($"{GetNullValue():F2}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+
+        [Test]
         public void should_truncate_value()
             => ShouldTruncateValue(() => _logMessage.Append(_value), false);
 
@@ -731,6 +1171,14 @@ unsafe partial class LogMessageTests
         [TestCase("F2")]
         public void should_not_allocate_formatted(string format)
             => ShouldNotAllocate(() => _logMessage.Append(_value, format));
+
+        [Test]
+        public void should_not_allocate_interpolation()
+            => ShouldNotAllocate(() => _logMessage.Append($"{_value}"));
+
+        [Test]
+        public void should_not_allocate_interpolation_formatted()
+            => ShouldNotAllocate(() => _logMessage.Append($"{_value:F2}"));
     }
 
     [TestFixture]
@@ -766,6 +1214,30 @@ unsafe partial class LogMessageTests
             => _logMessage.Append(_value, "D").ToString().ShouldEqual(_value.ToString("D", CultureInfo.InvariantCulture));
 
         [Test]
+        public void should_append_value_through_interpolation()
+            => _logMessage.Append($"{_value}").ToString().ShouldEqual(_value.ToString(null, CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_nullable_value_through_interpolation()
+            => _logMessage.Append($"{AsNullable(_value)}").ToString().ShouldEqual(_value.ToString(null, CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_null_value_through_interpolation()
+            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+
+        [Test]
+        public void should_append_formatted_value_through_interpolation()
+            => _logMessage.Append($"{_value:D}").ToString().ShouldEqual(_value.ToString("D", CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_nullable_formatted_value_through_interpolation()
+            => _logMessage.Append($"{AsNullable(_value):D}").ToString().ShouldEqual(_value.ToString("D", CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_formatted_null_value_through_interpolation()
+            => _logMessage.Append($"{GetNullValue():D}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+
+        [Test]
         public void should_truncate_value()
             => ShouldTruncateValue(() => _logMessage.Append(_value), false);
 
@@ -783,6 +1255,14 @@ unsafe partial class LogMessageTests
         [TestCase("B")]
         public void should_not_allocate_formatted(string format)
             => ShouldNotAllocate(() => _logMessage.Append(_value, format));
+
+        [Test]
+        public void should_not_allocate_interpolation()
+            => ShouldNotAllocate(() => _logMessage.Append($"{_value}"));
+
+        [Test]
+        public void should_not_allocate_interpolation_formatted()
+            => ShouldNotAllocate(() => _logMessage.Append($"{_value:B}"));
     }
 
     [TestFixture]
@@ -818,6 +1298,30 @@ unsafe partial class LogMessageTests
             => _logMessage.Append(_value, "D").ToString().ShouldEqual(_value.ToString("D", CultureInfo.InvariantCulture));
 
         [Test]
+        public void should_append_value_through_interpolation()
+            => _logMessage.Append($"{_value}").ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_nullable_value_through_interpolation()
+            => _logMessage.Append($"{AsNullable(_value)}").ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_null_value_through_interpolation()
+            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+
+        [Test]
+        public void should_append_formatted_value_through_interpolation()
+            => _logMessage.Append($"{_value:yyyy}").ToString().ShouldEqual(_value.ToString("yyyy", CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_nullable_formatted_value_through_interpolation()
+            => _logMessage.Append($"{AsNullable(_value):yyyy}").ToString().ShouldEqual(_value.ToString("yyyy", CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_formatted_null_value_through_interpolation()
+            => _logMessage.Append($"{GetNullValue():yyyy}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+
+        [Test]
         public void should_truncate_value()
             => ShouldTruncateValue(() => _logMessage.Append(_value), false);
 
@@ -835,6 +1339,14 @@ unsafe partial class LogMessageTests
         [TestCase("yyyy-MM-dd")]
         public void should_not_allocate_formatted(string format)
             => ShouldNotAllocate(() => _logMessage.Append(_value, format));
+
+        [Test]
+        public void should_not_allocate_interpolation()
+            => ShouldNotAllocate(() => _logMessage.Append($"{_value}"));
+
+        [Test]
+        public void should_not_allocate_interpolation_formatted()
+            => ShouldNotAllocate(() => _logMessage.Append($"{_value:yyyy-MM-dd}"));
     }
 
     [TestFixture]
@@ -869,6 +1381,30 @@ unsafe partial class LogMessageTests
             => _logMessage.Append(_value, "c").ToString().ShouldEqual(_value.ToString("c", CultureInfo.InvariantCulture));
 
         [Test]
+        public void should_append_value_through_interpolation()
+            => _logMessage.Append($"{_value}").ToString().ShouldEqual(_value.ToString(null, CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_nullable_value_through_interpolation()
+            => _logMessage.Append($"{AsNullable(_value)}").ToString().ShouldEqual(_value.ToString(null, CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_null_value_through_interpolation()
+            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+
+        [Test]
+        public void should_append_formatted_value_through_interpolation()
+            => _logMessage.Append($"{_value:c}").ToString().ShouldEqual(_value.ToString("c", CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_nullable_formatted_value_through_interpolation()
+            => _logMessage.Append($"{AsNullable(_value):c}").ToString().ShouldEqual(_value.ToString("c", CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_formatted_null_value_through_interpolation()
+            => _logMessage.Append($"{GetNullValue():c}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+
+        [Test]
         public void should_truncate_value()
             => ShouldTruncateValue(() => _logMessage.Append(_value), false);
 
@@ -885,5 +1421,13 @@ unsafe partial class LogMessageTests
         [TestCase("G")]
         public void should_not_allocate_formatted(string format)
             => ShouldNotAllocate(() => _logMessage.Append(_value, format));
+
+        [Test]
+        public void should_not_allocate_interpolation()
+            => ShouldNotAllocate(() => _logMessage.Append($"{_value}"));
+
+        [Test]
+        public void should_not_allocate_interpolation_formatted()
+            => ShouldNotAllocate(() => _logMessage.Append($"{_value:c}"));
     }
 }

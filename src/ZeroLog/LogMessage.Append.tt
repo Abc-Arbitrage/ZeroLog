@@ -7,6 +7,7 @@
 //------------------------------------------------------------------------------
 <#@ include file="LogMetadata.ttinclude" #>
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
 namespace ZeroLog;
@@ -71,4 +72,52 @@ partial class LogMessage
 <#
     }
 #>
+    public LogMessage Append([InterpolatedStringHandlerArgument("")] AppendInterpolatedStringHandler value)
+        => this;
+
+    [InterpolatedStringHandler]
+    public readonly ref struct AppendInterpolatedStringHandler
+    {
+        private readonly LogMessage _message;
+
+        [SuppressMessage("ReSharper", "UnusedParameter.Local")]
+        public AppendInterpolatedStringHandler(int literalLength, int formattedCount, LogMessage message)
+            => _message = message;
+
+        public void AppendLiteral(string value)
+            => _message.InternalAppendString(value);
+
+        public void AppendFormatted(string? value)
+            => _message.InternalAppendString(value);
+
+<#
+        foreach (var type in _valueTypes)
+        {
+#>
+        public void AppendFormatted(<#= type.name #> value)
+            => _message.InternalAppendValueType(value, ArgumentType.<#= type.argType #>);
+
+        public void AppendFormatted(<#= type.name #>? value)
+            => _message.InternalAppendValueType(value, ArgumentType.<#= type.argType #>);
+
+<#
+            if (type.isFormattable)
+            {
+#>
+        public void AppendFormatted(<#= type.name #> value, string format)
+            => _message.InternalAppendValueType(value, format, ArgumentType.<#= type.argType #>);
+
+        public void AppendFormatted(<#= type.name #>? value, string format)
+            => _message.InternalAppendValueType(value, format, ArgumentType.<#= type.argType #>);
+
+<#
+            }
+        }
+#>
+        public void AppendFormatted<T>(T value) where T : struct, Enum
+            => _message.InternalAppendEnum(value);
+
+        public void AppendFormatted<T>(T? value) where T : struct, Enum
+            => _message.InternalAppendEnum(value);
+    }
 }

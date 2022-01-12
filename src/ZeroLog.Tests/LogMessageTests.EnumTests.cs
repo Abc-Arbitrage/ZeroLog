@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using NUnit.Framework;
 using ZeroLog.Tests.Support;
 
@@ -7,6 +8,7 @@ namespace ZeroLog.Tests;
 unsafe partial class LogMessageTests
 {
     [TestFixture]
+    [SuppressMessage("ReSharper", "RedundantCast")]
     public class EnumTests : LogMessageTests
     {
         static EnumTests()
@@ -37,6 +39,18 @@ unsafe partial class LogMessageTests
         [Test]
         public void should_append_nullable_numeric_value()
             => _logMessage.AppendEnum((DayOfWeek?)42).ToString().ShouldEqual("42");
+
+        [Test]
+        public void should_append_value_through_interpolation()
+            => _logMessage.Append($"{DayOfWeek.Friday}").ToString().ShouldEqual(nameof(DayOfWeek.Friday));
+
+        [Test]
+        public void should_append_nullable_value_through_interpolation()
+            => _logMessage.Append($"{(DayOfWeek?)DayOfWeek.Friday}").ToString().ShouldEqual(nameof(DayOfWeek.Friday));
+
+        [Test]
+        public void should_append_null_value_through_interpolation()
+            => _logMessage.Append($"{(DayOfWeek?)null}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
 
         [Test]
         public void should_truncate_value()

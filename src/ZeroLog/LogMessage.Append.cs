@@ -5,6 +5,7 @@
 //------------------------------------------------------------------------------
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
 namespace ZeroLog;
@@ -741,4 +742,232 @@ partial class LogMessage
         return this;
     }
 
+    public LogMessage Append([InterpolatedStringHandlerArgument("")] AppendInterpolatedStringHandler value)
+        => this;
+
+    [InterpolatedStringHandler]
+    public readonly ref struct AppendInterpolatedStringHandler
+    {
+        private readonly LogMessage _message;
+
+        [SuppressMessage("ReSharper", "UnusedParameter.Local")]
+        public AppendInterpolatedStringHandler(int literalLength, int formattedCount, LogMessage message)
+            => _message = message;
+
+        public void AppendLiteral(string value)
+            => _message.InternalAppendString(value);
+
+        public void AppendFormatted(string? value)
+            => _message.InternalAppendString(value);
+
+        public void AppendFormatted(bool value)
+            => _message.InternalAppendValueType(value, ArgumentType.Boolean);
+
+        public void AppendFormatted(bool? value)
+            => _message.InternalAppendValueType(value, ArgumentType.Boolean);
+
+        public void AppendFormatted(byte value)
+            => _message.InternalAppendValueType(value, ArgumentType.Byte);
+
+        public void AppendFormatted(byte? value)
+            => _message.InternalAppendValueType(value, ArgumentType.Byte);
+
+        public void AppendFormatted(byte value, string format)
+            => _message.InternalAppendValueType(value, format, ArgumentType.Byte);
+
+        public void AppendFormatted(byte? value, string format)
+            => _message.InternalAppendValueType(value, format, ArgumentType.Byte);
+
+        public void AppendFormatted(sbyte value)
+            => _message.InternalAppendValueType(value, ArgumentType.SByte);
+
+        public void AppendFormatted(sbyte? value)
+            => _message.InternalAppendValueType(value, ArgumentType.SByte);
+
+        public void AppendFormatted(sbyte value, string format)
+            => _message.InternalAppendValueType(value, format, ArgumentType.SByte);
+
+        public void AppendFormatted(sbyte? value, string format)
+            => _message.InternalAppendValueType(value, format, ArgumentType.SByte);
+
+        public void AppendFormatted(char value)
+            => _message.InternalAppendValueType(value, ArgumentType.Char);
+
+        public void AppendFormatted(char? value)
+            => _message.InternalAppendValueType(value, ArgumentType.Char);
+
+        public void AppendFormatted(short value)
+            => _message.InternalAppendValueType(value, ArgumentType.Int16);
+
+        public void AppendFormatted(short? value)
+            => _message.InternalAppendValueType(value, ArgumentType.Int16);
+
+        public void AppendFormatted(short value, string format)
+            => _message.InternalAppendValueType(value, format, ArgumentType.Int16);
+
+        public void AppendFormatted(short? value, string format)
+            => _message.InternalAppendValueType(value, format, ArgumentType.Int16);
+
+        public void AppendFormatted(ushort value)
+            => _message.InternalAppendValueType(value, ArgumentType.UInt16);
+
+        public void AppendFormatted(ushort? value)
+            => _message.InternalAppendValueType(value, ArgumentType.UInt16);
+
+        public void AppendFormatted(ushort value, string format)
+            => _message.InternalAppendValueType(value, format, ArgumentType.UInt16);
+
+        public void AppendFormatted(ushort? value, string format)
+            => _message.InternalAppendValueType(value, format, ArgumentType.UInt16);
+
+        public void AppendFormatted(int value)
+            => _message.InternalAppendValueType(value, ArgumentType.Int32);
+
+        public void AppendFormatted(int? value)
+            => _message.InternalAppendValueType(value, ArgumentType.Int32);
+
+        public void AppendFormatted(int value, string format)
+            => _message.InternalAppendValueType(value, format, ArgumentType.Int32);
+
+        public void AppendFormatted(int? value, string format)
+            => _message.InternalAppendValueType(value, format, ArgumentType.Int32);
+
+        public void AppendFormatted(uint value)
+            => _message.InternalAppendValueType(value, ArgumentType.UInt32);
+
+        public void AppendFormatted(uint? value)
+            => _message.InternalAppendValueType(value, ArgumentType.UInt32);
+
+        public void AppendFormatted(uint value, string format)
+            => _message.InternalAppendValueType(value, format, ArgumentType.UInt32);
+
+        public void AppendFormatted(uint? value, string format)
+            => _message.InternalAppendValueType(value, format, ArgumentType.UInt32);
+
+        public void AppendFormatted(long value)
+            => _message.InternalAppendValueType(value, ArgumentType.Int64);
+
+        public void AppendFormatted(long? value)
+            => _message.InternalAppendValueType(value, ArgumentType.Int64);
+
+        public void AppendFormatted(long value, string format)
+            => _message.InternalAppendValueType(value, format, ArgumentType.Int64);
+
+        public void AppendFormatted(long? value, string format)
+            => _message.InternalAppendValueType(value, format, ArgumentType.Int64);
+
+        public void AppendFormatted(ulong value)
+            => _message.InternalAppendValueType(value, ArgumentType.UInt64);
+
+        public void AppendFormatted(ulong? value)
+            => _message.InternalAppendValueType(value, ArgumentType.UInt64);
+
+        public void AppendFormatted(ulong value, string format)
+            => _message.InternalAppendValueType(value, format, ArgumentType.UInt64);
+
+        public void AppendFormatted(ulong? value, string format)
+            => _message.InternalAppendValueType(value, format, ArgumentType.UInt64);
+
+        public void AppendFormatted(nint value)
+            => _message.InternalAppendValueType(value, ArgumentType.IntPtr);
+
+        public void AppendFormatted(nint? value)
+            => _message.InternalAppendValueType(value, ArgumentType.IntPtr);
+
+        public void AppendFormatted(nint value, string format)
+            => _message.InternalAppendValueType(value, format, ArgumentType.IntPtr);
+
+        public void AppendFormatted(nint? value, string format)
+            => _message.InternalAppendValueType(value, format, ArgumentType.IntPtr);
+
+        public void AppendFormatted(nuint value)
+            => _message.InternalAppendValueType(value, ArgumentType.UIntPtr);
+
+        public void AppendFormatted(nuint? value)
+            => _message.InternalAppendValueType(value, ArgumentType.UIntPtr);
+
+        public void AppendFormatted(nuint value, string format)
+            => _message.InternalAppendValueType(value, format, ArgumentType.UIntPtr);
+
+        public void AppendFormatted(nuint? value, string format)
+            => _message.InternalAppendValueType(value, format, ArgumentType.UIntPtr);
+
+        public void AppendFormatted(float value)
+            => _message.InternalAppendValueType(value, ArgumentType.Single);
+
+        public void AppendFormatted(float? value)
+            => _message.InternalAppendValueType(value, ArgumentType.Single);
+
+        public void AppendFormatted(float value, string format)
+            => _message.InternalAppendValueType(value, format, ArgumentType.Single);
+
+        public void AppendFormatted(float? value, string format)
+            => _message.InternalAppendValueType(value, format, ArgumentType.Single);
+
+        public void AppendFormatted(double value)
+            => _message.InternalAppendValueType(value, ArgumentType.Double);
+
+        public void AppendFormatted(double? value)
+            => _message.InternalAppendValueType(value, ArgumentType.Double);
+
+        public void AppendFormatted(double value, string format)
+            => _message.InternalAppendValueType(value, format, ArgumentType.Double);
+
+        public void AppendFormatted(double? value, string format)
+            => _message.InternalAppendValueType(value, format, ArgumentType.Double);
+
+        public void AppendFormatted(decimal value)
+            => _message.InternalAppendValueType(value, ArgumentType.Decimal);
+
+        public void AppendFormatted(decimal? value)
+            => _message.InternalAppendValueType(value, ArgumentType.Decimal);
+
+        public void AppendFormatted(decimal value, string format)
+            => _message.InternalAppendValueType(value, format, ArgumentType.Decimal);
+
+        public void AppendFormatted(decimal? value, string format)
+            => _message.InternalAppendValueType(value, format, ArgumentType.Decimal);
+
+        public void AppendFormatted(Guid value)
+            => _message.InternalAppendValueType(value, ArgumentType.Guid);
+
+        public void AppendFormatted(Guid? value)
+            => _message.InternalAppendValueType(value, ArgumentType.Guid);
+
+        public void AppendFormatted(Guid value, string format)
+            => _message.InternalAppendValueType(value, format, ArgumentType.Guid);
+
+        public void AppendFormatted(Guid? value, string format)
+            => _message.InternalAppendValueType(value, format, ArgumentType.Guid);
+
+        public void AppendFormatted(DateTime value)
+            => _message.InternalAppendValueType(value, ArgumentType.DateTime);
+
+        public void AppendFormatted(DateTime? value)
+            => _message.InternalAppendValueType(value, ArgumentType.DateTime);
+
+        public void AppendFormatted(DateTime value, string format)
+            => _message.InternalAppendValueType(value, format, ArgumentType.DateTime);
+
+        public void AppendFormatted(DateTime? value, string format)
+            => _message.InternalAppendValueType(value, format, ArgumentType.DateTime);
+
+        public void AppendFormatted(TimeSpan value)
+            => _message.InternalAppendValueType(value, ArgumentType.TimeSpan);
+
+        public void AppendFormatted(TimeSpan? value)
+            => _message.InternalAppendValueType(value, ArgumentType.TimeSpan);
+
+        public void AppendFormatted(TimeSpan value, string format)
+            => _message.InternalAppendValueType(value, format, ArgumentType.TimeSpan);
+
+        public void AppendFormatted(TimeSpan? value, string format)
+            => _message.InternalAppendValueType(value, format, ArgumentType.TimeSpan);
+
+        public void AppendFormatted<T>(T value) where T : struct, Enum
+            => _message.InternalAppendEnum(value);
+
+        public void AppendFormatted<T>(T? value) where T : struct, Enum
+            => _message.InternalAppendEnum(value);
+    }
 }
