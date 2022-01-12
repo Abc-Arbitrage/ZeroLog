@@ -100,12 +100,12 @@ public class StreamAppenderTests
     private sealed class MemoryAppender : StreamAppender
     {
         public MemoryAppender(string prefixPattern = "")
-            : base(prefixPattern)
         {
-            _stream = new MemoryStream();
+            PrefixPattern = prefixPattern;
+            Stream = new MemoryStream();
         }
 
         public override string ToString()
-            => _encoding.GetString(((MemoryStream)_stream!).GetBuffer(), 0, (int)_stream!.Length);
+            => Encoding.GetString(((MemoryStream)Stream!).GetBuffer(), 0, (int)Stream!.Length);
     }
 }

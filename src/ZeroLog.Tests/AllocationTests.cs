@@ -19,8 +19,8 @@ namespace ZeroLog.Tests
         {
             public int WrittenEventCount { get; private set; }
 
-            public WaitableAppender(string filePathRoot)
-                : base(filePathRoot)
+            public WaitableAppender(string fileNameRoot)
+                : base(fileNameRoot)
             {
             }
 

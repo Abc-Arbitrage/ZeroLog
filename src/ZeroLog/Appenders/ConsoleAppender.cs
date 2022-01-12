@@ -4,21 +4,27 @@ namespace ZeroLog.Appenders;
 
 public class ConsoleAppender : StreamAppender
 {
-    public const string DefaultPrefixPattern = "%time - %level - %logger || ";
+    public bool ColorOutput { get; set; }
 
     public ConsoleAppender()
-        : this(DefaultPrefixPattern)
     {
-    }
+        PrefixPattern = "%time - %level - %logger || ";
 
-    public ConsoleAppender(string prefixPattern)
-        : base(prefixPattern)
-    {
-        _stream = Console.OpenStandardOutput();
-        _encoding = Console.OutputEncoding;
+        Stream = Console.OpenStandardOutput();
+        Encoding = Console.OutputEncoding;
+        ColorOutput = !Console.IsOutputRedirected;
     }
 
     public override void WriteMessage(FormattedLogMessage message)
+    {
+        if (ColorOutput)
+            UpdateConsoleColor(message);
+
+        base.WriteMessage(message);
+        Flush();
+    }
+
+    private static void UpdateConsoleColor(FormattedLogMessage message)
     {
         Console.BackgroundColor = ConsoleColor.Black;
 
@@ -50,8 +56,5 @@ public class ConsoleAppender : StreamAppender
                 Console.ForegroundColor = ConsoleColor.White;
                 break;
         }
-
-        base.WriteMessage(message);
-        Flush();
     }
 }

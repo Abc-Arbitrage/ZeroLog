@@ -6,22 +6,24 @@ using ZeroLog.Config;
 
 namespace ZeroLog.Appenders
 {
-    public class AppenderFactory
+    internal static class AppenderFactory
     {
+        // TODO kill this along with the JSON config
+
         public static IAppender CreateAppender(AppenderDefinition definition)
         {
             var appenderType = GetAppenderType(definition) ?? throw new InvalidOperationException($"Appender type not found: {definition.AppenderTypeName}");
 
             var appender = (IAppender)Activator.CreateInstance(appenderType)!;
 
-            var appenderParameterType = GetAppenderParameterType(appenderType);
-            if (appenderParameterType != null)
-            {
-                var appenderParameters = GetAppenderParameters(definition, appenderParameterType);
-
-                var configureMethod = appenderType.GetMethod(nameof(IAppender<object>.Configure), new[] { appenderParameterType });
-                configureMethod?.Invoke(appender, new[] { appenderParameters });
-            }
+            // var appenderParameterType = GetAppenderParameterType(appenderType);
+            // if (appenderParameterType != null)
+            // {
+            //     var appenderParameters = GetAppenderParameters(definition, appenderParameterType);
+            //
+            //     var configureMethod = appenderType.GetMethod(nameof(IAppender<object>.Configure), new[] { appenderParameterType });
+            //     configureMethod?.Invoke(appender, new[] { appenderParameters });
+            // }
 
             return appender;
         }
@@ -56,22 +58,6 @@ namespace ZeroLog.Appenders
                         ? obj
                         : null;
             }
-        }
-
-        private static Type? GetAppenderParameterType(Type? appenderType)
-        {
-            if (appenderType is null)
-                return null;
-
-            var implementedInterfaceTypes = appenderType.GetInterfaces();
-
-            foreach (var interfaceType in implementedInterfaceTypes)
-            {
-                if (interfaceType.IsGenericType && interfaceType.GetGenericTypeDefinition() == typeof(IAppender<>))
-                    return interfaceType.GetGenericArguments()[0];
-            }
-
-            return null;
         }
     }
 }

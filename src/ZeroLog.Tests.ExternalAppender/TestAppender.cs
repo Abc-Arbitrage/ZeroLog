@@ -11,8 +11,8 @@ namespace ZeroLog.Tests.ExternalAppender
         }
 
         public TestAppender(string prefixPattern)
-            : base(prefixPattern)
         {
+            PrefixPattern = prefixPattern;
         }
     }
 }

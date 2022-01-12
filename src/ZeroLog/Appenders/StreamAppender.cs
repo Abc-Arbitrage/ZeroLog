@@ -9,27 +9,28 @@ public abstract class StreamAppender : IAppender
     private readonly char[] _charBuffer = GC.AllocateUninitializedArray<char>(LogManager.OutputBufferSize);
     private readonly byte[] _byteBuffer = GC.AllocateUninitializedArray<byte>(4 * LogManager.OutputBufferSize);
 
-    private readonly PrefixWriter? _prefixWriter;
-    protected Stream? _stream;
-    protected Encoding _encoding = Encoding.UTF8;
+    private PrefixWriter? _prefixWriter;
 
-    public StreamAppender(string? prefixPattern)
+    protected Stream? Stream { get; set; }
+    protected Encoding Encoding { get; set; } = Encoding.UTF8;
+
+    public string PrefixPattern
     {
-        if (!string.IsNullOrEmpty(prefixPattern))
-            _prefixWriter = new PrefixWriter(prefixPattern);
+        get => _prefixWriter?.Pattern ?? string.Empty;
+        set => _prefixWriter = !string.IsNullOrEmpty(value) ? new PrefixWriter(value) : null;
     }
 
     public virtual void Dispose()
     {
-        _stream?.Dispose();
-        _stream = null;
+        Stream?.Dispose();
+        Stream = null;
     }
 
     public virtual void WriteMessage(FormattedLogMessage message)
     {
         // TODO try to do a single Stream.Write call
 
-        if (_stream is null)
+        if (Stream is null)
             return;
 
         if (_prefixWriter != null)
@@ -51,15 +52,15 @@ public abstract class StreamAppender : IAppender
 
     private void Write(ReadOnlySpan<char> value)
     {
-        if (_stream is null)
+        if (Stream is null)
             return;
 
-        var byteCount = _encoding.GetBytes(value, _byteBuffer);
-        _stream.Write(_byteBuffer, 0, byteCount);
+        var byteCount = Encoding.GetBytes(value, _byteBuffer);
+        Stream.Write(_byteBuffer, 0, byteCount);
     }
 
     public virtual void Flush()
     {
-        _stream?.Flush();
+        Stream?.Flush();
     }
 }

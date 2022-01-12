@@ -14,7 +14,10 @@ namespace ZeroLog.Tests.Appenders
         [SetUp]
         public void SetUp()
         {
-            _appender = new DateAndSizeRollingFileAppender("TestLog", prefixPattern: "%date - %time - %thread - %level - %logger || ");
+            _appender = new DateAndSizeRollingFileAppender("TestLog")
+            {
+                PrefixPattern = "%date - %time - %thread - %level - %logger || "
+            };
         }
 
         [TearDown]

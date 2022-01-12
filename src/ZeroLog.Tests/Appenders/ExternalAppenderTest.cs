@@ -16,7 +16,7 @@ namespace ZeroLog.Tests.Appenders
             {
                 Name = "ExtApp1",
                 AppenderTypeName = "ZeroLog.Tests.ExternalAppender.TestAppender, ZeroLog.Tests.ExternalAppender",
-                AppenderJsonConfig = new DefaultAppenderConfig { PrefixPattern = "[%level] @ %time - %logger: " }
+                //AppenderJsonConfig = new DefaultAppenderConfig { PrefixPattern = "[%level] @ %time - %logger: " }
             };
 
             var config = new ZeroLogJsonConfiguration

@@ -11,8 +11,11 @@ internal class PrefixWriter
 {
     private readonly List<PatternPart> _parts;
 
+    public string Pattern { get; }
+
     public PrefixWriter(string pattern)
     {
+        Pattern = pattern;
         _parts = OptimizeParts(ParsePattern(pattern)).ToList();
     }
 

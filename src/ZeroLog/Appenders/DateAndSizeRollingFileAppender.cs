@@ -6,61 +6,52 @@ namespace ZeroLog.Appenders
 {
     public class DateAndSizeRollingFileAppender : StreamAppender
     {
-        public const int DefaultMaxSize = 200 * 1024 * 1024;
-        public const string DefaultExtension = "log";
-        public const string DefaultPrefixPattern = "%time - %level - %logger || ";
-
         private DateTime _currentDate = DateTime.UtcNow.Date;
         private int _rollingFileNumber;
         private long _fileSize;
 
         /// <summary>
-        /// Gets or sets the file name extension to use for the rolling files. Defaults to "txt".
+        /// Gets or sets the file name extension to use for the rolling files. Defaults to "log".
         /// </summary>
-        public string FilenameExtension { get; set; } = default!;
+        public string FileExtension { get; set; } = "log";
 
         /// <summary>
         /// Gets or sets the root path and file name used by this appender, not including the file extension.
         /// </summary>
-        public string FilenameRoot { get; set; } = default!;
+        public string FileNameRoot { get; set; }
 
         /// <summary>
         /// Gets or sets the maximum permitted file size in bytes. Once a file exceeds this value it will
         /// be closed and the next log file will be created. Defaults to 200 MB.
         /// If the size is 0, the feature is disabled.
         /// </summary>
-        public int MaxFileSizeInBytes { get; set; }
+        public int MaxFileSizeInBytes { get; set; } = 200 * 1024 * 1024;
 
         internal string? CurrentFileName { get; private set; }
 
-        /// <summary>
-        /// Initializes a new instance of the class.
-        /// </summary>
-        public DateAndSizeRollingFileAppender(string filePathRoot, int maxFileSizeInBytes = DefaultMaxSize, string? extension = DefaultExtension, string prefixPattern = DefaultPrefixPattern)
-            : base(prefixPattern)
+        public DateAndSizeRollingFileAppender(string fileNameRoot)
         {
-            FilenameRoot = filePathRoot;
-            MaxFileSizeInBytes = maxFileSizeInBytes;
-            FilenameExtension = extension ?? string.Empty;
+            PrefixPattern = "%time - %level - %logger || ";
+            FileNameRoot = fileNameRoot;
 
             Init();
         }
 
         private void Init()
         {
-            if (FilenameRoot == "")
+            if (string.IsNullOrEmpty(FileNameRoot))
                 throw new ArgumentException("FilenameRoot name was not supplied for RollingFileAppender");
 
             try
             {
-                FilenameRoot = Path.GetFullPath(FilenameRoot);
+                FileNameRoot = Path.GetFullPath(FileNameRoot);
             }
             catch (Exception ex)
             {
                 throw new ApplicationException("Could not resolve the full path to the log file", ex);
             }
 
-            var directory = Path.GetDirectoryName(FilenameRoot) ?? throw new ApplicationException($"Could not resolve the directory of {FilenameRoot}");
+            var directory = Path.GetDirectoryName(FileNameRoot) ?? throw new ApplicationException($"Could not resolve the directory of {FileNameRoot}");
 
             if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
             {
@@ -74,7 +65,7 @@ namespace ZeroLog.Appenders
                 }
             }
 
-            FilenameExtension ??= "";
+            FileExtension ??= "";
             _rollingFileNumber = FindLastRollingFileNumber(directory);
         }
 
@@ -94,21 +85,21 @@ namespace ZeroLog.Appenders
         private void OpenStream()
         {
             CurrentFileName = GetCurrentFileName();
-            _stream = OpenFile(CurrentFileName);
-            FileOpened(_stream);
-            _fileSize = _stream.Length;
+            Stream = OpenFile(CurrentFileName);
+            FileOpened(Stream);
+            _fileSize = Stream.Length;
         }
 
         private void CloseStream()
         {
-            var stream = _stream;
+            var stream = Stream;
             if (stream == null)
                 return;
 
             FileClosing(stream);
             Flush();
 
-            _stream = null;
+            Stream = null;
             _fileSize = 0;
             stream.Dispose();
         }
@@ -132,7 +123,7 @@ namespace ZeroLog.Appenders
             var maxSizeReached = MaxFileSizeInBytes > 0 && _fileSize >= MaxFileSizeInBytes;
             var dateReached = _currentDate != timestamp.Date;
 
-            if (!maxSizeReached && !dateReached && _stream != null)
+            if (!maxSizeReached && !dateReached && Stream != null)
                 return;
 
             CloseStream();
@@ -152,8 +143,8 @@ namespace ZeroLog.Appenders
         private int FindLastRollingFileNumber(string directory)
         {
             var fileNumber = 0;
-            var root = FilenameRoot + ".";
-            var extension = FilenameExtension.Length == 0 ? "" : "." + FilenameExtension;
+            var root = FileNameRoot + ".";
+            var extension = FileExtension.Length == 0 ? "" : "." + FileExtension;
             foreach (var filename in Directory.EnumerateFiles(directory).Select(f => f.ToUpper()))
             {
                 if (filename.StartsWith(root, StringComparison.OrdinalIgnoreCase) && filename.EndsWith(extension, StringComparison.OrdinalIgnoreCase))
@@ -170,7 +161,7 @@ namespace ZeroLog.Appenders
 
         private string GetCurrentFileName()
         {
-            return $"{FilenameRoot}.{_currentDate:yyyyMMdd}.{_rollingFileNumber:D3}{(FilenameExtension.Length == 0 ? "" : "." + FilenameExtension)}";
+            return $"{FileNameRoot}.{_currentDate:yyyyMMdd}.{_rollingFileNumber:D3}{(FileExtension.Length == 0 ? "" : "." + FileExtension)}";
         }
 
         private static Stream OpenFile(string filename)
