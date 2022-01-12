@@ -6,7 +6,6 @@ namespace ZeroLog;
 
 public sealed unsafe partial class LogMessage
 {
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage AppendKeyValue(string key, string? value)
     {
         if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(byte) <= _endOfBuffer && _stringIndex + 1 < _strings.Length)
@@ -47,7 +46,6 @@ public sealed unsafe partial class LogMessage
         return this;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage AppendKeyValue<T>(string key, T value)
         where T : struct, Enum
     {
@@ -77,7 +75,6 @@ public sealed unsafe partial class LogMessage
         return this;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage AppendKeyValue<T>(string key, T? value)
         where T : struct, Enum
     {
@@ -115,7 +112,6 @@ public sealed unsafe partial class LogMessage
         return this;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage AppendKeyValueAscii(string key, ReadOnlySpan<char> value)
     {
         if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(int) + value.Length <= _endOfBuffer && _stringIndex < _strings.Length)
@@ -140,7 +136,6 @@ public sealed unsafe partial class LogMessage
         return this;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage AppendKeyValueAscii(string key, ReadOnlySpan<byte> value)
     {
         if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(int) + value.Length <= _endOfBuffer && _stringIndex < _strings.Length)

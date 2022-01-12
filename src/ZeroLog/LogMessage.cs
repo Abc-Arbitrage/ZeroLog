@@ -64,14 +64,12 @@ public sealed unsafe partial class LogMessage
             Logger?.Submit(this);
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(string? value)
     {
         InternalAppendString(value);
         return this;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage AppendEnum<T>(T value)
         where T : struct, Enum
     {
@@ -79,7 +77,6 @@ public sealed unsafe partial class LogMessage
         return this;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage AppendEnum<T>(T? value)
         where T : struct, Enum
     {

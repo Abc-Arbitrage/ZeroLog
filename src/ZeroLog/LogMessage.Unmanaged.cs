@@ -40,7 +40,7 @@ unsafe partial class LogMessage
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppendUnmanaged<T>(ref T value, string? format)
+    private void InternalAppendUnmanaged<T>(ref T value, string? format)
         where T : unmanaged
     {
         if (string.IsNullOrEmpty(format))

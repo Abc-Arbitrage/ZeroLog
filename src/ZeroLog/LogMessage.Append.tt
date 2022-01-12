@@ -20,14 +20,12 @@ partial class LogMessage
     foreach (var type in _valueTypes)
     {
 #>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(<#= type.name #> value)
     {
         InternalAppendValueType(value, ArgumentType.<#= type.argType #>);
         return this;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(<#= type.name #>? value)
     {
         InternalAppendValueType(value, ArgumentType.<#= type.argType #>);
@@ -38,14 +36,12 @@ partial class LogMessage
         if (type.isFormattable)
         {
 #>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(<#= type.name #> value, string format)
     {
         InternalAppendValueType(value, format, ArgumentType.<#= type.argType #>);
         return this;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage Append(<#= type.name #>? value, string format)
     {
         InternalAppendValueType(value, format, ArgumentType.<#= type.argType #>);
@@ -55,14 +51,12 @@ partial class LogMessage
 <#
         }
 #>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage AppendKeyValue(string key, <#= type.name #> value)
     {
         InternalAppendKeyValue(key, value, ArgumentType.<#= type.argType #>);
         return this;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LogMessage AppendKeyValue(string key, <#= type.name #>? value)
     {
         InternalAppendKeyValue(key, value, ArgumentType.<#= type.argType #>);
