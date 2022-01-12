@@ -41,7 +41,7 @@ public sealed unsafe partial class LogMessage
         }
         else
         {
-            _isTruncated = true;
+            TruncateMessage();
         }
 
         return this;
@@ -71,7 +71,7 @@ public sealed unsafe partial class LogMessage
         }
         else
         {
-            _isTruncated = true;
+            TruncateMessage();
         }
 
         return this;
@@ -109,7 +109,7 @@ public sealed unsafe partial class LogMessage
         }
         else
         {
-            _isTruncated = true;
+            TruncateMessage();
         }
 
         return this;
@@ -134,7 +134,7 @@ public sealed unsafe partial class LogMessage
         }
         else
         {
-            _isTruncated = true;
+            TruncateMessage();
         }
 
         return this;
@@ -159,7 +159,7 @@ public sealed unsafe partial class LogMessage
         }
         else
         {
-            _isTruncated = true;
+            TruncateMessage();
         }
 
         return this;
@@ -189,7 +189,7 @@ public sealed unsafe partial class LogMessage
         }
         else
         {
-            _isTruncated = true;
+            TruncateMessage();
         }
     }
 
@@ -225,7 +225,7 @@ public sealed unsafe partial class LogMessage
         }
         else
         {
-            _isTruncated = true;
+            TruncateMessage();
         }
     }
 }

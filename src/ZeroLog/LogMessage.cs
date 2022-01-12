@@ -106,7 +106,7 @@ public sealed unsafe partial class LogMessage
             }
             else
             {
-                _isTruncated = true;
+                TruncateMessage();
             }
         }
         else
@@ -125,7 +125,7 @@ public sealed unsafe partial class LogMessage
         }
         else
         {
-            _isTruncated = true;
+            TruncateMessage();
         }
     }
 
@@ -143,7 +143,7 @@ public sealed unsafe partial class LogMessage
         }
         else
         {
-            _isTruncated = true;
+            TruncateMessage();
         }
     }
 
@@ -178,7 +178,7 @@ public sealed unsafe partial class LogMessage
         }
         else
         {
-            _isTruncated = true;
+            TruncateMessage();
         }
     }
 
@@ -206,7 +206,7 @@ public sealed unsafe partial class LogMessage
         }
         else
         {
-            _isTruncated = true;
+            TruncateMessage();
         }
     }
 
@@ -248,7 +248,7 @@ public sealed unsafe partial class LogMessage
             }
             else
             {
-                _isTruncated = true;
+                TruncateMessage();
             }
         }
 
@@ -283,10 +283,25 @@ public sealed unsafe partial class LogMessage
             }
             else
             {
-                _isTruncated = true;
+                TruncateMessage();
             }
         }
 
         return this;
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private void TruncateMessage()
+    {
+        if (_isTruncated)
+            return;
+
+        _isTruncated = true;
+
+        if (_dataPointer + sizeof(ArgumentType) <= _endOfBuffer)
+        {
+            *(ArgumentType*)_dataPointer = ArgumentType.EndOfTruncatedMessage;
+            _dataPointer += sizeof(ArgumentType);
+        }
     }
 }

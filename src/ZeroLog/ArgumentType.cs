@@ -30,6 +30,7 @@ internal enum ArgumentType : byte
     Enum,
     Unmanaged,
     KeyString,
+    EndOfTruncatedMessage,
 
     FormatFlag = 1 << 7
 }

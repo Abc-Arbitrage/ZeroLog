@@ -347,6 +347,12 @@ unsafe partial class LogMessage
                 return true;
             }
 
+            case ArgumentType.EndOfTruncatedMessage:
+            {
+                charsWritten = 0;
+                return false;
+            }
+
             default:
                 throw new ArgumentOutOfRangeException();
         }
@@ -515,6 +521,11 @@ unsafe partial class LogMessage
             {
                 ++dataPointer;
                 SkipArg(ref dataPointer);
+                return;
+            }
+
+            case ArgumentType.EndOfTruncatedMessage:
+            {
                 return;
             }
 

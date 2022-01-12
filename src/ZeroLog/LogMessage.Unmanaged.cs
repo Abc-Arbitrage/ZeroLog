@@ -58,7 +58,7 @@ unsafe partial class LogMessage
             }
             else
             {
-                _isTruncated = true;
+                TruncateMessage();
             }
         }
         else
@@ -83,7 +83,7 @@ unsafe partial class LogMessage
             }
             else
             {
-                _isTruncated = true;
+                TruncateMessage();
             }
         }
     }
