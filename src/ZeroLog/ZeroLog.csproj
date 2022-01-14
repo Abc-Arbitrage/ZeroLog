@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFrameworks>net6.0;netstandard2.0</TargetFrameworks>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
@@ -13,30 +13,12 @@
     <PackageReference Include="Fody" Version="6.6.0" PrivateAssets="all" />
     <PackageReference Include="InlineIL.Fody" Version="1.7.1" PrivateAssets="all" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="System.Memory" Version="4.5.4" Condition="'$(TargetFrameworkIdentifier)' == '.NETStandard'" />
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Log.Messages.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Log.Messages.tt</DependentUpon>
-    </Compile>
-    <None Update="Log.Messages.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>Log.Messages.cs</LastGenOutput>
-    </None>
-    <None Update="LogMessage.Append.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>LogMessage.Append.cs</LastGenOutput>
-    </None>
-    <Compile Update="LogMessage.Append.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>LogMessage.Append.tt</DependentUpon>
-    </Compile>
+    <Compile Include="../ZeroLog.Impl.Base/**/*.cs" Exclude="../ZeroLog.Impl.Base/obj/**/*;../ZeroLog.Impl.Base/bin/**/*" Visible="false" />
+    <Compile Include="../ZeroLog.Impl.Full/**/*.cs" Exclude="../ZeroLog.Impl.Full/obj/**/*;../ZeroLog.Impl.Full/bin/**/*" Visible="false" Condition="'$(TargetFramework)' != 'netstandard2.0'" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
-  </ItemGroup>
 </Project>

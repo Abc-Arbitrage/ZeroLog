@@ -35,6 +35,10 @@ internal static class AssertExtensions
         where T : class
         => Assert.That(actual, Is.SameAs(expected));
 
+    public static void ShouldNotBeTheSameAs<T>(this T? actual, T? expected)
+        where T : class
+        => Assert.That(actual, Is.Not.SameAs(expected));
+
     public static void ShouldBeEmpty<T>(this T actual)
         => Assert.That(actual, Is.Empty);
 

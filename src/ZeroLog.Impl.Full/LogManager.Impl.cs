@@ -8,12 +8,11 @@ using ZeroLog.ConfigResolvers;
 
 namespace ZeroLog
 {
-    public sealed class LogManager : ILogManager, ILogMessageProvider, IDisposable
+    partial class LogManager : ILogManager, ILogMessageProvider, IDisposable
     {
         internal const int OutputBufferSize = 16 * 1024;
 
         private static LogManager? _logManager;
-        private static readonly ConcurrentDictionary<string, Log> _loggers = new();
 
         private readonly ConcurrentQueue<LogMessage> _queue;
         private readonly ObjectPool<LogMessage> _pool;
@@ -122,13 +121,7 @@ namespace ZeroLog
             where T : unmanaged
             => UnmanagedCache.Register(formatter);
 
-        public static Log GetLogger<T>()
-            => GetLogger(typeof(T));
-
-        public static Log GetLogger(Type type)
-            => GetLogger(type.FullName!);
-
-        public static Log GetLogger(string name)
+        public static partial Log GetLogger(string name)
         {
             var logManager = _logManager;
 

@@ -1,91 +1,13 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
-using System.Threading;
 using ZeroLog.Utils;
 
 namespace ZeroLog;
 
-public sealed unsafe partial class LogMessage
+unsafe partial class LogMessage
 {
-    internal static readonly LogMessage Empty = new(string.Empty);
-
-    private readonly byte* _startOfBuffer;
-    private readonly byte* _endOfBuffer;
-    private readonly string?[] _strings;
-
-    private byte* _dataPointer;
-    private byte _stringIndex;
-    private bool _isTruncated;
-
-    public Level Level { get; private set; }
-    public DateTime Timestamp { get; internal set; }
-    public Thread? Thread { get; private set; }
-    public Exception? Exception { get; internal set; }
-
-    internal Log? Logger { get; private set; }
-    internal bool IsTruncated => _isTruncated;
-
-    internal string? ConstantMessage { get; }
-    internal bool IsPooled => ConstantMessage is null;
-
-    internal LogMessage(string message)
-    {
-        ConstantMessage = message;
-        _strings = Array.Empty<string>();
-    }
-
-    internal LogMessage(BufferSegment bufferSegment, int stringCapacity)
-    {
-        stringCapacity = Math.Min(stringCapacity, byte.MaxValue);
-        _strings = new string[stringCapacity];
-
-        _startOfBuffer = bufferSegment.Data;
-        _dataPointer = bufferSegment.Data;
-        _endOfBuffer = bufferSegment.Data + bufferSegment.Length;
-    }
-
-    internal void Initialize(Log? log, Level level)
-    {
-        Timestamp = DateTime.UtcNow; // TODO clock in Log
-        Level = level;
-        Thread = Thread.CurrentThread;
-        Exception = null;
-        Logger = log;
-
-        _dataPointer = _startOfBuffer;
-        _stringIndex = 0;
-        _isTruncated = false;
-    }
-
-    public void Log()
-    {
-        if (!ReferenceEquals(this, Empty))
-            Logger?.Submit(this);
-    }
-
-    public LogMessage Append(string? value)
-    {
-        InternalAppendString(value);
-        return this;
-    }
-
-    public LogMessage AppendEnum<T>(T value)
-        where T : struct, Enum
-    {
-        InternalAppendEnum(value);
-        return this;
-    }
-
-    public LogMessage AppendEnum<T>(T? value)
-        where T : struct, Enum
-    {
-        InternalAppendEnum(value);
-        return this;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppendString(string? value)
+    internal partial void InternalAppendString(string? value)
     {
         if (value is not null)
         {
@@ -112,7 +34,6 @@ public sealed unsafe partial class LogMessage
         }
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void InternalAppendNull()
     {
         if (_dataPointer + sizeof(ArgumentType) <= _endOfBuffer)
@@ -126,8 +47,7 @@ public sealed unsafe partial class LogMessage
         }
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppendValueType<T>(T value, ArgumentType argType)
+    internal partial void InternalAppendValueType<T>(T value, ArgumentType argType)
         where T : unmanaged
     {
         if (_dataPointer + sizeof(ArgumentType) + sizeof(T) <= _endOfBuffer)
@@ -144,8 +64,7 @@ public sealed unsafe partial class LogMessage
         }
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppendValueType<T>(T? value, ArgumentType argType)
+    internal partial void InternalAppendValueType<T>(T? value, ArgumentType argType)
         where T : unmanaged
     {
         if (value is not null)
@@ -154,8 +73,7 @@ public sealed unsafe partial class LogMessage
             InternalAppendNull();
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppendValueType<T>(T value, string format, ArgumentType argType)
+    internal partial void InternalAppendValueType<T>(T value, string format, ArgumentType argType)
         where T : unmanaged
     {
         if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(T) <= _endOfBuffer && _stringIndex < _strings.Length)
@@ -179,8 +97,7 @@ public sealed unsafe partial class LogMessage
         }
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppendValueType<T>(T? value, string format, ArgumentType argType)
+    internal partial void InternalAppendValueType<T>(T? value, string format, ArgumentType argType)
         where T : unmanaged
     {
         if (value is not null)
@@ -189,8 +106,7 @@ public sealed unsafe partial class LogMessage
             InternalAppendNull();
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppendEnum<T>(T value)
+    internal partial void InternalAppendEnum<T>(T value)
         where T : struct, Enum
     {
         if (_dataPointer + sizeof(ArgumentType) + sizeof(EnumArg) <= _endOfBuffer)
@@ -207,8 +123,7 @@ public sealed unsafe partial class LogMessage
         }
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void InternalAppendEnum<T>(T? value)
+    internal partial void InternalAppendEnum<T>(T? value)
         where T : struct, Enum
     {
         if (value is not null)
@@ -218,7 +133,7 @@ public sealed unsafe partial class LogMessage
     }
 
     [SuppressMessage("ReSharper", "ReplaceSliceWithRangeIndexer")]
-    public LogMessage AppendAsciiString(ReadOnlySpan<char> value)
+    private partial void InternalAppendAsciiString(ReadOnlySpan<char> value)
     {
         if (value.Length > 0)
         {
@@ -248,12 +163,10 @@ public sealed unsafe partial class LogMessage
                 TruncateMessage();
             }
         }
-
-        return this;
     }
 
     [SuppressMessage("ReSharper", "ReplaceSliceWithRangeIndexer")]
-    public LogMessage AppendAsciiString(ReadOnlySpan<byte> value)
+    private partial void InternalAppendAsciiString(ReadOnlySpan<byte> value)
     {
         if (value.Length > 0)
         {
@@ -283,8 +196,6 @@ public sealed unsafe partial class LogMessage
                 TruncateMessage();
             }
         }
-
-        return this;
     }
 
     [MethodImpl(MethodImplOptions.NoInlining)]
