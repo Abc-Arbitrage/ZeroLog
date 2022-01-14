@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 
 namespace ZeroLog.Utils;
 
@@ -26,6 +27,16 @@ internal ref struct CharBufferBuilder
 
     public void IncrementPos(int chars)
         => _pos += chars;
+
+    /// <summary>
+    /// Appends a character, but does nothing if there is no more room for it.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Append(char value)
+    {
+        if (_pos < _buffer.Length)
+            _buffer[_pos++] = value;
+    }
 
     public bool TryAppendWhole(ReadOnlySpan<char> value)
     {
