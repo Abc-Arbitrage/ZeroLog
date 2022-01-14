@@ -18,8 +18,8 @@ public class LogTests
     [Test]
     public void should_not_throw_fatal()
     {
-        _log.IsFatalEnabled.ShouldBeTrue();
-        _log.IsEnabled(Level.Fatal).ShouldBeTrue();
+        _log.IsFatalEnabled.ShouldBeFalse();
+        _log.IsEnabled(Level.Fatal).ShouldBeFalse();
 
         _log.Fatal("Message");
         _log.Fatal("Message", new InvalidOperationException());

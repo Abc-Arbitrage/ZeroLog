@@ -31,6 +31,17 @@ public partial class LogTests
         _provider.Dispose();
     }
 
+    [Test]
+    public void should_be_disabled_at_construction()
+    {
+        _log = new Log("TestLog");
+
+        _log.IsFatalEnabled.ShouldBeFalse();
+        _log.IsEnabled(Level.Fatal).ShouldBeFalse();
+
+        _log.Fatal().ShouldBeTheSameAs(LogMessage.Empty);
+    }
+
     [TestCase(Level.Trace, true, true, true, true, true, true)]
     [TestCase(Level.Debug, false, true, true, true, true, true)]
     [TestCase(Level.Info, false, false, true, true, true, true)]

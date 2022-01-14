@@ -6,7 +6,7 @@ namespace ZeroLog;
 public sealed partial class Log
 {
     [SuppressMessage("ReSharper", "FieldCanBeMadeReadOnly.Local")]
-    private Level _logLevel = Level.Fatal;
+    private Level _logLevel = Level.Fatal + 1;
 
     internal string Name { get; }
 
