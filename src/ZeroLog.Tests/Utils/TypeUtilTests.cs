@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using NFluent;
 using NUnit.Framework;
+using ZeroLog.Tests.Support;
 using ZeroLog.Utils;
 
 namespace ZeroLog.Tests.Utils
@@ -51,10 +53,9 @@ namespace ZeroLog.Tests.Utils
 
             bool IsUnmanaged<T>()
             {
-                var genericResult = TypeUtil.GetIsUnmanagedSlow<T>();
-                var nonGenericResult = TypeUtil.GetIsUnmanagedSlow(typeof(T));
-                Check.That(nonGenericResult).IsEqualTo(genericResult);
-                return genericResult;
+                var expectedResult = !RuntimeHelpers.IsReferenceOrContainsReferences<T>();
+                TypeUtil.GetIsUnmanagedSlow(typeof(T)).ShouldEqual(expectedResult);
+                return expectedResult;
             }
         }
 

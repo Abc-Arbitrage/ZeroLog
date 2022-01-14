@@ -1,8 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Threading;
+using Newtonsoft.Json;
 using ZeroLog.ConfigResolvers;
-using ZeroLog.Utils;
 
 namespace ZeroLog.Config
 {
@@ -72,7 +72,8 @@ namespace ZeroLog.Config
 
         internal static ZeroLogJsonConfiguration DeserializeConfiguration(string? jsonConfiguration)
         {
-            var config = JsonExtensions.DeserializeOrDefault(jsonConfiguration, new ZeroLogJsonConfiguration());
+            ZeroLogJsonConfiguration @default = new ZeroLogJsonConfiguration();
+            var config = string.IsNullOrEmpty(jsonConfiguration) ? @default : JsonConvert.DeserializeObject<ZeroLogJsonConfiguration>(jsonConfiguration!);
             return config;
         }
 

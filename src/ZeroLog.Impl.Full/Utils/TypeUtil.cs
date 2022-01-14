@@ -31,36 +31,11 @@ namespace ZeroLog.Utils
             ).Compile();
         }
 
-        public static bool GetIsUnmanagedSlow<T>()
-        {
-#if NETCOREAPP
-             return !RuntimeHelpers.IsReferenceOrContainsReferences<T>();
-#else
-             return GetIsUnmanagedSlow(typeof(T));
-#endif
-        }
-
         public static bool GetIsUnmanagedSlow(Type type)
         {
-#if NETCOREAPP
             return !(bool)typeof(RuntimeHelpers).GetMethod(nameof(RuntimeHelpers.IsReferenceOrContainsReferences), BindingFlags.Static | BindingFlags.Public)!
                                                 .MakeGenericMethod(type)
                                                 .Invoke(null, null)!;
-#else
-            if (type.IsPrimitive || type.IsPointer || type.IsEnum)
-                return true;
-
-            if (!type.IsValueType)
-                return false;
-
-            foreach (var field in type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
-            {
-                if (!GetIsUnmanagedSlow(field.FieldType))
-                    return false;
-            }
-
-            return true;
-#endif
         }
     }
 
@@ -80,6 +55,5 @@ namespace ZeroLog.Utils
         public static readonly bool IsNullableEnum = _underlyingType?.IsEnum == true;
         public static readonly IntPtr UnderlyingTypeHandle = TypeUtil.GetTypeHandleSlow(_underlyingType);
         public static readonly TypeCode UnderlyingTypeCode = Type.GetTypeCode(_underlyingType);
-        public static readonly bool IsUnmanaged = TypeUtil.GetIsUnmanagedSlow<T>();
     }
 }

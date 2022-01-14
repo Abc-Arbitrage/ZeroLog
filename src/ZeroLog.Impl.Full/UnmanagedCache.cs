@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using ZeroLog.Utils;
 
 namespace ZeroLog;
@@ -68,7 +69,7 @@ internal static unsafe class UnmanagedCache
         where T : unmanaged
     {
         if (typedFormatter != null)
-            return typedFormatter.Invoke(ref UnsafeTools.AsRef<T>(valuePtr), destination, out charsWritten, format);
+            return typedFormatter.Invoke(ref Unsafe.AsRef<T>(valuePtr), destination, out charsWritten, format);
 
         charsWritten = 0;
         return true;
@@ -77,7 +78,7 @@ internal static unsafe class UnmanagedCache
     private static bool FormatterGenericNullable<T>(byte* valuePtr, Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, UnmanagedFormatterDelegate<T>? typedFormatter)
         where T : unmanaged
     {
-        ref var typedValueRef = ref UnsafeTools.AsRef<T?>(valuePtr);
+        ref var typedValueRef = ref Unsafe.AsRef<T?>(valuePtr);
 
         if (typedValueRef != null)
         {
