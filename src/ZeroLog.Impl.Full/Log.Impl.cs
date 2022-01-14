@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using ZeroLog.Appenders;
 
@@ -25,52 +26,49 @@ partial class Log
     public partial bool IsEnabled(Level level)
         => level >= _logLevel;
 
-    public partial LogMessage ForLevel(Level level)
-        => IsEnabled(level)
-            ? GetLogMessage(level)
+    private partial LogMessage InternalAcquireLogMessage(Level level)
+    {
+        var provider = _logMessageProvider;
+
+        var logMessage = provider is not null
+            ? provider.TryAcquireLogMessage() ?? AcquireLogMessageOnExhaustedPool()
             : LogMessage.Empty;
 
-    private LogMessage GetLogMessage(Level level)
-    {
-        var logMessage = AcquireLogMessage();
         logMessage.Initialize(this, level);
         return logMessage;
+    }
 
-        LogMessage AcquireLogMessage()
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private LogMessage AcquireLogMessageOnExhaustedPool()
+    {
+        var provider = _logMessageProvider;
+        if (provider is null)
+            return LogMessage.Empty;
+
+        switch (_logMessagePoolExhaustionStrategy)
         {
-            var provider = _logMessageProvider;
-            if (provider is null)
+            case LogMessagePoolExhaustionStrategy.DropLogMessageAndNotifyAppenders:
+                return _poolExhaustedMessage;
+
+            case LogMessagePoolExhaustionStrategy.DropLogMessage:
                 return LogMessage.Empty;
 
-            var message = provider.TryAcquireLogMessage();
-            if (message is not null)
-                return message;
-
-            switch (_logMessagePoolExhaustionStrategy)
+            case LogMessagePoolExhaustionStrategy.WaitUntilAvailable:
             {
-                case LogMessagePoolExhaustionStrategy.DropLogMessageAndNotifyAppenders:
-                    return _poolExhaustedMessage;
+                var spinWait = new SpinWait();
 
-                case LogMessagePoolExhaustionStrategy.DropLogMessage:
-                    return LogMessage.Empty;
-
-                case LogMessagePoolExhaustionStrategy.WaitUntilAvailable:
+                while (true)
                 {
-                    var spinWait = new SpinWait();
+                    spinWait.SpinOnce();
 
-                    while (true)
-                    {
-                        spinWait.SpinOnce();
-
-                        message = provider.TryAcquireLogMessage();
-                        if (message is not null)
-                            return message;
-                    }
+                    var message = provider.TryAcquireLogMessage();
+                    if (message is not null)
+                        return message;
                 }
-
-                default:
-                    return LogMessage.Empty;
             }
+
+            default:
+                return LogMessage.Empty;
         }
     }
 

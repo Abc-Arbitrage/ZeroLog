@@ -70,13 +70,9 @@ partial class Log
         [SuppressMessage("ReSharper", "UnusedParameter.Local")]
         public <#= levelName #>InterpolatedStringHandler(int literalLength, int formattedCount, Log log, out bool isEnabled)
         {
-#if NETSTANDARD
-            Message = LogMessage.Empty;
-            isEnabled = false;
-#else
             if (log.Is<#= levelName #>Enabled)
             {
-                Message = log.GetLogMessage(Level.<#= levelName #>);
+                Message = log.InternalAcquireLogMessage(Level.<#= levelName #>);
                 isEnabled = true;
             }
             else
@@ -84,7 +80,6 @@ partial class Log
                 Message = LogMessage.Empty;
                 isEnabled = false;
             }
-#endif
         }
 
         public void AppendLiteral(string value)

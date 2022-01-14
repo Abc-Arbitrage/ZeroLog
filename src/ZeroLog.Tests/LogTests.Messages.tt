@@ -1,7 +1,7 @@
 <#@ template debug="false" hostspecific="false" language="C#" #>
 <#@ output extension=".cs" #>
 <#@ import namespace="System.Collections.Generic" #>
-<#@ include file="../ZeroLog/LogMetadata.ttinclude" #>
+<#@ include file="../ZeroLog.Impl.Base/LogMetadata.ttinclude" #>
 <#
     var testFormats = new Dictionary<string, string>
     {

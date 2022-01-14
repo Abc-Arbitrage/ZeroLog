@@ -19,7 +19,12 @@ public sealed partial class Log
     public partial bool IsEnabled(Level level);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public partial LogMessage ForLevel(Level level);
+    public LogMessage ForLevel(Level level)
+        => IsEnabled(level)
+            ? InternalAcquireLogMessage(level)
+            : LogMessage.Empty;
+
+    private partial LogMessage InternalAcquireLogMessage(Level level);
 
     public override string ToString()
         => Name;
@@ -29,7 +34,7 @@ public sealed partial class Log
     public partial bool IsEnabled(Level level)
         => false;
 
-    public partial LogMessage ForLevel(Level level)
+    private partial LogMessage InternalAcquireLogMessage(Level level)
         => LogMessage.Empty;
 
 #endif

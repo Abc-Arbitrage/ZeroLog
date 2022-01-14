@@ -191,13 +191,9 @@ partial class Log
         [SuppressMessage("ReSharper", "UnusedParameter.Local")]
         public TraceInterpolatedStringHandler(int literalLength, int formattedCount, Log log, out bool isEnabled)
         {
-#if NETSTANDARD
-            Message = LogMessage.Empty;
-            isEnabled = false;
-#else
             if (log.IsTraceEnabled)
             {
-                Message = log.GetLogMessage(Level.Trace);
+                Message = log.InternalAcquireLogMessage(Level.Trace);
                 isEnabled = true;
             }
             else
@@ -205,7 +201,6 @@ partial class Log
                 Message = LogMessage.Empty;
                 isEnabled = false;
             }
-#endif
         }
 
         public void AppendLiteral(string value)
@@ -434,13 +429,9 @@ partial class Log
         [SuppressMessage("ReSharper", "UnusedParameter.Local")]
         public DebugInterpolatedStringHandler(int literalLength, int formattedCount, Log log, out bool isEnabled)
         {
-#if NETSTANDARD
-            Message = LogMessage.Empty;
-            isEnabled = false;
-#else
             if (log.IsDebugEnabled)
             {
-                Message = log.GetLogMessage(Level.Debug);
+                Message = log.InternalAcquireLogMessage(Level.Debug);
                 isEnabled = true;
             }
             else
@@ -448,7 +439,6 @@ partial class Log
                 Message = LogMessage.Empty;
                 isEnabled = false;
             }
-#endif
         }
 
         public void AppendLiteral(string value)
@@ -677,13 +667,9 @@ partial class Log
         [SuppressMessage("ReSharper", "UnusedParameter.Local")]
         public InfoInterpolatedStringHandler(int literalLength, int formattedCount, Log log, out bool isEnabled)
         {
-#if NETSTANDARD
-            Message = LogMessage.Empty;
-            isEnabled = false;
-#else
             if (log.IsInfoEnabled)
             {
-                Message = log.GetLogMessage(Level.Info);
+                Message = log.InternalAcquireLogMessage(Level.Info);
                 isEnabled = true;
             }
             else
@@ -691,7 +677,6 @@ partial class Log
                 Message = LogMessage.Empty;
                 isEnabled = false;
             }
-#endif
         }
 
         public void AppendLiteral(string value)
@@ -920,13 +905,9 @@ partial class Log
         [SuppressMessage("ReSharper", "UnusedParameter.Local")]
         public WarnInterpolatedStringHandler(int literalLength, int formattedCount, Log log, out bool isEnabled)
         {
-#if NETSTANDARD
-            Message = LogMessage.Empty;
-            isEnabled = false;
-#else
             if (log.IsWarnEnabled)
             {
-                Message = log.GetLogMessage(Level.Warn);
+                Message = log.InternalAcquireLogMessage(Level.Warn);
                 isEnabled = true;
             }
             else
@@ -934,7 +915,6 @@ partial class Log
                 Message = LogMessage.Empty;
                 isEnabled = false;
             }
-#endif
         }
 
         public void AppendLiteral(string value)
@@ -1163,13 +1143,9 @@ partial class Log
         [SuppressMessage("ReSharper", "UnusedParameter.Local")]
         public ErrorInterpolatedStringHandler(int literalLength, int formattedCount, Log log, out bool isEnabled)
         {
-#if NETSTANDARD
-            Message = LogMessage.Empty;
-            isEnabled = false;
-#else
             if (log.IsErrorEnabled)
             {
-                Message = log.GetLogMessage(Level.Error);
+                Message = log.InternalAcquireLogMessage(Level.Error);
                 isEnabled = true;
             }
             else
@@ -1177,7 +1153,6 @@ partial class Log
                 Message = LogMessage.Empty;
                 isEnabled = false;
             }
-#endif
         }
 
         public void AppendLiteral(string value)
@@ -1406,13 +1381,9 @@ partial class Log
         [SuppressMessage("ReSharper", "UnusedParameter.Local")]
         public FatalInterpolatedStringHandler(int literalLength, int formattedCount, Log log, out bool isEnabled)
         {
-#if NETSTANDARD
-            Message = LogMessage.Empty;
-            isEnabled = false;
-#else
             if (log.IsFatalEnabled)
             {
-                Message = log.GetLogMessage(Level.Fatal);
+                Message = log.InternalAcquireLogMessage(Level.Fatal);
                 isEnabled = true;
             }
             else
@@ -1420,7 +1391,6 @@ partial class Log
                 Message = LogMessage.Empty;
                 isEnabled = false;
             }
-#endif
         }
 
         public void AppendLiteral(string value)
