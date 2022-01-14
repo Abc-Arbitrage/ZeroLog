@@ -8,7 +8,7 @@ using ZeroLog.ConfigResolvers;
 
 namespace ZeroLog
 {
-    partial class LogManager : ILogManager, ILogMessageProvider, IDisposable
+    partial class LogManager : ILogMessageProvider, IDisposable
     {
         internal const int OutputBufferSize = 16 * 1024;
 
@@ -63,6 +63,7 @@ namespace ZeroLog
                 return;
 
             _isRunning = false;
+            Interlocked.CompareExchange(ref _logManager, null, this);
 
             ResetAllLogConfigurations();
 
@@ -77,7 +78,7 @@ namespace ZeroLog
             _bufferSegmentProvider.Dispose();
         }
 
-        public static ILogManager Initialize(IConfigurationResolver configResolver, ZeroLogInitializationConfig? config = null)
+        public static IDisposable Initialize(IConfigurationResolver configResolver, ZeroLogInitializationConfig? config = null)
         {
             if (_logManager is not null)
                 throw new ApplicationException("LogManager is already initialized");
@@ -87,12 +88,7 @@ namespace ZeroLog
         }
 
         public static void Shutdown()
-        {
-            var logManager = _logManager;
-            _logManager = null;
-
-            logManager?.Dispose();
-        }
+            => _logManager?.Dispose();
 
         public static void RegisterEnum(Type enumType)
             => EnumCache.Register(enumType);

@@ -8,7 +8,7 @@ namespace ZeroLog.Config
 {
     public static class JsonConfigurator
     {
-        public static ILogManager ConfigureAndWatch(string configFilePath)
+        public static IDisposable ConfigureAndWatch(string configFilePath)
         {
             var configFileFullPath = Path.GetFullPath(configFilePath);
 
