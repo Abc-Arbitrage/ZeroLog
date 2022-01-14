@@ -1,9 +1,11 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
 namespace ZeroLog;
 
-public sealed partial class LogMessage
+[SuppressMessage("ReSharper", "UnusedParameterInPartialMethod")]
+partial class LogMessage
 {
     public LogMessage AppendKeyValue(string key, string? value)
     {

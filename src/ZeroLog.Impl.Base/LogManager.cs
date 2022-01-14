@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 
 namespace ZeroLog;
 
+[SuppressMessage("ReSharper", "PartialTypeWithSinglePart")]
 public sealed partial class LogManager
 {
     private static readonly ConcurrentDictionary<string, Log> _loggers = new();
@@ -18,12 +20,7 @@ public sealed partial class LogManager
 #if NETSTANDARD
 
     public static partial Log GetLogger(string name)
-    {
-        return _loggers.GetOrAdd(
-            name,
-            static n => new Log(n)
-        );
-    }
+        => _loggers.GetOrAdd(name, static n => new Log(n));
 
 #endif
 }

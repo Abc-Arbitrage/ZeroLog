@@ -16,9 +16,10 @@ public class LogTests
     }
 
     [Test]
-    public void should_not_throw()
+    public void should_not_throw_fatal()
     {
         _log.IsFatalEnabled.ShouldBeTrue();
+        _log.IsEnabled(Level.Fatal).ShouldBeTrue();
 
         _log.Fatal("Message");
         _log.Fatal("Message", new InvalidOperationException());
@@ -33,5 +34,28 @@ public class LogTests
             .Log();
 
         _log.Fatal().ShouldBeTheSameAs(LogMessage.Empty);
+        _log.ForLevel(Level.Fatal).ShouldBeTheSameAs(LogMessage.Empty);
+    }
+
+    [Test]
+    public void should_not_throw_trace()
+    {
+        _log.IsTraceEnabled.ShouldBeFalse();
+        _log.IsEnabled(Level.Trace).ShouldBeFalse();
+
+        _log.Trace("Message");
+        _log.Trace("Message", new InvalidOperationException());
+
+        _log.Trace($"Message {42}");
+        _log.Trace($"Message {42}", new InvalidOperationException());
+
+        _log.Trace()
+            .Append("Message")
+            .Append($"Other {42}")
+            .Append(42)
+            .Log();
+
+        _log.Trace().ShouldBeTheSameAs(LogMessage.Empty);
+        _log.ForLevel(Level.Trace).ShouldBeTheSameAs(LogMessage.Empty);
     }
 }

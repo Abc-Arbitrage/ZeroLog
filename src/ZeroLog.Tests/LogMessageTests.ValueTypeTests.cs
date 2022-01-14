@@ -7,7 +7,7 @@ namespace ZeroLog.Tests;
 
 unsafe partial class LogMessageTests
 {
-    public class ValueTypeTests<T> : LogMessageTests
+    public abstract class ValueTypeTests<T> : LogMessageTests
         where T : unmanaged
     {
         protected void ShouldTruncateValue(Action action, bool formatted)

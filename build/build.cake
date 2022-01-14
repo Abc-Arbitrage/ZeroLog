@@ -12,6 +12,7 @@ var paths = new {
     solution = MakeAbsolute(File("./../src/ZeroLog.sln")).FullPath,
     props = MakeAbsolute(File("./../src/Directory.Build.props")).FullPath,
     testProject = MakeAbsolute(File("./../src/ZeroLog.Tests/ZeroLog.Tests.csproj")).FullPath,
+    testProjectNetStandard = MakeAbsolute(File("./../src/ZeroLog.Tests.NetStandard/ZeroLog.Tests.NetStandard.csproj")).FullPath,
     output = MakeAbsolute(Directory("./../output")).FullPath
 };
 
@@ -49,6 +50,11 @@ Task("Run-Build").Does(() =>
 Task("Run-Tests").Does(() =>
 {
     DotNetCoreTest(paths.testProject, new DotNetCoreTestSettings {
+        Configuration = "Release",
+        NoBuild = true
+    });
+
+    DotNetCoreTest(paths.testProjectNetStandard, new DotNetCoreTestSettings {
         Configuration = "Release",
         NoBuild = true
     });

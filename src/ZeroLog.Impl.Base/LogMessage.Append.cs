@@ -1,8 +1,10 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
 namespace ZeroLog;
 
+[SuppressMessage("ReSharper", "UnusedParameterInPartialMethod")]
 partial class LogMessage
 {
     public LogMessage Append(string? value)

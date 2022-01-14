@@ -6,17 +6,13 @@ namespace ZeroLog;
 public sealed partial class Log
 {
     [SuppressMessage("ReSharper", "FieldCanBeMadeReadOnly.Local")]
-    private Level _logLevel;
+    private Level _logLevel = Level.Fatal;
 
     internal string Name { get; }
 
     internal Log(string name)
     {
         Name = name;
-
-#if NETSTANDARD
-        _logLevel = Level.Fatal;
-#endif
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -24,6 +20,9 @@ public sealed partial class Log
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public partial LogMessage ForLevel(Level level);
+
+    public override string ToString()
+        => Name;
 
 #if NETSTANDARD
 

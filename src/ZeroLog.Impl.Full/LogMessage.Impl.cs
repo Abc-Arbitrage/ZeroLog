@@ -5,6 +5,8 @@ namespace ZeroLog;
 
 unsafe partial class LogMessage
 {
+    internal static readonly LogMessage Empty = new(string.Empty);
+
     private readonly byte* _startOfBuffer;
     private readonly byte* _endOfBuffer;
     private readonly string?[] _strings;
@@ -18,6 +20,12 @@ unsafe partial class LogMessage
 
     internal string? ConstantMessage { get; }
     internal bool IsPooled => ConstantMessage is null;
+
+    internal LogMessage(string message)
+    {
+        ConstantMessage = message;
+        _strings = Array.Empty<string>();
+    }
 
     internal LogMessage(BufferSegment bufferSegment, int stringCapacity)
     {

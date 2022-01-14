@@ -4,21 +4,22 @@
     <RootNamespace>ZeroLog</RootNamespace>
     <Nullable>enable</Nullable>
   </PropertyGroup>
-  
+
   <ItemGroup>
     <PackageReference Include="System.Memory" Version="4.5.4" />
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Log.Generated.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Log.Messages.tt</DependentUpon>
-    </Compile>
     <None Update="Log.Generated.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Log.Generated.cs</LastGenOutput>
     </None>
+    <Compile Update="Log.Generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Log.Generated.tt</DependentUpon>
+    </Compile>
+
     <None Update="LogMessage.Generated.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>LogMessage.Generated.cs</LastGenOutput>
@@ -26,7 +27,7 @@
     <Compile Update="LogMessage.Generated.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>LogMessage.Append.tt</DependentUpon>
+      <DependentUpon>LogMessage.Generated.tt</DependentUpon>
     </Compile>
   </ItemGroup>
 

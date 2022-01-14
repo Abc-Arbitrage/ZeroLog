@@ -1,33 +1,33 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 
 namespace ZeroLog;
 
+[SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Local")]
 public sealed partial class LogMessage
 {
-    internal static readonly LogMessage Empty = new(string.Empty);
-
     public Level Level { get; private set; }
     public DateTime Timestamp { get; internal set; }
     public Thread? Thread { get; private set; }
     public Exception? Exception { get; internal set; }
 
-    internal LogMessage(string message)
-    {
-#if !NETSTANDARD
-        // That's definitely not pretty, but partial constructors are not supported :'(
-        ConstantMessage = message;
-        _strings = Array.Empty<string>();
-#endif
-    }
-
     public partial void Log();
 
 #if NETSTANDARD
 
+    internal static readonly LogMessage Empty = new();
+
+    private LogMessage()
+    {
+    }
+
     public partial void Log()
     {
     }
+
+    public override string ToString()
+        => string.Empty;
 
 #endif
 }

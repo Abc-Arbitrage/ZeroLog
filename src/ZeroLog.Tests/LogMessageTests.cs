@@ -5,8 +5,7 @@ using ZeroLog.Tests.Support;
 
 namespace ZeroLog.Tests;
 
-[TestFixture]
-public unsafe partial class LogMessageTests
+public abstract unsafe partial class LogMessageTests
 {
     private const int _bufferLength = 1024;
     private const int _stringCapacity = 4;

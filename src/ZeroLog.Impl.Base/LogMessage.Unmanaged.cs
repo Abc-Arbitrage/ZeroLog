@@ -1,7 +1,9 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
 namespace ZeroLog;
 
+[SuppressMessage("ReSharper", "UnusedParameterInPartialMethod")]
 partial class LogMessage
 {
     public LogMessage AppendUnmanaged<T>(T value, string? format = null)
