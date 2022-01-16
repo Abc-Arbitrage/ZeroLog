@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.Testing;
 using NUnit.Framework;
 
 namespace ZeroLog.Analyzers.Tests;
@@ -13,13 +14,10 @@ public class LanguageVersionAnalyzerTests
         var test = new Test
         {
             LanguageVersion = LanguageVersion.CSharp9,
-            TestState =
-            {
-                Sources = { string.Empty }
-            },
+            Source = string.Empty,
             ExpectedDiagnostics =
             {
-                new(LanguageVersionAnalyzer.UnsupportedLanguageVersionDiagnostic)
+                new DiagnosticResult(LanguageVersionAnalyzer.UnsupportedLanguageVersionDiagnostic)
             }
         };
 
@@ -32,16 +30,13 @@ public class LanguageVersionAnalyzerTests
         var test = new Test
         {
             LanguageVersion = LanguageVersion.CSharp10,
-            TestState =
-            {
-                Sources = { string.Empty }
-            }
+            Source = string.Empty,
         };
 
         return test.RunAsync();
     }
 
-    private class Test : AnalyzerTest<LanguageVersionAnalyzer>
+    private class Test : ZeroLogAnalyzerTest<LanguageVersionAnalyzer>
     {
     }
 }

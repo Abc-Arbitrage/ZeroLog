@@ -14,19 +14,13 @@ public class LegacyStringInterpolationAnalyzerTests
         var test = new Test
         {
             LanguageVersion = LanguageVersion.CSharp10,
-            TestState =
-            {
-                Sources =
-                {
-                    @"
+            Source = @"
 class C
 {
     void M(ZeroLog.Log log)
         => log.Info({|#0:$""""|});
 }
 "
-                }
-            }
         };
 
         return test.RunAsync();
@@ -38,19 +32,13 @@ class C
         var test = new Test
         {
             LanguageVersion = LanguageVersion.CSharp9,
-            TestState =
-            {
-                Sources =
-                {
-                    @"
+            Source = @"
 class C
 {
     void M(ZeroLog.Log log)
         => log.Info({|#0:$""""|});
 }
-"
-                }
-            },
+",
             ExpectedDiagnostics =
             {
                 new DiagnosticResult(LegacyStringInterpolationAnalyzer.AllocatingStringInterpolationDiagnostic).WithLocation(0)
@@ -66,19 +54,13 @@ class C
         var test = new Test
         {
             LanguageVersion = LanguageVersion.CSharp9,
-            TestState =
-            {
-                Sources =
-                {
-                    @"
+            Source = @"
 class C
 {
     void M(ZeroLog.LogMessage message)
         => message.Append({|#0:$""""|});
 }
-"
-                }
-            },
+",
             ExpectedDiagnostics =
             {
                 new DiagnosticResult(LegacyStringInterpolationAnalyzer.AllocatingStringInterpolationDiagnostic).WithLocation(0)
@@ -88,7 +70,7 @@ class C
         return test.RunAsync();
     }
 
-    private class Test : AnalyzerTest<LegacyStringInterpolationAnalyzer>
+    private class Test : ZeroLogAnalyzerTest<LegacyStringInterpolationAnalyzer>
     {
     }
 }
