@@ -1,0 +1,10 @@
+<Project>
+
+  <Target Name="ZeroLogSanityChack"
+          BeforeTargets="Build"
+          Condition="'$(ZeroLogSkipSanityCheck)' != 'true' and '$(DesignTimeBuild)' != 'true'">
+    <Error Condition="$([MSBuild]::VersionLessThan($([MSBuild]::ValueOrDefault('$(NETCoreSdkVersion)', '0.0')), '6.0'))"
+           Text="ZeroLog requires at least the .NET 6 SDK (Visual Studio 2022)." />
+  </Target>
+
+</Project>
