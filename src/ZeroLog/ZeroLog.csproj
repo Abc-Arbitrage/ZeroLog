@@ -21,4 +21,9 @@
     <Compile Include="../ZeroLog.Impl.Full/**/*.cs" Exclude="../ZeroLog.Impl.Full/obj/**/*;../ZeroLog.Impl.Full/bin/**/*" Visible="false" Condition="'$(TargetFramework)' != 'netstandard2.0'" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="../ZeroLog.Analyzers/ZeroLog.Analyzers.csproj" ReferenceOutputAssembly="false" />
+    <None Include="../ZeroLog.Analyzers/bin/$(Configuration)/netstandard2.0/ZeroLog.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+  </ItemGroup>
+
 </Project>
