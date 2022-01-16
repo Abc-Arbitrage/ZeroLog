@@ -30,6 +30,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeroLog.Impl.Full", "ZeroLo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeroLog.Tests.NetStandard", "ZeroLog.Tests.NetStandard\ZeroLog.Tests.NetStandard.csproj", "{9F6B9525-489C-4D34-A9B6-6D90093C46C3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeroLog.Analyzers", "ZeroLog.Analyzers\ZeroLog.Analyzers.csproj", "{A5AE4B4A-CB54-4781-9B35-2DFAC9A651FF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeroLog.Analyzers.Tests", "ZeroLog.Analyzers.Tests\ZeroLog.Analyzers.Tests.csproj", "{FC5C8744-6E2C-49B0-9B3B-6BE6F825DF6C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -64,6 +68,14 @@ Global
 		{9F6B9525-489C-4D34-A9B6-6D90093C46C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9F6B9525-489C-4D34-A9B6-6D90093C46C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9F6B9525-489C-4D34-A9B6-6D90093C46C3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A5AE4B4A-CB54-4781-9B35-2DFAC9A651FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A5AE4B4A-CB54-4781-9B35-2DFAC9A651FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A5AE4B4A-CB54-4781-9B35-2DFAC9A651FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A5AE4B4A-CB54-4781-9B35-2DFAC9A651FF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FC5C8744-6E2C-49B0-9B3B-6BE6F825DF6C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FC5C8744-6E2C-49B0-9B3B-6BE6F825DF6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FC5C8744-6E2C-49B0-9B3B-6BE6F825DF6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FC5C8744-6E2C-49B0-9B3B-6BE6F825DF6C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
