@@ -19,6 +19,8 @@ internal class GuardedAppender : Appender
 
     public override void WriteMessage(FormattedLogMessage message)
     {
+        // TODO move this logic to Appender
+
         if (_nextActivationTime.HasValue && _nextActivationTime.Value > SystemDateTime.UtcNow)
             return;
 

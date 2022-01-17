@@ -7,7 +7,6 @@
 
   <ItemGroup>
     <PackageReference Include="InlineIL.Fody" Version="1.7.1" PrivateAssets="all" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
   </ItemGroup>
 
   <ItemGroup>

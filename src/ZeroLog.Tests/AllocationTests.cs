@@ -9,7 +9,7 @@ using ZeroLog.Config;
 
 namespace ZeroLog.Tests
 {
-    [TestFixture]
+    [TestFixture, NonParallelizable]
     public class AllocationTests
     {
         private WaitableAppender _waitableAppender;
@@ -39,11 +39,14 @@ namespace ZeroLog.Tests
 
             _waitableAppender = new WaitableAppender(Path.Combine(_tempDirectory, "allocation-test"));
 
-            BasicConfigurator.Configure(new ZeroLogBasicConfiguration
+            LogManager.Initialize(new ZeroLogConfiguration
             {
-                Appenders = { _waitableAppender },
                 LogMessagePoolSize = 2048 * 10,
-                LogMessageBufferSize = 512
+                LogMessageBufferSize = 512,
+                RootLogger =
+                {
+                    Appenders = { _waitableAppender }
+                }
             });
 
             LogManager.RegisterEnum<DayOfWeek>();
@@ -126,12 +129,10 @@ namespace ZeroLog.Tests
                     // .AppendUnmanaged(unmanaged)
                     .Append("Unregistered Unmanaged Struct ")
                     // .AppendUnmanaged(unregistered_unmanaged)
-
                     .Append("Unmanaged Struct byref ")
                     // .AppendUnmanaged(ref unmanaged)
                     .Append("Unregistered Unmanaged byref ")
                     // .AppendUnmanaged(ref unregistered_unmanaged)
-
                     .Append("Nullable Unmanaged ")
                     // .AppendUnmanaged(nullable_unmanaged)
                     .Append("Null Nullable Unmanaged ")
@@ -140,7 +141,6 @@ namespace ZeroLog.Tests
                     // .AppendUnmanaged(nullable_unregistered_unmanaged)
                     .Append("Null Nullable Unregistered Unmanaged")
                     // .AppendUnmanaged(null_nullable_unregistered_unmanaged)
-
                     .Append("Nullable Unmanaged byref ")
                     // .AppendUnmanaged(ref nullable_unmanaged)
                     .Append("Null Nullable Unmanaged byref ")
@@ -149,7 +149,6 @@ namespace ZeroLog.Tests
                     // .AppendUnmanaged(ref nullable_unregistered_unmanaged)
                     .Append("Null Nullable Unregistered Unmanaged byref ")
                     // .AppendUnmanaged(ref null_nullable_unregistered_unmanaged)
-
                     .Log();
             }
 

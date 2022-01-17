@@ -17,13 +17,15 @@ namespace ZeroLog.Tests
         {
             _testAppender = new TestAppender(false);
 
-            BasicConfigurator.Configure(new ZeroLogBasicConfiguration
+            LogManager.Initialize(new ZeroLogConfiguration
             {
-                Appenders = { _testAppender },
                 LogMessagePoolSize = 16384,
                 LogMessageBufferSize = 512,
-                Level = Level.Trace,
-                LogMessagePoolExhaustionStrategy = LogMessagePoolExhaustionStrategy.WaitUntilAvailable
+                RootLogger =
+                {
+                    LogMessagePoolExhaustionStrategy = LogMessagePoolExhaustionStrategy.WaitUntilAvailable,
+                    Appenders = { _testAppender }
+                }
             });
         }
 

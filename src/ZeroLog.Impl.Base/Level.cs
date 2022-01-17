@@ -8,4 +8,5 @@ public enum Level
     Warn,
     Error,
     Fatal,
+    None
 }

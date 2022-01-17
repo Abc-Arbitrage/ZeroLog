@@ -27,6 +27,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using NUnit.Framework;
+using ZeroLog.Config;
 using ZeroLog.Tests.Support;
 
 namespace ZeroLog.Tests;
@@ -41,7 +42,7 @@ partial class LogTests
     [Test]
     public void should_not_log_above_level_<#= logLevel #>()
     {
-        _log.UpdateConfiguration(_provider, new LogConfig { Level = Level.<#= logLevel #> + 1 });
+        _log.UpdateConfiguration(_provider, ResolvedLoggerConfiguration.SingleAppender(Level.<#= logLevel #> + 1));
         _log.<#= logLevel #>("Foo");
         _provider.ShouldNotBeLogged();
     }
@@ -49,7 +50,7 @@ partial class LogTests
     [Test]
     public void should_not_log_above_level_<#= logLevel #>_interpolated()
     {
-        _log.UpdateConfiguration(_provider, new LogConfig { Level = Level.<#= logLevel #> + 1 });
+        _log.UpdateConfiguration(_provider, ResolvedLoggerConfiguration.SingleAppender(Level.<#= logLevel #> + 1));
         _log.<#= logLevel #>($"Foo {42}");
         _provider.ShouldNotBeLogged();
     }

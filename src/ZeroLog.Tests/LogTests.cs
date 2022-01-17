@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using NUnit.Framework;
+using ZeroLog.Config;
 using ZeroLog.Tests.Support;
 
 namespace ZeroLog.Tests;
@@ -22,7 +23,7 @@ public partial class LogTests
         _provider = new TestLogMessageProvider();
 
         _log = new Log("TestLog");
-        _log.UpdateConfiguration(_provider, default);
+        _log.UpdateConfiguration(_provider, ResolvedLoggerConfiguration.SingleAppender(Level.Trace));
     }
 
     [TearDown]
@@ -50,7 +51,7 @@ public partial class LogTests
     [TestCase(Level.Fatal, false, false, false, false, false, true)]
     public void should_tell_if_log_level_is_enabled(Level logLevel, bool isTrace, bool isDebug, bool isInfo, bool isWarn, bool isError, bool isFatal)
     {
-        _log.UpdateConfiguration(_provider, new LogConfig { Level = logLevel });
+        _log.UpdateConfiguration(_provider, ResolvedLoggerConfiguration.SingleAppender(logLevel));
 
         _log.IsTraceEnabled.ShouldEqual(isTrace);
         _log.IsDebugEnabled.ShouldEqual(isDebug);

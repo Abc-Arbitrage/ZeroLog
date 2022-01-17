@@ -24,7 +24,15 @@ namespace ZeroLog.Tests
         public void SetUpFixture()
         {
             _testAppender = new TestAppender(true);
-            BasicConfigurator.Configure(new List<Appender> { _testAppender }, new ZeroLogInitializationConfig { LogMessagePoolSize = 10 });
+
+            LogManager.Initialize(new ZeroLogConfiguration
+            {
+                LogMessagePoolSize = 10,
+                RootLogger =
+                {
+                    Appenders = { _testAppender }
+                }
+            });
         }
 
         [TearDown]
@@ -53,7 +61,7 @@ namespace ZeroLog.Tests
         [Test]
         public void should_prevent_initializing_already_initialized_log_manager()
         {
-            Assert.Throws<ApplicationException>(() => BasicConfigurator.Configure(new Appender[0]));
+            Assert.Throws<ApplicationException>(() => LogManager.Initialize(new ZeroLogConfiguration()));
         }
 
         [Test]
@@ -90,11 +98,14 @@ namespace ZeroLog.Tests
         {
             LogManager.Shutdown();
 
-            BasicConfigurator.Configure(new ZeroLogBasicConfiguration
+            LogManager.Initialize(new ZeroLogConfiguration
             {
-                Appenders = { _testAppender },
                 LogMessagePoolSize = 10,
-                LogMessagePoolExhaustionStrategy = LogMessagePoolExhaustionStrategy.DropLogMessageAndNotifyAppenders
+                RootLogger =
+                {
+                    LogMessagePoolExhaustionStrategy = LogMessagePoolExhaustionStrategy.DropLogMessageAndNotifyAppenders,
+                    Appenders = { _testAppender }
+                }
             });
 
             var log = LogManager.GetLogger(typeof(LogManagerTests));
@@ -116,11 +127,14 @@ namespace ZeroLog.Tests
         {
             LogManager.Shutdown();
 
-            BasicConfigurator.Configure(new ZeroLogBasicConfiguration
+            LogManager.Initialize(new ZeroLogConfiguration
             {
-                Appenders = { _testAppender },
                 LogMessagePoolSize = 10,
-                LogMessagePoolExhaustionStrategy = LogMessagePoolExhaustionStrategy.DropLogMessage
+                RootLogger =
+                {
+                    LogMessagePoolExhaustionStrategy = LogMessagePoolExhaustionStrategy.DropLogMessage,
+                    Appenders = { _testAppender }
+                }
             });
 
             var log = LogManager.GetLogger(typeof(LogManagerTests));
@@ -140,11 +154,14 @@ namespace ZeroLog.Tests
         {
             LogManager.Shutdown();
 
-            BasicConfigurator.Configure(new ZeroLogBasicConfiguration
+            LogManager.Initialize(new ZeroLogConfiguration
             {
-                Appenders = { _testAppender },
                 LogMessagePoolSize = 10,
-                LogMessagePoolExhaustionStrategy = LogMessagePoolExhaustionStrategy.WaitUntilAvailable
+                RootLogger =
+                {
+                    LogMessagePoolExhaustionStrategy = LogMessagePoolExhaustionStrategy.WaitUntilAvailable,
+                    Appenders = { _testAppender }
+                }
             });
 
             var log = LogManager.GetLogger(typeof(LogManagerTests));

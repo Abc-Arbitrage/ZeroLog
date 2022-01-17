@@ -8,7 +8,6 @@ using NLog;
 using NLog.Config;
 using NLog.Targets.Wrappers;
 using ZeroLog.Config;
-using BasicConfigurator = ZeroLog.Config.BasicConfigurator;
 
 namespace ZeroLog.Benchmarks.ThroughputTests
 {
@@ -63,11 +62,14 @@ namespace ZeroLog.Benchmarks.ThroughputTests
         {
             _zeroLogTestAppender = new ZeroLog.Tests.TestAppender(false);
 
-            BasicConfigurator.Configure(new ZeroLogBasicConfiguration
+            LogManager.Initialize(new ZeroLogConfiguration
             {
-                Appenders = { _zeroLogTestAppender },
                 LogMessagePoolSize = QueueSize,
-                LogMessagePoolExhaustionStrategy = LogMessagePoolExhaustionStrategy.WaitUntilAvailable
+                RootLogger =
+                {
+                    LogMessagePoolExhaustionStrategy = LogMessagePoolExhaustionStrategy.WaitUntilAvailable,
+                    Appenders = { _zeroLogTestAppender }
+                }
             });
 
             _zeroLogLogger = LogManager.GetLogger(nameof(ZeroLog));

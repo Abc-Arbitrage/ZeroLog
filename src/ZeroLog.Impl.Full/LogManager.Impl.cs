@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using ZeroLog.Appenders;
-using ZeroLog.ConfigResolvers;
+using ZeroLog.Config;
 
 namespace ZeroLog
 {
@@ -14,38 +14,29 @@ namespace ZeroLog
 
         private static LogManager? _logManager;
 
+        private readonly ZeroLogConfiguration _config;
         private readonly ConcurrentQueue<LogMessage> _queue;
         private readonly ObjectPool<LogMessage> _pool;
+        private readonly Appender[] _appenders;
 
         private readonly BufferSegmentProvider _bufferSegmentProvider;
-        private readonly IConfigurationResolver _configResolver;
         private readonly Thread _writeThread;
 
         private bool _isRunning;
-        private Appender[] _appenders = Array.Empty<Appender>();
 
-        public Level Level { get; private set; }
         public static ZeroLogConfig Config { get; } = new();
 
-        private LogManager(IConfigurationResolver configResolver, ZeroLogInitializationConfig config)
+        private LogManager(ZeroLogConfiguration config)
         {
-            config.Validate();
-
-            _configResolver = configResolver;
+            _config = config;
 
             _queue = new ConcurrentQueue<LogMessage>(new ConcurrentQueueCapacityInitializer(config.LogMessagePoolSize));
 
             _bufferSegmentProvider = new BufferSegmentProvider(config.LogMessagePoolSize * config.LogMessageBufferSize, config.LogMessageBufferSize);
-            _pool = new ObjectPool<LogMessage>(config.LogMessagePoolSize, () => new LogMessage(_bufferSegmentProvider.GetSegment(), config.LogMessageArgumentCapacity));
-
-            configResolver.Updated += () =>
-            {
-                UpdateAllLogConfigurations();
-                UpdateAppenders();
-            };
+            _pool = new ObjectPool<LogMessage>(config.LogMessagePoolSize, () => new LogMessage(_bufferSegmentProvider.GetSegment(), config.LogMessageStringCapacity));
+            _appenders = _config.GetAllAppenders().ToArray();
 
             UpdateAllLogConfigurations();
-            UpdateAppenders();
 
             _isRunning = true;
 
@@ -74,16 +65,22 @@ namespace ZeroLog
             if (_pool.IsAnyItemAcquired())
                 Thread.Sleep(100); // Can't really do much better here
 
-            _configResolver.Dispose();
             _bufferSegmentProvider.Dispose();
+
+            foreach (var appender in _appenders)
+                appender.Dispose();
         }
 
-        public static IDisposable Initialize(IConfigurationResolver configResolver, ZeroLogInitializationConfig? config = null)
+        public static IDisposable Initialize(ZeroLogConfiguration configuration)
         {
+            configuration.Validate();
+
             if (_logManager is not null)
                 throw new ApplicationException("LogManager is already initialized");
 
-            _logManager = new LogManager(configResolver, config ?? new ZeroLogInitializationConfig());
+            Config.UpdateFrom(configuration);
+
+            _logManager = new LogManager(configuration);
             return _logManager;
         }
 
@@ -139,7 +136,7 @@ namespace ZeroLog
         }
 
         internal void UpdateLogConfiguration(Log log)
-            => log.UpdateConfiguration(this, _configResolver.ResolveLogConfig(log.Name));
+            => log.UpdateConfiguration(this, _config.ResolveLoggerConfiguration(log.Name));
 
         private void UpdateAllLogConfigurations()
         {
@@ -150,7 +147,7 @@ namespace ZeroLog
         private static void ResetAllLogConfigurations()
         {
             foreach (var log in _loggers.Values)
-                log.UpdateConfiguration(null, default);
+                log.UpdateConfiguration(null, null);
         }
 
         LogMessage? ILogMessageProvider.TryAcquireLogMessage()
@@ -225,11 +222,14 @@ namespace ZeroLog
 
             try
             {
-                if ((logMessage.Logger?.Appenders.Length ?? 0) <= 0)
+                var appenders = logMessage.Logger?.GetAppenders(logMessage.Level) ?? Array.Empty<Appender>();
+                if (appenders.Length == 0)
                     return true;
 
                 formattedLogMessage.SetMessage(logMessage);
-                WriteMessageLogToAppenders(logMessage, formattedLogMessage);
+
+                foreach (var appender in appenders)
+                    appender.WriteMessage(formattedLogMessage);
             }
             finally
             {
@@ -238,23 +238,6 @@ namespace ZeroLog
             }
 
             return true;
-        }
-
-        private static void WriteMessageLogToAppenders(LogMessage logMessage, FormattedLogMessage message)
-        {
-            foreach (var appender in logMessage.Logger?.Appenders ?? Array.Empty<Appender>())
-            {
-                appender.WriteMessage(message);
-            }
-        }
-
-        private void UpdateAppenders()
-        {
-            var appenders = _configResolver.GetAllAppenders().ToArray();
-            Thread.MemoryBarrier();
-            _appenders = appenders;
-
-            Level = _configResolver.ResolveLogConfig(string.Empty).Level;
         }
 
         private void FlushAppenders()

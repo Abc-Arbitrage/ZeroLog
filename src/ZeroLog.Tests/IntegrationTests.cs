@@ -18,17 +18,20 @@ namespace ZeroLog.Tests
         private const int _nbThreads = 4;
         private const int _queueSize = 1 << 16;
         private const int _count = _queueSize / _nbThreads;
-        private readonly List<double[]> _enqueueMicros = new List<double[]>();
+        private readonly List<double[]> _enqueueMicros = new();
 
         [SetUp]
         public void SetUp()
         {
             _performanceAppender = new PerformanceAppender(_count * _nbThreads);
 
-            BasicConfigurator.Configure(new ZeroLogBasicConfiguration
+            LogManager.Initialize(new ZeroLogConfiguration
             {
-                Appenders = { new ConsoleAppender(), },
-                LogMessagePoolSize = _queueSize
+                LogMessagePoolSize = _queueSize,
+                RootLogger =
+                {
+                    Appenders = { new ConsoleAppender() }
+                }
             });
 
             for (int i = 0; i < _nbThreads; i++)

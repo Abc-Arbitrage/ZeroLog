@@ -1,30 +1,36 @@
 using System;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using ZeroLog.Appenders;
+using ZeroLog.Config;
 
 namespace ZeroLog;
 
 partial class Log
 {
+    private static readonly Appender[][] _emptyAppendersByLogLevel = Enumerable.Repeat(Array.Empty<Appender>(), (int)Level.None + 1).ToArray();
+
     private readonly LogMessage _poolExhaustedMessage = new("Log message skipped due to pool exhaustion.");
 
     private ILogMessageProvider? _logMessageProvider;
+    private Appender[][] _appendersByLogLevel = _emptyAppendersByLogLevel;
     private LogMessagePoolExhaustionStrategy _logMessagePoolExhaustionStrategy;
 
-    internal Appender[] Appenders { get; private set; } = Array.Empty<Appender>();
-
-    internal void UpdateConfiguration(ILogMessageProvider? provider, LogConfig config)
+    internal void UpdateConfiguration(ILogMessageProvider? provider, ResolvedLoggerConfiguration? config)
     {
         _logMessageProvider = provider;
 
-        Appenders = config.Appenders ?? Array.Empty<Appender>();
-        _logMessagePoolExhaustionStrategy = config.LogMessagePoolExhaustionStrategy;
-        _logLevel = config.Level;
+        _appendersByLogLevel = config?.AppendersByLogLevel ?? _emptyAppendersByLogLevel;
+        _logLevel = config?.Level ?? Level.None;
+        _logMessagePoolExhaustionStrategy = config?.LogMessagePoolExhaustionStrategy ?? LogMessagePoolExhaustionStrategy.Default;
     }
 
     public partial bool IsEnabled(Level level)
         => level >= _logLevel;
+
+    internal Appender[] GetAppenders(Level level)
+        => _appendersByLogLevel[(int)level];
 
     private partial LogMessage InternalAcquireLogMessage(Level level)
     {

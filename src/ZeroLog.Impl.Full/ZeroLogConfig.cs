@@ -1,37 +1,46 @@
-﻿using System;
-using JetBrains.Annotations;
+﻿using ZeroLog.Config;
 
-namespace ZeroLog
+namespace ZeroLog;
+
+public class ZeroLogConfig
 {
-    public class ZeroLogConfig
+    // TODO refactor this
+
+    private string _nullDisplayString = "null";
+    private string _truncatedMessageSuffix = " [TRUNCATED]";
+    private string _jsonSeparator = " ~~ ";
+
+    public bool LazyRegisterEnums { get; set; }
+    public bool FlushAppenders { get; set; } = true;
+
+    public string NullDisplayString
     {
-        private string _nullDisplayString = "null";
-        private string _truncatedMessageSuffix = " [TRUNCATED]";
-        private string _jsonSeparator = " ~~ ";
+        get => _nullDisplayString;
+        set => _nullDisplayString = value ?? string.Empty;
+    }
 
-        public bool LazyRegisterEnums { get; set; }
-        public bool FlushAppenders { get; set; } = true;
+    public string TruncatedMessageSuffix
+    {
+        get => _truncatedMessageSuffix;
+        set => _truncatedMessageSuffix = value ?? string.Empty;
+    }
 
-        public string NullDisplayString
-        {
-            get => _nullDisplayString;
-            set => _nullDisplayString = value ?? string.Empty;
-        }
+    public string JsonSeparator
+    {
+        get => _jsonSeparator;
+        set => _jsonSeparator = value ?? string.Empty;
+    }
 
-        public string TruncatedMessageSuffix
-        {
-            get => _truncatedMessageSuffix;
-            set => _truncatedMessageSuffix = value ?? string.Empty;
-        }
+    internal ZeroLogConfig()
+    {
+    }
 
-        public string JsonSeparator
-        {
-            get => _jsonSeparator;
-            set => _jsonSeparator = value ?? string.Empty;
-        }
+    internal void UpdateFrom(ZeroLogConfiguration config)
+    {
+        LazyRegisterEnums = config.AutoRegisterEnums;
 
-        internal ZeroLogConfig()
-        {
-        }
+        NullDisplayString = config.NullDisplayString;
+        TruncatedMessageSuffix = config.TruncatedMessageSuffix;
+        JsonSeparator = config.JsonSeparator;
     }
 }

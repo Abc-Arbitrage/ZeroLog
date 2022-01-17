@@ -17,14 +17,15 @@ namespace ZeroLog.Benchmarks.ThroughputTests
             {
                 Console.WriteLine("Initializing...");
 
-                BasicConfigurator.Configure(
-                    new ZeroLogBasicConfiguration
+                LogManager.Initialize(new ZeroLogConfiguration
+                {
+                    LogMessagePoolSize = 1000 * 4096 * 4,
+                    RootLogger =
                     {
-                        Appenders = { new DateAndSizeRollingFileAppender(Path.Combine(dir, "Output")), },
-                        LogMessagePoolSize = 1000 * 4096 * 4,
-                        LogMessagePoolExhaustionStrategy = LogMessagePoolExhaustionStrategy.WaitUntilAvailable
+                        LogMessagePoolExhaustionStrategy = LogMessagePoolExhaustionStrategy.WaitUntilAvailable,
+                        Appenders = { new DateAndSizeRollingFileAppender(Path.Combine(dir, "Output")) }
                     }
-                );
+                });
 
                 var log = LogManager.GetLogger(typeof(ThroughputToFileBench));
                 var duration = TimeSpan.FromSeconds(10);

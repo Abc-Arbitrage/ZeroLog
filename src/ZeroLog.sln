@@ -22,8 +22,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Misc", "Misc", "{44EDCA3A-D
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZeroLog.Benchmarks", "ZeroLog.Benchmarks\ZeroLog.Benchmarks.csproj", "{D8CB63CF-F35E-4D38-88AF-9FB4C6B29630}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeroLog.Tests.ExternalAppender", "ZeroLog.Tests.ExternalAppender\ZeroLog.Tests.ExternalAppender.csproj", "{B40F81DD-A04A-4E50-8063-5023DB1E7975}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeroLog.Impl.Base", "ZeroLog.Impl.Base\ZeroLog.Impl.Base.csproj", "{61DDA0F1-CCFE-437E-A8A9-1E1F332CCC50}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeroLog.Impl.Full", "ZeroLog.Impl.Full\ZeroLog.Impl.Full.csproj", "{93459DFF-22B2-45BA-B105-572F385B34FF}"
@@ -48,10 +46,6 @@ Global
 		{D8CB63CF-F35E-4D38-88AF-9FB4C6B29630}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D8CB63CF-F35E-4D38-88AF-9FB4C6B29630}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D8CB63CF-F35E-4D38-88AF-9FB4C6B29630}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B40F81DD-A04A-4E50-8063-5023DB1E7975}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B40F81DD-A04A-4E50-8063-5023DB1E7975}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B40F81DD-A04A-4E50-8063-5023DB1E7975}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B40F81DD-A04A-4E50-8063-5023DB1E7975}.Release|Any CPU.Build.0 = Release|Any CPU
 		{61DDA0F1-CCFE-437E-A8A9-1E1F332CCC50}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{61DDA0F1-CCFE-437E-A8A9-1E1F332CCC50}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{61DDA0F1-CCFE-437E-A8A9-1E1F332CCC50}.Release|Any CPU.ActiveCfg = Release|Any CPU

@@ -3,6 +3,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using NUnit.Framework;
+using ZeroLog.Config;
 using ZeroLog.Tests.Support;
 
 namespace ZeroLog.Tests;
@@ -13,7 +14,7 @@ partial class LogTests
     [Test]
     public void should_not_log_above_level_Trace()
     {
-        _log.UpdateConfiguration(_provider, new LogConfig { Level = Level.Trace + 1 });
+        _log.UpdateConfiguration(_provider, ResolvedLoggerConfiguration.SingleAppender(Level.Trace + 1));
         _log.Trace("Foo");
         _provider.ShouldNotBeLogged();
     }
@@ -21,7 +22,7 @@ partial class LogTests
     [Test]
     public void should_not_log_above_level_Trace_interpolated()
     {
-        _log.UpdateConfiguration(_provider, new LogConfig { Level = Level.Trace + 1 });
+        _log.UpdateConfiguration(_provider, ResolvedLoggerConfiguration.SingleAppender(Level.Trace + 1));
         _log.Trace($"Foo {42}");
         _provider.ShouldNotBeLogged();
     }
@@ -910,7 +911,7 @@ partial class LogTests
     [Test]
     public void should_not_log_above_level_Debug()
     {
-        _log.UpdateConfiguration(_provider, new LogConfig { Level = Level.Debug + 1 });
+        _log.UpdateConfiguration(_provider, ResolvedLoggerConfiguration.SingleAppender(Level.Debug + 1));
         _log.Debug("Foo");
         _provider.ShouldNotBeLogged();
     }
@@ -918,7 +919,7 @@ partial class LogTests
     [Test]
     public void should_not_log_above_level_Debug_interpolated()
     {
-        _log.UpdateConfiguration(_provider, new LogConfig { Level = Level.Debug + 1 });
+        _log.UpdateConfiguration(_provider, ResolvedLoggerConfiguration.SingleAppender(Level.Debug + 1));
         _log.Debug($"Foo {42}");
         _provider.ShouldNotBeLogged();
     }
@@ -1807,7 +1808,7 @@ partial class LogTests
     [Test]
     public void should_not_log_above_level_Info()
     {
-        _log.UpdateConfiguration(_provider, new LogConfig { Level = Level.Info + 1 });
+        _log.UpdateConfiguration(_provider, ResolvedLoggerConfiguration.SingleAppender(Level.Info + 1));
         _log.Info("Foo");
         _provider.ShouldNotBeLogged();
     }
@@ -1815,7 +1816,7 @@ partial class LogTests
     [Test]
     public void should_not_log_above_level_Info_interpolated()
     {
-        _log.UpdateConfiguration(_provider, new LogConfig { Level = Level.Info + 1 });
+        _log.UpdateConfiguration(_provider, ResolvedLoggerConfiguration.SingleAppender(Level.Info + 1));
         _log.Info($"Foo {42}");
         _provider.ShouldNotBeLogged();
     }
@@ -2704,7 +2705,7 @@ partial class LogTests
     [Test]
     public void should_not_log_above_level_Warn()
     {
-        _log.UpdateConfiguration(_provider, new LogConfig { Level = Level.Warn + 1 });
+        _log.UpdateConfiguration(_provider, ResolvedLoggerConfiguration.SingleAppender(Level.Warn + 1));
         _log.Warn("Foo");
         _provider.ShouldNotBeLogged();
     }
@@ -2712,7 +2713,7 @@ partial class LogTests
     [Test]
     public void should_not_log_above_level_Warn_interpolated()
     {
-        _log.UpdateConfiguration(_provider, new LogConfig { Level = Level.Warn + 1 });
+        _log.UpdateConfiguration(_provider, ResolvedLoggerConfiguration.SingleAppender(Level.Warn + 1));
         _log.Warn($"Foo {42}");
         _provider.ShouldNotBeLogged();
     }
@@ -3601,7 +3602,7 @@ partial class LogTests
     [Test]
     public void should_not_log_above_level_Error()
     {
-        _log.UpdateConfiguration(_provider, new LogConfig { Level = Level.Error + 1 });
+        _log.UpdateConfiguration(_provider, ResolvedLoggerConfiguration.SingleAppender(Level.Error + 1));
         _log.Error("Foo");
         _provider.ShouldNotBeLogged();
     }
@@ -3609,7 +3610,7 @@ partial class LogTests
     [Test]
     public void should_not_log_above_level_Error_interpolated()
     {
-        _log.UpdateConfiguration(_provider, new LogConfig { Level = Level.Error + 1 });
+        _log.UpdateConfiguration(_provider, ResolvedLoggerConfiguration.SingleAppender(Level.Error + 1));
         _log.Error($"Foo {42}");
         _provider.ShouldNotBeLogged();
     }
@@ -4498,7 +4499,7 @@ partial class LogTests
     [Test]
     public void should_not_log_above_level_Fatal()
     {
-        _log.UpdateConfiguration(_provider, new LogConfig { Level = Level.Fatal + 1 });
+        _log.UpdateConfiguration(_provider, ResolvedLoggerConfiguration.SingleAppender(Level.Fatal + 1));
         _log.Fatal("Foo");
         _provider.ShouldNotBeLogged();
     }
@@ -4506,7 +4507,7 @@ partial class LogTests
     [Test]
     public void should_not_log_above_level_Fatal_interpolated()
     {
-        _log.UpdateConfiguration(_provider, new LogConfig { Level = Level.Fatal + 1 });
+        _log.UpdateConfiguration(_provider, ResolvedLoggerConfiguration.SingleAppender(Level.Fatal + 1));
         _log.Fatal($"Foo {42}");
         _provider.ShouldNotBeLogged();
     }
