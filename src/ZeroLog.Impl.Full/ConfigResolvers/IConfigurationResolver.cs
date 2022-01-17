@@ -7,7 +7,7 @@ namespace ZeroLog.ConfigResolvers
 {
     public interface IConfigurationResolver : IDisposable
     {
-        IEnumerable<IAppender> GetAllAppenders();
+        IEnumerable<Appender> GetAllAppenders();
         LogConfig ResolveLogConfig(string name);
 
         event Action Updated;

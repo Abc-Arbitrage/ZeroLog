@@ -10,11 +10,11 @@ namespace ZeroLog.Appenders
     {
         // TODO kill this along with the JSON config
 
-        public static IAppender CreateAppender(AppenderDefinition definition)
+        public static Appender CreateAppender(AppenderDefinition definition)
         {
             var appenderType = GetAppenderType(definition) ?? throw new InvalidOperationException($"Appender type not found: {definition.AppenderTypeName}");
 
-            var appender = (IAppender)Activator.CreateInstance(appenderType)!;
+            var appender = (Appender)Activator.CreateInstance(appenderType)!;
 
             // var appenderParameterType = GetAppenderParameterType(appenderType);
             // if (appenderParameterType != null)

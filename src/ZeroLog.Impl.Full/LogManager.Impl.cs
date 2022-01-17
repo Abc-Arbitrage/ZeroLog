@@ -22,7 +22,7 @@ namespace ZeroLog
         private readonly Thread _writeThread;
 
         private bool _isRunning;
-        private IAppender[] _appenders = Array.Empty<IAppender>();
+        private Appender[] _appenders = Array.Empty<Appender>();
 
         public Level Level { get; private set; }
         public static ZeroLogConfig Config { get; } = new();
@@ -242,7 +242,7 @@ namespace ZeroLog
 
         private static void WriteMessageLogToAppenders(LogMessage logMessage, FormattedLogMessage message)
         {
-            foreach (var appender in logMessage.Logger?.Appenders ?? Array.Empty<IAppender>())
+            foreach (var appender in logMessage.Logger?.Appenders ?? Array.Empty<Appender>())
             {
                 appender.WriteMessage(message);
             }

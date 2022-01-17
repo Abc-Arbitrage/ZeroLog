@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
-using System.Text;
 using ZeroLog.Appenders;
 
 namespace ZeroLog.Tests
 {
-    internal class PerformanceAppender : IAppender
+    internal class PerformanceAppender : Appender
     {
         private readonly MessageReceived[] _messages;
         private int _count;
@@ -20,21 +19,13 @@ namespace ZeroLog.Tests
             }
         }
 
-        public void WriteMessage(FormattedLogMessage message)
+        public override void WriteMessage(FormattedLogMessage message)
         {
             var messageSpan = message.GetMessage();
             messageSpan.CopyTo(_messages[_count].StartTimestampInChars);
             _messages[_count].MessageLength = messageSpan.Length;
             _messages[_count].EndTimestamp = Stopwatch.GetTimestamp();
             _count++;
-        }
-
-        public void Flush()
-        {
-        }
-
-        public void Dispose()
-        {
         }
 
         private struct MessageReceived

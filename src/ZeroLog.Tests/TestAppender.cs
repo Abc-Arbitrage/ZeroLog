@@ -6,7 +6,7 @@ using ZeroLog.Appenders;
 
 namespace ZeroLog.Tests
 {
-    public class TestAppender : IAppender
+    public class TestAppender : Appender
     {
         private readonly bool _captureLoggedMessages;
         private int _messageCount;
@@ -36,7 +36,7 @@ namespace ZeroLog.Tests
             return _signal;
         }
 
-        public void WriteMessage(FormattedLogMessage message)
+        public override void WriteMessage(FormattedLogMessage message)
         {
             if (_captureLoggedMessages)
                 LoggedMessages.Add(message.ToString());
@@ -47,13 +47,11 @@ namespace ZeroLog.Tests
             WaitOnWriteEvent?.Wait();
         }
 
-        public void Flush()
+        public override void Flush()
         {
-            ++FlushCount;
-        }
+            base.Flush();
 
-        public void Dispose()
-        {
+            ++FlushCount;
         }
     }
 }

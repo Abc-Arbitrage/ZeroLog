@@ -10,9 +10,9 @@ namespace ZeroLog.ConfigResolvers
     {
         private Node? _root;
 
-        public IEnumerable<IAppender> GetAllAppenders()
+        public IEnumerable<Appender> GetAllAppenders()
         {
-            var appenders = new HashSet<IAppender>();
+            var appenders = new HashSet<Appender>();
             AddAppenders(_root);
             return appenders;
 
@@ -64,32 +64,32 @@ namespace ZeroLog.ConfigResolvers
             oldRoot?.Dispose();
         }
 
-        private static List<(LoggerDefinition logger, IAppender[] appenders)> CreateLoggersWithAppenders(IHierarchicalConfiguration config)
+        private static List<(LoggerDefinition logger, Appender[] appenders)> CreateLoggersWithAppenders(IHierarchicalConfiguration config)
         {
             var appendersByNames = config.Appenders.Where(x => x.Name != null).ToDictionary(x => x.Name!, CreateAppender);
 
-            var loggerWithAppenders = new List<(LoggerDefinition, IAppender[])>();
+            var loggerWithAppenders = new List<(LoggerDefinition, Appender[])>();
 
             config.RootLogger.Name = string.Empty;
             config.RootLogger.IncludeParentAppenders = false;
 
-            loggerWithAppenders.Add((config.RootLogger, config.RootLogger.AppenderReferences?.Select(x => appendersByNames[x]).ToArray() ?? new IAppender[0]));
+            loggerWithAppenders.Add((config.RootLogger, config.RootLogger.AppenderReferences?.Select(x => appendersByNames[x]).ToArray() ?? new Appender[0]));
 
             foreach (var loggerDefinition in config.Loggers)
             {
-                loggerWithAppenders.Add((loggerDefinition, loggerDefinition.AppenderReferences?.Select(x => appendersByNames[x]).ToArray() ?? new IAppender[0]));
+                loggerWithAppenders.Add((loggerDefinition, loggerDefinition.AppenderReferences?.Select(x => appendersByNames[x]).ToArray() ?? new Appender[0]));
             }
 
             return loggerWithAppenders;
         }
 
-        private static IAppender CreateAppender(AppenderDefinition appenderDefinition)
+        private static Appender CreateAppender(AppenderDefinition appenderDefinition)
         {
             var appender = AppenderFactory.CreateAppender(appenderDefinition);
             return new GuardedAppender(appender, TimeSpan.FromSeconds(15));
         }
 
-        private static void AddNode(Node root, LoggerDefinition logger, IAppender[] appenders)
+        private static void AddNode(Node root, LoggerDefinition logger, Appender[] appenders)
         {
             var parts = logger.Name?.Split(new[] { '.' }, StringSplitOptions.RemoveEmptyEntries) ?? Array.Empty<string>();
             var node = root;
@@ -141,7 +141,7 @@ namespace ZeroLog.ConfigResolvers
         private class Node : IDisposable
         {
             public readonly Dictionary<string, Node> Children = new Dictionary<string, Node>();
-            public IEnumerable<IAppender> Appenders = Enumerable.Empty<IAppender>();
+            public IEnumerable<Appender> Appenders = Enumerable.Empty<Appender>();
             public Level Level;
             public LogMessagePoolExhaustionStrategy LogMessagePoolExhaustionStrategy;
 

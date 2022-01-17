@@ -3,21 +3,21 @@ using ZeroLog.Utils;
 
 namespace ZeroLog.Appenders;
 
-internal class GuardedAppender : IAppender
+internal class GuardedAppender : Appender
 {
     private readonly TimeSpan _quarantineDelay;
     private DateTime? _nextActivationTime;
 
-    internal IAppender Appender { get; }
+    internal Appender Appender { get; }
 
-    public GuardedAppender(IAppender appender, TimeSpan quarantineDelay)
+    public GuardedAppender(Appender appender, TimeSpan quarantineDelay)
     {
         Appender = appender;
         _quarantineDelay = quarantineDelay;
         _nextActivationTime = null;
     }
 
-    public void WriteMessage(FormattedLogMessage message)
+    public override void WriteMessage(FormattedLogMessage message)
     {
         if (_nextActivationTime.HasValue && _nextActivationTime.Value > SystemDateTime.UtcNow)
             return;
@@ -33,9 +33,15 @@ internal class GuardedAppender : IAppender
         }
     }
 
-    public void Flush()
-        => Appender.Flush();
+    public override void Flush()
+    {
+        Appender.Flush();
+        base.Flush();
+    }
 
-    public void Dispose()
-        => Appender.Dispose();
+    public override void Dispose()
+    {
+        Appender.Dispose();
+        base.Dispose();
+    }
 }

@@ -5,7 +5,7 @@ namespace ZeroLog.Config
 {
     public class ZeroLogBasicConfiguration
     {
-        public ICollection<IAppender> Appenders { get; set; } = new List<IAppender>();
+        public ICollection<Appender> Appenders { get; set; } = new List<Appender>();
         public Level Level { get; set; } = Level.Trace;
         public LogMessagePoolExhaustionStrategy LogMessagePoolExhaustionStrategy { get; set; } = LogMessagePoolExhaustionStrategy.Default;
 

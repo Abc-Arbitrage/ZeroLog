@@ -24,7 +24,7 @@ namespace ZeroLog.Tests
         public void SetUpFixture()
         {
             _testAppender = new TestAppender(true);
-            BasicConfigurator.Configure(new List<IAppender> { _testAppender }, new ZeroLogInitializationConfig { LogMessagePoolSize = 10 });
+            BasicConfigurator.Configure(new List<Appender> { _testAppender }, new ZeroLogInitializationConfig { LogMessagePoolSize = 10 });
         }
 
         [TearDown]
@@ -53,7 +53,7 @@ namespace ZeroLog.Tests
         [Test]
         public void should_prevent_initializing_already_initialized_log_manager()
         {
-            Assert.Throws<ApplicationException>(() => BasicConfigurator.Configure(new IAppender[0]));
+            Assert.Throws<ApplicationException>(() => BasicConfigurator.Configure(new Appender[0]));
         }
 
         [Test]

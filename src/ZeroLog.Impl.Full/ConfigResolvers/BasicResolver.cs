@@ -7,18 +7,18 @@ namespace ZeroLog.ConfigResolvers
 {
     public class BasicResolver : IConfigurationResolver
     {
-        private readonly IAppender[] _appenders;
+        private readonly Appender[] _appenders;
         private readonly Level _level;
         private readonly LogMessagePoolExhaustionStrategy _logMessagePoolExhaustionStrategy;
 
-        public BasicResolver(IEnumerable<IAppender> appenders, Level level, LogMessagePoolExhaustionStrategy logMessagePoolExhaustionStrategy)
+        public BasicResolver(IEnumerable<Appender> appenders, Level level, LogMessagePoolExhaustionStrategy logMessagePoolExhaustionStrategy)
         {
             _level = level;
             _logMessagePoolExhaustionStrategy = logMessagePoolExhaustionStrategy;
-            _appenders = appenders.Select(x => new GuardedAppender(x, TimeSpan.FromSeconds(15))).ToArray<IAppender>();
+            _appenders = appenders.Select(x => new GuardedAppender(x, TimeSpan.FromSeconds(15))).ToArray<Appender>();
         }
 
-        public IEnumerable<IAppender> GetAllAppenders() => _appenders;
+        public IEnumerable<Appender> GetAllAppenders() => _appenders;
 
         public LogConfig ResolveLogConfig(string name)
         {

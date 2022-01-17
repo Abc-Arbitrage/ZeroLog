@@ -1,16 +1,8 @@
 ﻿namespace ZeroLog.Appenders;
 
-public class NoopAppender : IAppender
+public sealed class NoopAppender : Appender
 {
-    public void Dispose()
-    {
-    }
-
-    public void WriteMessage(FormattedLogMessage message)
-    {
-    }
-
-    public void Flush()
+    public override void WriteMessage(FormattedLogMessage message)
     {
     }
 }

@@ -16,10 +16,10 @@ namespace ZeroLog.Config
             return LogManager.Initialize(dummyResolver, config.ToInitializationConfig());
         }
 
-        public static IDisposable Configure(IEnumerable<IAppender> appenders)
+        public static IDisposable Configure(IEnumerable<Appender> appenders)
             => Configure(appenders, new ZeroLogInitializationConfig());
 
-        public static IDisposable Configure(IEnumerable<IAppender> appenders, ZeroLogInitializationConfig initializationConfig)
+        public static IDisposable Configure(IEnumerable<Appender> appenders, ZeroLogInitializationConfig initializationConfig)
         {
             var config = new ZeroLogBasicConfiguration
             {
@@ -34,7 +34,7 @@ namespace ZeroLog.Config
 
         [Obsolete("Use the overload with the " + nameof(ZeroLogBasicConfiguration) + " parameter")]
         [SuppressMessage("ReSharper", "MethodOverloadWithOptionalParameter")]
-        public static IDisposable Configure(IEnumerable<IAppender> appenders, int logMessagePoolSize = 1024, int logMessageBufferSize = 128, Level level = Level.Trace, LogMessagePoolExhaustionStrategy logMessagePoolExhaustionStrategy = LogMessagePoolExhaustionStrategy.Default)
+        public static IDisposable Configure(IEnumerable<Appender> appenders, int logMessagePoolSize = 1024, int logMessageBufferSize = 128, Level level = Level.Trace, LogMessagePoolExhaustionStrategy logMessagePoolExhaustionStrategy = LogMessagePoolExhaustionStrategy.Default)
         {
             return Configure(new ZeroLogBasicConfiguration
             {

@@ -12,13 +12,13 @@ partial class Log
     private ILogMessageProvider? _logMessageProvider;
     private LogMessagePoolExhaustionStrategy _logMessagePoolExhaustionStrategy;
 
-    internal IAppender[] Appenders { get; private set; } = Array.Empty<IAppender>();
+    internal Appender[] Appenders { get; private set; } = Array.Empty<Appender>();
 
     internal void UpdateConfiguration(ILogMessageProvider? provider, LogConfig config)
     {
         _logMessageProvider = provider;
 
-        Appenders = config.Appenders ?? Array.Empty<IAppender>();
+        Appenders = config.Appenders ?? Array.Empty<Appender>();
         _logMessagePoolExhaustionStrategy = config.LogMessagePoolExhaustionStrategy;
         _logLevel = config.Level;
     }

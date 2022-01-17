@@ -9,13 +9,13 @@ namespace ZeroLog.Tests.Appenders;
 [TestFixture]
 public class GuardedAppenderTests
 {
-    private Mock<IAppender> _appenderMock;
+    private Mock<Appender> _appenderMock;
     private GuardedAppender _guardedAppender;
 
     [SetUp]
     public void SetUp()
     {
-        _appenderMock = new Mock<IAppender>();
+        _appenderMock = new Mock<Appender>();
         _guardedAppender = new GuardedAppender(_appenderMock.Object, TimeSpan.FromSeconds(15));
     }
 

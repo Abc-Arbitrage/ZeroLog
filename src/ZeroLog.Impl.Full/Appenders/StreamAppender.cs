@@ -4,7 +4,7 @@ using System.Text;
 
 namespace ZeroLog.Appenders;
 
-public abstract class StreamAppender : IAppender
+public abstract class StreamAppender : Appender
 {
     private readonly char[] _charBuffer = GC.AllocateUninitializedArray<char>(LogManager.OutputBufferSize);
     private readonly byte[] _byteBuffer = GC.AllocateUninitializedArray<byte>(4 * LogManager.OutputBufferSize);
@@ -20,13 +20,15 @@ public abstract class StreamAppender : IAppender
         set => _prefixWriter = !string.IsNullOrEmpty(value) ? new PrefixWriter(value) : null;
     }
 
-    public virtual void Dispose()
+    public override void Dispose()
     {
         Stream?.Dispose();
         Stream = null;
+
+        base.Dispose();
     }
 
-    public virtual void WriteMessage(FormattedLogMessage message)
+    public override void WriteMessage(FormattedLogMessage message)
     {
         // TODO try to do a single Stream.Write call
 
@@ -59,8 +61,9 @@ public abstract class StreamAppender : IAppender
         Stream.Write(_byteBuffer, 0, byteCount);
     }
 
-    public virtual void Flush()
+    public override void Flush()
     {
         Stream?.Flush();
+        base.Flush();
     }
 }
