@@ -6,9 +6,6 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZeroLog", "ZeroLog\ZeroLog.csproj", "{34665A87-497B-4C4E-928E-1DFBEB3F7441}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZeroLog.Tests", "ZeroLog.Tests\ZeroLog.Tests.csproj", "{F2405E3E-69ED-4BA5-A862-CF920B612B16}"
-	ProjectSection(ProjectDependencies) = postProject
-		{B40F81DD-A04A-4E50-8063-5023DB1E7975} = {B40F81DD-A04A-4E50-8063-5023DB1E7975}
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Misc", "Misc", "{44EDCA3A-DBC5-415C-9A34-C742912674B5}"
 	ProjectSection(SolutionItems) = preProject

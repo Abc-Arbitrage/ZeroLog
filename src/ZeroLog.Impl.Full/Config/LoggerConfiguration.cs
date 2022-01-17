@@ -32,7 +32,7 @@ public sealed class LoggerConfiguration
         foreach (var appenderRef in Appenders)
         {
             if (!appenderRefs.Add(appenderRef.Appender))
-                throw new InvalidOperationException($"Multiple appender configurations for the same appender ({appenderRef.Appender.GetType()}) instance defined in the following logger configuration: {Name}");
+                throw new InvalidOperationException($"Multiple appender configurations for the same appender instance (of type {appenderRef.Appender.GetType()}) defined in the following logger configuration: {Name}");
         }
     }
 }

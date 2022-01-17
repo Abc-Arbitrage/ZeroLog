@@ -65,10 +65,11 @@ internal sealed class ResolvedLoggerConfiguration
 
             foreach (var appenderRef in loggerConfig.Appenders)
             {
-                var startLevel = Math.Max((int)loggerConfig.Level, (int)appenderRef.Level);
-
-                for (var level = startLevel; level <= (int)Level.None; ++level)
+                for (var level = (int)appenderRef.Level; level <= (int)Level.None; ++level)
                     appendersByLogLevel[level].Add(appenderRef.Appender);
+
+                for (var level = 0; level <= (int)loggerConfig.Level; ++level)
+                    appendersByLogLevel[level].Clear();
             }
 
             if (loggerConfig.LogMessagePoolExhaustionStrategy != null)
