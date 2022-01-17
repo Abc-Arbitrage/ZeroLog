@@ -12,7 +12,7 @@ public class DiscardedLogMessageAnalyzer : DiagnosticAnalyzer
     public static readonly DiagnosticDescriptor DiscardedLogMessageDiagnostic = new(
         DiagnosticIds.DiscardedLogMessage,
         "Discarded LogMessage",
-        "Log messages cannot be implicitly discarded. The Log() method must be called once the message is constructed.",
+        "The returned LogMessage cannot be implicitly discarded. This is most often caused by a missing call to Log(). If needed, discard the return value explicitly.",
         DiagnosticIds.Category,
         DiagnosticSeverity.Error,
         true

@@ -37,11 +37,9 @@ public class LegacyStringInterpolationAnalyzer : DiagnosticAnalyzer
             return;
 
         var logType = context.Compilation.GetTypeByMetadataName("ZeroLog.Log");
-        if (logType is null)
-            return;
-
         var logMessageType = context.Compilation.GetTypeByMetadataName("ZeroLog.LogMessage");
-        if (logMessageType is null)
+
+        if (logType is null || logMessageType is null)
             return;
 
         var stringParameters = logType.GetMembers()

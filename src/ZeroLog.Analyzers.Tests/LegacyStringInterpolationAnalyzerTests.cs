@@ -9,7 +9,7 @@ namespace ZeroLog.Analyzers.Tests;
 public class LegacyStringInterpolationAnalyzerTests
 {
     [Test]
-    public Task should_not_report_non_allocating_interpolation()
+    public Task should_not_report_interpolation_with_handler()
     {
         var test = new Test
         {
@@ -18,7 +18,7 @@ public class LegacyStringInterpolationAnalyzerTests
 class C
 {
     void M(ZeroLog.Log log)
-        => log.Info({|#0:$""""|});
+        => log.Info($""foo {42}"");
 }
 "
         };
@@ -36,7 +36,7 @@ class C
 class C
 {
     void M(ZeroLog.Log log)
-        => log.Info({|#0:$""""|});
+        => log.Info({|#0:$""foo {42}""|});
 }
 ",
             ExpectedDiagnostics =
@@ -58,13 +58,32 @@ class C
 class C
 {
     void M(ZeroLog.LogMessage message)
-        => message.Append({|#0:$""""|});
+        => message.Append({|#0:$""foo {42}""|});
 }
 ",
             ExpectedDiagnostics =
             {
                 new DiagnosticResult(LegacyStringInterpolationAnalyzer.AllocatingStringInterpolationDiagnostic).WithLocation(0)
             }
+        };
+
+        return test.RunAsync();
+    }
+
+    [Test]
+    public Task should_not_report_unrelated_allocating_interpolation()
+    {
+        var test = new Test
+        {
+            Source = @"
+class C
+{
+    void M()
+        => N($""foo {42}"");
+
+    void N(string value) { }
+}
+"
         };
 
         return test.RunAsync();
