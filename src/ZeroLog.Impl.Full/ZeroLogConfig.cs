@@ -1,4 +1,4 @@
-﻿using ZeroLog.Config;
+﻿using ZeroLog.Configuration;
 
 namespace ZeroLog;
 

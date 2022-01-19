@@ -1,7 +1,7 @@
 using System.Runtime.CompilerServices;
 using System.Threading;
 using ZeroLog.Appenders;
-using ZeroLog.Config;
+using ZeroLog.Configuration;
 
 namespace ZeroLog;
 
@@ -19,13 +19,13 @@ partial class Log
         _logLevel = _config.Level;
     }
 
-    public partial bool IsEnabled(Level level)
+    public partial bool IsEnabled(LogLevel level)
         => level >= _logLevel;
 
-    internal Appender[] GetAppenders(Level level)
+    internal Appender[] GetAppenders(LogLevel level)
         => _config.GetAppenders(level);
 
-    private partial LogMessage InternalAcquireLogMessage(Level level)
+    private partial LogMessage InternalAcquireLogMessage(LogLevel level)
     {
         var provider = _logMessageProvider;
 

@@ -30,7 +30,7 @@ namespace ZeroLog.Tests.Appenders
         public void should_log_to_file()
         {
             var logMessage = new LogMessage("Test log message");
-            logMessage.Initialize(new Log("TestLog"), Level.Info);
+            logMessage.Initialize(new Log("TestLog"), LogLevel.Info);
 
             var formattedMessage = new FormattedLogMessage(logMessage.ToString().Length);
             formattedMessage.SetMessage(logMessage);

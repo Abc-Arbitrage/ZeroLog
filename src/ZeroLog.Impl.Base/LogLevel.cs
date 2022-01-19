@@ -1,6 +1,6 @@
 namespace ZeroLog;
 
-public enum Level
+public enum LogLevel
 {
     // Same level values as in Microsoft.Extensions.Logging.LogLevel, but with different names
 

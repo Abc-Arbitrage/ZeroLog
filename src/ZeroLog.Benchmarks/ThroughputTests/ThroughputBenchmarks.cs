@@ -7,7 +7,7 @@ using log4net.Layout;
 using NLog;
 using NLog.Config;
 using NLog.Targets.Wrappers;
-using ZeroLog.Config;
+using ZeroLog.Configuration;
 
 namespace ZeroLog.Benchmarks.ThroughputTests
 {
@@ -154,8 +154,8 @@ namespace ZeroLog.Benchmarks.ThroughputTests
             var config = new LoggingConfiguration();
             config.AddTarget(nameof(_nLogTestTarget), _nLogTestTarget);
             config.AddTarget(nameof(asyncTarget), asyncTarget);
-            config.LoggingRules.Add(new LoggingRule(nameof(NLogSync), LogLevel.Debug, _nLogTestTarget));
-            config.LoggingRules.Add(new LoggingRule(nameof(NLogAsync), LogLevel.Debug, asyncTarget));
+            config.LoggingRules.Add(new LoggingRule(nameof(NLogSync), NLog.LogLevel.Debug, _nLogTestTarget));
+            config.LoggingRules.Add(new LoggingRule(nameof(NLogAsync), NLog.LogLevel.Debug, asyncTarget));
             NLog.LogManager.Configuration = config;
             NLog.LogManager.ReconfigExistingLoggers();
 

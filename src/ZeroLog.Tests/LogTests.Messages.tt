@@ -42,7 +42,7 @@ partial class LogTests
     [Test]
     public void should_not_log_above_level_<#= logLevel #>()
     {
-        _log.UpdateConfiguration(_provider, ResolvedLoggerConfiguration.SingleAppender(Level.<#= logLevel #> + 1));
+        _log.UpdateConfiguration(_provider, ResolvedLoggerConfiguration.SingleAppender(LogLevel.<#= logLevel #> + 1));
         _log.<#= logLevel #>("Foo");
         _provider.ShouldNotBeLogged();
     }
@@ -50,7 +50,7 @@ partial class LogTests
     [Test]
     public void should_not_log_above_level_<#= logLevel #>_interpolated()
     {
-        _log.UpdateConfiguration(_provider, ResolvedLoggerConfiguration.SingleAppender(Level.<#= logLevel #> + 1));
+        _log.UpdateConfiguration(_provider, ResolvedLoggerConfiguration.SingleAppender(LogLevel.<#= logLevel #> + 1));
         _log.<#= logLevel #>($"Foo {42}");
         _provider.ShouldNotBeLogged();
     }
@@ -61,7 +61,7 @@ partial class LogTests
         _log.<#= logLevel #>().Append("Foo").Log();
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.<#= logLevel #>);
+        message.Level.ShouldEqual(LogLevel.<#= logLevel #>);
         message.ToString().ShouldEqual("Foo");
         message.Exception.ShouldBeNull();
     }
@@ -72,7 +72,7 @@ partial class LogTests
         _log.<#= logLevel #>("foo");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.<#= logLevel #>);
+        message.Level.ShouldEqual(LogLevel.<#= logLevel #>);
         message.ToString().ShouldEqual("foo");
         message.Exception.ShouldBeNull();
     }
@@ -94,7 +94,7 @@ partial class LogTests
         _log.<#= logLevel #>($"foo {NoInline("bar")} baz {NoInline("foobar")}");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.<#= logLevel #>);
+        message.Level.ShouldEqual(LogLevel.<#= logLevel #>);
         message.ToString().ShouldEqual("foo bar baz foobar");
         message.Exception.ShouldBeNull();
     }
@@ -132,7 +132,7 @@ partial class LogTests
         _log.<#= logLevel #>($"foo {TestValues.<#= type.argType #>} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.<#= logLevel #>);
+        message.Level.ShouldEqual(LogLevel.<#= logLevel #>);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.<#= type.argType #>} bar"));
     }
 
@@ -142,7 +142,7 @@ partial class LogTests
         _log.<#= logLevel #>($"foo {(<#= type.name #>?)TestValues.<#= type.argType #>} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.<#= logLevel #>);
+        message.Level.ShouldEqual(LogLevel.<#= logLevel #>);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.<#= type.argType #>} bar"));
     }
 
@@ -156,7 +156,7 @@ partial class LogTests
         _log.<#= logLevel #>($"foo {TestValues.<#= type.argType #>:<#= testFormats[type.argType] #>} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.<#= logLevel #>);
+        message.Level.ShouldEqual(LogLevel.<#= logLevel #>);
         message.ToString().ShouldEqual($"foo {TestValues.<#= type.argType #>.ToString("<#= testFormats[type.argType] #>", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -166,7 +166,7 @@ partial class LogTests
         _log.<#= logLevel #>($"foo {(<#= type.name #>?)TestValues.<#= type.argType #>:<#= testFormats[type.argType] #>} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.<#= logLevel #>);
+        message.Level.ShouldEqual(LogLevel.<#= logLevel #>);
         message.ToString().ShouldEqual($"foo {TestValues.<#= type.argType #>.ToString("<#= testFormats[type.argType] #>", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -188,7 +188,7 @@ partial class LogTests
         _log.<#= logLevel #>($"foo {DayOfWeek.Friday} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.<#= logLevel #>);
+        message.Level.ShouldEqual(LogLevel.<#= logLevel #>);
         message.ToString().ShouldEqual("foo Friday bar");
     }
 
@@ -198,7 +198,7 @@ partial class LogTests
         _log.<#= logLevel #>($"foo {(DayOfWeek?)DayOfWeek.Friday} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.<#= logLevel #>);
+        message.Level.ShouldEqual(LogLevel.<#= logLevel #>);
         message.ToString().ShouldEqual("foo Friday bar");
     }
 

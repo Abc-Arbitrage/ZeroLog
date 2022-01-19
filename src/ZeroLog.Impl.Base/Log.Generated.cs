@@ -14,26 +14,26 @@ namespace ZeroLog;
 
 partial class Log
 {
-    public bool IsTraceEnabled => Level.Trace >= _logLevel;
-    public bool IsDebugEnabled => Level.Debug >= _logLevel;
-    public bool IsInfoEnabled => Level.Info >= _logLevel;
-    public bool IsWarnEnabled => Level.Warn >= _logLevel;
-    public bool IsErrorEnabled => Level.Error >= _logLevel;
-    public bool IsFatalEnabled => Level.Fatal >= _logLevel;
+    public bool IsTraceEnabled => LogLevel.Trace >= _logLevel;
+    public bool IsDebugEnabled => LogLevel.Debug >= _logLevel;
+    public bool IsInfoEnabled => LogLevel.Info >= _logLevel;
+    public bool IsWarnEnabled => LogLevel.Warn >= _logLevel;
+    public bool IsErrorEnabled => LogLevel.Error >= _logLevel;
+    public bool IsFatalEnabled => LogLevel.Fatal >= _logLevel;
 
     public LogMessage Trace()
-        => ForLevel(Level.Trace);
+        => ForLevel(LogLevel.Trace);
 
     public void Trace(string? message)
     {
-        var logMessage = ForLevel(Level.Trace);
+        var logMessage = ForLevel(LogLevel.Trace);
         logMessage.InternalAppendString(message);
         logMessage.Log();
     }
 
     public void Trace(string? message, Exception? ex)
     {
-        var logMessage = ForLevel(Level.Trace);
+        var logMessage = ForLevel(LogLevel.Trace);
         logMessage.InternalAppendString(message);
         logMessage.Exception = ex;
         logMessage.Log();
@@ -49,18 +49,18 @@ partial class Log
     }
 
     public LogMessage Debug()
-        => ForLevel(Level.Debug);
+        => ForLevel(LogLevel.Debug);
 
     public void Debug(string? message)
     {
-        var logMessage = ForLevel(Level.Debug);
+        var logMessage = ForLevel(LogLevel.Debug);
         logMessage.InternalAppendString(message);
         logMessage.Log();
     }
 
     public void Debug(string? message, Exception? ex)
     {
-        var logMessage = ForLevel(Level.Debug);
+        var logMessage = ForLevel(LogLevel.Debug);
         logMessage.InternalAppendString(message);
         logMessage.Exception = ex;
         logMessage.Log();
@@ -76,18 +76,18 @@ partial class Log
     }
 
     public LogMessage Info()
-        => ForLevel(Level.Info);
+        => ForLevel(LogLevel.Info);
 
     public void Info(string? message)
     {
-        var logMessage = ForLevel(Level.Info);
+        var logMessage = ForLevel(LogLevel.Info);
         logMessage.InternalAppendString(message);
         logMessage.Log();
     }
 
     public void Info(string? message, Exception? ex)
     {
-        var logMessage = ForLevel(Level.Info);
+        var logMessage = ForLevel(LogLevel.Info);
         logMessage.InternalAppendString(message);
         logMessage.Exception = ex;
         logMessage.Log();
@@ -103,18 +103,18 @@ partial class Log
     }
 
     public LogMessage Warn()
-        => ForLevel(Level.Warn);
+        => ForLevel(LogLevel.Warn);
 
     public void Warn(string? message)
     {
-        var logMessage = ForLevel(Level.Warn);
+        var logMessage = ForLevel(LogLevel.Warn);
         logMessage.InternalAppendString(message);
         logMessage.Log();
     }
 
     public void Warn(string? message, Exception? ex)
     {
-        var logMessage = ForLevel(Level.Warn);
+        var logMessage = ForLevel(LogLevel.Warn);
         logMessage.InternalAppendString(message);
         logMessage.Exception = ex;
         logMessage.Log();
@@ -130,18 +130,18 @@ partial class Log
     }
 
     public LogMessage Error()
-        => ForLevel(Level.Error);
+        => ForLevel(LogLevel.Error);
 
     public void Error(string? message)
     {
-        var logMessage = ForLevel(Level.Error);
+        var logMessage = ForLevel(LogLevel.Error);
         logMessage.InternalAppendString(message);
         logMessage.Log();
     }
 
     public void Error(string? message, Exception? ex)
     {
-        var logMessage = ForLevel(Level.Error);
+        var logMessage = ForLevel(LogLevel.Error);
         logMessage.InternalAppendString(message);
         logMessage.Exception = ex;
         logMessage.Log();
@@ -157,18 +157,18 @@ partial class Log
     }
 
     public LogMessage Fatal()
-        => ForLevel(Level.Fatal);
+        => ForLevel(LogLevel.Fatal);
 
     public void Fatal(string? message)
     {
-        var logMessage = ForLevel(Level.Fatal);
+        var logMessage = ForLevel(LogLevel.Fatal);
         logMessage.InternalAppendString(message);
         logMessage.Log();
     }
 
     public void Fatal(string? message, Exception? ex)
     {
-        var logMessage = ForLevel(Level.Fatal);
+        var logMessage = ForLevel(LogLevel.Fatal);
         logMessage.InternalAppendString(message);
         logMessage.Exception = ex;
         logMessage.Log();
@@ -193,7 +193,7 @@ partial class Log
         {
             if (log.IsTraceEnabled)
             {
-                Message = log.InternalAcquireLogMessage(Level.Trace);
+                Message = log.InternalAcquireLogMessage(LogLevel.Trace);
                 isEnabled = true;
             }
             else
@@ -431,7 +431,7 @@ partial class Log
         {
             if (log.IsDebugEnabled)
             {
-                Message = log.InternalAcquireLogMessage(Level.Debug);
+                Message = log.InternalAcquireLogMessage(LogLevel.Debug);
                 isEnabled = true;
             }
             else
@@ -669,7 +669,7 @@ partial class Log
         {
             if (log.IsInfoEnabled)
             {
-                Message = log.InternalAcquireLogMessage(Level.Info);
+                Message = log.InternalAcquireLogMessage(LogLevel.Info);
                 isEnabled = true;
             }
             else
@@ -907,7 +907,7 @@ partial class Log
         {
             if (log.IsWarnEnabled)
             {
-                Message = log.InternalAcquireLogMessage(Level.Warn);
+                Message = log.InternalAcquireLogMessage(LogLevel.Warn);
                 isEnabled = true;
             }
             else
@@ -1145,7 +1145,7 @@ partial class Log
         {
             if (log.IsErrorEnabled)
             {
-                Message = log.InternalAcquireLogMessage(Level.Error);
+                Message = log.InternalAcquireLogMessage(LogLevel.Error);
                 isEnabled = true;
             }
             else
@@ -1383,7 +1383,7 @@ partial class Log
         {
             if (log.IsFatalEnabled)
             {
-                Message = log.InternalAcquireLogMessage(Level.Fatal);
+                Message = log.InternalAcquireLogMessage(LogLevel.Fatal);
                 isEnabled = true;
             }
             else

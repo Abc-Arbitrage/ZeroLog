@@ -38,7 +38,7 @@ namespace ZeroLog.Tests.Appenders
             var prefixWriter = new PrefixWriter(pattern);
 
             var logMessage = new LogMessage("Foo");
-            logMessage.Initialize(new Log("TestLog"), Level.Info);
+            logMessage.Initialize(new Log("TestLog"), LogLevel.Info);
             logMessage.Timestamp = new DateTime(2020, 01, 02, 03, 04, 05, 06);
 
             var result = GetResult(prefixWriter, logMessage);
@@ -53,7 +53,7 @@ namespace ZeroLog.Tests.Appenders
             var prefixWriter = new PrefixWriter("%thread world!");
 
             var logMessage = new LogMessage("Foo");
-            logMessage.Initialize(null, Level.Info);
+            logMessage.Initialize(null, LogLevel.Info);
 
             var result = GetResult(prefixWriter, logMessage);
             Check.That(result).IsEqualTo("Hello world!");
@@ -65,7 +65,7 @@ namespace ZeroLog.Tests.Appenders
             var prefixWriter = new PrefixWriter("%thread");
 
             var logMessage = new LogMessage("Foo");
-            logMessage.Initialize(null, Level.Info);
+            logMessage.Initialize(null, LogLevel.Info);
 
             var result = GetResult(prefixWriter, logMessage);
             Check.That(result).IsEqualTo(Thread.CurrentThread.ManagedThreadId.ToString(CultureInfo.InvariantCulture));

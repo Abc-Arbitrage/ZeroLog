@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 using NFluent;
 using NUnit.Framework;
 using ZeroLog.Appenders;
-using ZeroLog.Config;
+using ZeroLog.Configuration;
 
 namespace ZeroLog.Tests.Config
 {

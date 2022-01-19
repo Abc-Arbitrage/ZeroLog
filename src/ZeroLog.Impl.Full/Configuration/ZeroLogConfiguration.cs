@@ -4,7 +4,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using ZeroLog.Appenders;
 
-namespace ZeroLog.Config;
+namespace ZeroLog.Configuration;
 
 public sealed class ZeroLogConfiguration
 {

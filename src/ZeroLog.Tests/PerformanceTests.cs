@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.Threading.Tasks;
 using NUnit.Framework;
-using ZeroLog.Config;
+using ZeroLog.Configuration;
 
 namespace ZeroLog.Tests
 {

@@ -6,7 +6,7 @@ namespace ZeroLog;
 public sealed partial class Log
 {
     [SuppressMessage("ReSharper", "FieldCanBeMadeReadOnly.Local")]
-    private Level _logLevel = Level.None;
+    private LogLevel _logLevel = LogLevel.None;
 
     internal string Name { get; }
 
@@ -16,25 +16,25 @@ public sealed partial class Log
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public partial bool IsEnabled(Level level);
+    public partial bool IsEnabled(LogLevel level);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public LogMessage ForLevel(Level level)
+    public LogMessage ForLevel(LogLevel level)
         => IsEnabled(level)
             ? InternalAcquireLogMessage(level)
             : LogMessage.Empty;
 
-    private partial LogMessage InternalAcquireLogMessage(Level level);
+    private partial LogMessage InternalAcquireLogMessage(LogLevel level);
 
     public override string ToString()
         => Name;
 
 #if NETSTANDARD
 
-    public partial bool IsEnabled(Level level)
+    public partial bool IsEnabled(LogLevel level)
         => false;
 
-    private partial LogMessage InternalAcquireLogMessage(Level level)
+    private partial LogMessage InternalAcquireLogMessage(LogLevel level)
         => LogMessage.Empty;
 
 #endif

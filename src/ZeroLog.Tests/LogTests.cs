@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using NUnit.Framework;
-using ZeroLog.Config;
+using ZeroLog.Configuration;
 using ZeroLog.Tests.Support;
 
 namespace ZeroLog.Tests;
@@ -23,7 +23,7 @@ public partial class LogTests
         _provider = new TestLogMessageProvider();
 
         _log = new Log("TestLog");
-        _log.UpdateConfiguration(_provider, ResolvedLoggerConfiguration.SingleAppender(Level.Trace));
+        _log.UpdateConfiguration(_provider, ResolvedLoggerConfiguration.SingleAppender(LogLevel.Trace));
     }
 
     [TearDown]
@@ -38,18 +38,18 @@ public partial class LogTests
         _log = new Log("TestLog");
 
         _log.IsFatalEnabled.ShouldBeFalse();
-        _log.IsEnabled(Level.Fatal).ShouldBeFalse();
+        _log.IsEnabled(LogLevel.Fatal).ShouldBeFalse();
 
         _log.Fatal().ShouldBeTheSameAs(LogMessage.Empty);
     }
 
-    [TestCase(Level.Trace, true, true, true, true, true, true)]
-    [TestCase(Level.Debug, false, true, true, true, true, true)]
-    [TestCase(Level.Info, false, false, true, true, true, true)]
-    [TestCase(Level.Warn, false, false, false, true, true, true)]
-    [TestCase(Level.Error, false, false, false, false, true, true)]
-    [TestCase(Level.Fatal, false, false, false, false, false, true)]
-    public void should_tell_if_log_level_is_enabled(Level logLevel, bool isTrace, bool isDebug, bool isInfo, bool isWarn, bool isError, bool isFatal)
+    [TestCase(LogLevel.Trace, true, true, true, true, true, true)]
+    [TestCase(LogLevel.Debug, false, true, true, true, true, true)]
+    [TestCase(LogLevel.Info, false, false, true, true, true, true)]
+    [TestCase(LogLevel.Warn, false, false, false, true, true, true)]
+    [TestCase(LogLevel.Error, false, false, false, false, true, true)]
+    [TestCase(LogLevel.Fatal, false, false, false, false, false, true)]
+    public void should_tell_if_log_level_is_enabled(LogLevel logLevel, bool isTrace, bool isDebug, bool isInfo, bool isWarn, bool isError, bool isFatal)
     {
         _log.UpdateConfiguration(_provider, ResolvedLoggerConfiguration.SingleAppender(logLevel));
 

@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using ZeroLog.Appenders;
-using ZeroLog.Config;
+using ZeroLog.Configuration;
 
 namespace ZeroLog.Benchmarks.ThroughputTests
 {

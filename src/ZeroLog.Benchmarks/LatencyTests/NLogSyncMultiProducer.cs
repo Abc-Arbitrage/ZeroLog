@@ -14,7 +14,7 @@ namespace ZeroLog.Benchmarks.LatencyTests
 
             var config = new LoggingConfiguration();
             config.AddTarget(nameof(appender), appender);
-            config.LoggingRules.Add(new LoggingRule(nameof(appender), LogLevel.Debug, appender));
+            config.LoggingRules.Add(new LoggingRule(nameof(appender), NLog.LogLevel.Debug, appender));
             NLog.LogManager.Configuration = config;
             NLog.LogManager.ReconfigExistingLoggers();
 

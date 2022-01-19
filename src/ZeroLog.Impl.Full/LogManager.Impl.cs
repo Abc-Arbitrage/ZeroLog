@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using ZeroLog.Appenders;
-using ZeroLog.Config;
+using ZeroLog.Configuration;
 
 namespace ZeroLog
 {

@@ -37,7 +37,7 @@ unsafe partial class LogMessage
         _endOfBuffer = bufferSegment.Data + bufferSegment.Length;
     }
 
-    internal void Initialize(Log? log, Level level)
+    internal void Initialize(Log? log, LogLevel level)
     {
         Timestamp = DateTime.UtcNow; // TODO clock in Log
         Level = level;

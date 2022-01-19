@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using NFluent;
 using NUnit.Framework;
 using ZeroLog.Appenders;
-using ZeroLog.Config;
+using ZeroLog.Configuration;
 using ZeroLog.Tests.Support;
 
 namespace ZeroLog.Tests

@@ -9,7 +9,7 @@ namespace ZeroLog.Appenders;
 
 internal class PrefixWriter
 {
-    private static readonly string[] _levelStrings = Enum.GetNames(typeof(Level)).Select(x => x.ToUpperInvariant()).ToArray();
+    private static readonly string[] _levelStrings = Enum.GetNames(typeof(LogLevel)).Select(x => x.ToUpperInvariant()).ToArray();
 
     private readonly List<PatternPart> _parts;
 

@@ -5,11 +5,11 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using ZeroLog.Appenders;
 
-namespace ZeroLog.Config;
+namespace ZeroLog.Configuration;
 
 internal sealed class ResolvedLoggerConfiguration
 {
-    private const int _levelCount = (int)Level.None + 1;
+    private const int _levelCount = (int)LogLevel.None + 1;
 
     public static ResolvedLoggerConfiguration Empty { get; } = new(Enumerable.Repeat(Array.Empty<Appender>(), _levelCount))
     {
@@ -18,29 +18,29 @@ internal sealed class ResolvedLoggerConfiguration
 
     private readonly Appender[][] _appendersByLogLevel;
 
-    public Level Level { get; }
+    public LogLevel Level { get; }
     public LogMessagePoolExhaustionStrategy LogMessagePoolExhaustionStrategy { get; private init; } = LogMessagePoolExhaustionStrategy.Default;
 
     private ResolvedLoggerConfiguration(IEnumerable<Appender[]> appendersByLogLevel)
     {
         _appendersByLogLevel = appendersByLogLevel.ToArray();
-        _appendersByLogLevel[(int)Level.None] = Array.Empty<Appender>();
+        _appendersByLogLevel[(int)LogLevel.None] = Array.Empty<Appender>();
         Debug.Assert(_appendersByLogLevel.Length == _levelCount);
 
-        Level = Level.None;
+        Level = LogLevel.None;
 
         for (var level = 0; level < _appendersByLogLevel.Length; ++level)
         {
             if (_appendersByLogLevel[level].Length == 0)
                 continue;
 
-            Level = (Level)level;
+            Level = (LogLevel)level;
             break;
         }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Appender[] GetAppenders(Level level)
+    public Appender[] GetAppenders(LogLevel level)
         => _appendersByLogLevel[(int)level];
 
     public static ResolvedLoggerConfiguration Resolve(string loggerName, ZeroLogConfiguration configuration)
@@ -50,7 +50,7 @@ internal sealed class ResolvedLoggerConfiguration
         for (var i = 0; i < appendersByLogLevel.Length; i++)
             appendersByLogLevel[i] = new HashSet<Appender>(ReferenceEqualityComparer.Instance);
 
-        var effectiveLevel = Level.Trace;
+        var effectiveLevel = LogLevel.Trace;
         var effectiveLogMessagePoolExhaustionStrategy = LogMessagePoolExhaustionStrategy.Default;
 
         foreach (var loggerConfig in GetOrderedLoggerConfigurations())
@@ -89,13 +89,13 @@ internal sealed class ResolvedLoggerConfiguration
             {
                 var startLevel = Math.Max((int)appenderRef.Level, (int)appenderRef.Appender.Level);
 
-                for (var level = startLevel; level < (int)Level.None; ++level)
+                for (var level = startLevel; level < (int)LogLevel.None; ++level)
                     appendersByLogLevel[level].Add(appenderRef.Appender);
             }
         }
     }
 
-    internal static ResolvedLoggerConfiguration SingleAppender(Level level, Appender? appender = null)
+    internal static ResolvedLoggerConfiguration SingleAppender(LogLevel level, Appender? appender = null)
     {
         // For unit tests
 

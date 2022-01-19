@@ -4,7 +4,7 @@ namespace ZeroLog.Appenders;
 
 public abstract class Appender : IDisposable
 {
-    public Level Level { get; init; }
+    public LogLevel Level { get; init; }
 
     public abstract void WriteMessage(FormattedLogMessage message);
 

@@ -20,7 +20,7 @@ partial class Log
     foreach (var levelName in _logLevels)
     {
 #>
-    public bool Is<#= levelName #>Enabled => Level.<#= levelName #> >= _logLevel;
+    public bool Is<#= levelName #>Enabled => LogLevel.<#= levelName #> >= _logLevel;
 <#
     }
 #>
@@ -30,18 +30,18 @@ partial class Log
     {
 #>
     public LogMessage <#= levelName #>()
-        => ForLevel(Level.<#= levelName #>);
+        => ForLevel(LogLevel.<#= levelName #>);
 
     public void <#= levelName #>(string? message)
     {
-        var logMessage = ForLevel(Level.<#= levelName #>);
+        var logMessage = ForLevel(LogLevel.<#= levelName #>);
         logMessage.InternalAppendString(message);
         logMessage.Log();
     }
 
     public void <#= levelName #>(string? message, Exception? ex)
     {
-        var logMessage = ForLevel(Level.<#= levelName #>);
+        var logMessage = ForLevel(LogLevel.<#= levelName #>);
         logMessage.InternalAppendString(message);
         logMessage.Exception = ex;
         logMessage.Log();
@@ -72,7 +72,7 @@ partial class Log
         {
             if (log.Is<#= levelName #>Enabled)
             {
-                Message = log.InternalAcquireLogMessage(Level.<#= levelName #>);
+                Message = log.InternalAcquireLogMessage(LogLevel.<#= levelName #>);
                 isEnabled = true;
             }
             else

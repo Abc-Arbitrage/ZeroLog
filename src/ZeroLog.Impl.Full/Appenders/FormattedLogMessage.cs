@@ -13,7 +13,7 @@ public class FormattedLogMessage
 
     private LogMessage _message = LogMessage.Empty;
 
-    public Level Level => _message.Level;
+    public LogLevel Level => _message.Level;
     public DateTime Timestamp => _message.Timestamp;
     public Thread? Thread => _message.Thread;
     public Exception? Exception => _message.Exception;

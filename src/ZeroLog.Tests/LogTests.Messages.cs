@@ -3,7 +3,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using NUnit.Framework;
-using ZeroLog.Config;
+using ZeroLog.Configuration;
 using ZeroLog.Tests.Support;
 
 namespace ZeroLog.Tests;
@@ -14,7 +14,7 @@ partial class LogTests
     [Test]
     public void should_not_log_above_level_Trace()
     {
-        _log.UpdateConfiguration(_provider, ResolvedLoggerConfiguration.SingleAppender(Level.Trace + 1));
+        _log.UpdateConfiguration(_provider, ResolvedLoggerConfiguration.SingleAppender(LogLevel.Trace + 1));
         _log.Trace("Foo");
         _provider.ShouldNotBeLogged();
     }
@@ -22,7 +22,7 @@ partial class LogTests
     [Test]
     public void should_not_log_above_level_Trace_interpolated()
     {
-        _log.UpdateConfiguration(_provider, ResolvedLoggerConfiguration.SingleAppender(Level.Trace + 1));
+        _log.UpdateConfiguration(_provider, ResolvedLoggerConfiguration.SingleAppender(LogLevel.Trace + 1));
         _log.Trace($"Foo {42}");
         _provider.ShouldNotBeLogged();
     }
@@ -33,7 +33,7 @@ partial class LogTests
         _log.Trace().Append("Foo").Log();
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual("Foo");
         message.Exception.ShouldBeNull();
     }
@@ -44,7 +44,7 @@ partial class LogTests
         _log.Trace("foo");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual("foo");
         message.Exception.ShouldBeNull();
     }
@@ -66,7 +66,7 @@ partial class LogTests
         _log.Trace($"foo {NoInline("bar")} baz {NoInline("foobar")}");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual("foo bar baz foobar");
         message.Exception.ShouldBeNull();
     }
@@ -100,7 +100,7 @@ partial class LogTests
         _log.Trace($"foo {TestValues.Boolean} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Boolean} bar"));
     }
 
@@ -110,7 +110,7 @@ partial class LogTests
         _log.Trace($"foo {(bool?)TestValues.Boolean} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Boolean} bar"));
     }
 
@@ -126,7 +126,7 @@ partial class LogTests
         _log.Trace($"foo {TestValues.Byte} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Byte} bar"));
     }
 
@@ -136,7 +136,7 @@ partial class LogTests
         _log.Trace($"foo {(byte?)TestValues.Byte} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Byte} bar"));
     }
 
@@ -146,7 +146,7 @@ partial class LogTests
         _log.Trace($"foo {TestValues.Byte:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual($"foo {TestValues.Byte.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -156,7 +156,7 @@ partial class LogTests
         _log.Trace($"foo {(byte?)TestValues.Byte:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual($"foo {TestValues.Byte.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -172,7 +172,7 @@ partial class LogTests
         _log.Trace($"foo {TestValues.SByte} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.SByte} bar"));
     }
 
@@ -182,7 +182,7 @@ partial class LogTests
         _log.Trace($"foo {(sbyte?)TestValues.SByte} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.SByte} bar"));
     }
 
@@ -192,7 +192,7 @@ partial class LogTests
         _log.Trace($"foo {TestValues.SByte:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual($"foo {TestValues.SByte.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -202,7 +202,7 @@ partial class LogTests
         _log.Trace($"foo {(sbyte?)TestValues.SByte:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual($"foo {TestValues.SByte.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -218,7 +218,7 @@ partial class LogTests
         _log.Trace($"foo {TestValues.Char} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Char} bar"));
     }
 
@@ -228,7 +228,7 @@ partial class LogTests
         _log.Trace($"foo {(char?)TestValues.Char} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Char} bar"));
     }
 
@@ -244,7 +244,7 @@ partial class LogTests
         _log.Trace($"foo {TestValues.Int16} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Int16} bar"));
     }
 
@@ -254,7 +254,7 @@ partial class LogTests
         _log.Trace($"foo {(short?)TestValues.Int16} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Int16} bar"));
     }
 
@@ -264,7 +264,7 @@ partial class LogTests
         _log.Trace($"foo {TestValues.Int16:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual($"foo {TestValues.Int16.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -274,7 +274,7 @@ partial class LogTests
         _log.Trace($"foo {(short?)TestValues.Int16:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual($"foo {TestValues.Int16.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -290,7 +290,7 @@ partial class LogTests
         _log.Trace($"foo {TestValues.UInt16} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.UInt16} bar"));
     }
 
@@ -300,7 +300,7 @@ partial class LogTests
         _log.Trace($"foo {(ushort?)TestValues.UInt16} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.UInt16} bar"));
     }
 
@@ -310,7 +310,7 @@ partial class LogTests
         _log.Trace($"foo {TestValues.UInt16:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual($"foo {TestValues.UInt16.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -320,7 +320,7 @@ partial class LogTests
         _log.Trace($"foo {(ushort?)TestValues.UInt16:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual($"foo {TestValues.UInt16.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -336,7 +336,7 @@ partial class LogTests
         _log.Trace($"foo {TestValues.Int32} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Int32} bar"));
     }
 
@@ -346,7 +346,7 @@ partial class LogTests
         _log.Trace($"foo {(int?)TestValues.Int32} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Int32} bar"));
     }
 
@@ -356,7 +356,7 @@ partial class LogTests
         _log.Trace($"foo {TestValues.Int32:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual($"foo {TestValues.Int32.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -366,7 +366,7 @@ partial class LogTests
         _log.Trace($"foo {(int?)TestValues.Int32:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual($"foo {TestValues.Int32.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -382,7 +382,7 @@ partial class LogTests
         _log.Trace($"foo {TestValues.UInt32} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.UInt32} bar"));
     }
 
@@ -392,7 +392,7 @@ partial class LogTests
         _log.Trace($"foo {(uint?)TestValues.UInt32} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.UInt32} bar"));
     }
 
@@ -402,7 +402,7 @@ partial class LogTests
         _log.Trace($"foo {TestValues.UInt32:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual($"foo {TestValues.UInt32.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -412,7 +412,7 @@ partial class LogTests
         _log.Trace($"foo {(uint?)TestValues.UInt32:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual($"foo {TestValues.UInt32.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -428,7 +428,7 @@ partial class LogTests
         _log.Trace($"foo {TestValues.Int64} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Int64} bar"));
     }
 
@@ -438,7 +438,7 @@ partial class LogTests
         _log.Trace($"foo {(long?)TestValues.Int64} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Int64} bar"));
     }
 
@@ -448,7 +448,7 @@ partial class LogTests
         _log.Trace($"foo {TestValues.Int64:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual($"foo {TestValues.Int64.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -458,7 +458,7 @@ partial class LogTests
         _log.Trace($"foo {(long?)TestValues.Int64:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual($"foo {TestValues.Int64.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -474,7 +474,7 @@ partial class LogTests
         _log.Trace($"foo {TestValues.UInt64} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.UInt64} bar"));
     }
 
@@ -484,7 +484,7 @@ partial class LogTests
         _log.Trace($"foo {(ulong?)TestValues.UInt64} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.UInt64} bar"));
     }
 
@@ -494,7 +494,7 @@ partial class LogTests
         _log.Trace($"foo {TestValues.UInt64:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual($"foo {TestValues.UInt64.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -504,7 +504,7 @@ partial class LogTests
         _log.Trace($"foo {(ulong?)TestValues.UInt64:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual($"foo {TestValues.UInt64.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -520,7 +520,7 @@ partial class LogTests
         _log.Trace($"foo {TestValues.IntPtr} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.IntPtr} bar"));
     }
 
@@ -530,7 +530,7 @@ partial class LogTests
         _log.Trace($"foo {(nint?)TestValues.IntPtr} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.IntPtr} bar"));
     }
 
@@ -540,7 +540,7 @@ partial class LogTests
         _log.Trace($"foo {TestValues.IntPtr:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual($"foo {TestValues.IntPtr.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -550,7 +550,7 @@ partial class LogTests
         _log.Trace($"foo {(nint?)TestValues.IntPtr:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual($"foo {TestValues.IntPtr.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -566,7 +566,7 @@ partial class LogTests
         _log.Trace($"foo {TestValues.UIntPtr} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.UIntPtr} bar"));
     }
 
@@ -576,7 +576,7 @@ partial class LogTests
         _log.Trace($"foo {(nuint?)TestValues.UIntPtr} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.UIntPtr} bar"));
     }
 
@@ -586,7 +586,7 @@ partial class LogTests
         _log.Trace($"foo {TestValues.UIntPtr:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual($"foo {TestValues.UIntPtr.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -596,7 +596,7 @@ partial class LogTests
         _log.Trace($"foo {(nuint?)TestValues.UIntPtr:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual($"foo {TestValues.UIntPtr.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -612,7 +612,7 @@ partial class LogTests
         _log.Trace($"foo {TestValues.Single} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Single} bar"));
     }
 
@@ -622,7 +622,7 @@ partial class LogTests
         _log.Trace($"foo {(float?)TestValues.Single} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Single} bar"));
     }
 
@@ -632,7 +632,7 @@ partial class LogTests
         _log.Trace($"foo {TestValues.Single:F4} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual($"foo {TestValues.Single.ToString("F4", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -642,7 +642,7 @@ partial class LogTests
         _log.Trace($"foo {(float?)TestValues.Single:F4} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual($"foo {TestValues.Single.ToString("F4", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -658,7 +658,7 @@ partial class LogTests
         _log.Trace($"foo {TestValues.Double} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Double} bar"));
     }
 
@@ -668,7 +668,7 @@ partial class LogTests
         _log.Trace($"foo {(double?)TestValues.Double} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Double} bar"));
     }
 
@@ -678,7 +678,7 @@ partial class LogTests
         _log.Trace($"foo {TestValues.Double:F4} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual($"foo {TestValues.Double.ToString("F4", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -688,7 +688,7 @@ partial class LogTests
         _log.Trace($"foo {(double?)TestValues.Double:F4} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual($"foo {TestValues.Double.ToString("F4", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -704,7 +704,7 @@ partial class LogTests
         _log.Trace($"foo {TestValues.Decimal} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Decimal} bar"));
     }
 
@@ -714,7 +714,7 @@ partial class LogTests
         _log.Trace($"foo {(decimal?)TestValues.Decimal} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Decimal} bar"));
     }
 
@@ -724,7 +724,7 @@ partial class LogTests
         _log.Trace($"foo {TestValues.Decimal:F4} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual($"foo {TestValues.Decimal.ToString("F4", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -734,7 +734,7 @@ partial class LogTests
         _log.Trace($"foo {(decimal?)TestValues.Decimal:F4} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual($"foo {TestValues.Decimal.ToString("F4", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -750,7 +750,7 @@ partial class LogTests
         _log.Trace($"foo {TestValues.Guid} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Guid} bar"));
     }
 
@@ -760,7 +760,7 @@ partial class LogTests
         _log.Trace($"foo {(Guid?)TestValues.Guid} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Guid} bar"));
     }
 
@@ -770,7 +770,7 @@ partial class LogTests
         _log.Trace($"foo {TestValues.Guid:B} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual($"foo {TestValues.Guid.ToString("B", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -780,7 +780,7 @@ partial class LogTests
         _log.Trace($"foo {(Guid?)TestValues.Guid:B} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual($"foo {TestValues.Guid.ToString("B", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -796,7 +796,7 @@ partial class LogTests
         _log.Trace($"foo {TestValues.DateTime} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.DateTime} bar"));
     }
 
@@ -806,7 +806,7 @@ partial class LogTests
         _log.Trace($"foo {(DateTime?)TestValues.DateTime} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.DateTime} bar"));
     }
 
@@ -816,7 +816,7 @@ partial class LogTests
         _log.Trace($"foo {TestValues.DateTime:yyyy-MM-dd} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual($"foo {TestValues.DateTime.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -826,7 +826,7 @@ partial class LogTests
         _log.Trace($"foo {(DateTime?)TestValues.DateTime:yyyy-MM-dd} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual($"foo {TestValues.DateTime.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -842,7 +842,7 @@ partial class LogTests
         _log.Trace($"foo {TestValues.TimeSpan} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.TimeSpan} bar"));
     }
 
@@ -852,7 +852,7 @@ partial class LogTests
         _log.Trace($"foo {(TimeSpan?)TestValues.TimeSpan} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.TimeSpan} bar"));
     }
 
@@ -862,7 +862,7 @@ partial class LogTests
         _log.Trace($"foo {TestValues.TimeSpan:g} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual($"foo {TestValues.TimeSpan.ToString("g", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -872,7 +872,7 @@ partial class LogTests
         _log.Trace($"foo {(TimeSpan?)TestValues.TimeSpan:g} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual($"foo {TestValues.TimeSpan.ToString("g", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -888,7 +888,7 @@ partial class LogTests
         _log.Trace($"foo {DayOfWeek.Friday} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual("foo Friday bar");
     }
 
@@ -898,7 +898,7 @@ partial class LogTests
         _log.Trace($"foo {(DayOfWeek?)DayOfWeek.Friday} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Trace);
+        message.Level.ShouldEqual(LogLevel.Trace);
         message.ToString().ShouldEqual("foo Friday bar");
     }
 
@@ -911,7 +911,7 @@ partial class LogTests
     [Test]
     public void should_not_log_above_level_Debug()
     {
-        _log.UpdateConfiguration(_provider, ResolvedLoggerConfiguration.SingleAppender(Level.Debug + 1));
+        _log.UpdateConfiguration(_provider, ResolvedLoggerConfiguration.SingleAppender(LogLevel.Debug + 1));
         _log.Debug("Foo");
         _provider.ShouldNotBeLogged();
     }
@@ -919,7 +919,7 @@ partial class LogTests
     [Test]
     public void should_not_log_above_level_Debug_interpolated()
     {
-        _log.UpdateConfiguration(_provider, ResolvedLoggerConfiguration.SingleAppender(Level.Debug + 1));
+        _log.UpdateConfiguration(_provider, ResolvedLoggerConfiguration.SingleAppender(LogLevel.Debug + 1));
         _log.Debug($"Foo {42}");
         _provider.ShouldNotBeLogged();
     }
@@ -930,7 +930,7 @@ partial class LogTests
         _log.Debug().Append("Foo").Log();
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual("Foo");
         message.Exception.ShouldBeNull();
     }
@@ -941,7 +941,7 @@ partial class LogTests
         _log.Debug("foo");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual("foo");
         message.Exception.ShouldBeNull();
     }
@@ -963,7 +963,7 @@ partial class LogTests
         _log.Debug($"foo {NoInline("bar")} baz {NoInline("foobar")}");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual("foo bar baz foobar");
         message.Exception.ShouldBeNull();
     }
@@ -997,7 +997,7 @@ partial class LogTests
         _log.Debug($"foo {TestValues.Boolean} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Boolean} bar"));
     }
 
@@ -1007,7 +1007,7 @@ partial class LogTests
         _log.Debug($"foo {(bool?)TestValues.Boolean} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Boolean} bar"));
     }
 
@@ -1023,7 +1023,7 @@ partial class LogTests
         _log.Debug($"foo {TestValues.Byte} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Byte} bar"));
     }
 
@@ -1033,7 +1033,7 @@ partial class LogTests
         _log.Debug($"foo {(byte?)TestValues.Byte} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Byte} bar"));
     }
 
@@ -1043,7 +1043,7 @@ partial class LogTests
         _log.Debug($"foo {TestValues.Byte:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual($"foo {TestValues.Byte.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -1053,7 +1053,7 @@ partial class LogTests
         _log.Debug($"foo {(byte?)TestValues.Byte:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual($"foo {TestValues.Byte.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -1069,7 +1069,7 @@ partial class LogTests
         _log.Debug($"foo {TestValues.SByte} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.SByte} bar"));
     }
 
@@ -1079,7 +1079,7 @@ partial class LogTests
         _log.Debug($"foo {(sbyte?)TestValues.SByte} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.SByte} bar"));
     }
 
@@ -1089,7 +1089,7 @@ partial class LogTests
         _log.Debug($"foo {TestValues.SByte:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual($"foo {TestValues.SByte.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -1099,7 +1099,7 @@ partial class LogTests
         _log.Debug($"foo {(sbyte?)TestValues.SByte:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual($"foo {TestValues.SByte.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -1115,7 +1115,7 @@ partial class LogTests
         _log.Debug($"foo {TestValues.Char} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Char} bar"));
     }
 
@@ -1125,7 +1125,7 @@ partial class LogTests
         _log.Debug($"foo {(char?)TestValues.Char} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Char} bar"));
     }
 
@@ -1141,7 +1141,7 @@ partial class LogTests
         _log.Debug($"foo {TestValues.Int16} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Int16} bar"));
     }
 
@@ -1151,7 +1151,7 @@ partial class LogTests
         _log.Debug($"foo {(short?)TestValues.Int16} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Int16} bar"));
     }
 
@@ -1161,7 +1161,7 @@ partial class LogTests
         _log.Debug($"foo {TestValues.Int16:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual($"foo {TestValues.Int16.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -1171,7 +1171,7 @@ partial class LogTests
         _log.Debug($"foo {(short?)TestValues.Int16:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual($"foo {TestValues.Int16.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -1187,7 +1187,7 @@ partial class LogTests
         _log.Debug($"foo {TestValues.UInt16} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.UInt16} bar"));
     }
 
@@ -1197,7 +1197,7 @@ partial class LogTests
         _log.Debug($"foo {(ushort?)TestValues.UInt16} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.UInt16} bar"));
     }
 
@@ -1207,7 +1207,7 @@ partial class LogTests
         _log.Debug($"foo {TestValues.UInt16:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual($"foo {TestValues.UInt16.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -1217,7 +1217,7 @@ partial class LogTests
         _log.Debug($"foo {(ushort?)TestValues.UInt16:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual($"foo {TestValues.UInt16.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -1233,7 +1233,7 @@ partial class LogTests
         _log.Debug($"foo {TestValues.Int32} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Int32} bar"));
     }
 
@@ -1243,7 +1243,7 @@ partial class LogTests
         _log.Debug($"foo {(int?)TestValues.Int32} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Int32} bar"));
     }
 
@@ -1253,7 +1253,7 @@ partial class LogTests
         _log.Debug($"foo {TestValues.Int32:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual($"foo {TestValues.Int32.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -1263,7 +1263,7 @@ partial class LogTests
         _log.Debug($"foo {(int?)TestValues.Int32:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual($"foo {TestValues.Int32.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -1279,7 +1279,7 @@ partial class LogTests
         _log.Debug($"foo {TestValues.UInt32} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.UInt32} bar"));
     }
 
@@ -1289,7 +1289,7 @@ partial class LogTests
         _log.Debug($"foo {(uint?)TestValues.UInt32} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.UInt32} bar"));
     }
 
@@ -1299,7 +1299,7 @@ partial class LogTests
         _log.Debug($"foo {TestValues.UInt32:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual($"foo {TestValues.UInt32.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -1309,7 +1309,7 @@ partial class LogTests
         _log.Debug($"foo {(uint?)TestValues.UInt32:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual($"foo {TestValues.UInt32.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -1325,7 +1325,7 @@ partial class LogTests
         _log.Debug($"foo {TestValues.Int64} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Int64} bar"));
     }
 
@@ -1335,7 +1335,7 @@ partial class LogTests
         _log.Debug($"foo {(long?)TestValues.Int64} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Int64} bar"));
     }
 
@@ -1345,7 +1345,7 @@ partial class LogTests
         _log.Debug($"foo {TestValues.Int64:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual($"foo {TestValues.Int64.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -1355,7 +1355,7 @@ partial class LogTests
         _log.Debug($"foo {(long?)TestValues.Int64:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual($"foo {TestValues.Int64.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -1371,7 +1371,7 @@ partial class LogTests
         _log.Debug($"foo {TestValues.UInt64} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.UInt64} bar"));
     }
 
@@ -1381,7 +1381,7 @@ partial class LogTests
         _log.Debug($"foo {(ulong?)TestValues.UInt64} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.UInt64} bar"));
     }
 
@@ -1391,7 +1391,7 @@ partial class LogTests
         _log.Debug($"foo {TestValues.UInt64:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual($"foo {TestValues.UInt64.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -1401,7 +1401,7 @@ partial class LogTests
         _log.Debug($"foo {(ulong?)TestValues.UInt64:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual($"foo {TestValues.UInt64.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -1417,7 +1417,7 @@ partial class LogTests
         _log.Debug($"foo {TestValues.IntPtr} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.IntPtr} bar"));
     }
 
@@ -1427,7 +1427,7 @@ partial class LogTests
         _log.Debug($"foo {(nint?)TestValues.IntPtr} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.IntPtr} bar"));
     }
 
@@ -1437,7 +1437,7 @@ partial class LogTests
         _log.Debug($"foo {TestValues.IntPtr:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual($"foo {TestValues.IntPtr.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -1447,7 +1447,7 @@ partial class LogTests
         _log.Debug($"foo {(nint?)TestValues.IntPtr:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual($"foo {TestValues.IntPtr.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -1463,7 +1463,7 @@ partial class LogTests
         _log.Debug($"foo {TestValues.UIntPtr} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.UIntPtr} bar"));
     }
 
@@ -1473,7 +1473,7 @@ partial class LogTests
         _log.Debug($"foo {(nuint?)TestValues.UIntPtr} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.UIntPtr} bar"));
     }
 
@@ -1483,7 +1483,7 @@ partial class LogTests
         _log.Debug($"foo {TestValues.UIntPtr:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual($"foo {TestValues.UIntPtr.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -1493,7 +1493,7 @@ partial class LogTests
         _log.Debug($"foo {(nuint?)TestValues.UIntPtr:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual($"foo {TestValues.UIntPtr.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -1509,7 +1509,7 @@ partial class LogTests
         _log.Debug($"foo {TestValues.Single} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Single} bar"));
     }
 
@@ -1519,7 +1519,7 @@ partial class LogTests
         _log.Debug($"foo {(float?)TestValues.Single} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Single} bar"));
     }
 
@@ -1529,7 +1529,7 @@ partial class LogTests
         _log.Debug($"foo {TestValues.Single:F4} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual($"foo {TestValues.Single.ToString("F4", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -1539,7 +1539,7 @@ partial class LogTests
         _log.Debug($"foo {(float?)TestValues.Single:F4} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual($"foo {TestValues.Single.ToString("F4", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -1555,7 +1555,7 @@ partial class LogTests
         _log.Debug($"foo {TestValues.Double} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Double} bar"));
     }
 
@@ -1565,7 +1565,7 @@ partial class LogTests
         _log.Debug($"foo {(double?)TestValues.Double} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Double} bar"));
     }
 
@@ -1575,7 +1575,7 @@ partial class LogTests
         _log.Debug($"foo {TestValues.Double:F4} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual($"foo {TestValues.Double.ToString("F4", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -1585,7 +1585,7 @@ partial class LogTests
         _log.Debug($"foo {(double?)TestValues.Double:F4} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual($"foo {TestValues.Double.ToString("F4", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -1601,7 +1601,7 @@ partial class LogTests
         _log.Debug($"foo {TestValues.Decimal} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Decimal} bar"));
     }
 
@@ -1611,7 +1611,7 @@ partial class LogTests
         _log.Debug($"foo {(decimal?)TestValues.Decimal} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Decimal} bar"));
     }
 
@@ -1621,7 +1621,7 @@ partial class LogTests
         _log.Debug($"foo {TestValues.Decimal:F4} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual($"foo {TestValues.Decimal.ToString("F4", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -1631,7 +1631,7 @@ partial class LogTests
         _log.Debug($"foo {(decimal?)TestValues.Decimal:F4} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual($"foo {TestValues.Decimal.ToString("F4", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -1647,7 +1647,7 @@ partial class LogTests
         _log.Debug($"foo {TestValues.Guid} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Guid} bar"));
     }
 
@@ -1657,7 +1657,7 @@ partial class LogTests
         _log.Debug($"foo {(Guid?)TestValues.Guid} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Guid} bar"));
     }
 
@@ -1667,7 +1667,7 @@ partial class LogTests
         _log.Debug($"foo {TestValues.Guid:B} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual($"foo {TestValues.Guid.ToString("B", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -1677,7 +1677,7 @@ partial class LogTests
         _log.Debug($"foo {(Guid?)TestValues.Guid:B} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual($"foo {TestValues.Guid.ToString("B", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -1693,7 +1693,7 @@ partial class LogTests
         _log.Debug($"foo {TestValues.DateTime} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.DateTime} bar"));
     }
 
@@ -1703,7 +1703,7 @@ partial class LogTests
         _log.Debug($"foo {(DateTime?)TestValues.DateTime} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.DateTime} bar"));
     }
 
@@ -1713,7 +1713,7 @@ partial class LogTests
         _log.Debug($"foo {TestValues.DateTime:yyyy-MM-dd} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual($"foo {TestValues.DateTime.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -1723,7 +1723,7 @@ partial class LogTests
         _log.Debug($"foo {(DateTime?)TestValues.DateTime:yyyy-MM-dd} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual($"foo {TestValues.DateTime.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -1739,7 +1739,7 @@ partial class LogTests
         _log.Debug($"foo {TestValues.TimeSpan} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.TimeSpan} bar"));
     }
 
@@ -1749,7 +1749,7 @@ partial class LogTests
         _log.Debug($"foo {(TimeSpan?)TestValues.TimeSpan} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.TimeSpan} bar"));
     }
 
@@ -1759,7 +1759,7 @@ partial class LogTests
         _log.Debug($"foo {TestValues.TimeSpan:g} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual($"foo {TestValues.TimeSpan.ToString("g", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -1769,7 +1769,7 @@ partial class LogTests
         _log.Debug($"foo {(TimeSpan?)TestValues.TimeSpan:g} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual($"foo {TestValues.TimeSpan.ToString("g", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -1785,7 +1785,7 @@ partial class LogTests
         _log.Debug($"foo {DayOfWeek.Friday} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual("foo Friday bar");
     }
 
@@ -1795,7 +1795,7 @@ partial class LogTests
         _log.Debug($"foo {(DayOfWeek?)DayOfWeek.Friday} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Debug);
+        message.Level.ShouldEqual(LogLevel.Debug);
         message.ToString().ShouldEqual("foo Friday bar");
     }
 
@@ -1808,7 +1808,7 @@ partial class LogTests
     [Test]
     public void should_not_log_above_level_Info()
     {
-        _log.UpdateConfiguration(_provider, ResolvedLoggerConfiguration.SingleAppender(Level.Info + 1));
+        _log.UpdateConfiguration(_provider, ResolvedLoggerConfiguration.SingleAppender(LogLevel.Info + 1));
         _log.Info("Foo");
         _provider.ShouldNotBeLogged();
     }
@@ -1816,7 +1816,7 @@ partial class LogTests
     [Test]
     public void should_not_log_above_level_Info_interpolated()
     {
-        _log.UpdateConfiguration(_provider, ResolvedLoggerConfiguration.SingleAppender(Level.Info + 1));
+        _log.UpdateConfiguration(_provider, ResolvedLoggerConfiguration.SingleAppender(LogLevel.Info + 1));
         _log.Info($"Foo {42}");
         _provider.ShouldNotBeLogged();
     }
@@ -1827,7 +1827,7 @@ partial class LogTests
         _log.Info().Append("Foo").Log();
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual("Foo");
         message.Exception.ShouldBeNull();
     }
@@ -1838,7 +1838,7 @@ partial class LogTests
         _log.Info("foo");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual("foo");
         message.Exception.ShouldBeNull();
     }
@@ -1860,7 +1860,7 @@ partial class LogTests
         _log.Info($"foo {NoInline("bar")} baz {NoInline("foobar")}");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual("foo bar baz foobar");
         message.Exception.ShouldBeNull();
     }
@@ -1894,7 +1894,7 @@ partial class LogTests
         _log.Info($"foo {TestValues.Boolean} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Boolean} bar"));
     }
 
@@ -1904,7 +1904,7 @@ partial class LogTests
         _log.Info($"foo {(bool?)TestValues.Boolean} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Boolean} bar"));
     }
 
@@ -1920,7 +1920,7 @@ partial class LogTests
         _log.Info($"foo {TestValues.Byte} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Byte} bar"));
     }
 
@@ -1930,7 +1930,7 @@ partial class LogTests
         _log.Info($"foo {(byte?)TestValues.Byte} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Byte} bar"));
     }
 
@@ -1940,7 +1940,7 @@ partial class LogTests
         _log.Info($"foo {TestValues.Byte:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual($"foo {TestValues.Byte.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -1950,7 +1950,7 @@ partial class LogTests
         _log.Info($"foo {(byte?)TestValues.Byte:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual($"foo {TestValues.Byte.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -1966,7 +1966,7 @@ partial class LogTests
         _log.Info($"foo {TestValues.SByte} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.SByte} bar"));
     }
 
@@ -1976,7 +1976,7 @@ partial class LogTests
         _log.Info($"foo {(sbyte?)TestValues.SByte} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.SByte} bar"));
     }
 
@@ -1986,7 +1986,7 @@ partial class LogTests
         _log.Info($"foo {TestValues.SByte:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual($"foo {TestValues.SByte.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -1996,7 +1996,7 @@ partial class LogTests
         _log.Info($"foo {(sbyte?)TestValues.SByte:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual($"foo {TestValues.SByte.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -2012,7 +2012,7 @@ partial class LogTests
         _log.Info($"foo {TestValues.Char} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Char} bar"));
     }
 
@@ -2022,7 +2022,7 @@ partial class LogTests
         _log.Info($"foo {(char?)TestValues.Char} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Char} bar"));
     }
 
@@ -2038,7 +2038,7 @@ partial class LogTests
         _log.Info($"foo {TestValues.Int16} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Int16} bar"));
     }
 
@@ -2048,7 +2048,7 @@ partial class LogTests
         _log.Info($"foo {(short?)TestValues.Int16} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Int16} bar"));
     }
 
@@ -2058,7 +2058,7 @@ partial class LogTests
         _log.Info($"foo {TestValues.Int16:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual($"foo {TestValues.Int16.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -2068,7 +2068,7 @@ partial class LogTests
         _log.Info($"foo {(short?)TestValues.Int16:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual($"foo {TestValues.Int16.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -2084,7 +2084,7 @@ partial class LogTests
         _log.Info($"foo {TestValues.UInt16} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.UInt16} bar"));
     }
 
@@ -2094,7 +2094,7 @@ partial class LogTests
         _log.Info($"foo {(ushort?)TestValues.UInt16} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.UInt16} bar"));
     }
 
@@ -2104,7 +2104,7 @@ partial class LogTests
         _log.Info($"foo {TestValues.UInt16:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual($"foo {TestValues.UInt16.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -2114,7 +2114,7 @@ partial class LogTests
         _log.Info($"foo {(ushort?)TestValues.UInt16:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual($"foo {TestValues.UInt16.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -2130,7 +2130,7 @@ partial class LogTests
         _log.Info($"foo {TestValues.Int32} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Int32} bar"));
     }
 
@@ -2140,7 +2140,7 @@ partial class LogTests
         _log.Info($"foo {(int?)TestValues.Int32} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Int32} bar"));
     }
 
@@ -2150,7 +2150,7 @@ partial class LogTests
         _log.Info($"foo {TestValues.Int32:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual($"foo {TestValues.Int32.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -2160,7 +2160,7 @@ partial class LogTests
         _log.Info($"foo {(int?)TestValues.Int32:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual($"foo {TestValues.Int32.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -2176,7 +2176,7 @@ partial class LogTests
         _log.Info($"foo {TestValues.UInt32} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.UInt32} bar"));
     }
 
@@ -2186,7 +2186,7 @@ partial class LogTests
         _log.Info($"foo {(uint?)TestValues.UInt32} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.UInt32} bar"));
     }
 
@@ -2196,7 +2196,7 @@ partial class LogTests
         _log.Info($"foo {TestValues.UInt32:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual($"foo {TestValues.UInt32.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -2206,7 +2206,7 @@ partial class LogTests
         _log.Info($"foo {(uint?)TestValues.UInt32:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual($"foo {TestValues.UInt32.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -2222,7 +2222,7 @@ partial class LogTests
         _log.Info($"foo {TestValues.Int64} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Int64} bar"));
     }
 
@@ -2232,7 +2232,7 @@ partial class LogTests
         _log.Info($"foo {(long?)TestValues.Int64} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Int64} bar"));
     }
 
@@ -2242,7 +2242,7 @@ partial class LogTests
         _log.Info($"foo {TestValues.Int64:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual($"foo {TestValues.Int64.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -2252,7 +2252,7 @@ partial class LogTests
         _log.Info($"foo {(long?)TestValues.Int64:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual($"foo {TestValues.Int64.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -2268,7 +2268,7 @@ partial class LogTests
         _log.Info($"foo {TestValues.UInt64} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.UInt64} bar"));
     }
 
@@ -2278,7 +2278,7 @@ partial class LogTests
         _log.Info($"foo {(ulong?)TestValues.UInt64} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.UInt64} bar"));
     }
 
@@ -2288,7 +2288,7 @@ partial class LogTests
         _log.Info($"foo {TestValues.UInt64:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual($"foo {TestValues.UInt64.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -2298,7 +2298,7 @@ partial class LogTests
         _log.Info($"foo {(ulong?)TestValues.UInt64:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual($"foo {TestValues.UInt64.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -2314,7 +2314,7 @@ partial class LogTests
         _log.Info($"foo {TestValues.IntPtr} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.IntPtr} bar"));
     }
 
@@ -2324,7 +2324,7 @@ partial class LogTests
         _log.Info($"foo {(nint?)TestValues.IntPtr} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.IntPtr} bar"));
     }
 
@@ -2334,7 +2334,7 @@ partial class LogTests
         _log.Info($"foo {TestValues.IntPtr:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual($"foo {TestValues.IntPtr.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -2344,7 +2344,7 @@ partial class LogTests
         _log.Info($"foo {(nint?)TestValues.IntPtr:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual($"foo {TestValues.IntPtr.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -2360,7 +2360,7 @@ partial class LogTests
         _log.Info($"foo {TestValues.UIntPtr} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.UIntPtr} bar"));
     }
 
@@ -2370,7 +2370,7 @@ partial class LogTests
         _log.Info($"foo {(nuint?)TestValues.UIntPtr} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.UIntPtr} bar"));
     }
 
@@ -2380,7 +2380,7 @@ partial class LogTests
         _log.Info($"foo {TestValues.UIntPtr:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual($"foo {TestValues.UIntPtr.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -2390,7 +2390,7 @@ partial class LogTests
         _log.Info($"foo {(nuint?)TestValues.UIntPtr:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual($"foo {TestValues.UIntPtr.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -2406,7 +2406,7 @@ partial class LogTests
         _log.Info($"foo {TestValues.Single} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Single} bar"));
     }
 
@@ -2416,7 +2416,7 @@ partial class LogTests
         _log.Info($"foo {(float?)TestValues.Single} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Single} bar"));
     }
 
@@ -2426,7 +2426,7 @@ partial class LogTests
         _log.Info($"foo {TestValues.Single:F4} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual($"foo {TestValues.Single.ToString("F4", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -2436,7 +2436,7 @@ partial class LogTests
         _log.Info($"foo {(float?)TestValues.Single:F4} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual($"foo {TestValues.Single.ToString("F4", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -2452,7 +2452,7 @@ partial class LogTests
         _log.Info($"foo {TestValues.Double} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Double} bar"));
     }
 
@@ -2462,7 +2462,7 @@ partial class LogTests
         _log.Info($"foo {(double?)TestValues.Double} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Double} bar"));
     }
 
@@ -2472,7 +2472,7 @@ partial class LogTests
         _log.Info($"foo {TestValues.Double:F4} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual($"foo {TestValues.Double.ToString("F4", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -2482,7 +2482,7 @@ partial class LogTests
         _log.Info($"foo {(double?)TestValues.Double:F4} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual($"foo {TestValues.Double.ToString("F4", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -2498,7 +2498,7 @@ partial class LogTests
         _log.Info($"foo {TestValues.Decimal} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Decimal} bar"));
     }
 
@@ -2508,7 +2508,7 @@ partial class LogTests
         _log.Info($"foo {(decimal?)TestValues.Decimal} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Decimal} bar"));
     }
 
@@ -2518,7 +2518,7 @@ partial class LogTests
         _log.Info($"foo {TestValues.Decimal:F4} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual($"foo {TestValues.Decimal.ToString("F4", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -2528,7 +2528,7 @@ partial class LogTests
         _log.Info($"foo {(decimal?)TestValues.Decimal:F4} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual($"foo {TestValues.Decimal.ToString("F4", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -2544,7 +2544,7 @@ partial class LogTests
         _log.Info($"foo {TestValues.Guid} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Guid} bar"));
     }
 
@@ -2554,7 +2554,7 @@ partial class LogTests
         _log.Info($"foo {(Guid?)TestValues.Guid} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Guid} bar"));
     }
 
@@ -2564,7 +2564,7 @@ partial class LogTests
         _log.Info($"foo {TestValues.Guid:B} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual($"foo {TestValues.Guid.ToString("B", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -2574,7 +2574,7 @@ partial class LogTests
         _log.Info($"foo {(Guid?)TestValues.Guid:B} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual($"foo {TestValues.Guid.ToString("B", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -2590,7 +2590,7 @@ partial class LogTests
         _log.Info($"foo {TestValues.DateTime} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.DateTime} bar"));
     }
 
@@ -2600,7 +2600,7 @@ partial class LogTests
         _log.Info($"foo {(DateTime?)TestValues.DateTime} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.DateTime} bar"));
     }
 
@@ -2610,7 +2610,7 @@ partial class LogTests
         _log.Info($"foo {TestValues.DateTime:yyyy-MM-dd} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual($"foo {TestValues.DateTime.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -2620,7 +2620,7 @@ partial class LogTests
         _log.Info($"foo {(DateTime?)TestValues.DateTime:yyyy-MM-dd} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual($"foo {TestValues.DateTime.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -2636,7 +2636,7 @@ partial class LogTests
         _log.Info($"foo {TestValues.TimeSpan} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.TimeSpan} bar"));
     }
 
@@ -2646,7 +2646,7 @@ partial class LogTests
         _log.Info($"foo {(TimeSpan?)TestValues.TimeSpan} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.TimeSpan} bar"));
     }
 
@@ -2656,7 +2656,7 @@ partial class LogTests
         _log.Info($"foo {TestValues.TimeSpan:g} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual($"foo {TestValues.TimeSpan.ToString("g", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -2666,7 +2666,7 @@ partial class LogTests
         _log.Info($"foo {(TimeSpan?)TestValues.TimeSpan:g} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual($"foo {TestValues.TimeSpan.ToString("g", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -2682,7 +2682,7 @@ partial class LogTests
         _log.Info($"foo {DayOfWeek.Friday} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual("foo Friday bar");
     }
 
@@ -2692,7 +2692,7 @@ partial class LogTests
         _log.Info($"foo {(DayOfWeek?)DayOfWeek.Friday} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Info);
+        message.Level.ShouldEqual(LogLevel.Info);
         message.ToString().ShouldEqual("foo Friday bar");
     }
 
@@ -2705,7 +2705,7 @@ partial class LogTests
     [Test]
     public void should_not_log_above_level_Warn()
     {
-        _log.UpdateConfiguration(_provider, ResolvedLoggerConfiguration.SingleAppender(Level.Warn + 1));
+        _log.UpdateConfiguration(_provider, ResolvedLoggerConfiguration.SingleAppender(LogLevel.Warn + 1));
         _log.Warn("Foo");
         _provider.ShouldNotBeLogged();
     }
@@ -2713,7 +2713,7 @@ partial class LogTests
     [Test]
     public void should_not_log_above_level_Warn_interpolated()
     {
-        _log.UpdateConfiguration(_provider, ResolvedLoggerConfiguration.SingleAppender(Level.Warn + 1));
+        _log.UpdateConfiguration(_provider, ResolvedLoggerConfiguration.SingleAppender(LogLevel.Warn + 1));
         _log.Warn($"Foo {42}");
         _provider.ShouldNotBeLogged();
     }
@@ -2724,7 +2724,7 @@ partial class LogTests
         _log.Warn().Append("Foo").Log();
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual("Foo");
         message.Exception.ShouldBeNull();
     }
@@ -2735,7 +2735,7 @@ partial class LogTests
         _log.Warn("foo");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual("foo");
         message.Exception.ShouldBeNull();
     }
@@ -2757,7 +2757,7 @@ partial class LogTests
         _log.Warn($"foo {NoInline("bar")} baz {NoInline("foobar")}");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual("foo bar baz foobar");
         message.Exception.ShouldBeNull();
     }
@@ -2791,7 +2791,7 @@ partial class LogTests
         _log.Warn($"foo {TestValues.Boolean} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Boolean} bar"));
     }
 
@@ -2801,7 +2801,7 @@ partial class LogTests
         _log.Warn($"foo {(bool?)TestValues.Boolean} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Boolean} bar"));
     }
 
@@ -2817,7 +2817,7 @@ partial class LogTests
         _log.Warn($"foo {TestValues.Byte} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Byte} bar"));
     }
 
@@ -2827,7 +2827,7 @@ partial class LogTests
         _log.Warn($"foo {(byte?)TestValues.Byte} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Byte} bar"));
     }
 
@@ -2837,7 +2837,7 @@ partial class LogTests
         _log.Warn($"foo {TestValues.Byte:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual($"foo {TestValues.Byte.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -2847,7 +2847,7 @@ partial class LogTests
         _log.Warn($"foo {(byte?)TestValues.Byte:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual($"foo {TestValues.Byte.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -2863,7 +2863,7 @@ partial class LogTests
         _log.Warn($"foo {TestValues.SByte} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.SByte} bar"));
     }
 
@@ -2873,7 +2873,7 @@ partial class LogTests
         _log.Warn($"foo {(sbyte?)TestValues.SByte} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.SByte} bar"));
     }
 
@@ -2883,7 +2883,7 @@ partial class LogTests
         _log.Warn($"foo {TestValues.SByte:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual($"foo {TestValues.SByte.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -2893,7 +2893,7 @@ partial class LogTests
         _log.Warn($"foo {(sbyte?)TestValues.SByte:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual($"foo {TestValues.SByte.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -2909,7 +2909,7 @@ partial class LogTests
         _log.Warn($"foo {TestValues.Char} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Char} bar"));
     }
 
@@ -2919,7 +2919,7 @@ partial class LogTests
         _log.Warn($"foo {(char?)TestValues.Char} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Char} bar"));
     }
 
@@ -2935,7 +2935,7 @@ partial class LogTests
         _log.Warn($"foo {TestValues.Int16} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Int16} bar"));
     }
 
@@ -2945,7 +2945,7 @@ partial class LogTests
         _log.Warn($"foo {(short?)TestValues.Int16} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Int16} bar"));
     }
 
@@ -2955,7 +2955,7 @@ partial class LogTests
         _log.Warn($"foo {TestValues.Int16:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual($"foo {TestValues.Int16.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -2965,7 +2965,7 @@ partial class LogTests
         _log.Warn($"foo {(short?)TestValues.Int16:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual($"foo {TestValues.Int16.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -2981,7 +2981,7 @@ partial class LogTests
         _log.Warn($"foo {TestValues.UInt16} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.UInt16} bar"));
     }
 
@@ -2991,7 +2991,7 @@ partial class LogTests
         _log.Warn($"foo {(ushort?)TestValues.UInt16} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.UInt16} bar"));
     }
 
@@ -3001,7 +3001,7 @@ partial class LogTests
         _log.Warn($"foo {TestValues.UInt16:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual($"foo {TestValues.UInt16.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -3011,7 +3011,7 @@ partial class LogTests
         _log.Warn($"foo {(ushort?)TestValues.UInt16:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual($"foo {TestValues.UInt16.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -3027,7 +3027,7 @@ partial class LogTests
         _log.Warn($"foo {TestValues.Int32} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Int32} bar"));
     }
 
@@ -3037,7 +3037,7 @@ partial class LogTests
         _log.Warn($"foo {(int?)TestValues.Int32} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Int32} bar"));
     }
 
@@ -3047,7 +3047,7 @@ partial class LogTests
         _log.Warn($"foo {TestValues.Int32:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual($"foo {TestValues.Int32.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -3057,7 +3057,7 @@ partial class LogTests
         _log.Warn($"foo {(int?)TestValues.Int32:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual($"foo {TestValues.Int32.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -3073,7 +3073,7 @@ partial class LogTests
         _log.Warn($"foo {TestValues.UInt32} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.UInt32} bar"));
     }
 
@@ -3083,7 +3083,7 @@ partial class LogTests
         _log.Warn($"foo {(uint?)TestValues.UInt32} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.UInt32} bar"));
     }
 
@@ -3093,7 +3093,7 @@ partial class LogTests
         _log.Warn($"foo {TestValues.UInt32:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual($"foo {TestValues.UInt32.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -3103,7 +3103,7 @@ partial class LogTests
         _log.Warn($"foo {(uint?)TestValues.UInt32:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual($"foo {TestValues.UInt32.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -3119,7 +3119,7 @@ partial class LogTests
         _log.Warn($"foo {TestValues.Int64} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Int64} bar"));
     }
 
@@ -3129,7 +3129,7 @@ partial class LogTests
         _log.Warn($"foo {(long?)TestValues.Int64} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Int64} bar"));
     }
 
@@ -3139,7 +3139,7 @@ partial class LogTests
         _log.Warn($"foo {TestValues.Int64:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual($"foo {TestValues.Int64.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -3149,7 +3149,7 @@ partial class LogTests
         _log.Warn($"foo {(long?)TestValues.Int64:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual($"foo {TestValues.Int64.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -3165,7 +3165,7 @@ partial class LogTests
         _log.Warn($"foo {TestValues.UInt64} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.UInt64} bar"));
     }
 
@@ -3175,7 +3175,7 @@ partial class LogTests
         _log.Warn($"foo {(ulong?)TestValues.UInt64} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.UInt64} bar"));
     }
 
@@ -3185,7 +3185,7 @@ partial class LogTests
         _log.Warn($"foo {TestValues.UInt64:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual($"foo {TestValues.UInt64.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -3195,7 +3195,7 @@ partial class LogTests
         _log.Warn($"foo {(ulong?)TestValues.UInt64:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual($"foo {TestValues.UInt64.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -3211,7 +3211,7 @@ partial class LogTests
         _log.Warn($"foo {TestValues.IntPtr} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.IntPtr} bar"));
     }
 
@@ -3221,7 +3221,7 @@ partial class LogTests
         _log.Warn($"foo {(nint?)TestValues.IntPtr} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.IntPtr} bar"));
     }
 
@@ -3231,7 +3231,7 @@ partial class LogTests
         _log.Warn($"foo {TestValues.IntPtr:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual($"foo {TestValues.IntPtr.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -3241,7 +3241,7 @@ partial class LogTests
         _log.Warn($"foo {(nint?)TestValues.IntPtr:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual($"foo {TestValues.IntPtr.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -3257,7 +3257,7 @@ partial class LogTests
         _log.Warn($"foo {TestValues.UIntPtr} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.UIntPtr} bar"));
     }
 
@@ -3267,7 +3267,7 @@ partial class LogTests
         _log.Warn($"foo {(nuint?)TestValues.UIntPtr} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.UIntPtr} bar"));
     }
 
@@ -3277,7 +3277,7 @@ partial class LogTests
         _log.Warn($"foo {TestValues.UIntPtr:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual($"foo {TestValues.UIntPtr.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -3287,7 +3287,7 @@ partial class LogTests
         _log.Warn($"foo {(nuint?)TestValues.UIntPtr:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual($"foo {TestValues.UIntPtr.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -3303,7 +3303,7 @@ partial class LogTests
         _log.Warn($"foo {TestValues.Single} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Single} bar"));
     }
 
@@ -3313,7 +3313,7 @@ partial class LogTests
         _log.Warn($"foo {(float?)TestValues.Single} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Single} bar"));
     }
 
@@ -3323,7 +3323,7 @@ partial class LogTests
         _log.Warn($"foo {TestValues.Single:F4} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual($"foo {TestValues.Single.ToString("F4", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -3333,7 +3333,7 @@ partial class LogTests
         _log.Warn($"foo {(float?)TestValues.Single:F4} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual($"foo {TestValues.Single.ToString("F4", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -3349,7 +3349,7 @@ partial class LogTests
         _log.Warn($"foo {TestValues.Double} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Double} bar"));
     }
 
@@ -3359,7 +3359,7 @@ partial class LogTests
         _log.Warn($"foo {(double?)TestValues.Double} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Double} bar"));
     }
 
@@ -3369,7 +3369,7 @@ partial class LogTests
         _log.Warn($"foo {TestValues.Double:F4} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual($"foo {TestValues.Double.ToString("F4", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -3379,7 +3379,7 @@ partial class LogTests
         _log.Warn($"foo {(double?)TestValues.Double:F4} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual($"foo {TestValues.Double.ToString("F4", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -3395,7 +3395,7 @@ partial class LogTests
         _log.Warn($"foo {TestValues.Decimal} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Decimal} bar"));
     }
 
@@ -3405,7 +3405,7 @@ partial class LogTests
         _log.Warn($"foo {(decimal?)TestValues.Decimal} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Decimal} bar"));
     }
 
@@ -3415,7 +3415,7 @@ partial class LogTests
         _log.Warn($"foo {TestValues.Decimal:F4} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual($"foo {TestValues.Decimal.ToString("F4", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -3425,7 +3425,7 @@ partial class LogTests
         _log.Warn($"foo {(decimal?)TestValues.Decimal:F4} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual($"foo {TestValues.Decimal.ToString("F4", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -3441,7 +3441,7 @@ partial class LogTests
         _log.Warn($"foo {TestValues.Guid} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Guid} bar"));
     }
 
@@ -3451,7 +3451,7 @@ partial class LogTests
         _log.Warn($"foo {(Guid?)TestValues.Guid} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Guid} bar"));
     }
 
@@ -3461,7 +3461,7 @@ partial class LogTests
         _log.Warn($"foo {TestValues.Guid:B} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual($"foo {TestValues.Guid.ToString("B", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -3471,7 +3471,7 @@ partial class LogTests
         _log.Warn($"foo {(Guid?)TestValues.Guid:B} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual($"foo {TestValues.Guid.ToString("B", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -3487,7 +3487,7 @@ partial class LogTests
         _log.Warn($"foo {TestValues.DateTime} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.DateTime} bar"));
     }
 
@@ -3497,7 +3497,7 @@ partial class LogTests
         _log.Warn($"foo {(DateTime?)TestValues.DateTime} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.DateTime} bar"));
     }
 
@@ -3507,7 +3507,7 @@ partial class LogTests
         _log.Warn($"foo {TestValues.DateTime:yyyy-MM-dd} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual($"foo {TestValues.DateTime.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -3517,7 +3517,7 @@ partial class LogTests
         _log.Warn($"foo {(DateTime?)TestValues.DateTime:yyyy-MM-dd} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual($"foo {TestValues.DateTime.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -3533,7 +3533,7 @@ partial class LogTests
         _log.Warn($"foo {TestValues.TimeSpan} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.TimeSpan} bar"));
     }
 
@@ -3543,7 +3543,7 @@ partial class LogTests
         _log.Warn($"foo {(TimeSpan?)TestValues.TimeSpan} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.TimeSpan} bar"));
     }
 
@@ -3553,7 +3553,7 @@ partial class LogTests
         _log.Warn($"foo {TestValues.TimeSpan:g} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual($"foo {TestValues.TimeSpan.ToString("g", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -3563,7 +3563,7 @@ partial class LogTests
         _log.Warn($"foo {(TimeSpan?)TestValues.TimeSpan:g} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual($"foo {TestValues.TimeSpan.ToString("g", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -3579,7 +3579,7 @@ partial class LogTests
         _log.Warn($"foo {DayOfWeek.Friday} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual("foo Friday bar");
     }
 
@@ -3589,7 +3589,7 @@ partial class LogTests
         _log.Warn($"foo {(DayOfWeek?)DayOfWeek.Friday} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Warn);
+        message.Level.ShouldEqual(LogLevel.Warn);
         message.ToString().ShouldEqual("foo Friday bar");
     }
 
@@ -3602,7 +3602,7 @@ partial class LogTests
     [Test]
     public void should_not_log_above_level_Error()
     {
-        _log.UpdateConfiguration(_provider, ResolvedLoggerConfiguration.SingleAppender(Level.Error + 1));
+        _log.UpdateConfiguration(_provider, ResolvedLoggerConfiguration.SingleAppender(LogLevel.Error + 1));
         _log.Error("Foo");
         _provider.ShouldNotBeLogged();
     }
@@ -3610,7 +3610,7 @@ partial class LogTests
     [Test]
     public void should_not_log_above_level_Error_interpolated()
     {
-        _log.UpdateConfiguration(_provider, ResolvedLoggerConfiguration.SingleAppender(Level.Error + 1));
+        _log.UpdateConfiguration(_provider, ResolvedLoggerConfiguration.SingleAppender(LogLevel.Error + 1));
         _log.Error($"Foo {42}");
         _provider.ShouldNotBeLogged();
     }
@@ -3621,7 +3621,7 @@ partial class LogTests
         _log.Error().Append("Foo").Log();
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual("Foo");
         message.Exception.ShouldBeNull();
     }
@@ -3632,7 +3632,7 @@ partial class LogTests
         _log.Error("foo");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual("foo");
         message.Exception.ShouldBeNull();
     }
@@ -3654,7 +3654,7 @@ partial class LogTests
         _log.Error($"foo {NoInline("bar")} baz {NoInline("foobar")}");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual("foo bar baz foobar");
         message.Exception.ShouldBeNull();
     }
@@ -3688,7 +3688,7 @@ partial class LogTests
         _log.Error($"foo {TestValues.Boolean} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Boolean} bar"));
     }
 
@@ -3698,7 +3698,7 @@ partial class LogTests
         _log.Error($"foo {(bool?)TestValues.Boolean} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Boolean} bar"));
     }
 
@@ -3714,7 +3714,7 @@ partial class LogTests
         _log.Error($"foo {TestValues.Byte} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Byte} bar"));
     }
 
@@ -3724,7 +3724,7 @@ partial class LogTests
         _log.Error($"foo {(byte?)TestValues.Byte} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Byte} bar"));
     }
 
@@ -3734,7 +3734,7 @@ partial class LogTests
         _log.Error($"foo {TestValues.Byte:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual($"foo {TestValues.Byte.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -3744,7 +3744,7 @@ partial class LogTests
         _log.Error($"foo {(byte?)TestValues.Byte:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual($"foo {TestValues.Byte.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -3760,7 +3760,7 @@ partial class LogTests
         _log.Error($"foo {TestValues.SByte} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.SByte} bar"));
     }
 
@@ -3770,7 +3770,7 @@ partial class LogTests
         _log.Error($"foo {(sbyte?)TestValues.SByte} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.SByte} bar"));
     }
 
@@ -3780,7 +3780,7 @@ partial class LogTests
         _log.Error($"foo {TestValues.SByte:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual($"foo {TestValues.SByte.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -3790,7 +3790,7 @@ partial class LogTests
         _log.Error($"foo {(sbyte?)TestValues.SByte:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual($"foo {TestValues.SByte.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -3806,7 +3806,7 @@ partial class LogTests
         _log.Error($"foo {TestValues.Char} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Char} bar"));
     }
 
@@ -3816,7 +3816,7 @@ partial class LogTests
         _log.Error($"foo {(char?)TestValues.Char} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Char} bar"));
     }
 
@@ -3832,7 +3832,7 @@ partial class LogTests
         _log.Error($"foo {TestValues.Int16} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Int16} bar"));
     }
 
@@ -3842,7 +3842,7 @@ partial class LogTests
         _log.Error($"foo {(short?)TestValues.Int16} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Int16} bar"));
     }
 
@@ -3852,7 +3852,7 @@ partial class LogTests
         _log.Error($"foo {TestValues.Int16:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual($"foo {TestValues.Int16.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -3862,7 +3862,7 @@ partial class LogTests
         _log.Error($"foo {(short?)TestValues.Int16:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual($"foo {TestValues.Int16.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -3878,7 +3878,7 @@ partial class LogTests
         _log.Error($"foo {TestValues.UInt16} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.UInt16} bar"));
     }
 
@@ -3888,7 +3888,7 @@ partial class LogTests
         _log.Error($"foo {(ushort?)TestValues.UInt16} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.UInt16} bar"));
     }
 
@@ -3898,7 +3898,7 @@ partial class LogTests
         _log.Error($"foo {TestValues.UInt16:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual($"foo {TestValues.UInt16.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -3908,7 +3908,7 @@ partial class LogTests
         _log.Error($"foo {(ushort?)TestValues.UInt16:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual($"foo {TestValues.UInt16.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -3924,7 +3924,7 @@ partial class LogTests
         _log.Error($"foo {TestValues.Int32} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Int32} bar"));
     }
 
@@ -3934,7 +3934,7 @@ partial class LogTests
         _log.Error($"foo {(int?)TestValues.Int32} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Int32} bar"));
     }
 
@@ -3944,7 +3944,7 @@ partial class LogTests
         _log.Error($"foo {TestValues.Int32:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual($"foo {TestValues.Int32.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -3954,7 +3954,7 @@ partial class LogTests
         _log.Error($"foo {(int?)TestValues.Int32:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual($"foo {TestValues.Int32.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -3970,7 +3970,7 @@ partial class LogTests
         _log.Error($"foo {TestValues.UInt32} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.UInt32} bar"));
     }
 
@@ -3980,7 +3980,7 @@ partial class LogTests
         _log.Error($"foo {(uint?)TestValues.UInt32} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.UInt32} bar"));
     }
 
@@ -3990,7 +3990,7 @@ partial class LogTests
         _log.Error($"foo {TestValues.UInt32:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual($"foo {TestValues.UInt32.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -4000,7 +4000,7 @@ partial class LogTests
         _log.Error($"foo {(uint?)TestValues.UInt32:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual($"foo {TestValues.UInt32.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -4016,7 +4016,7 @@ partial class LogTests
         _log.Error($"foo {TestValues.Int64} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Int64} bar"));
     }
 
@@ -4026,7 +4026,7 @@ partial class LogTests
         _log.Error($"foo {(long?)TestValues.Int64} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Int64} bar"));
     }
 
@@ -4036,7 +4036,7 @@ partial class LogTests
         _log.Error($"foo {TestValues.Int64:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual($"foo {TestValues.Int64.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -4046,7 +4046,7 @@ partial class LogTests
         _log.Error($"foo {(long?)TestValues.Int64:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual($"foo {TestValues.Int64.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -4062,7 +4062,7 @@ partial class LogTests
         _log.Error($"foo {TestValues.UInt64} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.UInt64} bar"));
     }
 
@@ -4072,7 +4072,7 @@ partial class LogTests
         _log.Error($"foo {(ulong?)TestValues.UInt64} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.UInt64} bar"));
     }
 
@@ -4082,7 +4082,7 @@ partial class LogTests
         _log.Error($"foo {TestValues.UInt64:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual($"foo {TestValues.UInt64.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -4092,7 +4092,7 @@ partial class LogTests
         _log.Error($"foo {(ulong?)TestValues.UInt64:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual($"foo {TestValues.UInt64.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -4108,7 +4108,7 @@ partial class LogTests
         _log.Error($"foo {TestValues.IntPtr} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.IntPtr} bar"));
     }
 
@@ -4118,7 +4118,7 @@ partial class LogTests
         _log.Error($"foo {(nint?)TestValues.IntPtr} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.IntPtr} bar"));
     }
 
@@ -4128,7 +4128,7 @@ partial class LogTests
         _log.Error($"foo {TestValues.IntPtr:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual($"foo {TestValues.IntPtr.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -4138,7 +4138,7 @@ partial class LogTests
         _log.Error($"foo {(nint?)TestValues.IntPtr:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual($"foo {TestValues.IntPtr.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -4154,7 +4154,7 @@ partial class LogTests
         _log.Error($"foo {TestValues.UIntPtr} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.UIntPtr} bar"));
     }
 
@@ -4164,7 +4164,7 @@ partial class LogTests
         _log.Error($"foo {(nuint?)TestValues.UIntPtr} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.UIntPtr} bar"));
     }
 
@@ -4174,7 +4174,7 @@ partial class LogTests
         _log.Error($"foo {TestValues.UIntPtr:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual($"foo {TestValues.UIntPtr.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -4184,7 +4184,7 @@ partial class LogTests
         _log.Error($"foo {(nuint?)TestValues.UIntPtr:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual($"foo {TestValues.UIntPtr.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -4200,7 +4200,7 @@ partial class LogTests
         _log.Error($"foo {TestValues.Single} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Single} bar"));
     }
 
@@ -4210,7 +4210,7 @@ partial class LogTests
         _log.Error($"foo {(float?)TestValues.Single} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Single} bar"));
     }
 
@@ -4220,7 +4220,7 @@ partial class LogTests
         _log.Error($"foo {TestValues.Single:F4} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual($"foo {TestValues.Single.ToString("F4", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -4230,7 +4230,7 @@ partial class LogTests
         _log.Error($"foo {(float?)TestValues.Single:F4} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual($"foo {TestValues.Single.ToString("F4", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -4246,7 +4246,7 @@ partial class LogTests
         _log.Error($"foo {TestValues.Double} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Double} bar"));
     }
 
@@ -4256,7 +4256,7 @@ partial class LogTests
         _log.Error($"foo {(double?)TestValues.Double} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Double} bar"));
     }
 
@@ -4266,7 +4266,7 @@ partial class LogTests
         _log.Error($"foo {TestValues.Double:F4} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual($"foo {TestValues.Double.ToString("F4", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -4276,7 +4276,7 @@ partial class LogTests
         _log.Error($"foo {(double?)TestValues.Double:F4} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual($"foo {TestValues.Double.ToString("F4", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -4292,7 +4292,7 @@ partial class LogTests
         _log.Error($"foo {TestValues.Decimal} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Decimal} bar"));
     }
 
@@ -4302,7 +4302,7 @@ partial class LogTests
         _log.Error($"foo {(decimal?)TestValues.Decimal} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Decimal} bar"));
     }
 
@@ -4312,7 +4312,7 @@ partial class LogTests
         _log.Error($"foo {TestValues.Decimal:F4} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual($"foo {TestValues.Decimal.ToString("F4", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -4322,7 +4322,7 @@ partial class LogTests
         _log.Error($"foo {(decimal?)TestValues.Decimal:F4} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual($"foo {TestValues.Decimal.ToString("F4", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -4338,7 +4338,7 @@ partial class LogTests
         _log.Error($"foo {TestValues.Guid} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Guid} bar"));
     }
 
@@ -4348,7 +4348,7 @@ partial class LogTests
         _log.Error($"foo {(Guid?)TestValues.Guid} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Guid} bar"));
     }
 
@@ -4358,7 +4358,7 @@ partial class LogTests
         _log.Error($"foo {TestValues.Guid:B} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual($"foo {TestValues.Guid.ToString("B", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -4368,7 +4368,7 @@ partial class LogTests
         _log.Error($"foo {(Guid?)TestValues.Guid:B} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual($"foo {TestValues.Guid.ToString("B", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -4384,7 +4384,7 @@ partial class LogTests
         _log.Error($"foo {TestValues.DateTime} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.DateTime} bar"));
     }
 
@@ -4394,7 +4394,7 @@ partial class LogTests
         _log.Error($"foo {(DateTime?)TestValues.DateTime} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.DateTime} bar"));
     }
 
@@ -4404,7 +4404,7 @@ partial class LogTests
         _log.Error($"foo {TestValues.DateTime:yyyy-MM-dd} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual($"foo {TestValues.DateTime.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -4414,7 +4414,7 @@ partial class LogTests
         _log.Error($"foo {(DateTime?)TestValues.DateTime:yyyy-MM-dd} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual($"foo {TestValues.DateTime.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -4430,7 +4430,7 @@ partial class LogTests
         _log.Error($"foo {TestValues.TimeSpan} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.TimeSpan} bar"));
     }
 
@@ -4440,7 +4440,7 @@ partial class LogTests
         _log.Error($"foo {(TimeSpan?)TestValues.TimeSpan} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.TimeSpan} bar"));
     }
 
@@ -4450,7 +4450,7 @@ partial class LogTests
         _log.Error($"foo {TestValues.TimeSpan:g} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual($"foo {TestValues.TimeSpan.ToString("g", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -4460,7 +4460,7 @@ partial class LogTests
         _log.Error($"foo {(TimeSpan?)TestValues.TimeSpan:g} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual($"foo {TestValues.TimeSpan.ToString("g", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -4476,7 +4476,7 @@ partial class LogTests
         _log.Error($"foo {DayOfWeek.Friday} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual("foo Friday bar");
     }
 
@@ -4486,7 +4486,7 @@ partial class LogTests
         _log.Error($"foo {(DayOfWeek?)DayOfWeek.Friday} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Error);
+        message.Level.ShouldEqual(LogLevel.Error);
         message.ToString().ShouldEqual("foo Friday bar");
     }
 
@@ -4499,7 +4499,7 @@ partial class LogTests
     [Test]
     public void should_not_log_above_level_Fatal()
     {
-        _log.UpdateConfiguration(_provider, ResolvedLoggerConfiguration.SingleAppender(Level.Fatal + 1));
+        _log.UpdateConfiguration(_provider, ResolvedLoggerConfiguration.SingleAppender(LogLevel.Fatal + 1));
         _log.Fatal("Foo");
         _provider.ShouldNotBeLogged();
     }
@@ -4507,7 +4507,7 @@ partial class LogTests
     [Test]
     public void should_not_log_above_level_Fatal_interpolated()
     {
-        _log.UpdateConfiguration(_provider, ResolvedLoggerConfiguration.SingleAppender(Level.Fatal + 1));
+        _log.UpdateConfiguration(_provider, ResolvedLoggerConfiguration.SingleAppender(LogLevel.Fatal + 1));
         _log.Fatal($"Foo {42}");
         _provider.ShouldNotBeLogged();
     }
@@ -4518,7 +4518,7 @@ partial class LogTests
         _log.Fatal().Append("Foo").Log();
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual("Foo");
         message.Exception.ShouldBeNull();
     }
@@ -4529,7 +4529,7 @@ partial class LogTests
         _log.Fatal("foo");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual("foo");
         message.Exception.ShouldBeNull();
     }
@@ -4551,7 +4551,7 @@ partial class LogTests
         _log.Fatal($"foo {NoInline("bar")} baz {NoInline("foobar")}");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual("foo bar baz foobar");
         message.Exception.ShouldBeNull();
     }
@@ -4585,7 +4585,7 @@ partial class LogTests
         _log.Fatal($"foo {TestValues.Boolean} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Boolean} bar"));
     }
 
@@ -4595,7 +4595,7 @@ partial class LogTests
         _log.Fatal($"foo {(bool?)TestValues.Boolean} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Boolean} bar"));
     }
 
@@ -4611,7 +4611,7 @@ partial class LogTests
         _log.Fatal($"foo {TestValues.Byte} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Byte} bar"));
     }
 
@@ -4621,7 +4621,7 @@ partial class LogTests
         _log.Fatal($"foo {(byte?)TestValues.Byte} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Byte} bar"));
     }
 
@@ -4631,7 +4631,7 @@ partial class LogTests
         _log.Fatal($"foo {TestValues.Byte:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual($"foo {TestValues.Byte.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -4641,7 +4641,7 @@ partial class LogTests
         _log.Fatal($"foo {(byte?)TestValues.Byte:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual($"foo {TestValues.Byte.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -4657,7 +4657,7 @@ partial class LogTests
         _log.Fatal($"foo {TestValues.SByte} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.SByte} bar"));
     }
 
@@ -4667,7 +4667,7 @@ partial class LogTests
         _log.Fatal($"foo {(sbyte?)TestValues.SByte} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.SByte} bar"));
     }
 
@@ -4677,7 +4677,7 @@ partial class LogTests
         _log.Fatal($"foo {TestValues.SByte:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual($"foo {TestValues.SByte.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -4687,7 +4687,7 @@ partial class LogTests
         _log.Fatal($"foo {(sbyte?)TestValues.SByte:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual($"foo {TestValues.SByte.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -4703,7 +4703,7 @@ partial class LogTests
         _log.Fatal($"foo {TestValues.Char} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Char} bar"));
     }
 
@@ -4713,7 +4713,7 @@ partial class LogTests
         _log.Fatal($"foo {(char?)TestValues.Char} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Char} bar"));
     }
 
@@ -4729,7 +4729,7 @@ partial class LogTests
         _log.Fatal($"foo {TestValues.Int16} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Int16} bar"));
     }
 
@@ -4739,7 +4739,7 @@ partial class LogTests
         _log.Fatal($"foo {(short?)TestValues.Int16} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Int16} bar"));
     }
 
@@ -4749,7 +4749,7 @@ partial class LogTests
         _log.Fatal($"foo {TestValues.Int16:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual($"foo {TestValues.Int16.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -4759,7 +4759,7 @@ partial class LogTests
         _log.Fatal($"foo {(short?)TestValues.Int16:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual($"foo {TestValues.Int16.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -4775,7 +4775,7 @@ partial class LogTests
         _log.Fatal($"foo {TestValues.UInt16} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.UInt16} bar"));
     }
 
@@ -4785,7 +4785,7 @@ partial class LogTests
         _log.Fatal($"foo {(ushort?)TestValues.UInt16} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.UInt16} bar"));
     }
 
@@ -4795,7 +4795,7 @@ partial class LogTests
         _log.Fatal($"foo {TestValues.UInt16:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual($"foo {TestValues.UInt16.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -4805,7 +4805,7 @@ partial class LogTests
         _log.Fatal($"foo {(ushort?)TestValues.UInt16:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual($"foo {TestValues.UInt16.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -4821,7 +4821,7 @@ partial class LogTests
         _log.Fatal($"foo {TestValues.Int32} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Int32} bar"));
     }
 
@@ -4831,7 +4831,7 @@ partial class LogTests
         _log.Fatal($"foo {(int?)TestValues.Int32} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Int32} bar"));
     }
 
@@ -4841,7 +4841,7 @@ partial class LogTests
         _log.Fatal($"foo {TestValues.Int32:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual($"foo {TestValues.Int32.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -4851,7 +4851,7 @@ partial class LogTests
         _log.Fatal($"foo {(int?)TestValues.Int32:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual($"foo {TestValues.Int32.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -4867,7 +4867,7 @@ partial class LogTests
         _log.Fatal($"foo {TestValues.UInt32} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.UInt32} bar"));
     }
 
@@ -4877,7 +4877,7 @@ partial class LogTests
         _log.Fatal($"foo {(uint?)TestValues.UInt32} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.UInt32} bar"));
     }
 
@@ -4887,7 +4887,7 @@ partial class LogTests
         _log.Fatal($"foo {TestValues.UInt32:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual($"foo {TestValues.UInt32.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -4897,7 +4897,7 @@ partial class LogTests
         _log.Fatal($"foo {(uint?)TestValues.UInt32:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual($"foo {TestValues.UInt32.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -4913,7 +4913,7 @@ partial class LogTests
         _log.Fatal($"foo {TestValues.Int64} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Int64} bar"));
     }
 
@@ -4923,7 +4923,7 @@ partial class LogTests
         _log.Fatal($"foo {(long?)TestValues.Int64} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Int64} bar"));
     }
 
@@ -4933,7 +4933,7 @@ partial class LogTests
         _log.Fatal($"foo {TestValues.Int64:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual($"foo {TestValues.Int64.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -4943,7 +4943,7 @@ partial class LogTests
         _log.Fatal($"foo {(long?)TestValues.Int64:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual($"foo {TestValues.Int64.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -4959,7 +4959,7 @@ partial class LogTests
         _log.Fatal($"foo {TestValues.UInt64} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.UInt64} bar"));
     }
 
@@ -4969,7 +4969,7 @@ partial class LogTests
         _log.Fatal($"foo {(ulong?)TestValues.UInt64} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.UInt64} bar"));
     }
 
@@ -4979,7 +4979,7 @@ partial class LogTests
         _log.Fatal($"foo {TestValues.UInt64:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual($"foo {TestValues.UInt64.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -4989,7 +4989,7 @@ partial class LogTests
         _log.Fatal($"foo {(ulong?)TestValues.UInt64:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual($"foo {TestValues.UInt64.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -5005,7 +5005,7 @@ partial class LogTests
         _log.Fatal($"foo {TestValues.IntPtr} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.IntPtr} bar"));
     }
 
@@ -5015,7 +5015,7 @@ partial class LogTests
         _log.Fatal($"foo {(nint?)TestValues.IntPtr} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.IntPtr} bar"));
     }
 
@@ -5025,7 +5025,7 @@ partial class LogTests
         _log.Fatal($"foo {TestValues.IntPtr:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual($"foo {TestValues.IntPtr.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -5035,7 +5035,7 @@ partial class LogTests
         _log.Fatal($"foo {(nint?)TestValues.IntPtr:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual($"foo {TestValues.IntPtr.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -5051,7 +5051,7 @@ partial class LogTests
         _log.Fatal($"foo {TestValues.UIntPtr} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.UIntPtr} bar"));
     }
 
@@ -5061,7 +5061,7 @@ partial class LogTests
         _log.Fatal($"foo {(nuint?)TestValues.UIntPtr} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.UIntPtr} bar"));
     }
 
@@ -5071,7 +5071,7 @@ partial class LogTests
         _log.Fatal($"foo {TestValues.UIntPtr:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual($"foo {TestValues.UIntPtr.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -5081,7 +5081,7 @@ partial class LogTests
         _log.Fatal($"foo {(nuint?)TestValues.UIntPtr:X} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual($"foo {TestValues.UIntPtr.ToString("X", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -5097,7 +5097,7 @@ partial class LogTests
         _log.Fatal($"foo {TestValues.Single} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Single} bar"));
     }
 
@@ -5107,7 +5107,7 @@ partial class LogTests
         _log.Fatal($"foo {(float?)TestValues.Single} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Single} bar"));
     }
 
@@ -5117,7 +5117,7 @@ partial class LogTests
         _log.Fatal($"foo {TestValues.Single:F4} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual($"foo {TestValues.Single.ToString("F4", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -5127,7 +5127,7 @@ partial class LogTests
         _log.Fatal($"foo {(float?)TestValues.Single:F4} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual($"foo {TestValues.Single.ToString("F4", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -5143,7 +5143,7 @@ partial class LogTests
         _log.Fatal($"foo {TestValues.Double} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Double} bar"));
     }
 
@@ -5153,7 +5153,7 @@ partial class LogTests
         _log.Fatal($"foo {(double?)TestValues.Double} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Double} bar"));
     }
 
@@ -5163,7 +5163,7 @@ partial class LogTests
         _log.Fatal($"foo {TestValues.Double:F4} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual($"foo {TestValues.Double.ToString("F4", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -5173,7 +5173,7 @@ partial class LogTests
         _log.Fatal($"foo {(double?)TestValues.Double:F4} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual($"foo {TestValues.Double.ToString("F4", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -5189,7 +5189,7 @@ partial class LogTests
         _log.Fatal($"foo {TestValues.Decimal} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Decimal} bar"));
     }
 
@@ -5199,7 +5199,7 @@ partial class LogTests
         _log.Fatal($"foo {(decimal?)TestValues.Decimal} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Decimal} bar"));
     }
 
@@ -5209,7 +5209,7 @@ partial class LogTests
         _log.Fatal($"foo {TestValues.Decimal:F4} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual($"foo {TestValues.Decimal.ToString("F4", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -5219,7 +5219,7 @@ partial class LogTests
         _log.Fatal($"foo {(decimal?)TestValues.Decimal:F4} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual($"foo {TestValues.Decimal.ToString("F4", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -5235,7 +5235,7 @@ partial class LogTests
         _log.Fatal($"foo {TestValues.Guid} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Guid} bar"));
     }
 
@@ -5245,7 +5245,7 @@ partial class LogTests
         _log.Fatal($"foo {(Guid?)TestValues.Guid} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.Guid} bar"));
     }
 
@@ -5255,7 +5255,7 @@ partial class LogTests
         _log.Fatal($"foo {TestValues.Guid:B} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual($"foo {TestValues.Guid.ToString("B", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -5265,7 +5265,7 @@ partial class LogTests
         _log.Fatal($"foo {(Guid?)TestValues.Guid:B} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual($"foo {TestValues.Guid.ToString("B", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -5281,7 +5281,7 @@ partial class LogTests
         _log.Fatal($"foo {TestValues.DateTime} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.DateTime} bar"));
     }
 
@@ -5291,7 +5291,7 @@ partial class LogTests
         _log.Fatal($"foo {(DateTime?)TestValues.DateTime} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.DateTime} bar"));
     }
 
@@ -5301,7 +5301,7 @@ partial class LogTests
         _log.Fatal($"foo {TestValues.DateTime:yyyy-MM-dd} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual($"foo {TestValues.DateTime.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -5311,7 +5311,7 @@ partial class LogTests
         _log.Fatal($"foo {(DateTime?)TestValues.DateTime:yyyy-MM-dd} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual($"foo {TestValues.DateTime.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -5327,7 +5327,7 @@ partial class LogTests
         _log.Fatal($"foo {TestValues.TimeSpan} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.TimeSpan} bar"));
     }
 
@@ -5337,7 +5337,7 @@ partial class LogTests
         _log.Fatal($"foo {(TimeSpan?)TestValues.TimeSpan} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.TimeSpan} bar"));
     }
 
@@ -5347,7 +5347,7 @@ partial class LogTests
         _log.Fatal($"foo {TestValues.TimeSpan:g} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual($"foo {TestValues.TimeSpan.ToString("g", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -5357,7 +5357,7 @@ partial class LogTests
         _log.Fatal($"foo {(TimeSpan?)TestValues.TimeSpan:g} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual($"foo {TestValues.TimeSpan.ToString("g", CultureInfo.InvariantCulture)} bar");
     }
 
@@ -5373,7 +5373,7 @@ partial class LogTests
         _log.Fatal($"foo {DayOfWeek.Friday} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual("foo Friday bar");
     }
 
@@ -5383,7 +5383,7 @@ partial class LogTests
         _log.Fatal($"foo {(DayOfWeek?)DayOfWeek.Friday} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(Level.Fatal);
+        message.Level.ShouldEqual(LogLevel.Fatal);
         message.ToString().ShouldEqual("foo Friday bar");
     }
 

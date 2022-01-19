@@ -30,25 +30,25 @@ public class ConsoleAppender : StreamAppender
 
         switch (message.Level)
         {
-            case Level.Fatal:
+            case LogLevel.Fatal:
                 Console.ForegroundColor = ConsoleColor.Black;
                 Console.BackgroundColor = ConsoleColor.White;
                 break;
 
-            case Level.Error:
+            case LogLevel.Error:
                 Console.ForegroundColor = ConsoleColor.Red;
                 break;
 
-            case Level.Warn:
+            case LogLevel.Warn:
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 break;
 
-            case Level.Info:
+            case LogLevel.Info:
                 Console.ForegroundColor = ConsoleColor.White;
                 break;
 
-            case Level.Debug:
-            case Level.Trace:
+            case LogLevel.Debug:
+            case LogLevel.Trace:
                 Console.ForegroundColor = ConsoleColor.Gray;
                 break;
 

@@ -20,7 +20,7 @@ unsafe partial class LogMessageTests
         public void should_truncate_value_types_after_string_capacity_is_exceeded()
         {
             _logMessage = new LogMessage(new BufferSegment(_buffer, _bufferLength), 1);
-            _logMessage.Initialize(null, Level.Info);
+            _logMessage.Initialize(null, LogLevel.Info);
 
             _logMessage.Append("foo")
                        .Append(10)

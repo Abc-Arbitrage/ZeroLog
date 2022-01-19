@@ -7,7 +7,7 @@ namespace ZeroLog;
 [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Local")]
 public sealed partial class LogMessage
 {
-    public Level Level { get; private set; }
+    public LogLevel Level { get; private set; }
     public DateTime Timestamp { get; internal set; }
     public Thread? Thread { get; private set; }
     public Exception? Exception { get; internal set; }

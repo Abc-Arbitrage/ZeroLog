@@ -13,7 +13,7 @@ public class StreamAppenderTests
     private static FormattedLogMessage GetFormattedMessage(string message, out LogMessage logMessage)
     {
         logMessage = new LogMessage(message);
-        logMessage.Initialize(new Log("TestLog"), Level.Info);
+        logMessage.Initialize(new Log("TestLog"), LogLevel.Info);
 
         var formattedMessage = new FormattedLogMessage(logMessage.ToString().Length);
         formattedMessage.SetMessage(logMessage);
@@ -57,7 +57,7 @@ public class StreamAppenderTests
     public void should_append_exceptions()
     {
         var logMessage = new LogMessage("Test log message");
-        logMessage.Initialize(new Log("TestLog"), Level.Info);
+        logMessage.Initialize(new Log("TestLog"), LogLevel.Info);
         logMessage.Exception = new InvalidOperationException("Simulated exception");
 
         var formattedMessage = new FormattedLogMessage(logMessage.ToString().Length);

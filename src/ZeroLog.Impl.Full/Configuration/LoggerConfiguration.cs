@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using ZeroLog.Appenders;
 
-namespace ZeroLog.Config;
+namespace ZeroLog.Configuration;
 
 public sealed class LoggerConfiguration
 {
     public string Name { get; }
     internal string NameWithPeriod { get; }
 
-    public Level? Level { get; set; }
+    public LogLevel? Level { get; set; }
     public LogMessagePoolExhaustionStrategy? LogMessagePoolExhaustionStrategy { get; set; }
 
     public bool IncludeParentAppenders { get; init; } = true;

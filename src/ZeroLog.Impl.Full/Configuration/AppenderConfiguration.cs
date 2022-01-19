@@ -1,11 +1,11 @@
 using ZeroLog.Appenders;
 
-namespace ZeroLog.Config;
+namespace ZeroLog.Configuration;
 
 public sealed class AppenderConfiguration
 {
     public Appender Appender { get; }
-    public Level Level { get; init; }
+    public LogLevel Level { get; init; }
 
     public AppenderConfiguration(Appender appender)
     {
