@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using ZeroLog.Appenders;
 
 namespace ZeroLog.Config;
@@ -9,10 +10,11 @@ public sealed class LoggerConfiguration
     public string Name { get; }
     internal string NameWithPeriod { get; }
 
-    public Level Level { get; init; }
-    public bool IncludeParentAppenders { get; init; } = true;
+    public Level? Level { get; set; }
     public LogMessagePoolExhaustionStrategy? LogMessagePoolExhaustionStrategy { get; set; }
-    public ICollection<AppenderReference> Appenders { get; } = new List<AppenderReference>();
+
+    public bool IncludeParentAppenders { get; init; } = true;
+    public ICollection<AppenderConfiguration> Appenders { get; private set; } = new List<AppenderConfiguration>();
 
     public LoggerConfiguration(string name)
     {
@@ -25,7 +27,7 @@ public sealed class LoggerConfiguration
     {
     }
 
-    internal void Validate()
+    internal void ValidateAndFreeze()
     {
         var appenderRefs = new HashSet<Appender>(ReferenceEqualityComparer.Instance);
 
@@ -34,5 +36,7 @@ public sealed class LoggerConfiguration
             if (!appenderRefs.Add(appenderRef.Appender))
                 throw new InvalidOperationException($"Multiple appender configurations for the same appender instance (of type {appenderRef.Appender.GetType()}) defined in the following logger configuration: {Name}");
         }
+
+        Appenders = ImmutableList.CreateRange(Appenders);
     }
 }

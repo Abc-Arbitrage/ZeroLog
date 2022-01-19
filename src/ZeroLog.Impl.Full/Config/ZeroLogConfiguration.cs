@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using ZeroLog.Appenders;
 
@@ -18,19 +19,24 @@ public sealed class ZeroLogConfiguration
     public string JsonSeparator { get; init; } = " ~~ ";
 
     public LoggerConfiguration RootLogger { get; } = new(string.Empty);
-    public ICollection<LoggerConfiguration> Loggers { get; } = new List<LoggerConfiguration>();
+    public ICollection<LoggerConfiguration> Loggers { get; private set; } = new List<LoggerConfiguration>();
 
-    internal void Validate()
+    internal void ValidateAndFreeze()
     {
         var loggerNames = new HashSet<string>(StringComparer.Ordinal);
 
         foreach (var loggerConfig in Loggers)
         {
+            if (string.IsNullOrEmpty(loggerConfig.Name))
+                throw new InvalidOperationException("Logger configurations must have a logger name.");
+
             if (!loggerNames.Add(loggerConfig.Name))
                 throw new InvalidOperationException($"Multiple configurations defined for the following logger: {loggerConfig.Name}");
 
-            loggerConfig.Validate();
+            loggerConfig.ValidateAndFreeze();
         }
+
+        Loggers = ImmutableList.CreateRange(Loggers);
     }
 
     internal ResolvedLoggerConfiguration ResolveLoggerConfiguration(string loggerName)

@@ -73,7 +73,7 @@ namespace ZeroLog
 
         public static IDisposable Initialize(ZeroLogConfiguration configuration)
         {
-            configuration.Validate();
+            configuration.ValidateAndFreeze();
 
             if (_logManager is not null)
                 throw new ApplicationException("LogManager is already initialized");

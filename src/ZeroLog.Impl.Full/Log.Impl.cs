@@ -1,5 +1,3 @@
-using System;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using ZeroLog.Appenders;
@@ -9,28 +7,23 @@ namespace ZeroLog;
 
 partial class Log
 {
-    private static readonly Appender[][] _emptyAppendersByLogLevel = Enumerable.Repeat(Array.Empty<Appender>(), (int)Level.None + 1).ToArray();
-
     private readonly LogMessage _poolExhaustedMessage = new("Log message skipped due to pool exhaustion.");
 
     private ILogMessageProvider? _logMessageProvider;
-    private Appender[][] _appendersByLogLevel = _emptyAppendersByLogLevel;
-    private LogMessagePoolExhaustionStrategy _logMessagePoolExhaustionStrategy;
+    private ResolvedLoggerConfiguration _config = ResolvedLoggerConfiguration.Empty;
 
     internal void UpdateConfiguration(ILogMessageProvider? provider, ResolvedLoggerConfiguration? config)
     {
         _logMessageProvider = provider;
-
-        _appendersByLogLevel = config?.AppendersByLogLevel ?? _emptyAppendersByLogLevel;
-        _logLevel = config?.Level ?? Level.None;
-        _logMessagePoolExhaustionStrategy = config?.LogMessagePoolExhaustionStrategy ?? LogMessagePoolExhaustionStrategy.Default;
+        _config = config ?? ResolvedLoggerConfiguration.Empty;
+        _logLevel = _config.Level;
     }
 
     public partial bool IsEnabled(Level level)
         => level >= _logLevel;
 
     internal Appender[] GetAppenders(Level level)
-        => _appendersByLogLevel[(int)level];
+        => _config.GetAppenders(level);
 
     private partial LogMessage InternalAcquireLogMessage(Level level)
     {
@@ -51,7 +44,7 @@ partial class Log
         if (provider is null)
             return LogMessage.Empty;
 
-        switch (_logMessagePoolExhaustionStrategy)
+        switch (_config.LogMessagePoolExhaustionStrategy)
         {
             case LogMessagePoolExhaustionStrategy.DropLogMessageAndNotifyAppenders:
                 return _poolExhaustedMessage;
