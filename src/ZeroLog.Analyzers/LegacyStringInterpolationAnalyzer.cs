@@ -15,7 +15,7 @@ public class LegacyStringInterpolationAnalyzer : DiagnosticAnalyzer
         "Allocating string interpolation",
         "This string interpolation will allocate. Set the language version to C# 10 or greater to fix this.",
         DiagnosticIds.Category,
-        DiagnosticSeverity.Error,
+        DiagnosticSeverity.Warning,
         true
     );
 
