@@ -1,5 +1,6 @@
 using System.IO;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -35,4 +36,16 @@ internal class ZeroLogAnalyzerTest<TAnalyzer> : CSharpAnalyzerTest<TAnalyzer, NU
 
     protected override ParseOptions CreateParseOptions()
         => ((CSharpParseOptions)base.CreateParseOptions()).WithLanguageVersion(LanguageVersion);
+}
+
+
+internal class ZeroLogCodeFixTest<TAnalyzer, TCodeFix> : CSharpCodeFixTest<TAnalyzer, TCodeFix, NUnitVerifier>
+    where TAnalyzer : DiagnosticAnalyzer, new()
+    where TCodeFix : CodeFixProvider, new()
+{
+    protected ZeroLogCodeFixTest()
+    {
+        ReferenceAssemblies = ZeroLogAnalyzerTest.Net6ReferenceAssemblies;
+        TestState.AdditionalReferences.Add(typeof(LogManager).Assembly);
+    }
 }
