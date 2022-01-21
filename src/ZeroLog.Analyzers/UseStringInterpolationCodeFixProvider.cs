@@ -133,19 +133,24 @@ public class UseStringInterpolationCodeFixProvider : CodeFixProvider
             currentNode = invocation.Parent;
         }
 
-        var interpolatedString = InterpolatedStringExpression(
-            Token(SyntaxKind.InterpolatedStringStartToken),
-            new SyntaxList<InterpolatedStringContentSyntax>(
-                ConcatInterpolationStringTexts(FlattenNestedInterpolations(parts))
-            ),
-            Token(SyntaxKind.InterpolatedStringEndToken)
-        );
+        parts = ConcatInterpolationStringTexts(FlattenNestedInterpolations(parts)).ToList();
+
+        ExpressionSyntax resultExpression = parts.Count == 1 && parts[0] is InterpolatedStringTextSyntax singleTextSyntax
+            ? LiteralExpression(
+                SyntaxKind.StringLiteralExpression,
+                Literal('"' + singleTextSyntax.TextToken.Text + '"', singleTextSyntax.TextToken.ValueText)
+            )
+            : InterpolatedStringExpression(
+                Token(SyntaxKind.InterpolatedStringStartToken),
+                new SyntaxList<InterpolatedStringContentSyntax>(parts),
+                Token(SyntaxKind.InterpolatedStringEndToken)
+            );
 
         var root = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
         if (root is null)
             return document;
 
-        var newArgList = rootInvocation.ArgumentList.AddArguments(Argument(interpolatedString));
+        var newArgList = rootInvocation.ArgumentList.AddArguments(Argument(resultExpression));
 
         root = root.ReplaceNode(logInvocation, rootInvocation.WithArgumentList(newArgList).WithTrailingTrivia(logInvocation.GetTrailingTrivia()));
         return document.WithSyntaxRoot(root);

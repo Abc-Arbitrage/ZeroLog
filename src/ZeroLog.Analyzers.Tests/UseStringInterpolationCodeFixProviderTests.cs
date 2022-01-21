@@ -64,7 +64,7 @@ class C
 {
     void M(ZeroLog.Log log)
     {
-        /* start trivia*/ log.{|#0:Info|}().Append(""Foo "").Append( /* foo */ 42 /* bar */ ).Log() /* end trivia */ ;
+        /* start trivia */ log.{|#0:Info|}().Append(""Foo "").Append( /* foo */ 42 /* bar */ ).Log() /* end trivia */ ;
     }
 }
 ",
@@ -75,7 +75,7 @@ class C
 {
     void M(ZeroLog.Log log)
     {
-        /* start trivia*/ log.Info($""Foo {42}"") /* end trivia */ ;
+        /* start trivia */ log.Info($""Foo {42}"") /* end trivia */ ;
     }
 }
 ",
@@ -184,6 +184,42 @@ class C
     void M(ZeroLog.Log log)
     {
         log.Info($""Foo{@""Bar""}Baz"");
+    }
+}
+",
+            ExpectedDiagnostics =
+            {
+                new DiagnosticResult(UseStringInterpolationAnalyzer.UseStringInterpolationDiagnostic).WithLocation(0)
+            }
+        };
+
+        return test.RunAsync();
+    }
+
+    [Test]
+    public Task should_output_string_literals_when_possible()
+    {
+        var test = new Test
+        {
+            TestCode = @"
+using System;
+
+class C
+{
+    void M(ZeroLog.Log log)
+    {
+        log.{|#0:Info|}().Append(""Foo"").Append(""Bar"").Log();
+    }
+}
+",
+            FixedCode = @"
+using System;
+
+class C
+{
+    void M(ZeroLog.Log log)
+    {
+        log.Info(""FooBar"");
     }
 }
 ",
