@@ -80,12 +80,16 @@ public class UseStringInterpolationCodeFixProvider : CodeFixProvider
                 {
                     var literalSyntax = (LiteralExpressionSyntax)valueSyntaxNode;
 
+                    // Verbatim strings have different escaping rules, treat them as separate expressions
+                    if (literalSyntax.Token.IsVerbatimStringLiteral())
+                        goto default;
+
                     parts.Add(
                         InterpolatedStringText(
                             Token(
                                 SyntaxTriviaList.Empty,
                                 SyntaxKind.InterpolatedStringTextToken,
-                                GetInnerText(literalSyntax.Token.Text),
+                                GetNonVerbatimStringTokenInnerText(literalSyntax.Token.Text),
                                 literalSyntax.Token.ValueText,
                                 SyntaxTriviaList.Empty
                             )
@@ -113,7 +117,7 @@ public class UseStringInterpolationCodeFixProvider : CodeFixProvider
                                 Token(
                                     SyntaxTriviaList.Empty,
                                     SyntaxKind.InterpolatedStringTextToken,
-                                    GetInnerText(formatExpression.Token.Text),
+                                    GetNonVerbatimStringTokenInnerText(formatExpression.Token.Text),
                                     formatExpression.Token.ValueText,
                                     SyntaxTriviaList.Empty
                                 )
@@ -219,6 +223,6 @@ public class UseStringInterpolationCodeFixProvider : CodeFixProvider
             yield return lastTextToken;
     }
 
-    private static string GetInnerText(string text)
+    private static string GetNonVerbatimStringTokenInnerText(string text)
         => text.Substring(1, text.Length - 2);
 }

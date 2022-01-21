@@ -160,6 +160,42 @@ class C
         return test.RunAsync();
     }
 
+    [Test]
+    public Task should_treat_verbatim_strings_as_expressions()
+    {
+        var test = new Test
+        {
+            TestCode = @"
+using System;
+
+class C
+{
+    void M(ZeroLog.Log log)
+    {
+        log.{|#0:Info|}().Append(""Foo"").Append(@""Bar"").Append(""Baz"").Log();
+    }
+}
+",
+            FixedCode = @"
+using System;
+
+class C
+{
+    void M(ZeroLog.Log log)
+    {
+        log.Info($""Foo{@""Bar""}Baz"");
+    }
+}
+",
+            ExpectedDiagnostics =
+            {
+                new DiagnosticResult(UseStringInterpolationAnalyzer.UseStringInterpolationDiagnostic).WithLocation(0)
+            }
+        };
+
+        return test.RunAsync();
+    }
+
     private class Test : ZeroLogCodeFixTest<UseStringInterpolationAnalyzer, UseStringInterpolationCodeFixProvider>
     {
     }
