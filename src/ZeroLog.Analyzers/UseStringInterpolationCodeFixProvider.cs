@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Composition;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
@@ -8,6 +9,7 @@ using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Operations;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace ZeroLog.Analyzers;
@@ -34,9 +36,9 @@ public class UseStringInterpolationCodeFixProvider : CodeFixProvider
         context.RegisterCodeFix(CodeAction.Create(title, ct => FixNode(context.Document, nodeToFix, ct), title), context.Diagnostics);
     }
 
-    private static async Task<Document> FixNode(Document document, SyntaxNode nodeToFix, CancellationToken cancellationToken)
+    private static async Task<Document> FixNode(Document document, SyntaxNode logBuilderIdentifierNode, CancellationToken cancellationToken)
     {
-        if (nodeToFix is not IdentifierNameSyntax { Parent: MemberAccessExpressionSyntax { Parent: InvocationExpressionSyntax rootInvocation } })
+        if (logBuilderIdentifierNode is not IdentifierNameSyntax { Parent: MemberAccessExpressionSyntax { Parent: InvocationExpressionSyntax rootInvocation } })
             return document;
 
         var parts = new List<InterpolatedStringContentSyntax>();
@@ -46,6 +48,10 @@ public class UseStringInterpolationCodeFixProvider : CodeFixProvider
 
         string? currentString = null;
         string? currentValueString = null;
+
+        var semanticModel = await document.GetSemanticModelAsync(cancellationToken).ConfigureAwait(false);
+        if (semanticModel is null)
+            return document;
 
         while (true)
         {
@@ -61,14 +67,21 @@ public class UseStringInterpolationCodeFixProvider : CodeFixProvider
             if (memberAccess.Name.Identifier.Text is not ("Append" or "AppendEnum"))
                 return document;
 
-            var value = invocation.ArgumentList.Arguments[0].Expression.WithoutTrivia();
+            if (semanticModel.GetOperation(invocation, cancellationToken) is not IInvocationOperation invocationOperation)
+                return document;
 
-            switch (value.Kind())
+            var valueOperation = invocationOperation.Arguments.FirstOrDefault(i => i.Parameter?.Name == "value")?.Value;
+            if (valueOperation is null)
+                return document;
+
+            var valueSyntaxNode = valueOperation.Syntax.WithoutTrivia();
+
+            switch (valueOperation.Syntax.Kind())
             {
                 case SyntaxKind.StringLiteralExpression:
                 case SyntaxKind.CharacterLiteralExpression:
                 {
-                    var literal = (LiteralExpressionSyntax)value;
+                    var literal = (LiteralExpressionSyntax)valueSyntaxNode;
                     currentString += GetInnerText(literal);
                     currentValueString += literal.Token.ValueText;
                     break;
@@ -78,15 +91,15 @@ public class UseStringInterpolationCodeFixProvider : CodeFixProvider
                 {
                     AppendCurrentString();
 
-                    var interpolation = Interpolation(value);
+                    var interpolation = Interpolation((ExpressionSyntax)valueSyntaxNode);
 
-                    if (invocation.ArgumentList.Arguments.Count > 1)
+                    if (invocationOperation.Arguments.Length > 1)
                     {
-                        var formatValue = invocation.ArgumentList.Arguments[1].Expression.WithoutTrivia();
-                        if (!formatValue.IsKind(SyntaxKind.StringLiteralExpression))
+                        var formatValueSyntax = invocationOperation.Arguments.FirstOrDefault(i => i.Parameter?.Name == "format")?.Value.Syntax.WithoutTrivia();
+                        if (!formatValueSyntax.IsKind(SyntaxKind.StringLiteralExpression))
                             return document;
 
-                        var formatExpression = (LiteralExpressionSyntax)formatValue;
+                        var formatExpression = (LiteralExpressionSyntax)formatValueSyntax;
 
                         interpolation = interpolation.WithFormatClause(
                             InterpolationFormatClause(
@@ -118,7 +131,7 @@ public class UseStringInterpolationCodeFixProvider : CodeFixProvider
 
         var newArgList = rootInvocation.ArgumentList.AddArguments(Argument(interpolatedString));
 
-        root = root.ReplaceNode(logInvocation, rootInvocation.WithArgumentList(newArgList).WithoutTrailingTrivia());
+        root = root.ReplaceNode(logInvocation, rootInvocation.WithArgumentList(newArgList).WithTrailingTrivia(logInvocation.GetTrailingTrivia()));
         return document.WithSyntaxRoot(root);
 
         void AppendCurrentString()

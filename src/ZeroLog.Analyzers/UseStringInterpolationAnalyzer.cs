@@ -78,14 +78,14 @@ public class UseStringInterpolationAnalyzer : DiagnosticAnalyzer
             if (!SymbolEqualityComparer.Default.Equals(invocation.TargetMethod, _logMethodSymbol))
                 return;
 
-            var rootMethodInvocation = FindRootBuilderInvocationOperation(invocation.Instance);
+            var rootMethodInvocation = FindSimplifiableLogBuilderInvocationOperation(invocation.Instance);
             if (rootMethodInvocation?.Syntax is InvocationExpressionSyntax { Expression: MemberAccessExpressionSyntax expressionSyntax })
             {
                 operationContext.ReportDiagnostic(Diagnostic.Create(UseStringInterpolationDiagnostic, expressionSyntax.Name.GetLocation()));
             }
         }
 
-        private IInvocationOperation? FindRootBuilderInvocationOperation(IOperation? operation)
+        private IInvocationOperation? FindSimplifiableLogBuilderInvocationOperation(IOperation? operation)
         {
             while (operation is not null)
             {
@@ -98,6 +98,14 @@ public class UseStringInterpolationAnalyzer : DiagnosticAnalyzer
                 {
                     if (invocationOperation.TargetMethod.Name is not ("Append" or "AppendEnum"))
                         return null;
+
+                    if (invocationOperation.Arguments.Length > 1)
+                    {
+                        // The format string needs to be a literal
+                        var formatArgument = invocationOperation.Arguments.FirstOrDefault(i => i.Parameter?.Name == "format");
+                        if (formatArgument != null && formatArgument.Value.Kind != OperationKind.Literal)
+                            return null;
+                    }
 
                     operation = invocationOperation.Instance;
                 }

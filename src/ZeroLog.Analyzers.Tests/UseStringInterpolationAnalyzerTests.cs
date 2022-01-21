@@ -66,6 +66,53 @@ class C
         return test.RunAsync();
     }
 
+    [Test]
+    public Task should_report_interpolation_opportunity_when_format_string_is_a_literal()
+    {
+        var test = new Test
+        {
+            Source = @"
+class C
+{
+    void M1(ZeroLog.Log log)
+        => log.{|#0:Info|}().Append(42, ""X"").Log();
+
+    void M2(ZeroLog.Log log)
+        => log.{|#1:Info|}().Append(format: ""X"", value: 40 + 2).Log();
+}
+",
+            ExpectedDiagnostics =
+            {
+                new DiagnosticResult(UseStringInterpolationAnalyzer.UseStringInterpolationDiagnostic).WithLocation(0),
+                new DiagnosticResult(UseStringInterpolationAnalyzer.UseStringInterpolationDiagnostic).WithLocation(1)
+            }
+        };
+
+        return test.RunAsync();
+    }
+
+    [Test]
+    public Task should_not_report_interpolation_opportunity_when_format_string_is_not_a_literal()
+    {
+        var test = new Test
+        {
+            Source = @"
+class C
+{
+    const string format = ""X"";
+
+    void M1(ZeroLog.Log log)
+        => log.Info().Append(42, format).Log();
+
+    void M2(ZeroLog.Log log)
+        => log.Info().Append(format: format, value: 42).Log();
+}
+"
+        };
+
+        return test.RunAsync();
+    }
+
     private class Test : ZeroLogAnalyzerTest<UseStringInterpolationAnalyzer>
     {
     }
