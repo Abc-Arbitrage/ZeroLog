@@ -11,11 +11,17 @@ namespace ZeroLog.Analyzers.Tests;
 
 internal static class ZeroLogAnalyzerTest
 {
-    public static readonly ReferenceAssemblies Net6ReferenceAssemblies = new(
+    private static readonly ReferenceAssemblies _net6ReferenceAssemblies = new(
         "net6.0",
         new PackageIdentity("Microsoft.NETCore.App.Ref", "6.0.0"),
         Path.Combine("ref", "net6.0")
     );
+
+    public static void ConfigureTest(AnalyzerTest<NUnitVerifier> test)
+    {
+        test.ReferenceAssemblies = _net6ReferenceAssemblies;
+        test.TestState.AdditionalReferences.Add(typeof(LogManager).Assembly);
+    }
 }
 
 internal class ZeroLogAnalyzerTest<TAnalyzer> : CSharpAnalyzerTest<TAnalyzer, NUnitVerifier>
@@ -30,14 +36,12 @@ internal class ZeroLogAnalyzerTest<TAnalyzer> : CSharpAnalyzerTest<TAnalyzer, NU
 
     protected ZeroLogAnalyzerTest()
     {
-        ReferenceAssemblies = ZeroLogAnalyzerTest.Net6ReferenceAssemblies;
-        TestState.AdditionalReferences.Add(typeof(LogManager).Assembly);
+        ZeroLogAnalyzerTest.ConfigureTest(this);
     }
 
     protected override ParseOptions CreateParseOptions()
         => ((CSharpParseOptions)base.CreateParseOptions()).WithLanguageVersion(LanguageVersion);
 }
-
 
 internal class ZeroLogCodeFixTest<TAnalyzer, TCodeFix> : CSharpCodeFixTest<TAnalyzer, TCodeFix, NUnitVerifier>
     where TAnalyzer : DiagnosticAnalyzer, new()
@@ -45,7 +49,6 @@ internal class ZeroLogCodeFixTest<TAnalyzer, TCodeFix> : CSharpCodeFixTest<TAnal
 {
     protected ZeroLogCodeFixTest()
     {
-        ReferenceAssemblies = ZeroLogAnalyzerTest.Net6ReferenceAssemblies;
-        TestState.AdditionalReferences.Add(typeof(LogManager).Assembly);
+        ZeroLogAnalyzerTest.ConfigureTest(this);
     }
 }

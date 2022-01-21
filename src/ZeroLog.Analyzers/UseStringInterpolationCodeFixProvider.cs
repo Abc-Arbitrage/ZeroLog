@@ -41,17 +41,14 @@ public class UseStringInterpolationCodeFixProvider : CodeFixProvider
         if (logBuilderIdentifierNode is not IdentifierNameSyntax { Parent: MemberAccessExpressionSyntax { Parent: InvocationExpressionSyntax rootInvocation } })
             return document;
 
+        var semanticModel = await document.GetSemanticModelAsync(cancellationToken).ConfigureAwait(false);
+        if (semanticModel is null)
+            return document;
+
         var parts = new List<InterpolatedStringContentSyntax>();
 
         var currentNode = rootInvocation.Parent;
         InvocationExpressionSyntax? logInvocation;
-
-        string? currentString = null;
-        string? currentValueString = null;
-
-        var semanticModel = await document.GetSemanticModelAsync(cancellationToken).ConfigureAwait(false);
-        if (semanticModel is null)
-            return document;
 
         while (true)
         {
@@ -81,16 +78,25 @@ public class UseStringInterpolationCodeFixProvider : CodeFixProvider
                 case SyntaxKind.StringLiteralExpression:
                 case SyntaxKind.CharacterLiteralExpression:
                 {
-                    var literal = (LiteralExpressionSyntax)valueSyntaxNode;
-                    currentString += GetInnerText(literal);
-                    currentValueString += literal.Token.ValueText;
+                    var literalSyntax = (LiteralExpressionSyntax)valueSyntaxNode;
+
+                    parts.Add(
+                        InterpolatedStringText(
+                            Token(
+                                SyntaxTriviaList.Empty,
+                                SyntaxKind.InterpolatedStringTextToken,
+                                GetInnerText(literalSyntax.Token.Text),
+                                literalSyntax.Token.ValueText,
+                                SyntaxTriviaList.Empty
+                            )
+                        )
+                    );
+
                     break;
                 }
 
                 default:
                 {
-                    AppendCurrentString();
-
                     var interpolation = Interpolation((ExpressionSyntax)valueSyntaxNode);
 
                     if (invocationOperation.Arguments.Length > 1)
@@ -104,7 +110,13 @@ public class UseStringInterpolationCodeFixProvider : CodeFixProvider
                         interpolation = interpolation.WithFormatClause(
                             InterpolationFormatClause(
                                 Token(SyntaxKind.ColonToken),
-                                Token(SyntaxTriviaList.Empty, SyntaxKind.InterpolatedStringTextToken, GetInnerText(formatExpression), formatExpression.Token.ValueText, SyntaxTriviaList.Empty)
+                                Token(
+                                    SyntaxTriviaList.Empty,
+                                    SyntaxKind.InterpolatedStringTextToken,
+                                    GetInnerText(formatExpression.Token.Text),
+                                    formatExpression.Token.ValueText,
+                                    SyntaxTriviaList.Empty
+                                )
                             )
                         );
                     }
@@ -117,11 +129,11 @@ public class UseStringInterpolationCodeFixProvider : CodeFixProvider
             currentNode = invocation.Parent;
         }
 
-        AppendCurrentString();
-
         var interpolatedString = InterpolatedStringExpression(
             Token(SyntaxKind.InterpolatedStringStartToken),
-            new SyntaxList<InterpolatedStringContentSyntax>(parts),
+            new SyntaxList<InterpolatedStringContentSyntax>(
+                ConcatInterpolationStringTexts(FlattenNestedInterpolations(parts))
+            ),
             Token(SyntaxKind.InterpolatedStringEndToken)
         );
 
@@ -133,21 +145,80 @@ public class UseStringInterpolationCodeFixProvider : CodeFixProvider
 
         root = root.ReplaceNode(logInvocation, rootInvocation.WithArgumentList(newArgList).WithTrailingTrivia(logInvocation.GetTrailingTrivia()));
         return document.WithSyntaxRoot(root);
+    }
 
-        void AppendCurrentString()
+    private static IEnumerable<InterpolatedStringContentSyntax> FlattenNestedInterpolations(IEnumerable<InterpolatedStringContentSyntax> parts)
+    {
+        foreach (var part in parts)
         {
-            if (currentString is null || currentValueString is null)
-                return;
+            if (part.IsKind(SyntaxKind.Interpolation))
+            {
+                var interpolationSyntax = (InterpolationSyntax)part;
 
-            parts.Add(InterpolatedStringText(Token(SyntaxTriviaList.Empty, SyntaxKind.InterpolatedStringTextToken, currentString, currentValueString, SyntaxTriviaList.Empty)));
-            currentString = null;
-            currentValueString = null;
-        }
+                if (interpolationSyntax.Expression.IsKind(SyntaxKind.InterpolatedStringExpression))
+                {
+                    var innerInterpolation = (InterpolatedStringExpressionSyntax)interpolationSyntax.Expression;
 
-        static string GetInnerText(LiteralExpressionSyntax syntax)
-        {
-            var text = syntax.Token.Text;
-            return text.Substring(1, text.Length - 2);
+                    foreach (var innerPart in FlattenNestedInterpolations(innerInterpolation.Contents))
+                        yield return innerPart;
+                }
+                else
+                {
+                    yield return part;
+                }
+            }
+            else
+            {
+                yield return part;
+            }
         }
     }
+
+    private static IEnumerable<InterpolatedStringContentSyntax> ConcatInterpolationStringTexts(IEnumerable<InterpolatedStringContentSyntax> parts)
+    {
+        InterpolatedStringTextSyntax? lastTextToken = null;
+
+        foreach (var part in parts)
+        {
+            if (part.IsKind(SyntaxKind.InterpolatedStringText))
+            {
+                var interpolatedString = (InterpolatedStringTextSyntax)part;
+
+                if (lastTextToken is null)
+                {
+                    lastTextToken = interpolatedString;
+                }
+                else
+                {
+                    var lastInterpolatedTextToken = lastTextToken.TextToken;
+
+                    lastTextToken = lastTextToken.WithTextToken(
+                        Token(
+                            SyntaxTriviaList.Empty,
+                            SyntaxKind.InterpolatedStringTextToken,
+                            lastInterpolatedTextToken.Text + interpolatedString.TextToken.Text,
+                            lastInterpolatedTextToken.ValueText + interpolatedString.TextToken.ValueText,
+                            SyntaxTriviaList.Empty
+                        )
+                    );
+                }
+            }
+            else
+            {
+                if (lastTextToken != null)
+                {
+                    yield return lastTextToken;
+                    lastTextToken = null;
+                }
+
+                yield return part;
+            }
+        }
+
+        if (lastTextToken != null)
+            yield return lastTextToken;
+    }
+
+    private static string GetInnerText(string text)
+        => text.Substring(1, text.Length - 2);
 }

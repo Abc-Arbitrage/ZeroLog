@@ -88,7 +88,6 @@ class C
         return test.RunAsync();
     }
 
-
     [Test]
     public Task should_transform_out_of_order_format_argument()
     {
@@ -125,6 +124,41 @@ class C
         return test.RunAsync();
     }
 
+    [Test]
+    public Task should_flatten_interpolated_appends()
+    {
+        var test = new Test
+        {
+            TestCode = @"
+using System;
+
+class C
+{
+    void M(ZeroLog.Log log)
+    {
+        log.{|#0:Info|}().Append(""Foo"").Append($""Bar {42} Baz"").Append(""!"").Log();
+    }
+}
+",
+            FixedCode = @"
+using System;
+
+class C
+{
+    void M(ZeroLog.Log log)
+    {
+        log.Info($""FooBar {42} Baz!"");
+    }
+}
+",
+            ExpectedDiagnostics =
+            {
+                new DiagnosticResult(UseStringInterpolationAnalyzer.UseStringInterpolationDiagnostic).WithLocation(0)
+            }
+        };
+
+        return test.RunAsync();
+    }
 
     private class Test : ZeroLogCodeFixTest<UseStringInterpolationAnalyzer, UseStringInterpolationCodeFixProvider>
     {
