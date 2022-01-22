@@ -33,43 +33,80 @@ public class UseStringInterpolationCodeFixProvider : CodeFixProvider
         var nodeToFix = root.FindNode(context.Span);
 
         const string title = "Use string interpolation";
-        context.RegisterCodeFix(CodeAction.Create(title, ct => FixNode(context.Document, nodeToFix, ct), title), context.Diagnostics);
+        context.RegisterCodeFix(CodeAction.Create(title, ct => FixNode(context.Document, nodeToFix, root, ct), title), context.Diagnostics);
     }
 
-    private static async Task<Document> FixNode(Document document, SyntaxNode logBuilderIdentifierNode, CancellationToken cancellationToken)
+    private static async Task<Document> FixNode(Document document,
+                                                SyntaxNode logBuilderIdentifierNode,
+                                                SyntaxNode rootNode,
+                                                CancellationToken cancellationToken)
     {
-        if (logBuilderIdentifierNode is not IdentifierNameSyntax { Parent: MemberAccessExpressionSyntax { Parent: InvocationExpressionSyntax rootInvocation } })
+        if (logBuilderIdentifierNode is not IdentifierNameSyntax { Parent: MemberAccessExpressionSyntax { Parent: InvocationExpressionSyntax logBuilderInvocation } })
             return document;
 
         var semanticModel = await document.GetSemanticModelAsync(cancellationToken).ConfigureAwait(false);
         if (semanticModel is null)
             return document;
 
-        var parts = new List<InterpolatedStringContentSyntax>();
+        var parts = TryConvertToStringInterpolationParts(logBuilderInvocation, semanticModel, cancellationToken, out var logMethodInvocation);
+        if (parts is null || logMethodInvocation is null)
+            return document;
 
-        var currentNode = rootInvocation.Parent;
-        InvocationExpressionSyntax? logInvocation;
+        parts = ConcatInterpolationStringTexts(FlattenNestedInterpolations(parts)).ToList();
+
+        ExpressionSyntax resultExpression = parts.Count == 1 && parts[0] is InterpolatedStringTextSyntax singleTextSyntax
+            ? LiteralExpression(
+                SyntaxKind.StringLiteralExpression,
+                Literal('"' + singleTextSyntax.TextToken.Text + '"', singleTextSyntax.TextToken.ValueText)
+            )
+            : InterpolatedStringExpression(
+                Token(SyntaxKind.InterpolatedStringStartToken),
+                new SyntaxList<InterpolatedStringContentSyntax>(parts),
+                Token(SyntaxKind.InterpolatedStringEndToken)
+            );
+
+        rootNode = rootNode.ReplaceNode(
+            logMethodInvocation,
+            logBuilderInvocation.WithArgumentList(
+                                    logBuilderInvocation.ArgumentList
+                                                        .AddArguments(Argument(resultExpression))
+                                )
+                                .WithTrailingTrivia(logMethodInvocation.GetTrailingTrivia())
+        );
+
+        return document.WithSyntaxRoot(rootNode);
+    }
+
+    private static List<InterpolatedStringContentSyntax>? TryConvertToStringInterpolationParts(InvocationExpressionSyntax logBuilderInvocation,
+                                                                                               SemanticModel semanticModel,
+                                                                                               CancellationToken cancellationToken,
+                                                                                               out InvocationExpressionSyntax? logMethodInvocation)
+    {
+        var parts = new List<InterpolatedStringContentSyntax>();
+        logMethodInvocation = null;
+
+        var currentNode = logBuilderInvocation.Parent;
 
         while (true)
         {
             if (currentNode is not MemberAccessExpressionSyntax { Parent: InvocationExpressionSyntax invocation } memberAccess)
-                return document;
+                return null;
 
             if (memberAccess.Name.Identifier.Text == "Log")
             {
-                logInvocation = invocation;
-                break;
+                logMethodInvocation = invocation;
+                return parts;
             }
 
             if (memberAccess.Name.Identifier.Text is not ("Append" or "AppendEnum"))
-                return document;
+                return null;
 
             if (semanticModel.GetOperation(invocation, cancellationToken) is not IInvocationOperation invocationOperation)
-                return document;
+                return null;
 
             var valueOperation = invocationOperation.Arguments.FirstOrDefault(i => i.Parameter?.Name == "value")?.Value;
             if (valueOperation is null)
-                return document;
+                return null;
 
             var valueSyntaxNode = valueOperation.Syntax.WithoutTrivia();
 
@@ -106,23 +143,24 @@ public class UseStringInterpolationCodeFixProvider : CodeFixProvider
                     if (invocationOperation.Arguments.Length > 1)
                     {
                         var formatValueSyntax = invocationOperation.Arguments.FirstOrDefault(i => i.Parameter?.Name == "format")?.Value.Syntax.WithoutTrivia();
-                        if (!formatValueSyntax.IsKind(SyntaxKind.StringLiteralExpression))
-                            return document;
 
-                        var formatExpression = (LiteralExpressionSyntax)formatValueSyntax;
+                        if (formatValueSyntax != null && formatValueSyntax.IsKind(SyntaxKind.StringLiteralExpression))
+                        {
+                            var formatExpression = (LiteralExpressionSyntax)formatValueSyntax;
 
-                        interpolation = interpolation.WithFormatClause(
-                            InterpolationFormatClause(
-                                Token(SyntaxKind.ColonToken),
-                                Token(
-                                    SyntaxTriviaList.Empty,
-                                    SyntaxKind.InterpolatedStringTextToken,
-                                    GetNonVerbatimStringTokenInnerText(formatExpression.Token.Text),
-                                    formatExpression.Token.ValueText,
-                                    SyntaxTriviaList.Empty
+                            interpolation = interpolation.WithFormatClause(
+                                InterpolationFormatClause(
+                                    Token(SyntaxKind.ColonToken),
+                                    Token(
+                                        SyntaxTriviaList.Empty,
+                                        SyntaxKind.InterpolatedStringTextToken,
+                                        GetNonVerbatimStringTokenInnerText(formatExpression.Token.Text),
+                                        formatExpression.Token.ValueText,
+                                        SyntaxTriviaList.Empty
+                                    )
                                 )
-                            )
-                        );
+                            );
+                        }
                     }
 
                     parts.Add(interpolation);
@@ -132,28 +170,6 @@ public class UseStringInterpolationCodeFixProvider : CodeFixProvider
 
             currentNode = invocation.Parent;
         }
-
-        parts = ConcatInterpolationStringTexts(FlattenNestedInterpolations(parts)).ToList();
-
-        ExpressionSyntax resultExpression = parts.Count == 1 && parts[0] is InterpolatedStringTextSyntax singleTextSyntax
-            ? LiteralExpression(
-                SyntaxKind.StringLiteralExpression,
-                Literal('"' + singleTextSyntax.TextToken.Text + '"', singleTextSyntax.TextToken.ValueText)
-            )
-            : InterpolatedStringExpression(
-                Token(SyntaxKind.InterpolatedStringStartToken),
-                new SyntaxList<InterpolatedStringContentSyntax>(parts),
-                Token(SyntaxKind.InterpolatedStringEndToken)
-            );
-
-        var root = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
-        if (root is null)
-            return document;
-
-        var newArgList = rootInvocation.ArgumentList.AddArguments(Argument(resultExpression));
-
-        root = root.ReplaceNode(logInvocation, rootInvocation.WithArgumentList(newArgList).WithTrailingTrivia(logInvocation.GetTrailingTrivia()));
-        return document.WithSyntaxRoot(root);
     }
 
     private static IEnumerable<InterpolatedStringContentSyntax> FlattenNestedInterpolations(IEnumerable<InterpolatedStringContentSyntax> parts)
