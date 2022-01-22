@@ -125,6 +125,42 @@ class C
     }
 
     [Test]
+    public Task should_handle_verbatim_format_string()
+    {
+        var test = new Test
+        {
+            TestCode = @"
+using System;
+
+class C
+{
+    void M(ZeroLog.Log log)
+    {
+        log.{|#0:Info|}().Append(42, @""Foo""""\"").Log();
+    }
+}
+",
+            FixedCode = @"
+using System;
+
+class C
+{
+    void M(ZeroLog.Log log)
+    {
+        log.Info($""{42:Foo\""\\}"");
+    }
+}
+",
+            ExpectedDiagnostics =
+            {
+                new DiagnosticResult(UseStringInterpolationAnalyzer.UseStringInterpolationDiagnostic).WithLocation(0)
+            }
+        };
+
+        return test.RunAsync();
+    }
+
+    [Test]
     public Task should_flatten_interpolated_appends()
     {
         var test = new Test

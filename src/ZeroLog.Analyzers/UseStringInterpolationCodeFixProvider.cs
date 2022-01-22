@@ -153,6 +153,15 @@ public class UseStringInterpolationCodeFixProvider : CodeFixProvider
                         if (formatValueSyntax != null && formatValueSyntax.IsKind(SyntaxKind.StringLiteralExpression))
                         {
                             var formatExpression = (LiteralExpressionSyntax)formatValueSyntax;
+                            var formatLiteralText = formatExpression.Token.Text;
+
+                            if (formatExpression.Token.IsVerbatimStringLiteral())
+                            {
+                                // Try to convert a verbatim string into a standard string
+                                formatLiteralText = SymbolDisplay.FormatLiteral(formatExpression.Token.ValueText, true);
+                                if (formatLiteralText.StartsWith("@"))
+                                    return null; // The format string contains a newline
+                            }
 
                             interpolation = interpolation.WithFormatClause(
                                 InterpolationFormatClause(
@@ -160,7 +169,7 @@ public class UseStringInterpolationCodeFixProvider : CodeFixProvider
                                     Token(
                                         SyntaxTriviaList.Empty,
                                         SyntaxKind.InterpolatedStringTextToken,
-                                        GetNonVerbatimStringTokenInnerText(formatExpression.Token.Text),
+                                        GetNonVerbatimStringTokenInnerText(formatLiteralText),
                                         formatExpression.Token.ValueText,
                                         SyntaxTriviaList.Empty
                                     )
