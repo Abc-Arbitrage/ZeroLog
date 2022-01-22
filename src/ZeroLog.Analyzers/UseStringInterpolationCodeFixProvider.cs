@@ -144,7 +144,16 @@ public class UseStringInterpolationCodeFixProvider : CodeFixProvider
 
                 default:
                 {
-                    var interpolation = Interpolation((ExpressionSyntax)valueSyntaxNode);
+                    var expression = (ExpressionSyntax)valueSyntaxNode;
+
+                    // Wrap the expression in parentheses if it contains a non-parenthesized conditional expression, in order for the colon token to be parsed correctly
+                    if (expression.DescendantNodesAndSelf(n => n.Kind() is not (SyntaxKind.ParenthesizedExpression or SyntaxKind.InvocationExpression))
+                                  .Any(n => n.IsKind(SyntaxKind.ConditionalExpression)))
+                    {
+                        expression = ParenthesizedExpression(expression);
+                    }
+
+                    var interpolation = Interpolation(expression);
 
                     if (invocationOperation.Arguments.Length > 1)
                     {

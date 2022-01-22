@@ -232,6 +232,81 @@ class C
     }
 
     [Test]
+    public Task should_add_parentheses_for_conditional_expressions()
+    {
+        var test = new Test
+        {
+            TestCode = @"
+using System;
+
+class C
+{
+    void M1(ZeroLog.Log log, bool condition)
+    {
+        log.{|#0:Info|}().Append(condition ? ""Foo"" : ""Bar"").Log();
+    }
+
+    void M2(ZeroLog.Log log, bool condition)
+    {
+        string str = null;
+        log.{|#1:Info|}().Append(str ??= condition ? ""Foo"" : ""Bar"").Log();
+    }
+
+    void M3(ZeroLog.Log log, bool condition)
+    {
+        string str = null;
+        log.{|#2:Info|}().Append(str ??= (condition ? ""Foo"" : ""Bar"")).Log();
+    }
+
+    void M4(ZeroLog.Log log, bool condition)
+    {
+        log.{|#3:Info|}().Append(GetValue(condition ? ""Foo"" : ""Bar"")).Log();
+        string GetValue(string value) => value;
+    }
+}
+",
+            FixedCode = @"
+using System;
+
+class C
+{
+    void M1(ZeroLog.Log log, bool condition)
+    {
+        log.Info($""{(condition ? ""Foo"" : ""Bar"")}"");
+    }
+
+    void M2(ZeroLog.Log log, bool condition)
+    {
+        string str = null;
+        log.Info($""{(str ??= condition ? ""Foo"" : ""Bar"")}"");
+    }
+
+    void M3(ZeroLog.Log log, bool condition)
+    {
+        string str = null;
+        log.Info($""{str ??= (condition ? ""Foo"" : ""Bar"")}"");
+    }
+
+    void M4(ZeroLog.Log log, bool condition)
+    {
+        log.Info($""{GetValue(condition ? ""Foo"" : ""Bar"")}"");
+        string GetValue(string value) => value;
+    }
+}
+",
+            ExpectedDiagnostics =
+            {
+                new DiagnosticResult(UseStringInterpolationAnalyzer.UseStringInterpolationDiagnostic).WithLocation(0),
+                new DiagnosticResult(UseStringInterpolationAnalyzer.UseStringInterpolationDiagnostic).WithLocation(1),
+                new DiagnosticResult(UseStringInterpolationAnalyzer.UseStringInterpolationDiagnostic).WithLocation(2),
+                new DiagnosticResult(UseStringInterpolationAnalyzer.UseStringInterpolationDiagnostic).WithLocation(3)
+            }
+        };
+
+        return test.RunAsync();
+    }
+
+    [Test]
     public Task should_treat_verbatim_strings_as_expressions()
     {
         var test = new Test
