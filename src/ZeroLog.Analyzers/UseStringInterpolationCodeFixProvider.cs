@@ -132,8 +132,8 @@ public class UseStringInterpolationCodeFixProvider : CodeFixProvider
                             Token(
                                 SyntaxTriviaList.Empty,
                                 SyntaxKind.InterpolatedStringTextToken,
-                                GetNonVerbatimStringTokenInnerText(literalSyntax.Token.Text),
-                                literalSyntax.Token.ValueText,
+                                EscapeBraces(GetNonVerbatimStringTokenInnerText(literalSyntax.Token.Text)),
+                                EscapeBraces(literalSyntax.Token.ValueText),
                                 SyntaxTriviaList.Empty
                             )
                         )
@@ -261,4 +261,7 @@ public class UseStringInterpolationCodeFixProvider : CodeFixProvider
 
     private static string GetNonVerbatimStringTokenInnerText(string text)
         => text.Substring(1, text.Length - 2);
+
+    private static string EscapeBraces(string text)
+        => text.Replace("{", "{{").Replace("}", "}}");
 }
