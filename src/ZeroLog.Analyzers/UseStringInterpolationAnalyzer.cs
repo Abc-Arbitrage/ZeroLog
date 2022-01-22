@@ -79,10 +79,9 @@ public class UseStringInterpolationAnalyzer : DiagnosticAnalyzer
                 return;
 
             var rootMethodInvocation = FindSimplifiableLogBuilderInvocationOperation(invocation.Instance);
+
             if (rootMethodInvocation?.Syntax is InvocationExpressionSyntax { Expression: MemberAccessExpressionSyntax expressionSyntax })
-            {
                 operationContext.ReportDiagnostic(Diagnostic.Create(UseStringInterpolationDiagnostic, expressionSyntax.Name.GetLocation()));
-            }
         }
 
         private IInvocationOperation? FindSimplifiableLogBuilderInvocationOperation(IOperation? operation)
@@ -98,6 +97,18 @@ public class UseStringInterpolationAnalyzer : DiagnosticAnalyzer
                 {
                     if (invocationOperation.TargetMethod.Name is not ("Append" or "AppendEnum"))
                         return null;
+
+                    var valueArgument = invocationOperation.Arguments.FirstOrDefault(i => i.Parameter?.Ordinal == 0);
+                    if (valueArgument is null)
+                        return null;
+
+                    // Don't suggest a simplification if there is a verbatim string interpolation
+                    if (valueArgument.Value.Kind == OperationKind.InterpolatedString
+                        && valueArgument.Value.Syntax is InterpolatedStringExpressionSyntax interpolatedStringSyntax
+                        && interpolatedStringSyntax.StringStartToken.IsKind(SyntaxKind.InterpolatedVerbatimStringStartToken))
+                    {
+                        return null;
+                    }
 
                     if (invocationOperation.Arguments.Length > 1)
                     {

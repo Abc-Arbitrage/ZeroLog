@@ -110,7 +110,7 @@ public class UseStringInterpolationCodeFixProvider : CodeFixProvider
             if (semanticModel.GetOperation(invocation, cancellationToken) is not IInvocationOperation invocationOperation)
                 return null;
 
-            var valueOperation = invocationOperation.Arguments.FirstOrDefault(i => i.Parameter?.Name == "value")?.Value;
+            var valueOperation = invocationOperation.Arguments.FirstOrDefault(i => i.Parameter?.Ordinal == 0)?.Value;
             if (valueOperation is null)
                 return null;
 

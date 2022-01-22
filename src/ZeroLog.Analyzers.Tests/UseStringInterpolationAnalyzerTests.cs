@@ -113,6 +113,25 @@ class C
         return test.RunAsync();
     }
 
+    [Test]
+    public Task should_not_report_interpolation_opportunity_when_verbatim_inner_interpolations_are_used()
+    {
+        var test = new Test
+        {
+            Source = @"
+class C
+{
+    const string format = ""X"";
+
+    void M(ZeroLog.Log log)
+        => log.Info().Append($@"""").Log();
+}
+"
+        };
+
+        return test.RunAsync();
+    }
+
     private class Test : ZeroLogAnalyzerTest<UseStringInterpolationAnalyzer>
     {
     }
