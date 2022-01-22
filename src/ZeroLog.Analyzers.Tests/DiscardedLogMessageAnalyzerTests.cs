@@ -12,7 +12,7 @@ public class DiscardedLogMessageAnalyzerTests
     {
         var test = new Test
         {
-            Source = @"
+            TestCode = @"
 class C
 {
     void M(ZeroLog.Log log)
@@ -29,7 +29,7 @@ class C
     {
         var test = new Test
         {
-            Source = @"
+            TestCode = @"
 class C
 {
     void M(ZeroLog.Log log)
@@ -50,7 +50,7 @@ class C
     {
         var test = new Test
         {
-            Source = @"
+            TestCode = @"
 class C
 {
     void M(ZeroLog.Log log)
@@ -67,7 +67,7 @@ class C
     {
         var test = new Test
         {
-            Source = @"
+            TestCode = @"
 class C
 {
     void M()
@@ -91,7 +91,7 @@ class C
     {
         var test = new Test
         {
-            Source = @"
+            TestCode = @"
 class C
 {
     ZeroLog.LogMessage M(ZeroLog.Log log)

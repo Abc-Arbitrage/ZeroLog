@@ -24,14 +24,9 @@ internal static class ZeroLogAnalyzerTest
     }
 }
 
-internal class ZeroLogAnalyzerTest<TAnalyzer> : CSharpAnalyzerTest<TAnalyzer, NUnitVerifier>
+internal abstract class ZeroLogAnalyzerTest<TAnalyzer> : CSharpAnalyzerTest<TAnalyzer, NUnitVerifier>
     where TAnalyzer : DiagnosticAnalyzer, new()
 {
-    public string Source
-    {
-        set => TestState.Sources.Add(value);
-    }
-
     public LanguageVersion LanguageVersion { get; init; } = LanguageVersion.Default;
 
     protected ZeroLogAnalyzerTest()
@@ -43,7 +38,7 @@ internal class ZeroLogAnalyzerTest<TAnalyzer> : CSharpAnalyzerTest<TAnalyzer, NU
         => ((CSharpParseOptions)base.CreateParseOptions()).WithLanguageVersion(LanguageVersion);
 }
 
-internal class ZeroLogCodeFixTest<TAnalyzer, TCodeFix> : CSharpCodeFixTest<TAnalyzer, TCodeFix, NUnitVerifier>
+internal abstract class ZeroLogCodeFixTest<TAnalyzer, TCodeFix> : CSharpCodeFixTest<TAnalyzer, TCodeFix, NUnitVerifier>
     where TAnalyzer : DiagnosticAnalyzer, new()
     where TCodeFix : CodeFixProvider, new()
 {

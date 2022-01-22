@@ -34,15 +34,18 @@ public class UseStringInterpolationAnalyzer : DiagnosticAnalyzer
 
     private static void AnalyzeCompilationStart(CompilationStartAnalysisContext compilationStartContext)
     {
-        if (((CSharpCompilation)compilationStartContext.Compilation).LanguageVersion < LanguageVersion.CSharp10)
+        var compilation = (CSharpCompilation)compilationStartContext.Compilation;
+
+        if (compilation.LanguageVersion < LanguageVersion.CSharp10)
             return;
 
-        var logType = compilationStartContext.Compilation.GetTypeByMetadataName("ZeroLog.Log");
-        var logMessageType = compilationStartContext.Compilation.GetTypeByMetadataName("ZeroLog.LogMessage");
+        var logType = compilation.GetTypeByMetadataName(ZeroLogFacts.TypeNames.Log);
+        var logMessageType = compilation.GetTypeByMetadataName(ZeroLogFacts.TypeNames.LogMessage);
+
         if (logType is null || logMessageType is null)
             return;
 
-        var logMethod = logMessageType.GetMembers("Log")
+        var logMethod = logMessageType.GetMembers(ZeroLogFacts.MethodNames.Log)
                                       .Where(i => i.Kind == SymbolKind.Method)
                                       .OfType<IMethodSymbol>()
                                       .FirstOrDefault(i => i.Parameters.IsEmpty && i.ReturnsVoid && !i.IsStatic);
@@ -86,16 +89,16 @@ public class UseStringInterpolationAnalyzer : DiagnosticAnalyzer
 
         private IInvocationOperation? FindSimplifiableLogBuilderInvocationOperation(IOperation? operation)
         {
-            while (operation is not null)
+            while (true)
             {
-                if (operation.Kind != OperationKind.Invocation)
-                    break;
+                if (operation?.Kind != OperationKind.Invocation)
+                    return null;
 
                 var invocationOperation = (IInvocationOperation)operation;
 
                 if (SymbolEqualityComparer.Default.Equals(invocationOperation.TargetMethod.ContainingType, _logMessageTypeSymbol))
                 {
-                    if (invocationOperation.TargetMethod.Name is not ("Append" or "AppendEnum"))
+                    if (invocationOperation.TargetMethod.Name is not (ZeroLogFacts.MethodNames.Append or ZeroLogFacts.MethodNames.AppendEnum))
                         return null;
 
                     var valueArgument = invocationOperation.Arguments.FirstOrDefault(i => i.Parameter?.Ordinal == 0);
@@ -113,7 +116,7 @@ public class UseStringInterpolationAnalyzer : DiagnosticAnalyzer
                     if (invocationOperation.Arguments.Length > 1)
                     {
                         // The format string needs to be a literal
-                        var formatArgument = invocationOperation.Arguments.FirstOrDefault(i => i.Parameter?.Name == "format");
+                        var formatArgument = invocationOperation.Arguments.FirstOrDefault(i => i.Parameter?.Name is ZeroLogFacts.ParameterNames.FormatString);
                         if (formatArgument != null && formatArgument.Value.Kind != OperationKind.Literal)
                             return null;
                     }
@@ -122,11 +125,8 @@ public class UseStringInterpolationAnalyzer : DiagnosticAnalyzer
                 }
                 else if (SymbolEqualityComparer.Default.Equals(invocationOperation.TargetMethod.ContainingType, _logTypeSymbol))
                 {
-                    if (invocationOperation.TargetMethod.Parameters.IsEmpty
-                        && invocationOperation.TargetMethod.Name is "Trace" or "Debug" or "Info" or "Warn" or "Error" or "Fatal")
-                    {
+                    if (invocationOperation.TargetMethod.Parameters.IsEmpty && ZeroLogFacts.IsLogLevelName(invocationOperation.TargetMethod.Name))
                         return invocationOperation;
-                    }
 
                     return null;
                 }
@@ -135,8 +135,6 @@ public class UseStringInterpolationAnalyzer : DiagnosticAnalyzer
                     return null;
                 }
             }
-
-            return null;
         }
     }
 }

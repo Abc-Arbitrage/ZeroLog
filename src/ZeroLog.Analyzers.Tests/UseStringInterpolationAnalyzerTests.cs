@@ -12,7 +12,7 @@ public class UseStringInterpolationAnalyzerTests
     {
         var test = new Test
         {
-            Source = @"
+            TestCode = @"
 class C
 {
     void M(ZeroLog.Log log)
@@ -33,7 +33,7 @@ class C
     {
         var test = new Test
         {
-            Source = @"
+            TestCode = @"
 class C
 {
     void M(ZeroLog.Log log)
@@ -54,7 +54,7 @@ class C
     {
         var test = new Test
         {
-            Source = @"
+            TestCode = @"
 class C
 {
     void M(ZeroLog.Log log)
@@ -71,7 +71,7 @@ class C
     {
         var test = new Test
         {
-            Source = @"
+            TestCode = @"
 class C
 {
     void M1(ZeroLog.Log log)
@@ -96,7 +96,7 @@ class C
     {
         var test = new Test
         {
-            Source = @"
+            TestCode = @"
 class C
 {
     const string format = ""X"";
@@ -118,7 +118,7 @@ class C
     {
         var test = new Test
         {
-            Source = @"
+            TestCode = @"
 class C
 {
     const string format = ""X"";

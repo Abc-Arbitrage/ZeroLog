@@ -30,13 +30,13 @@ public class DiscardedLogMessageAnalyzer : DiagnosticAnalyzer
         context.RegisterCompilationStartAction(AnalyzeCompilationStart);
     }
 
-    private static void AnalyzeCompilationStart(CompilationStartAnalysisContext context)
+    private static void AnalyzeCompilationStart(CompilationStartAnalysisContext compilationStartContext)
     {
-        var logMessageType = context.Compilation.GetTypeByMetadataName("ZeroLog.LogMessage");
+        var logMessageType = compilationStartContext.Compilation.GetTypeByMetadataName(ZeroLogFacts.TypeNames.LogMessage);
         if (logMessageType is null)
             return;
 
-        context.RegisterOperationAction(
+        compilationStartContext.RegisterOperationAction(
             operationContext =>
             {
                 var operation = (IExpressionStatementOperation)operationContext.Operation;

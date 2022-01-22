@@ -14,7 +14,7 @@ public class LegacyStringInterpolationAnalyzerTests
         var test = new Test
         {
             LanguageVersion = LanguageVersion.CSharp10,
-            Source = @"
+            TestCode = @"
 class C
 {
     void M(ZeroLog.Log log)
@@ -32,7 +32,7 @@ class C
         var test = new Test
         {
             LanguageVersion = LanguageVersion.CSharp9,
-            Source = @"
+            TestCode = @"
 class C
 {
     void M(ZeroLog.Log log)
@@ -54,7 +54,7 @@ class C
         var test = new Test
         {
             LanguageVersion = LanguageVersion.CSharp9,
-            Source = @"
+            TestCode = @"
 class C
 {
     void M(ZeroLog.LogMessage message)
@@ -75,7 +75,7 @@ class C
     {
         var test = new Test
         {
-            Source = @"
+            TestCode = @"
 class C
 {
     void M()

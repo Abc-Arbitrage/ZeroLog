@@ -31,35 +31,31 @@ public class LegacyStringInterpolationAnalyzer : DiagnosticAnalyzer
         context.RegisterCompilationStartAction(AnalyzeCompilationStart);
     }
 
-    private static void AnalyzeCompilationStart(CompilationStartAnalysisContext context)
+    private static void AnalyzeCompilationStart(CompilationStartAnalysisContext compilationStartContext)
     {
-        if (((CSharpCompilation)context.Compilation).LanguageVersion >= LanguageVersion.CSharp10)
+        var compilation = (CSharpCompilation)compilationStartContext.Compilation;
+
+        if (compilation.LanguageVersion >= LanguageVersion.CSharp10)
             return;
 
-        var logType = context.Compilation.GetTypeByMetadataName("ZeroLog.Log");
-        var logMessageType = context.Compilation.GetTypeByMetadataName("ZeroLog.LogMessage");
+        var logType = compilation.GetTypeByMetadataName(ZeroLogFacts.TypeNames.Log);
+        var logMessageType = compilation.GetTypeByMetadataName(ZeroLogFacts.TypeNames.LogMessage);
 
         if (logType is null || logMessageType is null)
             return;
 
         var stringParameters = logType.GetMembers()
-                                      .Where(
-                                          m => m.Kind == SymbolKind.Method
-                                               && m.Name is "Trace" or "Debug" or "Info" or "Warn" or "Error" or "Fatal"
-                                      )
+                                      .Where(m => m.Kind == SymbolKind.Method && ZeroLogFacts.IsLogLevelName(m.Name))
                                       .Concat(
-                                          logMessageType.GetMembers()
-                                                        .Where(
-                                                            m => m.Kind == SymbolKind.Method
-                                                                 && m.Name is "Append"
-                                                        )
+                                          logMessageType.GetMembers(ZeroLogFacts.MethodNames.Append)
+                                                        .Where(m => m.Kind == SymbolKind.Method)
                                       )
                                       .Cast<IMethodSymbol>()
                                       .Where(m => m.Parameters.Length > 0 && m.Parameters[0].Type.SpecialType == SpecialType.System_String)
                                       .Select(m => m.Parameters[0])
                                       .ToImmutableHashSet(SymbolEqualityComparer.Default);
 
-        context.RegisterOperationAction(
+        compilationStartContext.RegisterOperationAction(
             operationContext =>
             {
                 if (operationContext.Operation.Parent?.Kind != OperationKind.Argument)

@@ -62,7 +62,7 @@ public class UseStringInterpolationCodeFixProvider : CodeFixProvider
             ),
             1 when parts[0] is InterpolatedStringTextSyntax singleTextSyntax => LiteralExpression(
                 SyntaxKind.StringLiteralExpression,
-                Literal('"' + singleTextSyntax.TextToken.Text + '"', singleTextSyntax.TextToken.ValueText)
+                Literal($"\"{singleTextSyntax.TextToken.Text}\"", singleTextSyntax.TextToken.ValueText)
             ),
             _ => InterpolatedStringExpression(
                 Token(SyntaxKind.InterpolatedStringStartToken),
@@ -73,10 +73,7 @@ public class UseStringInterpolationCodeFixProvider : CodeFixProvider
 
         rootNode = rootNode.ReplaceNode(
             logMethodInvocation,
-            logBuilderInvocation.WithArgumentList(
-                                    logBuilderInvocation.ArgumentList
-                                                        .AddArguments(Argument(resultExpression))
-                                )
+            logBuilderInvocation.WithArgumentList(ArgumentList(SeparatedList(new[] { Argument(resultExpression) })))
                                 .WithTrailingTrivia(logMethodInvocation.GetTrailingTrivia())
         );
 
@@ -98,13 +95,13 @@ public class UseStringInterpolationCodeFixProvider : CodeFixProvider
             if (currentNode is not MemberAccessExpressionSyntax { Parent: InvocationExpressionSyntax invocation } memberAccess)
                 return null;
 
-            if (memberAccess.Name.Identifier.Text == "Log")
+            if (memberAccess.Name.Identifier.Text == ZeroLogFacts.MethodNames.Log)
             {
                 logMethodInvocation = invocation;
                 return parts;
             }
 
-            if (memberAccess.Name.Identifier.Text is not ("Append" or "AppendEnum"))
+            if (memberAccess.Name.Identifier.Text is not (ZeroLogFacts.MethodNames.Append or ZeroLogFacts.MethodNames.AppendEnum))
                 return null;
 
             if (semanticModel.GetOperation(invocation, cancellationToken) is not IInvocationOperation invocationOperation)
@@ -121,10 +118,10 @@ public class UseStringInterpolationCodeFixProvider : CodeFixProvider
                 case SyntaxKind.StringLiteralExpression:
                 case SyntaxKind.CharacterLiteralExpression:
                 {
-                    var literalSyntax = (LiteralExpressionSyntax)valueSyntaxNode;
+                    var literal = (LiteralExpressionSyntax)valueSyntaxNode;
 
                     // Verbatim strings have different escaping rules, treat them as separate expressions
-                    if (literalSyntax.Token.IsVerbatimStringLiteral())
+                    if (literal.Token.IsVerbatimStringLiteral())
                         goto default;
 
                     parts.Add(
@@ -132,8 +129,8 @@ public class UseStringInterpolationCodeFixProvider : CodeFixProvider
                             Token(
                                 SyntaxTriviaList.Empty,
                                 SyntaxKind.InterpolatedStringTextToken,
-                                EscapeBraces(GetNonVerbatimStringTokenInnerText(literalSyntax.Token.Text)),
-                                EscapeBraces(literalSyntax.Token.ValueText),
+                                EscapeBraces(GetNonVerbatimStringTokenInnerText(literal.Token.Text)),
+                                EscapeBraces(literal.Token.ValueText),
                                 SyntaxTriviaList.Empty
                             )
                         )
@@ -157,11 +154,11 @@ public class UseStringInterpolationCodeFixProvider : CodeFixProvider
 
                     if (invocationOperation.Arguments.Length > 1)
                     {
-                        var formatValueSyntax = invocationOperation.Arguments.FirstOrDefault(i => i.Parameter?.Name == "format")?.Value.Syntax.WithoutTrivia();
+                        var formatValueSyntax = invocationOperation.Arguments.FirstOrDefault(i => i.Parameter?.Name is ZeroLogFacts.ParameterNames.FormatString)?.Value.Syntax;
 
                         if (formatValueSyntax != null && formatValueSyntax.IsKind(SyntaxKind.StringLiteralExpression))
                         {
-                            var formatExpression = (LiteralExpressionSyntax)formatValueSyntax;
+                            var formatExpression = (LiteralExpressionSyntax)formatValueSyntax.WithoutTrivia();
                             var formatLiteralText = formatExpression.Token.Text;
 
                             if (formatExpression.Token.IsVerbatimStringLiteral())
