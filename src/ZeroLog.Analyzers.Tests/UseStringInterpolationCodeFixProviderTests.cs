@@ -232,6 +232,42 @@ class C
         return test.RunAsync();
     }
 
+    [Test]
+    public Task should_handle_empty_log_message()
+    {
+        var test = new Test
+        {
+            TestCode = @"
+using System;
+
+class C
+{
+    void M(ZeroLog.Log log)
+    {
+        log.{|#0:Info|}().Log();
+    }
+}
+",
+            FixedCode = @"
+using System;
+
+class C
+{
+    void M(ZeroLog.Log log)
+    {
+        log.Info("""");
+    }
+}
+",
+            ExpectedDiagnostics =
+            {
+                new DiagnosticResult(UseStringInterpolationAnalyzer.UseStringInterpolationDiagnostic).WithLocation(0)
+            }
+        };
+
+        return test.RunAsync();
+    }
+
     private class Test : ZeroLogCodeFixTest<UseStringInterpolationAnalyzer, UseStringInterpolationCodeFixProvider>
     {
     }

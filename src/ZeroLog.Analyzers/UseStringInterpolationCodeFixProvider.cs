@@ -54,16 +54,22 @@ public class UseStringInterpolationCodeFixProvider : CodeFixProvider
 
         parts = ConcatInterpolationStringTexts(FlattenNestedInterpolations(parts)).ToList();
 
-        ExpressionSyntax resultExpression = parts.Count == 1 && parts[0] is InterpolatedStringTextSyntax singleTextSyntax
-            ? LiteralExpression(
+        ExpressionSyntax resultExpression = parts.Count switch
+        {
+            0 => LiteralExpression(
+                SyntaxKind.StringLiteralExpression,
+                Literal(string.Empty)
+            ),
+            1 when parts[0] is InterpolatedStringTextSyntax singleTextSyntax => LiteralExpression(
                 SyntaxKind.StringLiteralExpression,
                 Literal('"' + singleTextSyntax.TextToken.Text + '"', singleTextSyntax.TextToken.ValueText)
-            )
-            : InterpolatedStringExpression(
+            ),
+            _ => InterpolatedStringExpression(
                 Token(SyntaxKind.InterpolatedStringStartToken),
                 new SyntaxList<InterpolatedStringContentSyntax>(parts),
                 Token(SyntaxKind.InterpolatedStringEndToken)
-            );
+            )
+        };
 
         rootNode = rootNode.ReplaceNode(
             logMethodInvocation,
