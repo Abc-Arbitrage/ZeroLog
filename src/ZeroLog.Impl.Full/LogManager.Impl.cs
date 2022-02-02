@@ -226,7 +226,7 @@ namespace ZeroLog
                 formattedLogMessage.SetMessage(logMessage);
 
                 foreach (var appender in appenders)
-                    appender.WriteMessage(formattedLogMessage);
+                    appender.InternalWriteMessage(formattedLogMessage, _config);
             }
             finally
             {

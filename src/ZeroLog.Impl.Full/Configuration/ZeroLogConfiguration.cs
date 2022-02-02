@@ -14,11 +14,13 @@ public sealed class ZeroLogConfiguration
     public int LogMessageBufferSize { get; init; } = 128;
     public int LogMessageStringCapacity { get; init; } = 32;
 
-    public bool AutoRegisterEnums { get; init; }
+    public bool AutoRegisterEnums { get; init; } = false;
 
     public string NullDisplayString { get; init; } = "null";
     public string TruncatedMessageSuffix { get; init; } = " [TRUNCATED]";
     public string JsonSeparator { get; init; } = " ~~ ";
+
+    public TimeSpan AppenderQuarantineDelay { get; init; } = TimeSpan.FromSeconds(15);
 
     public LoggerConfiguration RootLogger { get; } = new(string.Empty);
     public ICollection<LoggerConfiguration> Loggers { get; private set; } = new List<LoggerConfiguration>();
