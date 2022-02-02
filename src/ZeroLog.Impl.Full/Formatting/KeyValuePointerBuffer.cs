@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace ZeroLog;
+namespace ZeroLog.Formatting;
 
 internal class KeyValuePointerBuffer
 {

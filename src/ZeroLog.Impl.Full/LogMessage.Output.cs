@@ -3,6 +3,7 @@ using System.Buffers;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using ZeroLog.Configuration;
+using ZeroLog.Formatting;
 
 namespace ZeroLog;
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using ZeroLog.Formatting;
 
 namespace ZeroLog.Appenders
 {

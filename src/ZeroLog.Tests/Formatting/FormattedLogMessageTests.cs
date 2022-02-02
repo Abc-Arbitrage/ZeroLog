@@ -2,11 +2,11 @@ using System;
 using System.Runtime.InteropServices;
 using System.Text;
 using NUnit.Framework;
-using ZeroLog.Appenders;
 using ZeroLog.Configuration;
+using ZeroLog.Formatting;
 using ZeroLog.Tests.Support;
 
-namespace ZeroLog.Tests.Appenders;
+namespace ZeroLog.Tests.Formatting;
 
 [TestFixture]
 public unsafe class FormattedLogMessageTests

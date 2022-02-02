@@ -3,6 +3,7 @@ using Moq;
 using NUnit.Framework;
 using ZeroLog.Appenders;
 using ZeroLog.Configuration;
+using ZeroLog.Formatting;
 using ZeroLog.Utils;
 
 namespace ZeroLog.Tests.Appenders;

@@ -7,7 +7,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using NFluent;
 using NUnit.Framework;
-using ZeroLog.Appenders;
 using ZeroLog.Configuration;
 using ZeroLog.Tests.Support;
 

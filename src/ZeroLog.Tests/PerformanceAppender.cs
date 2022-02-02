@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using ZeroLog.Appenders;
+using ZeroLog.Formatting;
 
 namespace ZeroLog.Tests
 {

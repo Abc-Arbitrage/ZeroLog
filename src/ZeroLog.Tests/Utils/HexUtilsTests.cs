@@ -1,6 +1,4 @@
-﻿using System;
-using NUnit.Framework;
-using ZeroLog.Utils;
+﻿using NUnit.Framework;
 
 namespace ZeroLog.Tests.Utils;
 

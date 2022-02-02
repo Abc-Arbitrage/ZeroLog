@@ -2,9 +2,8 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using ZeroLog.Configuration;
-using ZeroLog.Utils;
 
-namespace ZeroLog.Appenders;
+namespace ZeroLog.Formatting;
 
 public class FormattedLogMessage
 {

@@ -1,9 +1,4 @@
-﻿using System.Linq;
-using Newtonsoft.Json;
-using NFluent;
-using NUnit.Framework;
-using ZeroLog.Appenders;
-using ZeroLog.Configuration;
+﻿using NUnit.Framework;
 
 namespace ZeroLog.Tests.Config
 {

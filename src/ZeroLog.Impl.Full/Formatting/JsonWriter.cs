@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 using ZeroLog.Configuration;
-using ZeroLog.Utils;
 
-namespace ZeroLog;
+namespace ZeroLog.Formatting;
 
 internal unsafe class JsonWriter
 {

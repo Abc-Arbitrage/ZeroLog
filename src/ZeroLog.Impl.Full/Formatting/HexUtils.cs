@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ZeroLog.Utils
+namespace ZeroLog.Formatting
 {
     internal static class HexUtils
     {

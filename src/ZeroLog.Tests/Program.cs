@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Linq;
-using System.Runtime;
-using ZeroLog.Appenders;
 
 namespace ZeroLog.Tests
 {

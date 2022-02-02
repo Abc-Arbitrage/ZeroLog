@@ -1,8 +1,8 @@
 using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using JetBrains.Annotations;
 using ZeroLog.Appenders;
+using ZeroLog.Formatting;
 
 namespace ZeroLog.Tests
 {

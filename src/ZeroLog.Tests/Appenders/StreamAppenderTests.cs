@@ -4,6 +4,7 @@ using System.Threading;
 using NUnit.Framework;
 using ZeroLog.Appenders;
 using ZeroLog.Configuration;
+using ZeroLog.Formatting;
 using ZeroLog.Tests.Support;
 
 namespace ZeroLog.Tests.Appenders;

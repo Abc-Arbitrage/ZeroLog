@@ -4,6 +4,7 @@ using NFluent;
 using NUnit.Framework;
 using ZeroLog.Appenders;
 using ZeroLog.Configuration;
+using ZeroLog.Formatting;
 
 namespace ZeroLog.Tests.Appenders
 {

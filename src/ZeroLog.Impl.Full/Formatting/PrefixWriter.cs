@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text.RegularExpressions;
-using ZeroLog.Utils;
 
-namespace ZeroLog.Appenders;
+namespace ZeroLog.Formatting;
 
 internal class PrefixWriter
 {

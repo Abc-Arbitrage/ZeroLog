@@ -1,4 +1,5 @@
 ﻿using System;
+using ZeroLog.Formatting;
 
 namespace ZeroLog.Appenders;
 

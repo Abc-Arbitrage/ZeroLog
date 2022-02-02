@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Threading;
 using ZeroLog.Appenders;
 using ZeroLog.Configuration;
+using ZeroLog.Formatting;
 
 namespace ZeroLog
 {

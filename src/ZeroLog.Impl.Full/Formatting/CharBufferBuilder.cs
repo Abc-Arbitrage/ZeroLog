@@ -3,7 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 
-namespace ZeroLog.Utils;
+namespace ZeroLog.Formatting;
 
 [SuppressMessage("ReSharper", "ReplaceSliceWithRangeIndexer")]
 internal ref struct CharBufferBuilder

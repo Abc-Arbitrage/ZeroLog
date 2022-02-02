@@ -2,6 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using ZeroLog.Configuration;
+using ZeroLog.Formatting;
 using ZeroLog.Utils;
 
 namespace ZeroLog;
