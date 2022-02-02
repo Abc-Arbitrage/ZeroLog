@@ -5,14 +5,23 @@ using ZeroLog.Utils;
 
 namespace ZeroLog;
 
-internal static unsafe class JsonWriter
+internal unsafe class JsonWriter
 {
-    public static void WriteJsonToStringBuffer(ref CharBufferBuilder builder, KeyValuePointerBuffer keyValuePointerBuffer, ZeroLogConfiguration config)
+    private readonly ZeroLogConfiguration _config;
+
+    public readonly KeyValuePointerBuffer KeyValuePointerBuffer = new();
+
+    public JsonWriter(ZeroLogConfiguration config)
+    {
+        _config = config;
+    }
+
+    public void WriteJsonToStringBuffer(ref CharBufferBuilder builder)
     {
         builder.Append('{');
         builder.Append(' ');
 
-        for (var i = 0; i < keyValuePointerBuffer.KeyPointerCount; i++)
+        for (var i = 0; i < KeyValuePointerBuffer.KeyPointerCount; i++)
         {
             if (i != 0)
             {
@@ -20,21 +29,21 @@ internal static unsafe class JsonWriter
                 builder.Append(' ');
             }
 
-            var dataPointer = keyValuePointerBuffer.GetKeyPointer(i);
+            var dataPointer = KeyValuePointerBuffer.GetKeyPointer(i);
 
-            AppendJsonKey(ref builder, keyValuePointerBuffer.Strings, ref dataPointer);
+            AppendJsonKey(ref builder, KeyValuePointerBuffer.Strings, ref dataPointer);
 
             builder.Append(':');
             builder.Append(' ');
 
-            AppendJsonValue(ref builder, keyValuePointerBuffer.Strings, ref dataPointer, config);
+            AppendJsonValue(ref builder, KeyValuePointerBuffer.Strings, ref dataPointer);
         }
 
         builder.Append(' ');
         builder.Append('}');
     }
 
-    private static void AppendJsonKey(ref CharBufferBuilder builder, string?[] strings, ref byte* dataPointer)
+    private void AppendJsonKey(ref CharBufferBuilder builder, string?[] strings, ref byte* dataPointer)
     {
         ++dataPointer; // ArgType
         var keyIndex = *dataPointer;
@@ -44,7 +53,7 @@ internal static unsafe class JsonWriter
         AppendString(key, ref builder);
     }
 
-    private static void AppendJsonValue(ref CharBufferBuilder builder, string?[] strings, ref byte* dataPointer, ZeroLogConfiguration config)
+    private void AppendJsonValue(ref CharBufferBuilder builder, string?[] strings, ref byte* dataPointer)
     {
         var argumentType = *(ArgumentType*)dataPointer;
         dataPointer += sizeof(ArgumentType);
@@ -159,7 +168,7 @@ internal static unsafe class JsonWriter
                 var enumArg = (EnumArg*)dataPointer;
                 builder.Append('"');
                 var destination = builder.GetRemainingBuffer();
-                enumArg->TryFormat(destination, out var charsWritten, config);
+                enumArg->TryFormat(destination, out var charsWritten, _config);
                 builder.IncrementPos(charsWritten);
                 builder.Append('"');
                 break;

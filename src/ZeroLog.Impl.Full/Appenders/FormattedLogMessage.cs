@@ -10,7 +10,7 @@ public class FormattedLogMessage
 {
     private readonly ZeroLogConfiguration _config;
     private readonly char[] _charBuffer;
-    private readonly KeyValuePointerBuffer _keyValuePointerBuffer = new();
+    private readonly JsonWriter _jsonWriter;
     private int _charLength;
 
     private LogMessage _message = LogMessage.Empty;
@@ -25,6 +25,7 @@ public class FormattedLogMessage
     {
         _config = config;
         _charBuffer = GC.AllocateUninitializedArray<char>(bufferSize);
+        _jsonWriter = new JsonWriter(config);
 
         SetMessage(LogMessage.Empty);
     }
@@ -35,9 +36,9 @@ public class FormattedLogMessage
 
         try
         {
-            _charLength = _message.WriteTo(_charBuffer, _config, false, _keyValuePointerBuffer);
+            _charLength = _message.WriteTo(_charBuffer, _config, false, _jsonWriter.KeyValuePointerBuffer);
 
-            if (_keyValuePointerBuffer.KeyPointerCount != 0)
+            if (_jsonWriter.KeyValuePointerBuffer.KeyPointerCount != 0)
                 AppendKeyValues();
         }
         catch (Exception ex)
@@ -52,7 +53,7 @@ public class FormattedLogMessage
         if (!builder.TryAppendWhole(_config.JsonSeparator))
             return;
 
-        JsonWriter.WriteJsonToStringBuffer(ref builder, _keyValuePointerBuffer, _config);
+        _jsonWriter.WriteJsonToStringBuffer(ref builder);
         _charLength += builder.Length;
     }
 
