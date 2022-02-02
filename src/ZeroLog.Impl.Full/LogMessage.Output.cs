@@ -2,13 +2,14 @@ using System;
 using System.Buffers;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using ZeroLog.Configuration;
 
 namespace ZeroLog;
 
 unsafe partial class LogMessage
 {
     [SuppressMessage("ReSharper", "ReplaceSliceWithRangeIndexer")]
-    internal int WriteTo(Span<char> outputBuffer, bool skipFormat = false, KeyValuePointerBuffer? keyValueBuffer = null)
+    internal int WriteTo(Span<char> outputBuffer, ZeroLogConfiguration config, bool skipFormat = false, KeyValuePointerBuffer? keyValueBuffer = null)
     {
         keyValueBuffer?.Init(_strings);
 
@@ -32,7 +33,7 @@ unsafe partial class LogMessage
                     keyValueBuffer.AddKeyPointer(dataPointer);
             }
 
-            var isTruncated = !TryWriteArg(ref dataPointer, outputBuffer.Slice(bufferIndex), out var charsWritten, skipFormat);
+            var isTruncated = !TryWriteArg(ref dataPointer, outputBuffer.Slice(bufferIndex), out var charsWritten, skipFormat, config);
             bufferIndex += charsWritten;
 
             if (isTruncated)
@@ -46,7 +47,7 @@ unsafe partial class LogMessage
 
         outputTruncated:
         {
-            var suffix = LogManager.Config.TruncatedMessageSuffix;
+            var suffix = config.TruncatedMessageSuffix;
 
             if (bufferIndex + suffix.Length <= outputBuffer.Length)
             {
@@ -72,7 +73,7 @@ unsafe partial class LogMessage
         }
     }
 
-    private bool TryWriteArg(ref byte* dataPointer, Span<char> outputBuffer, out int charsWritten, bool skipFormat)
+    private bool TryWriteArg(ref byte* dataPointer, Span<char> outputBuffer, out int charsWritten, bool skipFormat, ZeroLogConfiguration config)
     {
         var argType = *(ArgumentType*)dataPointer;
         dataPointer += sizeof(ArgumentType);
@@ -123,7 +124,7 @@ unsafe partial class LogMessage
 
             case ArgumentType.Null:
             {
-                var value = LogManager.Config.NullDisplayString;
+                var value = config.NullDisplayString;
 
                 if (value.Length <= outputBuffer.Length)
                 {
@@ -296,7 +297,7 @@ unsafe partial class LogMessage
                 var valuePtr = (EnumArg*)dataPointer;
                 dataPointer += sizeof(EnumArg);
 
-                return valuePtr->TryFormat(outputBuffer, out charsWritten);
+                return valuePtr->TryFormat(outputBuffer, out charsWritten, config);
             }
 
             case ArgumentType.AsciiString:
@@ -323,7 +324,7 @@ unsafe partial class LogMessage
 
                 if (!skipFormat)
                 {
-                    if (!headerPtr->TryAppendTo(dataPointer, outputBuffer, out charsWritten, format))
+                    if (!headerPtr->TryAppendTo(dataPointer, outputBuffer, out charsWritten, format, config))
                         return false;
                 }
                 else
@@ -541,7 +542,7 @@ unsafe partial class LogMessage
 
         var buffer = ArrayPool<char>.Shared.Rent(4 * 1024);
 
-        var chars = WriteTo(buffer);
+        var chars = WriteTo(buffer, ZeroLogConfiguration.Default);
         var value = new string(buffer.AsSpan(0, chars));
 
         ArrayPool<char>.Shared.Return(buffer);

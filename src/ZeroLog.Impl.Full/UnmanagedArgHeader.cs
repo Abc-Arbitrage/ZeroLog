@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
+using ZeroLog.Configuration;
 using ZeroLog.Utils;
 
 namespace ZeroLog;
@@ -21,10 +22,10 @@ internal unsafe struct UnmanagedArgHeader
         _typeSize = typeSize;
     }
 
-    public bool TryAppendTo(byte* valuePtr, Span<char> destination, out int charsWritten, string? format)
+    public bool TryAppendTo(byte* valuePtr, Span<char> destination, out int charsWritten, string? format, ZeroLogConfiguration config)
     {
         if (UnmanagedCache.TryGetFormatter(_typeHandle, out var formatter))
-            return formatter.Invoke(valuePtr, destination, out charsWritten, format);
+            return formatter.Invoke(valuePtr, destination, out charsWritten, format, config);
 
         return TryAppendUnformattedTo(valuePtr, destination, out charsWritten);
     }

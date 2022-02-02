@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using ZeroLog.Configuration;
 using ZeroLog.Utils;
 
 namespace ZeroLog;
@@ -22,7 +23,8 @@ internal static unsafe class UnmanagedCache
         byte* valuePtr,
         Span<char> destination,
         out int charsWritten,
-        ReadOnlySpan<char> format
+        ReadOnlySpan<char> format,
+        ZeroLogConfiguration config
     );
 
     private static readonly Dictionary<IntPtr, FormatterDelegate> _unmanagedStructs = new();
@@ -47,11 +49,11 @@ internal static unsafe class UnmanagedCache
     {
         lock (_unmanagedStructs)
         {
-            _unmanagedStructs[typeof(T).TypeHandle.Value] = (byte* valuePtr, Span<char> destination, out int charsWritten, ReadOnlySpan<char> format)
+            _unmanagedStructs[typeof(T).TypeHandle.Value] = (byte* valuePtr, Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, ZeroLogConfiguration config)
                 => FormatterGeneric(valuePtr, destination, out charsWritten, format, formatter);
 
-            _unmanagedStructs[typeof(T?).TypeHandle.Value] = (byte* valuePtr, Span<char> destination, out int charsWritten, ReadOnlySpan<char> format)
-                => FormatterGenericNullable(valuePtr, destination, out charsWritten, format, formatter);
+            _unmanagedStructs[typeof(T?).TypeHandle.Value] = (byte* valuePtr, Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, ZeroLogConfiguration config)
+                => FormatterGenericNullable(valuePtr, destination, out charsWritten, format, formatter, config);
         }
     }
 
@@ -75,7 +77,12 @@ internal static unsafe class UnmanagedCache
         return true;
     }
 
-    private static bool FormatterGenericNullable<T>(byte* valuePtr, Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, UnmanagedFormatterDelegate<T>? typedFormatter)
+    private static bool FormatterGenericNullable<T>(byte* valuePtr,
+                                                    Span<char> destination,
+                                                    out int charsWritten,
+                                                    ReadOnlySpan<char> format,
+                                                    UnmanagedFormatterDelegate<T>? typedFormatter,
+                                                    ZeroLogConfiguration config)
         where T : unmanaged
     {
         ref var typedValueRef = ref Unsafe.AsRef<T?>(valuePtr);
@@ -92,7 +99,7 @@ internal static unsafe class UnmanagedCache
         }
         else
         {
-            var value = LogManager.Config.NullDisplayString;
+            var value = config.NullDisplayString;
             charsWritten = 0;
 
             if (value.TryCopyTo(destination))

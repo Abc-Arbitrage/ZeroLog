@@ -1,12 +1,14 @@
 using System;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using ZeroLog.Configuration;
 using ZeroLog.Utils;
 
 namespace ZeroLog.Appenders;
 
 public class FormattedLogMessage
 {
+    private readonly ZeroLogConfiguration _config;
     private readonly char[] _charBuffer;
     private readonly KeyValuePointerBuffer _keyValuePointerBuffer = new();
     private int _charLength;
@@ -19,8 +21,9 @@ public class FormattedLogMessage
     public Exception? Exception => _message.Exception;
     public string? LoggerName => _message.Logger?.Name;
 
-    internal FormattedLogMessage(int bufferSize)
+    internal FormattedLogMessage(int bufferSize, ZeroLogConfiguration config)
     {
+        _config = config;
         _charBuffer = GC.AllocateUninitializedArray<char>(bufferSize);
 
         SetMessage(LogMessage.Empty);
@@ -32,7 +35,7 @@ public class FormattedLogMessage
 
         try
         {
-            _charLength = _message.WriteTo(_charBuffer, false, _keyValuePointerBuffer);
+            _charLength = _message.WriteTo(_charBuffer, _config, false, _keyValuePointerBuffer);
 
             if (_keyValuePointerBuffer.KeyPointerCount != 0)
                 AppendKeyValues();
@@ -46,10 +49,10 @@ public class FormattedLogMessage
     private void AppendKeyValues()
     {
         var builder = new CharBufferBuilder(_charBuffer.AsSpan(_charLength));
-        if (!builder.TryAppendWhole(LogManager.Config.JsonSeparator))
+        if (!builder.TryAppendWhole(_config.JsonSeparator))
             return;
 
-        JsonWriter.WriteJsonToStringBuffer(ref builder, _keyValuePointerBuffer);
+        JsonWriter.WriteJsonToStringBuffer(ref builder, _keyValuePointerBuffer, _config);
         _charLength += builder.Length;
     }
 
@@ -63,7 +66,7 @@ public class FormattedLogMessage
             builder.TryAppendPartial(ex.Message);
             builder.TryAppendPartial(" - Unformatted message: ");
 
-            var length = _message.WriteTo(builder.GetRemainingBuffer(), true);
+            var length = _message.WriteTo(builder.GetRemainingBuffer(), _config, true);
             _charLength = builder.Length + length;
         }
         catch

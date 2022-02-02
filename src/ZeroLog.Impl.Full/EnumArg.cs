@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using ZeroLog.Configuration;
 using ZeroLog.Utils;
 
 namespace ZeroLog
@@ -21,9 +22,9 @@ namespace ZeroLog
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool TryFormat(Span<char> destination, out int charsWritten)
+        public bool TryFormat(Span<char> destination, out int charsWritten, ZeroLogConfiguration config)
         {
-            var enumString = GetString();
+            var enumString = GetString(config);
 
             if (enumString != null)
             {
@@ -51,14 +52,14 @@ namespace ZeroLog
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public string? GetString()
+        public string? GetString(ZeroLogConfiguration config)
             => EnumCache.GetString(_typeHandle, _value, out var enumRegistered)
-               ?? GetStringSlow(enumRegistered);
+               ?? GetStringSlow(enumRegistered, config);
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private string? GetStringSlow(bool enumRegistered)
+        private string? GetStringSlow(bool enumRegistered, ZeroLogConfiguration config)
         {
-            if (enumRegistered || !LogManager.Config.LazyRegisterEnums)
+            if (enumRegistered || !config.AutoRegisterEnums)
                 return null;
 
             var type = TypeUtil.GetTypeFromHandle(_typeHandle);

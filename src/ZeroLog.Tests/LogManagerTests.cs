@@ -283,7 +283,7 @@ namespace ZeroLog.Tests
 
             signal.Wait(TimeSpan.FromMilliseconds(100));
             var message = _testAppender.LoggedMessages.Single();
-            Check.That(message).IsEqualTo(new string('.', LogManager.OutputBufferSize - LogManager.Config.TruncatedMessageSuffix.Length) + LogManager.Config.TruncatedMessageSuffix);
+            Check.That(message).IsEqualTo(new string('.', LogManager.OutputBufferSize - ZeroLogConfiguration.Default.TruncatedMessageSuffix.Length) + ZeroLogConfiguration.Default.TruncatedMessageSuffix);
         }
 
         public struct FailingUnmanagedStruct : ISpanFormattable

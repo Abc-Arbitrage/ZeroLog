@@ -1,6 +1,7 @@
 using System;
 using System.Runtime.InteropServices;
 using NUnit.Framework;
+using ZeroLog.Configuration;
 using ZeroLog.Tests.Support;
 
 namespace ZeroLog.Tests;
@@ -36,7 +37,7 @@ public abstract unsafe partial class LogMessageTests
             () =>
             {
                 action.Invoke();
-                _logMessage.WriteTo(output);
+                _logMessage.WriteTo(output, ZeroLogConfiguration.Default);
             },
             () => _logMessage.Initialize(null, LogLevel.Info)
         );

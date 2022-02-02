@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading;
 using NUnit.Framework;
 using ZeroLog.Appenders;
+using ZeroLog.Configuration;
 using ZeroLog.Tests.Support;
 
 namespace ZeroLog.Tests.Appenders;
@@ -15,7 +16,7 @@ public class StreamAppenderTests
         logMessage = new LogMessage(message);
         logMessage.Initialize(new Log("TestLog"), LogLevel.Info);
 
-        var formattedMessage = new FormattedLogMessage(logMessage.ToString().Length);
+        var formattedMessage = new FormattedLogMessage(logMessage.ToString().Length, ZeroLogConfiguration.Default);
         formattedMessage.SetMessage(logMessage);
 
         return formattedMessage;
@@ -60,7 +61,7 @@ public class StreamAppenderTests
         logMessage.Initialize(new Log("TestLog"), LogLevel.Info);
         logMessage.Exception = new InvalidOperationException("Simulated exception");
 
-        var formattedMessage = new FormattedLogMessage(logMessage.ToString().Length);
+        var formattedMessage = new FormattedLogMessage(logMessage.ToString().Length, ZeroLogConfiguration.Default);
         formattedMessage.SetMessage(logMessage);
 
         var appender = new MemoryAppender();

@@ -24,8 +24,6 @@ namespace ZeroLog
 
         private bool _isRunning;
 
-        public static ZeroLogConfig Config { get; } = new();
-
         private LogManager(ZeroLogConfiguration config)
         {
             _config = config;
@@ -77,8 +75,6 @@ namespace ZeroLog
 
             if (_logManager is not null)
                 throw new ApplicationException("LogManager is already initialized");
-
-            Config.UpdateFrom(configuration);
 
             _logManager = new LogManager(configuration);
             return _logManager;
@@ -189,7 +185,7 @@ namespace ZeroLog
         private void WriteToAppenders()
         {
             var spinWait = new SpinWait();
-            var formattedMessage = new FormattedLogMessage(OutputBufferSize);
+            var formattedMessage = new FormattedLogMessage(OutputBufferSize, _config);
             var flush = false;
 
             while (_isRunning || !_queue.IsEmpty)
@@ -201,7 +197,7 @@ namespace ZeroLog
                     continue;
                 }
 
-                if (flush && spinWait.NextSpinWillYield && Config.FlushAppenders)
+                if (flush && spinWait.NextSpinWillYield)
                 {
                     FlushAppenders();
                     flush = false;

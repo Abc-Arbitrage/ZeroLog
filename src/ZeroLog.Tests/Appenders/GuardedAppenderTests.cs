@@ -2,6 +2,7 @@
 using Moq;
 using NUnit.Framework;
 using ZeroLog.Appenders;
+using ZeroLog.Configuration;
 using ZeroLog.Utils;
 
 namespace ZeroLog.Tests.Appenders;
@@ -22,7 +23,7 @@ public class GuardedAppenderTests
     private static FormattedLogMessage GetFormattedMessage()
     {
         var logMessage = new LogMessage("Test");
-        var formattedMessage = new FormattedLogMessage(logMessage.ToString().Length);
+        var formattedMessage = new FormattedLogMessage(logMessage.ToString().Length, ZeroLogConfiguration.Default);
         formattedMessage.SetMessage(logMessage);
         return formattedMessage;
     }

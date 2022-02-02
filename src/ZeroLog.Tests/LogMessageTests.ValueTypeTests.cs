@@ -1,6 +1,7 @@
 using System;
 using System.Globalization;
 using NUnit.Framework;
+using ZeroLog.Configuration;
 using ZeroLog.Tests.Support;
 
 namespace ZeroLog.Tests;
@@ -26,12 +27,12 @@ unsafe partial class LogMessageTests
             {
                 // Truncate because the output buffer is too small
                 Span<char> smallBuffer = stackalloc char[2];
-                _logMessage.WriteTo(smallBuffer).ShouldEqual(smallBuffer.Length);
-                smallBuffer.SequenceEqual(LogManager.Config.TruncatedMessageSuffix.AsSpan(0, smallBuffer.Length)).ShouldBeTrue();
+                _logMessage.WriteTo(smallBuffer, ZeroLogConfiguration.Default).ShouldEqual(smallBuffer.Length);
+                smallBuffer.SequenceEqual(ZeroLogConfiguration.Default.TruncatedMessageSuffix.AsSpan(0, smallBuffer.Length)).ShouldBeTrue();
             }
 
             // Edge case: empty output buffer
-            _logMessage.WriteTo(Span<char>.Empty).ShouldEqual(0);
+            _logMessage.WriteTo(Span<char>.Empty, ZeroLogConfiguration.Default).ShouldEqual(0);
 
             // Truncate because the log message buffer is too small
             _logMessage = new LogMessage(new BufferSegment(_buffer, requiredBufferSize - 1), _stringCapacity);
@@ -40,7 +41,7 @@ unsafe partial class LogMessageTests
             action.Invoke();
 
             _logMessage.IsTruncated.ShouldBeTrue();
-            _logMessage.ToString().ShouldEqual(LogManager.Config.TruncatedMessageSuffix);
+            _logMessage.ToString().ShouldEqual(ZeroLogConfiguration.Default.TruncatedMessageSuffix);
 
             // Edge case: empty log message buffer
             _logMessage = new LogMessage(new BufferSegment(_buffer, 0), _stringCapacity);
@@ -76,7 +77,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_null()
-            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_value_through_interpolation([Values] bool value)
@@ -88,7 +89,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_truncate_value()
@@ -118,7 +119,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_null()
-            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value()
@@ -126,7 +127,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_formatted_null()
-            => _logMessage.Append(GetNullValue(), "X").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append(GetNullValue(), "X").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_nullable_formatted_value()
@@ -142,7 +143,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value_through_interpolation()
@@ -154,7 +155,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_formatted_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue():X}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue():X}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_truncate_value()
@@ -196,7 +197,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_null()
-            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value()
@@ -204,7 +205,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_formatted_null()
-            => _logMessage.Append(GetNullValue(), "X").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append(GetNullValue(), "X").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_nullable_formatted_value()
@@ -220,7 +221,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value_through_interpolation()
@@ -232,7 +233,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_formatted_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue():X}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue():X}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_truncate_value()
@@ -274,7 +275,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_null()
-            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_value_through_interpolation()
@@ -286,7 +287,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_truncate_value()
@@ -316,7 +317,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_null()
-            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value()
@@ -324,7 +325,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_formatted_null()
-            => _logMessage.Append(GetNullValue(), "X").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append(GetNullValue(), "X").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_nullable_formatted_value()
@@ -340,7 +341,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value_through_interpolation()
@@ -352,7 +353,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_formatted_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue():X}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue():X}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_truncate_value()
@@ -396,7 +397,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_null()
-            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value()
@@ -404,7 +405,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_formatted_null()
-            => _logMessage.Append(GetNullValue(), "X").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append(GetNullValue(), "X").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_nullable_formatted_value()
@@ -420,7 +421,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value_through_interpolation()
@@ -432,7 +433,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_formatted_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue():X}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue():X}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_truncate_value()
@@ -476,7 +477,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_null()
-            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value()
@@ -484,7 +485,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_formatted_null()
-            => _logMessage.Append(GetNullValue(), "X").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append(GetNullValue(), "X").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_nullable_formatted_value()
@@ -500,7 +501,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value_through_interpolation()
@@ -512,7 +513,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_formatted_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue():X}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue():X}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_truncate_value()
@@ -556,7 +557,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_null()
-            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value()
@@ -564,7 +565,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_formatted_null()
-            => _logMessage.Append(GetNullValue(), "X").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append(GetNullValue(), "X").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_nullable_formatted_value()
@@ -580,7 +581,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value_through_interpolation()
@@ -592,7 +593,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_formatted_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue():X}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue():X}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_truncate_value()
@@ -636,7 +637,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_null()
-            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value()
@@ -644,7 +645,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_formatted_null()
-            => _logMessage.Append(GetNullValue(), "X").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append(GetNullValue(), "X").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_nullable_formatted_value()
@@ -660,7 +661,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value_through_interpolation()
@@ -672,7 +673,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_formatted_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue():X}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue():X}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_truncate_value()
@@ -716,7 +717,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_null()
-            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value()
@@ -724,7 +725,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_formatted_null()
-            => _logMessage.Append(GetNullValue(), "X").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append(GetNullValue(), "X").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_nullable_formatted_value()
@@ -740,7 +741,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value_through_interpolation()
@@ -752,7 +753,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_formatted_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue():X}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue():X}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_truncate_value()
@@ -796,7 +797,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_null()
-            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value()
@@ -804,7 +805,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_formatted_null()
-            => _logMessage.Append(GetNullValue(), "X").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append(GetNullValue(), "X").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_nullable_formatted_value()
@@ -820,7 +821,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value_through_interpolation()
@@ -832,7 +833,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_formatted_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue():X}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue():X}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_truncate_value()
@@ -876,7 +877,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_null()
-            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value()
@@ -884,7 +885,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_formatted_null()
-            => _logMessage.Append(GetNullValue(), "X").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append(GetNullValue(), "X").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_nullable_formatted_value()
@@ -900,7 +901,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value_through_interpolation()
@@ -912,7 +913,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_formatted_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue():X}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue():X}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_truncate_value()
@@ -956,7 +957,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_null()
-            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value()
@@ -964,7 +965,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_formatted_null()
-            => _logMessage.Append(GetNullValue(), "F2").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append(GetNullValue(), "F2").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_nullable_formatted_value()
@@ -980,7 +981,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value_through_interpolation()
@@ -992,7 +993,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_formatted_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue():F2}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue():F2}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_truncate_value()
@@ -1036,7 +1037,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_null()
-            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value()
@@ -1044,7 +1045,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_formatted_null()
-            => _logMessage.Append(GetNullValue(), "F2").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append(GetNullValue(), "F2").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_nullable_formatted_value()
@@ -1060,7 +1061,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value_through_interpolation()
@@ -1072,7 +1073,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_formatted_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue():F2}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue():F2}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_truncate_value()
@@ -1116,7 +1117,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_null()
-            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value()
@@ -1124,7 +1125,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_formatted_null()
-            => _logMessage.Append(GetNullValue(), "F2").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append(GetNullValue(), "F2").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_nullable_formatted_value()
@@ -1140,7 +1141,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value_through_interpolation()
@@ -1152,7 +1153,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_formatted_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue():F2}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue():F2}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_truncate_value()
@@ -1196,7 +1197,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_null()
-            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         [TestCase("N")]
@@ -1207,7 +1208,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_formatted_null()
-            => _logMessage.Append(GetNullValue(), "D").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append(GetNullValue(), "D").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_nullable_formatted_value()
@@ -1223,7 +1224,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value_through_interpolation()
@@ -1235,7 +1236,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_formatted_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue():D}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue():D}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_truncate_value()
@@ -1280,7 +1281,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_null()
-            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         [TestCase("d")]
@@ -1291,7 +1292,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_formatted_null()
-            => _logMessage.Append(GetNullValue(), "D").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append(GetNullValue(), "D").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_nullable_formatted_value()
@@ -1307,7 +1308,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value_through_interpolation()
@@ -1319,7 +1320,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_formatted_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue():yyyy}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue():yyyy}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_truncate_value()
@@ -1364,7 +1365,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_null()
-            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         [TestCase("c")]
@@ -1374,7 +1375,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_formatted_null()
-            => _logMessage.Append(GetNullValue(), "G").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append(GetNullValue(), "G").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_nullable_formatted_value()
@@ -1390,7 +1391,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value_through_interpolation()
@@ -1402,7 +1403,7 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_formatted_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue():c}").ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue():c}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_truncate_value()

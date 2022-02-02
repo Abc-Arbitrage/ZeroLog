@@ -8,6 +8,8 @@ namespace ZeroLog.Configuration;
 
 public sealed class ZeroLogConfiguration
 {
+    internal static ZeroLogConfiguration Default { get; } = new();
+
     public int LogMessagePoolSize { get; init; } = 1024;
     public int LogMessageBufferSize { get; init; } = 128;
     public int LogMessageStringCapacity { get; init; } = 32;

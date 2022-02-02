@@ -4,6 +4,7 @@ using System.Threading;
 using NFluent;
 using NUnit.Framework;
 using ZeroLog.Appenders;
+using ZeroLog.Configuration;
 
 namespace ZeroLog.Tests.Appenders
 {
@@ -85,7 +86,7 @@ namespace ZeroLog.Tests.Appenders
         private static string GetResult(PrefixWriter prefixWriter, LogMessage logMessage)
         {
             var buffer = new char[256];
-            var formattedLogMessage = new FormattedLogMessage(256);
+            var formattedLogMessage = new FormattedLogMessage(256, ZeroLogConfiguration.Default);
             formattedLogMessage.SetMessage(logMessage);
             var prefixLength = prefixWriter.WritePrefix(formattedLogMessage, buffer);
             return buffer.AsSpan(0, prefixLength).ToString();

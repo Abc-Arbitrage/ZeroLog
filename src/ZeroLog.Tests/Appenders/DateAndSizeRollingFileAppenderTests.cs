@@ -3,6 +3,7 @@ using System.Threading;
 using NFluent;
 using NUnit.Framework;
 using ZeroLog.Appenders;
+using ZeroLog.Configuration;
 
 namespace ZeroLog.Tests.Appenders
 {
@@ -32,7 +33,7 @@ namespace ZeroLog.Tests.Appenders
             var logMessage = new LogMessage("Test log message");
             logMessage.Initialize(new Log("TestLog"), LogLevel.Info);
 
-            var formattedMessage = new FormattedLogMessage(logMessage.ToString().Length);
+            var formattedMessage = new FormattedLogMessage(logMessage.ToString().Length, ZeroLogConfiguration.Default);
             formattedMessage.SetMessage(logMessage);
 
             _appender.WriteMessage(formattedMessage);

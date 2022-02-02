@@ -1,5 +1,6 @@
 using System;
 using NUnit.Framework;
+using ZeroLog.Configuration;
 using ZeroLog.Tests.Support;
 
 namespace ZeroLog.Tests;
@@ -51,14 +52,14 @@ partial class LogMessageTests
         [Test]
         public void should_append_null_value()
         {
-            _logMessage.AppendUnmanaged((Int64FormattableWrapper?)null).ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            _logMessage.AppendUnmanaged((Int64FormattableWrapper?)null).ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
         }
 
         [Test]
         public void should_append_null_value_ref()
         {
             Int64FormattableWrapper? value = null;
-            _logMessage.AppendUnmanaged(ref value).ToString().ShouldEqual(LogManager.Config.NullDisplayString);
+            _logMessage.AppendUnmanaged(ref value).ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
         }
 
         [Test]

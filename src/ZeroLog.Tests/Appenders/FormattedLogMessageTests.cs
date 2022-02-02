@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using NUnit.Framework;
 using ZeroLog.Appenders;
+using ZeroLog.Configuration;
 using ZeroLog.Tests.Support;
 
 namespace ZeroLog.Tests.Appenders;
@@ -322,7 +323,7 @@ public unsafe class FormattedLogMessageTests
 
     private FormattedLogMessage GetFormatted()
     {
-        var message = new FormattedLogMessage(_bufferLength);
+        var message = new FormattedLogMessage(_bufferLength, ZeroLogConfiguration.Default);
         message.SetMessage(_logMessage);
         return message;
     }
