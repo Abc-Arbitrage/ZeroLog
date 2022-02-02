@@ -67,7 +67,7 @@ public class AppenderTests
         _appender.InternalWriteMessage(_message, config);
         _appender.AppendCount.ShouldEqual(1);
 
-        await Task.Delay(TimeSpan.FromSeconds(1));
+        await Task.Delay(TimeSpan.FromSeconds(2));
 
         _appender.InternalWriteMessage(_message, config);
         _appender.AppendCount.ShouldEqual(2);
