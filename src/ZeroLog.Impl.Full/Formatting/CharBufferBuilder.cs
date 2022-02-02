@@ -113,4 +113,7 @@ internal ref struct CharBufferBuilder
         _pos += charsWritten;
         return true;
     }
+
+    public override string ToString()
+        => GetOutput().ToString();
 }

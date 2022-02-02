@@ -160,7 +160,7 @@ namespace ZeroLog.Appenders
             return fileNumber;
         }
 
-        private string GetCurrentFileName()
+        internal string GetCurrentFileName()
         {
             return $"{FileNameRoot}.{_currentDate:yyyyMMdd}.{_rollingFileNumber:D3}{(FileExtension.Length == 0 ? "" : "." + FileExtension)}";
         }
