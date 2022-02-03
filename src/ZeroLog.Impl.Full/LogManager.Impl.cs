@@ -240,7 +240,7 @@ namespace ZeroLog
         private void FlushAppenders()
         {
             foreach (var appender in _appenders)
-                appender.Flush();
+                appender.InternalFlush();
         }
     }
 }

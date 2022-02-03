@@ -7,7 +7,7 @@ public class ConsoleAppender : StreamAppender
 {
     private LogLevel _lastLoggedLevel = LogLevel.None;
 
-    public bool ColorOutput { get; set; }
+    public bool ColorOutput { get; init; }
 
     public ConsoleAppender()
     {

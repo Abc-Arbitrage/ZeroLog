@@ -8,6 +8,7 @@ namespace ZeroLog.Appenders;
 public abstract class Appender : IDisposable
 {
     private readonly Stopwatch _quarantineStopwatch = new();
+    private bool _needsFlush;
 
     public LogLevel Level { get; init; }
 
@@ -28,8 +29,25 @@ public abstract class Appender : IDisposable
 
         try
         {
+            _needsFlush = true;
             WriteMessage(message);
             _quarantineStopwatch.Stop();
+        }
+        catch
+        {
+            _quarantineStopwatch.Restart();
+        }
+    }
+
+    internal void InternalFlush()
+    {
+        if (!_needsFlush)
+            return;
+
+        try
+        {
+            _needsFlush = false;
+            Flush();
         }
         catch
         {
