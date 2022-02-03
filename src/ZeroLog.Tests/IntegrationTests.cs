@@ -11,7 +11,7 @@ using ZeroLog.Configuration;
 namespace ZeroLog.Tests
 {
     [TestFixture]
-    [Ignore("Manual")]
+    [Explicit("Manual")]
     public class IntegrationTests
     {
         private PerformanceAppender _performanceAppender;

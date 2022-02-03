@@ -87,7 +87,7 @@ namespace ZeroLog.Tests
                 actualLogMessage.Append(i).Log();
             }
 
-            signal.Wait(TimeSpan.FromMilliseconds(100));
+            signal.Wait(TimeSpan.FromSeconds(1));
 
             Check.That(log.Debug().ConstantMessage).IsNull();
         }
@@ -116,7 +116,7 @@ namespace ZeroLog.Tests
 
             log.Debug().Append("this is not going to happen").Log();
 
-            Check.That(signal.Wait(TimeSpan.FromMilliseconds(100))).IsTrue();
+            Check.That(signal.Wait(TimeSpan.FromSeconds(1))).IsTrue();
 
             Check.That(_testAppender.LoggedMessages.Last()).Contains("Log message skipped due to pool exhaustion.");
         }
@@ -145,7 +145,7 @@ namespace ZeroLog.Tests
 
             log.Debug().Append("this is not going to happen").Log();
 
-            Check.That(signal.Wait(TimeSpan.FromMilliseconds(100))).IsFalse();
+            Check.That(signal.Wait(TimeSpan.FromSeconds(1))).IsFalse();
         }
 
         [Test]
@@ -178,12 +178,12 @@ namespace ZeroLog.Tests
                 logCompletedSignal.Set();
             });
 
-            Check.That(logCompletedSignal.WaitOne(TimeSpan.FromMilliseconds(100))).IsFalse();
+            Check.That(logCompletedSignal.WaitOne(TimeSpan.FromSeconds(1))).IsFalse();
 
             actualLogMessages[0].Log();
 
-            Check.That(logCompletedSignal.WaitOne(TimeSpan.FromMilliseconds(100))).IsTrue();
-            Check.That(signal.Wait(TimeSpan.FromMilliseconds(100))).IsTrue();
+            Check.That(logCompletedSignal.WaitOne(TimeSpan.FromSeconds(1))).IsTrue();
+            Check.That(signal.Wait(TimeSpan.FromSeconds(1))).IsTrue();
         }
 
         [Test]
@@ -215,7 +215,7 @@ namespace ZeroLog.Tests
                .AppendEnum(DayOfWeek.Friday)
                .Log();
 
-            signal.Wait(TimeSpan.FromMilliseconds(100));
+            signal.Wait(TimeSpan.FromSeconds(1));
 
             var logMessage = _testAppender.LoggedMessages.Single();
             logMessage.ShouldContain("An error occured during formatting:");
@@ -236,7 +236,7 @@ namespace ZeroLog.Tests
                // .AppendUnmanaged(new FailingUnmanagedStruct { Value = 42 }) // TODO
                .Log();
 
-            signal.Wait(TimeSpan.FromMilliseconds(100));
+            signal.Wait(TimeSpan.FromSeconds(1));
 
             var logMessage = _testAppender.LoggedMessages.Single();
             // Check.That(logMessage).Equals("An error occured during formatting: Simulated failure - Arguments: Unmanaged(0x2a000000)"); // TODO
@@ -254,7 +254,7 @@ namespace ZeroLog.Tests
             log.Info($"Baz");
 
             _testAppender.WaitOnWriteEvent.Set();
-            signal.Wait(TimeSpan.FromMilliseconds(500));
+            signal.Wait(TimeSpan.FromSeconds(1));
 
             Wait.Until(() => _testAppender.FlushCount == 1, TimeSpan.FromSeconds(1));
 
@@ -280,7 +280,7 @@ namespace ZeroLog.Tests
             var longMessage = new string('.', LogManager.OutputBufferSize + 1);
             log.Info().Append(longMessage).Log();
 
-            signal.Wait(TimeSpan.FromMilliseconds(100));
+            signal.Wait(TimeSpan.FromSeconds(1));
             var message = _testAppender.LoggedMessages.Single();
             Check.That(message).IsEqualTo(new string('.', LogManager.OutputBufferSize - ZeroLogConfiguration.Default.TruncatedMessageSuffix.Length) + ZeroLogConfiguration.Default.TruncatedMessageSuffix);
         }

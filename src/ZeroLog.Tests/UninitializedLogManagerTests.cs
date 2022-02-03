@@ -46,7 +46,7 @@ namespace ZeroLog.Tests
 
             log.Info("Lol");
 
-            Check.That(signal.Wait(TimeSpan.FromMilliseconds(100))).IsTrue();
+            Check.That(signal.Wait(TimeSpan.FromSeconds(1))).IsTrue();
         }
     }
 }
