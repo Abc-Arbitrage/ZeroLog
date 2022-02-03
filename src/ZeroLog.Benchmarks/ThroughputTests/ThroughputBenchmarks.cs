@@ -12,7 +12,7 @@ using ZeroLog.Configuration;
 namespace ZeroLog.Benchmarks.ThroughputTests
 {
     [MemoryDiagnoser]
-    [SimpleJob(RunStrategy.ColdStart, targetCount: 1000, invocationCount: 1)]
+    [SimpleJob(RunStrategy.ColdStart, targetCount: 1000, invocationCount: 1, baseline: true)]
     public class ThroughputBenchmarks
     {
         [Params(4)]
@@ -81,23 +81,24 @@ namespace ZeroLog.Benchmarks.ThroughputTests
         }
 
 
-        [Benchmark]
+        [Benchmark(Baseline = true)]
         public void ZeroLog()
         {
-            throw new NotImplementedException();
+            var signal = _zeroLogTestAppender.SetMessageCountTarget(TotalMessageCount);
 
-            // var signal = _zeroLogTestAppender.SetMessageCountTarget(TotalMessageCount);
-            //
-            // var produce = new Action(() =>
-            // {
-            //     for (var i = 0; i < TotalMessageCount / ProducingThreadCount; i++)
-            //         _zeroLogLogger.InfoFormat("Hi {0} ! It's {1:HH:mm:ss}, and the message is #{2}", "dude", DateTime.UtcNow, i);
-            // });
-            //
-            // for (var i = 0; i < ProducingThreadCount; i++)
-            //     Task.Factory.StartNew(produce, TaskCreationOptions.LongRunning);
-            //
-            // signal.Wait(TimeSpan.FromSeconds(30));
+            var produce = new Action(() =>
+            {
+                for (var i = 0; i < TotalMessageCount / ProducingThreadCount; i++)
+                {
+                    var text = "dude";
+                    _zeroLogLogger.Info($"Hi {text} ! It's {DateTime.UtcNow:HH:mm:ss}, and the message is #{i}");
+                }
+            });
+
+            for (var i = 0; i < ProducingThreadCount; i++)
+                Task.Factory.StartNew(produce, TaskCreationOptions.LongRunning);
+
+            signal.Wait(TimeSpan.FromSeconds(30));
         }
 
 
