@@ -1,6 +1,6 @@
 ﻿using NUnit.Framework;
 
-namespace ZeroLog.Tests.Utils;
+namespace ZeroLog.Tests.Support;
 
 [TestFixture]
 public unsafe class HexUtilsTests

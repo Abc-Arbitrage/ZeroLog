@@ -9,204 +9,203 @@ using NLog.Config;
 using NLog.Targets.Wrappers;
 using ZeroLog.Configuration;
 
-namespace ZeroLog.Benchmarks.ThroughputTests
+namespace ZeroLog.Benchmarks.ThroughputTests;
+
+[MemoryDiagnoser]
+[SimpleJob(RunStrategy.ColdStart, targetCount: 1000, invocationCount: 1, baseline: true)]
+public class ThroughputBenchmarks
 {
-    [MemoryDiagnoser]
-    [SimpleJob(RunStrategy.ColdStart, targetCount: 1000, invocationCount: 1, baseline: true)]
-    public class ThroughputBenchmarks
+    [Params(4)]
+    public int ProducingThreadCount;
+
+    [Params(4 * 50_000)]
+    public int TotalMessageCount;
+
+    [Params(8192)]
+    public int QueueSize;
+
+    // ZeroLog
+    private ZeroLog.Tests.TestAppender _zeroLogTestAppender;
+    private Log _zeroLogLogger;
+
+    // Log4Net
+    private log4net.ILog _log4NetLogger;
+    private Log4NetTestAppender _log4NetTestAppender;
+
+    // NLog
+    private NLogTestTarget _nLogTestTarget;
+    private Logger _nLogLogger;
+    private NLogTestTarget _nLogAsyncTestTarget;
+    private Logger _nLogAsyncLogger;
+
+    [GlobalSetup]
+    public void Setup()
     {
-        [Params(4)]
-        public int ProducingThreadCount;
+        SetupZeroLog();
+        SetupLog4Net();
+        SetupLogNLog();
+    }
 
-        [Params(4 * 50_000)]
-        public int TotalMessageCount;
+    [GlobalCleanup]
+    public void Cleanup()
+    {
+        TearDownZeroLog();
+        TearDownLog4Net();
+        TearDownNLog();
+    }
 
-        [Params(8192)]
-        public int QueueSize;
+    //
+    // ZeroLog
+    //
 
-        // ZeroLog
-        private ZeroLog.Tests.TestAppender _zeroLogTestAppender;
-        private Log _zeroLogLogger;
+    private void SetupZeroLog()
+    {
+        _zeroLogTestAppender = new ZeroLog.Tests.TestAppender(false);
 
-        // Log4Net
-        private log4net.ILog _log4NetLogger;
-        private Log4NetTestAppender _log4NetTestAppender;
-
-        // NLog
-        private NLogTestTarget _nLogTestTarget;
-        private Logger _nLogLogger;
-        private NLogTestTarget _nLogAsyncTestTarget;
-        private Logger _nLogAsyncLogger;
-
-        [GlobalSetup]
-        public void Setup()
+        LogManager.Initialize(new ZeroLogConfiguration
         {
-            SetupZeroLog();
-            SetupLog4Net();
-            SetupLogNLog();
-        }
-
-        [GlobalCleanup]
-        public void Cleanup()
-        {
-            TearDownZeroLog();
-            TearDownLog4Net();
-            TearDownNLog();
-        }
-
-        //
-        // ZeroLog
-        //
-
-        private void SetupZeroLog()
-        {
-            _zeroLogTestAppender = new ZeroLog.Tests.TestAppender(false);
-
-            LogManager.Initialize(new ZeroLogConfiguration
+            LogMessagePoolSize = QueueSize,
+            RootLogger =
             {
-                LogMessagePoolSize = QueueSize,
-                RootLogger =
-                {
-                    LogMessagePoolExhaustionStrategy = LogMessagePoolExhaustionStrategy.WaitUntilAvailable,
-                    Appenders = { _zeroLogTestAppender }
-                }
-            });
+                LogMessagePoolExhaustionStrategy = LogMessagePoolExhaustionStrategy.WaitUntilAvailable,
+                Appenders = { _zeroLogTestAppender }
+            }
+        });
 
-            _zeroLogLogger = LogManager.GetLogger(nameof(ZeroLog));
-        }
+        _zeroLogLogger = LogManager.GetLogger(nameof(ZeroLog));
+    }
 
-        private void TearDownZeroLog()
+    private void TearDownZeroLog()
+    {
+        LogManager.Shutdown();
+    }
+
+    [Benchmark(Baseline = true)]
+    public void ZeroLog()
+    {
+        var signal = _zeroLogTestAppender.SetMessageCountTarget(TotalMessageCount);
+
+        var produce = new Action(() =>
         {
-            LogManager.Shutdown();
-        }
-
-        [Benchmark(Baseline = true)]
-        public void ZeroLog()
-        {
-            var signal = _zeroLogTestAppender.SetMessageCountTarget(TotalMessageCount);
-
-            var produce = new Action(() =>
+            for (var i = 0; i < TotalMessageCount / ProducingThreadCount; i++)
             {
-                for (var i = 0; i < TotalMessageCount / ProducingThreadCount; i++)
-                {
-                    var text = "dude";
-                    _zeroLogLogger.Info($"Hi {text} ! It's {DateTime.UtcNow:HH:mm:ss}, and the message is #{i}");
-                }
-            });
+                var text = "dude";
+                _zeroLogLogger.Info($"Hi {text} ! It's {DateTime.UtcNow:HH:mm:ss}, and the message is #{i}");
+            }
+        });
 
-            for (var i = 0; i < ProducingThreadCount; i++)
-                Task.Factory.StartNew(produce, TaskCreationOptions.LongRunning);
+        for (var i = 0; i < ProducingThreadCount; i++)
+            Task.Factory.StartNew(produce, TaskCreationOptions.LongRunning);
 
-            signal.Wait(TimeSpan.FromSeconds(30));
-        }
+        signal.Wait(TimeSpan.FromSeconds(30));
+    }
 
-        //
-        // Log4Net
-        //
+    //
+    // Log4Net
+    //
 
-        private void SetupLog4Net()
+    private void SetupLog4Net()
+    {
+        var layout = new PatternLayout("%-4timestamp [%thread] %-5level %logger %ndc - %message%newline");
+        _log4NetTestAppender = new Log4NetTestAppender(false);
+        layout.ActivateOptions();
+        _log4NetTestAppender.ActivateOptions();
+
+        var repository = log4net.LogManager.GetRepository(Assembly.GetExecutingAssembly());
+        log4net.Config.BasicConfigurator.Configure(repository, _log4NetTestAppender);
+
+        _log4NetLogger = log4net.LogManager.GetLogger(repository.Name, nameof(Log4Net));
+    }
+
+    private void TearDownLog4Net()
+    {
+        log4net.LogManager.Shutdown();
+    }
+
+    [Benchmark]
+    public void Log4Net()
+    {
+        var signal = _log4NetTestAppender.SetMessageCountTarget(TotalMessageCount);
+
+        var produce = new Action(() =>
         {
-            var layout = new PatternLayout("%-4timestamp [%thread] %-5level %logger %ndc - %message%newline");
-            _log4NetTestAppender = new Log4NetTestAppender(false);
-            layout.ActivateOptions();
-            _log4NetTestAppender.ActivateOptions();
+            for (var i = 0; i < TotalMessageCount / ProducingThreadCount; i++)
+                _log4NetLogger.InfoFormat("Hi {0} ! It's {1:HH:mm:ss}, and the message is #{2}", "dude", DateTime.UtcNow, i);
+        });
 
-            var repository = log4net.LogManager.GetRepository(Assembly.GetExecutingAssembly());
-            log4net.Config.BasicConfigurator.Configure(repository, _log4NetTestAppender);
+        for (var i = 0; i < ProducingThreadCount; i++)
+            Task.Factory.StartNew(produce, TaskCreationOptions.LongRunning);
 
-            _log4NetLogger = log4net.LogManager.GetLogger(repository.Name, nameof(Log4Net));
-        }
+        signal.Wait(TimeSpan.FromSeconds(30));
+    }
 
-        private void TearDownLog4Net()
+    //
+    // NLog Sync
+    //
+
+    private void SetupLogNLog()
+    {
+        _nLogTestTarget = new NLogTestTarget(false);
+        _nLogAsyncTestTarget = new NLogTestTarget(false);
+        var asyncTarget = (new AsyncTargetWrapper(_nLogAsyncTestTarget, QueueSize, overflowAction: AsyncTargetWrapperOverflowAction.Block));
+
+        var config = new LoggingConfiguration();
+        config.AddTarget(nameof(_nLogTestTarget), _nLogTestTarget);
+        config.AddTarget(nameof(asyncTarget), asyncTarget);
+        config.LoggingRules.Add(new LoggingRule(nameof(NLogSync), NLog.LogLevel.Debug, _nLogTestTarget));
+        config.LoggingRules.Add(new LoggingRule(nameof(NLogAsync), NLog.LogLevel.Debug, asyncTarget));
+        NLog.LogManager.Configuration = config;
+        NLog.LogManager.ReconfigExistingLoggers();
+
+        _nLogLogger = NLog.LogManager.GetLogger(nameof(NLogSync));
+        _nLogAsyncLogger = NLog.LogManager.GetLogger(nameof(NLogAsync));
+    }
+
+    private void TearDownNLog()
+    {
+        NLog.LogManager.Shutdown();
+    }
+
+    [Benchmark]
+    public void NLogSync()
+    {
+        var signal = _nLogTestTarget.SetMessageCountTarget(TotalMessageCount);
+
+        var produce = new Action(() =>
         {
-            log4net.LogManager.Shutdown();
-        }
+            for (var i = 0; i < TotalMessageCount / ProducingThreadCount; i++)
+                _nLogLogger.Debug("Hi {0} ! It's {1:HH:mm:ss}, and the message is #{2}", "dude", DateTime.UtcNow, i);
+        });
 
-        [Benchmark]
-        public void Log4Net()
+        for (var i = 0; i < ProducingThreadCount; i++)
+            Task.Factory.StartNew(produce, TaskCreationOptions.LongRunning);
+
+        NLog.LogManager.Flush();
+        signal.Wait(TimeSpan.FromSeconds(30));
+    }
+
+    [Benchmark]
+    public void NLogAsync()
+    {
+        var signal = _nLogAsyncTestTarget.SetMessageCountTarget(TotalMessageCount);
+
+        var produce = new Action(() =>
         {
-            var signal = _log4NetTestAppender.SetMessageCountTarget(TotalMessageCount);
+            for (var i = 0; i < TotalMessageCount / ProducingThreadCount; i++)
+                _nLogAsyncLogger.Debug("Hi {0} ! It's {1:HH:mm:ss}, and the message is #{2}", "dude", DateTime.UtcNow, i);
+        });
 
-            var produce = new Action(() =>
-            {
-                for (var i = 0; i < TotalMessageCount / ProducingThreadCount; i++)
-                    _log4NetLogger.InfoFormat("Hi {0} ! It's {1:HH:mm:ss}, and the message is #{2}", "dude", DateTime.UtcNow, i);
-            });
-
-            for (var i = 0; i < ProducingThreadCount; i++)
-                Task.Factory.StartNew(produce, TaskCreationOptions.LongRunning);
-
-            signal.Wait(TimeSpan.FromSeconds(30));
-        }
-
-        //
-        // NLog Sync
-        //
-
-        private void SetupLogNLog()
+        var flusher = new Action(() =>
         {
-            _nLogTestTarget = new NLogTestTarget(false);
-            _nLogAsyncTestTarget = new NLogTestTarget(false);
-            var asyncTarget = (new AsyncTargetWrapper(_nLogAsyncTestTarget, QueueSize, overflowAction: AsyncTargetWrapperOverflowAction.Block));
+            while (!signal.IsSet)
+                NLog.LogManager.Flush();
+        });
 
-            var config = new LoggingConfiguration();
-            config.AddTarget(nameof(_nLogTestTarget), _nLogTestTarget);
-            config.AddTarget(nameof(asyncTarget), asyncTarget);
-            config.LoggingRules.Add(new LoggingRule(nameof(NLogSync), NLog.LogLevel.Debug, _nLogTestTarget));
-            config.LoggingRules.Add(new LoggingRule(nameof(NLogAsync), NLog.LogLevel.Debug, asyncTarget));
-            NLog.LogManager.Configuration = config;
-            NLog.LogManager.ReconfigExistingLoggers();
+        for (var i = 0; i < ProducingThreadCount; i++)
+            Task.Factory.StartNew(produce, TaskCreationOptions.LongRunning);
 
-            _nLogLogger = NLog.LogManager.GetLogger(nameof(NLogSync));
-            _nLogAsyncLogger = NLog.LogManager.GetLogger(nameof(NLogAsync));
-        }
+        Task.Factory.StartNew(flusher, TaskCreationOptions.LongRunning);
 
-        private void TearDownNLog()
-        {
-            NLog.LogManager.Shutdown();
-        }
-
-        [Benchmark]
-        public void NLogSync()
-        {
-            var signal = _nLogTestTarget.SetMessageCountTarget(TotalMessageCount);
-
-            var produce = new Action(() =>
-            {
-                for (var i = 0; i < TotalMessageCount / ProducingThreadCount; i++)
-                    _nLogLogger.Debug("Hi {0} ! It's {1:HH:mm:ss}, and the message is #{2}", "dude", DateTime.UtcNow, i);
-            });
-
-            for (var i = 0; i < ProducingThreadCount; i++)
-                Task.Factory.StartNew(produce, TaskCreationOptions.LongRunning);
-
-            NLog.LogManager.Flush();
-            signal.Wait(TimeSpan.FromSeconds(30));
-        }
-
-        [Benchmark]
-        public void NLogAsync()
-        {
-            var signal = _nLogAsyncTestTarget.SetMessageCountTarget(TotalMessageCount);
-
-            var produce = new Action(() =>
-            {
-                for (var i = 0; i < TotalMessageCount / ProducingThreadCount; i++)
-                    _nLogAsyncLogger.Debug("Hi {0} ! It's {1:HH:mm:ss}, and the message is #{2}", "dude", DateTime.UtcNow, i);
-            });
-
-            var flusher = new Action(() =>
-            {
-                while (!signal.IsSet)
-                    NLog.LogManager.Flush();
-            });
-
-            for (var i = 0; i < ProducingThreadCount; i++)
-                Task.Factory.StartNew(produce, TaskCreationOptions.LongRunning);
-
-            Task.Factory.StartNew(flusher, TaskCreationOptions.LongRunning);
-
-            signal.Wait(TimeSpan.FromSeconds(30));
-        }
+        signal.Wait(TimeSpan.FromSeconds(30));
     }
 }

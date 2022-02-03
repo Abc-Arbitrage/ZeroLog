@@ -3,7 +3,7 @@ using ZeroLog.Appenders;
 using ZeroLog.Configuration;
 using ZeroLog.Tests.Support;
 
-namespace ZeroLog.Tests.Config;
+namespace ZeroLog.Tests.Configuration;
 
 [TestFixture]
 public class ResolvedLoggerConfigurationTests

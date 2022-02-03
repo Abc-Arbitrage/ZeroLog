@@ -3,65 +3,64 @@ using System.Collections.Generic;
 using NFluent;
 using NUnit.Framework;
 
-namespace ZeroLog.Tests
+namespace ZeroLog.Tests;
+
+[TestFixture]
+public unsafe class BufferSegmentProviderTests
 {
-    [TestFixture]
-    public unsafe class BufferSegmentProviderTests
+    private BufferSegmentProvider _bufferSegmentProvider;
+    private readonly int _defaultSegmentSize = 8;
+
+    [SetUp]
+    public void SetUp()
     {
-        private BufferSegmentProvider _bufferSegmentProvider;
-        private readonly int _defaultSegmentSize = 8;
+        _bufferSegmentProvider = new BufferSegmentProvider(32, _defaultSegmentSize);
+    }
 
-        [SetUp]
-        public void SetUp()
+    [Test]
+    public void should_get_buffer_segment_when_there_are_segments_available()
+    {
+        var bufferSegment = _bufferSegmentProvider.GetSegment();
+
+        Check.That(bufferSegment.Length).Equals(_defaultSegmentSize);
+        Check.That(new IntPtr(bufferSegment.Data)).IsNotEqualTo(IntPtr.Zero);
+
+        Check.That(_bufferSegmentProvider.LargeBufferCount).Equals(1);
+        Check.That(_bufferSegmentProvider.LastSegmentIndex).Equals(0);
+    }
+
+    [Test]
+    public void should_get_all_segments_from_a_large_buffer()
+    {
+        var segments = new List<BufferSegment>();
+        for (var i = 0; i < 4; i++)
         {
-            _bufferSegmentProvider = new BufferSegmentProvider(32, _defaultSegmentSize);
+            segments.Add(_bufferSegmentProvider.GetSegment());
         }
 
-        [Test]
-        public void should_get_buffer_segment_when_there_are_segments_available()
+        var lastAddress = (int)segments[0].Data;
+        for (var i = 1; i < segments.Count; i++)
         {
-            var bufferSegment = _bufferSegmentProvider.GetSegment();
-
+            var bufferSegment = segments[i];
+            Check.That((int)bufferSegment.Data).IsEqualTo(lastAddress + _defaultSegmentSize);
             Check.That(bufferSegment.Length).Equals(_defaultSegmentSize);
-            Check.That(new IntPtr(bufferSegment.Data)).IsNotEqualTo(IntPtr.Zero);
-
-            Check.That(_bufferSegmentProvider.LargeBufferCount).Equals(1);
-            Check.That(_bufferSegmentProvider.LastSegmentIndex).Equals(0);
+            lastAddress = (int)bufferSegment.Data;
         }
 
-        [Test]
-        public void should_get_all_segments_from_a_large_buffer()
+        Check.That(_bufferSegmentProvider.LargeBufferCount).Equals(1);
+        Check.That(_bufferSegmentProvider.LastSegmentIndex).Equals(3);
+    }
+
+    [Test]
+    public void should_allocate_a_new_large_buffer_when_needed()
+    {
+        var segments = new List<BufferSegment>();
+        for (var i = 0; i < 5; i++)
         {
-            var segments = new List<BufferSegment>();
-            for (var i = 0; i < 4; i++)
-            {
-                segments.Add(_bufferSegmentProvider.GetSegment());
-            }
-
-            var lastAddress = (int)segments[0].Data;
-            for (var i = 1; i < segments.Count; i++)
-            {
-                var bufferSegment = segments[i];
-                Check.That((int)bufferSegment.Data).IsEqualTo(lastAddress + _defaultSegmentSize);
-                Check.That(bufferSegment.Length).Equals(_defaultSegmentSize);
-                lastAddress = (int)bufferSegment.Data;
-            }
-
-            Check.That(_bufferSegmentProvider.LargeBufferCount).Equals(1);
-            Check.That(_bufferSegmentProvider.LastSegmentIndex).Equals(3);
+            segments.Add(_bufferSegmentProvider.GetSegment());
         }
 
-        [Test]
-        public void should_allocate_a_new_large_buffer_when_needed()
-        {
-            var segments = new List<BufferSegment>();
-            for (var i = 0; i < 5; i++)
-            {
-                segments.Add(_bufferSegmentProvider.GetSegment());
-            }
-
-            Check.That(_bufferSegmentProvider.LargeBufferCount).Equals(2);
-            Check.That(_bufferSegmentProvider.LastSegmentIndex).Equals(4);
-        }
+        Check.That(_bufferSegmentProvider.LargeBufferCount).Equals(2);
+        Check.That(_bufferSegmentProvider.LastSegmentIndex).Equals(4);
     }
 }

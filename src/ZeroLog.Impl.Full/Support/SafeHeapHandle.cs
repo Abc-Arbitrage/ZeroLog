@@ -1,34 +1,33 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace ZeroLog.Support
+namespace ZeroLog.Support;
+
+internal sealed class SafeHeapHandle : SafeHandle
 {
-    internal sealed class SafeHeapHandle : SafeHandle
+    public int ByteLength { get; }
+
+    public override bool IsInvalid => handle == IntPtr.Zero;
+
+    public SafeHeapHandle(int byteLength)
+        : base(IntPtr.Zero, true)
     {
-        public int ByteLength { get; }
+        ByteLength = byteLength;
 
-        public override bool IsInvalid => handle == IntPtr.Zero;
+        handle = Marshal.AllocHGlobal(byteLength);
 
-        public SafeHeapHandle(int byteLength)
-            : base(IntPtr.Zero, true)
-        {
-            ByteLength = byteLength;
+        if (handle == IntPtr.Zero)
+            throw new OutOfMemoryException();
+    }
 
-            handle = Marshal.AllocHGlobal(byteLength);
+    protected override bool ReleaseHandle()
+    {
+        var handleCopy = handle;
+        handle = IntPtr.Zero;
 
-            if (handle == IntPtr.Zero)
-                throw new OutOfMemoryException();
-        }
+        if (handleCopy != IntPtr.Zero)
+            Marshal.FreeHGlobal(handleCopy);
 
-        protected override bool ReleaseHandle()
-        {
-            var handleCopy = handle;
-            handle = IntPtr.Zero;
-
-            if (handleCopy != IntPtr.Zero)
-                Marshal.FreeHGlobal(handleCopy);
-
-            return true;
-        }
+        return true;
     }
 }
