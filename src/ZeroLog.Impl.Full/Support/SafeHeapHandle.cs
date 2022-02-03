@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace ZeroLog.Utils
+namespace ZeroLog.Support
 {
     internal sealed class SafeHeapHandle : SafeHandle
     {

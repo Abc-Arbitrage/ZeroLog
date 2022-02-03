@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 using NFluent;
 using NUnit.Framework;
 using ZeroLog.Tests.Support;
-using ZeroLog.Utils;
+using ZeroLog.Support;
 
 namespace ZeroLog.Tests.Utils
 {

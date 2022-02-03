@@ -2,7 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using NFluent;
 using NUnit.Framework;
-using ZeroLog.Utils;
+using ZeroLog.Support;
 
 namespace ZeroLog.Tests
 {

@@ -1,4 +1,4 @@
-using ZeroLog.Utils;
+using ZeroLog.Support;
 
 namespace ZeroLog;
 

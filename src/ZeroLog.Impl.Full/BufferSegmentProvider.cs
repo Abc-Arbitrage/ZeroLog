@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading;
-using ZeroLog.Utils;
+using ZeroLog.Support;
 
 namespace ZeroLog
 {

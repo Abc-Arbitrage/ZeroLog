@@ -7,7 +7,7 @@ namespace ZeroLog.Tests
         public static void Main()
         {
             var test = new PerformanceTests();
-            
+
             test.SetUp();
 
             try

@@ -5,7 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using InlineIL;
-using ZeroLog.Utils;
+using ZeroLog.Support;
 using static InlineIL.IL.Emit;
 
 namespace ZeroLog;

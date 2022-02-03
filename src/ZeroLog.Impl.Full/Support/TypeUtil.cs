@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 using JetBrains.Annotations;
 using static System.Linq.Expressions.Expression;
 
-namespace ZeroLog.Utils
+namespace ZeroLog.Support
 {
     internal static class TypeUtil
     {

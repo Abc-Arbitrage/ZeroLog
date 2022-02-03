@@ -4,7 +4,7 @@ using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using ZeroLog.Configuration;
-using ZeroLog.Utils;
+using ZeroLog.Support;
 
 namespace ZeroLog
 {
