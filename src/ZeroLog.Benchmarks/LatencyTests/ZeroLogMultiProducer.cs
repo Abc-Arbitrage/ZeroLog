@@ -1,7 +1,5 @@
 ﻿using System;
 using HdrHistogram;
-using log4net.Appender;
-using log4net.Config;
 using ZeroLog.Benchmarks.Tools;
 using ZeroLog.Configuration;
 using ZeroLog.Tests;
@@ -30,7 +28,7 @@ namespace ZeroLog.Benchmarks.LatencyTests
             {
                 var warmingMessageByProducer = warmingMessageCount / producingThreadCount;
                 int[] counter = { 0 };
-                var text = "dude";
+                const string text = "dude";
                 var warmingResult = SimpleLatencyBenchmark.Bench(() => logger.Info($"Hi {text} ! It's {DateTime.UtcNow:HH:mm:ss}, and the message is #{counter[0]++}"), warmingMessageByProducer);
 
                 var messageByProducer = totalMessageCount / producingThreadCount;

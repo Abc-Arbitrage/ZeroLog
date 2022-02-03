@@ -18,10 +18,10 @@ namespace ZeroLog.Benchmarks.ThroughputTests
         [Params(4)]
         public int ProducingThreadCount;
 
-        [Params(4 * 5_000)]
+        [Params(4 * 50_000)]
         public int TotalMessageCount;
 
-        [Params(512)]
+        [Params(8192)]
         public int QueueSize;
 
         // ZeroLog
@@ -80,7 +80,6 @@ namespace ZeroLog.Benchmarks.ThroughputTests
             LogManager.Shutdown();
         }
 
-
         [Benchmark(Baseline = true)]
         public void ZeroLog()
         {
@@ -101,7 +100,6 @@ namespace ZeroLog.Benchmarks.ThroughputTests
             signal.Wait(TimeSpan.FromSeconds(30));
         }
 
-
         //
         // Log4Net
         //
@@ -121,13 +119,13 @@ namespace ZeroLog.Benchmarks.ThroughputTests
 
         private void TearDownLog4Net()
         {
+            log4net.LogManager.Shutdown();
         }
 
         [Benchmark]
         public void Log4Net()
         {
             var signal = _log4NetTestAppender.SetMessageCountTarget(TotalMessageCount);
-
 
             var produce = new Action(() =>
             {
@@ -140,7 +138,6 @@ namespace ZeroLog.Benchmarks.ThroughputTests
 
             signal.Wait(TimeSpan.FromSeconds(30));
         }
-
 
         //
         // NLog Sync
@@ -166,7 +163,7 @@ namespace ZeroLog.Benchmarks.ThroughputTests
 
         private void TearDownNLog()
         {
-
+            NLog.LogManager.Shutdown();
         }
 
         [Benchmark]
@@ -178,7 +175,6 @@ namespace ZeroLog.Benchmarks.ThroughputTests
             {
                 for (var i = 0; i < TotalMessageCount / ProducingThreadCount; i++)
                     _nLogLogger.Debug("Hi {0} ! It's {1:HH:mm:ss}, and the message is #{2}", "dude", DateTime.UtcNow, i);
-
             });
 
             for (var i = 0; i < ProducingThreadCount; i++)
@@ -187,7 +183,6 @@ namespace ZeroLog.Benchmarks.ThroughputTests
             NLog.LogManager.Flush();
             signal.Wait(TimeSpan.FromSeconds(30));
         }
-
 
         [Benchmark]
         public void NLogAsync()
