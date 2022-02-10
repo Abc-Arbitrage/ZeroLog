@@ -50,8 +50,8 @@ internal sealed class ResolvedLoggerConfiguration
         for (var i = 0; i < appendersByLogLevel.Length; i++)
             appendersByLogLevel[i] = new HashSet<Appender>(ReferenceEqualityComparer.Instance);
 
-        var effectiveLevel = LogLevel.Trace;
-        var effectiveLogMessagePoolExhaustionStrategy = LogMessagePoolExhaustionStrategy.Default;
+        var effectiveLevel = configuration.RootLogger.Level;
+        var effectiveLogMessagePoolExhaustionStrategy = configuration.RootLogger.LogMessagePoolExhaustionStrategy;
 
         foreach (var loggerConfig in GetOrderedLoggerConfigurations())
             ApplyLoggerConfig(loggerConfig);
@@ -64,17 +64,18 @@ internal sealed class ResolvedLoggerConfiguration
             LogMessagePoolExhaustionStrategy = effectiveLogMessagePoolExhaustionStrategy
         };
 
-        IEnumerable<LoggerConfiguration> GetOrderedLoggerConfigurations()
+        IEnumerable<ILoggerConfiguration> GetOrderedLoggerConfigurations()
         {
             var loggerNameWithPeriod = $"{loggerName}.";
 
             return configuration.Loggers
                                 .Where(i => loggerNameWithPeriod.StartsWith(i.NameWithPeriod, StringComparison.Ordinal))
                                 .OrderBy(i => i.Name.Length)
+                                .Cast<ILoggerConfiguration>()
                                 .Prepend(configuration.RootLogger);
         }
 
-        void ApplyLoggerConfig(LoggerConfiguration loggerConfig)
+        void ApplyLoggerConfig(ILoggerConfiguration loggerConfig)
         {
             effectiveLevel = loggerConfig.Level ?? effectiveLevel;
             effectiveLogMessagePoolExhaustionStrategy = loggerConfig.LogMessagePoolExhaustionStrategy ?? effectiveLogMessagePoolExhaustionStrategy;

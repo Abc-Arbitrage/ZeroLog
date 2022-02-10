@@ -22,11 +22,13 @@ public sealed class ZeroLogConfiguration
 
     public TimeSpan AppenderQuarantineDelay { get; init; } = TimeSpan.FromSeconds(15);
 
-    public LoggerConfiguration RootLogger { get; } = new(string.Empty);
+    public RootLoggerConfiguration RootLogger { get; } = new();
     public ICollection<LoggerConfiguration> Loggers { get; private set; } = new List<LoggerConfiguration>();
 
     internal void ValidateAndFreeze()
     {
+        RootLogger.ValidateAndFreeze();
+
         var loggerNames = new HashSet<string>(StringComparer.Ordinal);
 
         foreach (var loggerConfig in Loggers)
@@ -47,8 +49,8 @@ public sealed class ZeroLogConfiguration
         => ResolvedLoggerConfiguration.Resolve(loggerName, this);
 
     internal IEnumerable<Appender> GetAllAppenders()
-        => Loggers.Append(RootLogger)
-                  .SelectMany(i => i.Appenders)
-                  .Select(i => i.Appender)
-                  .DistinctBy(i => i, ReferenceEqualityComparer.Instance);
+        => RootLogger.Appenders
+                     .Concat(Loggers.SelectMany(i => i.Appenders))
+                     .Select(i => i.Appender)
+                     .DistinctBy(i => i, ReferenceEqualityComparer.Instance);
 }
