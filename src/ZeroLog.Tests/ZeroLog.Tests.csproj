@@ -7,7 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ZeroLog.Tests.ExternalAppender\ZeroLog.Tests.ExternalAppender.csproj" />
     <ProjectReference Include="..\ZeroLog\ZeroLog.csproj" />
   </ItemGroup>
 

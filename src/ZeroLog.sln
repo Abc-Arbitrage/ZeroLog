@@ -29,8 +29,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeroLog.Analyzers", "ZeroLo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeroLog.Analyzers.Tests", "ZeroLog.Analyzers.Tests\ZeroLog.Analyzers.Tests.csproj", "{FC5C8744-6E2C-49B0-9B3B-6BE6F825DF6C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeroLog.Tests.ExternalAppender", "ZeroLog.Tests.ExternalAppender\ZeroLog.Tests.ExternalAppender.csproj", "{92721CF3-E8E7-420B-9779-DCDDA8A336D9}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,10 +67,6 @@ Global
 		{FC5C8744-6E2C-49B0-9B3B-6BE6F825DF6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FC5C8744-6E2C-49B0-9B3B-6BE6F825DF6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FC5C8744-6E2C-49B0-9B3B-6BE6F825DF6C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{92721CF3-E8E7-420B-9779-DCDDA8A336D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{92721CF3-E8E7-420B-9779-DCDDA8A336D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{92721CF3-E8E7-420B-9779-DCDDA8A336D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{92721CF3-E8E7-420B-9779-DCDDA8A336D9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
