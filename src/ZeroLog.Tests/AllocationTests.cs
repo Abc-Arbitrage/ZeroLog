@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Threading;
 using NCrunch.Framework;
@@ -51,7 +52,7 @@ public class AllocationTests
         });
 
         LogManager.RegisterEnum<DayOfWeek>();
-        //LogManager.RegisterUnmanaged<UnmanagedStruct>(); // TODO
+        LogManager.RegisterUnmanaged<UnmanagedStruct>();
     }
 
     [TearDown]
@@ -62,6 +63,7 @@ public class AllocationTests
     }
 
     [Test]
+    [SuppressMessage("ReSharper", "ExpressionIsAlwaysNull")]
     public void should_not_allocate_using_all_formats_and_file_appender_builder()
     {
         // Allocation tests are unreliable when run from NCrunch
@@ -97,59 +99,55 @@ public class AllocationTests
                 .Append(DateTime.UtcNow)
                 .Log();
 
-            // TODO enums
-
             log
                 .Info()
                 .Append("Enum ")
-                // .AppendEnum(DayOfWeek.Friday) // TODO enums
+                .AppendEnum(DayOfWeek.Friday)
                 .Append("UnknownEnum ")
-                // .AppendEnum(UnregisteredEnum.Bar)
+                .AppendEnum(UnregisteredEnum.Bar)
                 .Append("NullableEnum ")
-                // .AppendEnum((DayOfWeek?)DayOfWeek.Monday)
+                .AppendEnum((DayOfWeek?)DayOfWeek.Monday)
                 .Append("NullableNullEnum ")
-                // .AppendEnum((DayOfWeek?)null)
+                .AppendEnum((DayOfWeek?)null)
                 .Append("NullableInt ")
                 .Append((int?)42)
                 .Append("NullableNullInt ")
                 .Append((int?)null)
                 .Log();
 
-            // TODO unmanaged
-
-            // var unmanaged = new UnmanagedStruct(1, 2, 3);
-            // var unregistered_unmanaged = new UnregisteredUnmanagedStruct(4, 5, 6);
-            // UnmanagedStruct? nullable_unmanaged = unmanaged;
-            // UnmanagedStruct? null_nullable_unmanaged = (UnmanagedStruct?)null;
-            // UnregisteredUnmanagedStruct? nullable_unregistered_unmanaged = new UnregisteredUnmanagedStruct(4, 5, 6);
-            // UnregisteredUnmanagedStruct? null_nullable_unregistered_unmanaged = (UnregisteredUnmanagedStruct?)null;
+            var unmanaged = new UnmanagedStruct(1, 2, 3);
+            var unregisteredUnmanaged = new UnregisteredUnmanagedStruct(4, 5, 6);
+            var nullableUnmanaged = (UnmanagedStruct?)unmanaged;
+            var nullNullableUnmanaged = (UnmanagedStruct?)null;
+            var nullableUnregisteredUnmanaged = (UnregisteredUnmanagedStruct?)new UnregisteredUnmanagedStruct(4, 5, 6);
+            var nullNullableUnregisteredUnmanaged = (UnregisteredUnmanagedStruct?)null;
 
             log
                 .Info()
                 .Append("Unmanaged Struct ")
-                // .AppendUnmanaged(unmanaged)
+                .AppendUnmanaged(unmanaged)
                 .Append("Unregistered Unmanaged Struct ")
-                // .AppendUnmanaged(unregistered_unmanaged)
+                .AppendUnmanaged(unregisteredUnmanaged)
                 .Append("Unmanaged Struct byref ")
-                // .AppendUnmanaged(ref unmanaged)
+                .AppendUnmanaged(ref unmanaged)
                 .Append("Unregistered Unmanaged byref ")
-                // .AppendUnmanaged(ref unregistered_unmanaged)
+                .AppendUnmanaged(ref unregisteredUnmanaged)
                 .Append("Nullable Unmanaged ")
-                // .AppendUnmanaged(nullable_unmanaged)
+                .AppendUnmanaged(nullableUnmanaged)
                 .Append("Null Nullable Unmanaged ")
-                // .AppendUnmanaged(null_nullable_unmanaged)
+                .AppendUnmanaged(nullNullableUnmanaged)
                 .Append("Nullable Unregistered Unmanaged ")
-                // .AppendUnmanaged(nullable_unregistered_unmanaged)
+                .AppendUnmanaged(nullableUnregisteredUnmanaged)
                 .Append("Null Nullable Unregistered Unmanaged")
-                // .AppendUnmanaged(null_nullable_unregistered_unmanaged)
+                .AppendUnmanaged(nullNullableUnregisteredUnmanaged)
                 .Append("Nullable Unmanaged byref ")
-                // .AppendUnmanaged(ref nullable_unmanaged)
+                .AppendUnmanaged(ref nullableUnmanaged)
                 .Append("Null Nullable Unmanaged byref ")
-                // .AppendUnmanaged(ref null_nullable_unmanaged)
+                .AppendUnmanaged(ref nullNullableUnmanaged)
                 .Append("Nullable Unregistered Unmanaged byref ")
-                // .AppendUnmanaged(ref nullable_unregistered_unmanaged)
+                .AppendUnmanaged(ref nullableUnregisteredUnmanaged)
                 .Append("Null Nullable Unregistered Unmanaged byref ")
-                // .AppendUnmanaged(ref null_nullable_unregistered_unmanaged)
+                .AppendUnmanaged(ref nullNullableUnregisteredUnmanaged)
                 .Log();
         }
 
@@ -169,49 +167,61 @@ public class AllocationTests
         Baz
     }
 
-    // private struct UnmanagedStruct : IStringFormattable
-    // {
-    //     public long A;
-    //     public int B;
-    //     public byte C;
-    //
-    //     public UnmanagedStruct(long a, int b, byte c)
-    //     {
-    //         this.A = a;
-    //         this.B = b;
-    //         this.C = c;
-    //     }
-    //
-    //     public void Format(StringBuffer buffer, StringView format)
-    //     {
-    //         buffer.Append(this.A, StringView.Empty);
-    //         buffer.Append("-");
-    //         buffer.Append(this.B, StringView.Empty);
-    //         buffer.Append("-");
-    //         buffer.Append(this.C, StringView.Empty);
-    //     }
-    // }
-    //
-    // private struct UnregisteredUnmanagedStruct : IStringFormattable
-    // {
-    //     public long D;
-    //     public int E;
-    //     public byte F;
-    //
-    //     public UnregisteredUnmanagedStruct(long d, int e, byte f)
-    //     {
-    //         this.D = d;
-    //         this.E = e;
-    //         this.F = f;
-    //     }
-    //
-    //     public void Format(StringBuffer buffer, StringView format)
-    //     {
-    //         buffer.Append(this.D, StringView.Empty);
-    //         buffer.Append("-");
-    //         buffer.Append(this.E, StringView.Empty);
-    //         buffer.Append("-");
-    //         buffer.Append(this.F, StringView.Empty);
-    //     }
-    // }
+    private readonly struct UnmanagedStruct : ISpanFormattable
+    {
+        public readonly long A;
+        public readonly int B;
+        public readonly byte C;
+
+        public UnmanagedStruct(long a, int b, byte c)
+        {
+            A = a;
+            B = b;
+            C = c;
+        }
+
+        public string ToString(string format, IFormatProvider formatProvider)
+            => throw new NotSupportedException();
+
+        public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider provider)
+        {
+            var builder = new CharBufferBuilder(destination);
+            builder.TryAppend(A);
+            builder.Append('-');
+            builder.TryAppend(B);
+            builder.Append('-');
+            builder.TryAppend(C);
+            charsWritten = builder.Length;
+            return true;
+        }
+    }
+
+    private readonly struct UnregisteredUnmanagedStruct : ISpanFormattable
+    {
+        public readonly long D;
+        public readonly int E;
+        public readonly byte F;
+
+        public UnregisteredUnmanagedStruct(long d, int e, byte f)
+        {
+            D = d;
+            E = e;
+            F = f;
+        }
+
+        public string ToString(string format, IFormatProvider formatProvider)
+            => throw new NotSupportedException();
+
+        public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider provider)
+        {
+            var builder = new CharBufferBuilder(destination);
+            builder.TryAppend(D);
+            builder.Append('-');
+            builder.TryAppend(E);
+            builder.Append('-');
+            builder.TryAppend(F);
+            charsWritten = builder.Length;
+            return true;
+        }
+    }
 }

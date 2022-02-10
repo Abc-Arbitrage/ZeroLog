@@ -233,13 +233,13 @@ public class LogManagerTests
         var signal = _testAppender.SetMessageCountTarget(1);
 
         log.Info()
-           // .AppendUnmanaged(new FailingUnmanagedStruct { Value = 42 }) // TODO
+           .AppendUnmanaged(new FailingUnmanagedStruct { Value = 42 })
            .Log();
 
         signal.Wait(TimeSpan.FromSeconds(1));
 
         var logMessage = _testAppender.LoggedMessages.Single();
-        // Check.That(logMessage).Equals("An error occured during formatting: Simulated failure - Arguments: Unmanaged(0x2a000000)"); // TODO
+        Check.That(logMessage).Equals("An error occured during formatting: Simulated failure - Unformatted message: Unmanaged(0x2a000000)");
     }
 
     [Test]
@@ -287,6 +287,8 @@ public class LogManagerTests
 
     public struct FailingUnmanagedStruct : ISpanFormattable
     {
+        public int Value;
+
         public string ToString(string format, IFormatProvider formatProvider)
             => throw new InvalidOperationException("Simulated failure");
 

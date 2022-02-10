@@ -1,48 +1,45 @@
-﻿using NUnit.Framework;
+﻿using System;
+using NUnit.Framework;
+using ZeroLog.Formatting;
 
 namespace ZeroLog.Tests.Support;
 
 [TestFixture]
 public unsafe class HexUtilsTests
 {
-    // TODO
+    [Test]
+    public void should_append_value_as_hex_1()
+    {
+        Span<char> buffer = new char[2 * sizeof(int)];
+        var x = 0x1234abcd;
+        var xPtr = (byte*)&x;
+        HexUtils.AppendValueAsHex(xPtr, sizeof(int), buffer);
+        var s = buffer.ToString();
+        var expected = BitConverter.IsLittleEndian ? "cdab3412" : "1234abcd";
+        Assert.That(s, Is.EqualTo(expected));
+    }
 
-    // [Test]
-    // public void should_append_value_as_hex_1()
-    // {
-    //     StringBuffer buffer = new StringBuffer(1024);
-    //     int x = 0x1234abcd;
-    //     var bytes = BitConverter.GetBytes(x);
-    //     byte* x_ptr = (byte*)&x;
-    //     HexUtils.AppendValueAsHex(buffer, x_ptr, sizeof(int));
-    //     var s = buffer.ToString();
-    //     var expected = BitConverter.IsLittleEndian ? "cdab3412" : "1234abcd";
-    //     Assert.That(s, Is.EqualTo(expected));
-    // }
-    //
-    // [Test]
-    // public void should_append_value_as_hex_2()
-    // {
-    //     StringBuffer buffer = new StringBuffer(1024);
-    //     int x = 0x01020304;
-    //     var bytes = BitConverter.GetBytes(x);
-    //     byte* x_ptr = (byte*)&x;
-    //     HexUtils.AppendValueAsHex(buffer, x_ptr, sizeof(int));
-    //     var s = buffer.ToString();
-    //     var expected = BitConverter.IsLittleEndian ? "04030201" : "01020304";
-    //     Assert.That(s, Is.EqualTo(expected));
-    // }
-    //
-    // [Test]
-    // public void should_append_value_as_hex_3()
-    // {
-    //     StringBuffer buffer = new StringBuffer(1024);
-    //     int x = 0x10203040;
-    //     var bytes = BitConverter.GetBytes(x);
-    //     byte* x_ptr = (byte*)&x;
-    //     HexUtils.AppendValueAsHex(buffer, x_ptr, sizeof(int));
-    //     var s = buffer.ToString();
-    //     var expected = BitConverter.IsLittleEndian ? "40302010" : "10203040";
-    //     Assert.That(s, Is.EqualTo(expected));
-    // }
+    [Test]
+    public void should_append_value_as_hex_2()
+    {
+        Span<char> buffer = new char[2 * sizeof(int)];
+        var x = 0x01020304;
+        var xPtr = (byte*)&x;
+        HexUtils.AppendValueAsHex(xPtr, sizeof(int), buffer);
+        var s = buffer.ToString();
+        var expected = BitConverter.IsLittleEndian ? "04030201" : "01020304";
+        Assert.That(s, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void should_append_value_as_hex_3()
+    {
+        Span<char> buffer = new char[2 * sizeof(int)];
+        var x = 0x10203040;
+        var xPtr = (byte*)&x;
+        HexUtils.AppendValueAsHex(xPtr, sizeof(int), buffer);
+        var s = buffer.ToString();
+        var expected = BitConverter.IsLittleEndian ? "40302010" : "10203040";
+        Assert.That(s, Is.EqualTo(expected));
+    }
 }

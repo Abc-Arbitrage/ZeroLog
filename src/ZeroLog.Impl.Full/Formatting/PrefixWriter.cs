@@ -10,14 +10,14 @@ internal class PrefixWriter
 {
     private static readonly string[] _levelStrings = Enum.GetNames(typeof(LogLevel)).Select(x => x.ToUpperInvariant()).ToArray();
 
-    private readonly List<PatternPart> _parts;
+    private readonly PatternPart[] _parts;
 
     public string Pattern { get; }
 
     public PrefixWriter(string pattern)
     {
         Pattern = pattern;
-        _parts = OptimizeParts(ParsePattern(pattern)).ToList();
+        _parts = OptimizeParts(ParsePattern(pattern)).ToArray();
     }
 
     private static IEnumerable<PatternPart> ParsePattern(string pattern)
@@ -75,8 +75,6 @@ internal class PrefixWriter
     [SuppressMessage("ReSharper", "ReplaceSliceWithRangeIndexer")]
     public int WritePrefix(FormattedLogMessage message, Span<char> buffer)
     {
-        // TODO optimize this?
-
         var builder = new CharBufferBuilder(buffer);
 
         foreach (var part in _parts)
