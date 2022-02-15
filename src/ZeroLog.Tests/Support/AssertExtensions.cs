@@ -32,6 +32,14 @@ internal static class AssertExtensions
         return actual ?? throw new AssertionException("Expected non-null");
     }
 
+    [ContractAnnotation("null => halt")]
+    public static T ShouldBe<T>(this object? actual)
+        where T : class
+    {
+        Assert.That(actual, Is.InstanceOf<T>());
+        return (T)actual!;
+    }
+
     public static void ShouldBeTheSameAs<T>(this T? actual, T? expected)
         where T : class
         => Assert.That(actual, Is.SameAs(expected));

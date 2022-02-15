@@ -14,7 +14,7 @@ public abstract class StreamAppender : Appender
     private Encoding _encoding = Encoding.UTF8;
     private byte[] _newLineBytes = Array.Empty<byte>();
 
-    protected Stream? Stream { get; set; }
+    protected internal Stream? Stream { get; set; }
 
     protected internal Encoding Encoding
     {

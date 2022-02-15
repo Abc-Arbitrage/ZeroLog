@@ -1,73 +1,45 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using ZeroLog.Formatting;
 
 namespace ZeroLog.Appenders;
 
 public class DateAndSizeRollingFileAppender : StreamAppender
 {
-    private DateTime _currentDate = DateTime.UtcNow.Date;
-    private int _rollingFileNumber;
-    private long _fileSize;
+    private const int _initializeOnFirstAppend = -1;
+
+    private DateTime _currentDate;
+    private int _currentFileNumber;
 
     /// <summary>
-    /// Gets or sets the file name extension to use for the rolling files. Defaults to "log".
+    /// Directory where to put the log files.
     /// </summary>
-    public string FileExtension { get; set; } = "log";
+    public string FileDirectory { get; }
 
     /// <summary>
-    /// Gets or sets the root path and file name used by this appender, not including the file extension.
+    /// File name prefix to use for rolling files. Default to "LogFile".
     /// </summary>
-    public string FileNameRoot { get; set; }
+    public string FileNamePrefix { get; init; } = "LogFile";
+
+    /// <summary>
+    /// File name extension to use for the rolling files. Defaults to "log".
+    /// </summary>
+    public string FileExtension { get; init; } = "log";
 
     /// <summary>
     /// Gets or sets the maximum permitted file size in bytes. Once a file exceeds this value it will
     /// be closed and the next log file will be created. Defaults to 200 MB.
     /// If the size is 0, the feature is disabled.
     /// </summary>
-    public int MaxFileSizeInBytes { get; set; } = 200 * 1024 * 1024;
+    public long MaxFileSizeInBytes { get; init; } = 200 * 1024 * 1024;
 
-    internal string? CurrentFileName { get; private set; }
-
-    public DateAndSizeRollingFileAppender(string fileNameRoot)
+    public DateAndSizeRollingFileAppender(string directory)
     {
         PrefixPattern = "%time - %level - %logger || ";
-        FileNameRoot = fileNameRoot;
+        FileDirectory = Path.GetFullPath(directory);
 
-        Init();
-    }
-
-    private void Init()
-    {
-        if (string.IsNullOrEmpty(FileNameRoot))
-            throw new ArgumentException("FilenameRoot name was not supplied for RollingFileAppender");
-
-        try
-        {
-            FileNameRoot = Path.GetFullPath(FileNameRoot);
-        }
-        catch (Exception ex)
-        {
-            throw new ApplicationException("Could not resolve the full path to the log file", ex);
-        }
-
-        var directory = Path.GetDirectoryName(FileNameRoot) ?? throw new ApplicationException($"Could not resolve the directory of {FileNameRoot}");
-
-        if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
-        {
-            try
-            {
-                Directory.CreateDirectory(directory);
-            }
-            catch (Exception ex)
-            {
-                throw new ApplicationException($"Could not create directory for log file '{directory}'", ex);
-            }
-        }
-
-        FileExtension ??= "";
-        _rollingFileNumber = FindLastRollingFileNumber(directory);
+        _currentFileNumber = _initializeOnFirstAppend;
     }
 
     public override void WriteMessage(FormattedLogMessage message)
@@ -85,97 +57,139 @@ public class DateAndSizeRollingFileAppender : StreamAppender
 
     private void OpenStream()
     {
-        CurrentFileName = GetCurrentFileName();
-        Stream = OpenFile(CurrentFileName);
-        FileOpened(Stream);
-        _fileSize = Stream.Length;
+        Debug.Assert(Stream is null);
+
+        if (_currentFileNumber == _initializeOnFirstAppend)
+        {
+            Directory.CreateDirectory(FileDirectory);
+
+            _currentDate = DateTime.UtcNow.Date;
+            _currentFileNumber = FindLastRollingFileNumber(DateOnly.FromDateTime(_currentDate));
+        }
+
+        var fileName = Path.Combine(FileDirectory, GetFileName(DateOnly.FromDateTime(_currentDate), _currentFileNumber));
+
+        try
+        {
+            Stream = new FileStream(fileName, FileMode.Append, FileAccess.Write, FileShare.Read, 64 * 1024, FileOptions.SequentialScan);
+        }
+        catch (Exception ex)
+        {
+            throw new IOException($"Could not open log file '{fileName}'", ex);
+        }
+
+        FileOpened();
     }
 
     private void CloseStream()
     {
-        var stream = Stream;
-        if (stream == null)
+        if (Stream is null)
             return;
 
-        FileClosing(stream);
+        FileClosing();
         Flush();
 
+        Stream.Dispose();
         Stream = null;
-        _fileSize = 0;
-        stream.Dispose();
     }
 
     /// <summary>
     /// Called after a file is opened. You may use this to write a header.
     /// </summary>
-    protected virtual void FileOpened(Stream stream)
+    protected virtual void FileOpened()
     {
     }
 
     /// <summary>
     /// Called before a file is closed. You may use this to write a footer.
     /// </summary>
-    protected virtual void FileClosing(Stream stream)
+    protected virtual void FileClosing()
     {
     }
 
+    /// <summary>
+    /// Returns the file name without the directory for the given parameters.
+    /// </summary>
+    /// <param name="date">The file date</param>
+    /// <param name="number">The file number</param>
+    protected virtual string GetFileName(DateOnly date, int number)
+        => $"{FileNamePrefix}.{date:yyyyMMdd}.{number:D3}{(string.IsNullOrEmpty(FileExtension) ? "" : "." + FileExtension)}";
+
     private void CheckRollFile(DateTime timestamp)
     {
-        var maxSizeReached = MaxFileSizeInBytes > 0 && _fileSize >= MaxFileSizeInBytes;
+        if (Stream is null)
+        {
+            OpenStream();
+            return;
+        }
+
+        // FileStream.Position has been optimized in .NET 6, it no longer performs a syscall
+        var maxSizeReached = MaxFileSizeInBytes > 0 && Stream.Position >= MaxFileSizeInBytes;
         var dateReached = _currentDate != timestamp.Date;
 
-        if (!maxSizeReached && !dateReached && Stream != null)
+        if (!maxSizeReached && !dateReached)
             return;
 
         CloseStream();
 
         if (maxSizeReached)
-            ++_rollingFileNumber;
+            ++_currentFileNumber;
 
         if (dateReached)
         {
             _currentDate = timestamp.Date;
-            _rollingFileNumber = 0;
+            _currentFileNumber = 0;
         }
 
         OpenStream();
     }
 
-    private int FindLastRollingFileNumber(string directory)
+    private int FindLastRollingFileNumber(DateOnly date)
     {
-        var fileNumber = 0;
-        var root = FileNameRoot + ".";
-        var extension = FileExtension.Length == 0 ? "" : "." + FileExtension;
-        foreach (var filename in Directory.EnumerateFiles(directory).Select(f => f.ToUpper()))
+        var nextFileNumber = 0;
+        string? lastExistingFileName = null;
+
+        while (true)
         {
-            if (filename.StartsWith(root, StringComparison.OrdinalIgnoreCase) && filename.EndsWith(extension, StringComparison.OrdinalIgnoreCase))
+            var fileName = Path.Combine(FileDirectory, GetFileName(date, nextFileNumber));
+
+            // Sanity check
+            if (string.Equals(fileName, lastExistingFileName, OperatingSystem.IsWindows() ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal))
+                return nextFileNumber;
+
+            if (!File.Exists(fileName))
             {
-                var rootLength = root.Length;
-                var extensionLength = extension.Length;
-                if (filename.Length - rootLength - extensionLength > 0 && int.TryParse(filename.Substring(rootLength, filename.Length - rootLength - extensionLength), out var tempNumber))
-                    fileNumber = Math.Max(fileNumber, tempNumber);
+                if (nextFileNumber == 0)
+                    return 0;
+
+                break;
+            }
+
+            lastExistingFileName = fileName;
+            ++nextFileNumber;
+        }
+
+        if (lastExistingFileName != null)
+        {
+            // Find out if we can append to the latest file
+
+            try
+            {
+                // Really open the file to check if it's not locked
+
+                // ReSharper disable once RedundantArgumentDefaultValue
+                using var handle = File.OpenHandle(lastExistingFileName, FileMode.Append, FileAccess.Write, FileShare.Read);
+
+                if (MaxFileSizeInBytes > 0 && RandomAccess.GetLength(handle) < MaxFileSizeInBytes)
+                    return nextFileNumber - 1;
+            }
+            catch
+            {
+                // Cannot open the file, create a new one
+                return nextFileNumber;
             }
         }
 
-        return fileNumber;
-    }
-
-    internal string GetCurrentFileName()
-    {
-        return $"{FileNameRoot}.{_currentDate:yyyyMMdd}.{_rollingFileNumber:D3}{(FileExtension.Length == 0 ? "" : "." + FileExtension)}";
-    }
-
-    private static Stream OpenFile(string filename)
-    {
-        var fullPath = Path.GetFullPath(filename);
-
-        try
-        {
-            return new FileStream(fullPath, FileMode.Append, FileAccess.Write, FileShare.Read, 64 * 1024, FileOptions.SequentialScan);
-        }
-        catch (Exception ex)
-        {
-            throw new IOException($"Could not open log file '{fullPath}'", ex);
-        }
+        return nextFileNumber;
     }
 }
