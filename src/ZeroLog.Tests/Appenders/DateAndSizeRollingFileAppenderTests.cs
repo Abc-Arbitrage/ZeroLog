@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using NUnit.Framework;
 using ZeroLog.Appenders;
@@ -201,6 +202,32 @@ public class DateAndSizeRollingFileAppenderTests
         _appender.Dispose();
 
         File.ReadAllLines(Path.Combine(_appender.Directory, ConstantFileNameAppender.FileName)).ShouldEqual(new[] { "First line", "Test message", "Test message", "Test message", "Test message" });
+    }
+
+    [Test]
+    public void should_supply_default_file_name_pattern()
+    {
+        _appender = new DateAndSizeRollingFileAppender(_directory)
+        {
+            FileNamePrefix = "Foo",
+            FileExtension = "bar"
+        };
+
+        var logMessage = new LogMessage("Test message")
+        {
+            Timestamp = new DateTime(2022, 02, 15)
+        };
+
+        logMessage.Initialize(new Log("TestLog"), LogLevel.Info);
+
+        var formattedMessage = new FormattedLogMessage(logMessage.ToString().Length, ZeroLogConfiguration.Default);
+        formattedMessage.SetMessage(logMessage);
+
+        _appender.WriteMessage(formattedMessage);
+
+        Directory.GetFiles(_appender.Directory)
+                 .Select(Path.GetFileName)
+                 .ShouldEqual(new[] { "Foo.20220215.000.bar" });
     }
 
     private class FileNumberPatternAppender : DateAndSizeRollingFileAppender

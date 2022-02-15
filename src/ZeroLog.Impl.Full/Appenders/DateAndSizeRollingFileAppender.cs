@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.CompilerServices;
 using ZeroLog.Formatting;
 
 namespace ZeroLog.Appenders;
@@ -48,7 +49,6 @@ public class DateAndSizeRollingFileAppender : StreamAppender
     public override void WriteMessage(FormattedLogMessage message)
     {
         CheckRollFile(message.Timestamp);
-
         base.WriteMessage(message);
     }
 
@@ -58,12 +58,81 @@ public class DateAndSizeRollingFileAppender : StreamAppender
         base.Dispose();
     }
 
+    /// <summary>
+    /// Called after a file is opened. You may use this to write a header.
+    /// </summary>
+    protected virtual void FileOpened()
+    {
+    }
+
+    /// <summary>
+    /// Called before a file is closed. You may use this to write a footer.
+    /// </summary>
+    protected virtual void FileClosing()
+    {
+    }
+
+    /// <summary>
+    /// Returns the file name without the directory for the given parameters.
+    /// </summary>
+    /// <param name="date">The file date</param>
+    /// <param name="number">The file number</param>
+    /// <remarks>
+    /// The implementation should be unconditional on the arguments and have no side effects.
+    /// </remarks>
+    protected virtual string GetFileName(DateOnly date, int number)
+        => $"{FileNamePrefix}.{date:yyyyMMdd}.{number:D3}{(string.IsNullOrEmpty(FileExtension) ? "" : "." + FileExtension)}";
+
+    private void CheckRollFile(DateTime timestamp)
+    {
+        if (Stream is null)
+        {
+            if (_currentFileNumber == _uninitializedFileNumber)
+                Initialize(timestamp);
+
+            OpenStream();
+            return;
+        }
+
+        // FileStream.Position has been optimized in .NET 6, it no longer performs a syscall
+        var maxSizeReached = _isFileNameNumberDependent && MaxFileSizeInBytes > 0 && Stream.Position >= MaxFileSizeInBytes;
+        var dateReached = _isFileNameDateDependent && _currentDate != timestamp.Date;
+
+        if (!maxSizeReached && !dateReached)
+            return;
+
+        CloseStream();
+
+        if (maxSizeReached)
+            ++_currentFileNumber;
+
+        if (dateReached)
+        {
+            _currentDate = timestamp.Date;
+            _currentFileNumber = 0;
+        }
+
+        OpenStream();
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private void Initialize(DateTime timestamp)
+    {
+        System.IO.Directory.CreateDirectory(Directory);
+
+        _currentDate = timestamp.Date;
+
+        // Check if the file name depends on date and number (will work if the implementation is an unconditional pure method)
+        var baseFileName = GetFileName(DateOnly.FromDateTime(_currentDate), 0);
+        _isFileNameDateDependent = !FileNameEquals(baseFileName, GetFileName(DateOnly.FromDateTime(_currentDate).AddDays(1), 0));
+        _isFileNameNumberDependent = !FileNameEquals(baseFileName, GetFileName(DateOnly.FromDateTime(_currentDate), 1));
+
+        _currentFileNumber = FindLastRollingFileNumber(DateOnly.FromDateTime(_currentDate));
+    }
+
     private void OpenStream()
     {
         Debug.Assert(Stream is null);
-
-        if (_currentFileNumber == _uninitializedFileNumber)
-            Initialize();
 
         var fileName = Path.Combine(Directory, GetFileName(DateOnly.FromDateTime(_currentDate), _currentFileNumber));
 
@@ -89,71 +158,6 @@ public class DateAndSizeRollingFileAppender : StreamAppender
 
         Stream.Dispose();
         Stream = null;
-    }
-
-    private void Initialize()
-    {
-        System.IO.Directory.CreateDirectory(Directory);
-
-        _currentDate = DateTime.UtcNow.Date;
-
-        // Check if the file name depends on date and number (will work if the implementation is an unconditional pure method)
-        var baseFileName = GetFileName(DateOnly.FromDateTime(_currentDate), 0);
-        _isFileNameDateDependent = !FileNameEquals(baseFileName, GetFileName(DateOnly.FromDateTime(_currentDate).AddDays(1), 0));
-        _isFileNameNumberDependent = !FileNameEquals(baseFileName, GetFileName(DateOnly.FromDateTime(_currentDate), 1));
-
-        _currentFileNumber = FindLastRollingFileNumber(DateOnly.FromDateTime(_currentDate));
-    }
-
-    /// <summary>
-    /// Called after a file is opened. You may use this to write a header.
-    /// </summary>
-    protected virtual void FileOpened()
-    {
-    }
-
-    /// <summary>
-    /// Called before a file is closed. You may use this to write a footer.
-    /// </summary>
-    protected virtual void FileClosing()
-    {
-    }
-
-    /// <summary>
-    /// Returns the file name without the directory for the given parameters.
-    /// </summary>
-    /// <param name="date">The file date</param>
-    /// <param name="number">The file number</param>
-    protected virtual string GetFileName(DateOnly date, int number)
-        => $"{FileNamePrefix}.{date:yyyyMMdd}.{number:D3}{(string.IsNullOrEmpty(FileExtension) ? "" : "." + FileExtension)}";
-
-    private void CheckRollFile(DateTime timestamp)
-    {
-        if (Stream is null)
-        {
-            OpenStream();
-            return;
-        }
-
-        // FileStream.Position has been optimized in .NET 6, it no longer performs a syscall
-        var maxSizeReached = _isFileNameNumberDependent && MaxFileSizeInBytes > 0 && Stream.Position >= MaxFileSizeInBytes;
-        var dateReached = _isFileNameDateDependent && _currentDate != timestamp.Date;
-
-        if (!maxSizeReached && !dateReached)
-            return;
-
-        CloseStream();
-
-        if (maxSizeReached)
-            ++_currentFileNumber;
-
-        if (dateReached)
-        {
-            _currentDate = timestamp.Date;
-            _currentFileNumber = 0;
-        }
-
-        OpenStream();
     }
 
     private int FindLastRollingFileNumber(DateOnly date)
