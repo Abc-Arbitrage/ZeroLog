@@ -7,15 +7,18 @@ namespace ZeroLog.Appenders;
 
 public class DateAndSizeRollingFileAppender : StreamAppender
 {
-    private const int _initializeOnFirstAppend = -1;
+    private const int _uninitializedFileNumber = -1;
 
     private DateTime _currentDate;
     private int _currentFileNumber;
 
+    private bool _isFileNameDateDependent;
+    private bool _isFileNameNumberDependent;
+
     /// <summary>
     /// Directory where to put the log files.
     /// </summary>
-    public string FileDirectory { get; }
+    public string Directory { get; }
 
     /// <summary>
     /// File name prefix to use for rolling files. Default to "LogFile".
@@ -36,10 +39,10 @@ public class DateAndSizeRollingFileAppender : StreamAppender
 
     public DateAndSizeRollingFileAppender(string directory)
     {
-        PrefixPattern = "%time - %level - %logger || ";
-        FileDirectory = Path.GetFullPath(directory);
+        PrefixPattern = DefaultPrefixPattern;
+        Directory = Path.GetFullPath(directory);
 
-        _currentFileNumber = _initializeOnFirstAppend;
+        _currentFileNumber = _uninitializedFileNumber;
     }
 
     public override void WriteMessage(FormattedLogMessage message)
@@ -59,15 +62,10 @@ public class DateAndSizeRollingFileAppender : StreamAppender
     {
         Debug.Assert(Stream is null);
 
-        if (_currentFileNumber == _initializeOnFirstAppend)
-        {
-            Directory.CreateDirectory(FileDirectory);
+        if (_currentFileNumber == _uninitializedFileNumber)
+            Initialize();
 
-            _currentDate = DateTime.UtcNow.Date;
-            _currentFileNumber = FindLastRollingFileNumber(DateOnly.FromDateTime(_currentDate));
-        }
-
-        var fileName = Path.Combine(FileDirectory, GetFileName(DateOnly.FromDateTime(_currentDate), _currentFileNumber));
+        var fileName = Path.Combine(Directory, GetFileName(DateOnly.FromDateTime(_currentDate), _currentFileNumber));
 
         try
         {
@@ -91,6 +89,20 @@ public class DateAndSizeRollingFileAppender : StreamAppender
 
         Stream.Dispose();
         Stream = null;
+    }
+
+    private void Initialize()
+    {
+        System.IO.Directory.CreateDirectory(Directory);
+
+        _currentDate = DateTime.UtcNow.Date;
+
+        // Check if the file name depends on date and number (will work if the implementation is an unconditional pure method)
+        var baseFileName = GetFileName(DateOnly.FromDateTime(_currentDate), 0);
+        _isFileNameDateDependent = !FileNameEquals(baseFileName, GetFileName(DateOnly.FromDateTime(_currentDate).AddDays(1), 0));
+        _isFileNameNumberDependent = !FileNameEquals(baseFileName, GetFileName(DateOnly.FromDateTime(_currentDate), 1));
+
+        _currentFileNumber = FindLastRollingFileNumber(DateOnly.FromDateTime(_currentDate));
     }
 
     /// <summary>
@@ -124,8 +136,8 @@ public class DateAndSizeRollingFileAppender : StreamAppender
         }
 
         // FileStream.Position has been optimized in .NET 6, it no longer performs a syscall
-        var maxSizeReached = MaxFileSizeInBytes > 0 && Stream.Position >= MaxFileSizeInBytes;
-        var dateReached = _currentDate != timestamp.Date;
+        var maxSizeReached = _isFileNameNumberDependent && MaxFileSizeInBytes > 0 && Stream.Position >= MaxFileSizeInBytes;
+        var dateReached = _isFileNameDateDependent && _currentDate != timestamp.Date;
 
         if (!maxSizeReached && !dateReached)
             return;
@@ -151,10 +163,10 @@ public class DateAndSizeRollingFileAppender : StreamAppender
 
         while (true)
         {
-            var fileName = Path.Combine(FileDirectory, GetFileName(date, nextFileNumber));
+            var fileName = Path.Combine(Directory, GetFileName(date, nextFileNumber));
 
             // Sanity check
-            if (string.Equals(fileName, lastExistingFileName, OperatingSystem.IsWindows() ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal))
+            if (FileNameEquals(fileName, lastExistingFileName))
                 return nextFileNumber;
 
             if (!File.Exists(fileName))
@@ -192,4 +204,7 @@ public class DateAndSizeRollingFileAppender : StreamAppender
 
         return nextFileNumber;
     }
+
+    private static bool FileNameEquals(string? a, string? b)
+        => string.Equals(a, b, OperatingSystem.IsWindows() ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal);
 }

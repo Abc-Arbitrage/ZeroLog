@@ -11,7 +11,7 @@ public class ConsoleAppender : StreamAppender
 
     public ConsoleAppender()
     {
-        PrefixPattern = "%time - %level - %logger || ";
+        PrefixPattern = DefaultPrefixPattern;
 
         Stream = Console.OpenStandardOutput();
         Encoding = Console.OutputEncoding;

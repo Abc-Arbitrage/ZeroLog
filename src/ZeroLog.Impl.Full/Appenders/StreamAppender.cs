@@ -7,6 +7,8 @@ namespace ZeroLog.Appenders;
 
 public abstract class StreamAppender : Appender
 {
+    internal const string DefaultPrefixPattern = "%time - %level - %logger || ";
+
     private readonly char[] _charBuffer = GC.AllocateUninitializedArray<char>(LogManager.OutputBufferSize);
     private readonly byte[] _byteBuffer = GC.AllocateUninitializedArray<byte>(4 * LogManager.OutputBufferSize);
 
