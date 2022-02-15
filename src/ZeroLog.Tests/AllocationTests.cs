@@ -21,8 +21,8 @@ public class AllocationTests
     {
         public int WrittenEventCount { get; private set; }
 
-        public WaitableAppender(string fileNameRoot)
-            : base(fileNameRoot)
+        public WaitableAppender(string directory)
+            : base(directory)
         {
         }
 
@@ -39,7 +39,7 @@ public class AllocationTests
         _tempDirectory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(_tempDirectory);
 
-        _waitableAppender = new WaitableAppender(Path.Combine(_tempDirectory, "allocation-test"));
+        _waitableAppender = new WaitableAppender(_tempDirectory) { FileNamePrefix = "allocation-test" };
 
         LogManager.Initialize(new ZeroLogConfiguration
         {

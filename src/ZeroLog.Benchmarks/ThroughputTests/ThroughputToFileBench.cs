@@ -23,7 +23,7 @@ public class ThroughputToFileBench
                 RootLogger =
                 {
                     LogMessagePoolExhaustionStrategy = LogMessagePoolExhaustionStrategy.WaitUntilAvailable,
-                    Appenders = { new DateAndSizeRollingFileAppender(Path.Combine(dir, "Output")) }
+                    Appenders = { new DateAndSizeRollingFileAppender(dir) { FileNamePrefix = "Output" } }
                 }
             });
 
