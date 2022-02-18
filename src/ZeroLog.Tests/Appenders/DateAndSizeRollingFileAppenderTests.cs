@@ -213,12 +213,9 @@ public class DateAndSizeRollingFileAppenderTests
             FileExtension = "bar"
         };
 
-        var logMessage = new LogMessage("Test message")
-        {
-            Timestamp = new DateTime(2022, 02, 15)
-        };
-
+        var logMessage = new LogMessage("Test message");
         logMessage.Initialize(new Log("TestLog"), LogLevel.Info);
+        logMessage.Timestamp = new DateTime(2022, 02, 15);
 
         var formattedMessage = new FormattedLogMessage(logMessage.ToString().Length, ZeroLogConfiguration.Default);
         formattedMessage.SetMessage(logMessage);
