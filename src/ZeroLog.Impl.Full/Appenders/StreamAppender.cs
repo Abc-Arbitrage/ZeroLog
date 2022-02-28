@@ -10,7 +10,7 @@ public abstract class StreamAppender : Appender
     internal const string DefaultPrefixPattern = "%time - %level - %logger || ";
 
     private readonly char[] _charBuffer = GC.AllocateUninitializedArray<char>(LogManager.OutputBufferSize);
-    private readonly byte[] _byteBuffer = GC.AllocateUninitializedArray<byte>(4 * LogManager.OutputBufferSize);
+    private byte[] _byteBuffer = Array.Empty<byte>();
 
     private PrefixWriter? _prefixWriter;
     private Encoding _encoding = Encoding.UTF8;
@@ -24,7 +24,7 @@ public abstract class StreamAppender : Appender
         set
         {
             _encoding = value;
-            UpdateNewLineBytes();
+            UpdateEncodingSpecificData();
         }
     }
 
@@ -36,7 +36,7 @@ public abstract class StreamAppender : Appender
 
     protected StreamAppender()
     {
-        UpdateNewLineBytes();
+        UpdateEncodingSpecificData();
     }
 
     public override void Dispose()
@@ -101,6 +101,13 @@ public abstract class StreamAppender : Appender
         base.Flush();
     }
 
-    private void UpdateNewLineBytes()
-        => _newLineBytes = _encoding.GetBytes(Environment.NewLine);
+    private void UpdateEncodingSpecificData()
+    {
+        _newLineBytes = _encoding.GetBytes(Environment.NewLine);
+
+        var maxBytes = _encoding.GetMaxByteCount(_charBuffer.Length);
+
+        if (_byteBuffer.Length < maxBytes)
+            _byteBuffer = GC.AllocateUninitializedArray<byte>(maxBytes);
+    }
 }
