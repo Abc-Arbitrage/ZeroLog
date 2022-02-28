@@ -9,6 +9,8 @@
     <DebugType>embedded</DebugType>
     <IsPackable>false</IsPackable>
     <Deterministic>true</Deterministic>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)ZeroLog.snk</AssemblyOriginatorKeyFile>
     <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' != ''">true</ContinuousIntegrationBuild>
   </PropertyGroup>
 

@@ -9,4 +9,8 @@
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.0.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Include="../ZeroLog/Properties/AssemblyData.cs" Link="Properties/AssemblyData.cs" />
+  </ItemGroup>
+
 </Project>
