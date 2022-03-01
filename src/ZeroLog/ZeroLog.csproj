@@ -8,6 +8,7 @@
     <IsPackable>true</IsPackable>
     <PackageId>ZeroLog</PackageId>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>icon.png</PackageIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -26,6 +27,7 @@
     <None Include="../ZeroLog.Analyzers/bin/$(Configuration)/netstandard2.0/ZeroLog.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
     <None Include="ZeroLog.targets" Pack="true" PackagePath="build" />
     <None Include="../NuGetReadme.md" Pack="true" PackagePath="/README.md" Visible="false" />
+    <None Include="../../icon.png" Pack="true" PackagePath="/" Visible="false" />
   </ItemGroup>
 
 </Project>

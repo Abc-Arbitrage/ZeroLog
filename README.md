@@ -1,4 +1,6 @@
-# ZeroLog
+<img src="icon.png" align="right" style="float: right; margin-left: 10px; margin-bottom: 10px;" alt="Logo" />
+
+# ZeroLog 
 
 [![Build](https://github.com/Abc-Arbitrage/ZeroLog/workflows/Build/badge.svg)](https://github.com/Abc-Arbitrage/ZeroLog/actions?query=workflow%3ABuild)
 [![NuGet](https://img.shields.io/nuget/v/ZeroLog.svg?label=NuGet&logo=NuGet)](http://www.nuget.org/packages/ZeroLog/)
@@ -56,7 +58,8 @@ Two logging APIs are provided:
  - A string interpolation API:
     
     ```csharp
-    _log.Info($"Tomorrow ({DateTime.Today.AddDays(1):yyyy-MM-dd}) will occur in {GetNumberOfSecondsUntilTomorrow():N0} seconds.");
+    var date = DateTime.Today.AddDays(1); 
+    _log.Info($"Tomorrow ({date:yyyy-MM-dd}) will be in {GetNumberOfSecondsUntilTomorrow():N0} seconds.");
     ```
     
     This API uses C# 10 string interpolation handlers to implement custom interpolation support without allocations.
