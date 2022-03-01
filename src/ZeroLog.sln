@@ -15,6 +15,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Misc", "Misc", "{44EDCA3A-D
 		..\README.md = ..\README.md
 		Directory.Build.targets = Directory.Build.targets
 		..\.github\workflows\build.yml = ..\.github\workflows\build.yml
+		NuGetReadme.md = NuGetReadme.md
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZeroLog.Benchmarks", "ZeroLog.Benchmarks\ZeroLog.Benchmarks.csproj", "{D8CB63CF-F35E-4D38-88AF-9FB4C6B29630}"

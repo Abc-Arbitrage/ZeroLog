@@ -7,6 +7,7 @@
   <PropertyGroup>
     <IsPackable>true</IsPackable>
     <PackageId>ZeroLog</PackageId>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -24,6 +25,7 @@
     <ProjectReference Include="../ZeroLog.Analyzers/ZeroLog.Analyzers.csproj" ReferenceOutputAssembly="false" />
     <None Include="../ZeroLog.Analyzers/bin/$(Configuration)/netstandard2.0/ZeroLog.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
     <None Include="ZeroLog.targets" Pack="true" PackagePath="build" />
+    <None Include="../NuGetReadme.md" Pack="true" PackagePath="/README.md" Visible="false" />
   </ItemGroup>
 
 </Project>
