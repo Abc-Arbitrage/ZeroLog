@@ -13,7 +13,7 @@ Since ZeroLog does not aim to replace any existing logging libraries in any kind
 
 The project is production ready and you can [get it via NuGet](https://www.nuget.org/packages/ZeroLog) if you want to give it a try.
 
-**ZeroLog v2 requires .NET 6 and C# 10.** If your application targets an earlier .NET version, you can une [ZeroLog v1](https://github.com/Abc-Arbitrage/ZeroLog/tree/v1). Note that a .NET Standard 2.0 target is provided with a limited API surface for use by libraries, but it still requires the main application to target .NET 6 or later.
+**ZeroLog v2 requires .NET 6 and C# 10.** If your application targets an earlier .NET version, you can use [ZeroLog v1](https://github.com/Abc-Arbitrage/ZeroLog/tree/v1). Note that a .NET Standard 2.0 target is provided with a limited API surface for use by libraries, but it still requires the main application to target .NET 6 or later.
 
 
 ## Internal Design
