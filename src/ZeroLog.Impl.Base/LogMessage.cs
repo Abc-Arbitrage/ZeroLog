@@ -12,6 +12,12 @@ public sealed partial class LogMessage
     public Thread? Thread { get; private set; }
     public Exception? Exception { get; internal set; }
 
+    public LogMessage WithException(Exception? exception)
+    {
+        Exception = exception;
+        return this;
+    }
+
     public partial void Log();
 
 #if NETSTANDARD

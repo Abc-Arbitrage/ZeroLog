@@ -1,3 +1,4 @@
+using System;
 using NUnit.Framework;
 using ZeroLog.Tests.Support;
 
@@ -28,6 +29,15 @@ unsafe partial class LogMessageTests
                        .Append(20)
                        .ToString()
                        .ShouldEqual("foo10 [TRUNCATED]");
+        }
+
+        [Test]
+        public void should_assign_exception()
+        {
+            var ex = new InvalidOperationException();
+            _logMessage.WithException(ex);
+
+            _logMessage.Exception.ShouldBeTheSameAs(ex);
         }
     }
 }
