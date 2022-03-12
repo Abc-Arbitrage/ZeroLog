@@ -1,6 +1,6 @@
 # ZeroLog
 
-ZeroLog is a **zero-allocation .NET logging library**.
+**ZeroLog is a high-performance, zero-allocation .NET logging library**.
 
 It provides logging capabilities to be used in latency-sensitive applications, where garbage collections are undesirable. ZeroLog can be used in a complete zero-allocation manner, meaning that after the initialization phase, it will not allocate any managed object on the heap, thus preventing any GC from being triggered.
 

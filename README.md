@@ -1,11 +1,11 @@
 <img src="icon.png" align="right" style="float: right; margin-left: 10px; margin-bottom: 10px;" alt="Logo" />
 
-# ZeroLog 
+# ZeroLog
 
 [![Build](https://github.com/Abc-Arbitrage/ZeroLog/workflows/Build/badge.svg)](https://github.com/Abc-Arbitrage/ZeroLog/actions?query=workflow%3ABuild)
 [![NuGet](https://img.shields.io/nuget/v/ZeroLog.svg?label=NuGet&logo=NuGet)](http://www.nuget.org/packages/ZeroLog/)
 
-ZeroLog is a **zero-allocation .NET logging library**.
+**ZeroLog is a high-performance, zero-allocation .NET logging library**.
 
 It provides logging capabilities to be used in latency-sensitive applications, where garbage collections are undesirable. ZeroLog can be used in a complete zero-allocation manner, meaning that after the initialization phase, it will not allocate any managed object on the heap, thus preventing any GC from being triggered.
 
