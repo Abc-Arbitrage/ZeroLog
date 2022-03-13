@@ -1,6 +1,4 @@
-<img src="icon.png" align="right" style="float: right; margin-left: 10px; margin-bottom: 10px;" alt="Logo" />
-
-# ZeroLog
+# ZeroLog                    <a href="#"><img src="icon.png" align="right" alt="Logo" /></a>
 
 [![Build](https://github.com/Abc-Arbitrage/ZeroLog/workflows/Build/badge.svg)](https://github.com/Abc-Arbitrage/ZeroLog/actions?query=workflow%3ABuild)
 [![NuGet](https://img.shields.io/nuget/v/ZeroLog.svg?label=NuGet&logo=NuGet)](http://www.nuget.org/packages/ZeroLog/)
