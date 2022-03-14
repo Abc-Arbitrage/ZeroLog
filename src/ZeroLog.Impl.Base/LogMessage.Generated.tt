@@ -69,21 +69,8 @@ partial class LogMessage
     public LogMessage Append([InterpolatedStringHandlerArgument("")] AppendInterpolatedStringHandler value)
         => this;
 
-    [InterpolatedStringHandler]
-    public readonly ref struct AppendInterpolatedStringHandler
+    partial struct AppendInterpolatedStringHandler
     {
-        private readonly LogMessage _message;
-
-        [SuppressMessage("ReSharper", "UnusedParameter.Local")]
-        public AppendInterpolatedStringHandler(int literalLength, int formattedCount, LogMessage message)
-            => _message = message;
-
-        public void AppendLiteral(string value)
-            => _message.InternalAppendString(value);
-
-        public void AppendFormatted(string? value)
-            => _message.InternalAppendString(value);
-
 <#
         foreach (var type in _valueTypes)
         {
@@ -108,10 +95,5 @@ partial class LogMessage
             }
         }
 #>
-        public void AppendFormatted<T>(T value) where T : struct, Enum
-            => _message.InternalAppendEnum(value);
-
-        public void AppendFormatted<T>(T? value) where T : struct, Enum
-            => _message.InternalAppendEnum(value);
     }
 }

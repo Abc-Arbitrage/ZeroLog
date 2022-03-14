@@ -419,6 +419,8 @@ partial class Log
         public void AppendFormatted<T>(T? value) where T : struct, Enum
             => Message.InternalAppendEnum(value);
 
+        public void AppendFormatted<T>(LogMessage.AppendOperation<T> operation)
+            => operation.AppendAction?.Invoke(Message, operation.Value);
     }
 
     [InterpolatedStringHandler]
@@ -657,6 +659,8 @@ partial class Log
         public void AppendFormatted<T>(T? value) where T : struct, Enum
             => Message.InternalAppendEnum(value);
 
+        public void AppendFormatted<T>(LogMessage.AppendOperation<T> operation)
+            => operation.AppendAction?.Invoke(Message, operation.Value);
     }
 
     [InterpolatedStringHandler]
@@ -895,6 +899,8 @@ partial class Log
         public void AppendFormatted<T>(T? value) where T : struct, Enum
             => Message.InternalAppendEnum(value);
 
+        public void AppendFormatted<T>(LogMessage.AppendOperation<T> operation)
+            => operation.AppendAction?.Invoke(Message, operation.Value);
     }
 
     [InterpolatedStringHandler]
@@ -1133,6 +1139,8 @@ partial class Log
         public void AppendFormatted<T>(T? value) where T : struct, Enum
             => Message.InternalAppendEnum(value);
 
+        public void AppendFormatted<T>(LogMessage.AppendOperation<T> operation)
+            => operation.AppendAction?.Invoke(Message, operation.Value);
     }
 
     [InterpolatedStringHandler]
@@ -1371,6 +1379,8 @@ partial class Log
         public void AppendFormatted<T>(T? value) where T : struct, Enum
             => Message.InternalAppendEnum(value);
 
+        public void AppendFormatted<T>(LogMessage.AppendOperation<T> operation)
+            => operation.AppendAction?.Invoke(Message, operation.Value);
     }
 
     [InterpolatedStringHandler]
@@ -1609,6 +1619,8 @@ partial class Log
         public void AppendFormatted<T>(T? value) where T : struct, Enum
             => Message.InternalAppendEnum(value);
 
+        public void AppendFormatted<T>(LogMessage.AppendOperation<T> operation)
+            => operation.AppendAction?.Invoke(Message, operation.Value);
     }
 
 }

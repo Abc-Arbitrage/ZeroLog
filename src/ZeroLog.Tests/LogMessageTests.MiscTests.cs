@@ -39,5 +39,13 @@ unsafe partial class LogMessageTests
 
             _logMessage.Exception.ShouldBeTheSameAs(ex);
         }
+
+        [Test]
+        public void should_append_indirect()
+        {
+            _logMessage.Append($"foo {new LogMessage.AppendOperation<int>(40, static (msg, i) => msg.Append(i + 2))} bar")
+                       .ToString()
+                       .ShouldEqual("foo 42 bar");
+        }
     }
 }

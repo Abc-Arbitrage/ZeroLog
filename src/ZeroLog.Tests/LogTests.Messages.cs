@@ -909,6 +909,22 @@ partial class LogTests
     }
 
     [Test]
+    public void should_log_indirect_Trace()
+    {
+        _log.Trace($"foo {new LogMessage.AppendOperation<int>(40, static (msg, i) => msg.Append(i + 2))} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Trace);
+        message.ToString().ShouldEqual("foo 42 bar");
+    }
+
+    [Test]
+    public void should_not_allocate_indirect_Trace()
+    {
+        GcTester.ShouldNotAllocate(() => _log.Trace($"foo {new LogMessage.AppendOperation<int>(40, static (msg, i) => msg.Append(i + 2))} bar"));
+    }
+
+    [Test]
     public void should_not_log_above_level_Debug()
     {
         _log.UpdateConfiguration(_provider, ResolvedLoggerConfiguration.SingleAppender(LogLevel.Debug + 1));
@@ -1803,6 +1819,22 @@ partial class LogTests
     public void should_not_allocate_Enum_Debug()
     {
         GcTester.ShouldNotAllocate(() => _log.Debug($"foo {DayOfWeek.Friday} bar"));
+    }
+
+    [Test]
+    public void should_log_indirect_Debug()
+    {
+        _log.Debug($"foo {new LogMessage.AppendOperation<int>(40, static (msg, i) => msg.Append(i + 2))} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Debug);
+        message.ToString().ShouldEqual("foo 42 bar");
+    }
+
+    [Test]
+    public void should_not_allocate_indirect_Debug()
+    {
+        GcTester.ShouldNotAllocate(() => _log.Debug($"foo {new LogMessage.AppendOperation<int>(40, static (msg, i) => msg.Append(i + 2))} bar"));
     }
 
     [Test]
@@ -2703,6 +2735,22 @@ partial class LogTests
     }
 
     [Test]
+    public void should_log_indirect_Info()
+    {
+        _log.Info($"foo {new LogMessage.AppendOperation<int>(40, static (msg, i) => msg.Append(i + 2))} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Info);
+        message.ToString().ShouldEqual("foo 42 bar");
+    }
+
+    [Test]
+    public void should_not_allocate_indirect_Info()
+    {
+        GcTester.ShouldNotAllocate(() => _log.Info($"foo {new LogMessage.AppendOperation<int>(40, static (msg, i) => msg.Append(i + 2))} bar"));
+    }
+
+    [Test]
     public void should_not_log_above_level_Warn()
     {
         _log.UpdateConfiguration(_provider, ResolvedLoggerConfiguration.SingleAppender(LogLevel.Warn + 1));
@@ -3597,6 +3645,22 @@ partial class LogTests
     public void should_not_allocate_Enum_Warn()
     {
         GcTester.ShouldNotAllocate(() => _log.Warn($"foo {DayOfWeek.Friday} bar"));
+    }
+
+    [Test]
+    public void should_log_indirect_Warn()
+    {
+        _log.Warn($"foo {new LogMessage.AppendOperation<int>(40, static (msg, i) => msg.Append(i + 2))} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Warn);
+        message.ToString().ShouldEqual("foo 42 bar");
+    }
+
+    [Test]
+    public void should_not_allocate_indirect_Warn()
+    {
+        GcTester.ShouldNotAllocate(() => _log.Warn($"foo {new LogMessage.AppendOperation<int>(40, static (msg, i) => msg.Append(i + 2))} bar"));
     }
 
     [Test]
@@ -4497,6 +4561,22 @@ partial class LogTests
     }
 
     [Test]
+    public void should_log_indirect_Error()
+    {
+        _log.Error($"foo {new LogMessage.AppendOperation<int>(40, static (msg, i) => msg.Append(i + 2))} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Error);
+        message.ToString().ShouldEqual("foo 42 bar");
+    }
+
+    [Test]
+    public void should_not_allocate_indirect_Error()
+    {
+        GcTester.ShouldNotAllocate(() => _log.Error($"foo {new LogMessage.AppendOperation<int>(40, static (msg, i) => msg.Append(i + 2))} bar"));
+    }
+
+    [Test]
     public void should_not_log_above_level_Fatal()
     {
         _log.UpdateConfiguration(_provider, ResolvedLoggerConfiguration.SingleAppender(LogLevel.Fatal + 1));
@@ -5391,6 +5471,22 @@ partial class LogTests
     public void should_not_allocate_Enum_Fatal()
     {
         GcTester.ShouldNotAllocate(() => _log.Fatal($"foo {DayOfWeek.Friday} bar"));
+    }
+
+    [Test]
+    public void should_log_indirect_Fatal()
+    {
+        _log.Fatal($"foo {new LogMessage.AppendOperation<int>(40, static (msg, i) => msg.Append(i + 2))} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Fatal);
+        message.ToString().ShouldEqual("foo 42 bar");
+    }
+
+    [Test]
+    public void should_not_allocate_indirect_Fatal()
+    {
+        GcTester.ShouldNotAllocate(() => _log.Fatal($"foo {new LogMessage.AppendOperation<int>(40, static (msg, i) => msg.Append(i + 2))} bar"));
     }
 
 }

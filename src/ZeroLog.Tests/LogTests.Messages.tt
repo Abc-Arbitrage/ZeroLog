@@ -27,7 +27,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using NUnit.Framework;
-using ZeroLog.Config;
+using ZeroLog.Configuration;
 using ZeroLog.Tests.Support;
 
 namespace ZeroLog.Tests;
@@ -206,6 +206,22 @@ partial class LogTests
     public void should_not_allocate_Enum_<#= logLevel #>()
     {
         GcTester.ShouldNotAllocate(() => _log.<#= logLevel #>($"foo {DayOfWeek.Friday} bar"));
+    }
+
+    [Test]
+    public void should_log_indirect_<#= logLevel #>()
+    {
+        _log.<#= logLevel #>($"foo {new LogMessage.AppendOperation<int>(40, static (msg, i) => msg.Append(i + 2))} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.<#= logLevel #>);
+        message.ToString().ShouldEqual("foo 42 bar");
+    }
+
+    [Test]
+    public void should_not_allocate_indirect_<#= logLevel #>()
+    {
+        GcTester.ShouldNotAllocate(() => _log.<#= logLevel #>($"foo {new LogMessage.AppendOperation<int>(40, static (msg, i) => msg.Append(i + 2))} bar"));
     }
 
 <#
