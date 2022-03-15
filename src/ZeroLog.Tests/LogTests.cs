@@ -26,12 +26,6 @@ public partial class LogTests
         _log.UpdateConfiguration(_provider, ResolvedLoggerConfiguration.SingleAppender(LogLevel.Trace));
     }
 
-    [TearDown]
-    public void Teardown()
-    {
-        _provider.Dispose();
-    }
-
     [Test]
     public void should_be_disabled_at_construction()
     {

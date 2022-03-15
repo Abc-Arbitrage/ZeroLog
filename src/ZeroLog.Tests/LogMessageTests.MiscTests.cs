@@ -4,7 +4,7 @@ using ZeroLog.Tests.Support;
 
 namespace ZeroLog.Tests;
 
-unsafe partial class LogMessageTests
+partial class LogMessageTests
 {
     [TestFixture]
     public class MiscTests : LogMessageTests
@@ -20,8 +20,7 @@ unsafe partial class LogMessageTests
         [Test]
         public void should_truncate_value_types_after_string_capacity_is_exceeded()
         {
-            _logMessage = new LogMessage(new BufferSegment(_buffer, _bufferLength, null), 1);
-            _logMessage.Initialize(null, LogLevel.Info);
+            _logMessage = LogMessage.CreateTestMessage(LogLevel.Info, _bufferLength, 1);
 
             _logMessage.Append("foo")
                        .Append(10)

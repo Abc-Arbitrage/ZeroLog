@@ -1,5 +1,4 @@
 using System;
-using System.Runtime.InteropServices;
 using System.Text;
 using NUnit.Framework;
 using ZeroLog.Configuration;
@@ -9,13 +8,12 @@ using ZeroLog.Tests.Support;
 namespace ZeroLog.Tests.Formatting;
 
 [TestFixture]
-public unsafe class FormattedLogMessageTests
+public class FormattedLogMessageTests
 {
     private const int _bufferLength = 1024;
     private const int _stringCapacity = 16;
 
     private LogMessage _logMessage;
-    private byte* _buffer;
 
     static FormattedLogMessageTests()
     {
@@ -25,16 +23,7 @@ public unsafe class FormattedLogMessageTests
     [SetUp]
     public void SetUp()
     {
-        _buffer = (byte*)NativeMemory.Alloc(_bufferLength);
-
-        _logMessage = new LogMessage(new BufferSegment(_buffer, _bufferLength, null), _stringCapacity);
-        _logMessage.Initialize(null, LogLevel.Info);
-    }
-
-    [TearDown]
-    public void Teardown()
-    {
-        NativeMemory.Free(_buffer);
+        _logMessage = LogMessage.CreateTestMessage(LogLevel.Info, _bufferLength, _stringCapacity);
     }
 
     [Test]

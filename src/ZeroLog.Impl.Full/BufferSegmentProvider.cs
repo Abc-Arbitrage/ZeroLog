@@ -48,6 +48,16 @@ internal unsafe class BufferSegmentProvider
             }
         }
     }
+
+    public static BufferSegment CreateStandaloneSegment(int bufferSize)
+    {
+        var buffer = GC.AllocateUninitializedArray<byte>(bufferSize, pinned: true);
+
+        fixed (byte* data = buffer)
+        {
+            return new BufferSegment(data, bufferSize, buffer);
+        }
+    }
 }
 
 internal unsafe struct BufferSegment

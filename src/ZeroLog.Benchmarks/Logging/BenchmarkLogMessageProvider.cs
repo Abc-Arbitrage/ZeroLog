@@ -1,39 +1,18 @@
-using System;
-using System.Runtime.InteropServices;
-
 namespace ZeroLog.Benchmarks.Logging;
 
-internal unsafe class BenchmarkLogMessageProvider : ILogMessageProvider, IDisposable
+internal class BenchmarkLogMessageProvider : ILogMessageProvider
 {
     private readonly LogMessage _logMessage;
-    private readonly byte* _buffer;
 
-    public BenchmarkLogMessageProvider(uint logMessageBufferSize = 128, uint logMessageStringCapacity = 32)
+    public BenchmarkLogMessageProvider(int logMessageBufferSize = 128, int logMessageStringCapacity = 32)
     {
-        _buffer = (byte*)NativeMemory.Alloc(logMessageBufferSize);
-        var bufferSegment = new BufferSegment(_buffer, (int)logMessageBufferSize, null);
-        _logMessage = new LogMessage(bufferSegment, (int)logMessageStringCapacity);
+        _logMessage = LogMessage.CreateTestMessage(LogLevel.Trace, logMessageBufferSize, logMessageStringCapacity);
     }
 
-    public LogMessage TryAcquireLogMessage() => _logMessage;
+    public LogMessage TryAcquireLogMessage()
+        => _logMessage;
 
     public void Submit(LogMessage message)
     {
-    }
-
-    ~BenchmarkLogMessageProvider()
-    {
-        ReleaseUnmanagedResources();
-    }
-
-    private void ReleaseUnmanagedResources()
-    {
-        NativeMemory.Free(_buffer);
-    }
-
-    public void Dispose()
-    {
-        ReleaseUnmanagedResources();
-        GC.SuppressFinalize(this);
     }
 }

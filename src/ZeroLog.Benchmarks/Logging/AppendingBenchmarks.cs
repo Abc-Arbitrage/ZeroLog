@@ -7,7 +7,7 @@ namespace ZeroLog.Benchmarks.Logging;
 public class AppendingBenchmarks
 {
     private BenchmarkLogMessageProvider _provider;
-    private ZeroLog.Log _log;
+    private Log _log;
 
     private readonly int _intField = 42;
     private readonly string _stringField = "string";
@@ -18,14 +18,13 @@ public class AppendingBenchmarks
     public void GlobalSetup()
     {
         _provider = new BenchmarkLogMessageProvider();
-        _log = new ZeroLog.Log("BenchmarkV2");
+        _log = new Log("BenchmarkV2");
         _log.UpdateConfiguration(_provider, ResolvedLoggerConfiguration.SingleAppender(LogLevel.Trace));
     }
 
     [GlobalCleanup]
     public void GlobalCleanup()
     {
-        _provider.Dispose();
         LogManager.Shutdown();
     }
 

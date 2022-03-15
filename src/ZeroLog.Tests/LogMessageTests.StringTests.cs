@@ -147,8 +147,7 @@ unsafe partial class LogMessageTests
         [TestCase("012346", "01234 [TRUNCATED]")]
         public void should_truncate_when_buffer_size_is_exceeded(string value, string expected)
         {
-            _logMessage = new LogMessage(new BufferSegment(_buffer, sizeof(ArgumentType) + sizeof(int) + 5, null), _stringCapacity);
-            _logMessage.Initialize(null, LogLevel.Info);
+            _logMessage = LogMessage.CreateTestMessage(LogLevel.Info, sizeof(ArgumentType) + sizeof(int) + 5, _stringCapacity);
 
             _logMessage.AppendAsciiString(value);
 
@@ -219,8 +218,7 @@ unsafe partial class LogMessageTests
         [TestCase("012346", "01234 [TRUNCATED]")]
         public void should_truncate_when_buffer_size_is_exceeded(string value, string expected)
         {
-            _logMessage = new LogMessage(new BufferSegment(_buffer, sizeof(ArgumentType) + sizeof(int) + 5, null), _stringCapacity);
-            _logMessage.Initialize(null, LogLevel.Info);
+            _logMessage = LogMessage.CreateTestMessage(LogLevel.Info, sizeof(ArgumentType) + sizeof(int) + 5, _stringCapacity);
 
             _logMessage.AppendAsciiString(GetBytes(value));
 
