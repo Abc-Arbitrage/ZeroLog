@@ -1,102 +1,65 @@
 ﻿using System;
-using System.Threading;
-using ZeroLog.Support;
 
 namespace ZeroLog;
 
-internal class BufferSegmentProvider : IDisposable
+internal unsafe class BufferSegmentProvider
 {
-    private readonly LargeBuffer[] _largeBuffers = new LargeBuffer[16384];
+    private readonly object _lock = new();
 
-    private readonly int _largeBufferSize;
-    private readonly int _bufferSegmentSize;
+    private readonly int _segmentCount;
+    private readonly int _segmentSize;
 
-    private int _segmentIndex = -1;
+    private byte[]? _currentBuffer;
+    private int _currentSegment;
 
-    public BufferSegmentProvider(int largeBufferSize, int bufferSegmentSize)
+    internal int BufferSize => _segmentCount * _segmentSize;
+
+    public BufferSegmentProvider(int segmentCount, int segmentSize)
     {
-        _largeBufferSize = largeBufferSize;
-        _bufferSegmentSize = bufferSegmentSize;
+        if (segmentCount <= 0)
+            throw new ArgumentOutOfRangeException(nameof(segmentCount), "Invalid pool size");
 
-        AllocateLargeBuffer(0);
+        if (segmentSize <= 0)
+            throw new ArgumentOutOfRangeException(nameof(segmentSize), "Invalid buffer size");
+
+        const int maxBufferSize = 1024 * 1024 * 1024;
+        segmentSize = Math.Min(segmentSize, maxBufferSize);
+
+        while ((long)segmentSize * segmentCount > maxBufferSize)
+            segmentCount >>= 1;
+
+        _segmentCount = segmentCount;
+        _segmentSize = segmentSize;
     }
-
-    public int LastSegmentIndex => _segmentIndex;
-    public int LargeBufferCount { get; private set; }
 
     public BufferSegment GetSegment()
     {
-        var nextSegmentIndex = Interlocked.Increment(ref _segmentIndex);
-
-        var largeBuffer = AllocateLargeBufferIfNeeded(nextSegmentIndex);
-
-        var bufferSegmentIndex = nextSegmentIndex - largeBuffer.FirstSegmentGlobalIndex;
-
-        // ReSharper disable once InconsistentlySynchronizedField
-        var bufferSegment = largeBuffer.GetSegment(bufferSegmentIndex * _bufferSegmentSize, _bufferSegmentSize);
-
-        return bufferSegment;
-    }
-
-    private LargeBuffer AllocateLargeBufferIfNeeded(int segmentIndex)
-    {
-        var largeBufferIndex = segmentIndex * _bufferSegmentSize / _largeBufferSize;
-
-        // ReSharper disable once InconsistentlySynchronizedField
-        if (largeBufferIndex < LargeBufferCount)
-            return _largeBuffers[largeBufferIndex];
-
-        lock (_largeBuffers)
+        lock (_lock)
         {
-            if (largeBufferIndex < LargeBufferCount)
-                return _largeBuffers[largeBufferIndex];
+            if (_currentSegment >= _segmentCount || _currentBuffer is null)
+            {
+                _currentBuffer = GC.AllocateUninitializedArray<byte>(BufferSize, pinned: true);
+                _currentSegment = 0;
+            }
 
-            return AllocateLargeBuffer(segmentIndex);
+            fixed (byte* data = &_currentBuffer[_segmentSize * _currentSegment++])
+            {
+                return new BufferSegment(data, _segmentSize, _currentBuffer);
+            }
         }
     }
+}
 
-    private LargeBuffer AllocateLargeBuffer(int firstSegmentGlobalIndex)
+internal unsafe struct BufferSegment
+{
+    public readonly byte* Data;
+    public readonly int Length;
+    public readonly byte[]? UnderlyingBuffer;
+
+    public BufferSegment(byte* data, int length, byte[]? underlyingBuffer)
     {
-        var largeBuffer = new LargeBuffer(_largeBufferSize, firstSegmentGlobalIndex);
-        _largeBuffers[LargeBufferCount++] = largeBuffer;
-        return largeBuffer;
-    }
-
-    public void Dispose()
-    {
-        for (var i = 0; i < LargeBufferCount; ++i)
-            _largeBuffers[i].Dispose();
-    }
-
-    private unsafe class LargeBuffer : IDisposable
-    {
-        private readonly SafeHeapHandle _bufferHandle;
-        private readonly byte* _bufferPointer;
-
-        public LargeBuffer(int size, int firstSegmentGlobalIndex)
-        {
-            FirstSegmentGlobalIndex = firstSegmentGlobalIndex;
-
-            _bufferHandle = new SafeHeapHandle(size);
-            _bufferPointer = (byte*)_bufferHandle.DangerousGetHandle();
-        }
-
-        public int FirstSegmentGlobalIndex { get; }
-
-        public BufferSegment GetSegment(int offset, int length)
-        {
-            if (offset < 0 || offset >= _bufferHandle.ByteLength)
-                throw new ArgumentOutOfRangeException(nameof(offset));
-
-            if (length <= 0 || offset + length > _bufferHandle.ByteLength)
-                throw new ArgumentOutOfRangeException(nameof(offset));
-
-            return new BufferSegment(_bufferPointer + offset, length);
-        }
-
-        public void Dispose()
-        {
-            _bufferHandle.Dispose();
-        }
+        Data = data;
+        Length = length;
+        UnderlyingBuffer = underlyingBuffer;
     }
 }

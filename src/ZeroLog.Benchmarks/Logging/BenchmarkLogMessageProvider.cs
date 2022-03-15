@@ -11,7 +11,7 @@ internal unsafe class BenchmarkLogMessageProvider : ILogMessageProvider, IDispos
     public BenchmarkLogMessageProvider(uint logMessageBufferSize = 128, uint logMessageStringCapacity = 32)
     {
         _buffer = (byte*)NativeMemory.Alloc(logMessageBufferSize);
-        var bufferSegment = new BufferSegment(_buffer, (int)logMessageBufferSize);
+        var bufferSegment = new BufferSegment(_buffer, (int)logMessageBufferSize, null);
         _logMessage = new LogMessage(bufferSegment, (int)logMessageStringCapacity);
     }
 

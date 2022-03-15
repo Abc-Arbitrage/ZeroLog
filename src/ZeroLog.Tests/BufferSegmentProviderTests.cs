@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using NFluent;
 using NUnit.Framework;
+using ZeroLog.Tests.Support;
 
 namespace ZeroLog.Tests;
 
@@ -9,12 +10,14 @@ namespace ZeroLog.Tests;
 public unsafe class BufferSegmentProviderTests
 {
     private BufferSegmentProvider _bufferSegmentProvider;
-    private readonly int _defaultSegmentSize = 8;
+
+    private const int _segmentCount = 4;
+    private const int _segmentSize = 8;
 
     [SetUp]
     public void SetUp()
     {
-        _bufferSegmentProvider = new BufferSegmentProvider(32, _defaultSegmentSize);
+        _bufferSegmentProvider = new BufferSegmentProvider(_segmentCount, _segmentSize);
     }
 
     [Test]
@@ -22,45 +25,58 @@ public unsafe class BufferSegmentProviderTests
     {
         var bufferSegment = _bufferSegmentProvider.GetSegment();
 
-        Check.That(bufferSegment.Length).Equals(_defaultSegmentSize);
-        Check.That(new IntPtr(bufferSegment.Data)).IsNotEqualTo(IntPtr.Zero);
-
-        Check.That(_bufferSegmentProvider.LargeBufferCount).Equals(1);
-        Check.That(_bufferSegmentProvider.LastSegmentIndex).Equals(0);
+        bufferSegment.Length.ShouldEqual(_segmentSize);
+        new IntPtr(bufferSegment.Data).ShouldNotEqual(IntPtr.Zero);
+        bufferSegment.UnderlyingBuffer.ShouldNotBeNull();
     }
 
     [Test]
     public void should_get_all_segments_from_a_large_buffer()
     {
         var segments = new List<BufferSegment>();
-        for (var i = 0; i < 4; i++)
-        {
-            segments.Add(_bufferSegmentProvider.GetSegment());
-        }
 
-        var lastAddress = (int)segments[0].Data;
+        for (var i = 0; i < _segmentCount; ++i)
+            segments.Add(_bufferSegmentProvider.GetSegment());
+
+        var lastAddress = (nuint)segments[0].Data;
+
         for (var i = 1; i < segments.Count; i++)
         {
             var bufferSegment = segments[i];
-            Check.That((int)bufferSegment.Data).IsEqualTo(lastAddress + _defaultSegmentSize);
-            Check.That(bufferSegment.Length).Equals(_defaultSegmentSize);
-            lastAddress = (int)bufferSegment.Data;
+            ((nuint)bufferSegment.Data).ShouldEqual(lastAddress + _segmentSize);
+            bufferSegment.Length.ShouldEqual(_segmentSize);
+            lastAddress = (nuint)bufferSegment.Data;
         }
-
-        Check.That(_bufferSegmentProvider.LargeBufferCount).Equals(1);
-        Check.That(_bufferSegmentProvider.LastSegmentIndex).Equals(3);
     }
 
     [Test]
     public void should_allocate_a_new_large_buffer_when_needed()
     {
         var segments = new List<BufferSegment>();
-        for (var i = 0; i < 5; i++)
-        {
-            segments.Add(_bufferSegmentProvider.GetSegment());
-        }
 
-        Check.That(_bufferSegmentProvider.LargeBufferCount).Equals(2);
-        Check.That(_bufferSegmentProvider.LastSegmentIndex).Equals(4);
+        for (var i = 0; i < 2 * _segmentCount; i++)
+            segments.Add(_bufferSegmentProvider.GetSegment());
+
+        segments[_segmentCount - 1].UnderlyingBuffer.ShouldBeTheSameAs(segments[0].UnderlyingBuffer);
+        segments[_segmentCount].UnderlyingBuffer.ShouldNotBeTheSameAs(segments[_segmentCount - 1].UnderlyingBuffer);
+        segments[_segmentCount + 1].UnderlyingBuffer.ShouldBeTheSameAs(segments[_segmentCount].UnderlyingBuffer);
+
+        ((nuint)segments[_segmentCount + 1].Data).ShouldEqual((nuint)segments[_segmentCount].Data + _segmentSize);
+    }
+
+    [Test]
+    public void should_validate_arguments()
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(() => _ = new BufferSegmentProvider(0, 1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => _ = new BufferSegmentProvider(-1, 1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => _ = new BufferSegmentProvider(1, 0));
+        Assert.Throws<ArgumentOutOfRangeException>(() => _ = new BufferSegmentProvider(1, -1));
+    }
+
+    [Test]
+    public void should_limit_buffer_size()
+    {
+        var provider = new BufferSegmentProvider(4 * 1024, 1024 * 1024);
+        provider.BufferSize.ShouldEqual(1024 * 1024 * 1024);
     }
 }

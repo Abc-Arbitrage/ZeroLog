@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 
 namespace ZeroLog;
@@ -6,6 +7,9 @@ namespace ZeroLog;
 unsafe partial class LogMessage
 {
     internal static readonly LogMessage Empty = new(string.Empty);
+
+    [SuppressMessage("ReSharper", "NotAccessedField.Local", Justification = "This field is a GC root for the underlying buffer")]
+    private readonly byte[]? _underlyingBuffer;
 
     private readonly byte* _startOfBuffer;
     private readonly byte* _endOfBuffer;
@@ -35,6 +39,7 @@ unsafe partial class LogMessage
         _startOfBuffer = bufferSegment.Data;
         _dataPointer = bufferSegment.Data;
         _endOfBuffer = bufferSegment.Data + bufferSegment.Length;
+        _underlyingBuffer = bufferSegment.UnderlyingBuffer;
     }
 
     internal void Initialize(Log? log, LogLevel level)

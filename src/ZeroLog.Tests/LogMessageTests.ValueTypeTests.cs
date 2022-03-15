@@ -16,7 +16,7 @@ unsafe partial class LogMessageTests
             var requiredBufferSize = sizeof(ArgumentType) + sizeof(T) + (formatted ? sizeof(byte) : 0);
 
             // Ensure the message fits in the buffer as a sanity check
-            _logMessage = new LogMessage(new BufferSegment(_buffer, requiredBufferSize), _stringCapacity);
+            _logMessage = new LogMessage(new BufferSegment(_buffer, requiredBufferSize, null), _stringCapacity);
             _logMessage.Initialize(null, LogLevel.Info);
 
             action.Invoke();
@@ -35,7 +35,7 @@ unsafe partial class LogMessageTests
             _logMessage.WriteTo(Span<char>.Empty, ZeroLogConfiguration.Default).ShouldEqual(0);
 
             // Truncate because the log message buffer is too small
-            _logMessage = new LogMessage(new BufferSegment(_buffer, requiredBufferSize - 1), _stringCapacity);
+            _logMessage = new LogMessage(new BufferSegment(_buffer, requiredBufferSize - 1, null), _stringCapacity);
             _logMessage.Initialize(null, LogLevel.Info);
 
             action.Invoke();
@@ -44,7 +44,7 @@ unsafe partial class LogMessageTests
             _logMessage.ToString().ShouldEqual(ZeroLogConfiguration.Default.TruncatedMessageSuffix);
 
             // Edge case: empty log message buffer
-            _logMessage = new LogMessage(new BufferSegment(_buffer, 0), _stringCapacity);
+            _logMessage = new LogMessage(new BufferSegment(_buffer, 0, null), _stringCapacity);
             _logMessage.Initialize(null, LogLevel.Info);
 
             action.Invoke();

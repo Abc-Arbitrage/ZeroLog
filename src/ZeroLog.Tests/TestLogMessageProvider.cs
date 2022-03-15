@@ -17,7 +17,7 @@ internal unsafe class TestLogMessageProvider : ILogMessageProvider, IDisposable
     {
         const int bufferSize = 128;
         _buffer = (byte*)NativeMemory.Alloc(bufferSize);
-        _message = new LogMessage(new BufferSegment(_buffer, bufferSize), 16);
+        _message = new LogMessage(new BufferSegment(_buffer, bufferSize, null), 16);
     }
 
     public void Dispose()

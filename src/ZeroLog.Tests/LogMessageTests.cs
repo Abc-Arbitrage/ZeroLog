@@ -19,7 +19,7 @@ public abstract unsafe partial class LogMessageTests
     {
         _buffer = (byte*)NativeMemory.Alloc(_bufferLength);
 
-        _logMessage = new LogMessage(new BufferSegment(_buffer, _bufferLength), _stringCapacity);
+        _logMessage = new LogMessage(new BufferSegment(_buffer, _bufferLength, null), _stringCapacity);
         _logMessage.Initialize(null, LogLevel.Info);
     }
 

@@ -18,7 +18,6 @@ partial class LogManager : ILogMessageProvider, IDisposable
     private readonly ConcurrentQueue<LogMessage> _queue;
     private readonly ObjectPool<LogMessage> _pool;
 
-    private readonly BufferSegmentProvider _bufferSegmentProvider;
     private readonly AppenderThread _appenderThread;
 
     private bool _isRunning;
@@ -29,8 +28,8 @@ partial class LogManager : ILogMessageProvider, IDisposable
 
         _queue = new ConcurrentQueue<LogMessage>(new ConcurrentQueueCapacityInitializer(config.LogMessagePoolSize));
 
-        _bufferSegmentProvider = new BufferSegmentProvider(config.LogMessagePoolSize * config.LogMessageBufferSize, config.LogMessageBufferSize);
-        _pool = new ObjectPool<LogMessage>(config.LogMessagePoolSize, () => new LogMessage(_bufferSegmentProvider.GetSegment(), config.LogMessageStringCapacity));
+        var bufferSegmentProvider = new BufferSegmentProvider(config.LogMessagePoolSize, config.LogMessageBufferSize);
+        _pool = new ObjectPool<LogMessage>(config.LogMessagePoolSize, () => new LogMessage(bufferSegmentProvider.GetSegment(), config.LogMessageStringCapacity));
 
         UpdateAllLogConfigurations();
 
@@ -57,7 +56,6 @@ partial class LogManager : ILogMessageProvider, IDisposable
         if (_pool.IsAnyItemAcquired())
             Thread.Sleep(100); // Can't really do much better here
 
-        _bufferSegmentProvider.Dispose();
         _appenderThread.DisposeAppenders();
     }
 
