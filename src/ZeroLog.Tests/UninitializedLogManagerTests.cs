@@ -1,7 +1,7 @@
 using System;
-using NFluent;
 using NUnit.Framework;
 using ZeroLog.Configuration;
+using ZeroLog.Tests.Support;
 
 namespace ZeroLog.Tests;
 
@@ -46,6 +46,6 @@ public class UninitializedLogManagerTests
 
         log.Info("Lol");
 
-        Check.That(signal.Wait(TimeSpan.FromSeconds(1))).IsTrue();
+        signal.Wait(TimeSpan.FromSeconds(1)).ShouldBeTrue();
     }
 }

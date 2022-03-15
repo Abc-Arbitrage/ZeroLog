@@ -2,12 +2,11 @@
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Threading;
-using NCrunch.Framework;
-using NFluent;
 using NUnit.Framework;
 using ZeroLog.Appenders;
 using ZeroLog.Configuration;
 using ZeroLog.Formatting;
+using ZeroLog.Tests.Support;
 
 namespace ZeroLog.Tests;
 
@@ -66,10 +65,6 @@ public class AllocationTests
     [SuppressMessage("ReSharper", "ExpressionIsAlwaysNull")]
     public void should_not_allocate_using_all_formats_and_file_appender_builder()
     {
-        // Allocation tests are unreliable when run from NCrunch
-        if (NCrunchEnvironment.NCrunchIsResident())
-            Assert.Inconclusive();
-
         var log = LogManager.GetLogger("AllocationTest");
 
         GC.Collect(2, GCCollectionMode.Forced, true);
@@ -157,7 +152,7 @@ public class AllocationTests
 
         var gcCountAfter = GC.CollectionCount(0);
 
-        Check.That(gcCountBefore).IsEqualTo(gcCountAfter);
+        gcCountAfter.ShouldEqual(gcCountBefore);
     }
 
     private enum UnregisteredEnum

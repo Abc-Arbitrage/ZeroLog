@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using NFluent;
 using NUnit.Framework;
 using ZeroLog.Support;
 
@@ -15,40 +14,40 @@ public class TypeUtilTests
         var typeHandle = TypeUtil<DayOfWeek>.TypeHandle;
         var type = TypeUtil.GetTypeFromHandle(typeHandle);
 
-        Check.That(type).IsEqualTo(typeof(DayOfWeek));
+        type.ShouldEqual(typeof(DayOfWeek));
     }
 
     [Test]
     public void should_identify_unmanaged_types()
     {
-        Check.That(IsUnmanaged<int>()).IsTrue();
-        Check.That(IsUnmanaged<int?>()).IsTrue();
+        IsUnmanaged<int>().ShouldBeTrue();
+        IsUnmanaged<int?>().ShouldBeTrue();
 
-        Check.That(IsUnmanaged<string>()).IsFalse();
+        IsUnmanaged<string>().ShouldBeFalse();
 
-        Check.That(IsUnmanaged<DayOfWeek>()).IsTrue();
-        Check.That(IsUnmanaged<DayOfWeek?>()).IsTrue();
+        IsUnmanaged<DayOfWeek>().ShouldBeTrue();
+        IsUnmanaged<DayOfWeek?>().ShouldBeTrue();
 
-        Check.That(IsUnmanaged<UnmanagedStruct>()).IsTrue();
-        Check.That(IsUnmanaged<UnmanagedStruct?>()).IsTrue();
+        IsUnmanaged<UnmanagedStruct>().ShouldBeTrue();
+        IsUnmanaged<UnmanagedStruct?>().ShouldBeTrue();
 
-        Check.That(IsUnmanaged<UnmanagedStructNested>()).IsTrue();
-        Check.That(IsUnmanaged<UnmanagedStructNested?>()).IsTrue();
+        IsUnmanaged<UnmanagedStructNested>().ShouldBeTrue();
+        IsUnmanaged<UnmanagedStructNested?>().ShouldBeTrue();
 
-        Check.That(IsUnmanaged<ManagedStruct>()).IsFalse();
-        Check.That(IsUnmanaged<ManagedStruct?>()).IsFalse();
+        IsUnmanaged<ManagedStruct>().ShouldBeFalse();
+        IsUnmanaged<ManagedStruct?>().ShouldBeFalse();
 
-        Check.That(IsUnmanaged<ManagedStructNested>()).IsFalse();
-        Check.That(IsUnmanaged<ManagedStructNested?>()).IsFalse();
+        IsUnmanaged<ManagedStructNested>().ShouldBeFalse();
+        IsUnmanaged<ManagedStructNested?>().ShouldBeFalse();
 
-        Check.That(IsUnmanaged<UnmanagedAutoLayoutStruct>()).IsTrue();
-        Check.That(IsUnmanaged<UnmanagedAutoLayoutStruct?>()).IsTrue();
+        IsUnmanaged<UnmanagedAutoLayoutStruct>().ShouldBeTrue();
+        IsUnmanaged<UnmanagedAutoLayoutStruct?>().ShouldBeTrue();
 
-        Check.That(IsUnmanaged<GenericStruct<GenericStruct<int>>>()).IsTrue();
-        Check.That(IsUnmanaged<GenericStruct<GenericStruct<int?>>?>()).IsTrue();
+        IsUnmanaged<GenericStruct<GenericStruct<int>>>().ShouldBeTrue();
+        IsUnmanaged<GenericStruct<GenericStruct<int?>>?>().ShouldBeTrue();
 
-        Check.That(IsUnmanaged<GenericStruct<GenericStruct<string>>>()).IsFalse();
-        Check.That(IsUnmanaged<GenericStruct<GenericStruct<string>>?>()).IsFalse();
+        IsUnmanaged<GenericStruct<GenericStruct<string>>>().ShouldBeFalse();
+        IsUnmanaged<GenericStruct<GenericStruct<string>>?>().ShouldBeFalse();
 
         bool IsUnmanaged<T>()
         {

@@ -1,10 +1,10 @@
 using System;
 using System.Globalization;
 using System.Threading;
-using NFluent;
 using NUnit.Framework;
 using ZeroLog.Configuration;
 using ZeroLog.Formatting;
+using ZeroLog.Tests.Support;
 
 namespace ZeroLog.Tests.Formatting;
 
@@ -43,7 +43,7 @@ public class PrefixWriterTests
         logMessage.Timestamp = new DateTime(2020, 01, 02, 03, 04, 05, 06);
 
         var result = GetResult(prefixWriter, logMessage);
-        Check.That(result).IsEqualTo(expectedResult);
+        result.ShouldEqual(expectedResult);
     }
 
     [Test, RequiresThread]
@@ -57,7 +57,7 @@ public class PrefixWriterTests
         logMessage.Initialize(null, LogLevel.Info);
 
         var result = GetResult(prefixWriter, logMessage);
-        Check.That(result).IsEqualTo("Hello world!");
+        result.ShouldEqual("Hello world!");
     }
 
     [Test, RequiresThread]
@@ -69,7 +69,7 @@ public class PrefixWriterTests
         logMessage.Initialize(null, LogLevel.Info);
 
         var result = GetResult(prefixWriter, logMessage);
-        Check.That(result).IsEqualTo(Thread.CurrentThread.ManagedThreadId.ToString(CultureInfo.InvariantCulture));
+        result.ShouldEqual(Thread.CurrentThread.ManagedThreadId.ToString(CultureInfo.InvariantCulture));
     }
 
     [Test, RequiresThread]
@@ -80,7 +80,7 @@ public class PrefixWriterTests
         var logMessage = new LogMessage("Foo");
 
         var result = GetResult(prefixWriter, logMessage);
-        Check.That(result).IsEqualTo("0");
+        result.ShouldEqual("0");
     }
 
     private static string GetResult(PrefixWriter prefixWriter, LogMessage logMessage)

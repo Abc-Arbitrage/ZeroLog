@@ -5,7 +5,6 @@ using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using NFluent;
 using NUnit.Framework;
 using ZeroLog.Configuration;
 using ZeroLog.Tests.Support;
@@ -45,7 +44,7 @@ public class LogManagerTests
     {
         var log = LogManager.GetLogger<LogManagerTests>();
 
-        Check.That(log).IsNotNull();
+        log.ShouldNotBeNull();
     }
 
     [Test]
@@ -76,8 +75,8 @@ public class LogManagerTests
 
         var unavailableEvent = log.Debug();
 
-        Check.That(actualLogMessages.Count).Equals(actualLogMessages.Count);
-        Check.That(unavailableEvent.ConstantMessage).IsNotNull();
+        actualLogMessages.Count.ShouldEqual(actualLogMessages.Count);
+        unavailableEvent.ConstantMessage.ShouldNotBeNull();
 
         var signal = _testAppender.SetMessageCountTarget(actualLogMessages.Count);
 
@@ -89,7 +88,7 @@ public class LogManagerTests
 
         signal.Wait(TimeSpan.FromSeconds(1));
 
-        Check.That(log.Debug().ConstantMessage).IsNull();
+        log.Debug().ConstantMessage.ShouldBeNull();
     }
 
     [Test]
@@ -116,9 +115,9 @@ public class LogManagerTests
 
         log.Debug().Append("this is not going to happen").Log();
 
-        Check.That(signal.Wait(TimeSpan.FromSeconds(1))).IsTrue();
+        signal.Wait(TimeSpan.FromSeconds(1)).ShouldBeTrue();
 
-        Check.That(_testAppender.LoggedMessages.Last()).Contains("Log message skipped due to pool exhaustion.");
+        _testAppender.LoggedMessages.Last().ShouldContain("Log message skipped due to pool exhaustion.");
     }
 
     [Test]
@@ -145,7 +144,7 @@ public class LogManagerTests
 
         log.Debug().Append("this is not going to happen").Log();
 
-        Check.That(signal.Wait(TimeSpan.FromSeconds(1))).IsFalse();
+        signal.Wait(TimeSpan.FromSeconds(1)).ShouldBeFalse();
     }
 
     [Test]
@@ -178,12 +177,12 @@ public class LogManagerTests
             logCompletedSignal.Set();
         });
 
-        Check.That(logCompletedSignal.WaitOne(TimeSpan.FromSeconds(1))).IsFalse();
+        logCompletedSignal.WaitOne(TimeSpan.FromSeconds(1)).ShouldBeFalse();
 
         actualLogMessages[0].Log();
 
-        Check.That(logCompletedSignal.WaitOne(TimeSpan.FromSeconds(1))).IsTrue();
-        Check.That(signal.Wait(TimeSpan.FromSeconds(1))).IsTrue();
+        logCompletedSignal.WaitOne(TimeSpan.FromSeconds(1)).ShouldBeTrue();
+        signal.Wait(TimeSpan.FromSeconds(1)).ShouldBeTrue();
     }
 
     [Test]
@@ -239,7 +238,7 @@ public class LogManagerTests
         signal.Wait(TimeSpan.FromSeconds(1));
 
         var logMessage = _testAppender.LoggedMessages.Single();
-        Check.That(logMessage).Equals("An error occured during formatting: Simulated failure - Unformatted message: Unmanaged(0x2a000000)");
+        logMessage.ShouldEqual("An error occured during formatting: Simulated failure - Unformatted message: Unmanaged(0x2a000000)");
     }
 
     [Test]
@@ -265,9 +264,9 @@ public class LogManagerTests
     [Test]
     public void should_register_all_assembly_enums()
     {
-        Check.That(EnumCache.IsRegistered(typeof(ConsoleColor))).IsFalse();
+        EnumCache.IsRegistered(typeof(ConsoleColor)).ShouldBeFalse();
         LogManager.RegisterAllEnumsFrom(typeof(ConsoleColor).Assembly);
-        Check.That(EnumCache.IsRegistered(typeof(ConsoleColor))).IsTrue();
+        EnumCache.IsRegistered(typeof(ConsoleColor)).ShouldBeTrue();
     }
 
     [Test]
@@ -282,7 +281,7 @@ public class LogManagerTests
 
         signal.Wait(TimeSpan.FromSeconds(1));
         var message = _testAppender.LoggedMessages.Single();
-        Check.That(message).IsEqualTo(new string('.', LogManager.OutputBufferSize - ZeroLogConfiguration.Default.TruncatedMessageSuffix.Length) + ZeroLogConfiguration.Default.TruncatedMessageSuffix);
+        message.ShouldEqual(new string('.', LogManager.OutputBufferSize - ZeroLogConfiguration.Default.TruncatedMessageSuffix.Length) + ZeroLogConfiguration.Default.TruncatedMessageSuffix);
     }
 
     public struct FailingUnmanagedStruct : ISpanFormattable
