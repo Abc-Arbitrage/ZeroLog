@@ -25,7 +25,7 @@ public class AllocationTests
         {
         }
 
-        public override void WriteMessage(FormattedLogMessage message)
+        public override void WriteMessage(LoggedMessage message)
         {
             WrittenEventCount++;
             base.WriteMessage(message);

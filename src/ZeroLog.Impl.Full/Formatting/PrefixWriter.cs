@@ -73,9 +73,9 @@ internal class PrefixWriter
     }
 
     [SuppressMessage("ReSharper", "ReplaceSliceWithRangeIndexer")]
-    public int WritePrefix(FormattedLogMessage message, Span<char> buffer)
+    public void WritePrefix(LoggedMessage message, Span<char> destination, out int charsWritten)
     {
-        var builder = new CharBufferBuilder(buffer);
+        var builder = new CharBufferBuilder(destination);
 
         foreach (var part in _parts)
         {
@@ -154,7 +154,7 @@ internal class PrefixWriter
 
         endOfLoop:
 
-        return builder.Length;
+        charsWritten = builder.Length;
     }
 
     private enum PatternPartType

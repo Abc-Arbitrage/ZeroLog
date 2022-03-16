@@ -17,12 +17,12 @@ public sealed class KeyValueList
         _buffer = new char[bufferSize];
     }
 
-    public FormattedKeyValue this[int index]
+    public LoggedKeyValue this[int index]
     {
         get
         {
             var item = _items[index];
-            return new FormattedKeyValue(item.Key, _buffer.AsSpan(item.ValueOffset, item.ValueLength), item.ValueType);
+            return new LoggedKeyValue(item.Key, _buffer.AsSpan(item.ValueOffset, item.ValueLength), item.ValueType);
         }
     }
 
@@ -62,7 +62,7 @@ public sealed class KeyValueList
             _index = -1;
         }
 
-        public FormattedKeyValue Current => _keyValueList[_index];
+        public LoggedKeyValue Current => _keyValueList[_index];
 
         public bool MoveNext()
             => ++_index < _keyValueList.Count;

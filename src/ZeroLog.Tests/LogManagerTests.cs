@@ -217,7 +217,7 @@ public class LogManagerTests
         signal.Wait(TimeSpan.FromSeconds(1));
 
         var logMessage = _testAppender.LoggedMessages.Single();
-        logMessage.ShouldContain("An error occured during formatting:");
+        logMessage.ShouldContain("An error occurred during formatting:");
         logMessage.ShouldContain(guid.ToString(null, CultureInfo.InvariantCulture));
         logMessage.ShouldContain("abc");
         logMessage.ShouldContain(nameof(DayOfWeek.Friday));
@@ -238,7 +238,7 @@ public class LogManagerTests
         signal.Wait(TimeSpan.FromSeconds(1));
 
         var logMessage = _testAppender.LoggedMessages.Single();
-        logMessage.ShouldEqual("An error occured during formatting: Simulated failure - Unformatted message: Unmanaged(0x2a000000)");
+        logMessage.ShouldEqual("An error occurred during formatting: Simulated failure - Unformatted message: Unmanaged(0x2a000000)");
     }
 
     [Test]

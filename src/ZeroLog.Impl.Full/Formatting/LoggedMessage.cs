@@ -5,11 +5,11 @@ using ZeroLog.Configuration;
 
 namespace ZeroLog.Formatting;
 
-public sealed class FormattedLogMessage
+public sealed class LoggedMessage
 {
     private readonly ZeroLogConfiguration _config;
-    private readonly char[] _charBuffer;
-    private int _charLength;
+    private readonly char[] _messageBuffer;
+    private int _messageLength;
 
     private LogMessage _message = LogMessage.Empty;
 
@@ -19,12 +19,13 @@ public sealed class FormattedLogMessage
     public Exception? Exception => _message.Exception;
     public string? LoggerName => _message.Logger?.Name;
 
+    public ReadOnlySpan<char> Message => _messageBuffer.AsSpan(0, _messageLength);
     public KeyValueList KeyValues { get; }
 
-    internal FormattedLogMessage(int bufferSize, ZeroLogConfiguration config)
+    internal LoggedMessage(int bufferSize, ZeroLogConfiguration config)
     {
         _config = config;
-        _charBuffer = GC.AllocateUninitializedArray<char>(bufferSize);
+        _messageBuffer = GC.AllocateUninitializedArray<char>(bufferSize);
         KeyValues = new(bufferSize);
 
         SetMessage(LogMessage.Empty);
@@ -36,7 +37,7 @@ public sealed class FormattedLogMessage
 
         try
         {
-            _charLength = _message.WriteTo(_charBuffer, _config, LogMessage.FormatType.Formatted, KeyValues);
+            _messageLength = _message.WriteTo(_messageBuffer, _config, LogMessage.FormatType.Formatted, KeyValues);
         }
         catch (Exception ex)
         {
@@ -49,26 +50,23 @@ public sealed class FormattedLogMessage
     {
         try
         {
-            var builder = new CharBufferBuilder(_charBuffer);
-            builder.TryAppendPartial("An error occured during formatting: ");
+            var builder = new CharBufferBuilder(_messageBuffer);
+            builder.TryAppendPartial("An error occurred during formatting: ");
             builder.TryAppendPartial(ex.Message);
             builder.TryAppendPartial(" - Unformatted message: ");
 
-            var length = _message.WriteTo(builder.GetRemainingBuffer(), _config, LogMessage.FormatType.Unformatted);
-            _charLength = builder.Length + length;
+            var length = _message.WriteTo(builder.GetRemainingBuffer(), _config, LogMessage.FormatType.Unformatted, null);
+            _messageLength = builder.Length + length;
         }
         catch
         {
-            var builder = new CharBufferBuilder(_charBuffer);
-            builder.TryAppendPartial("An error occured during formatting: ");
+            var builder = new CharBufferBuilder(_messageBuffer);
+            builder.TryAppendPartial("An error occurred during formatting: ");
             builder.TryAppendPartial(ex.Message);
-            _charLength = builder.Length;
+            _messageLength = builder.Length;
         }
     }
 
-    public ReadOnlySpan<char> GetMessage()
-        => _charBuffer.AsSpan(0, _charLength);
-
     public override string ToString()
-        => GetMessage().ToString();
+        => Message.ToString();
 }

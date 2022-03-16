@@ -7,14 +7,14 @@ public abstract class Formatter
     private readonly char[] _buffer = GC.AllocateUninitializedArray<char>(LogManager.OutputBufferSize);
     private int _position;
 
-    public ReadOnlySpan<char> FormatMessage(FormattedLogMessage message)
+    public ReadOnlySpan<char> FormatMessage(LoggedMessage message)
     {
         _position = 0;
         WriteMessage(message);
         return _buffer.AsSpan(0, _position);
     }
 
-    protected abstract void WriteMessage(FormattedLogMessage message);
+    protected abstract void WriteMessage(LoggedMessage message);
 
     protected void Write(ReadOnlySpan<char> value)
     {

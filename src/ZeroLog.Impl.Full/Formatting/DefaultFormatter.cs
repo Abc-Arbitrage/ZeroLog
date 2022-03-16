@@ -2,7 +2,9 @@ namespace ZeroLog.Formatting;
 
 public sealed class DefaultFormatter : Formatter
 {
-    private readonly PrefixWriter? _prefixWriter;
+    private static readonly PrefixWriter _defaultPrefixWriter = new("%time - %level - %logger || ");
+
+    private readonly PrefixWriter? _prefixWriter = _defaultPrefixWriter;
 
     public string PrefixPattern
     {
@@ -12,17 +14,15 @@ public sealed class DefaultFormatter : Formatter
 
     public string JsonSeparator { get; init; } = " ~~ ";
 
-    public DefaultFormatter()
-    {
-        PrefixPattern = "%time - %level - %logger || ";
-    }
-
-    protected override void WriteMessage(FormattedLogMessage message)
+    protected override void WriteMessage(LoggedMessage message)
     {
         if (_prefixWriter != null)
-            AdvanceBy(_prefixWriter.WritePrefix(message, GetRemainingBuffer()));
+        {
+            _prefixWriter.WritePrefix(message, GetRemainingBuffer(), out var charsWritten);
+            AdvanceBy(charsWritten);
+        }
 
-        Write(message.GetMessage());
+        Write(message.Message);
 
         if (message.KeyValues.Count != 0)
         {

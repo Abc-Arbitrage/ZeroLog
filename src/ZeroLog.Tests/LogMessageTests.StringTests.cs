@@ -69,7 +69,7 @@ unsafe partial class LogMessageTests
             _logMessage.Append((string?)null);
 
             Span<char> outputBuffer = stackalloc char[2];
-            _logMessage.WriteTo(outputBuffer, ZeroLogConfiguration.Default).ShouldEqual(outputBuffer.Length);
+            _logMessage.WriteTo(outputBuffer, ZeroLogConfiguration.Default, LogMessage.FormatType.Formatted, null).ShouldEqual(outputBuffer.Length);
             outputBuffer.SequenceEqual(ZeroLogConfiguration.Default.NullDisplayString.AsSpan(0, outputBuffer.Length));
         }
 
@@ -98,7 +98,7 @@ unsafe partial class LogMessageTests
         {
             _logMessage.Append("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ");
 
-            string.Create(16, _logMessage, (buffer, message) => message.WriteTo(buffer, ZeroLogConfiguration.Default))
+            string.Create(16, _logMessage, (buffer, message) => message.WriteTo(buffer, ZeroLogConfiguration.Default, LogMessage.FormatType.Formatted, null))
                   .ShouldEqual("0123 [TRUNCATED]");
         }
 
@@ -108,7 +108,7 @@ unsafe partial class LogMessageTests
         {
             _logMessage.Append("0123456789");
 
-            string.Create(8, _logMessage, (buffer, message) => message.WriteTo(buffer, ZeroLogConfiguration.Default))
+            string.Create(8, _logMessage, (buffer, message) => message.WriteTo(buffer, ZeroLogConfiguration.Default, LogMessage.FormatType.Formatted, null))
                   .ShouldEqual(" [TRUNCA");
         }
     }
@@ -169,7 +169,7 @@ unsafe partial class LogMessageTests
         {
             _logMessage.AppendAsciiString("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ");
 
-            string.Create(16, _logMessage, (buffer, message) => message.WriteTo(buffer, ZeroLogConfiguration.Default))
+            string.Create(16, _logMessage, (buffer, message) => message.WriteTo(buffer, ZeroLogConfiguration.Default, LogMessage.FormatType.Formatted, null))
                   .ShouldEqual("0123 [TRUNCATED]");
         }
 
@@ -179,7 +179,7 @@ unsafe partial class LogMessageTests
         {
             _logMessage.AppendAsciiString("0123456789");
 
-            string.Create(8, _logMessage, (buffer, message) => message.WriteTo(buffer, ZeroLogConfiguration.Default))
+            string.Create(8, _logMessage, (buffer, message) => message.WriteTo(buffer, ZeroLogConfiguration.Default, LogMessage.FormatType.Formatted, null))
                   .ShouldEqual(" [TRUNCA");
         }
     }
@@ -242,7 +242,7 @@ unsafe partial class LogMessageTests
         {
             _logMessage.AppendAsciiString(GetBytes("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"));
 
-            string.Create(16, _logMessage, (buffer, message) => message.WriteTo(buffer, ZeroLogConfiguration.Default))
+            string.Create(16, _logMessage, (buffer, message) => message.WriteTo(buffer, ZeroLogConfiguration.Default, LogMessage.FormatType.Formatted, null))
                   .ShouldEqual("0123 [TRUNCATED]");
         }
 
@@ -252,7 +252,7 @@ unsafe partial class LogMessageTests
         {
             _logMessage.AppendAsciiString(GetBytes("0123456789"));
 
-            string.Create(8, _logMessage, (buffer, message) => message.WriteTo(buffer, ZeroLogConfiguration.Default))
+            string.Create(8, _logMessage, (buffer, message) => message.WriteTo(buffer, ZeroLogConfiguration.Default, LogMessage.FormatType.Formatted, null))
                   .ShouldEqual(" [TRUNCA");
         }
 

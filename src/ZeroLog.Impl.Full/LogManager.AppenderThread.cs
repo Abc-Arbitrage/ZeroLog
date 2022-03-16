@@ -70,12 +70,12 @@ partial class LogManager
         private void WriteToAppenders()
         {
             var spinWait = new SpinWait();
-            var formattedMessage = new FormattedLogMessage(OutputBufferSize, _config);
+            var loggedMessage = new LoggedMessage(OutputBufferSize, _config);
             var flush = false;
 
             while (_logManager._isRunning || !_queue.IsEmpty)
             {
-                if (TryToProcessQueue(formattedMessage))
+                if (TryToProcessQueue(loggedMessage))
                 {
                     spinWait.Reset();
                     flush = true;
@@ -96,7 +96,7 @@ partial class LogManager
             FlushAppenders();
         }
 
-        private bool TryToProcessQueue(FormattedLogMessage formattedLogMessage)
+        private bool TryToProcessQueue(LoggedMessage loggedMessage)
         {
             if (!_queue.TryDequeue(out var logMessage))
                 return false;
@@ -107,10 +107,10 @@ partial class LogManager
                 if (appenders.Length == 0)
                     return true;
 
-                formattedLogMessage.SetMessage(logMessage);
+                loggedMessage.SetMessage(logMessage);
 
                 foreach (var appender in appenders)
-                    appender.InternalWriteMessage(formattedLogMessage, _config);
+                    appender.InternalWriteMessage(loggedMessage, _config);
             }
             finally
             {

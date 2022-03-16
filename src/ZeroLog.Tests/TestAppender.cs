@@ -36,7 +36,7 @@ public class TestAppender : Appender
         return _signal;
     }
 
-    public override void WriteMessage(FormattedLogMessage message)
+    public override void WriteMessage(LoggedMessage message)
     {
         if (_captureLoggedMessages)
             LoggedMessages.Add(message.ToString());

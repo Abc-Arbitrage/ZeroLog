@@ -44,7 +44,7 @@ public class DateAndSizeRollingFileAppenderTests
         var logMessage = new LogMessage("Test log message");
         logMessage.Initialize(new Log("TestLog"), LogLevel.Info);
 
-        var formattedMessage = new FormattedLogMessage(logMessage.ToString().Length, ZeroLogConfiguration.Default);
+        var formattedMessage = new LoggedMessage(logMessage.ToString().Length, ZeroLogConfiguration.Default);
         formattedMessage.SetMessage(logMessage);
 
         _appender.WriteMessage(formattedMessage);
@@ -70,7 +70,7 @@ public class DateAndSizeRollingFileAppenderTests
         var logMessage = new LogMessage(new string('a', 50));
         logMessage.Initialize(new Log("TestLog"), LogLevel.Info);
 
-        var formattedMessage = new FormattedLogMessage(logMessage.ToString().Length, ZeroLogConfiguration.Default);
+        var formattedMessage = new LoggedMessage(logMessage.ToString().Length, ZeroLogConfiguration.Default);
         formattedMessage.SetMessage(logMessage);
 
         _appender.WriteMessage(formattedMessage);
@@ -97,7 +97,7 @@ public class DateAndSizeRollingFileAppenderTests
         var logMessage = new LogMessage("Test message");
         logMessage.Initialize(new Log("TestLog"), LogLevel.Info);
 
-        var formattedMessage = new FormattedLogMessage(logMessage.ToString().Length, ZeroLogConfiguration.Default);
+        var formattedMessage = new LoggedMessage(logMessage.ToString().Length, ZeroLogConfiguration.Default);
         formattedMessage.SetMessage(logMessage);
 
         _appender.WriteMessage(formattedMessage);
@@ -128,7 +128,7 @@ public class DateAndSizeRollingFileAppenderTests
         var logMessage = new LogMessage("Test message");
         logMessage.Initialize(new Log("TestLog"), LogLevel.Info);
 
-        var formattedMessage = new FormattedLogMessage(logMessage.ToString().Length, ZeroLogConfiguration.Default);
+        var formattedMessage = new LoggedMessage(logMessage.ToString().Length, ZeroLogConfiguration.Default);
         formattedMessage.SetMessage(logMessage);
 
         Directory.CreateDirectory(_appender.Directory);
@@ -155,7 +155,7 @@ public class DateAndSizeRollingFileAppenderTests
         var logMessage = new LogMessage("Test message");
         logMessage.Initialize(new Log("TestLog"), LogLevel.Info);
 
-        var formattedMessage = new FormattedLogMessage(logMessage.ToString().Length, ZeroLogConfiguration.Default);
+        var formattedMessage = new LoggedMessage(logMessage.ToString().Length, ZeroLogConfiguration.Default);
         formattedMessage.SetMessage(logMessage);
 
         Directory.CreateDirectory(_appender.Directory);
@@ -187,7 +187,7 @@ public class DateAndSizeRollingFileAppenderTests
         var logMessage = new LogMessage("Test message");
         logMessage.Initialize(new Log("TestLog"), LogLevel.Info);
 
-        var formattedMessage = new FormattedLogMessage(logMessage.ToString().Length, ZeroLogConfiguration.Default);
+        var formattedMessage = new LoggedMessage(logMessage.ToString().Length, ZeroLogConfiguration.Default);
         formattedMessage.SetMessage(logMessage);
 
         Directory.CreateDirectory(_appender.Directory);
@@ -220,7 +220,7 @@ public class DateAndSizeRollingFileAppenderTests
         logMessage.Initialize(new Log("TestLog"), LogLevel.Info);
         logMessage.Timestamp = new DateTime(2022, 02, 15);
 
-        var formattedMessage = new FormattedLogMessage(logMessage.ToString().Length, ZeroLogConfiguration.Default);
+        var formattedMessage = new LoggedMessage(logMessage.ToString().Length, ZeroLogConfiguration.Default);
         formattedMessage.SetMessage(logMessage);
 
         _appender.WriteMessage(formattedMessage);

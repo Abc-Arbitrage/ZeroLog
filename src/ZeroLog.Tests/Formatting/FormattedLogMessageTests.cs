@@ -32,9 +32,9 @@ public class FormattedLogMessageTests
         GetFormatted().ToString().ShouldEqual("FooBar");
     }
 
-    private FormattedLogMessage GetFormatted()
+    private LoggedMessage GetFormatted()
     {
-        var message = new FormattedLogMessage(_bufferLength, ZeroLogConfiguration.Default);
+        var message = new LoggedMessage(_bufferLength, ZeroLogConfiguration.Default);
         message.SetMessage(_logMessage);
         return message;
     }

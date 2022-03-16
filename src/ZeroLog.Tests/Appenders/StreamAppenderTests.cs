@@ -12,12 +12,12 @@ namespace ZeroLog.Tests.Appenders;
 [TestFixture]
 public class StreamAppenderTests
 {
-    private static FormattedLogMessage GetFormattedMessage(string message, out LogMessage logMessage)
+    private static LoggedMessage GetFormattedMessage(string message, out LogMessage logMessage)
     {
         logMessage = new LogMessage(message);
         logMessage.Initialize(new Log("TestLog"), LogLevel.Info);
 
-        var formattedMessage = new FormattedLogMessage(logMessage.ToString().Length, ZeroLogConfiguration.Default);
+        var formattedMessage = new LoggedMessage(logMessage.ToString().Length, ZeroLogConfiguration.Default);
         formattedMessage.SetMessage(logMessage);
 
         return formattedMessage;
@@ -62,7 +62,7 @@ public class StreamAppenderTests
         logMessage.Initialize(new Log("TestLog"), LogLevel.Info);
         logMessage.Exception = new InvalidOperationException("Simulated exception");
 
-        var formattedMessage = new FormattedLogMessage(logMessage.ToString().Length, ZeroLogConfiguration.Default);
+        var formattedMessage = new LoggedMessage(logMessage.ToString().Length, ZeroLogConfiguration.Default);
         formattedMessage.SetMessage(logMessage);
 
         var appender = new MemoryAppender();

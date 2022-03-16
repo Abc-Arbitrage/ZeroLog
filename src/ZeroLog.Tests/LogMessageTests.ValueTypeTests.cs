@@ -26,12 +26,12 @@ unsafe partial class LogMessageTests
             {
                 // Truncate because the output buffer is too small
                 Span<char> smallBuffer = stackalloc char[2];
-                _logMessage.WriteTo(smallBuffer, ZeroLogConfiguration.Default).ShouldEqual(smallBuffer.Length);
+                _logMessage.WriteTo(smallBuffer, ZeroLogConfiguration.Default, LogMessage.FormatType.Formatted, null).ShouldEqual(smallBuffer.Length);
                 smallBuffer.SequenceEqual(ZeroLogConfiguration.Default.TruncatedMessageSuffix.AsSpan(0, smallBuffer.Length)).ShouldBeTrue();
             }
 
             // Edge case: empty output buffer
-            _logMessage.WriteTo(Span<char>.Empty, ZeroLogConfiguration.Default).ShouldEqual(0);
+            _logMessage.WriteTo(Span<char>.Empty, ZeroLogConfiguration.Default, LogMessage.FormatType.Formatted, null).ShouldEqual(0);
 
             // Truncate because the log message buffer is too small
             _logMessage = LogMessage.CreateTestMessage(LogLevel.Info, requiredBufferSize - 1, _stringCapacity);

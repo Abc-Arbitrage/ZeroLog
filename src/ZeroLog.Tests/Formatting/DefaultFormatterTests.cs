@@ -316,7 +316,7 @@ public class DefaultFormatterTests
 
     private string GetFormattedFull()
     {
-        var message = new FormattedLogMessage(_bufferLength, ZeroLogConfiguration.Default);
+        var message = new LoggedMessage(_bufferLength, ZeroLogConfiguration.Default);
         message.SetMessage(_logMessage);
 
         var formatter = new DefaultFormatter();
@@ -325,7 +325,7 @@ public class DefaultFormatterTests
 
     private string GetFormattedSimple()
     {
-        var message = new FormattedLogMessage(_bufferLength, ZeroLogConfiguration.Default);
+        var message = new LoggedMessage(_bufferLength, ZeroLogConfiguration.Default);
         message.SetMessage(_logMessage);
 
         var formatter = new DefaultFormatter

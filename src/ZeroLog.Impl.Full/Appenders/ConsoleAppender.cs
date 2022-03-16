@@ -16,7 +16,7 @@ public class ConsoleAppender : StreamAppender
         ColorOutput = !Console.IsOutputRedirected;
     }
 
-    public override void WriteMessage(FormattedLogMessage message)
+    public override void WriteMessage(LoggedMessage message)
     {
         if (ColorOutput)
             UpdateConsoleColor(message);
@@ -34,7 +34,7 @@ public class ConsoleAppender : StreamAppender
         _lastLoggedLevel = LogLevel.None;
     }
 
-    private void UpdateConsoleColor(FormattedLogMessage message)
+    private void UpdateConsoleColor(LoggedMessage message)
     {
         if (message.Level == _lastLoggedLevel)
             return;

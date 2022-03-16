@@ -1,6 +1,7 @@
 using System;
 using NUnit.Framework;
 using ZeroLog.Configuration;
+using ZeroLog.Formatting;
 using ZeroLog.Tests.Support;
 
 namespace ZeroLog.Tests;
@@ -21,12 +22,13 @@ public abstract partial class LogMessageTests
     private void ShouldNotAllocate(Action action)
     {
         var output = new char[1024];
+        var keyValues = new KeyValueList(1024);
 
         GcTester.ShouldNotAllocate(
             () =>
             {
                 action.Invoke();
-                _logMessage.WriteTo(output, ZeroLogConfiguration.Default);
+                _logMessage.WriteTo(output, ZeroLogConfiguration.Default, LogMessage.FormatType.Formatted, keyValues);
             },
             () => _logMessage.Initialize(null, LogLevel.Info)
         );

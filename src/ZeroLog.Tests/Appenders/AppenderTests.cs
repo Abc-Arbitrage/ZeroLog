@@ -14,7 +14,7 @@ namespace ZeroLog.Tests.Appenders;
 public class AppenderTests
 {
     private FailingAppender _appender;
-    private FormattedLogMessage _message;
+    private LoggedMessage _message;
 
     [SetUp]
     public void SetUp()
@@ -22,7 +22,7 @@ public class AppenderTests
         _appender = new FailingAppender();
 
         var logMessage = new LogMessage("Test");
-        _message = new FormattedLogMessage(logMessage.ToString().Length, ZeroLogConfiguration.Default);
+        _message = new LoggedMessage(logMessage.ToString().Length, ZeroLogConfiguration.Default);
         _message.SetMessage(logMessage);
     }
 
@@ -152,7 +152,7 @@ public class AppenderTests
         public int AppendCount { get; private set; }
         public int FlushCount { get; private set; }
 
-        public override void WriteMessage(FormattedLogMessage message)
+        public override void WriteMessage(LoggedMessage message)
         {
             ++AppendCount;
 

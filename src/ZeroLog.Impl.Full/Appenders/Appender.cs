@@ -12,7 +12,7 @@ public abstract class Appender : IDisposable
 
     public LogLevel Level { get; init; }
 
-    public abstract void WriteMessage(FormattedLogMessage message);
+    public abstract void WriteMessage(LoggedMessage message);
 
     public virtual void Flush()
     {
@@ -22,7 +22,7 @@ public abstract class Appender : IDisposable
     {
     }
 
-    internal void InternalWriteMessage(FormattedLogMessage message, ZeroLogConfiguration config)
+    internal void InternalWriteMessage(LoggedMessage message, ZeroLogConfiguration config)
     {
         if (_quarantineStopwatch.IsRunning && _quarantineStopwatch.Elapsed < config.AppenderQuarantineDelay)
             return;

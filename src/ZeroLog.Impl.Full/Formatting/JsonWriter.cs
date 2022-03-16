@@ -38,7 +38,7 @@ internal static unsafe class JsonWriter
         charsWritten = builder.Length;
     }
 
-    private static void AppendJsonValue(ref CharBufferBuilder builder, in FormattedKeyValue keyValue)
+    private static void AppendJsonValue(ref CharBufferBuilder builder, in LoggedKeyValue keyValue)
     {
         if (keyValue.IsBoolean)
             builder.TryAppendWhole(keyValue.Value.SequenceEqual(bool.TrueString) ? "true" : "false");

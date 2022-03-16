@@ -12,8 +12,8 @@ unsafe partial class LogMessage
     [SuppressMessage("ReSharper", "ReplaceSliceWithRangeIndexer")]
     internal int WriteTo(Span<char> outputBuffer,
                          ZeroLogConfiguration config,
-                         FormatType formatType = FormatType.Formatted,
-                         KeyValueList? keyValueList = null)
+                         FormatType formatType,
+                         KeyValueList? keyValueList)
     {
         keyValueList?.Clear();
 
@@ -582,7 +582,7 @@ unsafe partial class LogMessage
 
         var buffer = ArrayPool<char>.Shared.Rent(4 * 1024);
 
-        var chars = WriteTo(buffer, ZeroLogConfiguration.Default);
+        var chars = WriteTo(buffer, ZeroLogConfiguration.Default, FormatType.Formatted, null);
         var value = new string(buffer.AsSpan(0, chars));
 
         ArrayPool<char>.Shared.Return(buffer);

@@ -20,9 +20,9 @@ internal class PerformanceAppender : Appender
         }
     }
 
-    public override void WriteMessage(FormattedLogMessage message)
+    public override void WriteMessage(LoggedMessage message)
     {
-        var messageSpan = message.GetMessage();
+        var messageSpan = message.Message;
         messageSpan.CopyTo(_messages[_count].StartTimestampInChars);
         _messages[_count].MessageLength = messageSpan.Length;
         _messages[_count].EndTimestamp = Stopwatch.GetTimestamp();

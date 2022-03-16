@@ -10,6 +10,7 @@ public abstract class StreamAppender : Appender
     private byte[] _byteBuffer = Array.Empty<byte>();
 
     private Encoding _encoding = Encoding.UTF8;
+    private Formatter? _formatter;
 
     protected internal Stream? Stream { get; set; }
 
@@ -23,7 +24,11 @@ public abstract class StreamAppender : Appender
         }
     }
 
-    public Formatter Formatter { get; init; } = new DefaultFormatter();
+    public Formatter Formatter
+    {
+        get => _formatter ??= new DefaultFormatter();
+        init => _formatter = value;
+    }
 
     protected StreamAppender()
     {
@@ -38,7 +43,7 @@ public abstract class StreamAppender : Appender
         base.Dispose();
     }
 
-    public override void WriteMessage(FormattedLogMessage message)
+    public override void WriteMessage(LoggedMessage message)
     {
         if (Stream is null)
             return;

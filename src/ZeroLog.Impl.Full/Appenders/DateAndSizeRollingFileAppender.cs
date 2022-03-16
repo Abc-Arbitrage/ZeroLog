@@ -45,7 +45,7 @@ public class DateAndSizeRollingFileAppender : StreamAppender
         _currentFileNumber = _uninitializedFileNumber;
     }
 
-    public override void WriteMessage(FormattedLogMessage message)
+    public override void WriteMessage(LoggedMessage message)
     {
         CheckRollFile(message.Timestamp);
         base.WriteMessage(message);

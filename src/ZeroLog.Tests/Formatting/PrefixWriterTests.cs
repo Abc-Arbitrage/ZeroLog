@@ -86,9 +86,9 @@ public class PrefixWriterTests
     private static string GetResult(PrefixWriter prefixWriter, LogMessage logMessage)
     {
         var buffer = new char[256];
-        var formattedLogMessage = new FormattedLogMessage(256, ZeroLogConfiguration.Default);
+        var formattedLogMessage = new LoggedMessage(256, ZeroLogConfiguration.Default);
         formattedLogMessage.SetMessage(logMessage);
-        var prefixLength = prefixWriter.WritePrefix(formattedLogMessage, buffer);
-        return buffer.AsSpan(0, prefixLength).ToString();
+        prefixWriter.WritePrefix(formattedLogMessage, buffer, out var charsWritten);
+        return buffer.AsSpan(0, charsWritten).ToString();
     }
 }
