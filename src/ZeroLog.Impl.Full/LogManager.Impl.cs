@@ -39,6 +39,9 @@ partial class LogManager : ILogMessageProvider, IDisposable
         _appenderThread = new AppenderThread(this);
     }
 
+    /// <summary>
+    /// Disposes the log manager, effectively shutting it down.
+    /// </summary>
     public void Dispose()
     {
         if (!_isRunning)
@@ -59,27 +62,52 @@ partial class LogManager : ILogMessageProvider, IDisposable
         _appenderThread.DisposeAppenders();
     }
 
+    /// <summary>
+    /// Initializes ZeroLog.
+    /// </summary>
+    /// <param name="configuration">The configuration to use.</param>
+    /// <returns>A disposable which shuts down ZeroLog upon disposal.</returns>
+    /// <exception cref="InvalidOperationException">ZeroLog is already initialized.</exception>
     public static IDisposable Initialize(ZeroLogConfiguration configuration)
     {
         configuration.ValidateAndFreeze();
 
         if (_staticLogManager is not null)
-            throw new ApplicationException("LogManager is already initialized");
+            throw new InvalidOperationException("LogManager is already initialized.");
 
         _staticLogManager = new LogManager(configuration);
         return _staticLogManager;
     }
 
+    /// <summary>
+    /// Shuts down ZeroLog.
+    /// </summary>
     public static void Shutdown()
         => _staticLogManager?.Dispose();
 
+    /// <summary>
+    /// Registers an enum type.
+    /// Member names will be used when formatting the message (instead of numeric values).
+    /// </summary>
+    /// <param name="enumType">The enum type.</param>
     public static void RegisterEnum(Type enumType)
         => EnumCache.Register(enumType);
 
+    /// <summary>
+    /// Registers an enum type.
+    /// Member names will be used when formatting the message (instead of numeric values).
+    /// </summary>
+    /// <typeparam name="T">The enum type.</typeparam>
     public static void RegisterEnum<T>()
         where T : struct, Enum
         => RegisterEnum(typeof(T));
 
+    /// <summary>
+    /// Registers all enum types from the given assembly.
+    /// Member names will be used when formatting the message (instead of numeric values).
+    /// </summary>
+    /// <param name="assembly">The assembly.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="assembly"/> was null.</exception>
     public static void RegisterAllEnumsFrom(Assembly assembly)
     {
         if (assembly == null)
@@ -89,13 +117,31 @@ partial class LogManager : ILogMessageProvider, IDisposable
             RegisterEnum(type);
     }
 
+    /// <summary>
+    /// Registers an unmanaged type which implements <see cref="ISpanFormattable"/>.
+    /// The <see cref="ISpanFormattable.TryFormat"/> method will be used when formatting the message (instead of the binary representation).
+    /// </summary>
+    /// <param name="type">The unmanaged type.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="type"/> was null.</exception>
+    /// <exception cref="ArgumentException"><paramref name="type"/> is not an unmanaged type or does not implement <see cref="ISpanFormattable"/>.</exception>
     public static void RegisterUnmanaged(Type type)
         => UnmanagedCache.Register(type);
 
+    /// <summary>
+    /// Registers an unmanaged type which implements <see cref="ISpanFormattable"/>.
+    /// The <see cref="ISpanFormattable.TryFormat"/> method will be used when formatting the message (instead of the binary representation).
+    /// </summary>
+    /// <typeparam name="T">The unmanaged type.</typeparam>
+    /// <exception cref="ArgumentException"><typeparamref name="T"/> is not an unmanaged type.</exception>
     public static void RegisterUnmanaged<T>()
         where T : unmanaged, ISpanFormattable
         => UnmanagedCache.Register<T>();
 
+    /// <summary>
+    /// Registers a delegate to be used for formatting an unmanaged type.
+    /// </summary>
+    /// <param name="formatter">The formatter delegate.</param>
+    /// <typeparam name="T">The unmanaged type.</typeparam>
     public static void RegisterUnmanaged<T>(UnmanagedFormatterDelegate<T> formatter)
         where T : unmanaged
         => UnmanagedCache.Register(formatter);

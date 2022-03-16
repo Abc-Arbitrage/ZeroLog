@@ -3,12 +3,24 @@ using ZeroLog.Formatting;
 
 namespace ZeroLog.Appenders;
 
+/// <summary>
+/// An appender which logs to the standard output.
+/// </summary>
 public class ConsoleAppender : StreamAppender
 {
     private LogLevel _lastLoggedLevel = LogLevel.None;
 
+    /// <summary>
+    /// Defines whether messages should be colored.
+    /// </summary>
+    /// <remarks>
+    /// True by default when the standard output is not redirected.
+    /// </remarks>
     public bool ColorOutput { get; init; }
 
+    /// <summary>
+    /// Initializes a new instance of the console appender.
+    /// </summary>
     public ConsoleAppender()
     {
         Stream = Console.OpenStandardOutput();
@@ -16,6 +28,7 @@ public class ConsoleAppender : StreamAppender
         ColorOutput = !Console.IsOutputRedirected;
     }
 
+    /// <inheritdoc/>
     public override void WriteMessage(LoggedMessage message)
     {
         if (ColorOutput)
@@ -24,6 +37,7 @@ public class ConsoleAppender : StreamAppender
         base.WriteMessage(message);
     }
 
+    /// <inheritdoc/>
     public override void Flush()
     {
         base.Flush();

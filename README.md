@@ -146,5 +146,4 @@ Other settings that can be set on the `ZeroLogConfiguration` object are:
  - `AutoRegisterEnums` (default: `false`) - Automatically registers an enum type when it's logged for the first time. This causes allocations. Use `LogManager.RegisterEnum` when automatic registration is disabled.
  - `NullDisplayString` (default: `"null"`) - The string which should be logged instead of a `null` value.
  - `TruncatedMessageSuffix` (default: `" [TRUNCATED]"`) - The string which is appended to a message when it is truncated.
- - `JsonSeparator` (default: `" ~~ "`) - The string which is appended before structured data in log messages (when structured data is present).
  - `AppenderQuarantineDelay` (default: 15 seconds) - The time an appender will be put into quarantine (not used to log messages) after it throws an exception.

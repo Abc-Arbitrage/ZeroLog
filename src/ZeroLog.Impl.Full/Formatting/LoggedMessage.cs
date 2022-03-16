@@ -5,6 +5,9 @@ using ZeroLog.Configuration;
 
 namespace ZeroLog.Formatting;
 
+/// <summary>
+/// Represents a logged message.
+/// </summary>
 public sealed class LoggedMessage
 {
     private readonly ZeroLogConfiguration _config;
@@ -13,13 +16,31 @@ public sealed class LoggedMessage
 
     private LogMessage _message = LogMessage.Empty;
 
+    /// <inheritdoc cref="LogMessage.Level"/>
     public LogLevel Level => _message.Level;
+
+    /// <inheritdoc cref="LogMessage.Timestamp"/>
     public DateTime Timestamp => _message.Timestamp;
+
+    /// <inheritdoc cref="LogMessage.Thread"/>
     public Thread? Thread => _message.Thread;
+
+    /// <inheritdoc cref="LogMessage.Exception"/>
     public Exception? Exception => _message.Exception;
+
+    /// <summary>
+    /// The name of the logger which logged this message.
+    /// </summary>
     public string? LoggerName => _message.Logger?.Name;
 
+    /// <summary>
+    /// The logged message text.
+    /// </summary>
     public ReadOnlySpan<char> Message => _messageBuffer.AsSpan(0, _messageLength);
+
+    /// <summary>
+    /// The logged message metadata as a list of key/value pairs.
+    /// </summary>
     public KeyValueList KeyValues { get; }
 
     internal LoggedMessage(int bufferSize, ZeroLogConfiguration config)
@@ -67,6 +88,9 @@ public sealed class LoggedMessage
         }
     }
 
+    /// <summary>
+    /// Returns the logged message text.
+    /// </summary>
     public override string ToString()
         => Message.ToString();
 }

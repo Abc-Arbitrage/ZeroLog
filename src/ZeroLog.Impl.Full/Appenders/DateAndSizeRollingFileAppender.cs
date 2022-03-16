@@ -6,6 +6,12 @@ using ZeroLog.Formatting;
 
 namespace ZeroLog.Appenders;
 
+/// <summary>
+/// An appender which logs to rolling files based on date and/or file size.
+/// </summary>
+/// <remarks>
+/// This class can be overridden to customize the file name pattern and to add file headers or footers.
+/// </remarks>
 public class DateAndSizeRollingFileAppender : StreamAppender
 {
     private const int _uninitializedFileNumber = -1;
@@ -38,6 +44,10 @@ public class DateAndSizeRollingFileAppender : StreamAppender
     /// </summary>
     public long MaxFileSizeInBytes { get; init; } = 200 * 1024 * 1024;
 
+    /// <summary>
+    /// Initializes a new instance of the rolling file appender.
+    /// </summary>
+    /// <param name="directory">The parent directory of the log files.</param>
     public DateAndSizeRollingFileAppender(string directory)
     {
         Directory = Path.GetFullPath(directory);
@@ -45,12 +55,14 @@ public class DateAndSizeRollingFileAppender : StreamAppender
         _currentFileNumber = _uninitializedFileNumber;
     }
 
+    /// <inheritdoc/>
     public override void WriteMessage(LoggedMessage message)
     {
         CheckRollFile(message.Timestamp);
         base.WriteMessage(message);
     }
 
+    /// <inheritdoc/>
     public override void Dispose()
     {
         CloseStream();

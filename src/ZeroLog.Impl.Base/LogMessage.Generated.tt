@@ -20,12 +20,20 @@ partial class LogMessage
     foreach (var type in _valueTypes)
     {
 #>
+    /// <summary>
+    /// Appends a value of type <#= type.name #> to the message.
+    /// </summary>
+    /// <param name="value">The value to append.</param>
     public LogMessage Append(<#= type.name #> value)
     {
         InternalAppendValueType(value, ArgumentType.<#= type.argType #>);
         return this;
     }
 
+    /// <summary>
+    /// Appends a value of type <#= type.name #>? to the message.
+    /// </summary>
+    /// <param name="value">The value to append.</param>
     public LogMessage Append(<#= type.name #>? value)
     {
         InternalAppendValueType(value, ArgumentType.<#= type.argType #>);
@@ -36,12 +44,22 @@ partial class LogMessage
         if (type.isFormattable)
         {
 #>
+    /// <summary>
+    /// Appends a value of type <#= type.name #> to the message.
+    /// </summary>
+    /// <param name="value">The value to append.</param>
+    /// <param name="format">The format string.</param>
     public LogMessage Append(<#= type.name #> value, string format)
     {
         InternalAppendValueType(value, format, ArgumentType.<#= type.argType #>);
         return this;
     }
 
+    /// <summary>
+    /// Appends a value of type <#= type.name #>? to the message.
+    /// </summary>
+    /// <param name="value">The value to append.</param>
+    /// <param name="format">The format string.</param>
     public LogMessage Append(<#= type.name #>? value, string format)
     {
         InternalAppendValueType(value, format, ArgumentType.<#= type.argType #>);
@@ -51,12 +69,22 @@ partial class LogMessage
 <#
         }
 #>
+    /// <summary>
+    /// Appends a value of type <#= type.name #> to the message metadata.
+    /// </summary>
+    /// <param name="key">The key.</param>
+    /// <param name="value">The value.</param>
     public LogMessage AppendKeyValue(string key, <#= type.name #> value)
     {
         InternalAppendKeyValue(key, value, ArgumentType.<#= type.argType #>);
         return this;
     }
 
+    /// <summary>
+    /// Appends a value of type <#= type.name #>? to the message metadata.
+    /// </summary>
+    /// <param name="key">The key.</param>
+    /// <param name="value">The value.</param>
     public LogMessage AppendKeyValue(string key, <#= type.name #>? value)
     {
         InternalAppendKeyValue(key, value, ArgumentType.<#= type.argType #>);
@@ -66,6 +94,10 @@ partial class LogMessage
 <#
     }
 #>
+    /// <summary>
+    /// Appends an interpolated string to the message.
+    /// </summary>
+    /// <param name="value">The value to append.</param>
     public LogMessage Append([InterpolatedStringHandlerArgument("")] AppendInterpolatedStringHandler value)
         => this;
 
@@ -75,9 +107,17 @@ partial class LogMessage
         foreach (var type in _valueTypes)
         {
 #>
+        /// <summary>
+        /// Appends a value of type <#= type.name #> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
         public void AppendFormatted(<#= type.name #> value)
             => _message.InternalAppendValueType(value, ArgumentType.<#= type.argType #>);
 
+        /// <summary>
+        /// Appends a value of type <#= type.name #>? to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
         public void AppendFormatted(<#= type.name #>? value)
             => _message.InternalAppendValueType(value, ArgumentType.<#= type.argType #>);
 
@@ -85,9 +125,19 @@ partial class LogMessage
             if (type.isFormattable)
             {
 #>
+        /// <summary>
+        /// Appends a value of type <#= type.name #> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        /// <param name="format">The format string.</param>
         public void AppendFormatted(<#= type.name #> value, string format)
             => _message.InternalAppendValueType(value, format, ArgumentType.<#= type.argType #>);
 
+        /// <summary>
+        /// Appends a value of type <#= type.name #>? to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        /// <param name="format">The format string.</param>
         public void AppendFormatted(<#= type.name #>? value, string format)
             => _message.InternalAppendValueType(value, format, ArgumentType.<#= type.argType #>);
 

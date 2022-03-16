@@ -20,18 +20,21 @@ partial class Log
     foreach (var levelName in _logLevels)
     {
 #>
+    /// <summary>
+    /// Indicates whether logs of <see cref="LogLevel.<#= levelName #>"/> level are enabled for this logger.
+    /// </summary>
     public bool Is<#= levelName #>Enabled => LogLevel.<#= levelName #> >= _logLevel;
-<#
-    }
-#>
 
-<#
-    foreach (var levelName in _logLevels)
-    {
-#>
+    /// <summary>
+    /// Returns a log message builder of <see cref="LogLevel.<#= levelName #>"/> level.
+    /// </summary>
     public LogMessage <#= levelName #>()
         => ForLevel(LogLevel.<#= levelName #>);
 
+    /// <summary>
+    /// Logs a message of <see cref="LogLevel.<#= levelName #>"/> level.
+    /// </summary>
+    /// <param name="message">The message to log.</param>
     public void <#= levelName #>(string? message)
     {
         var logMessage = ForLevel(LogLevel.<#= levelName #>);
@@ -39,6 +42,11 @@ partial class Log
         logMessage.Log();
     }
 
+    /// <summary>
+    /// Logs a message of <see cref="LogLevel.<#= levelName #>"/> level.
+    /// </summary>
+    /// <param name="message">The message to log.</param>
+    /// <param name="ex">An exception to associate to the message.</param>
     public void <#= levelName #>(string? message, Exception? ex)
     {
         var logMessage = ForLevel(LogLevel.<#= levelName #>);
@@ -47,9 +55,18 @@ partial class Log
         logMessage.Log();
     }
 
+    /// <summary>
+    /// Logs a message of <see cref="LogLevel.<#= levelName #>"/> level.
+    /// </summary>
+    /// <param name="message">The message to log.</param>
     public void <#= levelName #>([InterpolatedStringHandlerArgument("")] <#= levelName #>InterpolatedStringHandler message)
         => message.Message.Log();
 
+    /// <summary>
+    /// Logs a message of <see cref="LogLevel.<#= levelName #>"/> level.
+    /// </summary>
+    /// <param name="message">The message to log.</param>
+    /// <param name="ex">An exception to associate to the message.</param>
     public void <#= levelName #>([InterpolatedStringHandlerArgument("")] <#= levelName #>InterpolatedStringHandler message, Exception? ex)
     {
         message.Message.Exception = ex;
@@ -62,11 +79,17 @@ partial class Log
     foreach (var levelName in _logLevels)
     {
 #>
+    /// <summary>
+    /// An interpolated string handler for messages of <see cref="LogLevel.<#= levelName #>"/> level.
+    /// </summary>
     [InterpolatedStringHandler]
     public readonly ref struct <#= levelName #>InterpolatedStringHandler
     {
         internal readonly LogMessage Message;
 
+        /// <summary>
+        /// Creates an interpolated string handler for messages of <see cref="LogLevel.<#= levelName #>"/> level.
+        /// </summary>
         [SuppressMessage("ReSharper", "UnusedParameter.Local")]
         public <#= levelName #>InterpolatedStringHandler(int literalLength, int formattedCount, Log log, out bool isEnabled)
         {
@@ -82,9 +105,17 @@ partial class Log
             }
         }
 
+        /// <summary>
+        /// Appends a literal string to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
         public void AppendLiteral(string value)
             => Message.InternalAppendString(value);
 
+        /// <summary>
+        /// Appends a string to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
         public void AppendFormatted(string? value)
             => Message.InternalAppendString(value);
 
@@ -92,9 +123,17 @@ partial class Log
         foreach (var type in _valueTypes)
         {
 #>
+        /// <summary>
+        /// Appends a value of type <#= type.name #> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
         public void AppendFormatted(<#= type.name #> value)
             => Message.InternalAppendValueType(value, ArgumentType.<#= type.argType #>);
 
+        /// <summary>
+        /// Appends a value of type <#= type.name #>? to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
         public void AppendFormatted(<#= type.name #>? value)
             => Message.InternalAppendValueType(value, ArgumentType.<#= type.argType #>);
 
@@ -102,9 +141,19 @@ partial class Log
             if (type.isFormattable)
             {
 #>
+        /// <summary>
+        /// Appends a value of type <#= type.name #> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        /// <param name="format">The format string.</param>
         public void AppendFormatted(<#= type.name #> value, string format)
             => Message.InternalAppendValueType(value, format, ArgumentType.<#= type.argType #>);
 
+        /// <summary>
+        /// Appends a value of type <#= type.name #>? to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        /// <param name="format">The format string.</param>
         public void AppendFormatted(<#= type.name #>? value, string format)
             => Message.InternalAppendValueType(value, format, ArgumentType.<#= type.argType #>);
 
@@ -112,12 +161,24 @@ partial class Log
             }
         }
 #>
+        /// <summary>
+        /// Appends an enum to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
         public void AppendFormatted<T>(T value) where T : struct, Enum
             => Message.InternalAppendEnum(value);
 
+        /// <summary>
+        /// Appends a nullable enum to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
         public void AppendFormatted<T>(T? value) where T : struct, Enum
             => Message.InternalAppendEnum(value);
 
+        /// <summary>
+        /// Executes an append operation on the underlying log message.
+        /// </summary>
+        /// <param name="operation">The operation to execute.</param>
         public void AppendFormatted<T>(LogMessage.AppendOperation<T> operation)
             => operation.AppendAction?.Invoke(Message, operation.Value);
     }

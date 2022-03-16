@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace ZeroLog.Formatting;
 
+/// <summary>
+/// A list of log message metadata as key/value pairs.
+/// </summary>
 public sealed class KeyValueList
 {
     private readonly List<InternalItem> _items = new(byte.MaxValue);
@@ -10,6 +13,9 @@ public sealed class KeyValueList
     private readonly char[] _buffer;
     private int _position;
 
+    /// <summary>
+    /// The number of items contained in the list.
+    /// </summary>
     public int Count => _items.Count;
 
     internal KeyValueList(int bufferSize)
@@ -17,6 +23,10 @@ public sealed class KeyValueList
         _buffer = new char[bufferSize];
     }
 
+    /// <summary>
+    /// Gets the item at the specified index.
+    /// </summary>
+    /// <param name="index">The item index.</param>
     public LoggedKeyValue this[int index]
     {
         get
@@ -41,6 +51,9 @@ public sealed class KeyValueList
         _position += valueLength;
     }
 
+    /// <summary>
+    /// Gets an enumerator over this list.
+    /// </summary>
     public Enumerator GetEnumerator()
         => new(this);
 
@@ -51,6 +64,9 @@ public sealed class KeyValueList
         ArgumentType ValueType
     );
 
+    /// <summary>
+    /// An enumerator over a <see cref="KeyValueList"/>.
+    /// </summary>
     public ref struct Enumerator
     {
         private readonly KeyValueList _keyValueList;
@@ -62,8 +78,14 @@ public sealed class KeyValueList
             _index = -1;
         }
 
+        /// <summary>
+        /// Gets the current item.
+        /// </summary>
         public LoggedKeyValue Current => _keyValueList[_index];
 
+        /// <summary>
+        /// Moves to the next item.
+        /// </summary>
         public bool MoveNext()
             => ++_index < _keyValueList.Count;
     }

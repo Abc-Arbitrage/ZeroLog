@@ -9,6 +9,10 @@ using ZeroLog.Support;
 
 namespace ZeroLog;
 
+/// <summary>
+/// A delegate used to format an unmanaged value.
+/// </summary>
+/// <typeparam name="T">The value type.</typeparam>
 public delegate bool UnmanagedFormatterDelegate<T>(
     ref T value,
     Span<char> destination,

@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
+using ZeroLog.Configuration;
 
 namespace ZeroLog;
 
@@ -63,6 +64,13 @@ unsafe partial class LogMessage
             Logger?.Submit(this);
     }
 
+    /// <summary>
+    /// Creates a log message for unit testing purposes.
+    /// </summary>
+    /// <param name="level">The message log level.</param>
+    /// <param name="bufferSize">The message buffer size. See <see cref="ZeroLogConfiguration.LogMessageBufferSize"/>.</param>
+    /// <param name="stringCapacity">The string argument capacity. See <see cref="ZeroLogConfiguration.LogMessageStringCapacity"/>.</param>
+    /// <returns>A standalone log message.</returns>
     public static LogMessage CreateTestMessage(LogLevel level, int bufferSize, int stringCapacity)
     {
         var message = new LogMessage(BufferSegmentProvider.CreateStandaloneSegment(bufferSize), stringCapacity, false);

@@ -59,7 +59,7 @@ public class LogManagerTests
     [Test]
     public void should_prevent_initializing_already_initialized_log_manager()
     {
-        Assert.Throws<ApplicationException>(() => LogManager.Initialize(new ZeroLogConfiguration()));
+        Assert.Throws<InvalidOperationException>(() => LogManager.Initialize(new ZeroLogConfiguration()));
     }
 
     [Test]

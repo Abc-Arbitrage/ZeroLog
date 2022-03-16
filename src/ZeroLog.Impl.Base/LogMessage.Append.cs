@@ -7,12 +7,20 @@ namespace ZeroLog;
 [SuppressMessage("ReSharper", "UnusedParameterInPartialMethod")]
 partial class LogMessage
 {
+    /// <summary>
+    /// Appends a value of type string to the message.
+    /// </summary>
+    /// <param name="value">The value to append.</param>
     public LogMessage Append(string? value)
     {
         InternalAppendString(value);
         return this;
     }
 
+    /// <summary>
+    /// Appends an enum to the message.
+    /// </summary>
+    /// <param name="value">The value to append.</param>
     public LogMessage AppendEnum<T>(T value)
         where T : struct, Enum
     {
@@ -20,6 +28,10 @@ partial class LogMessage
         return this;
     }
 
+    /// <summary>
+    /// Appends a nullable enum to the message.
+    /// </summary>
+    /// <param name="value">The value to append.</param>
     public LogMessage AppendEnum<T>(T? value)
         where T : struct, Enum
     {
@@ -27,12 +39,20 @@ partial class LogMessage
         return this;
     }
 
+    /// <summary>
+    /// Appends an ASCII string to the message.
+    /// </summary>
+    /// <param name="value">The value to append.</param>
     public LogMessage AppendAsciiString(ReadOnlySpan<char> value)
     {
         InternalAppendAsciiString(value);
         return this;
     }
 
+    /// <summary>
+    /// Appends an ASCII string represented as bytes to the message.
+    /// </summary>
+    /// <param name="value">The value to append.</param>
     public LogMessage AppendAsciiString(ReadOnlySpan<byte> value)
     {
         InternalAppendAsciiString(value);

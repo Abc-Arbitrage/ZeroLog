@@ -6,6 +6,12 @@ namespace ZeroLog;
 [SuppressMessage("ReSharper", "UnusedParameterInPartialMethod")]
 partial class LogMessage
 {
+    /// <summary>
+    /// Appends an unmanaged value to the message.
+    /// </summary>
+    /// <param name="value">The value to append.</param>
+    /// <param name="format">The format string.</param>
+    /// <typeparam name="T">The value type.</typeparam>
     public LogMessage AppendUnmanaged<T>(T value, string? format = null)
         where T : unmanaged
     {
@@ -13,6 +19,12 @@ partial class LogMessage
         return this;
     }
 
+    /// <summary>
+    /// Appends a nullable unmanaged value to the message.
+    /// </summary>
+    /// <param name="value">The value to append.</param>
+    /// <param name="format">The format string.</param>
+    /// <typeparam name="T">The value type.</typeparam>
     public LogMessage AppendUnmanaged<T>(T? value, string? format = null)
         where T : unmanaged
     {
@@ -20,6 +32,12 @@ partial class LogMessage
         return this;
     }
 
+    /// <summary>
+    /// Appends an unmanaged value to the message.
+    /// </summary>
+    /// <param name="value">The value to append.</param>
+    /// <param name="format">The format string.</param>
+    /// <typeparam name="T">The value type.</typeparam>
     public LogMessage AppendUnmanaged<T>(ref T value, string? format = null)
         where T : unmanaged
     {
@@ -27,6 +45,12 @@ partial class LogMessage
         return this;
     }
 
+    /// <summary>
+    /// Appends a nullable unmanaged value to the message.
+    /// </summary>
+    /// <param name="value">The value to append.</param>
+    /// <param name="format">The format string.</param>
+    /// <typeparam name="T">The value type.</typeparam>
     public LogMessage AppendUnmanaged<T>(ref T? value, string? format = null)
         where T : unmanaged
     {

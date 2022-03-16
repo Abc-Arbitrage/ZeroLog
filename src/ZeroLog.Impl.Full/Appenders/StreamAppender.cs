@@ -5,6 +5,9 @@ using ZeroLog.Formatting;
 
 namespace ZeroLog.Appenders;
 
+/// <summary>
+/// Base class for appenders which write to a <see cref="System.IO.Stream"/>.
+/// </summary>
 public abstract class StreamAppender : Appender
 {
     private byte[] _byteBuffer = Array.Empty<byte>();
@@ -12,8 +15,14 @@ public abstract class StreamAppender : Appender
     private Encoding _encoding = Encoding.UTF8;
     private Formatter? _formatter;
 
+    /// <summary>
+    /// The stream to write to.
+    /// </summary>
     protected internal Stream? Stream { get; set; }
 
+    /// <summary>
+    /// The encoding to use when writing to the stream.
+    /// </summary>
     protected internal Encoding Encoding
     {
         get => _encoding;
@@ -24,17 +33,24 @@ public abstract class StreamAppender : Appender
         }
     }
 
+    /// <summary>
+    /// The formatter to use to convert log messages to text.
+    /// </summary>
     public Formatter Formatter
     {
         get => _formatter ??= new DefaultFormatter();
         init => _formatter = value;
     }
 
+    /// <summary>
+    /// Initializes a new instance of the stream appender.
+    /// </summary>
     protected StreamAppender()
     {
         UpdateEncodingSpecificData();
     }
 
+    /// <inheritdoc/>
     public override void Dispose()
     {
         Stream?.Dispose();
@@ -43,6 +59,7 @@ public abstract class StreamAppender : Appender
         base.Dispose();
     }
 
+    /// <inheritdoc/>
     public override void WriteMessage(LoggedMessage message)
     {
         if (Stream is null)
@@ -53,6 +70,7 @@ public abstract class StreamAppender : Appender
         Stream.Write(_byteBuffer, 0, byteCount);
     }
 
+    /// <inheritdoc/>
     public override void Flush()
     {
         Stream?.Flush();
