@@ -10,9 +10,12 @@ namespace ZeroLog;
 unsafe partial class LogMessage
 {
     [SuppressMessage("ReSharper", "ReplaceSliceWithRangeIndexer")]
-    internal int WriteTo(Span<char> outputBuffer, ZeroLogConfiguration config, bool skipFormat = false, KeyValuePointerBuffer? keyValueBuffer = null)
+    internal int WriteTo(Span<char> outputBuffer,
+                         ZeroLogConfiguration config,
+                         FormatType formatType = FormatType.Formatted,
+                         KeyValueList? keyValueList = null)
     {
-        keyValueBuffer?.Init(_strings);
+        keyValueList?.Clear();
 
         if (ConstantMessage is not null)
         {
@@ -27,14 +30,19 @@ unsafe partial class LogMessage
 
         while (dataPointer < endOfData)
         {
-            if (keyValueBuffer != null)
+            if (keyValueList != null)
             {
                 var argType = *(ArgumentType*)dataPointer;
                 if (argType == ArgumentType.KeyString) // KeyString never has a format flag
-                    keyValueBuffer.AddKeyPointer(dataPointer);
+                {
+                    if (!TryWriteKeyValue(ref dataPointer, keyValueList, config))
+                        goto outputTruncated;
+
+                    continue;
+                }
             }
 
-            var isTruncated = !TryWriteArg(ref dataPointer, outputBuffer.Slice(bufferIndex), out var charsWritten, skipFormat, config);
+            var isTruncated = !TryWriteArg(ref dataPointer, outputBuffer.Slice(bufferIndex), out var charsWritten, formatType, config);
             bufferIndex += charsWritten;
 
             if (isTruncated)
@@ -74,7 +82,28 @@ unsafe partial class LogMessage
         }
     }
 
-    private bool TryWriteArg(ref byte* dataPointer, Span<char> outputBuffer, out int charsWritten, bool skipFormat, ZeroLogConfiguration config)
+    private bool TryWriteKeyValue(ref byte* dataPointer, KeyValueList keyValueList, ZeroLogConfiguration config)
+    {
+        dataPointer += sizeof(ArgumentType);
+
+        var keyIndex = *dataPointer;
+        ++dataPointer;
+
+        var key = _strings[keyIndex] ?? string.Empty;
+
+        if (dataPointer >= _dataPointer)
+            return false;
+
+        var valueType = *(ArgumentType*)dataPointer;
+
+        if (!TryWriteArg(ref dataPointer, keyValueList.GetRemainingBuffer(), out var valueLength, FormatType.KeyValue, config))
+            return false;
+
+        keyValueList.Add(key, valueLength, valueType);
+        return true;
+    }
+
+    private bool TryWriteArg(ref byte* dataPointer, Span<char> outputBuffer, out int charsWritten, FormatType formatType, ZeroLogConfiguration config)
     {
         var argType = *(ArgumentType*)dataPointer;
         dataPointer += sizeof(ArgumentType);
@@ -88,8 +117,18 @@ unsafe partial class LogMessage
             var stringIndex = *dataPointer;
             ++dataPointer;
 
-            if (!skipFormat)
+            if (formatType == FormatType.Formatted)
                 format = _strings[stringIndex];
+        }
+
+        if (formatType == FormatType.KeyValue)
+        {
+            format = argType switch
+            {
+                ArgumentType.DateTime => "yyyy-MM-dd HH:mm:ss",
+                ArgumentType.TimeSpan => @"hh\:mm\:ss\.fffffff",
+                _                     => null
+            };
         }
 
         switch (argType)
@@ -323,7 +362,7 @@ unsafe partial class LogMessage
                 var headerPtr = (UnmanagedArgHeader*)dataPointer;
                 dataPointer += sizeof(UnmanagedArgHeader);
 
-                if (!skipFormat)
+                if (formatType == FormatType.Formatted)
                 {
                     if (!headerPtr->TryAppendTo(dataPointer, outputBuffer, out charsWritten, format, config))
                         return false;
@@ -548,5 +587,12 @@ unsafe partial class LogMessage
 
         ArrayPool<char>.Shared.Return(buffer);
         return value;
+    }
+
+    internal enum FormatType
+    {
+        Formatted,
+        Unformatted,
+        KeyValue
     }
 }

@@ -77,7 +77,7 @@ public class StreamAppenderTests
     {
         public MemoryAppender(string prefixPattern = "")
         {
-            PrefixPattern = prefixPattern;
+            Formatter = new DefaultFormatter { PrefixPattern = prefixPattern };
             Stream = new MemoryStream();
         }
 

@@ -11,8 +11,6 @@ public class ConsoleAppender : StreamAppender
 
     public ConsoleAppender()
     {
-        PrefixPattern = DefaultPrefixPattern;
-
         Stream = Console.OpenStandardOutput();
         Encoding = Console.OutputEncoding;
         ColorOutput = !Console.IsOutputRedirected;

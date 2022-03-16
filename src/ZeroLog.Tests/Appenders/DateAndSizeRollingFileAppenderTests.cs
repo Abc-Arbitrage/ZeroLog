@@ -35,7 +35,10 @@ public class DateAndSizeRollingFileAppenderTests
     {
         _appender = new DateAndSizeRollingFileAppender(_directory)
         {
-            PrefixPattern = "%date - %time - %thread - %level - %logger || "
+            Formatter = new DefaultFormatter
+            {
+                PrefixPattern = "%date - %time - %thread - %level - %logger || "
+            }
         };
 
         var logMessage = new LogMessage("Test log message");
@@ -60,7 +63,7 @@ public class DateAndSizeRollingFileAppenderTests
     {
         _appender = new FileNumberPatternAppender(_directory)
         {
-            PrefixPattern = "",
+            Formatter = new DefaultFormatter { PrefixPattern = "" },
             MaxFileSizeInBytes = 100
         };
 
@@ -119,7 +122,7 @@ public class DateAndSizeRollingFileAppenderTests
     {
         _appender = new FileNumberPatternAppender(_directory)
         {
-            PrefixPattern = ""
+            Formatter = new DefaultFormatter { PrefixPattern = "" }
         };
 
         var logMessage = new LogMessage("Test message");
@@ -146,7 +149,7 @@ public class DateAndSizeRollingFileAppenderTests
     {
         _appender = new FileNumberPatternAppender(_directory)
         {
-            PrefixPattern = ""
+            Formatter = new DefaultFormatter { PrefixPattern = "" }
         };
 
         var logMessage = new LogMessage("Test message");
@@ -177,7 +180,7 @@ public class DateAndSizeRollingFileAppenderTests
     {
         _appender = new ConstantFileNameAppender(_directory)
         {
-            PrefixPattern = "",
+            Formatter = new DefaultFormatter { PrefixPattern = "" },
             MaxFileSizeInBytes = 2
         };
 

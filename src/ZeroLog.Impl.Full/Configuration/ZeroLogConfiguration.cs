@@ -18,7 +18,6 @@ public sealed class ZeroLogConfiguration
 
     public string NullDisplayString { get; init; } = "null";
     public string TruncatedMessageSuffix { get; init; } = " [TRUNCATED]";
-    public string JsonSeparator { get; init; } = " ~~ ";
 
     public TimeSpan AppenderQuarantineDelay { get; init; } = TimeSpan.FromSeconds(15);
 

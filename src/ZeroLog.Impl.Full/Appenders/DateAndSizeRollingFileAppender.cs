@@ -40,7 +40,6 @@ public class DateAndSizeRollingFileAppender : StreamAppender
 
     public DateAndSizeRollingFileAppender(string directory)
     {
-        PrefixPattern = DefaultPrefixPattern;
         Directory = Path.GetFullPath(directory);
 
         _currentFileNumber = _uninitializedFileNumber;
