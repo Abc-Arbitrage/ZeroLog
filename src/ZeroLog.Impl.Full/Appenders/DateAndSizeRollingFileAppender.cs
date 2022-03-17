@@ -8,6 +8,7 @@ namespace ZeroLog.Appenders;
 
 /// <summary>
 /// An appender which logs to rolling files based on date and/or file size.
+/// Note that switching files will allocate.
 /// </summary>
 /// <remarks>
 /// This class can be overridden to customize the file name pattern and to add file headers or footers.
@@ -86,8 +87,8 @@ public class DateAndSizeRollingFileAppender : StreamAppender
     /// <summary>
     /// Returns the file name without the directory for the given parameters.
     /// </summary>
-    /// <param name="date">The file date</param>
-    /// <param name="number">The file number</param>
+    /// <param name="date">The file date.</param>
+    /// <param name="number">The file number.</param>
     /// <remarks>
     /// The implementation should be unconditional on the arguments and have no side effects.
     /// </remarks>

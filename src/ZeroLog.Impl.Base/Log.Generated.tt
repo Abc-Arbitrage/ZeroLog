@@ -43,7 +43,8 @@ partial class Log
     }
 
     /// <summary>
-    /// Logs a message of <see cref="LogLevel.<#= levelName #>"/> level.
+    /// Logs a message of <see cref="LogLevel.<#= levelName #>"/> level with an attached exception.
+    /// Note that logging an exception will allocate.
     /// </summary>
     /// <param name="message">The message to log.</param>
     /// <param name="ex">An exception to associate to the message.</param>
@@ -63,7 +64,8 @@ partial class Log
         => message.Message.Log();
 
     /// <summary>
-    /// Logs a message of <see cref="LogLevel.<#= levelName #>"/> level.
+    /// Logs a message of <see cref="LogLevel.<#= levelName #>"/> level with an attached exception.
+    /// Note that logging an exception will allocate.
     /// </summary>
     /// <param name="message">The message to log.</param>
     /// <param name="ex">An exception to associate to the message.</param>
@@ -113,7 +115,7 @@ partial class Log
             => Message.InternalAppendString(value);
 
         /// <summary>
-        /// Appends a string to the handler.
+        /// Appends a value of type <c>string</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(string? value)
@@ -124,14 +126,14 @@ partial class Log
         {
 #>
         /// <summary>
-        /// Appends a value of type <#= type.name #> to the handler.
+        /// Appends a value of type <c><#= type.name #></c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(<#= type.name #> value)
             => Message.InternalAppendValueType(value, ArgumentType.<#= type.argType #>);
 
         /// <summary>
-        /// Appends a value of type <#= type.name #>? to the handler.
+        /// Appends a value of type <c><#= type.name #>?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(<#= type.name #>? value)
@@ -142,7 +144,7 @@ partial class Log
             {
 #>
         /// <summary>
-        /// Appends a value of type <#= type.name #> to the handler.
+        /// Appends a value of type <c><#= type.name #></c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -150,7 +152,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.<#= type.argType #>);
 
         /// <summary>
-        /// Appends a value of type <#= type.name #>? to the handler.
+        /// Appends a value of type <c><#= type.name #>?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>

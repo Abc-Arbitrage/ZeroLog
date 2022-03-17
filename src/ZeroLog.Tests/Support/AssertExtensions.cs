@@ -59,4 +59,10 @@ internal static class AssertExtensions
 
     public static void ShouldBeEquivalentTo<T>(this IEnumerable<T>? actual, IEnumerable<T> expected)
         => Assert.That(actual, Is.EquivalentTo(expected));
+
+    public static void ShouldEndWith(this string? actual, string expected)
+        => StringAssert.EndsWith(expected, actual);
+
+    public static void ShouldBeLessThanOrEqualTo<T>(this T? actual, T expected)
+        => Assert.That(actual, Is.LessThanOrEqualTo(expected));
 }

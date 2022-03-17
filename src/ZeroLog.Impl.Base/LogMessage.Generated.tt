@@ -21,7 +21,7 @@ partial class LogMessage
     {
 #>
     /// <summary>
-    /// Appends a value of type <#= type.name #> to the message.
+    /// Appends a value of type <c><#= type.name #></c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     public LogMessage Append(<#= type.name #> value)
@@ -31,7 +31,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type <#= type.name #>? to the message.
+    /// Appends a value of type <c><#= type.name #>?</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     public LogMessage Append(<#= type.name #>? value)
@@ -45,7 +45,7 @@ partial class LogMessage
         {
 #>
     /// <summary>
-    /// Appends a value of type <#= type.name #> to the message.
+    /// Appends a value of type <c><#= type.name #></c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     /// <param name="format">The format string.</param>
@@ -56,7 +56,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type <#= type.name #>? to the message.
+    /// Appends a value of type <c><#= type.name #>?</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     /// <param name="format">The format string.</param>
@@ -70,7 +70,7 @@ partial class LogMessage
         }
 #>
     /// <summary>
-    /// Appends a value of type <#= type.name #> to the message metadata.
+    /// Appends a value of type <c><#= type.name #></c> to the message metadata.
     /// </summary>
     /// <param name="key">The key.</param>
     /// <param name="value">The value.</param>
@@ -81,7 +81,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type <#= type.name #>? to the message metadata.
+    /// Appends a value of type <c><#= type.name #>?</c> to the message metadata.
     /// </summary>
     /// <param name="key">The key.</param>
     /// <param name="value">The value.</param>
@@ -108,14 +108,14 @@ partial class LogMessage
         {
 #>
         /// <summary>
-        /// Appends a value of type <#= type.name #> to the handler.
+        /// Appends a value of type <c><#= type.name #></c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(<#= type.name #> value)
             => _message.InternalAppendValueType(value, ArgumentType.<#= type.argType #>);
 
         /// <summary>
-        /// Appends a value of type <#= type.name #>? to the handler.
+        /// Appends a value of type <c><#= type.name #>?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(<#= type.name #>? value)
@@ -126,7 +126,7 @@ partial class LogMessage
             {
 #>
         /// <summary>
-        /// Appends a value of type <#= type.name #> to the handler.
+        /// Appends a value of type <c><#= type.name #></c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -134,7 +134,7 @@ partial class LogMessage
             => _message.InternalAppendValueType(value, format, ArgumentType.<#= type.argType #>);
 
         /// <summary>
-        /// Appends a value of type <#= type.name #>? to the handler.
+        /// Appends a value of type <c><#= type.name #>?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>

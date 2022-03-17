@@ -15,7 +15,7 @@ namespace ZeroLog;
 partial class LogMessage
 {
     /// <summary>
-    /// Appends a value of type bool to the message.
+    /// Appends a value of type <c>bool</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     public LogMessage Append(bool value)
@@ -25,7 +25,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type bool? to the message.
+    /// Appends a value of type <c>bool?</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     public LogMessage Append(bool? value)
@@ -35,7 +35,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type bool to the message metadata.
+    /// Appends a value of type <c>bool</c> to the message metadata.
     /// </summary>
     /// <param name="key">The key.</param>
     /// <param name="value">The value.</param>
@@ -46,7 +46,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type bool? to the message metadata.
+    /// Appends a value of type <c>bool?</c> to the message metadata.
     /// </summary>
     /// <param name="key">The key.</param>
     /// <param name="value">The value.</param>
@@ -57,7 +57,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type byte to the message.
+    /// Appends a value of type <c>byte</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     public LogMessage Append(byte value)
@@ -67,7 +67,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type byte? to the message.
+    /// Appends a value of type <c>byte?</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     public LogMessage Append(byte? value)
@@ -77,7 +77,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type byte to the message.
+    /// Appends a value of type <c>byte</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     /// <param name="format">The format string.</param>
@@ -88,7 +88,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type byte? to the message.
+    /// Appends a value of type <c>byte?</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     /// <param name="format">The format string.</param>
@@ -99,7 +99,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type byte to the message metadata.
+    /// Appends a value of type <c>byte</c> to the message metadata.
     /// </summary>
     /// <param name="key">The key.</param>
     /// <param name="value">The value.</param>
@@ -110,7 +110,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type byte? to the message metadata.
+    /// Appends a value of type <c>byte?</c> to the message metadata.
     /// </summary>
     /// <param name="key">The key.</param>
     /// <param name="value">The value.</param>
@@ -121,7 +121,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type sbyte to the message.
+    /// Appends a value of type <c>sbyte</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     public LogMessage Append(sbyte value)
@@ -131,7 +131,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type sbyte? to the message.
+    /// Appends a value of type <c>sbyte?</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     public LogMessage Append(sbyte? value)
@@ -141,7 +141,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type sbyte to the message.
+    /// Appends a value of type <c>sbyte</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     /// <param name="format">The format string.</param>
@@ -152,7 +152,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type sbyte? to the message.
+    /// Appends a value of type <c>sbyte?</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     /// <param name="format">The format string.</param>
@@ -163,7 +163,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type sbyte to the message metadata.
+    /// Appends a value of type <c>sbyte</c> to the message metadata.
     /// </summary>
     /// <param name="key">The key.</param>
     /// <param name="value">The value.</param>
@@ -174,7 +174,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type sbyte? to the message metadata.
+    /// Appends a value of type <c>sbyte?</c> to the message metadata.
     /// </summary>
     /// <param name="key">The key.</param>
     /// <param name="value">The value.</param>
@@ -185,7 +185,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type char to the message.
+    /// Appends a value of type <c>char</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     public LogMessage Append(char value)
@@ -195,7 +195,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type char? to the message.
+    /// Appends a value of type <c>char?</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     public LogMessage Append(char? value)
@@ -205,7 +205,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type char to the message metadata.
+    /// Appends a value of type <c>char</c> to the message metadata.
     /// </summary>
     /// <param name="key">The key.</param>
     /// <param name="value">The value.</param>
@@ -216,7 +216,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type char? to the message metadata.
+    /// Appends a value of type <c>char?</c> to the message metadata.
     /// </summary>
     /// <param name="key">The key.</param>
     /// <param name="value">The value.</param>
@@ -227,7 +227,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type short to the message.
+    /// Appends a value of type <c>short</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     public LogMessage Append(short value)
@@ -237,7 +237,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type short? to the message.
+    /// Appends a value of type <c>short?</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     public LogMessage Append(short? value)
@@ -247,7 +247,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type short to the message.
+    /// Appends a value of type <c>short</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     /// <param name="format">The format string.</param>
@@ -258,7 +258,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type short? to the message.
+    /// Appends a value of type <c>short?</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     /// <param name="format">The format string.</param>
@@ -269,7 +269,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type short to the message metadata.
+    /// Appends a value of type <c>short</c> to the message metadata.
     /// </summary>
     /// <param name="key">The key.</param>
     /// <param name="value">The value.</param>
@@ -280,7 +280,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type short? to the message metadata.
+    /// Appends a value of type <c>short?</c> to the message metadata.
     /// </summary>
     /// <param name="key">The key.</param>
     /// <param name="value">The value.</param>
@@ -291,7 +291,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type ushort to the message.
+    /// Appends a value of type <c>ushort</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     public LogMessage Append(ushort value)
@@ -301,7 +301,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type ushort? to the message.
+    /// Appends a value of type <c>ushort?</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     public LogMessage Append(ushort? value)
@@ -311,7 +311,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type ushort to the message.
+    /// Appends a value of type <c>ushort</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     /// <param name="format">The format string.</param>
@@ -322,7 +322,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type ushort? to the message.
+    /// Appends a value of type <c>ushort?</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     /// <param name="format">The format string.</param>
@@ -333,7 +333,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type ushort to the message metadata.
+    /// Appends a value of type <c>ushort</c> to the message metadata.
     /// </summary>
     /// <param name="key">The key.</param>
     /// <param name="value">The value.</param>
@@ -344,7 +344,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type ushort? to the message metadata.
+    /// Appends a value of type <c>ushort?</c> to the message metadata.
     /// </summary>
     /// <param name="key">The key.</param>
     /// <param name="value">The value.</param>
@@ -355,7 +355,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type int to the message.
+    /// Appends a value of type <c>int</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     public LogMessage Append(int value)
@@ -365,7 +365,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type int? to the message.
+    /// Appends a value of type <c>int?</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     public LogMessage Append(int? value)
@@ -375,7 +375,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type int to the message.
+    /// Appends a value of type <c>int</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     /// <param name="format">The format string.</param>
@@ -386,7 +386,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type int? to the message.
+    /// Appends a value of type <c>int?</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     /// <param name="format">The format string.</param>
@@ -397,7 +397,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type int to the message metadata.
+    /// Appends a value of type <c>int</c> to the message metadata.
     /// </summary>
     /// <param name="key">The key.</param>
     /// <param name="value">The value.</param>
@@ -408,7 +408,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type int? to the message metadata.
+    /// Appends a value of type <c>int?</c> to the message metadata.
     /// </summary>
     /// <param name="key">The key.</param>
     /// <param name="value">The value.</param>
@@ -419,7 +419,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type uint to the message.
+    /// Appends a value of type <c>uint</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     public LogMessage Append(uint value)
@@ -429,7 +429,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type uint? to the message.
+    /// Appends a value of type <c>uint?</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     public LogMessage Append(uint? value)
@@ -439,7 +439,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type uint to the message.
+    /// Appends a value of type <c>uint</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     /// <param name="format">The format string.</param>
@@ -450,7 +450,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type uint? to the message.
+    /// Appends a value of type <c>uint?</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     /// <param name="format">The format string.</param>
@@ -461,7 +461,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type uint to the message metadata.
+    /// Appends a value of type <c>uint</c> to the message metadata.
     /// </summary>
     /// <param name="key">The key.</param>
     /// <param name="value">The value.</param>
@@ -472,7 +472,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type uint? to the message metadata.
+    /// Appends a value of type <c>uint?</c> to the message metadata.
     /// </summary>
     /// <param name="key">The key.</param>
     /// <param name="value">The value.</param>
@@ -483,7 +483,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type long to the message.
+    /// Appends a value of type <c>long</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     public LogMessage Append(long value)
@@ -493,7 +493,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type long? to the message.
+    /// Appends a value of type <c>long?</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     public LogMessage Append(long? value)
@@ -503,7 +503,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type long to the message.
+    /// Appends a value of type <c>long</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     /// <param name="format">The format string.</param>
@@ -514,7 +514,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type long? to the message.
+    /// Appends a value of type <c>long?</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     /// <param name="format">The format string.</param>
@@ -525,7 +525,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type long to the message metadata.
+    /// Appends a value of type <c>long</c> to the message metadata.
     /// </summary>
     /// <param name="key">The key.</param>
     /// <param name="value">The value.</param>
@@ -536,7 +536,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type long? to the message metadata.
+    /// Appends a value of type <c>long?</c> to the message metadata.
     /// </summary>
     /// <param name="key">The key.</param>
     /// <param name="value">The value.</param>
@@ -547,7 +547,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type ulong to the message.
+    /// Appends a value of type <c>ulong</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     public LogMessage Append(ulong value)
@@ -557,7 +557,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type ulong? to the message.
+    /// Appends a value of type <c>ulong?</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     public LogMessage Append(ulong? value)
@@ -567,7 +567,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type ulong to the message.
+    /// Appends a value of type <c>ulong</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     /// <param name="format">The format string.</param>
@@ -578,7 +578,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type ulong? to the message.
+    /// Appends a value of type <c>ulong?</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     /// <param name="format">The format string.</param>
@@ -589,7 +589,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type ulong to the message metadata.
+    /// Appends a value of type <c>ulong</c> to the message metadata.
     /// </summary>
     /// <param name="key">The key.</param>
     /// <param name="value">The value.</param>
@@ -600,7 +600,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type ulong? to the message metadata.
+    /// Appends a value of type <c>ulong?</c> to the message metadata.
     /// </summary>
     /// <param name="key">The key.</param>
     /// <param name="value">The value.</param>
@@ -611,7 +611,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type nint to the message.
+    /// Appends a value of type <c>nint</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     public LogMessage Append(nint value)
@@ -621,7 +621,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type nint? to the message.
+    /// Appends a value of type <c>nint?</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     public LogMessage Append(nint? value)
@@ -631,7 +631,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type nint to the message.
+    /// Appends a value of type <c>nint</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     /// <param name="format">The format string.</param>
@@ -642,7 +642,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type nint? to the message.
+    /// Appends a value of type <c>nint?</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     /// <param name="format">The format string.</param>
@@ -653,7 +653,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type nint to the message metadata.
+    /// Appends a value of type <c>nint</c> to the message metadata.
     /// </summary>
     /// <param name="key">The key.</param>
     /// <param name="value">The value.</param>
@@ -664,7 +664,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type nint? to the message metadata.
+    /// Appends a value of type <c>nint?</c> to the message metadata.
     /// </summary>
     /// <param name="key">The key.</param>
     /// <param name="value">The value.</param>
@@ -675,7 +675,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type nuint to the message.
+    /// Appends a value of type <c>nuint</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     public LogMessage Append(nuint value)
@@ -685,7 +685,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type nuint? to the message.
+    /// Appends a value of type <c>nuint?</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     public LogMessage Append(nuint? value)
@@ -695,7 +695,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type nuint to the message.
+    /// Appends a value of type <c>nuint</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     /// <param name="format">The format string.</param>
@@ -706,7 +706,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type nuint? to the message.
+    /// Appends a value of type <c>nuint?</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     /// <param name="format">The format string.</param>
@@ -717,7 +717,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type nuint to the message metadata.
+    /// Appends a value of type <c>nuint</c> to the message metadata.
     /// </summary>
     /// <param name="key">The key.</param>
     /// <param name="value">The value.</param>
@@ -728,7 +728,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type nuint? to the message metadata.
+    /// Appends a value of type <c>nuint?</c> to the message metadata.
     /// </summary>
     /// <param name="key">The key.</param>
     /// <param name="value">The value.</param>
@@ -739,7 +739,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type float to the message.
+    /// Appends a value of type <c>float</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     public LogMessage Append(float value)
@@ -749,7 +749,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type float? to the message.
+    /// Appends a value of type <c>float?</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     public LogMessage Append(float? value)
@@ -759,7 +759,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type float to the message.
+    /// Appends a value of type <c>float</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     /// <param name="format">The format string.</param>
@@ -770,7 +770,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type float? to the message.
+    /// Appends a value of type <c>float?</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     /// <param name="format">The format string.</param>
@@ -781,7 +781,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type float to the message metadata.
+    /// Appends a value of type <c>float</c> to the message metadata.
     /// </summary>
     /// <param name="key">The key.</param>
     /// <param name="value">The value.</param>
@@ -792,7 +792,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type float? to the message metadata.
+    /// Appends a value of type <c>float?</c> to the message metadata.
     /// </summary>
     /// <param name="key">The key.</param>
     /// <param name="value">The value.</param>
@@ -803,7 +803,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type double to the message.
+    /// Appends a value of type <c>double</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     public LogMessage Append(double value)
@@ -813,7 +813,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type double? to the message.
+    /// Appends a value of type <c>double?</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     public LogMessage Append(double? value)
@@ -823,7 +823,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type double to the message.
+    /// Appends a value of type <c>double</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     /// <param name="format">The format string.</param>
@@ -834,7 +834,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type double? to the message.
+    /// Appends a value of type <c>double?</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     /// <param name="format">The format string.</param>
@@ -845,7 +845,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type double to the message metadata.
+    /// Appends a value of type <c>double</c> to the message metadata.
     /// </summary>
     /// <param name="key">The key.</param>
     /// <param name="value">The value.</param>
@@ -856,7 +856,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type double? to the message metadata.
+    /// Appends a value of type <c>double?</c> to the message metadata.
     /// </summary>
     /// <param name="key">The key.</param>
     /// <param name="value">The value.</param>
@@ -867,7 +867,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type decimal to the message.
+    /// Appends a value of type <c>decimal</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     public LogMessage Append(decimal value)
@@ -877,7 +877,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type decimal? to the message.
+    /// Appends a value of type <c>decimal?</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     public LogMessage Append(decimal? value)
@@ -887,7 +887,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type decimal to the message.
+    /// Appends a value of type <c>decimal</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     /// <param name="format">The format string.</param>
@@ -898,7 +898,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type decimal? to the message.
+    /// Appends a value of type <c>decimal?</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     /// <param name="format">The format string.</param>
@@ -909,7 +909,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type decimal to the message metadata.
+    /// Appends a value of type <c>decimal</c> to the message metadata.
     /// </summary>
     /// <param name="key">The key.</param>
     /// <param name="value">The value.</param>
@@ -920,7 +920,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type decimal? to the message metadata.
+    /// Appends a value of type <c>decimal?</c> to the message metadata.
     /// </summary>
     /// <param name="key">The key.</param>
     /// <param name="value">The value.</param>
@@ -931,7 +931,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type Guid to the message.
+    /// Appends a value of type <c>Guid</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     public LogMessage Append(Guid value)
@@ -941,7 +941,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type Guid? to the message.
+    /// Appends a value of type <c>Guid?</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     public LogMessage Append(Guid? value)
@@ -951,7 +951,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type Guid to the message.
+    /// Appends a value of type <c>Guid</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     /// <param name="format">The format string.</param>
@@ -962,7 +962,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type Guid? to the message.
+    /// Appends a value of type <c>Guid?</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     /// <param name="format">The format string.</param>
@@ -973,7 +973,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type Guid to the message metadata.
+    /// Appends a value of type <c>Guid</c> to the message metadata.
     /// </summary>
     /// <param name="key">The key.</param>
     /// <param name="value">The value.</param>
@@ -984,7 +984,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type Guid? to the message metadata.
+    /// Appends a value of type <c>Guid?</c> to the message metadata.
     /// </summary>
     /// <param name="key">The key.</param>
     /// <param name="value">The value.</param>
@@ -995,7 +995,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type DateTime to the message.
+    /// Appends a value of type <c>DateTime</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     public LogMessage Append(DateTime value)
@@ -1005,7 +1005,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type DateTime? to the message.
+    /// Appends a value of type <c>DateTime?</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     public LogMessage Append(DateTime? value)
@@ -1015,7 +1015,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type DateTime to the message.
+    /// Appends a value of type <c>DateTime</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     /// <param name="format">The format string.</param>
@@ -1026,7 +1026,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type DateTime? to the message.
+    /// Appends a value of type <c>DateTime?</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     /// <param name="format">The format string.</param>
@@ -1037,7 +1037,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type DateTime to the message metadata.
+    /// Appends a value of type <c>DateTime</c> to the message metadata.
     /// </summary>
     /// <param name="key">The key.</param>
     /// <param name="value">The value.</param>
@@ -1048,7 +1048,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type DateTime? to the message metadata.
+    /// Appends a value of type <c>DateTime?</c> to the message metadata.
     /// </summary>
     /// <param name="key">The key.</param>
     /// <param name="value">The value.</param>
@@ -1059,7 +1059,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type TimeSpan to the message.
+    /// Appends a value of type <c>TimeSpan</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     public LogMessage Append(TimeSpan value)
@@ -1069,7 +1069,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type TimeSpan? to the message.
+    /// Appends a value of type <c>TimeSpan?</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     public LogMessage Append(TimeSpan? value)
@@ -1079,7 +1079,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type TimeSpan to the message.
+    /// Appends a value of type <c>TimeSpan</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     /// <param name="format">The format string.</param>
@@ -1090,7 +1090,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type TimeSpan? to the message.
+    /// Appends a value of type <c>TimeSpan?</c> to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
     /// <param name="format">The format string.</param>
@@ -1101,7 +1101,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type TimeSpan to the message metadata.
+    /// Appends a value of type <c>TimeSpan</c> to the message metadata.
     /// </summary>
     /// <param name="key">The key.</param>
     /// <param name="value">The value.</param>
@@ -1112,7 +1112,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type TimeSpan? to the message metadata.
+    /// Appends a value of type <c>TimeSpan?</c> to the message metadata.
     /// </summary>
     /// <param name="key">The key.</param>
     /// <param name="value">The value.</param>
@@ -1132,35 +1132,35 @@ partial class LogMessage
     partial struct AppendInterpolatedStringHandler
     {
         /// <summary>
-        /// Appends a value of type bool to the handler.
+        /// Appends a value of type <c>bool</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(bool value)
             => _message.InternalAppendValueType(value, ArgumentType.Boolean);
 
         /// <summary>
-        /// Appends a value of type bool? to the handler.
+        /// Appends a value of type <c>bool?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(bool? value)
             => _message.InternalAppendValueType(value, ArgumentType.Boolean);
 
         /// <summary>
-        /// Appends a value of type byte to the handler.
+        /// Appends a value of type <c>byte</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(byte value)
             => _message.InternalAppendValueType(value, ArgumentType.Byte);
 
         /// <summary>
-        /// Appends a value of type byte? to the handler.
+        /// Appends a value of type <c>byte?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(byte? value)
             => _message.InternalAppendValueType(value, ArgumentType.Byte);
 
         /// <summary>
-        /// Appends a value of type byte to the handler.
+        /// Appends a value of type <c>byte</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1168,7 +1168,7 @@ partial class LogMessage
             => _message.InternalAppendValueType(value, format, ArgumentType.Byte);
 
         /// <summary>
-        /// Appends a value of type byte? to the handler.
+        /// Appends a value of type <c>byte?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1176,21 +1176,21 @@ partial class LogMessage
             => _message.InternalAppendValueType(value, format, ArgumentType.Byte);
 
         /// <summary>
-        /// Appends a value of type sbyte to the handler.
+        /// Appends a value of type <c>sbyte</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(sbyte value)
             => _message.InternalAppendValueType(value, ArgumentType.SByte);
 
         /// <summary>
-        /// Appends a value of type sbyte? to the handler.
+        /// Appends a value of type <c>sbyte?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(sbyte? value)
             => _message.InternalAppendValueType(value, ArgumentType.SByte);
 
         /// <summary>
-        /// Appends a value of type sbyte to the handler.
+        /// Appends a value of type <c>sbyte</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1198,7 +1198,7 @@ partial class LogMessage
             => _message.InternalAppendValueType(value, format, ArgumentType.SByte);
 
         /// <summary>
-        /// Appends a value of type sbyte? to the handler.
+        /// Appends a value of type <c>sbyte?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1206,35 +1206,35 @@ partial class LogMessage
             => _message.InternalAppendValueType(value, format, ArgumentType.SByte);
 
         /// <summary>
-        /// Appends a value of type char to the handler.
+        /// Appends a value of type <c>char</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(char value)
             => _message.InternalAppendValueType(value, ArgumentType.Char);
 
         /// <summary>
-        /// Appends a value of type char? to the handler.
+        /// Appends a value of type <c>char?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(char? value)
             => _message.InternalAppendValueType(value, ArgumentType.Char);
 
         /// <summary>
-        /// Appends a value of type short to the handler.
+        /// Appends a value of type <c>short</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(short value)
             => _message.InternalAppendValueType(value, ArgumentType.Int16);
 
         /// <summary>
-        /// Appends a value of type short? to the handler.
+        /// Appends a value of type <c>short?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(short? value)
             => _message.InternalAppendValueType(value, ArgumentType.Int16);
 
         /// <summary>
-        /// Appends a value of type short to the handler.
+        /// Appends a value of type <c>short</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1242,7 +1242,7 @@ partial class LogMessage
             => _message.InternalAppendValueType(value, format, ArgumentType.Int16);
 
         /// <summary>
-        /// Appends a value of type short? to the handler.
+        /// Appends a value of type <c>short?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1250,21 +1250,21 @@ partial class LogMessage
             => _message.InternalAppendValueType(value, format, ArgumentType.Int16);
 
         /// <summary>
-        /// Appends a value of type ushort to the handler.
+        /// Appends a value of type <c>ushort</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(ushort value)
             => _message.InternalAppendValueType(value, ArgumentType.UInt16);
 
         /// <summary>
-        /// Appends a value of type ushort? to the handler.
+        /// Appends a value of type <c>ushort?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(ushort? value)
             => _message.InternalAppendValueType(value, ArgumentType.UInt16);
 
         /// <summary>
-        /// Appends a value of type ushort to the handler.
+        /// Appends a value of type <c>ushort</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1272,7 +1272,7 @@ partial class LogMessage
             => _message.InternalAppendValueType(value, format, ArgumentType.UInt16);
 
         /// <summary>
-        /// Appends a value of type ushort? to the handler.
+        /// Appends a value of type <c>ushort?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1280,21 +1280,21 @@ partial class LogMessage
             => _message.InternalAppendValueType(value, format, ArgumentType.UInt16);
 
         /// <summary>
-        /// Appends a value of type int to the handler.
+        /// Appends a value of type <c>int</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(int value)
             => _message.InternalAppendValueType(value, ArgumentType.Int32);
 
         /// <summary>
-        /// Appends a value of type int? to the handler.
+        /// Appends a value of type <c>int?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(int? value)
             => _message.InternalAppendValueType(value, ArgumentType.Int32);
 
         /// <summary>
-        /// Appends a value of type int to the handler.
+        /// Appends a value of type <c>int</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1302,7 +1302,7 @@ partial class LogMessage
             => _message.InternalAppendValueType(value, format, ArgumentType.Int32);
 
         /// <summary>
-        /// Appends a value of type int? to the handler.
+        /// Appends a value of type <c>int?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1310,21 +1310,21 @@ partial class LogMessage
             => _message.InternalAppendValueType(value, format, ArgumentType.Int32);
 
         /// <summary>
-        /// Appends a value of type uint to the handler.
+        /// Appends a value of type <c>uint</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(uint value)
             => _message.InternalAppendValueType(value, ArgumentType.UInt32);
 
         /// <summary>
-        /// Appends a value of type uint? to the handler.
+        /// Appends a value of type <c>uint?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(uint? value)
             => _message.InternalAppendValueType(value, ArgumentType.UInt32);
 
         /// <summary>
-        /// Appends a value of type uint to the handler.
+        /// Appends a value of type <c>uint</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1332,7 +1332,7 @@ partial class LogMessage
             => _message.InternalAppendValueType(value, format, ArgumentType.UInt32);
 
         /// <summary>
-        /// Appends a value of type uint? to the handler.
+        /// Appends a value of type <c>uint?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1340,21 +1340,21 @@ partial class LogMessage
             => _message.InternalAppendValueType(value, format, ArgumentType.UInt32);
 
         /// <summary>
-        /// Appends a value of type long to the handler.
+        /// Appends a value of type <c>long</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(long value)
             => _message.InternalAppendValueType(value, ArgumentType.Int64);
 
         /// <summary>
-        /// Appends a value of type long? to the handler.
+        /// Appends a value of type <c>long?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(long? value)
             => _message.InternalAppendValueType(value, ArgumentType.Int64);
 
         /// <summary>
-        /// Appends a value of type long to the handler.
+        /// Appends a value of type <c>long</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1362,7 +1362,7 @@ partial class LogMessage
             => _message.InternalAppendValueType(value, format, ArgumentType.Int64);
 
         /// <summary>
-        /// Appends a value of type long? to the handler.
+        /// Appends a value of type <c>long?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1370,21 +1370,21 @@ partial class LogMessage
             => _message.InternalAppendValueType(value, format, ArgumentType.Int64);
 
         /// <summary>
-        /// Appends a value of type ulong to the handler.
+        /// Appends a value of type <c>ulong</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(ulong value)
             => _message.InternalAppendValueType(value, ArgumentType.UInt64);
 
         /// <summary>
-        /// Appends a value of type ulong? to the handler.
+        /// Appends a value of type <c>ulong?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(ulong? value)
             => _message.InternalAppendValueType(value, ArgumentType.UInt64);
 
         /// <summary>
-        /// Appends a value of type ulong to the handler.
+        /// Appends a value of type <c>ulong</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1392,7 +1392,7 @@ partial class LogMessage
             => _message.InternalAppendValueType(value, format, ArgumentType.UInt64);
 
         /// <summary>
-        /// Appends a value of type ulong? to the handler.
+        /// Appends a value of type <c>ulong?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1400,21 +1400,21 @@ partial class LogMessage
             => _message.InternalAppendValueType(value, format, ArgumentType.UInt64);
 
         /// <summary>
-        /// Appends a value of type nint to the handler.
+        /// Appends a value of type <c>nint</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(nint value)
             => _message.InternalAppendValueType(value, ArgumentType.IntPtr);
 
         /// <summary>
-        /// Appends a value of type nint? to the handler.
+        /// Appends a value of type <c>nint?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(nint? value)
             => _message.InternalAppendValueType(value, ArgumentType.IntPtr);
 
         /// <summary>
-        /// Appends a value of type nint to the handler.
+        /// Appends a value of type <c>nint</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1422,7 +1422,7 @@ partial class LogMessage
             => _message.InternalAppendValueType(value, format, ArgumentType.IntPtr);
 
         /// <summary>
-        /// Appends a value of type nint? to the handler.
+        /// Appends a value of type <c>nint?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1430,21 +1430,21 @@ partial class LogMessage
             => _message.InternalAppendValueType(value, format, ArgumentType.IntPtr);
 
         /// <summary>
-        /// Appends a value of type nuint to the handler.
+        /// Appends a value of type <c>nuint</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(nuint value)
             => _message.InternalAppendValueType(value, ArgumentType.UIntPtr);
 
         /// <summary>
-        /// Appends a value of type nuint? to the handler.
+        /// Appends a value of type <c>nuint?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(nuint? value)
             => _message.InternalAppendValueType(value, ArgumentType.UIntPtr);
 
         /// <summary>
-        /// Appends a value of type nuint to the handler.
+        /// Appends a value of type <c>nuint</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1452,7 +1452,7 @@ partial class LogMessage
             => _message.InternalAppendValueType(value, format, ArgumentType.UIntPtr);
 
         /// <summary>
-        /// Appends a value of type nuint? to the handler.
+        /// Appends a value of type <c>nuint?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1460,21 +1460,21 @@ partial class LogMessage
             => _message.InternalAppendValueType(value, format, ArgumentType.UIntPtr);
 
         /// <summary>
-        /// Appends a value of type float to the handler.
+        /// Appends a value of type <c>float</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(float value)
             => _message.InternalAppendValueType(value, ArgumentType.Single);
 
         /// <summary>
-        /// Appends a value of type float? to the handler.
+        /// Appends a value of type <c>float?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(float? value)
             => _message.InternalAppendValueType(value, ArgumentType.Single);
 
         /// <summary>
-        /// Appends a value of type float to the handler.
+        /// Appends a value of type <c>float</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1482,7 +1482,7 @@ partial class LogMessage
             => _message.InternalAppendValueType(value, format, ArgumentType.Single);
 
         /// <summary>
-        /// Appends a value of type float? to the handler.
+        /// Appends a value of type <c>float?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1490,21 +1490,21 @@ partial class LogMessage
             => _message.InternalAppendValueType(value, format, ArgumentType.Single);
 
         /// <summary>
-        /// Appends a value of type double to the handler.
+        /// Appends a value of type <c>double</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(double value)
             => _message.InternalAppendValueType(value, ArgumentType.Double);
 
         /// <summary>
-        /// Appends a value of type double? to the handler.
+        /// Appends a value of type <c>double?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(double? value)
             => _message.InternalAppendValueType(value, ArgumentType.Double);
 
         /// <summary>
-        /// Appends a value of type double to the handler.
+        /// Appends a value of type <c>double</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1512,7 +1512,7 @@ partial class LogMessage
             => _message.InternalAppendValueType(value, format, ArgumentType.Double);
 
         /// <summary>
-        /// Appends a value of type double? to the handler.
+        /// Appends a value of type <c>double?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1520,21 +1520,21 @@ partial class LogMessage
             => _message.InternalAppendValueType(value, format, ArgumentType.Double);
 
         /// <summary>
-        /// Appends a value of type decimal to the handler.
+        /// Appends a value of type <c>decimal</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(decimal value)
             => _message.InternalAppendValueType(value, ArgumentType.Decimal);
 
         /// <summary>
-        /// Appends a value of type decimal? to the handler.
+        /// Appends a value of type <c>decimal?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(decimal? value)
             => _message.InternalAppendValueType(value, ArgumentType.Decimal);
 
         /// <summary>
-        /// Appends a value of type decimal to the handler.
+        /// Appends a value of type <c>decimal</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1542,7 +1542,7 @@ partial class LogMessage
             => _message.InternalAppendValueType(value, format, ArgumentType.Decimal);
 
         /// <summary>
-        /// Appends a value of type decimal? to the handler.
+        /// Appends a value of type <c>decimal?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1550,21 +1550,21 @@ partial class LogMessage
             => _message.InternalAppendValueType(value, format, ArgumentType.Decimal);
 
         /// <summary>
-        /// Appends a value of type Guid to the handler.
+        /// Appends a value of type <c>Guid</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(Guid value)
             => _message.InternalAppendValueType(value, ArgumentType.Guid);
 
         /// <summary>
-        /// Appends a value of type Guid? to the handler.
+        /// Appends a value of type <c>Guid?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(Guid? value)
             => _message.InternalAppendValueType(value, ArgumentType.Guid);
 
         /// <summary>
-        /// Appends a value of type Guid to the handler.
+        /// Appends a value of type <c>Guid</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1572,7 +1572,7 @@ partial class LogMessage
             => _message.InternalAppendValueType(value, format, ArgumentType.Guid);
 
         /// <summary>
-        /// Appends a value of type Guid? to the handler.
+        /// Appends a value of type <c>Guid?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1580,21 +1580,21 @@ partial class LogMessage
             => _message.InternalAppendValueType(value, format, ArgumentType.Guid);
 
         /// <summary>
-        /// Appends a value of type DateTime to the handler.
+        /// Appends a value of type <c>DateTime</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(DateTime value)
             => _message.InternalAppendValueType(value, ArgumentType.DateTime);
 
         /// <summary>
-        /// Appends a value of type DateTime? to the handler.
+        /// Appends a value of type <c>DateTime?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(DateTime? value)
             => _message.InternalAppendValueType(value, ArgumentType.DateTime);
 
         /// <summary>
-        /// Appends a value of type DateTime to the handler.
+        /// Appends a value of type <c>DateTime</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1602,7 +1602,7 @@ partial class LogMessage
             => _message.InternalAppendValueType(value, format, ArgumentType.DateTime);
 
         /// <summary>
-        /// Appends a value of type DateTime? to the handler.
+        /// Appends a value of type <c>DateTime?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1610,21 +1610,21 @@ partial class LogMessage
             => _message.InternalAppendValueType(value, format, ArgumentType.DateTime);
 
         /// <summary>
-        /// Appends a value of type TimeSpan to the handler.
+        /// Appends a value of type <c>TimeSpan</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(TimeSpan value)
             => _message.InternalAppendValueType(value, ArgumentType.TimeSpan);
 
         /// <summary>
-        /// Appends a value of type TimeSpan? to the handler.
+        /// Appends a value of type <c>TimeSpan?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(TimeSpan? value)
             => _message.InternalAppendValueType(value, ArgumentType.TimeSpan);
 
         /// <summary>
-        /// Appends a value of type TimeSpan to the handler.
+        /// Appends a value of type <c>TimeSpan</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1632,7 +1632,7 @@ partial class LogMessage
             => _message.InternalAppendValueType(value, format, ArgumentType.TimeSpan);
 
         /// <summary>
-        /// Appends a value of type TimeSpan? to the handler.
+        /// Appends a value of type <c>TimeSpan?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>

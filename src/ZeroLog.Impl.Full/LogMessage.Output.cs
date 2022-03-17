@@ -575,10 +575,7 @@ unsafe partial class LogMessage
         }
     }
 
-    /// <summary>
-    /// Returns the logged message as a string.
-    /// </summary>
-    public override string ToString()
+    public override partial string ToString()
     {
         if (ConstantMessage is not null)
             return ConstantMessage;

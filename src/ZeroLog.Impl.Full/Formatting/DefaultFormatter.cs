@@ -12,6 +12,9 @@ namespace ZeroLog.Formatting;
 /// <item>The associated exception on the next lines.</item>
 /// </list>
 /// </summary>
+/// <remarks>
+/// Logging an exception will allocate.
+/// </remarks>
 public sealed class DefaultFormatter : Formatter
 {
     private static readonly PrefixWriter _defaultPrefixWriter = new("%time - %level - %logger || ");

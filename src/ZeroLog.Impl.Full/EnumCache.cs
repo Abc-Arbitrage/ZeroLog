@@ -54,11 +54,10 @@ internal static class EnumCache
         return IL.Return<ulong>();
     }
 
-    /// <summary>
-    /// Only used when registering enums
-    /// </summary>
     internal static ulong ToUInt64Slow(Enum value)
     {
+        // Only used when registering enums.
+
         return Type.GetTypeCode(Enum.GetUnderlyingType(value.GetType())) switch
         {
             TypeCode.SByte  => ToUInt64((sbyte)(object)value),

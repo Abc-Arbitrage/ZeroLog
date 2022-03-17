@@ -52,6 +52,11 @@ public sealed partial class LogMessage
     /// </remarks>
     public partial void Log();
 
+    /// <summary>
+    /// Returns the logged message as a string.
+    /// </summary>
+    public override partial string ToString();
+
 #if NETSTANDARD
 
     internal static readonly LogMessage Empty = new();
@@ -64,10 +69,7 @@ public sealed partial class LogMessage
     {
     }
 
-    /// <summary>
-    /// Returns an empty string in .NET Standard.
-    /// </summary>
-    public override string ToString()
+    public override partial string ToString()
         => string.Empty;
 
 #endif
@@ -128,7 +130,7 @@ public sealed partial class LogMessage
     /// <summary>
     /// An append operation used for indirections.
     /// </summary>
-    /// <typeparam name="T">The value type to append</typeparam>
+    /// <typeparam name="T">The value type to append.</typeparam>
     public readonly struct AppendOperation<T>
     {
         /// <summary>

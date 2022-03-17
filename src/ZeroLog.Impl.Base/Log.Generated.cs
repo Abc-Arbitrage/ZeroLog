@@ -37,7 +37,8 @@ partial class Log
     }
 
     /// <summary>
-    /// Logs a message of <see cref="LogLevel.Trace"/> level.
+    /// Logs a message of <see cref="LogLevel.Trace"/> level with an attached exception.
+    /// Note that logging an exception will allocate.
     /// </summary>
     /// <param name="message">The message to log.</param>
     /// <param name="ex">An exception to associate to the message.</param>
@@ -57,7 +58,8 @@ partial class Log
         => message.Message.Log();
 
     /// <summary>
-    /// Logs a message of <see cref="LogLevel.Trace"/> level.
+    /// Logs a message of <see cref="LogLevel.Trace"/> level with an attached exception.
+    /// Note that logging an exception will allocate.
     /// </summary>
     /// <param name="message">The message to log.</param>
     /// <param name="ex">An exception to associate to the message.</param>
@@ -90,7 +92,8 @@ partial class Log
     }
 
     /// <summary>
-    /// Logs a message of <see cref="LogLevel.Debug"/> level.
+    /// Logs a message of <see cref="LogLevel.Debug"/> level with an attached exception.
+    /// Note that logging an exception will allocate.
     /// </summary>
     /// <param name="message">The message to log.</param>
     /// <param name="ex">An exception to associate to the message.</param>
@@ -110,7 +113,8 @@ partial class Log
         => message.Message.Log();
 
     /// <summary>
-    /// Logs a message of <see cref="LogLevel.Debug"/> level.
+    /// Logs a message of <see cref="LogLevel.Debug"/> level with an attached exception.
+    /// Note that logging an exception will allocate.
     /// </summary>
     /// <param name="message">The message to log.</param>
     /// <param name="ex">An exception to associate to the message.</param>
@@ -143,7 +147,8 @@ partial class Log
     }
 
     /// <summary>
-    /// Logs a message of <see cref="LogLevel.Info"/> level.
+    /// Logs a message of <see cref="LogLevel.Info"/> level with an attached exception.
+    /// Note that logging an exception will allocate.
     /// </summary>
     /// <param name="message">The message to log.</param>
     /// <param name="ex">An exception to associate to the message.</param>
@@ -163,7 +168,8 @@ partial class Log
         => message.Message.Log();
 
     /// <summary>
-    /// Logs a message of <see cref="LogLevel.Info"/> level.
+    /// Logs a message of <see cref="LogLevel.Info"/> level with an attached exception.
+    /// Note that logging an exception will allocate.
     /// </summary>
     /// <param name="message">The message to log.</param>
     /// <param name="ex">An exception to associate to the message.</param>
@@ -196,7 +202,8 @@ partial class Log
     }
 
     /// <summary>
-    /// Logs a message of <see cref="LogLevel.Warn"/> level.
+    /// Logs a message of <see cref="LogLevel.Warn"/> level with an attached exception.
+    /// Note that logging an exception will allocate.
     /// </summary>
     /// <param name="message">The message to log.</param>
     /// <param name="ex">An exception to associate to the message.</param>
@@ -216,7 +223,8 @@ partial class Log
         => message.Message.Log();
 
     /// <summary>
-    /// Logs a message of <see cref="LogLevel.Warn"/> level.
+    /// Logs a message of <see cref="LogLevel.Warn"/> level with an attached exception.
+    /// Note that logging an exception will allocate.
     /// </summary>
     /// <param name="message">The message to log.</param>
     /// <param name="ex">An exception to associate to the message.</param>
@@ -249,7 +257,8 @@ partial class Log
     }
 
     /// <summary>
-    /// Logs a message of <see cref="LogLevel.Error"/> level.
+    /// Logs a message of <see cref="LogLevel.Error"/> level with an attached exception.
+    /// Note that logging an exception will allocate.
     /// </summary>
     /// <param name="message">The message to log.</param>
     /// <param name="ex">An exception to associate to the message.</param>
@@ -269,7 +278,8 @@ partial class Log
         => message.Message.Log();
 
     /// <summary>
-    /// Logs a message of <see cref="LogLevel.Error"/> level.
+    /// Logs a message of <see cref="LogLevel.Error"/> level with an attached exception.
+    /// Note that logging an exception will allocate.
     /// </summary>
     /// <param name="message">The message to log.</param>
     /// <param name="ex">An exception to associate to the message.</param>
@@ -302,7 +312,8 @@ partial class Log
     }
 
     /// <summary>
-    /// Logs a message of <see cref="LogLevel.Fatal"/> level.
+    /// Logs a message of <see cref="LogLevel.Fatal"/> level with an attached exception.
+    /// Note that logging an exception will allocate.
     /// </summary>
     /// <param name="message">The message to log.</param>
     /// <param name="ex">An exception to associate to the message.</param>
@@ -322,7 +333,8 @@ partial class Log
         => message.Message.Log();
 
     /// <summary>
-    /// Logs a message of <see cref="LogLevel.Fatal"/> level.
+    /// Logs a message of <see cref="LogLevel.Fatal"/> level with an attached exception.
+    /// Note that logging an exception will allocate.
     /// </summary>
     /// <param name="message">The message to log.</param>
     /// <param name="ex">An exception to associate to the message.</param>
@@ -366,42 +378,42 @@ partial class Log
             => Message.InternalAppendString(value);
 
         /// <summary>
-        /// Appends a string to the handler.
+        /// Appends a value of type <c>string</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(string? value)
             => Message.InternalAppendString(value);
 
         /// <summary>
-        /// Appends a value of type bool to the handler.
+        /// Appends a value of type <c>bool</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(bool value)
             => Message.InternalAppendValueType(value, ArgumentType.Boolean);
 
         /// <summary>
-        /// Appends a value of type bool? to the handler.
+        /// Appends a value of type <c>bool?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(bool? value)
             => Message.InternalAppendValueType(value, ArgumentType.Boolean);
 
         /// <summary>
-        /// Appends a value of type byte to the handler.
+        /// Appends a value of type <c>byte</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(byte value)
             => Message.InternalAppendValueType(value, ArgumentType.Byte);
 
         /// <summary>
-        /// Appends a value of type byte? to the handler.
+        /// Appends a value of type <c>byte?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(byte? value)
             => Message.InternalAppendValueType(value, ArgumentType.Byte);
 
         /// <summary>
-        /// Appends a value of type byte to the handler.
+        /// Appends a value of type <c>byte</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -409,7 +421,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Byte);
 
         /// <summary>
-        /// Appends a value of type byte? to the handler.
+        /// Appends a value of type <c>byte?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -417,21 +429,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Byte);
 
         /// <summary>
-        /// Appends a value of type sbyte to the handler.
+        /// Appends a value of type <c>sbyte</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(sbyte value)
             => Message.InternalAppendValueType(value, ArgumentType.SByte);
 
         /// <summary>
-        /// Appends a value of type sbyte? to the handler.
+        /// Appends a value of type <c>sbyte?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(sbyte? value)
             => Message.InternalAppendValueType(value, ArgumentType.SByte);
 
         /// <summary>
-        /// Appends a value of type sbyte to the handler.
+        /// Appends a value of type <c>sbyte</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -439,7 +451,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.SByte);
 
         /// <summary>
-        /// Appends a value of type sbyte? to the handler.
+        /// Appends a value of type <c>sbyte?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -447,35 +459,35 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.SByte);
 
         /// <summary>
-        /// Appends a value of type char to the handler.
+        /// Appends a value of type <c>char</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(char value)
             => Message.InternalAppendValueType(value, ArgumentType.Char);
 
         /// <summary>
-        /// Appends a value of type char? to the handler.
+        /// Appends a value of type <c>char?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(char? value)
             => Message.InternalAppendValueType(value, ArgumentType.Char);
 
         /// <summary>
-        /// Appends a value of type short to the handler.
+        /// Appends a value of type <c>short</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(short value)
             => Message.InternalAppendValueType(value, ArgumentType.Int16);
 
         /// <summary>
-        /// Appends a value of type short? to the handler.
+        /// Appends a value of type <c>short?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(short? value)
             => Message.InternalAppendValueType(value, ArgumentType.Int16);
 
         /// <summary>
-        /// Appends a value of type short to the handler.
+        /// Appends a value of type <c>short</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -483,7 +495,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Int16);
 
         /// <summary>
-        /// Appends a value of type short? to the handler.
+        /// Appends a value of type <c>short?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -491,21 +503,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Int16);
 
         /// <summary>
-        /// Appends a value of type ushort to the handler.
+        /// Appends a value of type <c>ushort</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(ushort value)
             => Message.InternalAppendValueType(value, ArgumentType.UInt16);
 
         /// <summary>
-        /// Appends a value of type ushort? to the handler.
+        /// Appends a value of type <c>ushort?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(ushort? value)
             => Message.InternalAppendValueType(value, ArgumentType.UInt16);
 
         /// <summary>
-        /// Appends a value of type ushort to the handler.
+        /// Appends a value of type <c>ushort</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -513,7 +525,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.UInt16);
 
         /// <summary>
-        /// Appends a value of type ushort? to the handler.
+        /// Appends a value of type <c>ushort?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -521,21 +533,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.UInt16);
 
         /// <summary>
-        /// Appends a value of type int to the handler.
+        /// Appends a value of type <c>int</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(int value)
             => Message.InternalAppendValueType(value, ArgumentType.Int32);
 
         /// <summary>
-        /// Appends a value of type int? to the handler.
+        /// Appends a value of type <c>int?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(int? value)
             => Message.InternalAppendValueType(value, ArgumentType.Int32);
 
         /// <summary>
-        /// Appends a value of type int to the handler.
+        /// Appends a value of type <c>int</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -543,7 +555,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Int32);
 
         /// <summary>
-        /// Appends a value of type int? to the handler.
+        /// Appends a value of type <c>int?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -551,21 +563,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Int32);
 
         /// <summary>
-        /// Appends a value of type uint to the handler.
+        /// Appends a value of type <c>uint</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(uint value)
             => Message.InternalAppendValueType(value, ArgumentType.UInt32);
 
         /// <summary>
-        /// Appends a value of type uint? to the handler.
+        /// Appends a value of type <c>uint?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(uint? value)
             => Message.InternalAppendValueType(value, ArgumentType.UInt32);
 
         /// <summary>
-        /// Appends a value of type uint to the handler.
+        /// Appends a value of type <c>uint</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -573,7 +585,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.UInt32);
 
         /// <summary>
-        /// Appends a value of type uint? to the handler.
+        /// Appends a value of type <c>uint?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -581,21 +593,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.UInt32);
 
         /// <summary>
-        /// Appends a value of type long to the handler.
+        /// Appends a value of type <c>long</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(long value)
             => Message.InternalAppendValueType(value, ArgumentType.Int64);
 
         /// <summary>
-        /// Appends a value of type long? to the handler.
+        /// Appends a value of type <c>long?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(long? value)
             => Message.InternalAppendValueType(value, ArgumentType.Int64);
 
         /// <summary>
-        /// Appends a value of type long to the handler.
+        /// Appends a value of type <c>long</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -603,7 +615,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Int64);
 
         /// <summary>
-        /// Appends a value of type long? to the handler.
+        /// Appends a value of type <c>long?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -611,21 +623,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Int64);
 
         /// <summary>
-        /// Appends a value of type ulong to the handler.
+        /// Appends a value of type <c>ulong</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(ulong value)
             => Message.InternalAppendValueType(value, ArgumentType.UInt64);
 
         /// <summary>
-        /// Appends a value of type ulong? to the handler.
+        /// Appends a value of type <c>ulong?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(ulong? value)
             => Message.InternalAppendValueType(value, ArgumentType.UInt64);
 
         /// <summary>
-        /// Appends a value of type ulong to the handler.
+        /// Appends a value of type <c>ulong</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -633,7 +645,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.UInt64);
 
         /// <summary>
-        /// Appends a value of type ulong? to the handler.
+        /// Appends a value of type <c>ulong?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -641,21 +653,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.UInt64);
 
         /// <summary>
-        /// Appends a value of type nint to the handler.
+        /// Appends a value of type <c>nint</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(nint value)
             => Message.InternalAppendValueType(value, ArgumentType.IntPtr);
 
         /// <summary>
-        /// Appends a value of type nint? to the handler.
+        /// Appends a value of type <c>nint?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(nint? value)
             => Message.InternalAppendValueType(value, ArgumentType.IntPtr);
 
         /// <summary>
-        /// Appends a value of type nint to the handler.
+        /// Appends a value of type <c>nint</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -663,7 +675,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.IntPtr);
 
         /// <summary>
-        /// Appends a value of type nint? to the handler.
+        /// Appends a value of type <c>nint?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -671,21 +683,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.IntPtr);
 
         /// <summary>
-        /// Appends a value of type nuint to the handler.
+        /// Appends a value of type <c>nuint</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(nuint value)
             => Message.InternalAppendValueType(value, ArgumentType.UIntPtr);
 
         /// <summary>
-        /// Appends a value of type nuint? to the handler.
+        /// Appends a value of type <c>nuint?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(nuint? value)
             => Message.InternalAppendValueType(value, ArgumentType.UIntPtr);
 
         /// <summary>
-        /// Appends a value of type nuint to the handler.
+        /// Appends a value of type <c>nuint</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -693,7 +705,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.UIntPtr);
 
         /// <summary>
-        /// Appends a value of type nuint? to the handler.
+        /// Appends a value of type <c>nuint?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -701,21 +713,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.UIntPtr);
 
         /// <summary>
-        /// Appends a value of type float to the handler.
+        /// Appends a value of type <c>float</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(float value)
             => Message.InternalAppendValueType(value, ArgumentType.Single);
 
         /// <summary>
-        /// Appends a value of type float? to the handler.
+        /// Appends a value of type <c>float?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(float? value)
             => Message.InternalAppendValueType(value, ArgumentType.Single);
 
         /// <summary>
-        /// Appends a value of type float to the handler.
+        /// Appends a value of type <c>float</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -723,7 +735,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Single);
 
         /// <summary>
-        /// Appends a value of type float? to the handler.
+        /// Appends a value of type <c>float?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -731,21 +743,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Single);
 
         /// <summary>
-        /// Appends a value of type double to the handler.
+        /// Appends a value of type <c>double</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(double value)
             => Message.InternalAppendValueType(value, ArgumentType.Double);
 
         /// <summary>
-        /// Appends a value of type double? to the handler.
+        /// Appends a value of type <c>double?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(double? value)
             => Message.InternalAppendValueType(value, ArgumentType.Double);
 
         /// <summary>
-        /// Appends a value of type double to the handler.
+        /// Appends a value of type <c>double</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -753,7 +765,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Double);
 
         /// <summary>
-        /// Appends a value of type double? to the handler.
+        /// Appends a value of type <c>double?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -761,21 +773,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Double);
 
         /// <summary>
-        /// Appends a value of type decimal to the handler.
+        /// Appends a value of type <c>decimal</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(decimal value)
             => Message.InternalAppendValueType(value, ArgumentType.Decimal);
 
         /// <summary>
-        /// Appends a value of type decimal? to the handler.
+        /// Appends a value of type <c>decimal?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(decimal? value)
             => Message.InternalAppendValueType(value, ArgumentType.Decimal);
 
         /// <summary>
-        /// Appends a value of type decimal to the handler.
+        /// Appends a value of type <c>decimal</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -783,7 +795,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Decimal);
 
         /// <summary>
-        /// Appends a value of type decimal? to the handler.
+        /// Appends a value of type <c>decimal?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -791,21 +803,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Decimal);
 
         /// <summary>
-        /// Appends a value of type Guid to the handler.
+        /// Appends a value of type <c>Guid</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(Guid value)
             => Message.InternalAppendValueType(value, ArgumentType.Guid);
 
         /// <summary>
-        /// Appends a value of type Guid? to the handler.
+        /// Appends a value of type <c>Guid?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(Guid? value)
             => Message.InternalAppendValueType(value, ArgumentType.Guid);
 
         /// <summary>
-        /// Appends a value of type Guid to the handler.
+        /// Appends a value of type <c>Guid</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -813,7 +825,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Guid);
 
         /// <summary>
-        /// Appends a value of type Guid? to the handler.
+        /// Appends a value of type <c>Guid?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -821,21 +833,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Guid);
 
         /// <summary>
-        /// Appends a value of type DateTime to the handler.
+        /// Appends a value of type <c>DateTime</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(DateTime value)
             => Message.InternalAppendValueType(value, ArgumentType.DateTime);
 
         /// <summary>
-        /// Appends a value of type DateTime? to the handler.
+        /// Appends a value of type <c>DateTime?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(DateTime? value)
             => Message.InternalAppendValueType(value, ArgumentType.DateTime);
 
         /// <summary>
-        /// Appends a value of type DateTime to the handler.
+        /// Appends a value of type <c>DateTime</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -843,7 +855,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.DateTime);
 
         /// <summary>
-        /// Appends a value of type DateTime? to the handler.
+        /// Appends a value of type <c>DateTime?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -851,21 +863,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.DateTime);
 
         /// <summary>
-        /// Appends a value of type TimeSpan to the handler.
+        /// Appends a value of type <c>TimeSpan</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(TimeSpan value)
             => Message.InternalAppendValueType(value, ArgumentType.TimeSpan);
 
         /// <summary>
-        /// Appends a value of type TimeSpan? to the handler.
+        /// Appends a value of type <c>TimeSpan?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(TimeSpan? value)
             => Message.InternalAppendValueType(value, ArgumentType.TimeSpan);
 
         /// <summary>
-        /// Appends a value of type TimeSpan to the handler.
+        /// Appends a value of type <c>TimeSpan</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -873,7 +885,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.TimeSpan);
 
         /// <summary>
-        /// Appends a value of type TimeSpan? to the handler.
+        /// Appends a value of type <c>TimeSpan?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -936,42 +948,42 @@ partial class Log
             => Message.InternalAppendString(value);
 
         /// <summary>
-        /// Appends a string to the handler.
+        /// Appends a value of type <c>string</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(string? value)
             => Message.InternalAppendString(value);
 
         /// <summary>
-        /// Appends a value of type bool to the handler.
+        /// Appends a value of type <c>bool</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(bool value)
             => Message.InternalAppendValueType(value, ArgumentType.Boolean);
 
         /// <summary>
-        /// Appends a value of type bool? to the handler.
+        /// Appends a value of type <c>bool?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(bool? value)
             => Message.InternalAppendValueType(value, ArgumentType.Boolean);
 
         /// <summary>
-        /// Appends a value of type byte to the handler.
+        /// Appends a value of type <c>byte</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(byte value)
             => Message.InternalAppendValueType(value, ArgumentType.Byte);
 
         /// <summary>
-        /// Appends a value of type byte? to the handler.
+        /// Appends a value of type <c>byte?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(byte? value)
             => Message.InternalAppendValueType(value, ArgumentType.Byte);
 
         /// <summary>
-        /// Appends a value of type byte to the handler.
+        /// Appends a value of type <c>byte</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -979,7 +991,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Byte);
 
         /// <summary>
-        /// Appends a value of type byte? to the handler.
+        /// Appends a value of type <c>byte?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -987,21 +999,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Byte);
 
         /// <summary>
-        /// Appends a value of type sbyte to the handler.
+        /// Appends a value of type <c>sbyte</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(sbyte value)
             => Message.InternalAppendValueType(value, ArgumentType.SByte);
 
         /// <summary>
-        /// Appends a value of type sbyte? to the handler.
+        /// Appends a value of type <c>sbyte?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(sbyte? value)
             => Message.InternalAppendValueType(value, ArgumentType.SByte);
 
         /// <summary>
-        /// Appends a value of type sbyte to the handler.
+        /// Appends a value of type <c>sbyte</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1009,7 +1021,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.SByte);
 
         /// <summary>
-        /// Appends a value of type sbyte? to the handler.
+        /// Appends a value of type <c>sbyte?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1017,35 +1029,35 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.SByte);
 
         /// <summary>
-        /// Appends a value of type char to the handler.
+        /// Appends a value of type <c>char</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(char value)
             => Message.InternalAppendValueType(value, ArgumentType.Char);
 
         /// <summary>
-        /// Appends a value of type char? to the handler.
+        /// Appends a value of type <c>char?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(char? value)
             => Message.InternalAppendValueType(value, ArgumentType.Char);
 
         /// <summary>
-        /// Appends a value of type short to the handler.
+        /// Appends a value of type <c>short</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(short value)
             => Message.InternalAppendValueType(value, ArgumentType.Int16);
 
         /// <summary>
-        /// Appends a value of type short? to the handler.
+        /// Appends a value of type <c>short?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(short? value)
             => Message.InternalAppendValueType(value, ArgumentType.Int16);
 
         /// <summary>
-        /// Appends a value of type short to the handler.
+        /// Appends a value of type <c>short</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1053,7 +1065,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Int16);
 
         /// <summary>
-        /// Appends a value of type short? to the handler.
+        /// Appends a value of type <c>short?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1061,21 +1073,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Int16);
 
         /// <summary>
-        /// Appends a value of type ushort to the handler.
+        /// Appends a value of type <c>ushort</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(ushort value)
             => Message.InternalAppendValueType(value, ArgumentType.UInt16);
 
         /// <summary>
-        /// Appends a value of type ushort? to the handler.
+        /// Appends a value of type <c>ushort?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(ushort? value)
             => Message.InternalAppendValueType(value, ArgumentType.UInt16);
 
         /// <summary>
-        /// Appends a value of type ushort to the handler.
+        /// Appends a value of type <c>ushort</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1083,7 +1095,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.UInt16);
 
         /// <summary>
-        /// Appends a value of type ushort? to the handler.
+        /// Appends a value of type <c>ushort?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1091,21 +1103,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.UInt16);
 
         /// <summary>
-        /// Appends a value of type int to the handler.
+        /// Appends a value of type <c>int</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(int value)
             => Message.InternalAppendValueType(value, ArgumentType.Int32);
 
         /// <summary>
-        /// Appends a value of type int? to the handler.
+        /// Appends a value of type <c>int?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(int? value)
             => Message.InternalAppendValueType(value, ArgumentType.Int32);
 
         /// <summary>
-        /// Appends a value of type int to the handler.
+        /// Appends a value of type <c>int</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1113,7 +1125,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Int32);
 
         /// <summary>
-        /// Appends a value of type int? to the handler.
+        /// Appends a value of type <c>int?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1121,21 +1133,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Int32);
 
         /// <summary>
-        /// Appends a value of type uint to the handler.
+        /// Appends a value of type <c>uint</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(uint value)
             => Message.InternalAppendValueType(value, ArgumentType.UInt32);
 
         /// <summary>
-        /// Appends a value of type uint? to the handler.
+        /// Appends a value of type <c>uint?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(uint? value)
             => Message.InternalAppendValueType(value, ArgumentType.UInt32);
 
         /// <summary>
-        /// Appends a value of type uint to the handler.
+        /// Appends a value of type <c>uint</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1143,7 +1155,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.UInt32);
 
         /// <summary>
-        /// Appends a value of type uint? to the handler.
+        /// Appends a value of type <c>uint?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1151,21 +1163,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.UInt32);
 
         /// <summary>
-        /// Appends a value of type long to the handler.
+        /// Appends a value of type <c>long</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(long value)
             => Message.InternalAppendValueType(value, ArgumentType.Int64);
 
         /// <summary>
-        /// Appends a value of type long? to the handler.
+        /// Appends a value of type <c>long?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(long? value)
             => Message.InternalAppendValueType(value, ArgumentType.Int64);
 
         /// <summary>
-        /// Appends a value of type long to the handler.
+        /// Appends a value of type <c>long</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1173,7 +1185,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Int64);
 
         /// <summary>
-        /// Appends a value of type long? to the handler.
+        /// Appends a value of type <c>long?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1181,21 +1193,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Int64);
 
         /// <summary>
-        /// Appends a value of type ulong to the handler.
+        /// Appends a value of type <c>ulong</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(ulong value)
             => Message.InternalAppendValueType(value, ArgumentType.UInt64);
 
         /// <summary>
-        /// Appends a value of type ulong? to the handler.
+        /// Appends a value of type <c>ulong?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(ulong? value)
             => Message.InternalAppendValueType(value, ArgumentType.UInt64);
 
         /// <summary>
-        /// Appends a value of type ulong to the handler.
+        /// Appends a value of type <c>ulong</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1203,7 +1215,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.UInt64);
 
         /// <summary>
-        /// Appends a value of type ulong? to the handler.
+        /// Appends a value of type <c>ulong?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1211,21 +1223,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.UInt64);
 
         /// <summary>
-        /// Appends a value of type nint to the handler.
+        /// Appends a value of type <c>nint</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(nint value)
             => Message.InternalAppendValueType(value, ArgumentType.IntPtr);
 
         /// <summary>
-        /// Appends a value of type nint? to the handler.
+        /// Appends a value of type <c>nint?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(nint? value)
             => Message.InternalAppendValueType(value, ArgumentType.IntPtr);
 
         /// <summary>
-        /// Appends a value of type nint to the handler.
+        /// Appends a value of type <c>nint</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1233,7 +1245,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.IntPtr);
 
         /// <summary>
-        /// Appends a value of type nint? to the handler.
+        /// Appends a value of type <c>nint?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1241,21 +1253,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.IntPtr);
 
         /// <summary>
-        /// Appends a value of type nuint to the handler.
+        /// Appends a value of type <c>nuint</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(nuint value)
             => Message.InternalAppendValueType(value, ArgumentType.UIntPtr);
 
         /// <summary>
-        /// Appends a value of type nuint? to the handler.
+        /// Appends a value of type <c>nuint?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(nuint? value)
             => Message.InternalAppendValueType(value, ArgumentType.UIntPtr);
 
         /// <summary>
-        /// Appends a value of type nuint to the handler.
+        /// Appends a value of type <c>nuint</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1263,7 +1275,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.UIntPtr);
 
         /// <summary>
-        /// Appends a value of type nuint? to the handler.
+        /// Appends a value of type <c>nuint?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1271,21 +1283,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.UIntPtr);
 
         /// <summary>
-        /// Appends a value of type float to the handler.
+        /// Appends a value of type <c>float</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(float value)
             => Message.InternalAppendValueType(value, ArgumentType.Single);
 
         /// <summary>
-        /// Appends a value of type float? to the handler.
+        /// Appends a value of type <c>float?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(float? value)
             => Message.InternalAppendValueType(value, ArgumentType.Single);
 
         /// <summary>
-        /// Appends a value of type float to the handler.
+        /// Appends a value of type <c>float</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1293,7 +1305,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Single);
 
         /// <summary>
-        /// Appends a value of type float? to the handler.
+        /// Appends a value of type <c>float?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1301,21 +1313,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Single);
 
         /// <summary>
-        /// Appends a value of type double to the handler.
+        /// Appends a value of type <c>double</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(double value)
             => Message.InternalAppendValueType(value, ArgumentType.Double);
 
         /// <summary>
-        /// Appends a value of type double? to the handler.
+        /// Appends a value of type <c>double?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(double? value)
             => Message.InternalAppendValueType(value, ArgumentType.Double);
 
         /// <summary>
-        /// Appends a value of type double to the handler.
+        /// Appends a value of type <c>double</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1323,7 +1335,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Double);
 
         /// <summary>
-        /// Appends a value of type double? to the handler.
+        /// Appends a value of type <c>double?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1331,21 +1343,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Double);
 
         /// <summary>
-        /// Appends a value of type decimal to the handler.
+        /// Appends a value of type <c>decimal</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(decimal value)
             => Message.InternalAppendValueType(value, ArgumentType.Decimal);
 
         /// <summary>
-        /// Appends a value of type decimal? to the handler.
+        /// Appends a value of type <c>decimal?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(decimal? value)
             => Message.InternalAppendValueType(value, ArgumentType.Decimal);
 
         /// <summary>
-        /// Appends a value of type decimal to the handler.
+        /// Appends a value of type <c>decimal</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1353,7 +1365,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Decimal);
 
         /// <summary>
-        /// Appends a value of type decimal? to the handler.
+        /// Appends a value of type <c>decimal?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1361,21 +1373,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Decimal);
 
         /// <summary>
-        /// Appends a value of type Guid to the handler.
+        /// Appends a value of type <c>Guid</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(Guid value)
             => Message.InternalAppendValueType(value, ArgumentType.Guid);
 
         /// <summary>
-        /// Appends a value of type Guid? to the handler.
+        /// Appends a value of type <c>Guid?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(Guid? value)
             => Message.InternalAppendValueType(value, ArgumentType.Guid);
 
         /// <summary>
-        /// Appends a value of type Guid to the handler.
+        /// Appends a value of type <c>Guid</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1383,7 +1395,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Guid);
 
         /// <summary>
-        /// Appends a value of type Guid? to the handler.
+        /// Appends a value of type <c>Guid?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1391,21 +1403,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Guid);
 
         /// <summary>
-        /// Appends a value of type DateTime to the handler.
+        /// Appends a value of type <c>DateTime</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(DateTime value)
             => Message.InternalAppendValueType(value, ArgumentType.DateTime);
 
         /// <summary>
-        /// Appends a value of type DateTime? to the handler.
+        /// Appends a value of type <c>DateTime?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(DateTime? value)
             => Message.InternalAppendValueType(value, ArgumentType.DateTime);
 
         /// <summary>
-        /// Appends a value of type DateTime to the handler.
+        /// Appends a value of type <c>DateTime</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1413,7 +1425,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.DateTime);
 
         /// <summary>
-        /// Appends a value of type DateTime? to the handler.
+        /// Appends a value of type <c>DateTime?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1421,21 +1433,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.DateTime);
 
         /// <summary>
-        /// Appends a value of type TimeSpan to the handler.
+        /// Appends a value of type <c>TimeSpan</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(TimeSpan value)
             => Message.InternalAppendValueType(value, ArgumentType.TimeSpan);
 
         /// <summary>
-        /// Appends a value of type TimeSpan? to the handler.
+        /// Appends a value of type <c>TimeSpan?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(TimeSpan? value)
             => Message.InternalAppendValueType(value, ArgumentType.TimeSpan);
 
         /// <summary>
-        /// Appends a value of type TimeSpan to the handler.
+        /// Appends a value of type <c>TimeSpan</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1443,7 +1455,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.TimeSpan);
 
         /// <summary>
-        /// Appends a value of type TimeSpan? to the handler.
+        /// Appends a value of type <c>TimeSpan?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1506,42 +1518,42 @@ partial class Log
             => Message.InternalAppendString(value);
 
         /// <summary>
-        /// Appends a string to the handler.
+        /// Appends a value of type <c>string</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(string? value)
             => Message.InternalAppendString(value);
 
         /// <summary>
-        /// Appends a value of type bool to the handler.
+        /// Appends a value of type <c>bool</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(bool value)
             => Message.InternalAppendValueType(value, ArgumentType.Boolean);
 
         /// <summary>
-        /// Appends a value of type bool? to the handler.
+        /// Appends a value of type <c>bool?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(bool? value)
             => Message.InternalAppendValueType(value, ArgumentType.Boolean);
 
         /// <summary>
-        /// Appends a value of type byte to the handler.
+        /// Appends a value of type <c>byte</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(byte value)
             => Message.InternalAppendValueType(value, ArgumentType.Byte);
 
         /// <summary>
-        /// Appends a value of type byte? to the handler.
+        /// Appends a value of type <c>byte?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(byte? value)
             => Message.InternalAppendValueType(value, ArgumentType.Byte);
 
         /// <summary>
-        /// Appends a value of type byte to the handler.
+        /// Appends a value of type <c>byte</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1549,7 +1561,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Byte);
 
         /// <summary>
-        /// Appends a value of type byte? to the handler.
+        /// Appends a value of type <c>byte?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1557,21 +1569,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Byte);
 
         /// <summary>
-        /// Appends a value of type sbyte to the handler.
+        /// Appends a value of type <c>sbyte</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(sbyte value)
             => Message.InternalAppendValueType(value, ArgumentType.SByte);
 
         /// <summary>
-        /// Appends a value of type sbyte? to the handler.
+        /// Appends a value of type <c>sbyte?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(sbyte? value)
             => Message.InternalAppendValueType(value, ArgumentType.SByte);
 
         /// <summary>
-        /// Appends a value of type sbyte to the handler.
+        /// Appends a value of type <c>sbyte</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1579,7 +1591,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.SByte);
 
         /// <summary>
-        /// Appends a value of type sbyte? to the handler.
+        /// Appends a value of type <c>sbyte?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1587,35 +1599,35 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.SByte);
 
         /// <summary>
-        /// Appends a value of type char to the handler.
+        /// Appends a value of type <c>char</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(char value)
             => Message.InternalAppendValueType(value, ArgumentType.Char);
 
         /// <summary>
-        /// Appends a value of type char? to the handler.
+        /// Appends a value of type <c>char?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(char? value)
             => Message.InternalAppendValueType(value, ArgumentType.Char);
 
         /// <summary>
-        /// Appends a value of type short to the handler.
+        /// Appends a value of type <c>short</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(short value)
             => Message.InternalAppendValueType(value, ArgumentType.Int16);
 
         /// <summary>
-        /// Appends a value of type short? to the handler.
+        /// Appends a value of type <c>short?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(short? value)
             => Message.InternalAppendValueType(value, ArgumentType.Int16);
 
         /// <summary>
-        /// Appends a value of type short to the handler.
+        /// Appends a value of type <c>short</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1623,7 +1635,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Int16);
 
         /// <summary>
-        /// Appends a value of type short? to the handler.
+        /// Appends a value of type <c>short?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1631,21 +1643,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Int16);
 
         /// <summary>
-        /// Appends a value of type ushort to the handler.
+        /// Appends a value of type <c>ushort</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(ushort value)
             => Message.InternalAppendValueType(value, ArgumentType.UInt16);
 
         /// <summary>
-        /// Appends a value of type ushort? to the handler.
+        /// Appends a value of type <c>ushort?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(ushort? value)
             => Message.InternalAppendValueType(value, ArgumentType.UInt16);
 
         /// <summary>
-        /// Appends a value of type ushort to the handler.
+        /// Appends a value of type <c>ushort</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1653,7 +1665,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.UInt16);
 
         /// <summary>
-        /// Appends a value of type ushort? to the handler.
+        /// Appends a value of type <c>ushort?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1661,21 +1673,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.UInt16);
 
         /// <summary>
-        /// Appends a value of type int to the handler.
+        /// Appends a value of type <c>int</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(int value)
             => Message.InternalAppendValueType(value, ArgumentType.Int32);
 
         /// <summary>
-        /// Appends a value of type int? to the handler.
+        /// Appends a value of type <c>int?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(int? value)
             => Message.InternalAppendValueType(value, ArgumentType.Int32);
 
         /// <summary>
-        /// Appends a value of type int to the handler.
+        /// Appends a value of type <c>int</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1683,7 +1695,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Int32);
 
         /// <summary>
-        /// Appends a value of type int? to the handler.
+        /// Appends a value of type <c>int?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1691,21 +1703,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Int32);
 
         /// <summary>
-        /// Appends a value of type uint to the handler.
+        /// Appends a value of type <c>uint</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(uint value)
             => Message.InternalAppendValueType(value, ArgumentType.UInt32);
 
         /// <summary>
-        /// Appends a value of type uint? to the handler.
+        /// Appends a value of type <c>uint?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(uint? value)
             => Message.InternalAppendValueType(value, ArgumentType.UInt32);
 
         /// <summary>
-        /// Appends a value of type uint to the handler.
+        /// Appends a value of type <c>uint</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1713,7 +1725,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.UInt32);
 
         /// <summary>
-        /// Appends a value of type uint? to the handler.
+        /// Appends a value of type <c>uint?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1721,21 +1733,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.UInt32);
 
         /// <summary>
-        /// Appends a value of type long to the handler.
+        /// Appends a value of type <c>long</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(long value)
             => Message.InternalAppendValueType(value, ArgumentType.Int64);
 
         /// <summary>
-        /// Appends a value of type long? to the handler.
+        /// Appends a value of type <c>long?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(long? value)
             => Message.InternalAppendValueType(value, ArgumentType.Int64);
 
         /// <summary>
-        /// Appends a value of type long to the handler.
+        /// Appends a value of type <c>long</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1743,7 +1755,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Int64);
 
         /// <summary>
-        /// Appends a value of type long? to the handler.
+        /// Appends a value of type <c>long?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1751,21 +1763,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Int64);
 
         /// <summary>
-        /// Appends a value of type ulong to the handler.
+        /// Appends a value of type <c>ulong</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(ulong value)
             => Message.InternalAppendValueType(value, ArgumentType.UInt64);
 
         /// <summary>
-        /// Appends a value of type ulong? to the handler.
+        /// Appends a value of type <c>ulong?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(ulong? value)
             => Message.InternalAppendValueType(value, ArgumentType.UInt64);
 
         /// <summary>
-        /// Appends a value of type ulong to the handler.
+        /// Appends a value of type <c>ulong</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1773,7 +1785,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.UInt64);
 
         /// <summary>
-        /// Appends a value of type ulong? to the handler.
+        /// Appends a value of type <c>ulong?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1781,21 +1793,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.UInt64);
 
         /// <summary>
-        /// Appends a value of type nint to the handler.
+        /// Appends a value of type <c>nint</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(nint value)
             => Message.InternalAppendValueType(value, ArgumentType.IntPtr);
 
         /// <summary>
-        /// Appends a value of type nint? to the handler.
+        /// Appends a value of type <c>nint?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(nint? value)
             => Message.InternalAppendValueType(value, ArgumentType.IntPtr);
 
         /// <summary>
-        /// Appends a value of type nint to the handler.
+        /// Appends a value of type <c>nint</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1803,7 +1815,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.IntPtr);
 
         /// <summary>
-        /// Appends a value of type nint? to the handler.
+        /// Appends a value of type <c>nint?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1811,21 +1823,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.IntPtr);
 
         /// <summary>
-        /// Appends a value of type nuint to the handler.
+        /// Appends a value of type <c>nuint</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(nuint value)
             => Message.InternalAppendValueType(value, ArgumentType.UIntPtr);
 
         /// <summary>
-        /// Appends a value of type nuint? to the handler.
+        /// Appends a value of type <c>nuint?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(nuint? value)
             => Message.InternalAppendValueType(value, ArgumentType.UIntPtr);
 
         /// <summary>
-        /// Appends a value of type nuint to the handler.
+        /// Appends a value of type <c>nuint</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1833,7 +1845,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.UIntPtr);
 
         /// <summary>
-        /// Appends a value of type nuint? to the handler.
+        /// Appends a value of type <c>nuint?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1841,21 +1853,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.UIntPtr);
 
         /// <summary>
-        /// Appends a value of type float to the handler.
+        /// Appends a value of type <c>float</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(float value)
             => Message.InternalAppendValueType(value, ArgumentType.Single);
 
         /// <summary>
-        /// Appends a value of type float? to the handler.
+        /// Appends a value of type <c>float?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(float? value)
             => Message.InternalAppendValueType(value, ArgumentType.Single);
 
         /// <summary>
-        /// Appends a value of type float to the handler.
+        /// Appends a value of type <c>float</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1863,7 +1875,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Single);
 
         /// <summary>
-        /// Appends a value of type float? to the handler.
+        /// Appends a value of type <c>float?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1871,21 +1883,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Single);
 
         /// <summary>
-        /// Appends a value of type double to the handler.
+        /// Appends a value of type <c>double</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(double value)
             => Message.InternalAppendValueType(value, ArgumentType.Double);
 
         /// <summary>
-        /// Appends a value of type double? to the handler.
+        /// Appends a value of type <c>double?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(double? value)
             => Message.InternalAppendValueType(value, ArgumentType.Double);
 
         /// <summary>
-        /// Appends a value of type double to the handler.
+        /// Appends a value of type <c>double</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1893,7 +1905,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Double);
 
         /// <summary>
-        /// Appends a value of type double? to the handler.
+        /// Appends a value of type <c>double?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1901,21 +1913,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Double);
 
         /// <summary>
-        /// Appends a value of type decimal to the handler.
+        /// Appends a value of type <c>decimal</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(decimal value)
             => Message.InternalAppendValueType(value, ArgumentType.Decimal);
 
         /// <summary>
-        /// Appends a value of type decimal? to the handler.
+        /// Appends a value of type <c>decimal?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(decimal? value)
             => Message.InternalAppendValueType(value, ArgumentType.Decimal);
 
         /// <summary>
-        /// Appends a value of type decimal to the handler.
+        /// Appends a value of type <c>decimal</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1923,7 +1935,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Decimal);
 
         /// <summary>
-        /// Appends a value of type decimal? to the handler.
+        /// Appends a value of type <c>decimal?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1931,21 +1943,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Decimal);
 
         /// <summary>
-        /// Appends a value of type Guid to the handler.
+        /// Appends a value of type <c>Guid</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(Guid value)
             => Message.InternalAppendValueType(value, ArgumentType.Guid);
 
         /// <summary>
-        /// Appends a value of type Guid? to the handler.
+        /// Appends a value of type <c>Guid?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(Guid? value)
             => Message.InternalAppendValueType(value, ArgumentType.Guid);
 
         /// <summary>
-        /// Appends a value of type Guid to the handler.
+        /// Appends a value of type <c>Guid</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1953,7 +1965,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Guid);
 
         /// <summary>
-        /// Appends a value of type Guid? to the handler.
+        /// Appends a value of type <c>Guid?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1961,21 +1973,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Guid);
 
         /// <summary>
-        /// Appends a value of type DateTime to the handler.
+        /// Appends a value of type <c>DateTime</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(DateTime value)
             => Message.InternalAppendValueType(value, ArgumentType.DateTime);
 
         /// <summary>
-        /// Appends a value of type DateTime? to the handler.
+        /// Appends a value of type <c>DateTime?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(DateTime? value)
             => Message.InternalAppendValueType(value, ArgumentType.DateTime);
 
         /// <summary>
-        /// Appends a value of type DateTime to the handler.
+        /// Appends a value of type <c>DateTime</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1983,7 +1995,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.DateTime);
 
         /// <summary>
-        /// Appends a value of type DateTime? to the handler.
+        /// Appends a value of type <c>DateTime?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -1991,21 +2003,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.DateTime);
 
         /// <summary>
-        /// Appends a value of type TimeSpan to the handler.
+        /// Appends a value of type <c>TimeSpan</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(TimeSpan value)
             => Message.InternalAppendValueType(value, ArgumentType.TimeSpan);
 
         /// <summary>
-        /// Appends a value of type TimeSpan? to the handler.
+        /// Appends a value of type <c>TimeSpan?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(TimeSpan? value)
             => Message.InternalAppendValueType(value, ArgumentType.TimeSpan);
 
         /// <summary>
-        /// Appends a value of type TimeSpan to the handler.
+        /// Appends a value of type <c>TimeSpan</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -2013,7 +2025,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.TimeSpan);
 
         /// <summary>
-        /// Appends a value of type TimeSpan? to the handler.
+        /// Appends a value of type <c>TimeSpan?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -2076,42 +2088,42 @@ partial class Log
             => Message.InternalAppendString(value);
 
         /// <summary>
-        /// Appends a string to the handler.
+        /// Appends a value of type <c>string</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(string? value)
             => Message.InternalAppendString(value);
 
         /// <summary>
-        /// Appends a value of type bool to the handler.
+        /// Appends a value of type <c>bool</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(bool value)
             => Message.InternalAppendValueType(value, ArgumentType.Boolean);
 
         /// <summary>
-        /// Appends a value of type bool? to the handler.
+        /// Appends a value of type <c>bool?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(bool? value)
             => Message.InternalAppendValueType(value, ArgumentType.Boolean);
 
         /// <summary>
-        /// Appends a value of type byte to the handler.
+        /// Appends a value of type <c>byte</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(byte value)
             => Message.InternalAppendValueType(value, ArgumentType.Byte);
 
         /// <summary>
-        /// Appends a value of type byte? to the handler.
+        /// Appends a value of type <c>byte?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(byte? value)
             => Message.InternalAppendValueType(value, ArgumentType.Byte);
 
         /// <summary>
-        /// Appends a value of type byte to the handler.
+        /// Appends a value of type <c>byte</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -2119,7 +2131,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Byte);
 
         /// <summary>
-        /// Appends a value of type byte? to the handler.
+        /// Appends a value of type <c>byte?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -2127,21 +2139,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Byte);
 
         /// <summary>
-        /// Appends a value of type sbyte to the handler.
+        /// Appends a value of type <c>sbyte</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(sbyte value)
             => Message.InternalAppendValueType(value, ArgumentType.SByte);
 
         /// <summary>
-        /// Appends a value of type sbyte? to the handler.
+        /// Appends a value of type <c>sbyte?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(sbyte? value)
             => Message.InternalAppendValueType(value, ArgumentType.SByte);
 
         /// <summary>
-        /// Appends a value of type sbyte to the handler.
+        /// Appends a value of type <c>sbyte</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -2149,7 +2161,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.SByte);
 
         /// <summary>
-        /// Appends a value of type sbyte? to the handler.
+        /// Appends a value of type <c>sbyte?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -2157,35 +2169,35 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.SByte);
 
         /// <summary>
-        /// Appends a value of type char to the handler.
+        /// Appends a value of type <c>char</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(char value)
             => Message.InternalAppendValueType(value, ArgumentType.Char);
 
         /// <summary>
-        /// Appends a value of type char? to the handler.
+        /// Appends a value of type <c>char?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(char? value)
             => Message.InternalAppendValueType(value, ArgumentType.Char);
 
         /// <summary>
-        /// Appends a value of type short to the handler.
+        /// Appends a value of type <c>short</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(short value)
             => Message.InternalAppendValueType(value, ArgumentType.Int16);
 
         /// <summary>
-        /// Appends a value of type short? to the handler.
+        /// Appends a value of type <c>short?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(short? value)
             => Message.InternalAppendValueType(value, ArgumentType.Int16);
 
         /// <summary>
-        /// Appends a value of type short to the handler.
+        /// Appends a value of type <c>short</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -2193,7 +2205,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Int16);
 
         /// <summary>
-        /// Appends a value of type short? to the handler.
+        /// Appends a value of type <c>short?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -2201,21 +2213,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Int16);
 
         /// <summary>
-        /// Appends a value of type ushort to the handler.
+        /// Appends a value of type <c>ushort</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(ushort value)
             => Message.InternalAppendValueType(value, ArgumentType.UInt16);
 
         /// <summary>
-        /// Appends a value of type ushort? to the handler.
+        /// Appends a value of type <c>ushort?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(ushort? value)
             => Message.InternalAppendValueType(value, ArgumentType.UInt16);
 
         /// <summary>
-        /// Appends a value of type ushort to the handler.
+        /// Appends a value of type <c>ushort</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -2223,7 +2235,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.UInt16);
 
         /// <summary>
-        /// Appends a value of type ushort? to the handler.
+        /// Appends a value of type <c>ushort?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -2231,21 +2243,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.UInt16);
 
         /// <summary>
-        /// Appends a value of type int to the handler.
+        /// Appends a value of type <c>int</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(int value)
             => Message.InternalAppendValueType(value, ArgumentType.Int32);
 
         /// <summary>
-        /// Appends a value of type int? to the handler.
+        /// Appends a value of type <c>int?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(int? value)
             => Message.InternalAppendValueType(value, ArgumentType.Int32);
 
         /// <summary>
-        /// Appends a value of type int to the handler.
+        /// Appends a value of type <c>int</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -2253,7 +2265,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Int32);
 
         /// <summary>
-        /// Appends a value of type int? to the handler.
+        /// Appends a value of type <c>int?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -2261,21 +2273,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Int32);
 
         /// <summary>
-        /// Appends a value of type uint to the handler.
+        /// Appends a value of type <c>uint</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(uint value)
             => Message.InternalAppendValueType(value, ArgumentType.UInt32);
 
         /// <summary>
-        /// Appends a value of type uint? to the handler.
+        /// Appends a value of type <c>uint?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(uint? value)
             => Message.InternalAppendValueType(value, ArgumentType.UInt32);
 
         /// <summary>
-        /// Appends a value of type uint to the handler.
+        /// Appends a value of type <c>uint</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -2283,7 +2295,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.UInt32);
 
         /// <summary>
-        /// Appends a value of type uint? to the handler.
+        /// Appends a value of type <c>uint?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -2291,21 +2303,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.UInt32);
 
         /// <summary>
-        /// Appends a value of type long to the handler.
+        /// Appends a value of type <c>long</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(long value)
             => Message.InternalAppendValueType(value, ArgumentType.Int64);
 
         /// <summary>
-        /// Appends a value of type long? to the handler.
+        /// Appends a value of type <c>long?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(long? value)
             => Message.InternalAppendValueType(value, ArgumentType.Int64);
 
         /// <summary>
-        /// Appends a value of type long to the handler.
+        /// Appends a value of type <c>long</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -2313,7 +2325,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Int64);
 
         /// <summary>
-        /// Appends a value of type long? to the handler.
+        /// Appends a value of type <c>long?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -2321,21 +2333,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Int64);
 
         /// <summary>
-        /// Appends a value of type ulong to the handler.
+        /// Appends a value of type <c>ulong</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(ulong value)
             => Message.InternalAppendValueType(value, ArgumentType.UInt64);
 
         /// <summary>
-        /// Appends a value of type ulong? to the handler.
+        /// Appends a value of type <c>ulong?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(ulong? value)
             => Message.InternalAppendValueType(value, ArgumentType.UInt64);
 
         /// <summary>
-        /// Appends a value of type ulong to the handler.
+        /// Appends a value of type <c>ulong</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -2343,7 +2355,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.UInt64);
 
         /// <summary>
-        /// Appends a value of type ulong? to the handler.
+        /// Appends a value of type <c>ulong?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -2351,21 +2363,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.UInt64);
 
         /// <summary>
-        /// Appends a value of type nint to the handler.
+        /// Appends a value of type <c>nint</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(nint value)
             => Message.InternalAppendValueType(value, ArgumentType.IntPtr);
 
         /// <summary>
-        /// Appends a value of type nint? to the handler.
+        /// Appends a value of type <c>nint?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(nint? value)
             => Message.InternalAppendValueType(value, ArgumentType.IntPtr);
 
         /// <summary>
-        /// Appends a value of type nint to the handler.
+        /// Appends a value of type <c>nint</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -2373,7 +2385,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.IntPtr);
 
         /// <summary>
-        /// Appends a value of type nint? to the handler.
+        /// Appends a value of type <c>nint?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -2381,21 +2393,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.IntPtr);
 
         /// <summary>
-        /// Appends a value of type nuint to the handler.
+        /// Appends a value of type <c>nuint</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(nuint value)
             => Message.InternalAppendValueType(value, ArgumentType.UIntPtr);
 
         /// <summary>
-        /// Appends a value of type nuint? to the handler.
+        /// Appends a value of type <c>nuint?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(nuint? value)
             => Message.InternalAppendValueType(value, ArgumentType.UIntPtr);
 
         /// <summary>
-        /// Appends a value of type nuint to the handler.
+        /// Appends a value of type <c>nuint</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -2403,7 +2415,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.UIntPtr);
 
         /// <summary>
-        /// Appends a value of type nuint? to the handler.
+        /// Appends a value of type <c>nuint?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -2411,21 +2423,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.UIntPtr);
 
         /// <summary>
-        /// Appends a value of type float to the handler.
+        /// Appends a value of type <c>float</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(float value)
             => Message.InternalAppendValueType(value, ArgumentType.Single);
 
         /// <summary>
-        /// Appends a value of type float? to the handler.
+        /// Appends a value of type <c>float?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(float? value)
             => Message.InternalAppendValueType(value, ArgumentType.Single);
 
         /// <summary>
-        /// Appends a value of type float to the handler.
+        /// Appends a value of type <c>float</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -2433,7 +2445,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Single);
 
         /// <summary>
-        /// Appends a value of type float? to the handler.
+        /// Appends a value of type <c>float?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -2441,21 +2453,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Single);
 
         /// <summary>
-        /// Appends a value of type double to the handler.
+        /// Appends a value of type <c>double</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(double value)
             => Message.InternalAppendValueType(value, ArgumentType.Double);
 
         /// <summary>
-        /// Appends a value of type double? to the handler.
+        /// Appends a value of type <c>double?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(double? value)
             => Message.InternalAppendValueType(value, ArgumentType.Double);
 
         /// <summary>
-        /// Appends a value of type double to the handler.
+        /// Appends a value of type <c>double</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -2463,7 +2475,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Double);
 
         /// <summary>
-        /// Appends a value of type double? to the handler.
+        /// Appends a value of type <c>double?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -2471,21 +2483,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Double);
 
         /// <summary>
-        /// Appends a value of type decimal to the handler.
+        /// Appends a value of type <c>decimal</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(decimal value)
             => Message.InternalAppendValueType(value, ArgumentType.Decimal);
 
         /// <summary>
-        /// Appends a value of type decimal? to the handler.
+        /// Appends a value of type <c>decimal?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(decimal? value)
             => Message.InternalAppendValueType(value, ArgumentType.Decimal);
 
         /// <summary>
-        /// Appends a value of type decimal to the handler.
+        /// Appends a value of type <c>decimal</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -2493,7 +2505,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Decimal);
 
         /// <summary>
-        /// Appends a value of type decimal? to the handler.
+        /// Appends a value of type <c>decimal?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -2501,21 +2513,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Decimal);
 
         /// <summary>
-        /// Appends a value of type Guid to the handler.
+        /// Appends a value of type <c>Guid</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(Guid value)
             => Message.InternalAppendValueType(value, ArgumentType.Guid);
 
         /// <summary>
-        /// Appends a value of type Guid? to the handler.
+        /// Appends a value of type <c>Guid?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(Guid? value)
             => Message.InternalAppendValueType(value, ArgumentType.Guid);
 
         /// <summary>
-        /// Appends a value of type Guid to the handler.
+        /// Appends a value of type <c>Guid</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -2523,7 +2535,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Guid);
 
         /// <summary>
-        /// Appends a value of type Guid? to the handler.
+        /// Appends a value of type <c>Guid?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -2531,21 +2543,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Guid);
 
         /// <summary>
-        /// Appends a value of type DateTime to the handler.
+        /// Appends a value of type <c>DateTime</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(DateTime value)
             => Message.InternalAppendValueType(value, ArgumentType.DateTime);
 
         /// <summary>
-        /// Appends a value of type DateTime? to the handler.
+        /// Appends a value of type <c>DateTime?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(DateTime? value)
             => Message.InternalAppendValueType(value, ArgumentType.DateTime);
 
         /// <summary>
-        /// Appends a value of type DateTime to the handler.
+        /// Appends a value of type <c>DateTime</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -2553,7 +2565,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.DateTime);
 
         /// <summary>
-        /// Appends a value of type DateTime? to the handler.
+        /// Appends a value of type <c>DateTime?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -2561,21 +2573,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.DateTime);
 
         /// <summary>
-        /// Appends a value of type TimeSpan to the handler.
+        /// Appends a value of type <c>TimeSpan</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(TimeSpan value)
             => Message.InternalAppendValueType(value, ArgumentType.TimeSpan);
 
         /// <summary>
-        /// Appends a value of type TimeSpan? to the handler.
+        /// Appends a value of type <c>TimeSpan?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(TimeSpan? value)
             => Message.InternalAppendValueType(value, ArgumentType.TimeSpan);
 
         /// <summary>
-        /// Appends a value of type TimeSpan to the handler.
+        /// Appends a value of type <c>TimeSpan</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -2583,7 +2595,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.TimeSpan);
 
         /// <summary>
-        /// Appends a value of type TimeSpan? to the handler.
+        /// Appends a value of type <c>TimeSpan?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -2646,42 +2658,42 @@ partial class Log
             => Message.InternalAppendString(value);
 
         /// <summary>
-        /// Appends a string to the handler.
+        /// Appends a value of type <c>string</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(string? value)
             => Message.InternalAppendString(value);
 
         /// <summary>
-        /// Appends a value of type bool to the handler.
+        /// Appends a value of type <c>bool</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(bool value)
             => Message.InternalAppendValueType(value, ArgumentType.Boolean);
 
         /// <summary>
-        /// Appends a value of type bool? to the handler.
+        /// Appends a value of type <c>bool?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(bool? value)
             => Message.InternalAppendValueType(value, ArgumentType.Boolean);
 
         /// <summary>
-        /// Appends a value of type byte to the handler.
+        /// Appends a value of type <c>byte</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(byte value)
             => Message.InternalAppendValueType(value, ArgumentType.Byte);
 
         /// <summary>
-        /// Appends a value of type byte? to the handler.
+        /// Appends a value of type <c>byte?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(byte? value)
             => Message.InternalAppendValueType(value, ArgumentType.Byte);
 
         /// <summary>
-        /// Appends a value of type byte to the handler.
+        /// Appends a value of type <c>byte</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -2689,7 +2701,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Byte);
 
         /// <summary>
-        /// Appends a value of type byte? to the handler.
+        /// Appends a value of type <c>byte?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -2697,21 +2709,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Byte);
 
         /// <summary>
-        /// Appends a value of type sbyte to the handler.
+        /// Appends a value of type <c>sbyte</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(sbyte value)
             => Message.InternalAppendValueType(value, ArgumentType.SByte);
 
         /// <summary>
-        /// Appends a value of type sbyte? to the handler.
+        /// Appends a value of type <c>sbyte?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(sbyte? value)
             => Message.InternalAppendValueType(value, ArgumentType.SByte);
 
         /// <summary>
-        /// Appends a value of type sbyte to the handler.
+        /// Appends a value of type <c>sbyte</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -2719,7 +2731,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.SByte);
 
         /// <summary>
-        /// Appends a value of type sbyte? to the handler.
+        /// Appends a value of type <c>sbyte?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -2727,35 +2739,35 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.SByte);
 
         /// <summary>
-        /// Appends a value of type char to the handler.
+        /// Appends a value of type <c>char</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(char value)
             => Message.InternalAppendValueType(value, ArgumentType.Char);
 
         /// <summary>
-        /// Appends a value of type char? to the handler.
+        /// Appends a value of type <c>char?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(char? value)
             => Message.InternalAppendValueType(value, ArgumentType.Char);
 
         /// <summary>
-        /// Appends a value of type short to the handler.
+        /// Appends a value of type <c>short</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(short value)
             => Message.InternalAppendValueType(value, ArgumentType.Int16);
 
         /// <summary>
-        /// Appends a value of type short? to the handler.
+        /// Appends a value of type <c>short?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(short? value)
             => Message.InternalAppendValueType(value, ArgumentType.Int16);
 
         /// <summary>
-        /// Appends a value of type short to the handler.
+        /// Appends a value of type <c>short</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -2763,7 +2775,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Int16);
 
         /// <summary>
-        /// Appends a value of type short? to the handler.
+        /// Appends a value of type <c>short?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -2771,21 +2783,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Int16);
 
         /// <summary>
-        /// Appends a value of type ushort to the handler.
+        /// Appends a value of type <c>ushort</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(ushort value)
             => Message.InternalAppendValueType(value, ArgumentType.UInt16);
 
         /// <summary>
-        /// Appends a value of type ushort? to the handler.
+        /// Appends a value of type <c>ushort?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(ushort? value)
             => Message.InternalAppendValueType(value, ArgumentType.UInt16);
 
         /// <summary>
-        /// Appends a value of type ushort to the handler.
+        /// Appends a value of type <c>ushort</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -2793,7 +2805,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.UInt16);
 
         /// <summary>
-        /// Appends a value of type ushort? to the handler.
+        /// Appends a value of type <c>ushort?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -2801,21 +2813,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.UInt16);
 
         /// <summary>
-        /// Appends a value of type int to the handler.
+        /// Appends a value of type <c>int</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(int value)
             => Message.InternalAppendValueType(value, ArgumentType.Int32);
 
         /// <summary>
-        /// Appends a value of type int? to the handler.
+        /// Appends a value of type <c>int?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(int? value)
             => Message.InternalAppendValueType(value, ArgumentType.Int32);
 
         /// <summary>
-        /// Appends a value of type int to the handler.
+        /// Appends a value of type <c>int</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -2823,7 +2835,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Int32);
 
         /// <summary>
-        /// Appends a value of type int? to the handler.
+        /// Appends a value of type <c>int?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -2831,21 +2843,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Int32);
 
         /// <summary>
-        /// Appends a value of type uint to the handler.
+        /// Appends a value of type <c>uint</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(uint value)
             => Message.InternalAppendValueType(value, ArgumentType.UInt32);
 
         /// <summary>
-        /// Appends a value of type uint? to the handler.
+        /// Appends a value of type <c>uint?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(uint? value)
             => Message.InternalAppendValueType(value, ArgumentType.UInt32);
 
         /// <summary>
-        /// Appends a value of type uint to the handler.
+        /// Appends a value of type <c>uint</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -2853,7 +2865,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.UInt32);
 
         /// <summary>
-        /// Appends a value of type uint? to the handler.
+        /// Appends a value of type <c>uint?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -2861,21 +2873,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.UInt32);
 
         /// <summary>
-        /// Appends a value of type long to the handler.
+        /// Appends a value of type <c>long</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(long value)
             => Message.InternalAppendValueType(value, ArgumentType.Int64);
 
         /// <summary>
-        /// Appends a value of type long? to the handler.
+        /// Appends a value of type <c>long?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(long? value)
             => Message.InternalAppendValueType(value, ArgumentType.Int64);
 
         /// <summary>
-        /// Appends a value of type long to the handler.
+        /// Appends a value of type <c>long</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -2883,7 +2895,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Int64);
 
         /// <summary>
-        /// Appends a value of type long? to the handler.
+        /// Appends a value of type <c>long?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -2891,21 +2903,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Int64);
 
         /// <summary>
-        /// Appends a value of type ulong to the handler.
+        /// Appends a value of type <c>ulong</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(ulong value)
             => Message.InternalAppendValueType(value, ArgumentType.UInt64);
 
         /// <summary>
-        /// Appends a value of type ulong? to the handler.
+        /// Appends a value of type <c>ulong?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(ulong? value)
             => Message.InternalAppendValueType(value, ArgumentType.UInt64);
 
         /// <summary>
-        /// Appends a value of type ulong to the handler.
+        /// Appends a value of type <c>ulong</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -2913,7 +2925,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.UInt64);
 
         /// <summary>
-        /// Appends a value of type ulong? to the handler.
+        /// Appends a value of type <c>ulong?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -2921,21 +2933,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.UInt64);
 
         /// <summary>
-        /// Appends a value of type nint to the handler.
+        /// Appends a value of type <c>nint</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(nint value)
             => Message.InternalAppendValueType(value, ArgumentType.IntPtr);
 
         /// <summary>
-        /// Appends a value of type nint? to the handler.
+        /// Appends a value of type <c>nint?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(nint? value)
             => Message.InternalAppendValueType(value, ArgumentType.IntPtr);
 
         /// <summary>
-        /// Appends a value of type nint to the handler.
+        /// Appends a value of type <c>nint</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -2943,7 +2955,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.IntPtr);
 
         /// <summary>
-        /// Appends a value of type nint? to the handler.
+        /// Appends a value of type <c>nint?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -2951,21 +2963,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.IntPtr);
 
         /// <summary>
-        /// Appends a value of type nuint to the handler.
+        /// Appends a value of type <c>nuint</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(nuint value)
             => Message.InternalAppendValueType(value, ArgumentType.UIntPtr);
 
         /// <summary>
-        /// Appends a value of type nuint? to the handler.
+        /// Appends a value of type <c>nuint?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(nuint? value)
             => Message.InternalAppendValueType(value, ArgumentType.UIntPtr);
 
         /// <summary>
-        /// Appends a value of type nuint to the handler.
+        /// Appends a value of type <c>nuint</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -2973,7 +2985,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.UIntPtr);
 
         /// <summary>
-        /// Appends a value of type nuint? to the handler.
+        /// Appends a value of type <c>nuint?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -2981,21 +2993,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.UIntPtr);
 
         /// <summary>
-        /// Appends a value of type float to the handler.
+        /// Appends a value of type <c>float</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(float value)
             => Message.InternalAppendValueType(value, ArgumentType.Single);
 
         /// <summary>
-        /// Appends a value of type float? to the handler.
+        /// Appends a value of type <c>float?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(float? value)
             => Message.InternalAppendValueType(value, ArgumentType.Single);
 
         /// <summary>
-        /// Appends a value of type float to the handler.
+        /// Appends a value of type <c>float</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -3003,7 +3015,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Single);
 
         /// <summary>
-        /// Appends a value of type float? to the handler.
+        /// Appends a value of type <c>float?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -3011,21 +3023,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Single);
 
         /// <summary>
-        /// Appends a value of type double to the handler.
+        /// Appends a value of type <c>double</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(double value)
             => Message.InternalAppendValueType(value, ArgumentType.Double);
 
         /// <summary>
-        /// Appends a value of type double? to the handler.
+        /// Appends a value of type <c>double?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(double? value)
             => Message.InternalAppendValueType(value, ArgumentType.Double);
 
         /// <summary>
-        /// Appends a value of type double to the handler.
+        /// Appends a value of type <c>double</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -3033,7 +3045,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Double);
 
         /// <summary>
-        /// Appends a value of type double? to the handler.
+        /// Appends a value of type <c>double?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -3041,21 +3053,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Double);
 
         /// <summary>
-        /// Appends a value of type decimal to the handler.
+        /// Appends a value of type <c>decimal</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(decimal value)
             => Message.InternalAppendValueType(value, ArgumentType.Decimal);
 
         /// <summary>
-        /// Appends a value of type decimal? to the handler.
+        /// Appends a value of type <c>decimal?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(decimal? value)
             => Message.InternalAppendValueType(value, ArgumentType.Decimal);
 
         /// <summary>
-        /// Appends a value of type decimal to the handler.
+        /// Appends a value of type <c>decimal</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -3063,7 +3075,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Decimal);
 
         /// <summary>
-        /// Appends a value of type decimal? to the handler.
+        /// Appends a value of type <c>decimal?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -3071,21 +3083,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Decimal);
 
         /// <summary>
-        /// Appends a value of type Guid to the handler.
+        /// Appends a value of type <c>Guid</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(Guid value)
             => Message.InternalAppendValueType(value, ArgumentType.Guid);
 
         /// <summary>
-        /// Appends a value of type Guid? to the handler.
+        /// Appends a value of type <c>Guid?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(Guid? value)
             => Message.InternalAppendValueType(value, ArgumentType.Guid);
 
         /// <summary>
-        /// Appends a value of type Guid to the handler.
+        /// Appends a value of type <c>Guid</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -3093,7 +3105,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Guid);
 
         /// <summary>
-        /// Appends a value of type Guid? to the handler.
+        /// Appends a value of type <c>Guid?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -3101,21 +3113,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Guid);
 
         /// <summary>
-        /// Appends a value of type DateTime to the handler.
+        /// Appends a value of type <c>DateTime</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(DateTime value)
             => Message.InternalAppendValueType(value, ArgumentType.DateTime);
 
         /// <summary>
-        /// Appends a value of type DateTime? to the handler.
+        /// Appends a value of type <c>DateTime?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(DateTime? value)
             => Message.InternalAppendValueType(value, ArgumentType.DateTime);
 
         /// <summary>
-        /// Appends a value of type DateTime to the handler.
+        /// Appends a value of type <c>DateTime</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -3123,7 +3135,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.DateTime);
 
         /// <summary>
-        /// Appends a value of type DateTime? to the handler.
+        /// Appends a value of type <c>DateTime?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -3131,21 +3143,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.DateTime);
 
         /// <summary>
-        /// Appends a value of type TimeSpan to the handler.
+        /// Appends a value of type <c>TimeSpan</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(TimeSpan value)
             => Message.InternalAppendValueType(value, ArgumentType.TimeSpan);
 
         /// <summary>
-        /// Appends a value of type TimeSpan? to the handler.
+        /// Appends a value of type <c>TimeSpan?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(TimeSpan? value)
             => Message.InternalAppendValueType(value, ArgumentType.TimeSpan);
 
         /// <summary>
-        /// Appends a value of type TimeSpan to the handler.
+        /// Appends a value of type <c>TimeSpan</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -3153,7 +3165,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.TimeSpan);
 
         /// <summary>
-        /// Appends a value of type TimeSpan? to the handler.
+        /// Appends a value of type <c>TimeSpan?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -3216,42 +3228,42 @@ partial class Log
             => Message.InternalAppendString(value);
 
         /// <summary>
-        /// Appends a string to the handler.
+        /// Appends a value of type <c>string</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(string? value)
             => Message.InternalAppendString(value);
 
         /// <summary>
-        /// Appends a value of type bool to the handler.
+        /// Appends a value of type <c>bool</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(bool value)
             => Message.InternalAppendValueType(value, ArgumentType.Boolean);
 
         /// <summary>
-        /// Appends a value of type bool? to the handler.
+        /// Appends a value of type <c>bool?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(bool? value)
             => Message.InternalAppendValueType(value, ArgumentType.Boolean);
 
         /// <summary>
-        /// Appends a value of type byte to the handler.
+        /// Appends a value of type <c>byte</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(byte value)
             => Message.InternalAppendValueType(value, ArgumentType.Byte);
 
         /// <summary>
-        /// Appends a value of type byte? to the handler.
+        /// Appends a value of type <c>byte?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(byte? value)
             => Message.InternalAppendValueType(value, ArgumentType.Byte);
 
         /// <summary>
-        /// Appends a value of type byte to the handler.
+        /// Appends a value of type <c>byte</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -3259,7 +3271,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Byte);
 
         /// <summary>
-        /// Appends a value of type byte? to the handler.
+        /// Appends a value of type <c>byte?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -3267,21 +3279,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Byte);
 
         /// <summary>
-        /// Appends a value of type sbyte to the handler.
+        /// Appends a value of type <c>sbyte</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(sbyte value)
             => Message.InternalAppendValueType(value, ArgumentType.SByte);
 
         /// <summary>
-        /// Appends a value of type sbyte? to the handler.
+        /// Appends a value of type <c>sbyte?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(sbyte? value)
             => Message.InternalAppendValueType(value, ArgumentType.SByte);
 
         /// <summary>
-        /// Appends a value of type sbyte to the handler.
+        /// Appends a value of type <c>sbyte</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -3289,7 +3301,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.SByte);
 
         /// <summary>
-        /// Appends a value of type sbyte? to the handler.
+        /// Appends a value of type <c>sbyte?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -3297,35 +3309,35 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.SByte);
 
         /// <summary>
-        /// Appends a value of type char to the handler.
+        /// Appends a value of type <c>char</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(char value)
             => Message.InternalAppendValueType(value, ArgumentType.Char);
 
         /// <summary>
-        /// Appends a value of type char? to the handler.
+        /// Appends a value of type <c>char?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(char? value)
             => Message.InternalAppendValueType(value, ArgumentType.Char);
 
         /// <summary>
-        /// Appends a value of type short to the handler.
+        /// Appends a value of type <c>short</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(short value)
             => Message.InternalAppendValueType(value, ArgumentType.Int16);
 
         /// <summary>
-        /// Appends a value of type short? to the handler.
+        /// Appends a value of type <c>short?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(short? value)
             => Message.InternalAppendValueType(value, ArgumentType.Int16);
 
         /// <summary>
-        /// Appends a value of type short to the handler.
+        /// Appends a value of type <c>short</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -3333,7 +3345,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Int16);
 
         /// <summary>
-        /// Appends a value of type short? to the handler.
+        /// Appends a value of type <c>short?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -3341,21 +3353,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Int16);
 
         /// <summary>
-        /// Appends a value of type ushort to the handler.
+        /// Appends a value of type <c>ushort</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(ushort value)
             => Message.InternalAppendValueType(value, ArgumentType.UInt16);
 
         /// <summary>
-        /// Appends a value of type ushort? to the handler.
+        /// Appends a value of type <c>ushort?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(ushort? value)
             => Message.InternalAppendValueType(value, ArgumentType.UInt16);
 
         /// <summary>
-        /// Appends a value of type ushort to the handler.
+        /// Appends a value of type <c>ushort</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -3363,7 +3375,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.UInt16);
 
         /// <summary>
-        /// Appends a value of type ushort? to the handler.
+        /// Appends a value of type <c>ushort?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -3371,21 +3383,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.UInt16);
 
         /// <summary>
-        /// Appends a value of type int to the handler.
+        /// Appends a value of type <c>int</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(int value)
             => Message.InternalAppendValueType(value, ArgumentType.Int32);
 
         /// <summary>
-        /// Appends a value of type int? to the handler.
+        /// Appends a value of type <c>int?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(int? value)
             => Message.InternalAppendValueType(value, ArgumentType.Int32);
 
         /// <summary>
-        /// Appends a value of type int to the handler.
+        /// Appends a value of type <c>int</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -3393,7 +3405,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Int32);
 
         /// <summary>
-        /// Appends a value of type int? to the handler.
+        /// Appends a value of type <c>int?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -3401,21 +3413,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Int32);
 
         /// <summary>
-        /// Appends a value of type uint to the handler.
+        /// Appends a value of type <c>uint</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(uint value)
             => Message.InternalAppendValueType(value, ArgumentType.UInt32);
 
         /// <summary>
-        /// Appends a value of type uint? to the handler.
+        /// Appends a value of type <c>uint?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(uint? value)
             => Message.InternalAppendValueType(value, ArgumentType.UInt32);
 
         /// <summary>
-        /// Appends a value of type uint to the handler.
+        /// Appends a value of type <c>uint</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -3423,7 +3435,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.UInt32);
 
         /// <summary>
-        /// Appends a value of type uint? to the handler.
+        /// Appends a value of type <c>uint?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -3431,21 +3443,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.UInt32);
 
         /// <summary>
-        /// Appends a value of type long to the handler.
+        /// Appends a value of type <c>long</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(long value)
             => Message.InternalAppendValueType(value, ArgumentType.Int64);
 
         /// <summary>
-        /// Appends a value of type long? to the handler.
+        /// Appends a value of type <c>long?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(long? value)
             => Message.InternalAppendValueType(value, ArgumentType.Int64);
 
         /// <summary>
-        /// Appends a value of type long to the handler.
+        /// Appends a value of type <c>long</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -3453,7 +3465,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Int64);
 
         /// <summary>
-        /// Appends a value of type long? to the handler.
+        /// Appends a value of type <c>long?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -3461,21 +3473,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Int64);
 
         /// <summary>
-        /// Appends a value of type ulong to the handler.
+        /// Appends a value of type <c>ulong</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(ulong value)
             => Message.InternalAppendValueType(value, ArgumentType.UInt64);
 
         /// <summary>
-        /// Appends a value of type ulong? to the handler.
+        /// Appends a value of type <c>ulong?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(ulong? value)
             => Message.InternalAppendValueType(value, ArgumentType.UInt64);
 
         /// <summary>
-        /// Appends a value of type ulong to the handler.
+        /// Appends a value of type <c>ulong</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -3483,7 +3495,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.UInt64);
 
         /// <summary>
-        /// Appends a value of type ulong? to the handler.
+        /// Appends a value of type <c>ulong?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -3491,21 +3503,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.UInt64);
 
         /// <summary>
-        /// Appends a value of type nint to the handler.
+        /// Appends a value of type <c>nint</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(nint value)
             => Message.InternalAppendValueType(value, ArgumentType.IntPtr);
 
         /// <summary>
-        /// Appends a value of type nint? to the handler.
+        /// Appends a value of type <c>nint?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(nint? value)
             => Message.InternalAppendValueType(value, ArgumentType.IntPtr);
 
         /// <summary>
-        /// Appends a value of type nint to the handler.
+        /// Appends a value of type <c>nint</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -3513,7 +3525,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.IntPtr);
 
         /// <summary>
-        /// Appends a value of type nint? to the handler.
+        /// Appends a value of type <c>nint?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -3521,21 +3533,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.IntPtr);
 
         /// <summary>
-        /// Appends a value of type nuint to the handler.
+        /// Appends a value of type <c>nuint</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(nuint value)
             => Message.InternalAppendValueType(value, ArgumentType.UIntPtr);
 
         /// <summary>
-        /// Appends a value of type nuint? to the handler.
+        /// Appends a value of type <c>nuint?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(nuint? value)
             => Message.InternalAppendValueType(value, ArgumentType.UIntPtr);
 
         /// <summary>
-        /// Appends a value of type nuint to the handler.
+        /// Appends a value of type <c>nuint</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -3543,7 +3555,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.UIntPtr);
 
         /// <summary>
-        /// Appends a value of type nuint? to the handler.
+        /// Appends a value of type <c>nuint?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -3551,21 +3563,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.UIntPtr);
 
         /// <summary>
-        /// Appends a value of type float to the handler.
+        /// Appends a value of type <c>float</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(float value)
             => Message.InternalAppendValueType(value, ArgumentType.Single);
 
         /// <summary>
-        /// Appends a value of type float? to the handler.
+        /// Appends a value of type <c>float?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(float? value)
             => Message.InternalAppendValueType(value, ArgumentType.Single);
 
         /// <summary>
-        /// Appends a value of type float to the handler.
+        /// Appends a value of type <c>float</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -3573,7 +3585,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Single);
 
         /// <summary>
-        /// Appends a value of type float? to the handler.
+        /// Appends a value of type <c>float?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -3581,21 +3593,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Single);
 
         /// <summary>
-        /// Appends a value of type double to the handler.
+        /// Appends a value of type <c>double</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(double value)
             => Message.InternalAppendValueType(value, ArgumentType.Double);
 
         /// <summary>
-        /// Appends a value of type double? to the handler.
+        /// Appends a value of type <c>double?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(double? value)
             => Message.InternalAppendValueType(value, ArgumentType.Double);
 
         /// <summary>
-        /// Appends a value of type double to the handler.
+        /// Appends a value of type <c>double</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -3603,7 +3615,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Double);
 
         /// <summary>
-        /// Appends a value of type double? to the handler.
+        /// Appends a value of type <c>double?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -3611,21 +3623,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Double);
 
         /// <summary>
-        /// Appends a value of type decimal to the handler.
+        /// Appends a value of type <c>decimal</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(decimal value)
             => Message.InternalAppendValueType(value, ArgumentType.Decimal);
 
         /// <summary>
-        /// Appends a value of type decimal? to the handler.
+        /// Appends a value of type <c>decimal?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(decimal? value)
             => Message.InternalAppendValueType(value, ArgumentType.Decimal);
 
         /// <summary>
-        /// Appends a value of type decimal to the handler.
+        /// Appends a value of type <c>decimal</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -3633,7 +3645,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Decimal);
 
         /// <summary>
-        /// Appends a value of type decimal? to the handler.
+        /// Appends a value of type <c>decimal?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -3641,21 +3653,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Decimal);
 
         /// <summary>
-        /// Appends a value of type Guid to the handler.
+        /// Appends a value of type <c>Guid</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(Guid value)
             => Message.InternalAppendValueType(value, ArgumentType.Guid);
 
         /// <summary>
-        /// Appends a value of type Guid? to the handler.
+        /// Appends a value of type <c>Guid?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(Guid? value)
             => Message.InternalAppendValueType(value, ArgumentType.Guid);
 
         /// <summary>
-        /// Appends a value of type Guid to the handler.
+        /// Appends a value of type <c>Guid</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -3663,7 +3675,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Guid);
 
         /// <summary>
-        /// Appends a value of type Guid? to the handler.
+        /// Appends a value of type <c>Guid?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -3671,21 +3683,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.Guid);
 
         /// <summary>
-        /// Appends a value of type DateTime to the handler.
+        /// Appends a value of type <c>DateTime</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(DateTime value)
             => Message.InternalAppendValueType(value, ArgumentType.DateTime);
 
         /// <summary>
-        /// Appends a value of type DateTime? to the handler.
+        /// Appends a value of type <c>DateTime?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(DateTime? value)
             => Message.InternalAppendValueType(value, ArgumentType.DateTime);
 
         /// <summary>
-        /// Appends a value of type DateTime to the handler.
+        /// Appends a value of type <c>DateTime</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -3693,7 +3705,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.DateTime);
 
         /// <summary>
-        /// Appends a value of type DateTime? to the handler.
+        /// Appends a value of type <c>DateTime?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -3701,21 +3713,21 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.DateTime);
 
         /// <summary>
-        /// Appends a value of type TimeSpan to the handler.
+        /// Appends a value of type <c>TimeSpan</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(TimeSpan value)
             => Message.InternalAppendValueType(value, ArgumentType.TimeSpan);
 
         /// <summary>
-        /// Appends a value of type TimeSpan? to the handler.
+        /// Appends a value of type <c>TimeSpan?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(TimeSpan? value)
             => Message.InternalAppendValueType(value, ArgumentType.TimeSpan);
 
         /// <summary>
-        /// Appends a value of type TimeSpan to the handler.
+        /// Appends a value of type <c>TimeSpan</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
@@ -3723,7 +3735,7 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.TimeSpan);
 
         /// <summary>
-        /// Appends a value of type TimeSpan? to the handler.
+        /// Appends a value of type <c>TimeSpan?</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <param name="format">The format string.</param>
