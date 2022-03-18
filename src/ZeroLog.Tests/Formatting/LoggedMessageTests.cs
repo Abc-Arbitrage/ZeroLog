@@ -7,14 +7,14 @@ using ZeroLog.Tests.Support;
 namespace ZeroLog.Tests.Formatting;
 
 [TestFixture]
-public class FormattedLogMessageTests
+public class LoggedMessageTests
 {
     private const int _bufferLength = 1024;
     private const int _stringCapacity = 16;
 
     private LogMessage _logMessage;
 
-    static FormattedLogMessageTests()
+    static LoggedMessageTests()
     {
         LogManager.RegisterEnum<DayOfWeek>();
     }

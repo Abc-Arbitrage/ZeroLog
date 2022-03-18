@@ -19,7 +19,7 @@ public abstract class Formatter
     {
         _position = 0;
         WriteMessage(message);
-        return _buffer.AsSpan(0, _position);
+        return GetOutput();
     }
 
     /// <summary>
@@ -35,7 +35,7 @@ public abstract class Formatter
     /// Appends text to the output.
     /// </summary>
     /// <param name="value">The value to write.</param>
-    protected void Write(ReadOnlySpan<char> value)
+    protected internal void Write(ReadOnlySpan<char> value)
     {
         var charCount = Math.Min(value.Length, _buffer.Length - _position);
         value.Slice(0, charCount).CopyTo(_buffer.AsSpan(_position));
@@ -46,17 +46,37 @@ public abstract class Formatter
     /// Appends text followed by a newline to the output.
     /// </summary>
     /// <param name="value">The value to write.</param>
-    protected void WriteLine(ReadOnlySpan<char> value)
+    protected internal void WriteLine(ReadOnlySpan<char> value)
     {
         Write(value);
-        Write(Environment.NewLine);
+        WriteLine();
     }
 
     /// <summary>
     /// Appends a newline to the output.
     /// </summary>
-    protected void WriteLine()
-        => Write(Environment.NewLine);
+    /// <remarks>
+    /// If the buffer is full, the newline will be inserted by overwriting the last characters.
+    /// </remarks>
+    protected internal void WriteLine()
+    {
+        if (_position <= _buffer.Length - Environment.NewLine.Length)
+        {
+            Environment.NewLine.AsSpan().CopyTo(_buffer.AsSpan(_position));
+            _position += Environment.NewLine.Length;
+        }
+        else
+        {
+            // Make sure to end the string with a newline
+            Environment.NewLine.AsSpan().CopyTo(_buffer.AsSpan(_buffer.Length - Environment.NewLine.Length));
+        }
+    }
+
+    /// <summary>
+    /// Returns a span of the current output.
+    /// </summary>
+    protected internal Span<char> GetOutput()
+        => _buffer.AsSpan(0, _position);
 
     /// <summary>
     /// Returns a span of the remaining buffer. Call <see cref="AdvanceBy"/> after modifying it.
