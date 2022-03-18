@@ -24,7 +24,7 @@ unsafe partial class LogMessage
     internal bool IsTruncated => _isTruncated;
 
     internal string? ConstantMessage { get; }
-    internal bool IsPooled { get; }
+    internal bool ReturnToPool { get; set; }
 
     internal LogMessage(string message)
     {
@@ -32,7 +32,7 @@ unsafe partial class LogMessage
         _strings = Array.Empty<string>();
     }
 
-    internal LogMessage(BufferSegment bufferSegment, int stringCapacity, bool isPooled)
+    internal LogMessage(BufferSegment bufferSegment, int stringCapacity)
     {
         stringCapacity = Math.Min(stringCapacity, byte.MaxValue);
         _strings = new string[stringCapacity];
@@ -41,8 +41,6 @@ unsafe partial class LogMessage
         _dataPointer = bufferSegment.Data;
         _endOfBuffer = bufferSegment.Data + bufferSegment.Length;
         _underlyingBuffer = bufferSegment.UnderlyingBuffer;
-
-        IsPooled = isPooled;
     }
 
     internal void Initialize(Log? log, LogLevel level)
@@ -73,7 +71,7 @@ unsafe partial class LogMessage
     /// <returns>A standalone log message.</returns>
     public static LogMessage CreateTestMessage(LogLevel level, int bufferSize, int stringCapacity)
     {
-        var message = new LogMessage(BufferSegmentProvider.CreateStandaloneSegment(bufferSize), stringCapacity, false);
+        var message = new LogMessage(BufferSegmentProvider.CreateStandaloneSegment(bufferSize), stringCapacity);
         message.Initialize(null, level);
         return message;
     }

@@ -29,7 +29,7 @@ partial class LogManager : ILogMessageProvider, IDisposable
         _queue = new ConcurrentQueue<LogMessage>(new ConcurrentQueueCapacityInitializer(config.LogMessagePoolSize));
 
         var bufferSegmentProvider = new BufferSegmentProvider(config.LogMessagePoolSize, config.LogMessageBufferSize);
-        _pool = new ObjectPool<LogMessage>(config.LogMessagePoolSize, () => new LogMessage(bufferSegmentProvider.GetSegment(), config.LogMessageStringCapacity, true));
+        _pool = new ObjectPool<LogMessage>(config.LogMessagePoolSize, () => new LogMessage(bufferSegmentProvider.GetSegment(), config.LogMessageStringCapacity));
 
         UpdateAllLogConfigurations();
 
@@ -184,8 +184,11 @@ partial class LogManager : ILogMessageProvider, IDisposable
 
     LogMessage? ILogMessageProvider.TryAcquireLogMessage()
     {
-        if (_pool.TryAcquire(out var logMessage))
-            return logMessage;
+        if (_pool.TryAcquire(out var message))
+        {
+            message.ReturnToPool = true;
+            return message;
+        }
 
         if (!_isRunning)
             return LogMessage.Empty;
@@ -195,4 +198,13 @@ partial class LogManager : ILogMessageProvider, IDisposable
 
     void ILogMessageProvider.Submit(LogMessage message)
         => _queue.Enqueue(message);
+
+    private void ReleaseAfterProcessing(LogMessage message)
+    {
+        if (message.ReturnToPool && _isRunning)
+        {
+            message.ReturnToPool = false;
+            _pool.Release(message);
+        }
+    }
 }

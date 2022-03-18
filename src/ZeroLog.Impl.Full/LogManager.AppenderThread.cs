@@ -15,7 +15,6 @@ partial class LogManager
         private readonly LogManager _logManager;
         private readonly ZeroLogConfiguration _config;
         private readonly ConcurrentQueue<LogMessage> _queue;
-        private readonly ObjectPool<LogMessage> _pool;
         private readonly Appender[] _appenders;
         private readonly Thread _thread;
 
@@ -24,7 +23,6 @@ partial class LogManager
             _logManager = logManager;
             _config = logManager._config;
             _queue = logManager._queue;
-            _pool = logManager._pool;
 
             _appenders = _config.GetAllAppenders().ToArray();
 
@@ -114,8 +112,7 @@ partial class LogManager
             }
             finally
             {
-                if (logMessage.IsPooled && _logManager._isRunning)
-                    _pool.Release(logMessage);
+                _logManager.ReleaseAfterProcessing(logMessage);
             }
 
             return true;
