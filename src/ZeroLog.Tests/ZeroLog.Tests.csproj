@@ -1,10 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-    <OutputType>Exe</OutputType>
     <NoWarn>$(NoWarn);CS8002</NoWarn>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <StartupObject>ZeroLog.Tests.Program</StartupObject>
   </PropertyGroup>
 
   <ItemGroup>
