@@ -6,23 +6,28 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZeroLog", "ZeroLog\ZeroLog.csproj", "{34665A87-497B-4C4E-928E-1DFBEB3F7441}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZeroLog.Tests", "ZeroLog.Tests\ZeroLog.Tests.csproj", "{F2405E3E-69ED-4BA5-A862-CF920B612B16}"
-	ProjectSection(ProjectDependencies) = postProject
-		{B40F81DD-A04A-4E50-8063-5023DB1E7975} = {B40F81DD-A04A-4E50-8063-5023DB1E7975}
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Misc", "Misc", "{44EDCA3A-DBC5-415C-9A34-C742912674B5}"
 	ProjectSection(SolutionItems) = preProject
-		..\build\build.cake = ..\build\build.cake
 		Directory.Build.props = Directory.Build.props
 		..\LICENSE.md = ..\LICENSE.md
 		..\README.md = ..\README.md
 		Directory.Build.targets = Directory.Build.targets
 		..\.github\workflows\build.yml = ..\.github\workflows\build.yml
+		NuGetReadme.md = NuGetReadme.md
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZeroLog.Benchmarks", "ZeroLog.Benchmarks\ZeroLog.Benchmarks.csproj", "{D8CB63CF-F35E-4D38-88AF-9FB4C6B29630}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeroLog.Tests.ExternalAppender", "ZeroLog.Tests.ExternalAppender\ZeroLog.Tests.ExternalAppender.csproj", "{B40F81DD-A04A-4E50-8063-5023DB1E7975}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeroLog.Impl.Base", "ZeroLog.Impl.Base\ZeroLog.Impl.Base.csproj", "{61DDA0F1-CCFE-437E-A8A9-1E1F332CCC50}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeroLog.Impl.Full", "ZeroLog.Impl.Full\ZeroLog.Impl.Full.csproj", "{93459DFF-22B2-45BA-B105-572F385B34FF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeroLog.Tests.NetStandard", "ZeroLog.Tests.NetStandard\ZeroLog.Tests.NetStandard.csproj", "{9F6B9525-489C-4D34-A9B6-6D90093C46C3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeroLog.Analyzers", "ZeroLog.Analyzers\ZeroLog.Analyzers.csproj", "{A5AE4B4A-CB54-4781-9B35-2DFAC9A651FF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeroLog.Analyzers.Tests", "ZeroLog.Analyzers.Tests\ZeroLog.Analyzers.Tests.csproj", "{FC5C8744-6E2C-49B0-9B3B-6BE6F825DF6C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -42,10 +47,26 @@ Global
 		{D8CB63CF-F35E-4D38-88AF-9FB4C6B29630}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D8CB63CF-F35E-4D38-88AF-9FB4C6B29630}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D8CB63CF-F35E-4D38-88AF-9FB4C6B29630}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B40F81DD-A04A-4E50-8063-5023DB1E7975}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B40F81DD-A04A-4E50-8063-5023DB1E7975}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B40F81DD-A04A-4E50-8063-5023DB1E7975}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B40F81DD-A04A-4E50-8063-5023DB1E7975}.Release|Any CPU.Build.0 = Release|Any CPU
+		{61DDA0F1-CCFE-437E-A8A9-1E1F332CCC50}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{61DDA0F1-CCFE-437E-A8A9-1E1F332CCC50}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{61DDA0F1-CCFE-437E-A8A9-1E1F332CCC50}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{61DDA0F1-CCFE-437E-A8A9-1E1F332CCC50}.Release|Any CPU.Build.0 = Release|Any CPU
+		{93459DFF-22B2-45BA-B105-572F385B34FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{93459DFF-22B2-45BA-B105-572F385B34FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{93459DFF-22B2-45BA-B105-572F385B34FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{93459DFF-22B2-45BA-B105-572F385B34FF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9F6B9525-489C-4D34-A9B6-6D90093C46C3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9F6B9525-489C-4D34-A9B6-6D90093C46C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9F6B9525-489C-4D34-A9B6-6D90093C46C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9F6B9525-489C-4D34-A9B6-6D90093C46C3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A5AE4B4A-CB54-4781-9B35-2DFAC9A651FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A5AE4B4A-CB54-4781-9B35-2DFAC9A651FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A5AE4B4A-CB54-4781-9B35-2DFAC9A651FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A5AE4B4A-CB54-4781-9B35-2DFAC9A651FF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FC5C8744-6E2C-49B0-9B3B-6BE6F825DF6C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FC5C8744-6E2C-49B0-9B3B-6BE6F825DF6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FC5C8744-6E2C-49B0-9B3B-6BE6F825DF6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FC5C8744-6E2C-49B0-9B3B-6BE6F825DF6C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

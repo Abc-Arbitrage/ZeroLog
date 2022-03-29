@@ -1,82 +1,67 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
-using System.Text;
 using ZeroLog.Appenders;
+using ZeroLog.Formatting;
 
-namespace ZeroLog.Tests
+namespace ZeroLog.Tests;
+
+internal class PerformanceAppender : Appender
 {
-    internal class PerformanceAppender : IAppender
+    private readonly MessageReceived[] _messages;
+    private int _count;
+
+    public PerformanceAppender(int expectedEntries)
     {
-        private readonly MessageReceived[] _messages;
-        private int _count;
-
-        public PerformanceAppender(int expectedEntries)
+        _messages = new MessageReceived[expectedEntries];
+        for (int i = 0; i < expectedEntries; i++)
         {
-            _messages = new MessageReceived[expectedEntries];
-            for (int i = 0; i < expectedEntries; i++)
+            _messages[i] = new MessageReceived(new char[30]);
+        }
+    }
+
+    public override void WriteMessage(LoggedMessage message)
+    {
+        var messageSpan = message.Message;
+        messageSpan.CopyTo(_messages[_count].StartTimestampInChars);
+        _messages[_count].MessageLength = messageSpan.Length;
+        _messages[_count].EndTimestamp = Stopwatch.GetTimestamp();
+        _count++;
+    }
+
+    private struct MessageReceived
+    {
+        public readonly char[] StartTimestampInChars;
+        public int MessageLength;
+        public long EndTimestamp;
+
+        public MessageReceived(char[] startTimestampInChars)
+        {
+            StartTimestampInChars = startTimestampInChars;
+            EndTimestamp = 0;
+            MessageLength = 0;
+        }
+    }
+
+    public void PrintTimeTaken()
+    {
+        var totalTimeCsv = "total-time.csv";
+        if (File.Exists(totalTimeCsv))
+            File.Delete(totalTimeCsv);
+
+        using (var fileStream = new StreamWriter(File.OpenWrite(totalTimeCsv)))
+        {
+            for (int i = 0; i < _count; i++)
             {
-                _messages[i] = new MessageReceived(new byte[30]);
+                var messageReceived = _messages[i];
+                var startTime = long.Parse(messageReceived.StartTimestampInChars.AsSpan(0, messageReceived.MessageLength));
+                fileStream.WriteLine(ToMicroseconds(messageReceived.EndTimestamp - startTime));
             }
         }
+    }
 
-        public string Name { get; set; }
-
-        public void WriteEvent(ILogEventHeader logEventHeader, byte[] messageBytes, int messageLength)
-        {
-            Array.Copy(messageBytes, _messages[_count].StartTimestampInChars, messageLength);
-            _messages[_count].MessageLength = messageLength;
-            _messages[_count].EndTimestamp = Stopwatch.GetTimestamp();
-            _count++;
-        }
-
-        public void SetEncoding(Encoding encoding)
-        {
-        }
-
-        public void Flush()
-        {
-        }
-
-        public void Dispose()
-        {
-        }
-
-        private struct MessageReceived
-        {
-            public readonly byte[] StartTimestampInChars;
-            public int MessageLength;
-            public long EndTimestamp;
-
-            public MessageReceived(byte[] startTimestampInChars)
-            {
-                StartTimestampInChars = startTimestampInChars;
-                EndTimestamp = 0;
-                MessageLength = 0;
-            }
-        }
-
-        public void PrintTimeTaken()
-        {
-            var totalTimeCsv = "total-time.csv";
-            if (File.Exists(totalTimeCsv))
-                File.Delete(totalTimeCsv);
-
-            using (var fileStream = new StreamWriter(File.OpenWrite(totalTimeCsv)))
-            {
-                for (int i = 0; i < _count; i++)
-                {
-                    var messageReceived = _messages[i];
-                    var timestampString = Encoding.Default.GetString(messageReceived.StartTimestampInChars, 0, messageReceived.MessageLength);
-                    var startTime = long.Parse(timestampString);
-                    fileStream.WriteLine(ToMicroseconds(messageReceived.EndTimestamp - startTime));
-                }
-            }
-        }
-
-        private static double ToMicroseconds(long ticks)
-        {
-            return unchecked(ticks * 1000000 / (double)(Stopwatch.Frequency));
-        }
+    private static double ToMicroseconds(long ticks)
+    {
+        return unchecked(ticks * 1000000 / (double)(Stopwatch.Frequency));
     }
 }

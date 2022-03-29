@@ -3,23 +3,22 @@ using System.Diagnostics;
 using System.Threading;
 using JetBrains.Annotations;
 
-namespace ZeroLog.Tests
+namespace ZeroLog.Tests;
+
+public static class Wait
 {
-    public static class Wait
+    public static void Until([InstantHandle] Func<bool> exitCondition, TimeSpan timeout)
     {
-        public static void Until([InstantHandle] Func<bool> exitCondition, TimeSpan timeout)
+        var sw = Stopwatch.StartNew();
+
+        while (sw.Elapsed < timeout)
         {
-            var sw = Stopwatch.StartNew();
+            if (exitCondition())
+                return;
 
-            while (sw.Elapsed < timeout)
-            {
-                if (exitCondition())
-                    return;
-
-                Thread.Sleep(10);
-            }
-
-            throw new TimeoutException();
+            Thread.Sleep(10);
         }
+
+        throw new TimeoutException();
     }
 }

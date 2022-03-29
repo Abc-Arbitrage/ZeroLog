@@ -1,0 +1,33 @@
+<#+
+    private static readonly (string name, string argType, bool isFormattable)[] _valueTypes =
+    {
+        ("bool", "Boolean", false),
+        ("byte", "Byte", true),
+        ("sbyte", "SByte", true),
+        ("char", "Char", false),
+        ("short", "Int16", true),
+        ("ushort", "UInt16", true),
+        ("int", "Int32", true),
+        ("uint", "UInt32", true),
+        ("long", "Int64", true),
+        ("ulong", "UInt64", true),
+        ("nint", "IntPtr", true),
+        ("nuint", "UIntPtr", true),
+        ("float", "Single", true),
+        ("double", "Double", true),
+        ("decimal", "Decimal", true),
+        ("Guid", "Guid", true),
+        ("DateTime", "DateTime", true),
+        ("TimeSpan", "TimeSpan", true),
+    };
+
+    private static readonly string[] _logLevels =
+    {
+        "Trace",
+        "Debug",
+        "Info",
+        "Warn",
+        "Error",
+        "Fatal"
+    };
+#>

@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <RootNamespace>ZeroLog</RootNamespace>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="InlineIL.Fody" Version="1.7.1" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="../ZeroLog.Impl.Base/**/*.cs" Exclude="../ZeroLog.Impl.Base/obj/**/*;../ZeroLog.Impl.Base/bin/**/*" />
+  </ItemGroup>
+
+</Project>

@@ -1,8 +1,10 @@
 ﻿using System.Runtime.CompilerServices;
+using ZeroLog;
 
-[assembly: InternalsVisibleTo("ZeroLog.Tests")]
-[assembly: InternalsVisibleTo("ZeroLog.Benchmarks")]
+[assembly: InternalsVisibleTo($"ZeroLog.Tests, PublicKey={AssemblyData.PublicKey}")]
+[assembly: InternalsVisibleTo($"ZeroLog.Tests.NetStandard, PublicKey={AssemblyData.PublicKey}")]
+[assembly: InternalsVisibleTo($"ZeroLog.Benchmarks, PublicKey={AssemblyData.PublicKey}")]
 
-#if NETCOREAPP && !NETCOREAPP2_1
+#if NETCOREAPP
 [module: SkipLocalsInit]
 #endif

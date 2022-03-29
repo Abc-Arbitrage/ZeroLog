@@ -6,97 +6,96 @@ using BenchmarkDotNet.Running;
 using InlineIL;
 using static InlineIL.IL.Emit;
 
-namespace ZeroLog.Benchmarks.EnumTests
+namespace ZeroLog.Benchmarks.EnumTests;
+
+public static class EnumBenchmarksRunner
 {
-    public static class EnumBenchmarksRunner
+    public static void Run()
     {
-        public static void Run()
-        {
-            Validate();
-            BenchmarkRunner.Run<EnumBenchmarks>();
-        }
-
-        private static void Validate()
-        {
-            var benchmarks = new EnumBenchmarks();
-            var expected = benchmarks.Typeof();
-
-            if (benchmarks.TypeofCached() != expected)
-                throw new InvalidOperationException();
-
-            if (benchmarks.TypedRef() != expected)
-                throw new InvalidOperationException();
-
-            if (benchmarks.TypeHandleIl() != expected)
-                throw new InvalidOperationException();
-        }
+        Validate();
+        BenchmarkRunner.Run<EnumBenchmarks>();
     }
 
-    [MemoryDiagnoser]
-    [SimpleJob(RuntimeMoniker.Net48), SimpleJob(RuntimeMoniker.NetCoreApp50)]
-    public unsafe class EnumBenchmarks
+    private static void Validate()
     {
-        [Benchmark(Baseline = true)]
-        public IntPtr Typeof() => TypeofImpl<SomeEnum>();
+        var benchmarks = new EnumBenchmarks();
+        var expected = benchmarks.Typeof();
 
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        private static IntPtr TypeofImpl<T>()
-            where T : struct
-        {
-            return typeof(T).TypeHandle.Value;
-        }
+        if (benchmarks.TypeofCached() != expected)
+            throw new InvalidOperationException();
 
-        [Benchmark]
-        public IntPtr TypeofCached() => TypeofCachedImpl<SomeEnum>();
+        if (benchmarks.TypedRef() != expected)
+            throw new InvalidOperationException();
 
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        private static IntPtr TypeofCachedImpl<T>()
-            where T : struct
-        {
-            return Cache<T>.TypeHandle;
-        }
+        if (benchmarks.TypeHandleIl() != expected)
+            throw new InvalidOperationException();
+    }
+}
 
-        private struct Cache<T>
-        {
-            public static readonly IntPtr TypeHandle = typeof(T).TypeHandle.Value;
-        }
+[MemoryDiagnoser]
+[SimpleJob(RuntimeMoniker.Net48), SimpleJob(RuntimeMoniker.NetCoreApp50)]
+public unsafe class EnumBenchmarks
+{
+    [Benchmark(Baseline = true)]
+    public IntPtr Typeof() => TypeofImpl<SomeEnum>();
 
-        [Benchmark]
-        public IntPtr TypedRef() => TypedRefImpl<SomeEnum>();
-
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        private static IntPtr TypedRefImpl<T>()
-            where T : struct
-        {
-            var value = default(T);
-            var typedRef = __makeref(value);
-            return ((IntPtr*)&typedRef)[1];
-        }
-
-        [Benchmark]
-        public IntPtr TypeHandleIl() => TypeHandleIlImpl<SomeEnum>();
-
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        private static IntPtr TypeHandleIlImpl<T>()
-            where T : struct
-        {
-            IL.DeclareLocals(
-                false,
-                new LocalVar(typeof(RuntimeTypeHandle))
-            );
-
-            Ldtoken(typeof(T));
-            Stloc_0();
-            Ldloca_S(0);
-            Call(new MethodRef(typeof(RuntimeTypeHandle), "get_" + nameof(RuntimeTypeHandle.Value)));
-            return IL.Return<IntPtr>();
-        }
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static IntPtr TypeofImpl<T>()
+        where T : struct
+    {
+        return typeof(T).TypeHandle.Value;
     }
 
-    public enum SomeEnum
+    [Benchmark]
+    public IntPtr TypeofCached() => TypeofCachedImpl<SomeEnum>();
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static IntPtr TypeofCachedImpl<T>()
+        where T : struct
     {
-        Foo,
-        Bar,
-        Baz
+        return Cache<T>.TypeHandle;
     }
+
+    private struct Cache<T>
+    {
+        public static readonly IntPtr TypeHandle = typeof(T).TypeHandle.Value;
+    }
+
+    [Benchmark]
+    public IntPtr TypedRef() => TypedRefImpl<SomeEnum>();
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static IntPtr TypedRefImpl<T>()
+        where T : struct
+    {
+        var value = default(T);
+        var typedRef = __makeref(value);
+        return ((IntPtr*)&typedRef)[1];
+    }
+
+    [Benchmark]
+    public IntPtr TypeHandleIl() => TypeHandleIlImpl<SomeEnum>();
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static IntPtr TypeHandleIlImpl<T>()
+        where T : struct
+    {
+        IL.DeclareLocals(
+            false,
+            new LocalVar(typeof(RuntimeTypeHandle))
+        );
+
+        Ldtoken(typeof(T));
+        Stloc_0();
+        Ldloca_S(0);
+        Call(new MethodRef(typeof(RuntimeTypeHandle), "get_" + nameof(RuntimeTypeHandle.Value)));
+        return IL.Return<IntPtr>();
+    }
+}
+
+public enum SomeEnum
+{
+    Foo,
+    Bar,
+    Baz
 }

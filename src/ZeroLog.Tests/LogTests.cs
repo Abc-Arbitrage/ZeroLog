@@ -1,210 +1,87 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
-using Moq;
-using NFluent;
 using NUnit.Framework;
-using ZeroLog.Appenders;
-using ZeroLog.ConfigResolvers;
+using ZeroLog.Configuration;
+using ZeroLog.Tests.Support;
 
-namespace ZeroLog.Tests
+namespace ZeroLog.Tests;
+
+[TestFixture]
+public partial class LogTests
 {
-    [TestFixture]
-    public class LogTests
+    private Log _log;
+    private TestLogMessageProvider _provider;
+
+    static LogTests()
     {
-        private TestAppender _appender;
-        private Mock<IConfigurationResolver> _configResolver;
-        private LogManager _logManager;
+        LogManager.RegisterEnum<DayOfWeek>();
+    }
 
-        [SetUp]
-        public void SetUp()
-        {
-            _appender = new TestAppender(true);
+    [SetUp]
+    public void SetUp()
+    {
+        _provider = new TestLogMessageProvider();
 
-            _configResolver = new Mock<IConfigurationResolver>();
-            _configResolver.Setup(x => x.ResolveLogConfig(It.IsAny<string>()))
-                           .Returns(new LogConfig
-                           {
-                               Level = Level.Debug,
-                               Appenders = new IAppender[] { _appender }
-                           });
+        _log = new Log("TestLog");
+        _log.UpdateConfiguration(_provider, ResolvedLoggerConfiguration.SingleAppender(LogLevel.Trace));
+    }
 
-            _logManager = new LogManager(_configResolver.Object, new ZeroLogInitializationConfig { LogEventQueueSize = 16, LogEventBufferSize = 128 });
-        }
+    [Test]
+    public void should_be_disabled_at_construction()
+    {
+        _log = new Log("TestLog");
 
-        [TearDown]
-        public void Teardown()
-        {
-            _logManager.Dispose();
-        }
+        _log.IsFatalEnabled.ShouldBeFalse();
+        _log.IsEnabled(LogLevel.Fatal).ShouldBeFalse();
 
-        [TestCase(Level.Finest, true, true, true, true, true)]
-        [TestCase(Level.Verbose, true, true, true, true, true)]
-        [TestCase(Level.Debug, true, true, true, true, true)]
-        [TestCase(Level.Info, false, true, true, true, true)]
-        [TestCase(Level.Warn, false, false, true, true, true)]
-        [TestCase(Level.Error, false, false, false, true, true)]
-        [TestCase(Level.Fatal, false, false, false, false, true)]
-        public void should_return_if_log_level_is_enabled(Level logLevel, bool isDebug, bool isInfo, bool isWarn, bool isError, bool isFatal)
-        {
-            _configResolver.Setup(x => x.ResolveLogConfig(It.IsAny<string>()))
-                           .Returns(new LogConfig { Level = logLevel });
+        _log.Fatal().ShouldBeTheSameAs(LogMessage.Empty);
+    }
 
-            var log = new Log(_logManager, "logger");
+    [TestCase(LogLevel.Trace, true, true, true, true, true, true)]
+    [TestCase(LogLevel.Debug, false, true, true, true, true, true)]
+    [TestCase(LogLevel.Info, false, false, true, true, true, true)]
+    [TestCase(LogLevel.Warn, false, false, false, true, true, true)]
+    [TestCase(LogLevel.Error, false, false, false, false, true, true)]
+    [TestCase(LogLevel.Fatal, false, false, false, false, false, true)]
+    public void should_tell_if_log_level_is_enabled(LogLevel logLevel, bool isTrace, bool isDebug, bool isInfo, bool isWarn, bool isError, bool isFatal)
+    {
+        _log.UpdateConfiguration(_provider, ResolvedLoggerConfiguration.SingleAppender(logLevel));
 
-            Check.That(log.IsDebugEnabled).Equals(isDebug);
-            Check.That(log.IsInfoEnabled).Equals(isInfo);
-            Check.That(log.IsWarnEnabled).Equals(isWarn);
-            Check.That(log.IsErrorEnabled).Equals(isError);
-            Check.That(log.IsFatalEnabled).Equals(isFatal);
+        _log.IsTraceEnabled.ShouldEqual(isTrace);
+        _log.IsDebugEnabled.ShouldEqual(isDebug);
+        _log.IsInfoEnabled.ShouldEqual(isInfo);
+        _log.IsWarnEnabled.ShouldEqual(isWarn);
+        _log.IsErrorEnabled.ShouldEqual(isError);
+        _log.IsFatalEnabled.ShouldEqual(isFatal);
 
-            Check.That(log.IsLevelEnabled(logLevel)).IsTrue();
-            if (logLevel > Level.Finest)
-                Check.That(log.IsLevelEnabled(logLevel - 1)).IsFalse();
-            if (logLevel < Level.Fatal)
-                Check.That(log.IsLevelEnabled(logLevel + 1)).IsTrue();
-        }
+        _log.IsEnabled(logLevel).ShouldBeTrue();
+        _log.IsEnabled(logLevel - 1).ShouldBeFalse();
+        _log.IsEnabled(logLevel + 1).ShouldBeTrue();
+    }
 
-        [Test]
-        public void should_log_primitive_types_with_simple_api()
-        {
-            var log = new Log(_logManager, "logger");
+    private static string NoInline(string value)
+        => value;
 
-            log.InfoFormat("foo {0} bar", 42);
-            log.InfoFormat("foo {0} bar", (int?)42);
-            log.InfoFormat("foo {0} bar", (int?)null);
-
-            WaitForEmptyQueue();
-
-            Check.That(_appender.LoggedMessages).ContainsExactly(
-                "foo 42 bar",
-                "foo 42 bar",
-                "foo null bar"
-            );
-        }
-
-        [Test]
-        public void should_log_enums_with_simple_api()
-        {
-            LogManager.RegisterEnum<DayOfWeek>();
-
-            var log = new Log(_logManager, "logger");
-
-            log.InfoFormat("foo {0} bar", DayOfWeek.Friday);
-            log.InfoFormat("foo {0} bar", (DayOfWeek?)DayOfWeek.Friday);
-            log.InfoFormat("foo {0} bar", (DayOfWeek?)null);
-
-            WaitForEmptyQueue();
-
-            Check.That(_appender.LoggedMessages).ContainsExactly(
-                "foo Friday bar",
-                "foo Friday bar",
-                "foo null bar"
-            );
-        }
-
-        [Test]
-        public void should_log_datetime_with_simple_api()
-        {
-            var log = new Log(_logManager, "logger");
-
-            var dateTime = new DateTime(2000, 1, 2, 3, 4, 5, 6);
-
-            log.InfoFormat("foo {0} bar", dateTime);
-            log.InfoFormat("foo {0:d} bar", dateTime);
-            log.InfoFormat("foo {0:yyyy-MM-dd} bar", dateTime);
-            log.InfoFormat("foo {0} bar", (DateTime?)dateTime);
-            log.InfoFormat("foo {0:d} bar", (DateTime?)dateTime);
-            log.InfoFormat("foo {0} bar", (DateTime?)null);
-            log.InfoFormat("foo {0:d} bar", (DateTime?)null);
-
-            WaitForEmptyQueue();
-
-            Check.That(_appender.LoggedMessages).ContainsExactly(
-                "foo 2000-01-02 03:04:05.006 bar",
-                "foo 2000-01-02 bar",
-                "foo 2000-01-02 bar",
-                "foo 2000-01-02 03:04:05.006 bar",
-                "foo 2000-01-02 bar",
-                "foo null bar",
-                "foo null bar"
-            );
-        }
-
-        [Test]
-        public void should_log_timespan_with_simple_api()
-        {
-            var log = new Log(_logManager, "logger");
-
-            var timeSpan = new TimeSpan(1, 2, 3, 4, 5);
-
-            log.InfoFormat("foo {0} bar", timeSpan);
-            log.InfoFormat("foo {0:c} bar", timeSpan);
-            log.InfoFormat("foo {0:g} bar", timeSpan);
-            log.InfoFormat("foo {0:G} bar", timeSpan);
-            log.InfoFormat("foo {0} bar", (TimeSpan?)timeSpan);
-            log.InfoFormat("foo {0:g} bar", (TimeSpan?)timeSpan);
-            log.InfoFormat("foo {0} bar", (TimeSpan?)null);
-            log.InfoFormat("foo {0:g} bar", (TimeSpan?)null);
-
-            WaitForEmptyQueue();
-
-            Check.That(_appender.LoggedMessages).ContainsExactly(
-                "foo 1.02:03:04.0050000 bar",
-                "foo 1.02:03:04.0050000 bar",
-                "foo 1:2:03:04.005 bar",
-                "foo 1:02:03:04.0050000 bar",
-                "foo 1.02:03:04.0050000 bar",
-                "foo 1:2:03:04.005 bar",
-                "foo null bar",
-                "foo null bar"
-            );
-        }
-
-        [Test]
-        [SuppressMessage("ReSharper", "FormatStringProblem")]
-        public void should_log_unmanaged_types_with_simple_api()
-        {
-            LogManager.RegisterUnmanaged<LogEventTests.UnmanagedStruct>();
-            LogManager.RegisterUnmanaged<LogEventTests.UnmanagedStructWithFormatSupport>();
-
-            var log = new Log(_logManager, "logger");
-
-            var valueNormal = new LogEventTests.UnmanagedStruct
-            {
-                A = 1,
-                B = 2,
-                C = 3
-            };
-
-            var valueFormattable = new LogEventTests.UnmanagedStructWithFormatSupport
-            {
-                A = 42
-            };
-
-            log.InfoFormat("foo {0} bar", valueNormal);
-            log.InfoFormat("foo {0} bar", (LogEventTests.UnmanagedStruct?)valueNormal);
-            log.InfoFormat("foo {0} bar", (LogEventTests.UnmanagedStruct?)null);
-
-            log.InfoFormat("foo {0:baz} bar", valueFormattable);
-            log.InfoFormat("foo {0:baz} bar", (LogEventTests.UnmanagedStructWithFormatSupport?)valueFormattable);
-            log.InfoFormat("foo {0:baz} bar", (LogEventTests.UnmanagedStructWithFormatSupport?)null);
-
-            WaitForEmptyQueue();
-
-            Check.That(_appender.LoggedMessages).ContainsExactly(
-                "foo 1-2-3 bar",
-                "foo 1-2-3 bar",
-                "foo null bar",
-                "foo 42[baz] bar",
-                "foo 42[baz] bar",
-                "foo null bar"
-            );
-        }
-
-        private void WaitForEmptyQueue()
-        {
-            var queue = _logManager.GetInternalQueue();
-            Wait.Until(() => queue.IsEmpty, TimeSpan.FromSeconds(1));
-        }
+    [SuppressMessage("ReSharper", "ConvertToConstant.Local")]
+    private static class TestValues
+    {
+        public static readonly bool Boolean = true;
+        public static readonly byte Byte = 42;
+        public static readonly sbyte SByte = -42;
+        public static readonly char Char = 'x';
+        public static readonly short Int16 = -4242;
+        public static readonly ushort UInt16 = 4242;
+        public static readonly int Int32 = -Random.Shared.Next();
+        public static readonly uint UInt32 = (uint)Random.Shared.Next();
+        public static readonly long Int64 = -(long)Random.Shared.Next() * Random.Shared.Next();
+        public static readonly ulong UInt64 = (ulong)Random.Shared.Next() * (ulong)Random.Shared.Next();
+        public static readonly nint IntPtr = nint.MinValue;
+        public static readonly nuint UIntPtr = nuint.MaxValue;
+        public static readonly float Single = 42.42f;
+        public static readonly double Double = -42.42;
+        public static readonly decimal Decimal = 42.42m;
+        public static readonly Guid Guid = Guid.NewGuid();
+        public static readonly DateTime DateTime = DateTime.UtcNow;
+        public static readonly TimeSpan TimeSpan = DateTime.UtcNow.TimeOfDay;
     }
 }

@@ -1,63 +1,56 @@
 using System.Collections.Generic;
-using System.Text;
 using System.Threading;
+using JetBrains.Annotations;
 using ZeroLog.Appenders;
+using ZeroLog.Formatting;
 
-namespace ZeroLog.Tests
+namespace ZeroLog.Tests;
+
+public class TestAppender : Appender
 {
-    public class TestAppender : IAppender
+    private readonly bool _captureLoggedMessages;
+    private int _messageCount;
+    private ManualResetEventSlim _signal;
+    private int _messageCountTarget;
+
+    public List<string> LoggedMessages { get; } = new();
+    public int FlushCount { get; set; }
+
+    public ManualResetEventSlim WaitOnWriteEvent { get; set; }
+
+    [UsedImplicitly]
+    public TestAppender()
     {
-        private readonly bool _captureLoggedMessages;
-        private int _messageCount;
-        private ManualResetEventSlim _signal;
-        private int _messageCountTarget;
+    }
 
-        public List<string> LoggedMessages { get; } = new List<string>();
-        public int FlushCount { get; set; }
+    public TestAppender(bool captureLoggedMessages)
+    {
+        _captureLoggedMessages = captureLoggedMessages;
+    }
 
-        public ManualResetEventSlim WaitOnWriteEvent { get; set; }
+    public ManualResetEventSlim SetMessageCountTarget(int expectedMessageCount)
+    {
+        _signal = new ManualResetEventSlim(false);
+        _messageCount = 0;
+        _messageCountTarget = expectedMessageCount;
+        return _signal;
+    }
 
-        public TestAppender()
-        {
-        }
+    public override void WriteMessage(LoggedMessage message)
+    {
+        if (_captureLoggedMessages)
+            LoggedMessages.Add(message.ToString());
 
-        public TestAppender(bool captureLoggedMessages = true)
-        {
-            _captureLoggedMessages = captureLoggedMessages;
-        }
+        if (++_messageCount == _messageCountTarget)
+            _signal.Set();
 
-        public ManualResetEventSlim SetMessageCountTarget(int expectedMessageCount)
-        {
-            _signal = new ManualResetEventSlim(false);
-            _messageCount = 0;
-            _messageCountTarget = expectedMessageCount;
-            return _signal;
-        }
+        WaitOnWriteEvent?.Wait();
+    }
 
-        public string Name { get; set; }
+    public override void Flush()
+    {
+        base.Flush();
 
-        public void WriteEvent(ILogEventHeader logEventHeader, byte[] messageBytes, int messageLength)
-        {
-            if (_captureLoggedMessages)
-                LoggedMessages.Add(Encoding.ASCII.GetString(messageBytes, 0, messageLength));
-
-            if (++_messageCount == _messageCountTarget)
-                _signal.Set();
-
-            WaitOnWriteEvent?.Wait();
-        }
-
-        public void SetEncoding(Encoding encoding)
-        {
-        }
-
-        public void Flush()
-        {
-            ++FlushCount;
-        }
-
-        public void Dispose()
-        {
-        }
+        ++FlushCount;
     }
 }

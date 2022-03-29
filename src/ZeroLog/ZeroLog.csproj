@@ -1,57 +1,34 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;netcoreapp2.1;net5.0;net461</TargetFrameworks>
+    <TargetFrameworks>net6.0;netstandard2.0</TargetFrameworks>
     <Nullable>enable</Nullable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup>
     <IsPackable>true</IsPackable>
     <PackageId>ZeroLog</PackageId>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>icon.png</PackageIcon>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Fody" Version="6.3.0" PrivateAssets="all" />
-    <PackageReference Include="InlineIL.Fody" Version="1.6.0" PrivateAssets="all" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-    <PackageReference Include="StringFormatter" Version="1.0.0.13" />
-    <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.7.0" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework'">
-    <Reference Include="Microsoft.CSharp" />
+    <PackageReference Include="Fody" Version="6.6.0" PrivateAssets="all" />
+    <PackageReference Include="InlineIL.Fody" Version="1.7.1" PrivateAssets="all" />
+    <PackageReference Include="System.Memory" Version="4.5.4" Condition="'$(TargetFrameworkIdentifier)' == '.NETStandard'" />
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Log.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Log.tt</DependentUpon>
-    </Compile>
-    <None Update="Log.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>Log.cs</LastGenOutput>
-    </None>
-    <Compile Update="LogEvent.Append.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>LogEvent.Append.tt</DependentUpon>
-    </Compile>
-    <None Update="LogEvent.Append.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>LogEvent.Append.cs</LastGenOutput>
-    </None>
-    <Compile Update="LogEvent.AppendUnmanaged.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>LogEvent.AppendUnmanaged.tt</DependentUpon>
-    </Compile>
-    <None Update="LogEvent.AppendUnmanaged.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>LogEvent.AppendUnmanaged.cs</LastGenOutput>
-    </None>
+    <Compile Include="../ZeroLog.Impl.Base/**/*.cs" Exclude="../ZeroLog.Impl.Base/obj/**/*;../ZeroLog.Impl.Base/bin/**/*" Visible="false" />
+    <Compile Include="../ZeroLog.Impl.Full/**/*.cs" Exclude="../ZeroLog.Impl.Full/obj/**/*;../ZeroLog.Impl.Full/bin/**/*" Visible="false" Condition="'$(TargetFramework)' != 'netstandard2.0'" />
   </ItemGroup>
 
   <ItemGroup>
-    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+    <ProjectReference Include="../ZeroLog.Analyzers/ZeroLog.Analyzers.csproj" ReferenceOutputAssembly="false" />
+    <None Include="../ZeroLog.Analyzers/bin/$(Configuration)/netstandard2.0/ZeroLog.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    <None Include="ZeroLog.targets" Pack="true" PackagePath="build" />
+    <None Include="../NuGetReadme.md" Pack="true" PackagePath="/README.md" Visible="false" />
+    <None Include="../../icon.png" Pack="true" PackagePath="/" Visible="false" />
   </ItemGroup>
+
 </Project>

@@ -3,39 +3,38 @@ using System.Threading;
 using log4net.Appender;
 using log4net.Core;
 
-namespace ZeroLog.Benchmarks
+namespace ZeroLog.Benchmarks;
+
+internal class Log4NetTestAppender : AppenderSkeleton
 {
-    internal class Log4NetTestAppender : AppenderSkeleton
+    private readonly bool _captureLoggedMessages;
+    private int _messageCount;
+    private ManualResetEventSlim _signal;
+    private int _messageCountTarget;
+
+    public List<string> LoggedMessages { get; } = new List<string>();
+
+    public Log4NetTestAppender(bool captureLoggedMessages)
     {
-        private readonly bool _captureLoggedMessages;
-        private int _messageCount;
-        private ManualResetEventSlim _signal;
-        private int _messageCountTarget;
+        _captureLoggedMessages = captureLoggedMessages;
+    }
 
-        public List<string> LoggedMessages { get; } = new List<string>();
+    public ManualResetEventSlim SetMessageCountTarget(int expectedMessageCount)
+    {
+        _signal = new ManualResetEventSlim(false);
+        _messageCount = 0;
+        _messageCountTarget = expectedMessageCount;
+        return _signal;
+    }
 
-        public Log4NetTestAppender(bool captureLoggedMessages)
-        {
-            _captureLoggedMessages = captureLoggedMessages;
-        }
+    protected override void Append(LoggingEvent loggingEvent)
+    {
+        var formatted = loggingEvent.RenderedMessage;
 
-        public ManualResetEventSlim SetMessageCountTarget(int expectedMessageCount)
-        {
-            _signal = new ManualResetEventSlim(false);
-            _messageCount = 0;
-            _messageCountTarget = expectedMessageCount;
-            return _signal;
-        }
+        if (_captureLoggedMessages)
+            LoggedMessages.Add(loggingEvent.ToString());
 
-        protected override void Append(LoggingEvent loggingEvent)
-        {
-            var formatted = loggingEvent.RenderedMessage;
-
-            if (_captureLoggedMessages)
-                LoggedMessages.Add(loggingEvent.ToString());
-
-            if (++_messageCount == _messageCountTarget)
-                _signal.Set();
-        }
+        if (++_messageCount == _messageCountTarget)
+            _signal.Set();
     }
 }
