@@ -5,7 +5,6 @@ using System.Globalization;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using ZeroLog.Configuration;
-using ZeroLog.Support;
 
 namespace ZeroLog;
 
@@ -32,7 +31,7 @@ internal static unsafe class UnmanagedCache
     );
 
     private static readonly Dictionary<IntPtr, FormatterDelegate> _unmanagedStructs = new();
-    private static readonly MethodInfo _registerMethod = typeof(UnmanagedCache).GetMethod(nameof(Register), Type.EmptyTypes)!;
+    private static readonly MethodInfo _registerGuardedMethod = typeof(UnmanagedCache).GetMethod(nameof(RegisterGuarded), Type.EmptyTypes)!;
 
     internal static void Register(Type unmanagedType)
     {
@@ -41,10 +40,15 @@ internal static unsafe class UnmanagedCache
         if (!typeof(ISpanFormattable).IsAssignableFrom(unmanagedType))
             throw new ArgumentException($"Not an {nameof(ISpanFormattable)} type: {unmanagedType}");
 
-        if (!TypeUtil.GetIsUnmanagedSlow(unmanagedType))
-            throw new ArgumentException($"Not an unmanaged type: {unmanagedType}");
+        _registerGuardedMethod.MakeGenericMethod(unmanagedType).Invoke(null, null);
+    }
 
-        _registerMethod.MakeGenericMethod(unmanagedType).Invoke(null, null);
+    private static void RegisterGuarded<T>(UnmanagedFormatterDelegate<T> formatter)
+        where T : unmanaged
+    {
+        if (RuntimeHelpers.IsReferenceOrContainsReferences<T>())
+            throw new ArgumentException($"Not an unmanaged type: {typeof(T)}");
+        Register(formatter);
     }
 
     public static void Register<T>(UnmanagedFormatterDelegate<T> formatter)

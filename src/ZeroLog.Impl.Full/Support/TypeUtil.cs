@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using static System.Linq.Expressions.Expression;
 
 namespace ZeroLog.Support;
@@ -30,13 +29,6 @@ internal static class TypeUtil
             Call(method, param),
             param
         ).Compile();
-    }
-
-    public static bool GetIsUnmanagedSlow(Type type)
-    {
-        return !(bool)typeof(RuntimeHelpers).GetMethod(nameof(RuntimeHelpers.IsReferenceOrContainsReferences), BindingFlags.Static | BindingFlags.Public)!
-                                            .MakeGenericMethod(type)
-                                            .Invoke(null, null)!;
     }
 }
 
