@@ -44,7 +44,7 @@ public sealed class ZeroLogConfiguration
     /// <remarks>
     /// Default: false
     /// </remarks>
-    public bool AutoRegisterEnums { get; init; } = false;
+    public bool AutoRegisterEnums { get; set; } = false;
 
     /// <summary>
     /// The string which should be logged instead of a <c>null</c> value.
@@ -52,7 +52,7 @@ public sealed class ZeroLogConfiguration
     /// <remarks>
     /// Default: "null"
     /// </remarks>
-    public string NullDisplayString { get; init; } = "null";
+    public string NullDisplayString { get; set; } = "null";
 
     /// <summary>
     /// The string which is appended to a message when it is truncated.
@@ -60,7 +60,7 @@ public sealed class ZeroLogConfiguration
     /// <remarks>
     /// Default: " [TRUNCATED]"
     /// </remarks>
-    public string TruncatedMessageSuffix { get; init; } = " [TRUNCATED]";
+    public string TruncatedMessageSuffix { get; set; } = " [TRUNCATED]";
 
     /// <summary>
     /// The time an appender will be put into quarantine (not used to log messages) after it throws an exception.
@@ -68,7 +68,7 @@ public sealed class ZeroLogConfiguration
     /// <remarks>
     /// Default: 15 seconds
     /// </remarks>
-    public TimeSpan AppenderQuarantineDelay { get; init; } = TimeSpan.FromSeconds(15);
+    public TimeSpan AppenderQuarantineDelay { get; set; } = TimeSpan.FromSeconds(15);
 
     /// <summary>
     /// The configuration of the root logger.

@@ -16,7 +16,7 @@ public sealed class AppenderConfiguration
     /// The minimum log level of messages this appender should handle.
     /// This can be higher than the level defined on the appender.
     /// </summary>
-    public LogLevel Level { get; init; }
+    public LogLevel Level { get; set; }
 
     /// <summary>
     /// Creates a configuration for an appender.

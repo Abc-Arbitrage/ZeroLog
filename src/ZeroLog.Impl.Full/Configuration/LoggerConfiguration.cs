@@ -23,7 +23,7 @@ public sealed class LoggerConfiguration : ILoggerConfiguration
     /// <remarks>
     /// The level of the parent logger is inherited by default.
     /// </remarks>
-    public LogLevel? Level { get; init; }
+    public LogLevel? Level { get; set; }
 
     /// <summary>
     /// The strategy to apply on log message pool exhaustion.
@@ -31,7 +31,7 @@ public sealed class LoggerConfiguration : ILoggerConfiguration
     /// <remarks>
     /// The strategy of the parent logger is inherited by default.
     /// </remarks>
-    public LogMessagePoolExhaustionStrategy? LogMessagePoolExhaustionStrategy { get; init; }
+    public LogMessagePoolExhaustionStrategy? LogMessagePoolExhaustionStrategy { get; set; }
 
     /// <summary>
     /// Indicate whether appenders defined on parent levels should be included.
@@ -39,7 +39,7 @@ public sealed class LoggerConfiguration : ILoggerConfiguration
     /// <remarks>
     /// True by default.
     /// </remarks>
-    public bool IncludeParentAppenders { get; init; } = true;
+    public bool IncludeParentAppenders { get; set; } = true;
 
     /// <summary>
     /// The appenders to use for this level.
