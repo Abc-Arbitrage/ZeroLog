@@ -1,6 +1,5 @@
 ﻿using System;
 using HdrHistogram;
-using NLog;
 using NLog.Config;
 using ZeroLog.Benchmarks.Tools;
 

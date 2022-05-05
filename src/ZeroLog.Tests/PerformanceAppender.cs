@@ -14,7 +14,7 @@ internal class PerformanceAppender : Appender
     public PerformanceAppender(int expectedEntries)
     {
         _messages = new MessageReceived[expectedEntries];
-        for (int i = 0; i < expectedEntries; i++)
+        for (var i = 0; i < expectedEntries; i++)
         {
             _messages[i] = new MessageReceived(new char[30]);
         }
@@ -51,7 +51,7 @@ internal class PerformanceAppender : Appender
 
         using (var fileStream = new StreamWriter(File.OpenWrite(totalTimeCsv)))
         {
-            for (int i = 0; i < _count; i++)
+            for (var i = 0; i < _count; i++)
             {
                 var messageReceived = _messages[i];
                 var startTime = long.Parse(messageReceived.StartTimestampInChars.AsSpan(0, messageReceived.MessageLength));
@@ -62,6 +62,6 @@ internal class PerformanceAppender : Appender
 
     private static double ToMicroseconds(long ticks)
     {
-        return unchecked(ticks * 1000000 / (double)(Stopwatch.Frequency));
+        return unchecked(ticks * 1000000 / (double)Stopwatch.Frequency);
     }
 }

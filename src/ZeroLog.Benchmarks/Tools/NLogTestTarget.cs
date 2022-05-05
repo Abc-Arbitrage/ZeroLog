@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Threading;
 using NLog;
-using NLog.Common;
 using NLog.Targets;
 
 namespace ZeroLog.Benchmarks;
@@ -19,7 +18,7 @@ internal class NLogTestTarget : NLog.Targets.TargetWithLayout
         _captureLoggedMessages = captureLoggedMessages;
     }
 
-    public List<string> LoggedMessages { get; } = new List<string>();
+    public List<string> LoggedMessages { get; } = new();
 
     public ManualResetEventSlim SetMessageCountTarget(int expectedMessageCount)
     {
@@ -31,7 +30,7 @@ internal class NLogTestTarget : NLog.Targets.TargetWithLayout
 
     protected override void Write(LogEventInfo logEvent)
     {
-        string logMessage = this.Layout.Render(logEvent);
+        var logMessage = this.Layout.Render(logEvent);
 
         if (_captureLoggedMessages)
             LoggedMessages.Add(logMessage);
