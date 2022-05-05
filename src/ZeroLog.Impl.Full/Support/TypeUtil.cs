@@ -10,8 +10,8 @@ internal static class TypeUtil
 {
     private static readonly Func<IntPtr, Type>? _getTypeFromHandleFunc = BuildGetTypeFromHandleFunc();
 
-    public static IntPtr GetTypeHandleSlow(Type? type)
-        => type?.TypeHandle.Value ?? IntPtr.Zero;
+    public static IntPtr GetTypeHandleSlow(Type type)
+        => type.TypeHandle.Value;
 
     public static Type? GetTypeFromHandle(IntPtr typeHandle)
         => _getTypeFromHandleFunc?.Invoke(typeHandle);
