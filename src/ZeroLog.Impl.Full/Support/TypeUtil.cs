@@ -18,6 +18,8 @@ internal static class TypeUtil
 
     private static Func<IntPtr, Type>? BuildGetTypeFromHandleFunc()
     {
+        // TODO: Use RuntimeTypeHandle.FromIntPtr in .NET 7 (see #47)
+
         var method = typeof(Type).GetMethod("GetTypeFromHandleUnsafe", BindingFlags.Static | BindingFlags.NonPublic, null, new[] { typeof(IntPtr) }, null);
         if (method == null)
             return null;

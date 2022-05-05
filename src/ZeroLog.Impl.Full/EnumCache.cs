@@ -17,8 +17,7 @@ internal static class EnumCache
 
     public static void Register(Type enumType)
     {
-        if (enumType == null)
-            throw new ArgumentNullException(nameof(enumType));
+        ArgumentNullException.ThrowIfNull(enumType);
 
         if (!enumType.IsEnum)
             throw new ArgumentException($"Not an enum type: {enumType}");

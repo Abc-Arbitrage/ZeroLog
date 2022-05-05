@@ -36,8 +36,7 @@ internal static unsafe class UnmanagedCache
 
     internal static void Register(Type unmanagedType)
     {
-        if (unmanagedType == null)
-            throw new ArgumentNullException(nameof(unmanagedType));
+        ArgumentNullException.ThrowIfNull(unmanagedType);
 
         if (!typeof(ISpanFormattable).IsAssignableFrom(unmanagedType))
             throw new ArgumentException($"Not an {nameof(ISpanFormattable)} type: {unmanagedType}");
@@ -51,6 +50,8 @@ internal static unsafe class UnmanagedCache
     public static void Register<T>(UnmanagedFormatterDelegate<T> formatter)
         where T : unmanaged
     {
+        ArgumentNullException.ThrowIfNull(formatter);
+
         lock (_unmanagedStructs)
         {
             _unmanagedStructs[typeof(T).TypeHandle.Value] = (byte* valuePtr, Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, ZeroLogConfiguration config)
