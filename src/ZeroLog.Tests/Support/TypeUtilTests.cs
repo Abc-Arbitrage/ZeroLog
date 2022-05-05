@@ -17,46 +17,6 @@ public class TypeUtilTests
         type.ShouldEqual(typeof(DayOfWeek));
     }
 
-    [Test]
-    public void should_identify_unmanaged_types()
-    {
-        IsUnmanaged<int>().ShouldBeTrue();
-        IsUnmanaged<int?>().ShouldBeTrue();
-
-        IsUnmanaged<string>().ShouldBeFalse();
-
-        IsUnmanaged<DayOfWeek>().ShouldBeTrue();
-        IsUnmanaged<DayOfWeek?>().ShouldBeTrue();
-
-        IsUnmanaged<UnmanagedStruct>().ShouldBeTrue();
-        IsUnmanaged<UnmanagedStruct?>().ShouldBeTrue();
-
-        IsUnmanaged<UnmanagedStructNested>().ShouldBeTrue();
-        IsUnmanaged<UnmanagedStructNested?>().ShouldBeTrue();
-
-        IsUnmanaged<ManagedStruct>().ShouldBeFalse();
-        IsUnmanaged<ManagedStruct?>().ShouldBeFalse();
-
-        IsUnmanaged<ManagedStructNested>().ShouldBeFalse();
-        IsUnmanaged<ManagedStructNested?>().ShouldBeFalse();
-
-        IsUnmanaged<UnmanagedAutoLayoutStruct>().ShouldBeTrue();
-        IsUnmanaged<UnmanagedAutoLayoutStruct?>().ShouldBeTrue();
-
-        IsUnmanaged<GenericStruct<GenericStruct<int>>>().ShouldBeTrue();
-        IsUnmanaged<GenericStruct<GenericStruct<int?>>?>().ShouldBeTrue();
-
-        IsUnmanaged<GenericStruct<GenericStruct<string>>>().ShouldBeFalse();
-        IsUnmanaged<GenericStruct<GenericStruct<string>>?>().ShouldBeFalse();
-
-        bool IsUnmanaged<T>()
-        {
-            var expectedResult = !RuntimeHelpers.IsReferenceOrContainsReferences<T>();
-            TypeUtil.GetIsUnmanagedSlow(typeof(T)).ShouldEqual(expectedResult);
-            return expectedResult;
-        }
-    }
-
     [StructLayout(LayoutKind.Sequential)]
     private unsafe struct UnmanagedStruct
     {
