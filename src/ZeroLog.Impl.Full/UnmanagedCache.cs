@@ -71,21 +71,17 @@ internal static unsafe class UnmanagedCache
         Register(formatter);
     }
 
-    private static bool FormatterGeneric<T>(byte* valuePtr, Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, UnmanagedFormatterDelegate<T>? typedFormatter)
+    private static bool FormatterGeneric<T>(byte* valuePtr, Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, UnmanagedFormatterDelegate<T> typedFormatter)
         where T : unmanaged
     {
-        if (typedFormatter != null)
-            return typedFormatter.Invoke(ref Unsafe.AsRef<T>(valuePtr), destination, out charsWritten, format);
-
-        charsWritten = 0;
-        return true;
+        return typedFormatter.Invoke(ref Unsafe.AsRef<T>(valuePtr), destination, out charsWritten, format);
     }
 
     private static bool FormatterGenericNullable<T>(byte* valuePtr,
                                                     Span<char> destination,
                                                     out int charsWritten,
                                                     ReadOnlySpan<char> format,
-                                                    UnmanagedFormatterDelegate<T>? typedFormatter,
+                                                    UnmanagedFormatterDelegate<T> typedFormatter,
                                                     ZeroLogConfiguration config)
         where T : unmanaged
     {
@@ -95,11 +91,7 @@ internal static unsafe class UnmanagedCache
         {
             var value = typedValueRef.GetValueOrDefault(); // This copies the value, but this is the slower execution path anyway.
 
-            if (typedFormatter != null)
-                return typedFormatter.Invoke(ref value, destination, out charsWritten, format);
-
-            charsWritten = 0;
-            return true;
+            return typedFormatter.Invoke(ref value, destination, out charsWritten, format);
         }
         else
         {
