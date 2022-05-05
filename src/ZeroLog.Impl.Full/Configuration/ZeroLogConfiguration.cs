@@ -12,6 +12,8 @@ public sealed class ZeroLogConfiguration
 {
     internal static ZeroLogConfiguration Default { get; } = new();
 
+    internal event Action? ApplyChangesRequested;
+
     /// <summary>
     /// Count of pooled log messages. A log message is acquired from the pool on demand, and released by the logging thread.
     /// </summary>
@@ -86,6 +88,16 @@ public sealed class ZeroLogConfiguration
     /// If <c>Foo.Bar</c> is configured, but <c>Foo.Bar.Baz</c> is not, it will use the configuration for <c>Foo.Bar</c>.
     /// </remarks>
     public ICollection<LoggerConfiguration> Loggers { get; private set; } = new List<LoggerConfiguration>();
+
+    /// <summary>
+    /// Applies the changes made to this object since the call to <see cref="LogManager.Initialize"/>
+    /// or the last call to <see cref="ApplyChanges"/>.
+    /// </summary>
+    /// <remarks>
+    /// This method allocates.
+    /// </remarks>
+    public void ApplyChanges()
+        => ApplyChangesRequested?.Invoke();
 
     internal void Validate()
     {

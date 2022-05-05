@@ -40,6 +40,8 @@ partial class LogManager : ILogMessageProvider, IDisposable
 
         // Instantiate this last
         _appenderThread = new AppenderThread(this);
+
+        _originalConfig.ApplyChangesRequested += ApplyConfigurationChanges;
     }
 
     /// <summary>
@@ -53,6 +55,7 @@ partial class LogManager : ILogMessageProvider, IDisposable
         _isRunning = false;
         Interlocked.CompareExchange(ref _staticLogManager, null, this);
 
+        _originalConfig.ApplyChangesRequested -= ApplyConfigurationChanges;
         ResetAllLogConfigurations();
 
         _pool.Clear();
@@ -72,7 +75,7 @@ partial class LogManager : ILogMessageProvider, IDisposable
     /// <returns>A disposable which shuts down ZeroLog upon disposal.</returns>
     /// <exception cref="InvalidOperationException">ZeroLog is already initialized.</exception>
     /// <remarks>
-    /// Any changes to the <paramref name="configuration"/> object will only be taken into account after calling <see cref="UpdateConfiguration"/>.
+    /// Any changes to the <paramref name="configuration"/> object will only be taken into account after calling <see cref="ZeroLogConfiguration.ApplyChanges"/>.
     /// </remarks>
     public static IDisposable Initialize(ZeroLogConfiguration configuration)
     {
@@ -84,15 +87,6 @@ partial class LogManager : ILogMessageProvider, IDisposable
         _staticLogManager = new LogManager(configuration);
         return _staticLogManager;
     }
-
-    /// <summary>
-    /// Applies changes made to the configuration object which was passed to <see cref="Initialize"/>.
-    /// </summary>
-    /// <remarks>
-    /// This method allocates.
-    /// </remarks>
-    public static void UpdateConfiguration()
-        => _staticLogManager?.ApplyConfigurationChanges();
 
     /// <summary>
     /// Shuts down ZeroLog.
