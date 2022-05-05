@@ -45,7 +45,7 @@ internal static unsafe class UnmanagedCache
         _registerGuardedMethod.MakeGenericMethod(unmanagedType).Invoke(null, null);
     }
 
-    internal static void RegisterGuarded<T>(UnmanagedFormatterDelegate<T> formatter)
+    private static void RegisterGuarded<T>(UnmanagedFormatterDelegate<T> formatter)
         where T : unmanaged
     {
         if (RuntimeHelpers.IsReferenceOrContainsReferences<T>())
