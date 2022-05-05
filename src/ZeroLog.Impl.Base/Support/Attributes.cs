@@ -2,7 +2,7 @@
 
 namespace System.Diagnostics.CodeAnalysis
 {
-    [AttributeUsageAttribute(AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.Property | AttributeTargets.ReturnValue)]
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.Property | AttributeTargets.ReturnValue)]
     internal sealed class NotNullAttribute : Attribute
     {
     }

@@ -33,7 +33,6 @@ internal static class TypeUtil
 internal static class TypeUtil<T>
 {
     public static readonly IntPtr TypeHandle = TypeUtil.GetTypeHandleSlow(typeof(T));
-    public static readonly bool IsEnum = typeof(T).IsEnum;
 }
 
 [SuppressMessage("ReSharper", "StaticMemberInGenericType")]
@@ -43,7 +42,5 @@ internal static class TypeUtilSlow<T>
 
     private static readonly Type? _underlyingType = Nullable.GetUnderlyingType(typeof(T));
 
-    public static readonly bool IsNullableEnum = _underlyingType?.IsEnum == true;
-    public static readonly IntPtr UnderlyingTypeHandle = TypeUtil.GetTypeHandleSlow(_underlyingType);
     public static readonly TypeCode UnderlyingTypeCode = Type.GetTypeCode(_underlyingType);
 }

@@ -12,7 +12,7 @@ internal class Log4NetTestAppender : AppenderSkeleton
     private ManualResetEventSlim _signal;
     private int _messageCountTarget;
 
-    public List<string> LoggedMessages { get; } = new List<string>();
+    public List<string> LoggedMessages { get; } = new();
 
     public Log4NetTestAppender(bool captureLoggedMessages)
     {
