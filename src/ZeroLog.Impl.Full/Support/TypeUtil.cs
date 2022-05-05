@@ -31,11 +31,13 @@ internal static class TypeUtil
         ).Compile();
     }
 
+    static MethodInfo _isReferenceOrContainsReferencesInfo = typeof(RuntimeHelpers).GetMethod(nameof(RuntimeHelpers.IsReferenceOrContainsReferences), BindingFlags.Static | BindingFlags.Public)!;
+
     public static bool GetIsUnmanagedSlow(Type type)
     {
-        return !(bool)typeof(RuntimeHelpers).GetMethod(nameof(RuntimeHelpers.IsReferenceOrContainsReferences), BindingFlags.Static | BindingFlags.Public)!
-                                            .MakeGenericMethod(type)
-                                            .Invoke(null, null)!;
+        return !(bool)_isReferenceOrContainsReferencesInfo
+                      .MakeGenericMethod(type)
+                      .Invoke(null, null)!;
     }
 }
 
