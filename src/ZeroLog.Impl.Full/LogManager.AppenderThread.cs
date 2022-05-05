@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using ZeroLog.Appenders;
 using ZeroLog.Configuration;
@@ -13,10 +14,13 @@ partial class LogManager
     private class AppenderThread
     {
         private readonly LogManager _logManager;
-        private readonly ZeroLogConfiguration _config;
         private readonly ConcurrentQueue<LogMessage> _queue;
-        private readonly Appender[] _appenders;
         private readonly Thread _thread;
+        private readonly LoggedMessage _loggedMessage;
+
+        private ZeroLogConfiguration _config;
+        private ZeroLogConfiguration? _nextConfig;
+        private Appender[] _appenders;
 
         public AppenderThread(LogManager logManager)
         {
@@ -25,6 +29,7 @@ partial class LogManager
             _queue = logManager._queue;
 
             _appenders = _config.GetAllAppenders().ToArray();
+            _loggedMessage = new LoggedMessage(OutputBufferSize, _config);
 
             _thread = new Thread(WriteThread)
             {
@@ -41,6 +46,13 @@ partial class LogManager
         {
             foreach (var appender in _appenders)
                 appender.Dispose();
+
+            _appenders = Array.Empty<Appender>();
+        }
+
+        public void UpdateConfiguration(ZeroLogConfiguration config)
+        {
+            Volatile.Write(ref _nextConfig, config);
         }
 
         private void WriteThread()
@@ -68,12 +80,11 @@ partial class LogManager
         private void WriteToAppenders()
         {
             var spinWait = new SpinWait();
-            var loggedMessage = new LoggedMessage(OutputBufferSize, _config);
             var flush = false;
 
             while (_logManager._isRunning || !_queue.IsEmpty)
             {
-                if (TryToProcessQueue(loggedMessage))
+                if (TryToProcessQueue())
                 {
                     spinWait.Reset();
                     flush = true;
@@ -85,6 +96,10 @@ partial class LogManager
                     FlushAppenders();
                     flush = false;
                 }
+                else if (_nextConfig is not null)
+                {
+                    ApplyConfigurationUpdate();
+                }
                 else
                 {
                     spinWait.SpinOnce();
@@ -94,7 +109,7 @@ partial class LogManager
             FlushAppenders();
         }
 
-        private bool TryToProcessQueue(LoggedMessage loggedMessage)
+        private bool TryToProcessQueue()
         {
             if (!_queue.TryDequeue(out var logMessage))
                 return false;
@@ -105,10 +120,10 @@ partial class LogManager
                 if (appenders.Length == 0)
                     return true;
 
-                loggedMessage.SetMessage(logMessage);
+                _loggedMessage.SetMessage(logMessage);
 
                 foreach (var appender in appenders)
-                    appender.InternalWriteMessage(loggedMessage, _config);
+                    appender.InternalWriteMessage(_loggedMessage, _config);
             }
             finally
             {
@@ -122,6 +137,29 @@ partial class LogManager
         {
             foreach (var appender in _appenders)
                 appender.InternalFlush();
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private void ApplyConfigurationUpdate()
+        {
+            var newConfig = Interlocked.Exchange(ref _nextConfig, null);
+            if (newConfig is null)
+                return;
+
+            _config = newConfig;
+
+            // We could dispose the appenders that are no longer present in the new configuration right now,
+            // but the user may want to add them back later, so their state needs to remain valid.
+
+            var appenders = newConfig.GetAllAppenders();
+
+            if (!appenders.SetEquals(_appenders))
+            {
+                appenders.UnionWith(_appenders);
+                _appenders = appenders.ToArray();
+            }
+
+            _loggedMessage.UpdateConfiguration(newConfig);
         }
     }
 }

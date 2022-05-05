@@ -14,9 +14,11 @@ partial class LogManager : ILogMessageProvider, IDisposable
 
     private static LogManager? _staticLogManager;
 
-    private readonly ZeroLogConfiguration _config;
     private readonly ConcurrentQueue<LogMessage> _queue;
     private readonly ObjectPool<LogMessage> _pool;
+
+    private readonly ZeroLogConfiguration _originalConfig; // Reference to the configuration object supplied by the user
+    private ZeroLogConfiguration _config; // Snapshot of the current configuration
 
     private readonly AppenderThread _appenderThread;
 
@@ -24,6 +26,7 @@ partial class LogManager : ILogMessageProvider, IDisposable
 
     private LogManager(ZeroLogConfiguration config)
     {
+        _originalConfig = config;
         _config = config.Clone();
 
         _queue = new ConcurrentQueue<LogMessage>(new ConcurrentQueueCapacityInitializer(config.LogMessagePoolSize));
@@ -68,6 +71,9 @@ partial class LogManager : ILogMessageProvider, IDisposable
     /// <param name="configuration">The configuration to use.</param>
     /// <returns>A disposable which shuts down ZeroLog upon disposal.</returns>
     /// <exception cref="InvalidOperationException">ZeroLog is already initialized.</exception>
+    /// <remarks>
+    /// Any changes to the <paramref name="configuration"/> object will only be taken into account after calling <see cref="UpdateConfiguration"/>.
+    /// </remarks>
     public static IDisposable Initialize(ZeroLogConfiguration configuration)
     {
         configuration.Validate();
@@ -78,6 +84,15 @@ partial class LogManager : ILogMessageProvider, IDisposable
         _staticLogManager = new LogManager(configuration);
         return _staticLogManager;
     }
+
+    /// <summary>
+    /// Applies changes made to the configuration object which was passed to <see cref="Initialize"/>.
+    /// </summary>
+    /// <remarks>
+    /// This method allocates.
+    /// </remarks>
+    public static void UpdateConfiguration()
+        => _staticLogManager?.ApplyConfigurationChanges();
 
     /// <summary>
     /// Shuts down ZeroLog.
@@ -165,6 +180,17 @@ partial class LogManager : ILogMessageProvider, IDisposable
                 name,
                 static n => new Log(n)
             );
+    }
+
+    private void ApplyConfigurationChanges()
+    {
+        var newConfig = _originalConfig.Clone();
+        newConfig.Validate();
+
+        _config = newConfig;
+
+        UpdateAllLogConfigurations();
+        _appenderThread.UpdateConfiguration(_config);
     }
 
     internal void UpdateLogConfiguration(Log log)

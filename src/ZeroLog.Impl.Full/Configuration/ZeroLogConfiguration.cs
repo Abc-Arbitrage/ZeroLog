@@ -116,9 +116,9 @@ public sealed class ZeroLogConfiguration
     internal ResolvedLoggerConfiguration ResolveLoggerConfiguration(string loggerName)
         => ResolvedLoggerConfiguration.Resolve(loggerName, this);
 
-    internal IEnumerable<Appender> GetAllAppenders()
+    internal HashSet<Appender> GetAllAppenders()
         => RootLogger.Appenders
                      .Concat(Loggers.SelectMany(i => i.Appenders))
                      .Select(i => i.Appender)
-                     .DistinctBy(i => i, ReferenceEqualityComparer.Instance);
+                     .ToHashSet<Appender>(ReferenceEqualityComparer.Instance);
 }
