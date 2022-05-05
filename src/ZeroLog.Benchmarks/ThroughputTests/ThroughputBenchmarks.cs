@@ -147,7 +147,7 @@ public class ThroughputBenchmarks
     {
         _nLogTestTarget = new NLogTestTarget(false);
         _nLogAsyncTestTarget = new NLogTestTarget(false);
-        var asyncTarget = (new AsyncTargetWrapper(_nLogAsyncTestTarget, QueueSize, overflowAction: AsyncTargetWrapperOverflowAction.Block));
+        var asyncTarget = new AsyncTargetWrapper(_nLogAsyncTestTarget, QueueSize, overflowAction: AsyncTargetWrapperOverflowAction.Block);
 
         var config = new LoggingConfiguration();
         config.AddTarget(nameof(_nLogTestTarget), _nLogTestTarget);

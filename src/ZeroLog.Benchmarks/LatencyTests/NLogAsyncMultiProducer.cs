@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using HdrHistogram;
-using NLog;
 using NLog.Config;
 using NLog.Targets.Wrappers;
 using ZeroLog.Benchmarks.Tools;
@@ -13,7 +12,7 @@ public class NLogAsyncMultiProducer
     public SimpleLatencyBenchmarkResult Bench(int queueSize, int warmingMessageCount, int totalMessageCount, int producingThreadCount)
     {
         var appender = new NLogTestTarget(false);
-        var asyncTarget = (new AsyncTargetWrapper(appender, queueSize, overflowAction: AsyncTargetWrapperOverflowAction.Block));
+        var asyncTarget = new AsyncTargetWrapper(appender, queueSize, overflowAction: AsyncTargetWrapperOverflowAction.Block);
 
         var config = new LoggingConfiguration();
         config.AddTarget(nameof(asyncTarget), asyncTarget);
