@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using ZeroLog.Appenders;
 
@@ -77,7 +76,7 @@ public sealed class ZeroLogConfiguration
     /// <remarks>
     /// The root logger is the default logger. If <c>GetLogger</c> is called for a namespace which is not configured, it will fallback to the root logger.
     /// </remarks>
-    public RootLoggerConfiguration RootLogger { get; } = new();
+    public RootLoggerConfiguration RootLogger { get; private set; } = new();
 
     /// <summary>
     /// Configuration for logger namespaces (besides the root logger).
@@ -88,9 +87,9 @@ public sealed class ZeroLogConfiguration
     /// </remarks>
     public ICollection<LoggerConfiguration> Loggers { get; private set; } = new List<LoggerConfiguration>();
 
-    internal void ValidateAndFreeze()
+    internal void Validate()
     {
-        RootLogger.ValidateAndFreeze();
+        RootLogger.Validate();
 
         var loggerNames = new HashSet<string>(StringComparer.Ordinal);
 
@@ -102,10 +101,16 @@ public sealed class ZeroLogConfiguration
             if (!loggerNames.Add(loggerConfig.Name))
                 throw new InvalidOperationException($"Multiple configurations defined for the following logger: {loggerConfig.Name}");
 
-            loggerConfig.ValidateAndFreeze();
+            loggerConfig.Validate();
         }
+    }
 
-        Loggers = ImmutableList.CreateRange(Loggers);
+    internal ZeroLogConfiguration Clone()
+    {
+        var clone = (ZeroLogConfiguration)MemberwiseClone();
+        clone.RootLogger = RootLogger.Clone();
+        clone.Loggers = Loggers.Select(i => i.Clone()).ToList();
+        return clone;
     }
 
     internal ResolvedLoggerConfiguration ResolveLoggerConfiguration(string loggerName)

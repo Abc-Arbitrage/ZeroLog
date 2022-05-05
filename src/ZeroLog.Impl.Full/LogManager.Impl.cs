@@ -24,7 +24,7 @@ partial class LogManager : ILogMessageProvider, IDisposable
 
     private LogManager(ZeroLogConfiguration config)
     {
-        _config = config;
+        _config = config.Clone();
 
         _queue = new ConcurrentQueue<LogMessage>(new ConcurrentQueueCapacityInitializer(config.LogMessagePoolSize));
 
@@ -70,7 +70,7 @@ partial class LogManager : ILogMessageProvider, IDisposable
     /// <exception cref="InvalidOperationException">ZeroLog is already initialized.</exception>
     public static IDisposable Initialize(ZeroLogConfiguration configuration)
     {
-        configuration.ValidateAndFreeze();
+        configuration.Validate();
 
         if (_staticLogManager is not null)
             throw new InvalidOperationException("LogManager is already initialized.");

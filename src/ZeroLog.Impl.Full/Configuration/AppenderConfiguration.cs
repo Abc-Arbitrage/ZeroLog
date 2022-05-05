@@ -34,4 +34,7 @@ public sealed class AppenderConfiguration
     /// <param name="appender">The appender to configure.</param>
     public static implicit operator AppenderConfiguration(Appender appender)
         => new(appender);
+
+    internal AppenderConfiguration Clone()
+        => (AppenderConfiguration)MemberwiseClone();
 }
