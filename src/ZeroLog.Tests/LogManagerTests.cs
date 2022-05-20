@@ -14,23 +14,27 @@ namespace ZeroLog.Tests;
 [TestFixture, NonParallelizable]
 [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
 [SuppressMessage("ReSharper", "NotAccessedField.Global")]
-public class LogManagerTests
+public partial class LogManagerTests
 {
     private TestAppender _testAppender;
+    private ZeroLogConfiguration _config;
+    private LogManager _logManager;
 
     [SetUp]
     public void SetUpFixture()
     {
         _testAppender = new TestAppender(true);
 
-        LogManager.Initialize(new ZeroLogConfiguration
+        _config = new ZeroLogConfiguration
         {
             LogMessagePoolSize = 10,
             RootLogger =
             {
                 Appenders = { _testAppender }
             }
-        });
+        };
+
+        _logManager = (LogManager)LogManager.Initialize(_config);
     }
 
     [TearDown]
@@ -216,7 +220,7 @@ public class LogManagerTests
 
         signal.Wait(TimeSpan.FromSeconds(1));
 
-        var logMessage = _testAppender.LoggedMessages.Single();
+        var logMessage = _testAppender.LoggedMessages.ShouldHaveSingleItem();
         logMessage.ShouldContain("An error occurred during formatting:");
         logMessage.ShouldContain(guid.ToString(null, CultureInfo.InvariantCulture));
         logMessage.ShouldContain("abc");
@@ -237,7 +241,7 @@ public class LogManagerTests
 
         signal.Wait(TimeSpan.FromSeconds(1));
 
-        var logMessage = _testAppender.LoggedMessages.Single();
+        var logMessage = _testAppender.LoggedMessages.ShouldHaveSingleItem();
         logMessage.ShouldEqual("An error occurred during formatting: Simulated failure - Unformatted message: Unmanaged(0x2a000000)");
     }
 
@@ -280,7 +284,7 @@ public class LogManagerTests
         log.Info().Append(longMessage).Log();
 
         signal.Wait(TimeSpan.FromSeconds(1));
-        var message = _testAppender.LoggedMessages.Single();
+        var message = _testAppender.LoggedMessages.ShouldHaveSingleItem();
         message.ShouldEqual(new string('.', LogManager.OutputBufferSize - ZeroLogConfiguration.Default.TruncatedMessageSuffix.Length) + ZeroLogConfiguration.Default.TruncatedMessageSuffix);
     }
 

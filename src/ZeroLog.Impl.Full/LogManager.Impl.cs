@@ -79,6 +79,8 @@ partial class LogManager : ILogMessageProvider, IDisposable
     /// </remarks>
     public static IDisposable Initialize(ZeroLogConfiguration configuration)
     {
+        ArgumentNullException.ThrowIfNull(configuration);
+
         configuration.Validate();
 
         if (_staticLogManager is not null)
@@ -201,6 +203,9 @@ partial class LogManager : ILogMessageProvider, IDisposable
         foreach (var log in _loggers.Values)
             log.UpdateConfiguration(null, null);
     }
+
+    internal void WaitUntilNewConfigurationIsApplied()
+        => _appenderThread.WaitUntilNewConfigurationIsApplied();
 
     LogMessage? ILogMessageProvider.TryAcquireLogMessage()
     {

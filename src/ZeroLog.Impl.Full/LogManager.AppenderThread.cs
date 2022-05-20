@@ -106,6 +106,7 @@ partial class LogManager
                 }
             }
 
+            ApplyConfigurationUpdate(); // Make sure any new appenders are taken into account before disposal
             FlushAppenders();
         }
 
@@ -160,6 +161,12 @@ partial class LogManager
             }
 
             _loggedMessage.UpdateConfiguration(newConfig);
+        }
+
+        public void WaitUntilNewConfigurationIsApplied()
+        {
+            while (Volatile.Read(ref _nextConfig) != null)
+                Thread.Yield();
         }
     }
 }
