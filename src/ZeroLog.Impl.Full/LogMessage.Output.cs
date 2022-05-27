@@ -127,6 +127,8 @@ unsafe partial class LogMessage
             {
                 ArgumentType.DateTime => "yyyy-MM-dd HH:mm:ss",
                 ArgumentType.TimeSpan => @"hh\:mm\:ss\.fffffff",
+                ArgumentType.DateOnly => @"yyyy-MM-dd",
+                ArgumentType.TimeOnly => @"HH\:mm\:ss\.fffffff",
                 _                     => null
             };
         }
@@ -332,6 +334,22 @@ unsafe partial class LogMessage
                 return valuePtr->TryFormat(outputBuffer, out charsWritten, format, CultureInfo.InvariantCulture);
             }
 
+            case ArgumentType.DateOnly:
+            {
+                var valuePtr = (DateOnly*)dataPointer;
+                dataPointer += sizeof(DateOnly);
+
+                return valuePtr->TryFormat(outputBuffer, out charsWritten, format, CultureInfo.InvariantCulture);
+            }
+
+            case ArgumentType.TimeOnly:
+            {
+                var valuePtr = (TimeOnly*)dataPointer;
+                dataPointer += sizeof(TimeOnly);
+
+                return valuePtr->TryFormat(outputBuffer, out charsWritten, format, CultureInfo.InvariantCulture);
+            }
+
             case ArgumentType.Enum:
             {
                 var valuePtr = (EnumArg*)dataPointer;
@@ -533,6 +551,18 @@ unsafe partial class LogMessage
             case ArgumentType.TimeSpan:
             {
                 dataPointer += sizeof(TimeSpan);
+                return;
+            }
+
+            case ArgumentType.DateOnly:
+            {
+                dataPointer += sizeof(DateOnly);
+                return;
+            }
+
+            case ArgumentType.TimeOnly:
+            {
+                dataPointer += sizeof(TimeOnly);
                 return;
             }
 

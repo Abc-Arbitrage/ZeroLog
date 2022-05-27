@@ -83,5 +83,7 @@ public partial class LogTests
         public static readonly Guid Guid = Guid.NewGuid();
         public static readonly DateTime DateTime = DateTime.UtcNow;
         public static readonly TimeSpan TimeSpan = DateTime.UtcNow.TimeOfDay;
+        public static readonly DateOnly DateOnly = DateOnly.FromDateTime(DateTime.UtcNow);
+        public static readonly TimeOnly TimeOnly = TimeOnly.FromDateTime(DateTime.UtcNow);
     }
 }

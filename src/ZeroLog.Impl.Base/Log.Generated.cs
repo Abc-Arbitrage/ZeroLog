@@ -892,6 +892,74 @@ partial class Log
         public void AppendFormatted(TimeSpan? value, string format)
             => Message.InternalAppendValueType(value, format, ArgumentType.TimeSpan);
 
+#if NETCOREAPP
+
+        /// <summary>
+        /// Appends a value of type <c>DateOnly</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        public void AppendFormatted(DateOnly value)
+            => Message.InternalAppendValueType(value, ArgumentType.DateOnly);
+
+        /// <summary>
+        /// Appends a value of type <c>DateOnly?</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        public void AppendFormatted(DateOnly? value)
+            => Message.InternalAppendValueType(value, ArgumentType.DateOnly);
+
+        /// <summary>
+        /// Appends a value of type <c>DateOnly</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        /// <param name="format">The format string.</param>
+        public void AppendFormatted(DateOnly value, string format)
+            => Message.InternalAppendValueType(value, format, ArgumentType.DateOnly);
+
+        /// <summary>
+        /// Appends a value of type <c>DateOnly?</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        /// <param name="format">The format string.</param>
+        public void AppendFormatted(DateOnly? value, string format)
+            => Message.InternalAppendValueType(value, format, ArgumentType.DateOnly);
+
+#endif
+
+#if NETCOREAPP
+
+        /// <summary>
+        /// Appends a value of type <c>TimeOnly</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        public void AppendFormatted(TimeOnly value)
+            => Message.InternalAppendValueType(value, ArgumentType.TimeOnly);
+
+        /// <summary>
+        /// Appends a value of type <c>TimeOnly?</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        public void AppendFormatted(TimeOnly? value)
+            => Message.InternalAppendValueType(value, ArgumentType.TimeOnly);
+
+        /// <summary>
+        /// Appends a value of type <c>TimeOnly</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        /// <param name="format">The format string.</param>
+        public void AppendFormatted(TimeOnly value, string format)
+            => Message.InternalAppendValueType(value, format, ArgumentType.TimeOnly);
+
+        /// <summary>
+        /// Appends a value of type <c>TimeOnly?</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        /// <param name="format">The format string.</param>
+        public void AppendFormatted(TimeOnly? value, string format)
+            => Message.InternalAppendValueType(value, format, ArgumentType.TimeOnly);
+
+#endif
+
         /// <summary>
         /// Appends an enum to the handler.
         /// </summary>
@@ -1461,6 +1529,74 @@ partial class Log
         /// <param name="format">The format string.</param>
         public void AppendFormatted(TimeSpan? value, string format)
             => Message.InternalAppendValueType(value, format, ArgumentType.TimeSpan);
+
+#if NETCOREAPP
+
+        /// <summary>
+        /// Appends a value of type <c>DateOnly</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        public void AppendFormatted(DateOnly value)
+            => Message.InternalAppendValueType(value, ArgumentType.DateOnly);
+
+        /// <summary>
+        /// Appends a value of type <c>DateOnly?</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        public void AppendFormatted(DateOnly? value)
+            => Message.InternalAppendValueType(value, ArgumentType.DateOnly);
+
+        /// <summary>
+        /// Appends a value of type <c>DateOnly</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        /// <param name="format">The format string.</param>
+        public void AppendFormatted(DateOnly value, string format)
+            => Message.InternalAppendValueType(value, format, ArgumentType.DateOnly);
+
+        /// <summary>
+        /// Appends a value of type <c>DateOnly?</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        /// <param name="format">The format string.</param>
+        public void AppendFormatted(DateOnly? value, string format)
+            => Message.InternalAppendValueType(value, format, ArgumentType.DateOnly);
+
+#endif
+
+#if NETCOREAPP
+
+        /// <summary>
+        /// Appends a value of type <c>TimeOnly</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        public void AppendFormatted(TimeOnly value)
+            => Message.InternalAppendValueType(value, ArgumentType.TimeOnly);
+
+        /// <summary>
+        /// Appends a value of type <c>TimeOnly?</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        public void AppendFormatted(TimeOnly? value)
+            => Message.InternalAppendValueType(value, ArgumentType.TimeOnly);
+
+        /// <summary>
+        /// Appends a value of type <c>TimeOnly</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        /// <param name="format">The format string.</param>
+        public void AppendFormatted(TimeOnly value, string format)
+            => Message.InternalAppendValueType(value, format, ArgumentType.TimeOnly);
+
+        /// <summary>
+        /// Appends a value of type <c>TimeOnly?</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        /// <param name="format">The format string.</param>
+        public void AppendFormatted(TimeOnly? value, string format)
+            => Message.InternalAppendValueType(value, format, ArgumentType.TimeOnly);
+
+#endif
 
         /// <summary>
         /// Appends an enum to the handler.
@@ -2032,6 +2168,74 @@ partial class Log
         public void AppendFormatted(TimeSpan? value, string format)
             => Message.InternalAppendValueType(value, format, ArgumentType.TimeSpan);
 
+#if NETCOREAPP
+
+        /// <summary>
+        /// Appends a value of type <c>DateOnly</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        public void AppendFormatted(DateOnly value)
+            => Message.InternalAppendValueType(value, ArgumentType.DateOnly);
+
+        /// <summary>
+        /// Appends a value of type <c>DateOnly?</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        public void AppendFormatted(DateOnly? value)
+            => Message.InternalAppendValueType(value, ArgumentType.DateOnly);
+
+        /// <summary>
+        /// Appends a value of type <c>DateOnly</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        /// <param name="format">The format string.</param>
+        public void AppendFormatted(DateOnly value, string format)
+            => Message.InternalAppendValueType(value, format, ArgumentType.DateOnly);
+
+        /// <summary>
+        /// Appends a value of type <c>DateOnly?</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        /// <param name="format">The format string.</param>
+        public void AppendFormatted(DateOnly? value, string format)
+            => Message.InternalAppendValueType(value, format, ArgumentType.DateOnly);
+
+#endif
+
+#if NETCOREAPP
+
+        /// <summary>
+        /// Appends a value of type <c>TimeOnly</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        public void AppendFormatted(TimeOnly value)
+            => Message.InternalAppendValueType(value, ArgumentType.TimeOnly);
+
+        /// <summary>
+        /// Appends a value of type <c>TimeOnly?</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        public void AppendFormatted(TimeOnly? value)
+            => Message.InternalAppendValueType(value, ArgumentType.TimeOnly);
+
+        /// <summary>
+        /// Appends a value of type <c>TimeOnly</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        /// <param name="format">The format string.</param>
+        public void AppendFormatted(TimeOnly value, string format)
+            => Message.InternalAppendValueType(value, format, ArgumentType.TimeOnly);
+
+        /// <summary>
+        /// Appends a value of type <c>TimeOnly?</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        /// <param name="format">The format string.</param>
+        public void AppendFormatted(TimeOnly? value, string format)
+            => Message.InternalAppendValueType(value, format, ArgumentType.TimeOnly);
+
+#endif
+
         /// <summary>
         /// Appends an enum to the handler.
         /// </summary>
@@ -2601,6 +2805,74 @@ partial class Log
         /// <param name="format">The format string.</param>
         public void AppendFormatted(TimeSpan? value, string format)
             => Message.InternalAppendValueType(value, format, ArgumentType.TimeSpan);
+
+#if NETCOREAPP
+
+        /// <summary>
+        /// Appends a value of type <c>DateOnly</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        public void AppendFormatted(DateOnly value)
+            => Message.InternalAppendValueType(value, ArgumentType.DateOnly);
+
+        /// <summary>
+        /// Appends a value of type <c>DateOnly?</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        public void AppendFormatted(DateOnly? value)
+            => Message.InternalAppendValueType(value, ArgumentType.DateOnly);
+
+        /// <summary>
+        /// Appends a value of type <c>DateOnly</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        /// <param name="format">The format string.</param>
+        public void AppendFormatted(DateOnly value, string format)
+            => Message.InternalAppendValueType(value, format, ArgumentType.DateOnly);
+
+        /// <summary>
+        /// Appends a value of type <c>DateOnly?</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        /// <param name="format">The format string.</param>
+        public void AppendFormatted(DateOnly? value, string format)
+            => Message.InternalAppendValueType(value, format, ArgumentType.DateOnly);
+
+#endif
+
+#if NETCOREAPP
+
+        /// <summary>
+        /// Appends a value of type <c>TimeOnly</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        public void AppendFormatted(TimeOnly value)
+            => Message.InternalAppendValueType(value, ArgumentType.TimeOnly);
+
+        /// <summary>
+        /// Appends a value of type <c>TimeOnly?</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        public void AppendFormatted(TimeOnly? value)
+            => Message.InternalAppendValueType(value, ArgumentType.TimeOnly);
+
+        /// <summary>
+        /// Appends a value of type <c>TimeOnly</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        /// <param name="format">The format string.</param>
+        public void AppendFormatted(TimeOnly value, string format)
+            => Message.InternalAppendValueType(value, format, ArgumentType.TimeOnly);
+
+        /// <summary>
+        /// Appends a value of type <c>TimeOnly?</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        /// <param name="format">The format string.</param>
+        public void AppendFormatted(TimeOnly? value, string format)
+            => Message.InternalAppendValueType(value, format, ArgumentType.TimeOnly);
+
+#endif
 
         /// <summary>
         /// Appends an enum to the handler.
@@ -3172,6 +3444,74 @@ partial class Log
         public void AppendFormatted(TimeSpan? value, string format)
             => Message.InternalAppendValueType(value, format, ArgumentType.TimeSpan);
 
+#if NETCOREAPP
+
+        /// <summary>
+        /// Appends a value of type <c>DateOnly</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        public void AppendFormatted(DateOnly value)
+            => Message.InternalAppendValueType(value, ArgumentType.DateOnly);
+
+        /// <summary>
+        /// Appends a value of type <c>DateOnly?</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        public void AppendFormatted(DateOnly? value)
+            => Message.InternalAppendValueType(value, ArgumentType.DateOnly);
+
+        /// <summary>
+        /// Appends a value of type <c>DateOnly</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        /// <param name="format">The format string.</param>
+        public void AppendFormatted(DateOnly value, string format)
+            => Message.InternalAppendValueType(value, format, ArgumentType.DateOnly);
+
+        /// <summary>
+        /// Appends a value of type <c>DateOnly?</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        /// <param name="format">The format string.</param>
+        public void AppendFormatted(DateOnly? value, string format)
+            => Message.InternalAppendValueType(value, format, ArgumentType.DateOnly);
+
+#endif
+
+#if NETCOREAPP
+
+        /// <summary>
+        /// Appends a value of type <c>TimeOnly</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        public void AppendFormatted(TimeOnly value)
+            => Message.InternalAppendValueType(value, ArgumentType.TimeOnly);
+
+        /// <summary>
+        /// Appends a value of type <c>TimeOnly?</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        public void AppendFormatted(TimeOnly? value)
+            => Message.InternalAppendValueType(value, ArgumentType.TimeOnly);
+
+        /// <summary>
+        /// Appends a value of type <c>TimeOnly</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        /// <param name="format">The format string.</param>
+        public void AppendFormatted(TimeOnly value, string format)
+            => Message.InternalAppendValueType(value, format, ArgumentType.TimeOnly);
+
+        /// <summary>
+        /// Appends a value of type <c>TimeOnly?</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        /// <param name="format">The format string.</param>
+        public void AppendFormatted(TimeOnly? value, string format)
+            => Message.InternalAppendValueType(value, format, ArgumentType.TimeOnly);
+
+#endif
+
         /// <summary>
         /// Appends an enum to the handler.
         /// </summary>
@@ -3741,6 +4081,74 @@ partial class Log
         /// <param name="format">The format string.</param>
         public void AppendFormatted(TimeSpan? value, string format)
             => Message.InternalAppendValueType(value, format, ArgumentType.TimeSpan);
+
+#if NETCOREAPP
+
+        /// <summary>
+        /// Appends a value of type <c>DateOnly</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        public void AppendFormatted(DateOnly value)
+            => Message.InternalAppendValueType(value, ArgumentType.DateOnly);
+
+        /// <summary>
+        /// Appends a value of type <c>DateOnly?</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        public void AppendFormatted(DateOnly? value)
+            => Message.InternalAppendValueType(value, ArgumentType.DateOnly);
+
+        /// <summary>
+        /// Appends a value of type <c>DateOnly</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        /// <param name="format">The format string.</param>
+        public void AppendFormatted(DateOnly value, string format)
+            => Message.InternalAppendValueType(value, format, ArgumentType.DateOnly);
+
+        /// <summary>
+        /// Appends a value of type <c>DateOnly?</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        /// <param name="format">The format string.</param>
+        public void AppendFormatted(DateOnly? value, string format)
+            => Message.InternalAppendValueType(value, format, ArgumentType.DateOnly);
+
+#endif
+
+#if NETCOREAPP
+
+        /// <summary>
+        /// Appends a value of type <c>TimeOnly</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        public void AppendFormatted(TimeOnly value)
+            => Message.InternalAppendValueType(value, ArgumentType.TimeOnly);
+
+        /// <summary>
+        /// Appends a value of type <c>TimeOnly?</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        public void AppendFormatted(TimeOnly? value)
+            => Message.InternalAppendValueType(value, ArgumentType.TimeOnly);
+
+        /// <summary>
+        /// Appends a value of type <c>TimeOnly</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        /// <param name="format">The format string.</param>
+        public void AppendFormatted(TimeOnly value, string format)
+            => Message.InternalAppendValueType(value, format, ArgumentType.TimeOnly);
+
+        /// <summary>
+        /// Appends a value of type <c>TimeOnly?</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        /// <param name="format">The format string.</param>
+        public void AppendFormatted(TimeOnly? value, string format)
+            => Message.InternalAppendValueType(value, format, ArgumentType.TimeOnly);
+
+#endif
 
         /// <summary>
         /// Appends an enum to the handler.
