@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Threading;
-using JetBrains.Annotations;
 using ZeroLog.Appenders;
 using ZeroLog.Formatting;
 
@@ -14,14 +13,10 @@ public class TestAppender : Appender
     private int _messageCountTarget;
 
     public List<string> LoggedMessages { get; } = new();
-    public int FlushCount { get; set; }
+    public int FlushCount { get; private set; }
+    public bool IsDisposed { get; private set; }
 
     public ManualResetEventSlim WaitOnWriteEvent { get; set; }
-
-    [UsedImplicitly]
-    public TestAppender()
-    {
-    }
 
     public TestAppender(bool captureLoggedMessages)
     {
@@ -52,5 +47,12 @@ public class TestAppender : Appender
         base.Flush();
 
         ++FlushCount;
+    }
+
+    public override void Dispose()
+    {
+        base.Dispose();
+
+        IsDisposed = true;
     }
 }

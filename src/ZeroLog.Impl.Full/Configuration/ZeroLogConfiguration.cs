@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using ZeroLog.Appenders;
 
@@ -12,6 +11,8 @@ namespace ZeroLog.Configuration;
 public sealed class ZeroLogConfiguration
 {
     internal static ZeroLogConfiguration Default { get; } = new();
+
+    internal event Action? ApplyChangesRequested;
 
     /// <summary>
     /// Count of pooled log messages. A log message is acquired from the pool on demand, and released by the logging thread.
@@ -45,7 +46,7 @@ public sealed class ZeroLogConfiguration
     /// <remarks>
     /// Default: false
     /// </remarks>
-    public bool AutoRegisterEnums { get; init; } = false;
+    public bool AutoRegisterEnums { get; set; } = false;
 
     /// <summary>
     /// The string which should be logged instead of a <c>null</c> value.
@@ -53,7 +54,7 @@ public sealed class ZeroLogConfiguration
     /// <remarks>
     /// Default: "null"
     /// </remarks>
-    public string NullDisplayString { get; init; } = "null";
+    public string NullDisplayString { get; set; } = "null";
 
     /// <summary>
     /// The string which is appended to a message when it is truncated.
@@ -61,7 +62,7 @@ public sealed class ZeroLogConfiguration
     /// <remarks>
     /// Default: " [TRUNCATED]"
     /// </remarks>
-    public string TruncatedMessageSuffix { get; init; } = " [TRUNCATED]";
+    public string TruncatedMessageSuffix { get; set; } = " [TRUNCATED]";
 
     /// <summary>
     /// The time an appender will be put into quarantine (not used to log messages) after it throws an exception.
@@ -69,7 +70,7 @@ public sealed class ZeroLogConfiguration
     /// <remarks>
     /// Default: 15 seconds
     /// </remarks>
-    public TimeSpan AppenderQuarantineDelay { get; init; } = TimeSpan.FromSeconds(15);
+    public TimeSpan AppenderQuarantineDelay { get; set; } = TimeSpan.FromSeconds(15);
 
     /// <summary>
     /// The configuration of the root logger.
@@ -77,7 +78,7 @@ public sealed class ZeroLogConfiguration
     /// <remarks>
     /// The root logger is the default logger. If <c>GetLogger</c> is called for a namespace which is not configured, it will fallback to the root logger.
     /// </remarks>
-    public RootLoggerConfiguration RootLogger { get; } = new();
+    public RootLoggerConfiguration RootLogger { get; private set; } = new();
 
     /// <summary>
     /// Configuration for logger namespaces (besides the root logger).
@@ -88,9 +89,19 @@ public sealed class ZeroLogConfiguration
     /// </remarks>
     public ICollection<LoggerConfiguration> Loggers { get; private set; } = new List<LoggerConfiguration>();
 
-    internal void ValidateAndFreeze()
+    /// <summary>
+    /// Applies the changes made to this object since the call to <see cref="LogManager.Initialize"/>
+    /// or the last call to <see cref="ApplyChanges"/>.
+    /// </summary>
+    /// <remarks>
+    /// This method allocates.
+    /// </remarks>
+    public void ApplyChanges()
+        => ApplyChangesRequested?.Invoke();
+
+    internal void Validate()
     {
-        RootLogger.ValidateAndFreeze();
+        RootLogger.Validate();
 
         var loggerNames = new HashSet<string>(StringComparer.Ordinal);
 
@@ -102,18 +113,24 @@ public sealed class ZeroLogConfiguration
             if (!loggerNames.Add(loggerConfig.Name))
                 throw new InvalidOperationException($"Multiple configurations defined for the following logger: {loggerConfig.Name}");
 
-            loggerConfig.ValidateAndFreeze();
+            loggerConfig.Validate();
         }
+    }
 
-        Loggers = ImmutableList.CreateRange(Loggers);
+    internal ZeroLogConfiguration Clone()
+    {
+        var clone = (ZeroLogConfiguration)MemberwiseClone();
+        clone.RootLogger = RootLogger.Clone();
+        clone.Loggers = Loggers.Select(i => i.Clone()).ToList();
+        return clone;
     }
 
     internal ResolvedLoggerConfiguration ResolveLoggerConfiguration(string loggerName)
         => ResolvedLoggerConfiguration.Resolve(loggerName, this);
 
-    internal IEnumerable<Appender> GetAllAppenders()
+    internal HashSet<Appender> GetAllAppenders()
         => RootLogger.Appenders
                      .Concat(Loggers.SelectMany(i => i.Appenders))
                      .Select(i => i.Appender)
-                     .DistinctBy(i => i, ReferenceEqualityComparer.Instance);
+                     .ToHashSet<Appender>(ReferenceEqualityComparer.Instance);
 }

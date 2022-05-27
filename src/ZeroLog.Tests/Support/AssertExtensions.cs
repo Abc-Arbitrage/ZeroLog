@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using JetBrains.Annotations;
 using NUnit.Framework;
 
@@ -65,4 +66,11 @@ internal static class AssertExtensions
 
     public static void ShouldBeLessThanOrEqualTo<T>(this T? actual, T expected)
         => Assert.That(actual, Is.LessThanOrEqualTo(expected));
+
+    public static T ShouldHaveSingleItem<T>(this IEnumerable<T>? actual)
+    {
+        var list = actual as ICollection<T> ?? actual.ShouldNotBeNull().ToList();
+        Assert.That(list.Count, Is.EqualTo(1));
+        return list.Single();
+    }
 }

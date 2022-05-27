@@ -10,9 +10,9 @@ namespace ZeroLog.Formatting;
 /// </summary>
 public sealed class LoggedMessage
 {
-    private readonly ZeroLogConfiguration _config;
     private readonly char[] _messageBuffer;
     private int _messageLength;
+    private ZeroLogConfiguration _config;
 
     private LogMessage _message = LogMessage.Empty;
 
@@ -64,6 +64,11 @@ public sealed class LoggedMessage
         {
             HandleFormattingError(ex);
         }
+    }
+
+    internal void UpdateConfiguration(ZeroLogConfiguration config)
+    {
+        _config = config;
     }
 
     [MethodImpl(MethodImplOptions.NoInlining)]

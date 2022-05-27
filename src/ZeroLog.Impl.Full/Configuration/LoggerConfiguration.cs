@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
+using System.Linq;
 using ZeroLog.Appenders;
 
 namespace ZeroLog.Configuration;
@@ -23,7 +23,7 @@ public sealed class LoggerConfiguration : ILoggerConfiguration
     /// <remarks>
     /// The level of the parent logger is inherited by default.
     /// </remarks>
-    public LogLevel? Level { get; init; }
+    public LogLevel? Level { get; set; }
 
     /// <summary>
     /// The strategy to apply on log message pool exhaustion.
@@ -31,7 +31,7 @@ public sealed class LoggerConfiguration : ILoggerConfiguration
     /// <remarks>
     /// The strategy of the parent logger is inherited by default.
     /// </remarks>
-    public LogMessagePoolExhaustionStrategy? LogMessagePoolExhaustionStrategy { get; init; }
+    public LogMessagePoolExhaustionStrategy? LogMessagePoolExhaustionStrategy { get; set; }
 
     /// <summary>
     /// Indicate whether appenders defined on parent levels should be included.
@@ -39,7 +39,7 @@ public sealed class LoggerConfiguration : ILoggerConfiguration
     /// <remarks>
     /// True by default.
     /// </remarks>
-    public bool IncludeParentAppenders { get; init; } = true;
+    public bool IncludeParentAppenders { get; set; } = true;
 
     /// <summary>
     /// The appenders to use for this level.
@@ -68,7 +68,7 @@ public sealed class LoggerConfiguration : ILoggerConfiguration
     {
     }
 
-    internal void ValidateAndFreeze()
+    internal void Validate()
     {
         var appenderRefs = new HashSet<Appender>(ReferenceEqualityComparer.Instance);
 
@@ -77,8 +77,13 @@ public sealed class LoggerConfiguration : ILoggerConfiguration
             if (!appenderRefs.Add(appenderRef.Appender))
                 throw new InvalidOperationException($"Multiple appender configurations for the same appender instance (of type {appenderRef.Appender.GetType()}) defined in the following logger configuration: {Name}");
         }
+    }
 
-        Appenders = ImmutableList.CreateRange(Appenders);
+    internal LoggerConfiguration Clone()
+    {
+        var clone = (LoggerConfiguration)MemberwiseClone();
+        clone.Appenders = Appenders.Select(i => i.Clone()).ToList();
+        return clone;
     }
 }
 
@@ -110,7 +115,7 @@ public sealed class RootLoggerConfiguration : ILoggerConfiguration
     LogMessagePoolExhaustionStrategy? ILoggerConfiguration.LogMessagePoolExhaustionStrategy => LogMessagePoolExhaustionStrategy;
     bool ILoggerConfiguration.IncludeParentAppenders => false;
 
-    internal void ValidateAndFreeze()
+    internal void Validate()
     {
         var appenderRefs = new HashSet<Appender>(ReferenceEqualityComparer.Instance);
 
@@ -119,8 +124,13 @@ public sealed class RootLoggerConfiguration : ILoggerConfiguration
             if (!appenderRefs.Add(appenderRef.Appender))
                 throw new InvalidOperationException($"Multiple appender configurations for the same appender instance (of type {appenderRef.Appender.GetType()}) defined in the root logger configuration.");
         }
+    }
 
-        Appenders = ImmutableList.CreateRange(Appenders);
+    internal RootLoggerConfiguration Clone()
+    {
+        var clone = (RootLoggerConfiguration)MemberwiseClone();
+        clone.Appenders = Appenders.Select(i => i.Clone()).ToList();
+        return clone;
     }
 }
 

@@ -14,9 +14,11 @@ partial class LogManager : ILogMessageProvider, IDisposable
 
     private static LogManager? _staticLogManager;
 
-    private readonly ZeroLogConfiguration _config;
     private readonly ConcurrentQueue<LogMessage> _queue;
     private readonly ObjectPool<LogMessage> _pool;
+
+    private readonly ZeroLogConfiguration _originalConfig; // Reference to the configuration object supplied by the user
+    private ZeroLogConfiguration _config; // Snapshot of the current configuration
 
     private readonly AppenderThread _appenderThread;
 
@@ -24,7 +26,8 @@ partial class LogManager : ILogMessageProvider, IDisposable
 
     private LogManager(ZeroLogConfiguration config)
     {
-        _config = config;
+        _originalConfig = config;
+        _config = config.Clone();
 
         _queue = new ConcurrentQueue<LogMessage>(new ConcurrentQueueCapacityInitializer(config.LogMessagePoolSize));
 
@@ -37,6 +40,8 @@ partial class LogManager : ILogMessageProvider, IDisposable
 
         // Instantiate this last
         _appenderThread = new AppenderThread(this);
+
+        _originalConfig.ApplyChangesRequested += ApplyConfigurationChanges;
     }
 
     /// <summary>
@@ -50,6 +55,7 @@ partial class LogManager : ILogMessageProvider, IDisposable
         _isRunning = false;
         Interlocked.CompareExchange(ref _staticLogManager, null, this);
 
+        _originalConfig.ApplyChangesRequested -= ApplyConfigurationChanges;
         ResetAllLogConfigurations();
 
         _pool.Clear();
@@ -68,9 +74,14 @@ partial class LogManager : ILogMessageProvider, IDisposable
     /// <param name="configuration">The configuration to use.</param>
     /// <returns>A disposable which shuts down ZeroLog upon disposal.</returns>
     /// <exception cref="InvalidOperationException">ZeroLog is already initialized.</exception>
+    /// <remarks>
+    /// Any changes to the <paramref name="configuration"/> object will only be taken into account after calling <see cref="ZeroLogConfiguration.ApplyChanges"/>.
+    /// </remarks>
     public static IDisposable Initialize(ZeroLogConfiguration configuration)
     {
-        configuration.ValidateAndFreeze();
+        ArgumentNullException.ThrowIfNull(configuration);
+
+        configuration.Validate();
 
         if (_staticLogManager is not null)
             throw new InvalidOperationException("LogManager is already initialized.");
@@ -167,6 +178,17 @@ partial class LogManager : ILogMessageProvider, IDisposable
             );
     }
 
+    private void ApplyConfigurationChanges()
+    {
+        var newConfig = _originalConfig.Clone();
+        newConfig.Validate();
+
+        _config = newConfig;
+
+        UpdateAllLogConfigurations();
+        _appenderThread.UpdateConfiguration(_config);
+    }
+
     internal void UpdateLogConfiguration(Log log)
         => log.UpdateConfiguration(this, _config.ResolveLoggerConfiguration(log.Name));
 
@@ -181,6 +203,9 @@ partial class LogManager : ILogMessageProvider, IDisposable
         foreach (var log in _loggers.Values)
             log.UpdateConfiguration(null, null);
     }
+
+    internal void WaitUntilNewConfigurationIsApplied()
+        => _appenderThread.WaitUntilNewConfigurationIsApplied();
 
     LogMessage? ILogMessageProvider.TryAcquireLogMessage()
     {
