@@ -26,6 +26,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Text;
 using NUnit.Framework;
 using ZeroLog.Configuration;
 using ZeroLog.Tests.Support;
@@ -92,6 +93,28 @@ partial class LogTests
     public void should_log_interpolated_String_<#= logLevel #>()
     {
         _log.<#= logLevel #>($"foo {NoInline("bar")} baz {NoInline("foobar")}");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.<#= logLevel #>);
+        message.ToString().ShouldEqual("foo bar baz foobar");
+        message.Exception.ShouldBeNull();
+    }
+
+    [Test]
+    public void should_log_interpolated_String_Span_<#= logLevel #>()
+    {
+        _log.<#= logLevel #>($"foo {"bar".AsSpan()} baz {"foobar".AsSpan()}");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.<#= logLevel #>);
+        message.ToString().ShouldEqual("foo bar baz foobar");
+        message.Exception.ShouldBeNull();
+    }
+
+    [Test]
+    public void should_log_interpolated_Utf8_String_Span_<#= logLevel #>()
+    {
+        _log.<#= logLevel #>($"foo {Encoding.UTF8.GetBytes("bar")} baz {Encoding.UTF8.GetBytes("foobar").AsSpan()}");
 
         var message = _provider.GetSubmittedMessage();
         message.Level.ShouldEqual(LogLevel.<#= logLevel #>);

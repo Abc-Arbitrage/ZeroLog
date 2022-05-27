@@ -62,20 +62,20 @@ public class DefaultFormatterTests
     }
 
     [Test]
-    public void should_format_json_ascii_string_char()
+    public void should_format_json_string_span_char()
     {
         _logMessage.Append("Foo")
-                   .AppendKeyValueAscii("Hello", "World")
+                   .AppendKeyValue("Hello", "World".AsSpan())
                    .Append("Bar");
 
         GetFormattedSimple().ShouldEqual(@"FooBar ~~ { ""Hello"": ""World"" }");
     }
 
     [Test]
-    public void should_format_json_ascii_string_byte()
+    public void should_format_json_string_span_byte()
     {
         _logMessage.Append("Foo")
-                   .AppendKeyValueAscii("Hello", Encoding.ASCII.GetBytes("World"))
+                   .AppendKeyValue("Hello", Encoding.UTF8.GetBytes("World"))
                    .Append("Bar");
 
         GetFormattedSimple().ShouldEqual(@"FooBar ~~ { ""Hello"": ""World"" }");

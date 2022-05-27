@@ -136,7 +136,7 @@ There are currently three strategies to handle a full queue scenario:
 These values can be configured directly in `ZeroLogConfiguration`:
 
  - `LogMessagePoolSize` (default: `1024`) - Count of pooled log messages. A log message is acquired from the pool on demand, and released by the logging thread.
- - `LogMessageBufferSize` (default: `128`) - The size of the buffer used to serialize log message arguments. Once exceeded, the message is truncated. All `Append` calls use a few bytes, except for `AppendAsciiString` which copies the whole string into the buffer.
+ - `LogMessageBufferSize` (default: `128`) - The size of the buffer used to serialize log message arguments. Once exceeded, the message is truncated. All `Append` calls use a few bytes, except for those with a `ReadOnlySpan` parameter, which copy the whole data into the buffer.
  - `LogMessageStringCapacity` (default: `32`) - The maximum number of `Append` calls which involve `string` objects that can be made for a log message. Note that `string` objects are also used for format strings.
 
 ### Other Settings

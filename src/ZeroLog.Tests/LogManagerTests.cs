@@ -28,6 +28,7 @@ public partial class LogManagerTests
         _config = new ZeroLogConfiguration
         {
             LogMessagePoolSize = 10,
+            LogMessageBufferSize = 256,
             RootLogger =
             {
                 Appenders = { _testAppender }
@@ -214,7 +215,8 @@ public partial class LogManagerTests
            .Append(guid, "meh, this is going to break formatting")
            .Append(date)
            .Append(timespan)
-           .AppendAsciiString(new[] { (byte)'a', (byte)'b', (byte)'c' })
+           .Append(new[] { 'a', 'b', 'c' })
+           .Append(new[] { (byte)'d', (byte)'e', (byte)'f' })
            .AppendEnum(DayOfWeek.Friday)
            .Log();
 
@@ -224,6 +226,7 @@ public partial class LogManagerTests
         logMessage.ShouldContain("An error occurred during formatting:");
         logMessage.ShouldContain(guid.ToString(null, CultureInfo.InvariantCulture));
         logMessage.ShouldContain("abc");
+        logMessage.ShouldContain("def");
         logMessage.ShouldContain(nameof(DayOfWeek.Friday));
     }
 

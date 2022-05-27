@@ -40,22 +40,22 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends an ASCII string to the message.
+    /// Appends a string span to the message. This will copy the span and use buffer space.
     /// </summary>
     /// <param name="value">The value to append.</param>
-    public LogMessage AppendAsciiString(ReadOnlySpan<char> value)
+    public LogMessage Append(ReadOnlySpan<char> value)
     {
-        InternalAppendAsciiString(value);
+        InternalAppendStringSpan(value);
         return this;
     }
 
     /// <summary>
-    /// Appends an ASCII string represented as bytes to the message.
+    /// Appends an UTF-8 string to the message. This will copy the span and use buffer space.
     /// </summary>
     /// <param name="value">The value to append.</param>
-    public LogMessage AppendAsciiString(ReadOnlySpan<byte> value)
+    public LogMessage Append(ReadOnlySpan<byte> value)
     {
-        InternalAppendAsciiString(value);
+        InternalAppendUtf8StringSpan(value);
         return this;
     }
 
@@ -87,10 +87,10 @@ partial class LogMessage
         where T : struct, Enum;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private partial void InternalAppendAsciiString(ReadOnlySpan<char> value);
+    internal partial void InternalAppendStringSpan(ReadOnlySpan<char> value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private partial void InternalAppendAsciiString(ReadOnlySpan<byte> value);
+    internal partial void InternalAppendUtf8StringSpan(ReadOnlySpan<byte> value);
 
 #if NETSTANDARD
 
@@ -128,11 +128,11 @@ partial class LogMessage
     {
     }
 
-    private partial void InternalAppendAsciiString(ReadOnlySpan<char> value)
+    internal partial void InternalAppendStringSpan(ReadOnlySpan<char> value)
     {
     }
 
-    private partial void InternalAppendAsciiString(ReadOnlySpan<byte> value)
+    internal partial void InternalAppendUtf8StringSpan(ReadOnlySpan<byte> value)
     {
     }
 
