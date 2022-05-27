@@ -91,22 +91,23 @@ partial class LogManager
                     continue;
                 }
 
-                if (flush && spinWait.NextSpinWillYield)
+                if (spinWait.NextSpinWillYield)
                 {
-                    FlushAppenders();
-                    flush = false;
+                    if (flush)
+                    {
+                        FlushAppenders();
+                        flush = false;
+                        continue;
+                    }
+
+                    if (TryApplyConfigurationUpdate())
+                        continue;
                 }
-                else if (_nextConfig is not null)
-                {
-                    ApplyConfigurationUpdate();
-                }
-                else
-                {
-                    spinWait.SpinOnce();
-                }
+
+                spinWait.SpinOnce();
             }
 
-            ApplyConfigurationUpdate(); // Make sure any new appenders are taken into account before disposal
+            TryApplyConfigurationUpdate(); // Make sure any new appenders are taken into account before disposal
             FlushAppenders();
         }
 
@@ -140,13 +141,20 @@ partial class LogManager
                 appender.InternalFlush();
         }
 
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        private void ApplyConfigurationUpdate()
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private bool TryApplyConfigurationUpdate()
         {
             var newConfig = Interlocked.Exchange(ref _nextConfig, null);
             if (newConfig is null)
-                return;
+                return false;
 
+            ApplyConfigurationUpdate(newConfig);
+            return true;
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private void ApplyConfigurationUpdate(ZeroLogConfiguration newConfig)
+        {
             _config = newConfig;
 
             // We could dispose the appenders that are no longer present in the new configuration right now,
