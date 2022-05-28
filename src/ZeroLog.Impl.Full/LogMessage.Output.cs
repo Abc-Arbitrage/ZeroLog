@@ -10,8 +10,6 @@ namespace ZeroLog;
 
 unsafe partial class LogMessage
 {
-    private static readonly UTF8Encoding _utf8Encoding = new(false, false);
-
     [SuppressMessage("ReSharper", "ReplaceSliceWithRangeIndexer")]
     internal int WriteTo(Span<char> outputBuffer,
                          ZeroLogConfiguration config,
@@ -366,10 +364,10 @@ unsafe partial class LogMessage
 
                 var valueBytes = new ReadOnlySpan<byte>(dataPointer, lengthInBytes);
 
-                var maxChars = _utf8Encoding.GetMaxCharCount(valueBytes.Length);
+                var maxChars = Encoding.UTF8.GetMaxCharCount(valueBytes.Length);
                 if (maxChars > outputBuffer.Length)
                 {
-                    var charCount = _utf8Encoding.GetCharCount(valueBytes);
+                    var charCount = Encoding.UTF8.GetCharCount(valueBytes);
                     if (charCount > outputBuffer.Length)
                     {
                         // There's currently no API that would truncate the string instead of throwing, so drop the value altogether.
@@ -379,7 +377,7 @@ unsafe partial class LogMessage
                     }
                 }
 
-                charsWritten = _utf8Encoding.GetChars(valueBytes, outputBuffer);
+                charsWritten = Encoding.UTF8.GetChars(valueBytes, outputBuffer);
                 dataPointer += lengthInBytes;
                 return true;
             }

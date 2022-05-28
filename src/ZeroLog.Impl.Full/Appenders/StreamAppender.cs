@@ -12,7 +12,7 @@ public abstract class StreamAppender : Appender
 {
     private byte[] _byteBuffer = Array.Empty<byte>();
 
-    private Encoding _encoding = new UTF8Encoding(false, false);
+    private Encoding _encoding = Encoding.UTF8;
     private Formatter? _formatter;
 
     /// <summary>
