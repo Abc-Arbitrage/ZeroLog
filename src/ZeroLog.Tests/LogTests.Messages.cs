@@ -906,6 +906,98 @@ partial class LogTests
     }
 
     [Test]
+    public void should_log_DateOnly_Trace()
+    {
+        _log.Trace($"foo {TestValues.DateOnly} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Trace);
+        message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.DateOnly} bar"));
+    }
+
+    [Test]
+    public void should_log_DateOnly_Trace_nullable()
+    {
+        _log.Trace($"foo {(DateOnly?)TestValues.DateOnly} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Trace);
+        message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.DateOnly} bar"));
+    }
+
+    [Test]
+    public void should_log_DateOnly_Trace_formatted()
+    {
+        _log.Trace($"foo {TestValues.DateOnly:yyyy-MM-dd} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Trace);
+        message.ToString().ShouldEqual($"foo {TestValues.DateOnly.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)} bar");
+    }
+
+    [Test]
+    public void should_log_DateOnly_Trace_nullable_formatted()
+    {
+        _log.Trace($"foo {(DateOnly?)TestValues.DateOnly:yyyy-MM-dd} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Trace);
+        message.ToString().ShouldEqual($"foo {TestValues.DateOnly.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)} bar");
+    }
+
+    [Test]
+    public void should_not_allocate_DateOnly_Trace()
+    {
+        GcTester.ShouldNotAllocate(() => _log.Trace($"foo {TestValues.DateOnly} bar"));
+    }
+
+    [Test]
+    public void should_log_TimeOnly_Trace()
+    {
+        _log.Trace($"foo {TestValues.TimeOnly} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Trace);
+        message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.TimeOnly} bar"));
+    }
+
+    [Test]
+    public void should_log_TimeOnly_Trace_nullable()
+    {
+        _log.Trace($"foo {(TimeOnly?)TestValues.TimeOnly} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Trace);
+        message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.TimeOnly} bar"));
+    }
+
+    [Test]
+    public void should_log_TimeOnly_Trace_formatted()
+    {
+        _log.Trace($"foo {TestValues.TimeOnly:t} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Trace);
+        message.ToString().ShouldEqual($"foo {TestValues.TimeOnly.ToString("t", CultureInfo.InvariantCulture)} bar");
+    }
+
+    [Test]
+    public void should_log_TimeOnly_Trace_nullable_formatted()
+    {
+        _log.Trace($"foo {(TimeOnly?)TestValues.TimeOnly:t} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Trace);
+        message.ToString().ShouldEqual($"foo {TestValues.TimeOnly.ToString("t", CultureInfo.InvariantCulture)} bar");
+    }
+
+    [Test]
+    public void should_not_allocate_TimeOnly_Trace()
+    {
+        GcTester.ShouldNotAllocate(() => _log.Trace($"foo {TestValues.TimeOnly} bar"));
+    }
+
+    [Test]
     public void should_log_Enum_Trace()
     {
         _log.Trace($"foo {DayOfWeek.Friday} bar");
@@ -1838,6 +1930,98 @@ partial class LogTests
     public void should_not_allocate_TimeSpan_Debug()
     {
         GcTester.ShouldNotAllocate(() => _log.Debug($"foo {TestValues.TimeSpan} bar"));
+    }
+
+    [Test]
+    public void should_log_DateOnly_Debug()
+    {
+        _log.Debug($"foo {TestValues.DateOnly} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Debug);
+        message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.DateOnly} bar"));
+    }
+
+    [Test]
+    public void should_log_DateOnly_Debug_nullable()
+    {
+        _log.Debug($"foo {(DateOnly?)TestValues.DateOnly} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Debug);
+        message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.DateOnly} bar"));
+    }
+
+    [Test]
+    public void should_log_DateOnly_Debug_formatted()
+    {
+        _log.Debug($"foo {TestValues.DateOnly:yyyy-MM-dd} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Debug);
+        message.ToString().ShouldEqual($"foo {TestValues.DateOnly.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)} bar");
+    }
+
+    [Test]
+    public void should_log_DateOnly_Debug_nullable_formatted()
+    {
+        _log.Debug($"foo {(DateOnly?)TestValues.DateOnly:yyyy-MM-dd} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Debug);
+        message.ToString().ShouldEqual($"foo {TestValues.DateOnly.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)} bar");
+    }
+
+    [Test]
+    public void should_not_allocate_DateOnly_Debug()
+    {
+        GcTester.ShouldNotAllocate(() => _log.Debug($"foo {TestValues.DateOnly} bar"));
+    }
+
+    [Test]
+    public void should_log_TimeOnly_Debug()
+    {
+        _log.Debug($"foo {TestValues.TimeOnly} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Debug);
+        message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.TimeOnly} bar"));
+    }
+
+    [Test]
+    public void should_log_TimeOnly_Debug_nullable()
+    {
+        _log.Debug($"foo {(TimeOnly?)TestValues.TimeOnly} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Debug);
+        message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.TimeOnly} bar"));
+    }
+
+    [Test]
+    public void should_log_TimeOnly_Debug_formatted()
+    {
+        _log.Debug($"foo {TestValues.TimeOnly:t} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Debug);
+        message.ToString().ShouldEqual($"foo {TestValues.TimeOnly.ToString("t", CultureInfo.InvariantCulture)} bar");
+    }
+
+    [Test]
+    public void should_log_TimeOnly_Debug_nullable_formatted()
+    {
+        _log.Debug($"foo {(TimeOnly?)TestValues.TimeOnly:t} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Debug);
+        message.ToString().ShouldEqual($"foo {TestValues.TimeOnly.ToString("t", CultureInfo.InvariantCulture)} bar");
+    }
+
+    [Test]
+    public void should_not_allocate_TimeOnly_Debug()
+    {
+        GcTester.ShouldNotAllocate(() => _log.Debug($"foo {TestValues.TimeOnly} bar"));
     }
 
     [Test]
@@ -2776,6 +2960,98 @@ partial class LogTests
     }
 
     [Test]
+    public void should_log_DateOnly_Info()
+    {
+        _log.Info($"foo {TestValues.DateOnly} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Info);
+        message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.DateOnly} bar"));
+    }
+
+    [Test]
+    public void should_log_DateOnly_Info_nullable()
+    {
+        _log.Info($"foo {(DateOnly?)TestValues.DateOnly} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Info);
+        message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.DateOnly} bar"));
+    }
+
+    [Test]
+    public void should_log_DateOnly_Info_formatted()
+    {
+        _log.Info($"foo {TestValues.DateOnly:yyyy-MM-dd} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Info);
+        message.ToString().ShouldEqual($"foo {TestValues.DateOnly.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)} bar");
+    }
+
+    [Test]
+    public void should_log_DateOnly_Info_nullable_formatted()
+    {
+        _log.Info($"foo {(DateOnly?)TestValues.DateOnly:yyyy-MM-dd} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Info);
+        message.ToString().ShouldEqual($"foo {TestValues.DateOnly.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)} bar");
+    }
+
+    [Test]
+    public void should_not_allocate_DateOnly_Info()
+    {
+        GcTester.ShouldNotAllocate(() => _log.Info($"foo {TestValues.DateOnly} bar"));
+    }
+
+    [Test]
+    public void should_log_TimeOnly_Info()
+    {
+        _log.Info($"foo {TestValues.TimeOnly} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Info);
+        message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.TimeOnly} bar"));
+    }
+
+    [Test]
+    public void should_log_TimeOnly_Info_nullable()
+    {
+        _log.Info($"foo {(TimeOnly?)TestValues.TimeOnly} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Info);
+        message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.TimeOnly} bar"));
+    }
+
+    [Test]
+    public void should_log_TimeOnly_Info_formatted()
+    {
+        _log.Info($"foo {TestValues.TimeOnly:t} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Info);
+        message.ToString().ShouldEqual($"foo {TestValues.TimeOnly.ToString("t", CultureInfo.InvariantCulture)} bar");
+    }
+
+    [Test]
+    public void should_log_TimeOnly_Info_nullable_formatted()
+    {
+        _log.Info($"foo {(TimeOnly?)TestValues.TimeOnly:t} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Info);
+        message.ToString().ShouldEqual($"foo {TestValues.TimeOnly.ToString("t", CultureInfo.InvariantCulture)} bar");
+    }
+
+    [Test]
+    public void should_not_allocate_TimeOnly_Info()
+    {
+        GcTester.ShouldNotAllocate(() => _log.Info($"foo {TestValues.TimeOnly} bar"));
+    }
+
+    [Test]
     public void should_log_Enum_Info()
     {
         _log.Info($"foo {DayOfWeek.Friday} bar");
@@ -3708,6 +3984,98 @@ partial class LogTests
     public void should_not_allocate_TimeSpan_Warn()
     {
         GcTester.ShouldNotAllocate(() => _log.Warn($"foo {TestValues.TimeSpan} bar"));
+    }
+
+    [Test]
+    public void should_log_DateOnly_Warn()
+    {
+        _log.Warn($"foo {TestValues.DateOnly} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Warn);
+        message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.DateOnly} bar"));
+    }
+
+    [Test]
+    public void should_log_DateOnly_Warn_nullable()
+    {
+        _log.Warn($"foo {(DateOnly?)TestValues.DateOnly} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Warn);
+        message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.DateOnly} bar"));
+    }
+
+    [Test]
+    public void should_log_DateOnly_Warn_formatted()
+    {
+        _log.Warn($"foo {TestValues.DateOnly:yyyy-MM-dd} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Warn);
+        message.ToString().ShouldEqual($"foo {TestValues.DateOnly.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)} bar");
+    }
+
+    [Test]
+    public void should_log_DateOnly_Warn_nullable_formatted()
+    {
+        _log.Warn($"foo {(DateOnly?)TestValues.DateOnly:yyyy-MM-dd} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Warn);
+        message.ToString().ShouldEqual($"foo {TestValues.DateOnly.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)} bar");
+    }
+
+    [Test]
+    public void should_not_allocate_DateOnly_Warn()
+    {
+        GcTester.ShouldNotAllocate(() => _log.Warn($"foo {TestValues.DateOnly} bar"));
+    }
+
+    [Test]
+    public void should_log_TimeOnly_Warn()
+    {
+        _log.Warn($"foo {TestValues.TimeOnly} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Warn);
+        message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.TimeOnly} bar"));
+    }
+
+    [Test]
+    public void should_log_TimeOnly_Warn_nullable()
+    {
+        _log.Warn($"foo {(TimeOnly?)TestValues.TimeOnly} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Warn);
+        message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.TimeOnly} bar"));
+    }
+
+    [Test]
+    public void should_log_TimeOnly_Warn_formatted()
+    {
+        _log.Warn($"foo {TestValues.TimeOnly:t} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Warn);
+        message.ToString().ShouldEqual($"foo {TestValues.TimeOnly.ToString("t", CultureInfo.InvariantCulture)} bar");
+    }
+
+    [Test]
+    public void should_log_TimeOnly_Warn_nullable_formatted()
+    {
+        _log.Warn($"foo {(TimeOnly?)TestValues.TimeOnly:t} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Warn);
+        message.ToString().ShouldEqual($"foo {TestValues.TimeOnly.ToString("t", CultureInfo.InvariantCulture)} bar");
+    }
+
+    [Test]
+    public void should_not_allocate_TimeOnly_Warn()
+    {
+        GcTester.ShouldNotAllocate(() => _log.Warn($"foo {TestValues.TimeOnly} bar"));
     }
 
     [Test]
@@ -4646,6 +5014,98 @@ partial class LogTests
     }
 
     [Test]
+    public void should_log_DateOnly_Error()
+    {
+        _log.Error($"foo {TestValues.DateOnly} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Error);
+        message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.DateOnly} bar"));
+    }
+
+    [Test]
+    public void should_log_DateOnly_Error_nullable()
+    {
+        _log.Error($"foo {(DateOnly?)TestValues.DateOnly} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Error);
+        message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.DateOnly} bar"));
+    }
+
+    [Test]
+    public void should_log_DateOnly_Error_formatted()
+    {
+        _log.Error($"foo {TestValues.DateOnly:yyyy-MM-dd} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Error);
+        message.ToString().ShouldEqual($"foo {TestValues.DateOnly.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)} bar");
+    }
+
+    [Test]
+    public void should_log_DateOnly_Error_nullable_formatted()
+    {
+        _log.Error($"foo {(DateOnly?)TestValues.DateOnly:yyyy-MM-dd} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Error);
+        message.ToString().ShouldEqual($"foo {TestValues.DateOnly.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)} bar");
+    }
+
+    [Test]
+    public void should_not_allocate_DateOnly_Error()
+    {
+        GcTester.ShouldNotAllocate(() => _log.Error($"foo {TestValues.DateOnly} bar"));
+    }
+
+    [Test]
+    public void should_log_TimeOnly_Error()
+    {
+        _log.Error($"foo {TestValues.TimeOnly} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Error);
+        message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.TimeOnly} bar"));
+    }
+
+    [Test]
+    public void should_log_TimeOnly_Error_nullable()
+    {
+        _log.Error($"foo {(TimeOnly?)TestValues.TimeOnly} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Error);
+        message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.TimeOnly} bar"));
+    }
+
+    [Test]
+    public void should_log_TimeOnly_Error_formatted()
+    {
+        _log.Error($"foo {TestValues.TimeOnly:t} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Error);
+        message.ToString().ShouldEqual($"foo {TestValues.TimeOnly.ToString("t", CultureInfo.InvariantCulture)} bar");
+    }
+
+    [Test]
+    public void should_log_TimeOnly_Error_nullable_formatted()
+    {
+        _log.Error($"foo {(TimeOnly?)TestValues.TimeOnly:t} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Error);
+        message.ToString().ShouldEqual($"foo {TestValues.TimeOnly.ToString("t", CultureInfo.InvariantCulture)} bar");
+    }
+
+    [Test]
+    public void should_not_allocate_TimeOnly_Error()
+    {
+        GcTester.ShouldNotAllocate(() => _log.Error($"foo {TestValues.TimeOnly} bar"));
+    }
+
+    [Test]
     public void should_log_Enum_Error()
     {
         _log.Error($"foo {DayOfWeek.Friday} bar");
@@ -5578,6 +6038,98 @@ partial class LogTests
     public void should_not_allocate_TimeSpan_Fatal()
     {
         GcTester.ShouldNotAllocate(() => _log.Fatal($"foo {TestValues.TimeSpan} bar"));
+    }
+
+    [Test]
+    public void should_log_DateOnly_Fatal()
+    {
+        _log.Fatal($"foo {TestValues.DateOnly} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Fatal);
+        message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.DateOnly} bar"));
+    }
+
+    [Test]
+    public void should_log_DateOnly_Fatal_nullable()
+    {
+        _log.Fatal($"foo {(DateOnly?)TestValues.DateOnly} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Fatal);
+        message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.DateOnly} bar"));
+    }
+
+    [Test]
+    public void should_log_DateOnly_Fatal_formatted()
+    {
+        _log.Fatal($"foo {TestValues.DateOnly:yyyy-MM-dd} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Fatal);
+        message.ToString().ShouldEqual($"foo {TestValues.DateOnly.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)} bar");
+    }
+
+    [Test]
+    public void should_log_DateOnly_Fatal_nullable_formatted()
+    {
+        _log.Fatal($"foo {(DateOnly?)TestValues.DateOnly:yyyy-MM-dd} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Fatal);
+        message.ToString().ShouldEqual($"foo {TestValues.DateOnly.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)} bar");
+    }
+
+    [Test]
+    public void should_not_allocate_DateOnly_Fatal()
+    {
+        GcTester.ShouldNotAllocate(() => _log.Fatal($"foo {TestValues.DateOnly} bar"));
+    }
+
+    [Test]
+    public void should_log_TimeOnly_Fatal()
+    {
+        _log.Fatal($"foo {TestValues.TimeOnly} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Fatal);
+        message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.TimeOnly} bar"));
+    }
+
+    [Test]
+    public void should_log_TimeOnly_Fatal_nullable()
+    {
+        _log.Fatal($"foo {(TimeOnly?)TestValues.TimeOnly} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Fatal);
+        message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.TimeOnly} bar"));
+    }
+
+    [Test]
+    public void should_log_TimeOnly_Fatal_formatted()
+    {
+        _log.Fatal($"foo {TestValues.TimeOnly:t} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Fatal);
+        message.ToString().ShouldEqual($"foo {TestValues.TimeOnly.ToString("t", CultureInfo.InvariantCulture)} bar");
+    }
+
+    [Test]
+    public void should_log_TimeOnly_Fatal_nullable_formatted()
+    {
+        _log.Fatal($"foo {(TimeOnly?)TestValues.TimeOnly:t} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Fatal);
+        message.ToString().ShouldEqual($"foo {TestValues.TimeOnly.ToString("t", CultureInfo.InvariantCulture)} bar");
+    }
+
+    [Test]
+    public void should_not_allocate_TimeOnly_Fatal()
+    {
+        GcTester.ShouldNotAllocate(() => _log.Fatal($"foo {TestValues.TimeOnly} bar"));
     }
 
     [Test]

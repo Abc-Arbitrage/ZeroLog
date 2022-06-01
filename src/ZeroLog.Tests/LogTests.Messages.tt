@@ -20,7 +20,9 @@
         { "Decimal", "F4" },
         { "Guid", "B" },
         { "DateTime", "yyyy-MM-dd" },
-        { "TimeSpan", "g" }
+        { "TimeSpan", "g" },
+        { "DateOnly", "yyyy-MM-dd" },
+        { "TimeOnly", "t" }
     };
 #>
 using System;

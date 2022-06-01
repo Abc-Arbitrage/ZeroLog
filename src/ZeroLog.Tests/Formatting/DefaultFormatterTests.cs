@@ -291,7 +291,7 @@ public class DefaultFormatterTests
     [Test]
     public void should_format_json_time()
     {
-        var value = new TimeSpan(0, 1, 2, 3, 4);
+        var value = new TimeSpan(0, 14, 15, 16, 17);
 
         _logMessage.Append("Foo")
                    .AppendKeyValue("Hello", value)
@@ -299,7 +299,35 @@ public class DefaultFormatterTests
                    .AppendKeyValue("Null", (TimeSpan?)null)
                    .Append("Bar");
 
-        GetFormattedSimple().ShouldEqual(@"FooBar ~~ { ""Hello"": ""01:02:03.0040000"", ""World"": ""01:02:03.0040000"", ""Null"": null }");
+        GetFormattedSimple().ShouldEqual(@"FooBar ~~ { ""Hello"": ""14:15:16.0170000"", ""World"": ""14:15:16.0170000"", ""Null"": null }");
+    }
+
+    [Test]
+    public void should_format_json_date_only()
+    {
+        var value = new DateOnly(2020, 01, 02);
+
+        _logMessage.Append("Foo")
+                   .AppendKeyValue("Hello", value)
+                   .AppendKeyValue("World", (DateOnly?)value)
+                   .AppendKeyValue("Null", (DateOnly?)null)
+                   .Append("Bar");
+
+        GetFormattedSimple().ShouldEqual(@"FooBar ~~ { ""Hello"": ""2020-01-02"", ""World"": ""2020-01-02"", ""Null"": null }");
+    }
+
+    [Test]
+    public void should_format_json_time_only()
+    {
+        var value = new TimeOnly(14, 15, 16, 17);
+
+        _logMessage.Append("Foo")
+                   .AppendKeyValue("Hello", value)
+                   .AppendKeyValue("World", (TimeOnly?)value)
+                   .AppendKeyValue("Null", (TimeOnly?)null)
+                   .Append("Bar");
+
+        GetFormattedSimple().ShouldEqual(@"FooBar ~~ { ""Hello"": ""14:15:16.0170000"", ""World"": ""14:15:16.0170000"", ""Null"": null }");
     }
 
     [Test]

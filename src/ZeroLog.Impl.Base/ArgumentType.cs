@@ -29,6 +29,8 @@ internal enum ArgumentType : byte
     Guid,
     DateTime,
     TimeSpan,
+    DateOnly,
+    TimeOnly,
     StringSpan,
     Utf8StringSpan,
     Enum,

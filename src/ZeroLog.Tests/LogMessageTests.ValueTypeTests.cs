@@ -1428,4 +1428,170 @@ unsafe partial class LogMessageTests
         public void should_not_allocate_interpolation_formatted()
             => ShouldNotAllocate(() => _logMessage.Append($"{_value:c}"));
     }
+
+    [TestFixture]
+    public class DateOnlyTests : ValueTypeTests<DateOnly>
+    {
+        private static readonly DateOnly _value = DateOnly.FromDateTime(DateTime.UtcNow);
+
+        [Test]
+        public void should_append_value()
+            => _logMessage.Append(_value).ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_nullable_value()
+            => _logMessage.Append(AsNullable(_value)).ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_null()
+            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+
+        [Test]
+        [TestCase("d")]
+        [TestCase("D")]
+        [TestCase("yyyy-MM-dd")]
+        public void should_append_formatted_value(string format)
+            => _logMessage.Append(_value, format).ToString().ShouldEqual(_value.ToString(format, CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_formatted_null()
+            => _logMessage.Append(GetNullValue(), "D").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+
+        [Test]
+        public void should_append_nullable_formatted_value()
+            => _logMessage.Append(_value, "D").ToString().ShouldEqual(_value.ToString("D", CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_value_through_interpolation()
+            => _logMessage.Append($"{_value}").ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_nullable_value_through_interpolation()
+            => _logMessage.Append($"{AsNullable(_value)}").ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_null_value_through_interpolation()
+            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+
+        [Test]
+        public void should_append_formatted_value_through_interpolation()
+            => _logMessage.Append($"{_value:yyyy}").ToString().ShouldEqual(_value.ToString("yyyy", CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_nullable_formatted_value_through_interpolation()
+            => _logMessage.Append($"{AsNullable(_value):yyyy}").ToString().ShouldEqual(_value.ToString("yyyy", CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_formatted_null_value_through_interpolation()
+            => _logMessage.Append($"{GetNullValue():yyyy}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+
+        [Test]
+        public void should_truncate_value()
+            => ShouldTruncateValue(() => _logMessage.Append(_value), false);
+
+        [Test]
+        public void should_truncate_formatted_value()
+            => ShouldTruncateValue(() => _logMessage.Append(_value, "D"), true);
+
+        [Test]
+        public void should_not_allocate()
+            => ShouldNotAllocate(() => _logMessage.Append(_value));
+
+        [Test]
+        [TestCase("d")]
+        [TestCase("D")]
+        [TestCase("yyyy-MM-dd")]
+        public void should_not_allocate_formatted(string format)
+            => ShouldNotAllocate(() => _logMessage.Append(_value, format));
+
+        [Test]
+        public void should_not_allocate_interpolation()
+            => ShouldNotAllocate(() => _logMessage.Append($"{_value}"));
+
+        [Test]
+        public void should_not_allocate_interpolation_formatted()
+            => ShouldNotAllocate(() => _logMessage.Append($"{_value:yyyy-MM-dd}"));
+    }
+
+    [TestFixture]
+    public class TimeOnlyTests : ValueTypeTests<TimeOnly>
+    {
+        private static readonly TimeOnly _value = TimeOnly.FromDateTime(DateTime.UtcNow);
+
+        [Test]
+        public void should_append_value()
+            => _logMessage.Append(_value).ToString().ShouldEqual(_value.ToString(null, CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_nullable_value()
+            => _logMessage.Append(AsNullable(_value)).ToString().ShouldEqual(_value.ToString(null, CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_null()
+            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+
+        [Test]
+        [TestCase("t")]
+        [TestCase("T")]
+        public void should_append_formatted_value(string format)
+            => _logMessage.Append(_value, format).ToString().ShouldEqual(_value.ToString(format, CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_formatted_null()
+            => _logMessage.Append(GetNullValue(), "T").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+
+        [Test]
+        public void should_append_nullable_formatted_value()
+            => _logMessage.Append(_value, "t").ToString().ShouldEqual(_value.ToString("t", CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_value_through_interpolation()
+            => _logMessage.Append($"{_value}").ToString().ShouldEqual(_value.ToString(null, CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_nullable_value_through_interpolation()
+            => _logMessage.Append($"{AsNullable(_value)}").ToString().ShouldEqual(_value.ToString(null, CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_null_value_through_interpolation()
+            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+
+        [Test]
+        public void should_append_formatted_value_through_interpolation()
+            => _logMessage.Append($"{_value:t}").ToString().ShouldEqual(_value.ToString("t", CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_nullable_formatted_value_through_interpolation()
+            => _logMessage.Append($"{AsNullable(_value):t}").ToString().ShouldEqual(_value.ToString("t", CultureInfo.InvariantCulture));
+
+        [Test]
+        public void should_append_formatted_null_value_through_interpolation()
+            => _logMessage.Append($"{GetNullValue():c}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+
+        [Test]
+        public void should_truncate_value()
+            => ShouldTruncateValue(() => _logMessage.Append(_value), false);
+
+        [Test]
+        public void should_truncate_formatted_value()
+            => ShouldTruncateValue(() => _logMessage.Append(_value, "t"), true);
+
+        [Test]
+        public void should_not_allocate()
+            => ShouldNotAllocate(() => _logMessage.Append(_value));
+
+        [Test]
+        [TestCase("t")]
+        [TestCase("T")]
+        public void should_not_allocate_formatted(string format)
+            => ShouldNotAllocate(() => _logMessage.Append(_value, format));
+
+        [Test]
+        public void should_not_allocate_interpolation()
+            => ShouldNotAllocate(() => _logMessage.Append($"{_value}"));
+
+        [Test]
+        public void should_not_allocate_interpolation_formatted()
+            => ShouldNotAllocate(() => _logMessage.Append($"{_value:t}"));
+    }
 }
