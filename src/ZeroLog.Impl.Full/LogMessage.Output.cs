@@ -2,6 +2,7 @@ using System;
 using System.Buffers;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Text;
 using ZeroLog.Configuration;
 using ZeroLog.Formatting;
 
@@ -358,21 +359,45 @@ unsafe partial class LogMessage
                 return valuePtr->TryFormat(outputBuffer, out charsWritten, config);
             }
 
-            case ArgumentType.AsciiString:
+            case ArgumentType.StringSpan:
             {
-                var valueLength = *(int*)dataPointer;
+                var lengthInChars = *(int*)dataPointer;
                 dataPointer += sizeof(int);
 
                 var bufferLength = outputBuffer.Length;
-                var lengthToCopy = Math.Min(valueLength, bufferLength);
+                var charsToCopy = Math.Min(lengthInChars, bufferLength);
 
-                for (var i = 0; i < lengthToCopy; ++i)
-                    outputBuffer[i] = (char)dataPointer[i];
+                new ReadOnlySpan<char>(dataPointer, charsToCopy).CopyTo(outputBuffer);
 
-                charsWritten = lengthToCopy;
-                dataPointer += valueLength;
+                charsWritten = charsToCopy;
+                dataPointer += lengthInChars * sizeof(char);
 
-                return valueLength <= bufferLength;
+                return lengthInChars <= bufferLength;
+            }
+
+            case ArgumentType.Utf8StringSpan:
+            {
+                var lengthInBytes = *(int*)dataPointer;
+                dataPointer += sizeof(int);
+
+                var valueBytes = new ReadOnlySpan<byte>(dataPointer, lengthInBytes);
+
+                var maxChars = Encoding.UTF8.GetMaxCharCount(valueBytes.Length);
+                if (maxChars > outputBuffer.Length)
+                {
+                    var charCount = Encoding.UTF8.GetCharCount(valueBytes);
+                    if (charCount > outputBuffer.Length)
+                    {
+                        // There's currently no API that would truncate the string instead of throwing, so drop the value altogether.
+                        // It's very unlikely we end up in this situation anyway, as the output buffer size is much bigger than the message buffer size.
+                        charsWritten = 0;
+                        return false;
+                    }
+                }
+
+                charsWritten = Encoding.UTF8.GetChars(valueBytes, outputBuffer);
+                dataPointer += lengthInBytes;
+                return true;
             }
 
             case ArgumentType.Unmanaged:
@@ -572,11 +597,19 @@ unsafe partial class LogMessage
                 return;
             }
 
-            case ArgumentType.AsciiString:
+            case ArgumentType.StringSpan:
             {
-                var valueLength = *(int*)dataPointer;
+                var lengthInChars = *(int*)dataPointer;
                 dataPointer += sizeof(int);
-                dataPointer += valueLength;
+                dataPointer += lengthInChars * sizeof(char);
+                return;
+            }
+
+            case ArgumentType.Utf8StringSpan:
+            {
+                var lengthInBytes = *(int*)dataPointer;
+                dataPointer += sizeof(int);
+                dataPointer += lengthInBytes;
                 return;
             }
 

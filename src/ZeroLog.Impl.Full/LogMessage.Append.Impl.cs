@@ -133,7 +133,7 @@ unsafe partial class LogMessage
     }
 
     [SuppressMessage("ReSharper", "ReplaceSliceWithRangeIndexer")]
-    private partial void InternalAppendAsciiString(ReadOnlySpan<char> value)
+    internal partial void InternalAppendStringSpan(ReadOnlySpan<char> value)
     {
         if (value.Length > 0)
         {
@@ -141,22 +141,29 @@ unsafe partial class LogMessage
 
             if (remainingBytes > 0)
             {
-                var length = value.Length;
+                var lengthInChars = value.Length;
 
-                if (length > remainingBytes)
+                if (lengthInChars * sizeof(char) > remainingBytes)
                 {
+                    lengthInChars = remainingBytes / sizeof(char);
+
+                    if (lengthInChars == 0)
+                    {
+                        TruncateMessage();
+                        return;
+                    }
+
                     _isTruncated = true;
-                    length = remainingBytes;
                 }
 
-                *(ArgumentType*)_dataPointer = ArgumentType.AsciiString;
+                *(ArgumentType*)_dataPointer = ArgumentType.StringSpan;
                 _dataPointer += sizeof(ArgumentType);
 
-                *(int*)_dataPointer = length;
+                *(int*)_dataPointer = lengthInChars;
                 _dataPointer += sizeof(int);
 
-                foreach (var c in value.Slice(0, length))
-                    *_dataPointer++ = (byte)c;
+                value.Slice(0, lengthInChars).CopyTo(new Span<char>(_dataPointer, lengthInChars));
+                _dataPointer += lengthInChars * sizeof(char);
             }
             else
             {
@@ -166,7 +173,7 @@ unsafe partial class LogMessage
     }
 
     [SuppressMessage("ReSharper", "ReplaceSliceWithRangeIndexer")]
-    private partial void InternalAppendAsciiString(ReadOnlySpan<byte> value)
+    internal partial void InternalAppendUtf8StringSpan(ReadOnlySpan<byte> value)
     {
         if (value.Length > 0)
         {
@@ -174,22 +181,22 @@ unsafe partial class LogMessage
 
             if (remainingBytes > 0)
             {
-                var length = value.Length;
+                var lengthInBytes = value.Length;
 
-                if (length > remainingBytes)
+                if (lengthInBytes > remainingBytes)
                 {
                     _isTruncated = true;
-                    length = remainingBytes;
+                    lengthInBytes = remainingBytes;
                 }
 
-                *(ArgumentType*)_dataPointer = ArgumentType.AsciiString;
+                *(ArgumentType*)_dataPointer = ArgumentType.Utf8StringSpan;
                 _dataPointer += sizeof(ArgumentType);
 
-                *(int*)_dataPointer = length;
+                *(int*)_dataPointer = lengthInBytes;
                 _dataPointer += sizeof(int);
 
-                value.Slice(0, length).CopyTo(new Span<byte>(_dataPointer, length));
-                _dataPointer += length;
+                value.Slice(0, lengthInBytes).CopyTo(new Span<byte>(_dataPointer, lengthInBytes));
+                _dataPointer += lengthInBytes;
             }
             else
             {

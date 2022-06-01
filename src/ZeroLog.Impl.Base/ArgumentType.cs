@@ -31,7 +31,8 @@ internal enum ArgumentType : byte
     TimeSpan,
     DateOnly,
     TimeOnly,
-    AsciiString,
+    StringSpan,
+    Utf8StringSpan,
     Enum,
     Unmanaged,
 

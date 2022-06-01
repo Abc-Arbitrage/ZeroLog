@@ -385,6 +385,20 @@ partial class Log
             => Message.InternalAppendString(value);
 
         /// <summary>
+        /// Appends a string represented by a <c>ReadOnlySpan&lt;char&gt;</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        public void AppendFormatted(ReadOnlySpan<char> value)
+            => Message.InternalAppendStringSpan(value);
+
+        /// <summary>
+        /// Appends an UTF-8 string represented by a <c>ReadOnlySpanReadOnlySpan&lt;byte&gt;</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        public void AppendFormatted(ReadOnlySpan<byte> value)
+            => Message.InternalAppendUtf8StringSpan(value);
+
+        /// <summary>
         /// Appends a value of type <c>bool</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
@@ -1021,6 +1035,20 @@ partial class Log
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(string? value)
             => Message.InternalAppendString(value);
+
+        /// <summary>
+        /// Appends a string represented by a <c>ReadOnlySpan&lt;char&gt;</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        public void AppendFormatted(ReadOnlySpan<char> value)
+            => Message.InternalAppendStringSpan(value);
+
+        /// <summary>
+        /// Appends an UTF-8 string represented by a <c>ReadOnlySpanReadOnlySpan&lt;byte&gt;</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        public void AppendFormatted(ReadOnlySpan<byte> value)
+            => Message.InternalAppendUtf8StringSpan(value);
 
         /// <summary>
         /// Appends a value of type <c>bool</c> to the handler.
@@ -1661,6 +1689,20 @@ partial class Log
             => Message.InternalAppendString(value);
 
         /// <summary>
+        /// Appends a string represented by a <c>ReadOnlySpan&lt;char&gt;</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        public void AppendFormatted(ReadOnlySpan<char> value)
+            => Message.InternalAppendStringSpan(value);
+
+        /// <summary>
+        /// Appends an UTF-8 string represented by a <c>ReadOnlySpanReadOnlySpan&lt;byte&gt;</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        public void AppendFormatted(ReadOnlySpan<byte> value)
+            => Message.InternalAppendUtf8StringSpan(value);
+
+        /// <summary>
         /// Appends a value of type <c>bool</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
@@ -2297,6 +2339,20 @@ partial class Log
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(string? value)
             => Message.InternalAppendString(value);
+
+        /// <summary>
+        /// Appends a string represented by a <c>ReadOnlySpan&lt;char&gt;</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        public void AppendFormatted(ReadOnlySpan<char> value)
+            => Message.InternalAppendStringSpan(value);
+
+        /// <summary>
+        /// Appends an UTF-8 string represented by a <c>ReadOnlySpanReadOnlySpan&lt;byte&gt;</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        public void AppendFormatted(ReadOnlySpan<byte> value)
+            => Message.InternalAppendUtf8StringSpan(value);
 
         /// <summary>
         /// Appends a value of type <c>bool</c> to the handler.
@@ -2937,6 +2993,20 @@ partial class Log
             => Message.InternalAppendString(value);
 
         /// <summary>
+        /// Appends a string represented by a <c>ReadOnlySpan&lt;char&gt;</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        public void AppendFormatted(ReadOnlySpan<char> value)
+            => Message.InternalAppendStringSpan(value);
+
+        /// <summary>
+        /// Appends an UTF-8 string represented by a <c>ReadOnlySpanReadOnlySpan&lt;byte&gt;</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        public void AppendFormatted(ReadOnlySpan<byte> value)
+            => Message.InternalAppendUtf8StringSpan(value);
+
+        /// <summary>
         /// Appends a value of type <c>bool</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
@@ -3573,6 +3643,20 @@ partial class Log
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(string? value)
             => Message.InternalAppendString(value);
+
+        /// <summary>
+        /// Appends a string represented by a <c>ReadOnlySpan&lt;char&gt;</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        public void AppendFormatted(ReadOnlySpan<char> value)
+            => Message.InternalAppendStringSpan(value);
+
+        /// <summary>
+        /// Appends an UTF-8 string represented by a <c>ReadOnlySpanReadOnlySpan&lt;byte&gt;</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        public void AppendFormatted(ReadOnlySpan<byte> value)
+            => Message.InternalAppendUtf8StringSpan(value);
 
         /// <summary>
         /// Appends a value of type <c>bool</c> to the handler.

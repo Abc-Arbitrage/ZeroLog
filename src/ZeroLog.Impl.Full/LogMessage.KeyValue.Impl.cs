@@ -167,9 +167,9 @@ unsafe partial class LogMessage
         }
     }
 
-    private partial void InternalAppendKeyValueAscii(string key, ReadOnlySpan<char> value)
+    private partial void InternalAppendKeyValue(string key, ReadOnlySpan<char> value)
     {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(int) + value.Length <= _endOfBuffer && _stringIndex < _strings.Length)
+        if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(int) + value.Length * sizeof(char) <= _endOfBuffer && _stringIndex < _strings.Length)
         {
             *(ArgumentType*)_dataPointer = ArgumentType.KeyString;
             _dataPointer += sizeof(ArgumentType);
@@ -181,7 +181,7 @@ unsafe partial class LogMessage
 
             ++_stringIndex;
 
-            AppendAsciiString(value);
+            InternalAppendStringSpan(value);
         }
         else
         {
@@ -189,7 +189,7 @@ unsafe partial class LogMessage
         }
     }
 
-    private partial void InternalAppendKeyValueAscii(string key, ReadOnlySpan<byte> value)
+    private partial void InternalAppendKeyValue(string key, ReadOnlySpan<byte> value)
     {
         if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(ArgumentType) + sizeof(int) + value.Length <= _endOfBuffer && _stringIndex < _strings.Length)
         {
@@ -203,7 +203,7 @@ unsafe partial class LogMessage
 
             ++_stringIndex;
 
-            AppendAsciiString(value);
+            InternalAppendUtf8StringSpan(value);
         }
         else
         {
