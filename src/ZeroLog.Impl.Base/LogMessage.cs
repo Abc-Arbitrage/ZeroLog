@@ -104,6 +104,20 @@ public sealed partial class LogMessage
             => _message.InternalAppendString(value);
 
         /// <summary>
+        /// Appends a string represented by a <c>ReadOnlySpan&lt;char&gt;</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        public void AppendFormatted(ReadOnlySpan<char> value)
+            => _message.InternalAppendStringSpan(value);
+
+        /// <summary>
+        /// Appends an UTF-8 string represented by a <c>ReadOnlySpanReadOnlySpan&lt;byte&gt;</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        public void AppendFormatted(ReadOnlySpan<byte> value)
+            => _message.InternalAppendUtf8StringSpan(value);
+
+        /// <summary>
         /// Appends an enum to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>

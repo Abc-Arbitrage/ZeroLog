@@ -43,24 +43,24 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends a value of type ASCII string to the message metadata.
+    /// Appends a value of type string span to the message metadata. This will copy the span and use buffer space.
     /// </summary>
     /// <param name="key">The key.</param>
     /// <param name="value">The value.</param>
-    public LogMessage AppendKeyValueAscii(string key, ReadOnlySpan<char> value)
+    public LogMessage AppendKeyValue(string key, ReadOnlySpan<char> value)
     {
-        InternalAppendKeyValueAscii(key, value);
+        InternalAppendKeyValue(key, value);
         return this;
     }
 
     /// <summary>
-    /// Appends a value of type ASCII string represented as bytes to the message metadata.
+    /// Appends an UTF-8 string to the message metadata. This will copy the span and use buffer space.
     /// </summary>
     /// <param name="key">The key.</param>
     /// <param name="value">The value.</param>
-    public LogMessage AppendKeyValueAscii(string key, ReadOnlySpan<byte> value)
+    public LogMessage AppendKeyValue(string key, ReadOnlySpan<byte> value)
     {
-        InternalAppendKeyValueAscii(key, value);
+        InternalAppendKeyValue(key, value);
         return this;
     }
 
@@ -84,10 +84,10 @@ partial class LogMessage
         where T : struct, Enum;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private partial void InternalAppendKeyValueAscii(string key, ReadOnlySpan<char> value);
+    private partial void InternalAppendKeyValue(string key, ReadOnlySpan<char> value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private partial void InternalAppendKeyValueAscii(string key, ReadOnlySpan<byte> value);
+    private partial void InternalAppendKeyValue(string key, ReadOnlySpan<byte> value);
 
 #if NETSTANDARD
 
@@ -115,11 +115,11 @@ partial class LogMessage
     {
     }
 
-    private partial void InternalAppendKeyValueAscii(string key, ReadOnlySpan<char> value)
+    private partial void InternalAppendKeyValue(string key, ReadOnlySpan<char> value)
     {
     }
 
-    private partial void InternalAppendKeyValueAscii(string key, ReadOnlySpan<byte> value)
+    private partial void InternalAppendKeyValue(string key, ReadOnlySpan<byte> value)
     {
     }
 

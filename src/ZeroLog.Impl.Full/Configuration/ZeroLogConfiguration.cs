@@ -24,7 +24,7 @@ public sealed class ZeroLogConfiguration
 
     /// <summary>
     /// The size of the buffer used to serialize log message arguments. Once exceeded, the message is truncated.
-    /// All Append calls use a few bytes, except for <c>AppendAsciiString</c> which copies the whole string into the buffer.
+    /// All <c>Append</c> calls use a few bytes, except for those with a <c>ReadOnlySpan</c> parameter, which copy the whole value into the buffer.
     /// </summary>
     /// <remarks>
     /// Default: 128
