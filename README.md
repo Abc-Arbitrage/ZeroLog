@@ -21,7 +21,7 @@ ZeroLog was designed to meet two main objectives:
  - Being a **zero allocation library**.
  - Doing **as little work as possible in calling threads**.
 
-The second goal implies a major design choice: the actual logging is completely asynchronous. It means that writing messages to the appenders obviously occurs in a background thread, but also that *all formatting operations are delayed to be performed just before the appending*. **No formatting occurs in the calling thread**, the log data is merely marshalled to the background logging thread in the most efficient way possible.
+The second goal implies a major design choice: the actual logging is completely asynchronous. It means that writing messages to the appenders occurs in a background thread, and *all formatting operations are delayed to be performed just before the appending*. **No formatting occurs in the calling thread**, the log data is merely marshalled to the background logging thread in the most efficient way possible.
 
 Internally, each logging call data (context, log messages, arguments, etc.) will be serialized to a pooled log message, before being enqueued in a concurrent data structure the background logging thread consumes. The logging thread will then format the log messages and append them to the configured appenders.
 
