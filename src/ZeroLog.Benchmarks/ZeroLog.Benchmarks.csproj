@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <OutputType>Exe</OutputType>
     <NoWarn>$(NoWarn);CS8002</NoWarn>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
@@ -12,12 +12,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="BenchmarkDotNet" Version="0.12.1" />
+    <PackageReference Include="BenchmarkDotNet" Version="0.13.2" />
     <PackageReference Include="HdrHistogram" Version="2.5.0" />
-    <PackageReference Include="Fody" Version="6.6.0" PrivateAssets="all" />
-    <PackageReference Include="InlineIL.Fody" Version="1.7.1" PrivateAssets="all" />
-    <PackageReference Include="log4net" Version="2.0.12" />
-    <PackageReference Include="NLog" Version="4.7.7" />
+    <PackageReference Include="Fody" Version="6.6.4" PrivateAssets="all" />
+    <PackageReference Include="InlineIL.Fody" Version="1.7.3" PrivateAssets="all" />
+    <PackageReference Include="log4net" Version="2.0.15" />
+    <PackageReference Include="NLog" Version="5.0.5" />
     <PackageReference Include="System.Net.Sockets" Version="4.3.0" />
   </ItemGroup>
 

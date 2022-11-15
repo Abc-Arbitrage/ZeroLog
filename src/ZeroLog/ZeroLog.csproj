@@ -13,9 +13,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Fody" Version="6.6.0" PrivateAssets="all" />
-    <PackageReference Include="InlineIL.Fody" Version="1.7.1" PrivateAssets="all" />
-    <PackageReference Include="System.Memory" Version="4.5.4" Condition="'$(TargetFrameworkIdentifier)' == '.NETStandard'" />
+    <PackageReference Include="Fody" Version="6.6.4" PrivateAssets="all" />
+    <PackageReference Include="InlineIL.Fody" Version="1.7.3" PrivateAssets="all" />
+    <PackageReference Include="System.Memory" Version="4.5.5" Condition="'$(TargetFrameworkIdentifier)' == '.NETStandard'" />
   </ItemGroup>
 
   <ItemGroup>

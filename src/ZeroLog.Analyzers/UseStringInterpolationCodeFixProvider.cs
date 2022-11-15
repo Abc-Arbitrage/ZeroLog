@@ -54,13 +54,13 @@ public class UseStringInterpolationCodeFixProvider : CodeFixProvider
 
         parts = ConcatInterpolationStringTexts(FlattenNestedInterpolations(parts)).ToList();
 
-        ExpressionSyntax resultExpression = parts.Count switch
+        ExpressionSyntax resultExpression = parts switch
         {
-            0 => LiteralExpression(
+            [] => LiteralExpression(
                 SyntaxKind.StringLiteralExpression,
                 Literal(string.Empty)
             ),
-            1 when parts[0] is InterpolatedStringTextSyntax singleTextSyntax => LiteralExpression(
+            [InterpolatedStringTextSyntax singleTextSyntax] => LiteralExpression(
                 SyntaxKind.StringLiteralExpression,
                 Literal($"\"{singleTextSyntax.TextToken.Text}\"", singleTextSyntax.TextToken.ValueText)
             ),
