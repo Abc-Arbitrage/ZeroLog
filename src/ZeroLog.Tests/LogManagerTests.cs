@@ -216,7 +216,7 @@ public partial class LogManagerTests
            .Append(date)
            .Append(timespan)
            .Append(new[] { 'a', 'b', 'c' })
-           .Append(new[] { (byte)'d', (byte)'e', (byte)'f' })
+           .Append("def"u8)
            .AppendEnum(DayOfWeek.Friday)
            .Log();
 

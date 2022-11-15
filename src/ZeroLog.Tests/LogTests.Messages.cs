@@ -1,8 +1,7 @@
-﻿
+
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.Text;
 using NUnit.Framework;
 using ZeroLog.Configuration;
 using ZeroLog.Tests.Support;
@@ -84,9 +83,10 @@ partial class LogTests
     }
 
     [Test]
+    [SuppressMessage("ReSharper", "StringLiteralAsInterpolationArgument")]
     public void should_log_interpolated_Utf8_String_Span_Trace()
     {
-        _log.Trace($"foo {Encoding.UTF8.GetBytes("bar")} baz {Encoding.UTF8.GetBytes("foobar").AsSpan()}");
+        _log.Trace($"foo {"bar"u8} baz {"foobar"u8}");
 
         var message = _provider.GetSubmittedMessage();
         message.Level.ShouldEqual(LogLevel.Trace);
@@ -1111,9 +1111,10 @@ partial class LogTests
     }
 
     [Test]
+    [SuppressMessage("ReSharper", "StringLiteralAsInterpolationArgument")]
     public void should_log_interpolated_Utf8_String_Span_Debug()
     {
-        _log.Debug($"foo {Encoding.UTF8.GetBytes("bar")} baz {Encoding.UTF8.GetBytes("foobar").AsSpan()}");
+        _log.Debug($"foo {"bar"u8} baz {"foobar"u8}");
 
         var message = _provider.GetSubmittedMessage();
         message.Level.ShouldEqual(LogLevel.Debug);
@@ -2138,9 +2139,10 @@ partial class LogTests
     }
 
     [Test]
+    [SuppressMessage("ReSharper", "StringLiteralAsInterpolationArgument")]
     public void should_log_interpolated_Utf8_String_Span_Info()
     {
-        _log.Info($"foo {Encoding.UTF8.GetBytes("bar")} baz {Encoding.UTF8.GetBytes("foobar").AsSpan()}");
+        _log.Info($"foo {"bar"u8} baz {"foobar"u8}");
 
         var message = _provider.GetSubmittedMessage();
         message.Level.ShouldEqual(LogLevel.Info);
@@ -3165,9 +3167,10 @@ partial class LogTests
     }
 
     [Test]
+    [SuppressMessage("ReSharper", "StringLiteralAsInterpolationArgument")]
     public void should_log_interpolated_Utf8_String_Span_Warn()
     {
-        _log.Warn($"foo {Encoding.UTF8.GetBytes("bar")} baz {Encoding.UTF8.GetBytes("foobar").AsSpan()}");
+        _log.Warn($"foo {"bar"u8} baz {"foobar"u8}");
 
         var message = _provider.GetSubmittedMessage();
         message.Level.ShouldEqual(LogLevel.Warn);
@@ -4192,9 +4195,10 @@ partial class LogTests
     }
 
     [Test]
+    [SuppressMessage("ReSharper", "StringLiteralAsInterpolationArgument")]
     public void should_log_interpolated_Utf8_String_Span_Error()
     {
-        _log.Error($"foo {Encoding.UTF8.GetBytes("bar")} baz {Encoding.UTF8.GetBytes("foobar").AsSpan()}");
+        _log.Error($"foo {"bar"u8} baz {"foobar"u8}");
 
         var message = _provider.GetSubmittedMessage();
         message.Level.ShouldEqual(LogLevel.Error);
@@ -5219,9 +5223,10 @@ partial class LogTests
     }
 
     [Test]
+    [SuppressMessage("ReSharper", "StringLiteralAsInterpolationArgument")]
     public void should_log_interpolated_Utf8_String_Span_Fatal()
     {
-        _log.Fatal($"foo {Encoding.UTF8.GetBytes("bar")} baz {Encoding.UTF8.GetBytes("foobar").AsSpan()}");
+        _log.Fatal($"foo {"bar"u8} baz {"foobar"u8}");
 
         var message = _provider.GetSubmittedMessage();
         message.Level.ShouldEqual(LogLevel.Fatal);

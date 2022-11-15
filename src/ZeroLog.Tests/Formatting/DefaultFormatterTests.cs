@@ -1,5 +1,4 @@
 using System;
-using System.Text;
 using NUnit.Framework;
 using ZeroLog.Configuration;
 using ZeroLog.Formatting;
@@ -75,7 +74,7 @@ public class DefaultFormatterTests
     public void should_format_json_string_span_byte()
     {
         _logMessage.Append("Foo")
-                   .AppendKeyValue("Hello", Encoding.UTF8.GetBytes("World"))
+                   .AppendKeyValue("Hello", "World"u8)
                    .Append("Bar");
 
         GetFormattedSimple().ShouldEqual("""FooBar ~~ { "Hello": "World" }""");

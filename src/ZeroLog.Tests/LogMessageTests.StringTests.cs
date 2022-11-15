@@ -230,7 +230,7 @@ unsafe partial class LogMessageTests
         [Test]
         public void should_append_string()
         {
-            _logMessage.Append(GetBytes("foo")).ShouldEqual(_logMessage);
+            _logMessage.Append("foo"u8).ShouldEqual(_logMessage);
 
             _logMessage.ToString().ShouldEqual("foo");
         }
@@ -246,16 +246,17 @@ unsafe partial class LogMessageTests
         [Test]
         public void should_append_strings()
         {
-            _logMessage.Append(GetBytes("foo"));
-            _logMessage.Append(GetBytes("bar"));
+            _logMessage.Append("foo"u8);
+            _logMessage.Append("bar"u8);
 
             _logMessage.ToString().ShouldEqual("foobar");
         }
 
         [Test]
+        [SuppressMessage("ReSharper", "StringLiteralAsInterpolationArgument")]
         public void should_append_through_string_interpolation()
         {
-            _logMessage.Append($"foo {GetBytes("bar")} baz");
+            _logMessage.Append($"foo {"bar"u8} baz");
 
             _logMessage.ToString().ShouldEqual("foo bar baz");
         }
@@ -268,7 +269,7 @@ unsafe partial class LogMessageTests
         {
             _logMessage = LogMessage.CreateTestMessage(LogLevel.Info, sizeof(ArgumentType) + sizeof(int) + 5, _stringCapacity);
 
-            _logMessage.Append(GetBytes(value));
+            _logMessage.Append(Encoding.UTF8.GetBytes(value));
 
             _logMessage.ToString().ShouldEqual(expected);
         }
@@ -278,7 +279,7 @@ unsafe partial class LogMessageTests
         {
             _logMessage = LogMessage.CreateTestMessage(LogLevel.Info, sizeof(ArgumentType) + sizeof(int), _stringCapacity);
 
-            _logMessage.Append(GetBytes("0123456"));
+            _logMessage.Append("0123456"u8);
 
             _logMessage.ToString().ShouldEqual(" [TRUNCATED]");
         }
@@ -286,31 +287,28 @@ unsafe partial class LogMessageTests
         [Test]
         public void should_not_allocate()
         {
-            var value = GetBytes("foo");
-
             ShouldNotAllocate(() =>
             {
                 for (var i = 0; i < 2 * _stringCapacity; ++i)
-                    _logMessage.Append(value);
+                    _logMessage.Append("foo"u8);
             });
         }
 
         [Test]
+        [SuppressMessage("ReSharper", "StringLiteralAsInterpolationArgument")]
         public void should_not_allocate_interpolation()
         {
-            var value = GetBytes("foo");
-
             ShouldNotAllocate(() =>
             {
                 for (var i = 0; i < 2 * _stringCapacity; ++i)
-                    _logMessage.Append($"foo {value}");
+                    _logMessage.Append($"foo {"foo"u8}");
             });
         }
 
         [Test]
         public void should_report_truncated_string()
         {
-            _logMessage.Append(GetBytes("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"));
+            _logMessage.Append("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"u8);
 
             string.Create(16, _logMessage, (buffer, message) => message.WriteTo(buffer, ZeroLogConfiguration.Default, LogMessage.FormatType.Formatted, null))
                   .ShouldEqual(" [TRUNCATED]\0\0\0\0");
@@ -320,7 +318,7 @@ unsafe partial class LogMessageTests
         [SuppressMessage("ReSharper", "StringLiteralTypo")]
         public void should_write_truncated_string_when_buffer_is_too_small_to_fit_the_suffix()
         {
-            _logMessage.Append(GetBytes("0123456789"));
+            _logMessage.Append("0123456789"u8);
 
             string.Create(8, _logMessage, (buffer, message) => message.WriteTo(buffer, ZeroLogConfiguration.Default, LogMessage.FormatType.Formatted, null))
                   .ShouldEqual(" [TRUNCA");
@@ -332,8 +330,5 @@ unsafe partial class LogMessageTests
             _logMessage.Append(new byte[] { (byte)'[', 0xFF, (byte)']' });
             _logMessage.ToString().ShouldEqual("[\uFFFD]");
         }
-
-        private static byte[] GetBytes(string value)
-            => Encoding.UTF8.GetBytes(value);
     }
 }

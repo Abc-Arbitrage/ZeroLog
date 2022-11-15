@@ -28,7 +28,6 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.Text;
 using NUnit.Framework;
 using ZeroLog.Configuration;
 using ZeroLog.Tests.Support;
@@ -114,9 +113,10 @@ partial class LogTests
     }
 
     [Test]
+    [SuppressMessage("ReSharper", "StringLiteralAsInterpolationArgument")]
     public void should_log_interpolated_Utf8_String_Span_<#= logLevel #>()
     {
-        _log.<#= logLevel #>($"foo {Encoding.UTF8.GetBytes("bar")} baz {Encoding.UTF8.GetBytes("foobar").AsSpan()}");
+        _log.<#= logLevel #>($"foo {"bar"u8} baz {"foobar"u8}");
 
         var message = _provider.GetSubmittedMessage();
         message.Level.ShouldEqual(LogLevel.<#= logLevel #>);
