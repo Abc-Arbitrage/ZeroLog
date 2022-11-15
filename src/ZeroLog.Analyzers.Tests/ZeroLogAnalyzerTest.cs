@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeFixes;
@@ -27,6 +28,12 @@ internal static class ZeroLogAnalyzerTest
 internal abstract class ZeroLogAnalyzerTest<TAnalyzer> : CSharpAnalyzerTest<TAnalyzer, NUnitVerifier>
     where TAnalyzer : DiagnosticAnalyzer, new()
 {
+    [StringSyntax("csharp")]
+    public new string TestCode
+    {
+        set => base.TestCode = value;
+    }
+
     public LanguageVersion LanguageVersion { get; init; } = LanguageVersion.Default;
 
     protected ZeroLogAnalyzerTest()
@@ -42,6 +49,18 @@ internal abstract class ZeroLogCodeFixTest<TAnalyzer, TCodeFix> : CSharpCodeFixT
     where TAnalyzer : DiagnosticAnalyzer, new()
     where TCodeFix : CodeFixProvider, new()
 {
+    [StringSyntax("csharp")]
+    public new string TestCode
+    {
+        set => base.TestCode = value;
+    }
+
+    [StringSyntax("csharp")]
+    public new string FixedCode
+    {
+        set => base.FixedCode = value;
+    }
+
     protected ZeroLogCodeFixTest()
     {
         ZeroLogAnalyzerTest.ConfigureTest(this);

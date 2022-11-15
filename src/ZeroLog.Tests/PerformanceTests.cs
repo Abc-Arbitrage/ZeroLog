@@ -38,7 +38,7 @@ public class PerformanceTests
     [Test]
     public void should_test_console()
     {
-        LogManager.GetLogger(typeof(PerformanceTests)).Info().Append("Hello ").Append(42).Append(" this is a relatlively long message ").Append(12345.4332m).Log();
+        LogManager.GetLogger(typeof(PerformanceTests)).Info().Append("Hello ").Append(42).Append(" this is a relatively long message ").Append(12345.4332m).Log();
     }
 
     [Test]
@@ -59,7 +59,7 @@ public class PerformanceTests
         {
             for (var k = 0; k < threadMessageCount; k++)
             {
-                logger.Info().Append("Hello ").Append(42).Append(utcNow).Append(42.56).Append(" this is a relatlively long message ").Append(12345.4332m).Log();
+                logger.Info().Append("Hello ").Append(42).Append(utcNow).Append(42.56).Append(" this is a relatively long message ").Append(12345.4332m).Log();
             }
         });
 

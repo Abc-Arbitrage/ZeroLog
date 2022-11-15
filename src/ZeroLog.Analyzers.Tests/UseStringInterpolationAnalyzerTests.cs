@@ -12,13 +12,13 @@ public class UseStringInterpolationAnalyzerTests
     {
         var test = new Test
         {
-            TestCode = @"
-class C
-{
-    void M(ZeroLog.Log log)
-        => log.{|#0:Info|}().Append(""Foo"").Log();
-}
-",
+            TestCode = """
+                class C
+                {
+                    void M(ZeroLog.Log log)
+                        => log.{|#0:Info|}().Append("Foo").Log();
+                }
+                """,
             ExpectedDiagnostics =
             {
                 new DiagnosticResult(UseStringInterpolationAnalyzer.UseStringInterpolationDiagnostic).WithLocation(0)
@@ -33,13 +33,13 @@ class C
     {
         var test = new Test
         {
-            TestCode = @"
-class C
-{
-    void M(ZeroLog.Log log)
-        => log.{|#0:Info|}().Append(42).AppendEnum(System.DayOfWeek.Friday).Append(true).Log();
-}
-",
+            TestCode = """
+                class C
+                {
+                    void M(ZeroLog.Log log)
+                        => log.{|#0:Info|}().Append(42).AppendEnum(System.DayOfWeek.Friday).Append(true).Log();
+                }
+                """,
             ExpectedDiagnostics =
             {
                 new DiagnosticResult(UseStringInterpolationAnalyzer.UseStringInterpolationDiagnostic).WithLocation(0)
@@ -54,13 +54,13 @@ class C
     {
         var test = new Test
         {
-            TestCode = @"
-class C
-{
-    void M(ZeroLog.Log log)
-        => log.Info().AppendKeyValue(""Key"", ""Value"").Log();
-}
-"
+            TestCode = """
+                class C
+                {
+                    void M(ZeroLog.Log log)
+                        => log.Info().AppendKeyValue("Key", "Value").Log();
+                }
+                """
         };
 
         return test.RunAsync();
@@ -71,16 +71,16 @@ class C
     {
         var test = new Test
         {
-            TestCode = @"
-class C
-{
-    void M1(ZeroLog.Log log)
-        => log.{|#0:Info|}().Append(42, ""X"").Log();
+            TestCode = """
+                class C
+                {
+                    void M1(ZeroLog.Log log)
+                        => log.{|#0:Info|}().Append(42, "X").Log();
 
-    void M2(ZeroLog.Log log)
-        => log.{|#1:Info|}().Append(format: ""X"", value: 40 + 2).Log();
-}
-",
+                    void M2(ZeroLog.Log log)
+                        => log.{|#1:Info|}().Append(format: "X", value: 40 + 2).Log();
+                }
+                """,
             ExpectedDiagnostics =
             {
                 new DiagnosticResult(UseStringInterpolationAnalyzer.UseStringInterpolationDiagnostic).WithLocation(0),
@@ -96,18 +96,18 @@ class C
     {
         var test = new Test
         {
-            TestCode = @"
-class C
-{
-    const string format = ""X"";
+            TestCode = """
+                class C
+                {
+                    const string format = "X";
 
-    void M1(ZeroLog.Log log)
-        => log.Info().Append(42, format).Log();
+                    void M1(ZeroLog.Log log)
+                        => log.Info().Append(42, format).Log();
 
-    void M2(ZeroLog.Log log)
-        => log.Info().Append(format: format, value: 42).Log();
-}
-"
+                    void M2(ZeroLog.Log log)
+                        => log.Info().Append(format: format, value: 42).Log();
+                }
+                """
         };
 
         return test.RunAsync();
@@ -118,15 +118,15 @@ class C
     {
         var test = new Test
         {
-            TestCode = @"
-class C
-{
-    const string format = ""X"";
+            TestCode = """
+                class C
+                {
+                    const string format = "X";
 
-    void M(ZeroLog.Log log)
-        => log.Info().Append($@"""").Log();
-}
-"
+                    void M(ZeroLog.Log log)
+                        => log.Info().Append($@"").Log();
+                }
+                """
         };
 
         return test.RunAsync();

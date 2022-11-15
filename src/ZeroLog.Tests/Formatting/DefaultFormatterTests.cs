@@ -47,7 +47,7 @@ public class DefaultFormatterTests
                    .AppendKeyValue("NullString", (string)null)
                    .Append("Bar");
 
-        GetFormattedSimple().ShouldEqual(@"FooBar ~~ { ""Hello"": 42, ""World"": 10, ""String"": ""foo\r\n"", ""NullString"": null }");
+        GetFormattedSimple().ShouldEqual("""FooBar ~~ { "Hello": 42, "World": 10, "String": "foo\r\n", "NullString": null }""");
     }
 
     [Test]
@@ -58,7 +58,7 @@ public class DefaultFormatterTests
                    .AppendKeyValue("Escapes", "\"\\\b\t\n\f\r")
                    .Append("Bar");
 
-        GetFormattedSimple().ShouldEqual(@"FooBar ~~ { ""Hello"": ""...\u0001..."", ""Escapes"": ""\""\\\b\t\n\f\r"" }");
+        GetFormattedSimple().ShouldEqual("""FooBar ~~ { "Hello": "...\u0001...", "Escapes": "\"\\\b\t\n\f\r" }""");
     }
 
     [Test]
@@ -68,7 +68,7 @@ public class DefaultFormatterTests
                    .AppendKeyValue("Hello", "World".AsSpan())
                    .Append("Bar");
 
-        GetFormattedSimple().ShouldEqual(@"FooBar ~~ { ""Hello"": ""World"" }");
+        GetFormattedSimple().ShouldEqual("""FooBar ~~ { "Hello": "World" }""");
     }
 
     [Test]
@@ -78,7 +78,7 @@ public class DefaultFormatterTests
                    .AppendKeyValue("Hello", Encoding.UTF8.GetBytes("World"))
                    .Append("Bar");
 
-        GetFormattedSimple().ShouldEqual(@"FooBar ~~ { ""Hello"": ""World"" }");
+        GetFormattedSimple().ShouldEqual("""FooBar ~~ { "Hello": "World" }""");
     }
 
     [Test]
@@ -89,7 +89,7 @@ public class DefaultFormatterTests
                    .AppendKeyValue("World", false)
                    .Append("Bar");
 
-        GetFormattedSimple().ShouldEqual(@"FooBar ~~ { ""Hello"": true, ""World"": false }");
+        GetFormattedSimple().ShouldEqual("""FooBar ~~ { "Hello": true, "World": false }""");
     }
 
     [Test]
@@ -101,7 +101,7 @@ public class DefaultFormatterTests
                    .AppendKeyValue("Null", (byte?)null)
                    .Append("Bar");
 
-        GetFormattedSimple().ShouldEqual(@"FooBar ~~ { ""Hello"": 42, ""World"": 10, ""Null"": null }");
+        GetFormattedSimple().ShouldEqual("""FooBar ~~ { "Hello": 42, "World": 10, "Null": null }""");
     }
 
     [Test]
@@ -113,7 +113,7 @@ public class DefaultFormatterTests
                    .AppendKeyValue("Null", (sbyte?)null)
                    .Append("Bar");
 
-        GetFormattedSimple().ShouldEqual(@"FooBar ~~ { ""Hello"": 42, ""World"": 10, ""Null"": null }");
+        GetFormattedSimple().ShouldEqual("""FooBar ~~ { "Hello": 42, "World": 10, "Null": null }""");
     }
 
     [Test]
@@ -125,7 +125,7 @@ public class DefaultFormatterTests
                    .AppendKeyValue("Null", (char?)null)
                    .Append("Bar");
 
-        GetFormattedSimple().ShouldEqual(@"FooBar ~~ { ""Hello"": ""x"", ""World"": ""y"", ""Null"": null }");
+        GetFormattedSimple().ShouldEqual("""FooBar ~~ { "Hello": "x", "World": "y", "Null": null }""");
     }
 
     [Test]
@@ -137,7 +137,7 @@ public class DefaultFormatterTests
                    .AppendKeyValue("Null", (short?)null)
                    .Append("Bar");
 
-        GetFormattedSimple().ShouldEqual(@"FooBar ~~ { ""Hello"": 42, ""World"": 10, ""Null"": null }");
+        GetFormattedSimple().ShouldEqual("""FooBar ~~ { "Hello": 42, "World": 10, "Null": null }""");
     }
 
     [Test]
@@ -149,19 +149,19 @@ public class DefaultFormatterTests
                    .AppendKeyValue("Null", (ushort?)null)
                    .Append("Bar");
 
-        GetFormattedSimple().ShouldEqual(@"FooBar ~~ { ""Hello"": 42, ""World"": 10, ""Null"": null }");
+        GetFormattedSimple().ShouldEqual("""FooBar ~~ { "Hello": 42, "World": 10, "Null": null }""");
     }
 
     [Test]
     public void should_format_json_int()
     {
         _logMessage.Append("Foo")
-                   .AppendKeyValue("Hello", (int)42)
+                   .AppendKeyValue("Hello", (int)42u)
                    .AppendKeyValue("World", (int?)10)
                    .AppendKeyValue("Null", (int?)null)
                    .Append("Bar");
 
-        GetFormattedSimple().ShouldEqual(@"FooBar ~~ { ""Hello"": 42, ""World"": 10, ""Null"": null }");
+        GetFormattedSimple().ShouldEqual("""FooBar ~~ { "Hello": 42, "World": 10, "Null": null }""");
     }
 
     [Test]
@@ -173,7 +173,7 @@ public class DefaultFormatterTests
                    .AppendKeyValue("Null", (uint?)null)
                    .Append("Bar");
 
-        GetFormattedSimple().ShouldEqual(@"FooBar ~~ { ""Hello"": 42, ""World"": 10, ""Null"": null }");
+        GetFormattedSimple().ShouldEqual("""FooBar ~~ { "Hello": 42, "World": 10, "Null": null }""");
     }
 
     [Test]
@@ -185,7 +185,7 @@ public class DefaultFormatterTests
                    .AppendKeyValue("Null", (long?)null)
                    .Append("Bar");
 
-        GetFormattedSimple().ShouldEqual(@"FooBar ~~ { ""Hello"": 42, ""World"": 10, ""Null"": null }");
+        GetFormattedSimple().ShouldEqual("""FooBar ~~ { "Hello": 42, "World": 10, "Null": null }""");
     }
 
     [Test]
@@ -197,7 +197,7 @@ public class DefaultFormatterTests
                    .AppendKeyValue("Null", (ulong?)null)
                    .Append("Bar");
 
-        GetFormattedSimple().ShouldEqual(@"FooBar ~~ { ""Hello"": 42, ""World"": 10, ""Null"": null }");
+        GetFormattedSimple().ShouldEqual("""FooBar ~~ { "Hello": 42, "World": 10, "Null": null }""");
     }
 
     [Test]
@@ -209,7 +209,7 @@ public class DefaultFormatterTests
                    .AppendKeyValue("Null", (nint?)null)
                    .Append("Bar");
 
-        GetFormattedSimple().ShouldEqual(@"FooBar ~~ { ""Hello"": 42, ""World"": 10, ""Null"": null }");
+        GetFormattedSimple().ShouldEqual("""FooBar ~~ { "Hello": 42, "World": 10, "Null": null }""");
     }
 
     [Test]
@@ -221,7 +221,7 @@ public class DefaultFormatterTests
                    .AppendKeyValue("Null", (nuint?)null)
                    .Append("Bar");
 
-        GetFormattedSimple().ShouldEqual(@"FooBar ~~ { ""Hello"": 42, ""World"": 10, ""Null"": null }");
+        GetFormattedSimple().ShouldEqual("""FooBar ~~ { "Hello": 42, "World": 10, "Null": null }""");
     }
 
     [Test]
@@ -233,7 +233,7 @@ public class DefaultFormatterTests
                    .AppendKeyValue("Null", (float?)null)
                    .Append("Bar");
 
-        GetFormattedSimple().ShouldEqual(@"FooBar ~~ { ""Hello"": 42.1, ""World"": 42.2, ""Null"": null }");
+        GetFormattedSimple().ShouldEqual("""FooBar ~~ { "Hello": 42.1, "World": 42.2, "Null": null }""");
     }
 
     [Test]
@@ -245,7 +245,7 @@ public class DefaultFormatterTests
                    .AppendKeyValue("Null", (double?)null)
                    .Append("Bar");
 
-        GetFormattedSimple().ShouldEqual(@"FooBar ~~ { ""Hello"": 42.1, ""World"": 42.2, ""Null"": null }");
+        GetFormattedSimple().ShouldEqual("""FooBar ~~ { "Hello": 42.1, "World": 42.2, "Null": null }""");
     }
 
     [Test]
@@ -257,7 +257,7 @@ public class DefaultFormatterTests
                    .AppendKeyValue("Null", (decimal?)null)
                    .Append("Bar");
 
-        GetFormattedSimple().ShouldEqual(@"FooBar ~~ { ""Hello"": 42.1, ""World"": 42.2, ""Null"": null }");
+        GetFormattedSimple().ShouldEqual("""FooBar ~~ { "Hello": 42.1, "World": 42.2, "Null": null }""");
     }
 
     [Test]
@@ -271,7 +271,7 @@ public class DefaultFormatterTests
                    .AppendKeyValue("Null", (Guid?)null)
                    .Append("Bar");
 
-        GetFormattedSimple().ShouldEqual(@"FooBar ~~ { ""Hello"": """ + value + @""", ""World"": """ + value + @""", ""Null"": null }");
+        GetFormattedSimple().ShouldEqual($$"""FooBar ~~ { "Hello": "{{value}}", "World": "{{value}}", "Null": null }""");
     }
 
     [Test]
@@ -285,7 +285,7 @@ public class DefaultFormatterTests
                    .AppendKeyValue("Null", (DateTime?)null)
                    .Append("Bar");
 
-        GetFormattedSimple().ShouldEqual(@"FooBar ~~ { ""Hello"": ""2020-01-02 03:04:05"", ""World"": ""2020-01-02 03:04:05"", ""Null"": null }");
+        GetFormattedSimple().ShouldEqual("""FooBar ~~ { "Hello": "2020-01-02 03:04:05", "World": "2020-01-02 03:04:05", "Null": null }""");
     }
 
     [Test]
@@ -299,7 +299,7 @@ public class DefaultFormatterTests
                    .AppendKeyValue("Null", (TimeSpan?)null)
                    .Append("Bar");
 
-        GetFormattedSimple().ShouldEqual(@"FooBar ~~ { ""Hello"": ""14:15:16.0170000"", ""World"": ""14:15:16.0170000"", ""Null"": null }");
+        GetFormattedSimple().ShouldEqual("""FooBar ~~ { "Hello": "14:15:16.0170000", "World": "14:15:16.0170000", "Null": null }""");
     }
 
     [Test]
@@ -313,7 +313,7 @@ public class DefaultFormatterTests
                    .AppendKeyValue("Null", (DateOnly?)null)
                    .Append("Bar");
 
-        GetFormattedSimple().ShouldEqual(@"FooBar ~~ { ""Hello"": ""2020-01-02"", ""World"": ""2020-01-02"", ""Null"": null }");
+        GetFormattedSimple().ShouldEqual("""FooBar ~~ { "Hello": "2020-01-02", "World": "2020-01-02", "Null": null }""");
     }
 
     [Test]
@@ -327,7 +327,7 @@ public class DefaultFormatterTests
                    .AppendKeyValue("Null", (TimeOnly?)null)
                    .Append("Bar");
 
-        GetFormattedSimple().ShouldEqual(@"FooBar ~~ { ""Hello"": ""14:15:16.0170000"", ""World"": ""14:15:16.0170000"", ""Null"": null }");
+        GetFormattedSimple().ShouldEqual("""FooBar ~~ { "Hello": "14:15:16.0170000", "World": "14:15:16.0170000", "Null": null }""");
     }
 
     [Test]
@@ -339,7 +339,7 @@ public class DefaultFormatterTests
                    .AppendKeyValue("Null", (DayOfWeek?)null)
                    .Append("Bar");
 
-        GetFormattedSimple().ShouldEqual(@"FooBar ~~ { ""Hello"": ""Friday"", ""World"": ""Saturday"", ""Null"": null }");
+        GetFormattedSimple().ShouldEqual("""FooBar ~~ { "Hello": "Friday", "World": "Saturday", "Null": null }""");
     }
 
     private string GetFormattedFull()

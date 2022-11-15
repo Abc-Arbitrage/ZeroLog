@@ -12,36 +12,36 @@ public class UseStringInterpolationCodeFixProviderTests
     {
         var test = new Test
         {
-            TestCode = @"
-using System;
+            TestCode = """
+                using System;
 
-class C
-{
-    void M(ZeroLog.Log log)
-    {
-        log.{|#0:Info|}()
-           .Append(""Foo"")
-           .Append(""Bar:\n"")
-           .Append(' ')
-           .Append(42)
-           .Append(Guid.NewGuid(), ""B"")
-           .AppendEnum(DayOfWeek.Friday)
-           .Append("" Baz"")
-           .Log();
-    }
-}
-",
-            FixedCode = @"
-using System;
+                class C
+                {
+                    void M(ZeroLog.Log log)
+                    {
+                        log.{|#0:Info|}()
+                           .Append("Foo")
+                           .Append("Bar:\n")
+                           .Append(' ')
+                           .Append(42)
+                           .Append(Guid.NewGuid(), "B")
+                           .AppendEnum(DayOfWeek.Friday)
+                           .Append(" Baz")
+                           .Log();
+                    }
+                }
+                """,
+            FixedCode = """
+                using System;
 
-class C
-{
-    void M(ZeroLog.Log log)
-    {
-        log.Info($""FooBar:\n {42}{Guid.NewGuid():B}{DayOfWeek.Friday} Baz"");
-    }
-}
-",
+                class C
+                {
+                    void M(ZeroLog.Log log)
+                    {
+                        log.Info($"FooBar:\n {42}{Guid.NewGuid():B}{DayOfWeek.Friday} Baz");
+                    }
+                }
+                """,
             ExpectedDiagnostics =
             {
                 new DiagnosticResult(UseStringInterpolationAnalyzer.UseStringInterpolationDiagnostic).WithLocation(0)
@@ -56,28 +56,28 @@ class C
     {
         var test = new Test
         {
-            TestCode = @"
-using System;
+            TestCode = """
+                using System;
 
-class C
-{
-    void M(ZeroLog.Log log)
-    {
-        /* start trivia */ log.{|#0:Info|}().Append(""Foo "").Append( /* foo */ 42 /* bar */ ).Log() /* end trivia */ ;
-    }
-}
-",
-            FixedCode = @"
-using System;
+                class C
+                {
+                    void M(ZeroLog.Log log)
+                    {
+                        /* start trivia */ log.{|#0:Info|}().Append("Foo ").Append( /* foo */ 42 /* bar */ ).Log() /* end trivia */ ;
+                    }
+                }
+                """,
+            FixedCode = """
+                using System;
 
-class C
-{
-    void M(ZeroLog.Log log)
-    {
-        /* start trivia */ log.Info($""Foo {42}"") /* end trivia */ ;
-    }
-}
-",
+                class C
+                {
+                    void M(ZeroLog.Log log)
+                    {
+                        /* start trivia */ log.Info($"Foo {42}") /* end trivia */ ;
+                    }
+                }
+                """,
             ExpectedDiagnostics =
             {
                 new DiagnosticResult(UseStringInterpolationAnalyzer.UseStringInterpolationDiagnostic).WithLocation(0)
@@ -92,28 +92,28 @@ class C
     {
         var test = new Test
         {
-            TestCode = @"
-using System;
+            TestCode = """
+                using System;
 
-class C
-{
-    void M(ZeroLog.Log log)
-    {
-        log.{|#0:Info|}().Append(format: ""X"", value: 42).Log();
-    }
-}
-",
-            FixedCode = @"
-using System;
+                class C
+                {
+                    void M(ZeroLog.Log log)
+                    {
+                        log.{|#0:Info|}().Append(format: "X", value: 42).Log();
+                    }
+                }
+                """,
+            FixedCode = """
+                using System;
 
-class C
-{
-    void M(ZeroLog.Log log)
-    {
-        log.Info($""{42:X}"");
-    }
-}
-",
+                class C
+                {
+                    void M(ZeroLog.Log log)
+                    {
+                        log.Info($"{42:X}");
+                    }
+                }
+                """,
             ExpectedDiagnostics =
             {
                 new DiagnosticResult(UseStringInterpolationAnalyzer.UseStringInterpolationDiagnostic).WithLocation(0)
@@ -128,28 +128,28 @@ class C
     {
         var test = new Test
         {
-            TestCode = @"
-using System;
+            TestCode = """
+                using System;
 
-class C
-{
-    void M(ZeroLog.Log log)
-    {
-        log.{|#0:Info|}().Append(""Foo{Bar}Baz"").Append(42).Log();
-    }
-}
-",
-            FixedCode = @"
-using System;
+                class C
+                {
+                    void M(ZeroLog.Log log)
+                    {
+                        log.{|#0:Info|}().Append("Foo{Bar}Baz").Append(42).Log();
+                    }
+                }
+                """,
+            FixedCode = """
+                using System;
 
-class C
-{
-    void M(ZeroLog.Log log)
-    {
-        log.Info($""Foo{{Bar}}Baz{42}"");
-    }
-}
-",
+                class C
+                {
+                    void M(ZeroLog.Log log)
+                    {
+                        log.Info($"Foo{{Bar}}Baz{42}");
+                    }
+                }
+                """,
             ExpectedDiagnostics =
             {
                 new DiagnosticResult(UseStringInterpolationAnalyzer.UseStringInterpolationDiagnostic).WithLocation(0)
@@ -164,28 +164,28 @@ class C
     {
         var test = new Test
         {
-            TestCode = @"
-using System;
+            TestCode = """
+                using System;
 
-class C
-{
-    void M(ZeroLog.Log log)
-    {
-        log.{|#0:Info|}().Append(42, @""Foo""""\"").Log();
-    }
-}
-",
-            FixedCode = @"
-using System;
+                class C
+                {
+                    void M(ZeroLog.Log log)
+                    {
+                        log.{|#0:Info|}().Append(42, @"Foo""\").Log();
+                    }
+                }
+                """,
+            FixedCode = """
+                using System;
 
-class C
-{
-    void M(ZeroLog.Log log)
-    {
-        log.Info($""{42:Foo\""\\}"");
-    }
-}
-",
+                class C
+                {
+                    void M(ZeroLog.Log log)
+                    {
+                        log.Info($"{42:Foo\"\\}");
+                    }
+                }
+                """,
             ExpectedDiagnostics =
             {
                 new DiagnosticResult(UseStringInterpolationAnalyzer.UseStringInterpolationDiagnostic).WithLocation(0)
@@ -200,28 +200,28 @@ class C
     {
         var test = new Test
         {
-            TestCode = @"
-using System;
+            TestCode = """
+                using System;
 
-class C
-{
-    void M(ZeroLog.Log log)
-    {
-        log.{|#0:Info|}().Append(""Foo"").Append($""Bar {42} Baz"").Append(""!"").Log();
-    }
-}
-",
-            FixedCode = @"
-using System;
+                class C
+                {
+                    void M(ZeroLog.Log log)
+                    {
+                        log.{|#0:Info|}().Append("Foo").Append($"Bar {42} Baz").Append("!").Log();
+                    }
+                }
+                """,
+            FixedCode = """
+                using System;
 
-class C
-{
-    void M(ZeroLog.Log log)
-    {
-        log.Info($""FooBar {42} Baz!"");
-    }
-}
-",
+                class C
+                {
+                    void M(ZeroLog.Log log)
+                    {
+                        log.Info($"FooBar {42} Baz!");
+                    }
+                }
+                """,
             ExpectedDiagnostics =
             {
                 new DiagnosticResult(UseStringInterpolationAnalyzer.UseStringInterpolationDiagnostic).WithLocation(0)
@@ -236,64 +236,64 @@ class C
     {
         var test = new Test
         {
-            TestCode = @"
-using System;
+            TestCode = """
+                using System;
 
-class C
-{
-    void M1(ZeroLog.Log log, bool condition)
-    {
-        log.{|#0:Info|}().Append(condition ? ""Foo"" : ""Bar"").Log();
-    }
+                class C
+                {
+                    void M1(ZeroLog.Log log, bool condition)
+                    {
+                        log.{|#0:Info|}().Append(condition ? "Foo" : "Bar").Log();
+                    }
 
-    void M2(ZeroLog.Log log, bool condition)
-    {
-        string str = null;
-        log.{|#1:Info|}().Append(str ??= condition ? ""Foo"" : ""Bar"").Log();
-    }
+                    void M2(ZeroLog.Log log, bool condition)
+                    {
+                        string str = null;
+                        log.{|#1:Info|}().Append(str ??= condition ? "Foo" : "Bar").Log();
+                    }
 
-    void M3(ZeroLog.Log log, bool condition)
-    {
-        string str = null;
-        log.{|#2:Info|}().Append(str ??= (condition ? ""Foo"" : ""Bar"")).Log();
-    }
+                    void M3(ZeroLog.Log log, bool condition)
+                    {
+                        string str = null;
+                        log.{|#2:Info|}().Append(str ??= (condition ? "Foo" : "Bar")).Log();
+                    }
 
-    void M4(ZeroLog.Log log, bool condition)
-    {
-        log.{|#3:Info|}().Append(GetValue(condition ? ""Foo"" : ""Bar"")).Log();
-        string GetValue(string value) => value;
-    }
-}
-",
-            FixedCode = @"
-using System;
+                    void M4(ZeroLog.Log log, bool condition)
+                    {
+                        log.{|#3:Info|}().Append(GetValue(condition ? "Foo" : "Bar")).Log();
+                        string GetValue(string value) => value;
+                    }
+                }
+                """,
+            FixedCode = """
+                using System;
 
-class C
-{
-    void M1(ZeroLog.Log log, bool condition)
-    {
-        log.Info($""{(condition ? ""Foo"" : ""Bar"")}"");
-    }
+                class C
+                {
+                    void M1(ZeroLog.Log log, bool condition)
+                    {
+                        log.Info($"{(condition ? "Foo" : "Bar")}");
+                    }
 
-    void M2(ZeroLog.Log log, bool condition)
-    {
-        string str = null;
-        log.Info($""{(str ??= condition ? ""Foo"" : ""Bar"")}"");
-    }
+                    void M2(ZeroLog.Log log, bool condition)
+                    {
+                        string str = null;
+                        log.Info($"{(str ??= condition ? "Foo" : "Bar")}");
+                    }
 
-    void M3(ZeroLog.Log log, bool condition)
-    {
-        string str = null;
-        log.Info($""{str ??= (condition ? ""Foo"" : ""Bar"")}"");
-    }
+                    void M3(ZeroLog.Log log, bool condition)
+                    {
+                        string str = null;
+                        log.Info($"{str ??= (condition ? "Foo" : "Bar")}");
+                    }
 
-    void M4(ZeroLog.Log log, bool condition)
-    {
-        log.Info($""{GetValue(condition ? ""Foo"" : ""Bar"")}"");
-        string GetValue(string value) => value;
-    }
-}
-",
+                    void M4(ZeroLog.Log log, bool condition)
+                    {
+                        log.Info($"{GetValue(condition ? "Foo" : "Bar")}");
+                        string GetValue(string value) => value;
+                    }
+                }
+                """,
             ExpectedDiagnostics =
             {
                 new DiagnosticResult(UseStringInterpolationAnalyzer.UseStringInterpolationDiagnostic).WithLocation(0),
@@ -311,28 +311,28 @@ class C
     {
         var test = new Test
         {
-            TestCode = @"
-using System;
+            TestCode = """
+                using System;
 
-class C
-{
-    void M(ZeroLog.Log log)
-    {
-        log.{|#0:Info|}().Append(""Foo"").Append(@""Bar"").Append(""Baz"").Log();
-    }
-}
-",
-            FixedCode = @"
-using System;
+                class C
+                {
+                    void M(ZeroLog.Log log)
+                    {
+                        log.{|#0:Info|}().Append("Foo").Append(@"Bar").Append("Baz").Log();
+                    }
+                }
+                """,
+            FixedCode = """
+                using System;
 
-class C
-{
-    void M(ZeroLog.Log log)
-    {
-        log.Info($""Foo{@""Bar""}Baz"");
-    }
-}
-",
+                class C
+                {
+                    void M(ZeroLog.Log log)
+                    {
+                        log.Info($"Foo{@"Bar"}Baz");
+                    }
+                }
+                """,
             ExpectedDiagnostics =
             {
                 new DiagnosticResult(UseStringInterpolationAnalyzer.UseStringInterpolationDiagnostic).WithLocation(0)
@@ -347,28 +347,28 @@ class C
     {
         var test = new Test
         {
-            TestCode = @"
-using System;
+            TestCode = """
+                using System;
 
-class C
-{
-    void M(ZeroLog.Log log)
-    {
-        log.{|#0:Info|}().Append(""Foo"").Append(""Bar"").Log();
-    }
-}
-",
-            FixedCode = @"
-using System;
+                class C
+                {
+                    void M(ZeroLog.Log log)
+                    {
+                        log.{|#0:Info|}().Append("Foo").Append("Bar").Log();
+                    }
+                }
+                """,
+            FixedCode = """
+                using System;
 
-class C
-{
-    void M(ZeroLog.Log log)
-    {
-        log.Info(""FooBar"");
-    }
-}
-",
+                class C
+                {
+                    void M(ZeroLog.Log log)
+                    {
+                        log.Info("FooBar");
+                    }
+                }
+                """,
             ExpectedDiagnostics =
             {
                 new DiagnosticResult(UseStringInterpolationAnalyzer.UseStringInterpolationDiagnostic).WithLocation(0)
@@ -383,28 +383,28 @@ class C
     {
         var test = new Test
         {
-            TestCode = @"
-using System;
+            TestCode = """
+                using System;
 
-class C
-{
-    void M(ZeroLog.Log log)
-    {
-        log.{|#0:Info|}().Log();
-    }
-}
-",
-            FixedCode = @"
-using System;
+                class C
+                {
+                    void M(ZeroLog.Log log)
+                    {
+                        log.{|#0:Info|}().Log();
+                    }
+                }
+                """,
+            FixedCode = """
+                using System;
 
-class C
-{
-    void M(ZeroLog.Log log)
-    {
-        log.Info("""");
-    }
-}
-",
+                class C
+                {
+                    void M(ZeroLog.Log log)
+                    {
+                        log.Info("");
+                    }
+                }
+                """,
             ExpectedDiagnostics =
             {
                 new DiagnosticResult(UseStringInterpolationAnalyzer.UseStringInterpolationDiagnostic).WithLocation(0)

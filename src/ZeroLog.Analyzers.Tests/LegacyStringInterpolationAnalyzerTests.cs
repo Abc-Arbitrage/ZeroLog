@@ -14,13 +14,13 @@ public class LegacyStringInterpolationAnalyzerTests
         var test = new Test
         {
             LanguageVersion = LanguageVersion.CSharp10,
-            TestCode = @"
-class C
-{
-    void M(ZeroLog.Log log)
-        => log.Info($""foo {42}"");
-}
-"
+            TestCode = """
+                class C
+                {
+                    void M(ZeroLog.Log log)
+                        => log.Info($"foo {42}");
+                }
+                """
         };
 
         return test.RunAsync();
@@ -32,13 +32,13 @@ class C
         var test = new Test
         {
             LanguageVersion = LanguageVersion.CSharp9,
-            TestCode = @"
-class C
-{
-    void M(ZeroLog.Log log)
-        => log.Info({|#0:$""foo {42}""|});
-}
-",
+            TestCode = """
+                class C
+                {
+                    void M(ZeroLog.Log log)
+                        => log.Info({|#0:$"foo {42}"|});
+                }
+                """,
             ExpectedDiagnostics =
             {
                 new DiagnosticResult(LegacyStringInterpolationAnalyzer.AllocatingStringInterpolationDiagnostic).WithLocation(0)
@@ -54,13 +54,13 @@ class C
         var test = new Test
         {
             LanguageVersion = LanguageVersion.CSharp9,
-            TestCode = @"
-class C
-{
-    void M(ZeroLog.LogMessage message)
-        => message.Append({|#0:$""foo {42}""|});
-}
-",
+            TestCode = """
+                class C
+                {
+                    void M(ZeroLog.LogMessage message)
+                        => message.Append({|#0:$"foo {42}"|});
+                }
+                """,
             ExpectedDiagnostics =
             {
                 new DiagnosticResult(LegacyStringInterpolationAnalyzer.AllocatingStringInterpolationDiagnostic).WithLocation(0)
@@ -75,15 +75,15 @@ class C
     {
         var test = new Test
         {
-            TestCode = @"
-class C
-{
-    void M()
-        => N($""foo {42}"");
+            TestCode = """
+                class C
+                {
+                    void M()
+                        => N($"foo {42}");
 
-    void N(string value) { }
-}
-"
+                    void N(string value) { }
+                }
+                """
         };
 
         return test.RunAsync();

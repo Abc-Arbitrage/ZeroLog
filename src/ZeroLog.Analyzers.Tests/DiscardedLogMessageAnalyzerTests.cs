@@ -12,13 +12,13 @@ public class DiscardedLogMessageAnalyzerTests
     {
         var test = new Test
         {
-            TestCode = @"
-class C
-{
-    void M(ZeroLog.Log log)
-        => log.Info().Append(42).Log();
-}
-"
+            TestCode = """
+                class C
+                {
+                    void M(ZeroLog.Log log)
+                        => log.Info().Append(42).Log();
+                }
+                """
         };
 
         return test.RunAsync();
@@ -29,13 +29,13 @@ class C
     {
         var test = new Test
         {
-            TestCode = @"
-class C
-{
-    void M(ZeroLog.Log log)
-        => log.Info().{|#0:Append|}(42);
-}
-",
+            TestCode = """
+                class C
+                {
+                    void M(ZeroLog.Log log)
+                        => log.Info().{|#0:Append|}(42);
+                }
+                """,
             ExpectedDiagnostics =
             {
                 new DiagnosticResult(DiscardedLogMessageAnalyzer.DiscardedLogMessageDiagnostic).WithLocation(0)
@@ -50,13 +50,13 @@ class C
     {
         var test = new Test
         {
-            TestCode = @"
-class C
-{
-    void M(ZeroLog.Log log)
-        => _ = log.Info().Append(42);
-}
-"
+            TestCode = """
+                class C
+                {
+                    void M(ZeroLog.Log log)
+                        => _ = log.Info().Append(42);
+                }
+                """
         };
 
         return test.RunAsync();
@@ -67,16 +67,16 @@ class C
     {
         var test = new Test
         {
-            TestCode = @"
-class C
-{
-    void M()
-        => {|#0:N|}();
+            TestCode = """
+                class C
+                {
+                    void M()
+                        => {|#0:N|}();
 
-    ZeroLog.LogMessage N()
-        => throw null;
-}
-",
+                    ZeroLog.LogMessage N()
+                        => throw null;
+                }
+                """,
             ExpectedDiagnostics =
             {
                 new DiagnosticResult(DiscardedLogMessageAnalyzer.DiscardedLogMessageDiagnostic).WithLocation(0)
@@ -91,13 +91,13 @@ class C
     {
         var test = new Test
         {
-            TestCode = @"
-class C
-{
-    ZeroLog.LogMessage M(ZeroLog.Log log)
-        => log.Info().Append(42);
-}
-"
+            TestCode = """
+                class C
+                {
+                    ZeroLog.LogMessage M(ZeroLog.Log log)
+                        => log.Info().Append(42);
+                }
+                """
         };
 
         return test.RunAsync();
