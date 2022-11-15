@@ -12,15 +12,15 @@ namespace ZeroLog.Analyzers.Tests;
 
 internal static class ZeroLogAnalyzerTest
 {
-    private static readonly ReferenceAssemblies _net6ReferenceAssemblies = new(
-        "net6.0",
-        new PackageIdentity("Microsoft.NETCore.App.Ref", "6.0.0"),
-        Path.Combine("ref", "net6.0")
+    private static readonly ReferenceAssemblies _net7ReferenceAssemblies = new(
+        "net7.0",
+        new PackageIdentity("Microsoft.NETCore.App.Ref", "7.0.0"),
+        Path.Combine("ref", "net7.0")
     );
 
     public static void ConfigureTest(AnalyzerTest<NUnitVerifier> test)
     {
-        test.ReferenceAssemblies = _net6ReferenceAssemblies;
+        test.ReferenceAssemblies = _net7ReferenceAssemblies;
         test.TestState.AdditionalReferences.Add(typeof(LogManager).Assembly);
     }
 }

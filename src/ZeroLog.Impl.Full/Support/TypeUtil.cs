@@ -8,18 +8,20 @@ namespace ZeroLog.Support;
 
 internal static class TypeUtil
 {
-    private static readonly Func<IntPtr, Type>? _getTypeFromHandleFunc = BuildGetTypeFromHandleFunc();
-
     public static IntPtr GetTypeHandleSlow(Type type)
         => type.TypeHandle.Value;
 
+#if NET7_0_OR_GREATER
+    public static Type? GetTypeFromHandle(IntPtr typeHandle)
+        => Type.GetTypeFromHandle(RuntimeTypeHandle.FromIntPtr(typeHandle));
+#else
     public static Type? GetTypeFromHandle(IntPtr typeHandle)
         => _getTypeFromHandleFunc?.Invoke(typeHandle);
 
+    private static readonly Func<IntPtr, Type>? _getTypeFromHandleFunc = BuildGetTypeFromHandleFunc();
+
     private static Func<IntPtr, Type>? BuildGetTypeFromHandleFunc()
     {
-        // TODO: Use RuntimeTypeHandle.FromIntPtr in .NET 7 (see #47)
-
         var method = typeof(Type).GetMethod("GetTypeFromHandleUnsafe", BindingFlags.Static | BindingFlags.NonPublic, null, new[] { typeof(IntPtr) }, null);
         if (method == null)
             return null;
@@ -31,6 +33,7 @@ internal static class TypeUtil
             param
         ).Compile();
     }
+#endif
 
     public static bool GetIsUnmanagedSlow(Type type)
     {
