@@ -52,9 +52,13 @@ public sealed class ZeroLogConfiguration
     /// Flag indicating to use a background thread for appending log messages.
     /// </summary>
     /// <remarks>
-    /// If a background thread is used the application exit won't wait for <see cref="LogManager.Shutdown"/>
-    /// This allows hooking LogManager.Shutdown calls to AppDomain.CurrentDomain.ProcessExit events as this event is otherwise blocked by foreground thread
-    /// Default: false
+    /// <para>
+    /// If a background thread is used the application exit won't wait for <see cref="LogManager.Shutdown"/>.
+    /// This allows hooking <c>LogManager.Shutdown</c> calls to <c>AppDomain.CurrentDomain.ProcessExit</c> events as this event is otherwise blocked by a foreground thread.
+    /// </para>
+    /// <para>
+    /// Default: false.
+    /// </para>
     /// </remarks>
     public bool UseBackgroundThread { get; init; } = false;
 
