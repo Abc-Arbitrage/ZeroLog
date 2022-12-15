@@ -57,7 +57,7 @@ public sealed class ZeroLogConfiguration
     /// This allows hooking <c>LogManager.Shutdown</c> calls to <c>AppDomain.CurrentDomain.ProcessExit</c> events as this event is otherwise blocked by a foreground thread.
     /// </para>
     /// <para>
-    /// Default: false.
+    /// Default: false
     /// </para>
     /// </remarks>
     public bool UseBackgroundThread { get; init; } = false;

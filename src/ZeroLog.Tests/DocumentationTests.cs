@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using NUnit.Framework;
 using NUnit.Framework.Interfaces;
@@ -28,9 +29,11 @@ public class DocumentationTests
             member.Elements("remarks").Count().ShouldBeLessThanOrEqualTo(1);
         }
 
-        foreach (var text in member.Elements().Select(i => i.Value.Trim()).Where(i => i.Length != 0))
+        foreach (var elem in member.Elements())
         {
-            if (!text.StartsWith("Default: "))
+            var text = Regex.Replace(elem.Value, @"^\s*Default:.*", "", RegexOptions.Multiline).Trim();
+
+            if (text.Length != 0)
                 text.ShouldEndWith(".");
         }
     }
