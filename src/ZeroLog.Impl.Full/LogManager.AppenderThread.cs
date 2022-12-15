@@ -33,7 +33,8 @@ partial class LogManager
 
             _thread = new Thread(WriteThread)
             {
-                Name = $"{nameof(ZeroLog)}.{nameof(AppenderThread)}"
+                Name = $"{nameof(ZeroLog)}.{nameof(AppenderThread)}",
+                IsBackground = _config.UseBackgroundThread
             };
 
             _thread.Start();

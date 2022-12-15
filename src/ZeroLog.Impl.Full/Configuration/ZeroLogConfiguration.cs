@@ -49,6 +49,20 @@ public sealed class ZeroLogConfiguration
     public bool AutoRegisterEnums { get; set; } = false;
 
     /// <summary>
+    /// Flag indicating to use a background thread for appending log messages.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// If a background thread is used the application exit won't wait for <see cref="LogManager.Shutdown"/>.
+    /// This allows hooking <c>LogManager.Shutdown</c> calls to <c>AppDomain.CurrentDomain.ProcessExit</c> events as this event is otherwise blocked by a foreground thread.
+    /// </para>
+    /// <para>
+    /// Default: false.
+    /// </para>
+    /// </remarks>
+    public bool UseBackgroundThread { get; init; } = false;
+
+    /// <summary>
     /// The string which should be logged instead of a <c>null</c> value.
     /// </summary>
     /// <remarks>
