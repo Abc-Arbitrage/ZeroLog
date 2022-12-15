@@ -49,7 +49,7 @@ public sealed class ZeroLogConfiguration
     public bool AutoRegisterEnums { get; set; } = false;
 
     /// <summary>
-    /// Flag indicating to use background thread for flushing to appenders.
+    /// Flag indicating to use a background thread for appending log messages.
     /// </summary>
     /// <remarks>
     /// If a background thread is used the application exit won't wait for <see cref="LogManager.Shutdown"/>
