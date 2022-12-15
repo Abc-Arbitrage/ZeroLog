@@ -52,7 +52,7 @@ public sealed class ZeroLogConfiguration
     /// Flag indicating to use background thread for flushing to appenders.
     /// </summary>
     /// <remarks>
-    /// If background thread is used application exit will not waiting for <see cref="LogManager.Shutdown"/>
+    /// If a background thread is used the application exit won't wait for <see cref="LogManager.Shutdown"/>
     /// This allows hooking LogManager.Shutdown calls to AppDomain.CurrentDomain.ProcessExit events as this event is otherwise blocked by foreground thread
     /// Default: false
     /// </remarks>
