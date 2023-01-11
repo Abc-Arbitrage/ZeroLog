@@ -18,7 +18,7 @@ public sealed class LoggerConfiguration : ILoggerConfiguration
     internal string NameWithPeriod { get; }
 
     /// <summary>
-    /// The minimum log level for this level.
+    /// The minimum log level for this logger.
     /// </summary>
     /// <remarks>
     /// The level of the parent logger is inherited by default.
@@ -60,12 +60,34 @@ public sealed class LoggerConfiguration : ILoggerConfiguration
     }
 
     /// <summary>
+    /// Creates a configuration for a logger.
+    /// </summary>
+    /// <param name="name">The logger name or partial namespace.</param>
+    /// <param name="level">The minimum log level for this logger.</param>
+    public LoggerConfiguration(string name, LogLevel level)
+        : this(name)
+    {
+        Level = level;
+    }
+
+    /// <summary>
     /// Creates a configuration for a type.
     /// </summary>
     /// <param name="type">The type which uses the logger.</param>
     public LoggerConfiguration(Type type)
         : this(type.FullName ?? throw new InvalidOperationException("Invalid type name"))
     {
+    }
+
+    /// <summary>
+    /// Creates a configuration for a type.
+    /// </summary>
+    /// <param name="type">The type which uses the logger.</param>
+    /// <param name="level">The minimum log level for this logger.</param>
+    public LoggerConfiguration(Type type, LogLevel level)
+        : this(type)
+    {
+        Level = level;
     }
 
     internal void Validate()

@@ -12,6 +12,8 @@ public sealed class ZeroLogConfiguration
 {
     internal static ZeroLogConfiguration Default { get; } = new();
 
+    private List<LoggerConfiguration> _loggers = new();
+
     internal event Action? ApplyChangesRequested;
 
     /// <summary>
@@ -101,7 +103,7 @@ public sealed class ZeroLogConfiguration
     /// ZeroLog supports hierarchical loggers. When <c>GetLogger("Foo.Bar.Baz")</c> is called, it will try to find the best matching configuration using a hierarchical namespace-like mode.
     /// If <c>Foo.Bar</c> is configured, but <c>Foo.Bar.Baz</c> is not, it will use the configuration for <c>Foo.Bar</c>.
     /// </remarks>
-    public ICollection<LoggerConfiguration> Loggers { get; private set; } = new List<LoggerConfiguration>();
+    public ICollection<LoggerConfiguration> Loggers => _loggers;
 
     /// <summary>
     /// Applies the changes made to this object since the call to <see cref="LogManager.Initialize"/>
@@ -112,6 +114,44 @@ public sealed class ZeroLogConfiguration
     /// </remarks>
     public void ApplyChanges()
         => ApplyChangesRequested?.Invoke();
+
+    /// <summary>
+    /// Sets the log level of a given logger.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// This is an utility method which updates a logger configuration in <see cref="Loggers"/> or adds one if necessary.
+    /// It will update the <see cref="RootLogger"/> if the provided logger name is null or empty.
+    /// </para>
+    /// <para>
+    /// You need to call <see cref="ApplyChanges"/> for the changes to be taken into account after ZeroLog is started.
+    /// </para>
+    /// </remarks>
+    /// <param name="loggerName">The logger name whose configuration to update. Updates the root log level when null or empty.</param>
+    /// <param name="logLevel">The new log level.</param>
+    /// <seealso cref="LoggerConfiguration.Level"/>
+    public void SetLogLevel(string? loggerName, LogLevel? logLevel)
+    {
+        if (string.IsNullOrEmpty(loggerName))
+        {
+            RootLogger.Level = logLevel ?? LogLevel.Trace;
+            return;
+        }
+
+        foreach (var logger in _loggers)
+        {
+            if (logger.Name == loggerName)
+            {
+                logger.Level = logLevel;
+                return;
+            }
+        }
+
+        Loggers.Add(new LoggerConfiguration(loggerName)
+        {
+            Level = logLevel
+        });
+    }
 
     internal void Validate()
     {
@@ -135,7 +175,7 @@ public sealed class ZeroLogConfiguration
     {
         var clone = (ZeroLogConfiguration)MemberwiseClone();
         clone.RootLogger = RootLogger.Clone();
-        clone.Loggers = Loggers.Select(i => i.Clone()).ToList();
+        clone._loggers = Loggers.Select(i => i.Clone()).ToList();
         return clone;
     }
 
