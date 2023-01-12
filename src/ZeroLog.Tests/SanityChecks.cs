@@ -20,6 +20,7 @@ public class SanityChecks
             "ZeroLog.Appenders.NoopAppender",
             "ZeroLog.Appenders.StreamAppender",
             "ZeroLog.Configuration.AppenderConfiguration",
+            "ZeroLog.Configuration.ILoggerConfigurationCollection",
             "ZeroLog.Configuration.LogMessagePoolExhaustionStrategy",
             "ZeroLog.Configuration.LoggerConfiguration",
             "ZeroLog.Configuration.RootLoggerConfiguration",

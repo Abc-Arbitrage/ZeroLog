@@ -164,3 +164,31 @@ internal interface ILoggerConfiguration
     bool IncludeParentAppenders { get; }
     ICollection<AppenderConfiguration> Appenders { get; }
 }
+
+/// <summary>
+/// A collection of <see cref="LoggerConfiguration"/>.
+/// </summary>
+public interface ILoggerConfigurationCollection : ICollection<LoggerConfiguration>
+{
+    /// <summary>
+    /// Adds a <see cref="LoggerConfiguration"/> with a given level and name.
+    /// </summary>
+    /// <param name="name">The logger name.</param>
+    /// <param name="level">The log level.</param>
+    void Add(string name, LogLevel level);
+}
+
+internal class LoggerConfigurationCollection : List<LoggerConfiguration>, ILoggerConfigurationCollection
+{
+    public LoggerConfigurationCollection()
+    {
+    }
+
+    public LoggerConfigurationCollection(IEnumerable<LoggerConfiguration> items)
+        : base(items)
+    {
+    }
+
+    public void Add(string name, LogLevel level)
+        => Add(new LoggerConfiguration(name, level));
+}

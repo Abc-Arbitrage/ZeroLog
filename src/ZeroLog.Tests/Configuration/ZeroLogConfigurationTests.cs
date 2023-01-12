@@ -40,4 +40,20 @@ public class ZeroLogConfigurationTests
         config.RootLogger.Level.ShouldEqual(LogLevel.Warn);
         config.Loggers.ShouldBeEmpty();
     }
+
+    [Test]
+    public void should_set_log_level_from_initializer()
+    {
+        var config = new ZeroLogConfiguration
+        {
+            Loggers =
+            {
+                { "Foo", LogLevel.Warn }
+            }
+        };
+
+        var logger = config.Loggers.ShouldHaveSingleItem();
+        logger.Name.ShouldEqual("Foo");
+        logger.Level.ShouldEqual(LogLevel.Warn);
+    }
 }

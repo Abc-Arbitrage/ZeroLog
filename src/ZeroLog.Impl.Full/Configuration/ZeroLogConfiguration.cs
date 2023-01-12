@@ -12,7 +12,7 @@ public sealed class ZeroLogConfiguration
 {
     internal static ZeroLogConfiguration Default { get; } = new();
 
-    private List<LoggerConfiguration> _loggers = new();
+    private LoggerConfigurationCollection _loggers = new();
 
     internal event Action? ApplyChangesRequested;
 
@@ -103,7 +103,7 @@ public sealed class ZeroLogConfiguration
     /// ZeroLog supports hierarchical loggers. When <c>GetLogger("Foo.Bar.Baz")</c> is called, it will try to find the best matching configuration using a hierarchical namespace-like mode.
     /// If <c>Foo.Bar</c> is configured, but <c>Foo.Bar.Baz</c> is not, it will use the configuration for <c>Foo.Bar</c>.
     /// </remarks>
-    public ICollection<LoggerConfiguration> Loggers => _loggers;
+    public ILoggerConfigurationCollection Loggers => _loggers;
 
     /// <summary>
     /// Applies the changes made to this object since the call to <see cref="LogManager.Initialize"/>
@@ -175,7 +175,7 @@ public sealed class ZeroLogConfiguration
     {
         var clone = (ZeroLogConfiguration)MemberwiseClone();
         clone.RootLogger = RootLogger.Clone();
-        clone._loggers = Loggers.Select(i => i.Clone()).ToList();
+        clone._loggers = new LoggerConfigurationCollection(Loggers.Select(i => i.Clone()));
         return clone;
     }
 
