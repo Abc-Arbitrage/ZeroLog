@@ -1,46 +1,30 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
 using ZeroLog.Configuration;
-using ZeroLog.Support;
 
 namespace ZeroLog;
 
-partial class LogManager : ILogMessageProvider, IDisposable
+partial class LogManager : IDisposable
 {
     internal const int OutputBufferSize = 16 * 1024;
 
     private static LogManager? _staticLogManager;
 
-    private readonly ConcurrentQueue<LogMessage> _queue;
-    private readonly ObjectPool<LogMessage> _pool;
+    private Runner? _runner;
 
     private readonly ZeroLogConfiguration _originalConfig; // Reference to the configuration object supplied by the user
     private ZeroLogConfiguration _config; // Snapshot of the current configuration
-
-    private readonly AppenderThread _appenderThread;
-
-    private bool _isRunning;
 
     private LogManager(ZeroLogConfiguration config)
     {
         _originalConfig = config;
         _config = config.Clone();
 
-        _queue = new ConcurrentQueue<LogMessage>(new ConcurrentQueueCapacityInitializer(config.LogMessagePoolSize));
-
-        var bufferSegmentProvider = new BufferSegmentProvider(config.LogMessagePoolSize, config.LogMessageBufferSize);
-        _pool = new ObjectPool<LogMessage>(config.LogMessagePoolSize, () => new LogMessage(bufferSegmentProvider.GetSegment(), config.LogMessageStringCapacity));
+        _runner = new AsyncRunner(_config);
 
         UpdateAllLogConfigurations();
-
-        _isRunning = true;
-
-        // Instantiate this last
-        _appenderThread = new AppenderThread(this);
-
         _originalConfig.ApplyChangesRequested += ApplyConfigurationChanges;
     }
 
@@ -49,23 +33,16 @@ partial class LogManager : ILogMessageProvider, IDisposable
     /// </summary>
     public void Dispose()
     {
-        if (!_isRunning)
+        var runner = Interlocked.Exchange(ref _runner, null);
+        if (runner is null)
             return;
 
-        _isRunning = false;
         Interlocked.CompareExchange(ref _staticLogManager, null, this);
 
         _originalConfig.ApplyChangesRequested -= ApplyConfigurationChanges;
         ResetAllLogConfigurations();
 
-        _pool.Clear();
-        _appenderThread.Join();
-        _pool.Clear();
-
-        if (_pool.IsAnyItemAcquired())
-            Thread.Sleep(100); // Can't really do much better here
-
-        _appenderThread.DisposeAppenders();
+        runner.Dispose();
     }
 
     /// <summary>
@@ -186,11 +163,11 @@ partial class LogManager : ILogMessageProvider, IDisposable
         _config = newConfig;
 
         UpdateAllLogConfigurations();
-        _appenderThread.UpdateConfiguration(_config);
+        _runner?.UpdateConfiguration(_config);
     }
 
-    internal void UpdateLogConfiguration(Log log)
-        => log.UpdateConfiguration(this, _config.ResolveLoggerConfiguration(log.Name));
+    private void UpdateLogConfiguration(Log log)
+        => log.UpdateConfiguration(_runner, _config.ResolveLoggerConfiguration(log.Name));
 
     private void UpdateAllLogConfigurations()
     {
@@ -204,32 +181,6 @@ partial class LogManager : ILogMessageProvider, IDisposable
             log.UpdateConfiguration(null, null);
     }
 
-    internal void WaitUntilNewConfigurationIsApplied()
-        => _appenderThread.WaitUntilNewConfigurationIsApplied();
-
-    LogMessage? ILogMessageProvider.TryAcquireLogMessage()
-    {
-        if (_pool.TryAcquire(out var message))
-        {
-            message.ReturnToPool = true;
-            return message;
-        }
-
-        if (!_isRunning)
-            return LogMessage.Empty;
-
-        return null;
-    }
-
-    void ILogMessageProvider.Submit(LogMessage message)
-        => _queue.Enqueue(message);
-
-    private void ReleaseAfterProcessing(LogMessage message)
-    {
-        if (message.ReturnToPool && _isRunning)
-        {
-            message.ReturnToPool = false;
-            _pool.Release(message);
-        }
-    }
+    internal void WaitUntilNewConfigurationIsApplied() // For unit tests
+        => _runner?.WaitUntilNewConfigurationIsApplied();
 }
