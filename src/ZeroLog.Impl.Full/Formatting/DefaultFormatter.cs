@@ -27,12 +27,14 @@ public sealed class DefaultFormatter : Formatter
     /// <remarks>
     /// The pattern is a string containing placeholders:
     /// <list type="table">
-    /// <item><term><c>%date</c></term><description>The message date in the <c>yyyy-MM-dd</c> format.</description></item>
-    /// <item><term><c>%time</c></term><description>The message UTC timestamp in the <c>hh:mm:ss.fffffff</c> format.</description></item>
+    /// <item><term><c>%date</c></term><description>The message UTC date (default format: <c>yyyy-MM-dd</c>).</description></item>
+    /// <item><term><c>%time</c></term><description>The message UTC timestamp (default format: <c>hh\:mm\:ss\.fffffff</c>).</description></item>
     /// <item><term><c>%thread</c></term><description>The thread name (or ID) which logged the message.</description></item>
     /// <item><term><c>%level</c></term><description>The log level in uppercase.</description></item>
-    /// <item><term><c>%logger</c></term><description>The logger name.</description></item>
+    /// <item><term><c>%logger</c></term><description>The logger name (specify the <c>pad</c> format to make each level 5 characters wide).</description></item>
     /// </list>
+    /// Placeholders can also be surrounded with braces and can specify an optional format string:
+    /// <c>%{date:yyyy-MM-dd HH:mm:ss}</c> for instance.
     /// </remarks>
     public string PrefixPattern
     {

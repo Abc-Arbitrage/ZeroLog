@@ -34,6 +34,10 @@ public class PrefixWriterTests
     [TestCase("%foo%bar", "%foo%bar")]
     [TestCase("%foo%bar%level%baz", "%foo%barINFO%baz")]
     [TestCase("<%foo>%bar|", "<%foo>%bar|")]
+    [TestCase("%{date:dd MM yyyy}", "02 01 2020")]
+    [TestCase("%{date:lol}", "lol")]
+    [TestCase("%{time:hh\\:mm}", "03:04")]
+    [TestCase("%{level:pad}", "INFO ")]
     public void should_write_prefix(string pattern, string expectedResult)
     {
         var prefixWriter = new PrefixWriter(pattern);
@@ -81,6 +85,14 @@ public class PrefixWriterTests
 
         var result = GetResult(prefixWriter, logMessage);
         result.ShouldEqual("0");
+    }
+
+    [Test]
+    [TestCase("%{date:\\}")]
+    [TestCase("%{time:\\}")]
+    public void should_throw_on_invalid_format(string pattern)
+    {
+        Assert.Throws<FormatException>(() => _ = new PrefixWriter(pattern));
     }
 
     private static string GetResult(PrefixWriter prefixWriter, LogMessage logMessage)
