@@ -65,6 +65,20 @@ public sealed class ZeroLogConfiguration
     public bool UseBackgroundThread { get; init; } = false;
 
     /// <summary>
+    /// Determines the way log messages are formatted and passed to appenders.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// By default, ZeroLog uses a dedicated thread to format log messages and write them to appenders. This corresponds to the <see cref="Configuration.AppendingStrategy.Asynchronous"/> mode.
+    /// A <see cref="Configuration.AppendingStrategy.Synchronous"/> mode is also available, where messages are formatted and appended in the current thread. It is intended primarily for unit testing.
+    /// </para>
+    /// <para>
+    /// Default: <see cref="Configuration.AppendingStrategy.Asynchronous"/>
+    /// </para>
+    /// </remarks>
+    public AppendingStrategy AppendingStrategy { get; init; } = AppendingStrategy.Asynchronous;
+
+    /// <summary>
     /// The string which should be logged instead of a <c>null</c> value.
     /// </summary>
     /// <remarks>

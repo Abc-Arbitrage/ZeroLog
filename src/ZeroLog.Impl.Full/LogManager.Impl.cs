@@ -22,7 +22,12 @@ partial class LogManager : IDisposable
         _originalConfig = config;
         _config = config.Clone();
 
-        _runner = new AsyncRunner(_config);
+        _runner = config.AppendingStrategy switch
+        {
+            AppendingStrategy.Asynchronous => new AsyncRunner(_config),
+            AppendingStrategy.Synchronous  => new SyncRunner(_config),
+            _                              => throw new ArgumentException("Unknown execution mode")
+        };
 
         UpdateAllLogConfigurations();
         _originalConfig.ApplyChangesRequested += ApplyConfigurationChanges;

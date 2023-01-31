@@ -13,11 +13,12 @@ namespace ZeroLog;
 internal abstract class Runner : ILogMessageProvider, IDisposable
 {
     private readonly ObjectPool<LogMessage> _pool;
+    private readonly LoggedMessage _loggedMessage;
 
-    protected ZeroLogConfiguration _config;
-    protected Appender[] _appenders;
+    private ZeroLogConfiguration _config;
+    private Appender[] _appenders;
 
-    protected bool _isRunning;
+    protected bool IsRunning { get; private set; }
 
     protected Runner(ZeroLogConfiguration config)
     {
@@ -28,15 +29,17 @@ internal abstract class Runner : ILogMessageProvider, IDisposable
 
         _appenders = config.GetAllAppenders().ToArray();
 
-        _isRunning = true;
+        _loggedMessage = new LoggedMessage(LogManager.OutputBufferSize, _config);
+
+        IsRunning = true;
     }
 
     public void Dispose()
     {
-        if (!_isRunning)
+        if (!IsRunning)
             return;
 
-        _isRunning = false;
+        IsRunning = false;
 
         _pool.Clear();
         Stop();
@@ -59,7 +62,7 @@ internal abstract class Runner : ILogMessageProvider, IDisposable
             return message;
         }
 
-        if (!_isRunning)
+        if (!IsRunning)
             return LogMessage.Empty;
 
         return null;
@@ -67,18 +70,57 @@ internal abstract class Runner : ILogMessageProvider, IDisposable
 
     public abstract void Submit(LogMessage message);
 
-    public abstract void UpdateConfiguration(ZeroLogConfiguration config);
+    public abstract void UpdateConfiguration(ZeroLogConfiguration newConfig);
     protected abstract void Stop();
 
     internal abstract void WaitUntilNewConfigurationIsApplied(); // For unit tests
 
-    protected void ReleaseAfterProcessing(LogMessage message)
+    protected void ProcessMessage(LogMessage message)
     {
-        if (message.ReturnToPool && _isRunning)
+        try
         {
-            message.ReturnToPool = false;
-            _pool.Release(message);
+            var appenders = message.Logger?.GetAppenders(message.Level) ?? Array.Empty<Appender>();
+            if (appenders.Length == 0)
+                return;
+
+            _loggedMessage.SetMessage(message);
+
+            foreach (var appender in appenders)
+                appender.InternalWriteMessage(_loggedMessage, _config);
         }
+        finally
+        {
+            if (message.ReturnToPool && IsRunning)
+            {
+                message.ReturnToPool = false;
+                _pool.Release(message);
+            }
+        }
+    }
+
+    protected void FlushAppenders()
+    {
+        foreach (var appender in _appenders)
+            appender.InternalFlush();
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    protected void ApplyConfigurationUpdate(ZeroLogConfiguration newConfig)
+    {
+        _config = newConfig;
+
+        // We could dispose the appenders that are no longer present in the new configuration right now,
+        // but the user may want to add them back later, so their state needs to remain valid.
+
+        var appenders = newConfig.GetAllAppenders();
+
+        if (!appenders.SetEquals(_appenders))
+        {
+            appenders.UnionWith(_appenders);
+            _appenders = appenders.ToArray();
+        }
+
+        _loggedMessage.UpdateConfiguration(newConfig);
     }
 }
 
@@ -86,7 +128,6 @@ internal sealed class AsyncRunner : Runner
 {
     private readonly ConcurrentQueue<LogMessage> _queue;
     private readonly Thread _thread;
-    private readonly LoggedMessage _loggedMessage;
 
     private ZeroLogConfiguration? _nextConfig;
 
@@ -95,12 +136,10 @@ internal sealed class AsyncRunner : Runner
     {
         _queue = new ConcurrentQueue<LogMessage>(new ConcurrentQueueCapacityInitializer(config.LogMessagePoolSize));
 
-        _loggedMessage = new LoggedMessage(LogManager.OutputBufferSize, _config);
-
         _thread = new Thread(WriteThread)
         {
             Name = $"{nameof(ZeroLog)}.{nameof(AsyncRunner)}",
-            IsBackground = _config.UseBackgroundThread
+            IsBackground = config.UseBackgroundThread
         };
 
         _thread.Start();
@@ -148,7 +187,7 @@ internal sealed class AsyncRunner : Runner
         var spinWait = new SpinWait();
         var flush = false;
 
-        while (_isRunning || !_queue.IsEmpty)
+        while (IsRunning || !_queue.IsEmpty)
         {
             if (TryToProcessQueue())
             {
@@ -182,29 +221,8 @@ internal sealed class AsyncRunner : Runner
         if (!_queue.TryDequeue(out var logMessage))
             return false;
 
-        try
-        {
-            var appenders = logMessage.Logger?.GetAppenders(logMessage.Level) ?? Array.Empty<Appender>();
-            if (appenders.Length == 0)
-                return true;
-
-            _loggedMessage.SetMessage(logMessage);
-
-            foreach (var appender in appenders)
-                appender.InternalWriteMessage(_loggedMessage, _config);
-        }
-        finally
-        {
-            ReleaseAfterProcessing(logMessage);
-        }
-
+        ProcessMessage(logMessage);
         return true;
-    }
-
-    private void FlushAppenders()
-    {
-        foreach (var appender in _appenders)
-            appender.InternalFlush();
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -217,23 +235,39 @@ internal sealed class AsyncRunner : Runner
         ApplyConfigurationUpdate(newConfig);
         return true;
     }
+}
 
-    [MethodImpl(MethodImplOptions.NoInlining)]
-    private void ApplyConfigurationUpdate(ZeroLogConfiguration newConfig)
+internal sealed class SyncRunner : Runner
+{
+    private readonly object _lock = new();
+
+    public SyncRunner(ZeroLogConfiguration config)
+        : base(config)
     {
-        _config = newConfig;
+    }
 
-        // We could dispose the appenders that are no longer present in the new configuration right now,
-        // but the user may want to add them back later, so their state needs to remain valid.
-
-        var appenders = newConfig.GetAllAppenders();
-
-        if (!appenders.SetEquals(_appenders))
+    public override void Submit(LogMessage message)
+    {
+        lock (_lock)
         {
-            appenders.UnionWith(_appenders);
-            _appenders = appenders.ToArray();
+            ProcessMessage(message);
+            FlushAppenders();
         }
+    }
 
-        _loggedMessage.UpdateConfiguration(newConfig);
+    public override void UpdateConfiguration(ZeroLogConfiguration newConfig)
+    {
+        lock (_lock)
+        {
+            ApplyConfigurationUpdate(newConfig);
+        }
+    }
+
+    protected override void Stop()
+    {
+    }
+
+    internal override void WaitUntilNewConfigurationIsApplied()
+    {
     }
 }
