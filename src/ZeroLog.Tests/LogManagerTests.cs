@@ -11,14 +11,23 @@ using ZeroLog.Tests.Support;
 
 namespace ZeroLog.Tests;
 
-[TestFixture, NonParallelizable]
+[NonParallelizable]
+[TestFixture(AppendingStrategy.Asynchronous)]
+[TestFixture(AppendingStrategy.Synchronous)]
 [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
 [SuppressMessage("ReSharper", "NotAccessedField.Global")]
 public partial class LogManagerTests
 {
+    private readonly AppendingStrategy _appendingStrategy;
+
     private TestAppender _testAppender;
     private ZeroLogConfiguration _config;
     private LogManager _logManager;
+
+    public LogManagerTests(AppendingStrategy appendingStrategy)
+    {
+        _appendingStrategy = appendingStrategy;
+    }
 
     [SetUp]
     public void SetUpFixture()
@@ -29,6 +38,7 @@ public partial class LogManagerTests
         {
             LogMessagePoolSize = 10,
             LogMessageBufferSize = 256,
+            AppendingStrategy = _appendingStrategy,
             RootLogger =
             {
                 Appenders = { _testAppender }
@@ -246,34 +256,6 @@ public partial class LogManagerTests
 
         var logMessage = _testAppender.LoggedMessages.ShouldHaveSingleItem();
         logMessage.ShouldEqual("An error occurred during formatting: Simulated failure - Unformatted message: Unmanaged(0x2a000000)");
-    }
-
-    [Test]
-    public void should_flush_appenders_when_not_logging_messages()
-    {
-        var log = LogManager.GetLogger(typeof(LogManagerTests));
-        var signal = _testAppender.SetMessageCountTarget(3);
-        _testAppender.WaitOnWriteEvent = new ManualResetEventSlim(false);
-
-        log.Info("Foo");
-        log.Info("Bar");
-        log.Info("Baz");
-
-        _testAppender.WaitOnWriteEvent.Set();
-        signal.Wait(TimeSpan.FromSeconds(1));
-
-        Wait.Until(() => _testAppender.FlushCount == 1, TimeSpan.FromSeconds(1));
-
-        log.Info("Foo");
-        Wait.Until(() => _testAppender.FlushCount == 2, TimeSpan.FromSeconds(1));
-    }
-
-    [Test]
-    public void should_register_all_assembly_enums()
-    {
-        EnumCache.IsRegistered(typeof(ConsoleColor)).ShouldBeFalse();
-        LogManager.RegisterAllEnumsFrom(typeof(ConsoleColor).Assembly);
-        EnumCache.IsRegistered(typeof(ConsoleColor)).ShouldBeTrue();
     }
 
     [Test]

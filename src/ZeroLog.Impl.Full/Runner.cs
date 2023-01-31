@@ -73,7 +73,9 @@ internal abstract class Runner : ILogMessageProvider, IDisposable
     public abstract void UpdateConfiguration(ZeroLogConfiguration newConfig);
     protected abstract void Stop();
 
-    internal abstract void WaitUntilNewConfigurationIsApplied(); // For unit tests
+    internal virtual void WaitUntilNewConfigurationIsApplied() // For unit tests
+    {
+    }
 
     protected void ProcessMessage(LogMessage message)
     {
@@ -264,10 +266,6 @@ internal sealed class SyncRunner : Runner
     }
 
     protected override void Stop()
-    {
-    }
-
-    internal override void WaitUntilNewConfigurationIsApplied()
     {
     }
 }

@@ -172,7 +172,7 @@ partial class LogManager : IDisposable
     }
 
     private void UpdateLogConfiguration(Log log)
-        => log.UpdateConfiguration(_runner, _config.ResolveLoggerConfiguration(log.Name));
+        => log.UpdateConfiguration(_runner, _config);
 
     private void UpdateAllLogConfigurations()
     {
@@ -183,7 +183,7 @@ partial class LogManager : IDisposable
     private static void ResetAllLogConfigurations()
     {
         foreach (var log in _loggers.Values)
-            log.UpdateConfiguration(null, null);
+            log.UpdateConfiguration(null, (ResolvedLoggerConfiguration?)null);
     }
 
     internal void WaitUntilNewConfigurationIsApplied() // For unit tests

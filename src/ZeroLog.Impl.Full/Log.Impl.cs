@@ -12,6 +12,9 @@ partial class Log
     private ILogMessageProvider? _logMessageProvider;
     private ResolvedLoggerConfiguration _config = ResolvedLoggerConfiguration.Empty;
 
+    internal void UpdateConfiguration(ILogMessageProvider? provider, ZeroLogConfiguration? config)
+        => UpdateConfiguration(provider, config?.ResolveLoggerConfiguration(Name));
+
     internal void UpdateConfiguration(ILogMessageProvider? provider, ResolvedLoggerConfiguration? config)
     {
         _logMessageProvider = provider;
