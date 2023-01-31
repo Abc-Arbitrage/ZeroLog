@@ -9,6 +9,15 @@ namespace ZeroLog.Tests;
 public partial class LogManagerTests
 {
     [Test]
+    public void should_return_configuration()
+    {
+        LogManager.Configuration.ShouldBeTheSameAs(_config);
+
+        LogManager.Shutdown();
+        LogManager.Configuration.ShouldBeNull();
+    }
+
+    [Test]
     public void should_apply_appender_changes()
     {
         var fooLog = LogManager.GetLogger("Foo");

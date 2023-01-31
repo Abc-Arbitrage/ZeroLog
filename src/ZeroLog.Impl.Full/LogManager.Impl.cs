@@ -14,23 +14,32 @@ partial class LogManager : IDisposable
 
     private Runner? _runner;
 
-    private readonly ZeroLogConfiguration _originalConfig; // Reference to the configuration object supplied by the user
-    private ZeroLogConfiguration _config; // Snapshot of the current configuration
+    private readonly ZeroLogConfiguration _userConfig; // Reference to the configuration object supplied by the user
+    private ZeroLogConfiguration _appliedConfig; // Snapshot of the current configuration
+
+    /// <summary>
+    /// The configuration being used.
+    /// </summary>
+    /// <remarks>
+    /// This configuration is not necessarily up to date. <see cref="ZeroLogConfiguration.ApplyChanges"/> needs to be called for the changes to be taken into account.
+    /// Returns <c>null</c> when the log manager is uninitialized or shut down.
+    /// </remarks>
+    public static ZeroLogConfiguration? Configuration => _staticLogManager?._userConfig;
 
     private LogManager(ZeroLogConfiguration config)
     {
-        _originalConfig = config;
-        _config = config.Clone();
+        _userConfig = config;
+        _appliedConfig = config.Clone();
 
         _runner = config.AppendingStrategy switch
         {
-            AppendingStrategy.Asynchronous => new AsyncRunner(_config),
-            AppendingStrategy.Synchronous  => new SyncRunner(_config),
+            AppendingStrategy.Asynchronous => new AsyncRunner(_appliedConfig),
+            AppendingStrategy.Synchronous  => new SyncRunner(_appliedConfig),
             _                              => throw new ArgumentException("Unknown execution mode")
         };
 
         UpdateAllLogConfigurations();
-        _originalConfig.ApplyChangesRequested += ApplyConfigurationChanges;
+        _userConfig.ApplyChangesRequested += ApplyConfigurationChanges;
     }
 
     /// <summary>
@@ -44,7 +53,7 @@ partial class LogManager : IDisposable
 
         Interlocked.CompareExchange(ref _staticLogManager, null, this);
 
-        _originalConfig.ApplyChangesRequested -= ApplyConfigurationChanges;
+        _userConfig.ApplyChangesRequested -= ApplyConfigurationChanges;
         ResetAllLogConfigurations();
 
         runner.Dispose();
@@ -162,17 +171,17 @@ partial class LogManager : IDisposable
 
     private void ApplyConfigurationChanges()
     {
-        var newConfig = _originalConfig.Clone();
+        var newConfig = _userConfig.Clone();
         newConfig.Validate();
 
-        _config = newConfig;
+        _appliedConfig = newConfig;
 
         UpdateAllLogConfigurations();
-        _runner?.UpdateConfiguration(_config);
+        _runner?.UpdateConfiguration(_appliedConfig);
     }
 
     private void UpdateLogConfiguration(Log log)
-        => log.UpdateConfiguration(_runner, _config);
+        => log.UpdateConfiguration(_runner, _appliedConfig);
 
     private void UpdateAllLogConfigurations()
     {
