@@ -141,7 +141,7 @@ internal sealed class AsyncRunner : Runner
         _thread = new Thread(WriteThread)
         {
             Name = $"{nameof(ZeroLog)}.{nameof(AsyncRunner)}",
-            IsBackground = config.UseBackgroundThread
+            IsBackground = true
         };
 
         _thread.Start();

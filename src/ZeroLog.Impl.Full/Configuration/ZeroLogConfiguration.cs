@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using ZeroLog.Appenders;
 
@@ -51,18 +52,18 @@ public sealed class ZeroLogConfiguration
     public bool AutoRegisterEnums { get; set; } = false;
 
     /// <summary>
-    /// Flag indicating to use a background thread for appending log messages.
+    /// Flag indicating to use a background thread for appending log messages (obsolete).
     /// </summary>
     /// <remarks>
-    /// <para>
-    /// If a background thread is used the application exit won't wait for <see cref="LogManager.Shutdown"/>.
-    /// This allows hooking <c>LogManager.Shutdown</c> calls to <c>AppDomain.CurrentDomain.ProcessExit</c> events as this event is otherwise blocked by a foreground thread.
-    /// </para>
-    /// <para>
-    /// Default: false
-    /// </para>
+    /// This flag is obsolete and has no effect. ZeroLog always uses a background thread in asynchronous mode.
     /// </remarks>
-    public bool UseBackgroundThread { get; init; } = false;
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [Obsolete("ZeroLog will always use a background thread in asynchronous mode.")]
+    public bool UseBackgroundThread
+    {
+        get => true;
+        init => _ = value;
+    }
 
     /// <summary>
     /// Determines the way log messages are formatted and passed to appenders.
