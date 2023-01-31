@@ -19,6 +19,7 @@ public class SanityChecks
             "ZeroLog.Appenders.DateAndSizeRollingFileAppender",
             "ZeroLog.Appenders.NoopAppender",
             "ZeroLog.Appenders.StreamAppender",
+            "ZeroLog.Appenders.TextWriterAppender",
             "ZeroLog.Configuration.AppenderConfiguration",
             "ZeroLog.Configuration.AppendingStrategy",
             "ZeroLog.Configuration.ILoggerConfigurationCollection",
