@@ -9,6 +9,22 @@ namespace ZeroLog.Formatting;
 
 internal class PrefixWriter
 {
+    private static readonly Regex _patternRegex = new(
+        """
+        %(?:
+            (?<part>\w+)
+            |
+            \{
+                \s* (?<part>\w+) \s*
+                (?:
+                    : \s* (?<format>.*?) \s*
+                )?
+            \}
+        )
+        """,
+        RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace
+    );
+
     private readonly PatternPart[] _parts;
 
     public string Pattern { get; }
@@ -19,26 +35,27 @@ internal class PrefixWriter
         _parts = OptimizeParts(ParsePattern(pattern)).ToArray();
     }
 
+    public static bool IsValidPattern(string? pattern)
+    {
+        if (pattern is null)
+            return false;
+
+        try
+        {
+            _ = new PrefixWriter(pattern);
+            return true;
+        }
+        catch (FormatException)
+        {
+            return false;
+        }
+    }
+
     private static IEnumerable<PatternPart> ParsePattern(string pattern)
     {
         var position = 0;
 
-        var matches = Regex.Matches(
-            pattern,
-            """
-            %(?:
-                (?<part>\w+)
-                |
-                \{
-                    \s* (?<part>\w+) \s*
-                    (?:
-                        : \s* (?<format>.*?) \s*
-                    )?
-                \}
-            )
-            """,
-            RegexOptions.CultureInvariant | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace
-        );
+        var matches = _patternRegex.Matches(pattern);
 
         foreach (Match? match in matches)
         {
@@ -79,16 +96,22 @@ internal class PrefixWriter
 
             case PatternPartType.Date:
             {
-                if (part.Format is not null && new DateTime(2020, 01, 01, 03, 04, 05, 06).TryFormat(stackalloc char[128], out _, part.Format, CultureInfo.InvariantCulture))
+                if (part.Format is not null)
+                {
+                    _ = new DateTime(2020, 01, 01, 03, 04, 05, 06).ToString(part.Format, CultureInfo.InvariantCulture);
                     return part;
+                }
 
                 return new PatternPart(PatternPartType.Date, "yyyy-MM-dd", null);
             }
 
             case PatternPartType.Time:
             {
-                if (part.Format is not null && new TimeSpan(0, 01, 02, 03, 04).TryFormat(stackalloc char[128], out _, part.Format, CultureInfo.InvariantCulture))
+                if (part.Format is not null)
+                {
+                    _ = new TimeSpan(0, 01, 02, 03, 04).ToString(part.Format, CultureInfo.InvariantCulture);
                     return part;
+                }
 
                 return new PatternPart(PatternPartType.Time, @"hh\:mm\:ss\.fffffff", null);
             }
@@ -138,6 +161,8 @@ internal class PrefixWriter
         if (currentString.Length != 0)
             yield return new PatternPart(currentString);
     }
+
+#if NETCOREAPP
 
     [SuppressMessage("ReSharper", "ReplaceSliceWithRangeIndexer")]
     public void WritePrefix(LoggedMessage message, Span<char> destination, out int charsWritten)
@@ -236,6 +261,8 @@ internal class PrefixWriter
 
         charsWritten = builder.Length;
     }
+
+#endif
 
     private enum PatternPartType
     {

@@ -53,6 +53,8 @@ public class PrefixWriterTests
 
         var result = GetResult(prefixWriter, logMessage);
         result.ShouldEqual(expectedResult);
+
+        PrefixWriter.IsValidPattern(pattern).ShouldBeTrue();
     }
 
     [Test]
@@ -65,6 +67,7 @@ public class PrefixWriterTests
     public void should_throw_on_invalid_format(string pattern)
     {
         Assert.Throws<FormatException>(() => _ = new PrefixWriter(pattern));
+        PrefixWriter.IsValidPattern(pattern).ShouldBeFalse();
     }
 
     [Test, RequiresThread]

@@ -9,6 +9,7 @@ internal static class ZeroLogFacts
     {
         public const string Log = "ZeroLog.Log";
         public const string LogMessage = "ZeroLog.LogMessage";
+        public const string DefaultFormatter = "ZeroLog.Formatting.DefaultFormatter";
     }
 
     public static class MethodNames
@@ -21,5 +22,10 @@ internal static class ZeroLogFacts
     public static class ParameterNames
     {
         public const string FormatString = "format";
+    }
+
+    public static class PropertyNames
+    {
+        public const string PrefixPattern = "PrefixPattern";
     }
 }

@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <Compile Include="../ZeroLog/Properties/AssemblyData.cs" Link="Properties/AssemblyData.cs" />
+    <Compile Include="../ZeroLog.Impl.Full/Formatting/PrefixWriter.cs" Link="Library/%(Filename)%(Extension)" />
   </ItemGroup>
 
 </Project>
