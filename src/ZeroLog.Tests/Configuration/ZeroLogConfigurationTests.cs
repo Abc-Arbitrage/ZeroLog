@@ -56,4 +56,11 @@ public class ZeroLogConfigurationTests
         logger.Name.ShouldEqual("Foo");
         logger.Level.ShouldEqual(LogLevel.Warn);
     }
+
+    [Test]
+    public void should_create_test_config()
+    {
+        var config = ZeroLogConfiguration.CreateTestConfiguration();
+        config.AppendingStrategy.ShouldEqual(AppendingStrategy.Synchronous); // This is the most important property
+    }
 }

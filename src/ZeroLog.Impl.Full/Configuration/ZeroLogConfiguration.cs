@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using ZeroLog.Appenders;
+using ZeroLog.Formatting;
 
 namespace ZeroLog.Configuration;
 
@@ -166,6 +167,36 @@ public sealed class ZeroLogConfiguration
         {
             Level = logLevel
         });
+    }
+
+    /// <summary>
+    /// Creates a configuration suitable for unit tests.
+    /// </summary>
+    public static ZeroLogConfiguration CreateTestConfiguration()
+    {
+        return new ZeroLogConfiguration
+        {
+            LogMessagePoolSize = 4,
+            LogMessageBufferSize = 1024,
+            AutoRegisterEnums = true,
+            AppendingStrategy = AppendingStrategy.Synchronous,
+            AppenderQuarantineDelay = TimeSpan.Zero,
+            RootLogger =
+            {
+                Level = LogLevel.Trace,
+                LogMessagePoolExhaustionStrategy = LogMessagePoolExhaustionStrategy.Allocate,
+                Appenders =
+                {
+                    new TextWriterAppender(Console.Out) // Console.Out may have been intercepted by a testing framework such as NUnit
+                    {
+                        Formatter = new DefaultFormatter
+                        {
+                            PrefixPattern = "%{level:pad} %logger || "
+                        }
+                    }
+                }
+            }
+        };
     }
 
     internal void Validate()
