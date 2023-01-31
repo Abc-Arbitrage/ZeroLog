@@ -12,6 +12,8 @@ namespace ZeroLog;
 
 internal abstract class Runner : ILogMessageProvider, IDisposable
 {
+    private readonly LogMessage _poolExhaustedMessage = new("Log message skipped due to pool exhaustion.");
+
     private readonly ObjectPool<LogMessage> _pool;
     private readonly LoggedMessage _loggedMessage;
 
@@ -41,20 +43,17 @@ internal abstract class Runner : ILogMessageProvider, IDisposable
 
         IsRunning = false;
 
-        _pool.Clear();
+        _pool.Dispose();
         Stop();
-        _pool.Clear();
 
-        if (_pool.IsAnyItemAcquired())
-            Thread.Sleep(100); // Can't really do much better here
-
-        foreach (var appender in _appenders)
-            appender.Dispose();
-
+        var appenders = _appenders;
         _appenders = Array.Empty<Appender>();
+
+        foreach (var appender in appenders)
+            appender.Dispose();
     }
 
-    public LogMessage? TryAcquireLogMessage()
+    public LogMessage AcquireLogMessage(LogMessagePoolExhaustionStrategy poolExhaustionStrategy)
     {
         if (_pool.TryAcquire(out var message))
         {
@@ -65,7 +64,43 @@ internal abstract class Runner : ILogMessageProvider, IDisposable
         if (!IsRunning)
             return LogMessage.Empty;
 
-        return null;
+        switch (poolExhaustionStrategy)
+        {
+            case LogMessagePoolExhaustionStrategy.DropLogMessageAndNotifyAppenders:
+                return _poolExhaustedMessage;
+
+            case LogMessagePoolExhaustionStrategy.DropLogMessage:
+                return LogMessage.Empty;
+
+            case LogMessagePoolExhaustionStrategy.WaitUntilAvailable:
+            {
+                var spinWait = new SpinWait();
+
+                while (true)
+                {
+                    spinWait.SpinOnce();
+
+                    if (_pool.TryAcquire(out message))
+                    {
+                        message.ReturnToPool = true;
+                        return message;
+                    }
+
+                    if (!IsRunning)
+                        return LogMessage.Empty;
+                }
+            }
+
+            case LogMessagePoolExhaustionStrategy.Allocate:
+            {
+                message = _pool.CreateObject();
+                message.ReturnToPool = true; // Will only be returned to the pool if its not full.
+                return message;
+            }
+
+            default:
+                return LogMessage.Empty;
+        }
     }
 
     public abstract void Submit(LogMessage message);
@@ -136,7 +171,7 @@ internal sealed class AsyncRunner : Runner
     public AsyncRunner(ZeroLogConfiguration config)
         : base(config)
     {
-        _queue = new ConcurrentQueue<LogMessage>(new ConcurrentQueueCapacityInitializer(config.LogMessagePoolSize));
+        _queue = new ConcurrentQueue<LogMessage>(new ConcurrentQueueCapacityInitializer<LogMessage>(config.LogMessagePoolSize));
 
         _thread = new Thread(WriteThread)
         {

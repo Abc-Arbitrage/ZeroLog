@@ -1,5 +1,6 @@
 using System;
 using NUnit.Framework;
+using ZeroLog.Configuration;
 
 namespace ZeroLog.Tests;
 
@@ -11,7 +12,7 @@ internal class TestLogMessageProvider : ILogMessageProvider
     private bool _isSubmitted;
     private readonly LogMessage _message = LogMessage.CreateTestMessage(LogLevel.Info, 128, 16);
 
-    public LogMessage TryAcquireLogMessage()
+    public LogMessage AcquireLogMessage(LogMessagePoolExhaustionStrategy poolExhaustionStrategy)
     {
         if (_isAcquired)
             throw new InvalidOperationException("The message is already acquired");

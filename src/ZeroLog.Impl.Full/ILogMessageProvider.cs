@@ -1,7 +1,9 @@
-﻿namespace ZeroLog;
+﻿using ZeroLog.Configuration;
+
+namespace ZeroLog;
 
 internal interface ILogMessageProvider
 {
-    LogMessage? TryAcquireLogMessage();
+    LogMessage AcquireLogMessage(LogMessagePoolExhaustionStrategy poolExhaustionStrategy);
     void Submit(LogMessage message);
 }

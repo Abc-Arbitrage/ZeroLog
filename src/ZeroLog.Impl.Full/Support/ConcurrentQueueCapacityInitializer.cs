@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace ZeroLog.Support;
 
-internal class ConcurrentQueueCapacityInitializer : ICollection<LogMessage>
+internal class ConcurrentQueueCapacityInitializer<T> : ICollection<T>
 {
     // Fake collection used to initialize the capacity of a ConcurrentQueue:
     // - Has a Count property set to the desired initial capacity
@@ -20,11 +20,11 @@ internal class ConcurrentQueueCapacityInitializer : ICollection<LogMessage>
     }
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-    public IEnumerator<LogMessage> GetEnumerator() => Enumerable.Empty<LogMessage>().GetEnumerator();
+    public IEnumerator<T> GetEnumerator() => Enumerable.Empty<T>().GetEnumerator();
 
-    public void Add(LogMessage item) => throw new NotSupportedException();
+    public void Add(T item) => throw new NotSupportedException();
     public void Clear() => throw new NotSupportedException();
-    public bool Contains(LogMessage item) => throw new NotSupportedException();
-    public void CopyTo(LogMessage[] array, int arrayIndex) => throw new NotSupportedException();
-    public bool Remove(LogMessage item) => throw new NotSupportedException();
+    public bool Contains(T item) => throw new NotSupportedException();
+    public void CopyTo(T[] array, int arrayIndex) => throw new NotSupportedException();
+    public bool Remove(T item) => throw new NotSupportedException();
 }

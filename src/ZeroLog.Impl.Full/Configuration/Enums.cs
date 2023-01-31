@@ -21,6 +21,11 @@ public enum LogMessagePoolExhaustionStrategy
     WaitUntilAvailable = 2,
 
     /// <summary>
+    /// Allocates a new log message.
+    /// </summary>
+    Allocate = 3,
+
+    /// <summary>
     /// The default value is <see cref="DropLogMessageAndNotifyAppenders"/>.
     /// </summary>
     Default = DropLogMessageAndNotifyAppenders
