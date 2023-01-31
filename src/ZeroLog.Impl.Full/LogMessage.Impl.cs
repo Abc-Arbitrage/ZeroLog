@@ -35,7 +35,7 @@ unsafe partial class LogMessage
     internal LogMessage(BufferSegment bufferSegment, int stringCapacity)
     {
         stringCapacity = Math.Min(stringCapacity, byte.MaxValue);
-        _strings = new string[stringCapacity];
+        _strings = stringCapacity > 0 ? new string[stringCapacity] : Array.Empty<string>();
 
         _startOfBuffer = bufferSegment.Data;
         _dataPointer = bufferSegment.Data;
@@ -74,5 +74,18 @@ unsafe partial class LogMessage
         var message = new LogMessage(BufferSegmentProvider.CreateStandaloneSegment(bufferSize), stringCapacity);
         message.Initialize(null, level);
         return message;
+    }
+
+    internal LogMessage CloneMetadata()
+    {
+        return new LogMessage(string.Empty)
+        {
+            Level = Level,
+            Timestamp = Timestamp,
+            Thread = Thread,
+            Exception = Exception,
+            Logger = Logger,
+            _isTruncated = _isTruncated
+        };
     }
 }

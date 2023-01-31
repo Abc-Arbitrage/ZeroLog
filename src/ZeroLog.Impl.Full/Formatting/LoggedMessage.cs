@@ -47,9 +47,20 @@ public sealed class LoggedMessage
     {
         _config = config;
         _messageBuffer = GC.AllocateUninitializedArray<char>(bufferSize);
-        KeyValues = new(bufferSize);
+        KeyValues = new KeyValueList(bufferSize);
 
         SetMessage(LogMessage.Empty);
+    }
+
+    private LoggedMessage(LoggedMessage other)
+    {
+        _config = other._config;
+
+        _messageBuffer = other._messageBuffer.AsSpan(0, other._messageLength).ToArray();
+        _messageLength = other._messageLength;
+
+        KeyValues = new KeyValueList(other.KeyValues);
+        _message = other._message.CloneMetadata();
     }
 
     internal void SetMessage(LogMessage message)
@@ -98,4 +109,20 @@ public sealed class LoggedMessage
     /// </summary>
     public override string ToString()
         => Message.ToString();
+
+    /// <summary>
+    /// Returns a clone of this message.
+    /// </summary>
+    /// <returns>
+    /// <para>
+    /// The instance of <see cref="LoggedMessage"/> which is passed to the appenders
+    /// is a singleton in order to avoid allocations, and is overwritten for each logged message.
+    /// Cloning a message can be useful to capture logged data in unit tests for instance.
+    /// </para>
+    /// <para>
+    /// This method allocates.
+    /// </para>
+    /// </returns>
+    public LoggedMessage Clone()
+        => new(this);
 }

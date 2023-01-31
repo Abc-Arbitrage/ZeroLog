@@ -8,7 +8,7 @@ namespace ZeroLog.Formatting;
 /// </summary>
 public sealed class KeyValueList
 {
-    private readonly List<InternalItem> _items = new(byte.MaxValue);
+    private readonly List<InternalItem> _items;
 
     private readonly char[] _buffer;
     private int _position;
@@ -20,7 +20,16 @@ public sealed class KeyValueList
 
     internal KeyValueList(int bufferSize)
     {
-        _buffer = new char[bufferSize];
+        _items = new(byte.MaxValue);
+        _buffer = GC.AllocateUninitializedArray<char>(bufferSize);
+    }
+
+    internal KeyValueList(KeyValueList other)
+    {
+        _buffer = GC.AllocateUninitializedArray<char>(other._position);
+        other._buffer.AsSpan(0, other._position).CopyTo(_buffer);
+        _position = other._position;
+        _items = new(other._items);
     }
 
     /// <summary>
