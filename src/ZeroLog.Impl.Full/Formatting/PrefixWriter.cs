@@ -73,7 +73,7 @@ internal class PrefixWriter
                 "thread" => new PatternPart(PatternPartType.Thread, format),
                 "level"  => new PatternPart(PatternPartType.Level, format),
                 "logger" => new PatternPart(PatternPartType.Logger, format),
-                _        => new PatternPart(match.Value)
+                _        => throw new FormatException($"Invalid placeholder type: %{match.Groups["part"].Value}")
             };
 
             yield return ValidatePart(part);

@@ -41,7 +41,7 @@ public class PrefixPatternAnalyzerTests
                 class C
                 {
                     DefaultFormatter M()
-                        => new DefaultFormatter { PrefixPattern = {|#0:"%{level:20}"|} };
+                        => new DefaultFormatter { PrefixPattern = "%{level:20}" };
                 }
                 """
         };
@@ -60,7 +60,7 @@ public class PrefixPatternAnalyzerTests
                 class C
                 {
                     C M()
-                        => new C { PrefixPattern = {|#0:"%{level:-20}"|} };
+                        => new C { PrefixPattern = "%{level:-20}" };
 
                     string PrefixPattern { get; init; }
                 }

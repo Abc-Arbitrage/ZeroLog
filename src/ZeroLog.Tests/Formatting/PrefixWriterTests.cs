@@ -28,13 +28,7 @@ public class PrefixWriterTests
     [TestCase("foo%{level}", "fooINFO")]
     [TestCase("foo%level", "fooINFO")]
     [TestCase("%{level}Bar", "INFOBar")]
-    [TestCase("%threads", "%threads")]
     [TestCase("%{level}%{logger}", "INFOTestLog")]
-    [TestCase("%FOO", "%FOO")]
-    [TestCase("%{foo}", "%{foo}")]
-    [TestCase("%foo%bar", "%foo%bar")]
-    [TestCase("%foo%bar%level%baz", "%foo%barINFO%baz")]
-    [TestCase("<%foo>%bar|", "<%foo>%bar|")]
     [TestCase("%{date:dd MM yyyy}", "02 01 2020")]
     [TestCase("%{date:lol}", "lol")]
     [TestCase("%{time:hh\\:mm}", "03:04")]
@@ -64,6 +58,9 @@ public class PrefixWriterTests
     [TestCase("%{level:lol}")]
     [TestCase("%{logger:-3}")]
     [TestCase("%{logger:lol}")]
+    [TestCase("%foo")]
+    [TestCase("%{foo}")]
+    [TestCase("%{foo:bar}")]
     public void should_throw_on_invalid_format(string pattern)
     {
         Assert.Throws<FormatException>(() => _ = new PrefixWriter(pattern));
