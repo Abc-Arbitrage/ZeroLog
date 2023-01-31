@@ -24,6 +24,7 @@ public class PrefixWriterTests
     [TestCase("%{level}", "INFO")]
     [TestCase("%{ level  }", "INFO")]
     [TestCase("foo%{level}Bar", "fooINFOBar")]
+    [TestCase("foo%{level:6}Bar%{level:5}Baz", "fooINFO  BarINFO Baz")]
     [TestCase("foo%{level}", "fooINFO")]
     [TestCase("foo%level", "fooINFO")]
     [TestCase("%{level}Bar", "INFOBar")]
@@ -38,6 +39,10 @@ public class PrefixWriterTests
     [TestCase("%{date:lol}", "lol")]
     [TestCase("%{time:hh\\:mm}", "03:04")]
     [TestCase("%{level:pad}", "INFO ")]
+    [TestCase("%{level:5}", "INFO ")]
+    [TestCase("%{level:6}", "INFO  ")]
+    [TestCase("%{logger:3}", "TestLog")]
+    [TestCase("%{logger:10}", "TestLog   ")]
     public void should_write_prefix(string pattern, string expectedResult)
     {
         var prefixWriter = new PrefixWriter(pattern);
@@ -48,6 +53,18 @@ public class PrefixWriterTests
 
         var result = GetResult(prefixWriter, logMessage);
         result.ShouldEqual(expectedResult);
+    }
+
+    [Test]
+    [TestCase("%{date:\\}")]
+    [TestCase("%{time:\\}")]
+    [TestCase("%{level:-3}")]
+    [TestCase("%{level:lol}")]
+    [TestCase("%{logger:-3}")]
+    [TestCase("%{logger:lol}")]
+    public void should_throw_on_invalid_format(string pattern)
+    {
+        Assert.Throws<FormatException>(() => _ = new PrefixWriter(pattern));
     }
 
     [Test, RequiresThread]
@@ -85,14 +102,6 @@ public class PrefixWriterTests
 
         var result = GetResult(prefixWriter, logMessage);
         result.ShouldEqual("0");
-    }
-
-    [Test]
-    [TestCase("%{date:\\}")]
-    [TestCase("%{time:\\}")]
-    public void should_throw_on_invalid_format(string pattern)
-    {
-        Assert.Throws<FormatException>(() => _ = new PrefixWriter(pattern));
     }
 
     private static string GetResult(PrefixWriter prefixWriter, LogMessage logMessage)

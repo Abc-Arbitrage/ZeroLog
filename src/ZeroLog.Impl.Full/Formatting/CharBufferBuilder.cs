@@ -65,6 +65,16 @@ internal ref struct CharBufferBuilder
         return false;
     }
 
+    public void TryAppendPartial(char value, int count)
+    {
+        if (count > 0)
+        {
+            count = Math.Min(count, _buffer.Length - _pos);
+            _buffer.Slice(_pos, count).Fill(value);
+            _pos += count;
+        }
+    }
+
     public bool TryAppend(int value, string? format = null)
     {
         if (!value.TryFormat(_buffer.Slice(_pos), out var charsWritten, format, CultureInfo.InvariantCulture))
