@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ZeroLog\ZeroLog.csproj" />
+    <PackageReference Include="MarkdownSnippets.MsBuild" Version="24.5.1" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>

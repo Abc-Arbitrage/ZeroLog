@@ -30,7 +30,9 @@ Internally, each logging call data (context, log messages, arguments, etc.) will
 
 Before using ZeroLog, you need to initialize the `LogManager` by calling `LogManager.Initialize` and providing a configuration.
 
-```csharp
+<!-- snippet: Initialize -->
+<a id='snippet-initialize'></a>
+```cs
 LogManager.Initialize(new ZeroLogConfiguration
 {
     RootLogger =
@@ -42,42 +44,57 @@ LogManager.Initialize(new ZeroLogConfiguration
     }
 });
 ```
+<sup><a href='/src/ZeroLog.Tests/Snippets.cs#L20-L31' title='Snippet source file'>snippet source</a> | <a href='#snippet-initialize' title='Start of snippet'>anchor</a></sup>
+<!-- endSnippet -->
 
 The `LogManager` needs to be shut down by calling `LogManager.Shutdown()` when your application needs to exit.
 
 You can retrieve a logger that will be the logging API entry point. Store this logger in a field.
 
-```csharp
+<!-- snippet: GetLogger -->
+<a id='snippet-getlogger'></a>
+```cs
 private static readonly Log _log = LogManager.GetLogger(typeof(YourClass));
 ```
+<sup><a href='/src/ZeroLog.Tests/Snippets.cs#L10-L12' title='Snippet source file'>snippet source</a> | <a href='#snippet-getlogger' title='Start of snippet'>anchor</a></sup>
+<!-- endSnippet -->
+
+### Logging APIs
 
 Two logging APIs are provided:
 
- - A string interpolation API:
-    
-    ```csharp
-    var date = DateTime.Today.AddDays(1); 
-    _log.Info($"Tomorrow ({date:yyyy-MM-dd}) will be in {GetNumberOfSecondsUntilTomorrow():N0} seconds.");
-    ```
-    
-    This API uses C# 10 string interpolation handlers to implement custom interpolation support without allocations.
+#### A string interpolation API:
 
-    Note that if the log level is disabled (`Info` in this example), method calls such as `GetNumberOfSecondsUntilTomorrow()` will *not* be executed. 
+<!-- snippet: StringInterpolationApi -->
+<a id='snippet-stringinterpolationapi'></a>
+```cs
+var date = DateTime.Today.AddDays(1);
+_log.Info($"Tomorrow ({date:yyyy-MM-dd}) will be in {GetNumberOfSecondsUntilTomorrow():N0} seconds.");
+```
+<sup><a href='/src/ZeroLog.Tests/Snippets.cs#L37-L40' title='Snippet source file'>snippet source</a> | <a href='#snippet-stringinterpolationapi' title='Start of snippet'>anchor</a></sup>
+<!-- endSnippet -->
 
+This API uses C# 10 string interpolation handlers to implement custom interpolation support without allocations.
 
- - A `StringBuilder`-like API:
+Note that if the log level is disabled (`Info` in this example), method calls such as `GetNumberOfSecondsUntilTomorrow()` will *not* be executed. 
 
-    ```csharp
-    _log.Info()
-        .Append("Tomorrow (")
-        .Append(DateTime.Today.AddDays(1), "yyyy-MM-dd")
-        .Append(") will occur in ")
-        .Append(GetNumberOfSecondsUntilTomorrow(), "N0")
-        .Append(" seconds.")
-        .Log();
-    ```
+#### A `StringBuilder`-like API:
 
-    This API supports more features, but is less convenient to use. You need to call `Log` at the end of the chain. Note that an `Append` overload with a string interpolation handler is provided though.
+<!-- snippet: StringBuilderApi -->
+<a id='snippet-stringbuilderapi'></a>
+```cs
+_log.Info()
+    .Append("Tomorrow (")
+    .Append(DateTime.Today.AddDays(1), "yyyy-MM-dd")
+    .Append(") will occur in ")
+    .Append(GetNumberOfSecondsUntilTomorrow(), "N0")
+    .Append(" seconds.")
+    .Log();
+```
+<sup><a href='/src/ZeroLog.Tests/Snippets.cs#L46-L54' title='Snippet source file'>snippet source</a> | <a href='#snippet-stringbuilderapi' title='Start of snippet'>anchor</a></sup>
+<!-- endSnippet -->
+
+This API supports more features, but is less convenient to use. You need to call `Log` at the end of the chain. Note that an `Append` overload with a string interpolation handler is provided though.
 
 The library provides Roslyn analyzers that check for incorrect usages of these APIs.
 
@@ -88,13 +105,16 @@ ZeroLog supports appending structured data (formatted as JSON) to log messages.
 
 Structured data can be appended by calling `AppendKeyValue`, like so:
 
-```csharp
+<!-- snippet: StructuredData -->
+<a id='snippet-structureddata'></a>
+```cs
 _log.Info()
     .Append("Tomorrow is another day.")
     .AppendKeyValue("NumSecondsUntilTomorrow", GetNumberOfSecondsUntilTomorrow())
     .Log();
 ```
-
+<sup><a href='/src/ZeroLog.Tests/Snippets.cs#L60-L65' title='Snippet source file'>snippet source</a> | <a href='#snippet-structureddata' title='Start of snippet'>anchor</a></sup>
+<!-- endSnippet -->
 
 ## Configuration
 
