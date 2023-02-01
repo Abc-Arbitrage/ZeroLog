@@ -95,12 +95,12 @@ unsafe partial class LogMessage
         if (dataPointer >= _dataPointer)
             return false;
 
-        var valueType = *(ArgumentType*)dataPointer;
+        var valuePtr = dataPointer;
 
         if (!TryWriteArg(ref dataPointer, keyValueList.GetRemainingBuffer(), out var valueLength, FormatType.KeyValue, config))
             return false;
 
-        keyValueList.Add(key, valueLength, valueType);
+        keyValueList.Add(key, valueLength, valuePtr, (int)(dataPointer - valuePtr));
         return true;
     }
 

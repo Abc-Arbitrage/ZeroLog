@@ -3,17 +3,19 @@ using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using ZeroLog.Configuration;
 using ZeroLog.Formatting;
+using ZeroLog.Support;
 
 namespace ZeroLog;
 
 [StructLayout(LayoutKind.Sequential)]
 [SuppressMessage("ReSharper", "FieldCanBeMadeReadOnly.Local")]
 [SuppressMessage("ReSharper", "ReplaceSliceWithRangeIndexer")]
-internal unsafe struct UnmanagedArgHeader
+internal readonly unsafe struct UnmanagedArgHeader
 {
-    private IntPtr _typeHandle;
-    private int _typeSize;
+    private readonly IntPtr _typeHandle;
+    private readonly int _typeSize;
 
+    public Type? Type => TypeUtil.GetTypeFromHandle(_typeHandle);
     public int Size => _typeSize;
 
     public UnmanagedArgHeader(IntPtr typeHandle, int typeSize)

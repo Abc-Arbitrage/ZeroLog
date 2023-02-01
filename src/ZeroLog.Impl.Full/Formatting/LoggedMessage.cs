@@ -69,6 +69,10 @@ public sealed class LoggedMessage
 
         try
         {
+#if DEBUG
+            _messageBuffer.AsSpan().Fill((char)0);
+#endif
+
             _messageLength = _message.WriteTo(_messageBuffer, _config, LogMessage.FormatType.Formatted, KeyValues);
         }
         catch (Exception ex)

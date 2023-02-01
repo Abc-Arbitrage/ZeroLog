@@ -1,16 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace ZeroLog.Formatting;
 
 /// <summary>
 /// A list of log message metadata as key/value pairs.
 /// </summary>
-public sealed class KeyValueList
+public sealed unsafe class KeyValueList
 {
     private readonly List<InternalItem> _items;
 
     private readonly char[] _buffer;
+    private readonly byte[]? _rawDataBuffer;
     private int _position;
 
     /// <summary>
@@ -30,6 +33,23 @@ public sealed class KeyValueList
         other._buffer.AsSpan(0, other._position).CopyTo(_buffer);
         _position = other._position;
         _items = new(other._items);
+
+        if (other._rawDataBuffer is null)
+        {
+            _rawDataBuffer = GC.AllocateUninitializedArray<byte>(_items.Sum(item => item.RawDataLength));
+            var offset = 0;
+
+            foreach (ref var item in CollectionsMarshal.AsSpan(_items))
+            {
+                new Span<byte>((void*)item.RawDataPointerOrOffset, item.RawDataLength).CopyTo(_rawDataBuffer.AsSpan(offset, item.RawDataLength));
+                item.RawDataPointerOrOffset = (nuint)offset;
+                offset += item.RawDataLength;
+            }
+        }
+        else
+        {
+            _rawDataBuffer = other._rawDataBuffer;
+        }
     }
 
     /// <summary>
@@ -41,7 +61,14 @@ public sealed class KeyValueList
         get
         {
             var item = _items[index];
-            return new LoggedKeyValue(item.Key, _buffer.AsSpan(item.ValueOffset, item.ValueLength), item.ValueType);
+
+            return new LoggedKeyValue(
+                item.Key,
+                _buffer.AsSpan(item.StringValueOffset, item.StringValueLength),
+                _rawDataBuffer is null
+                    ? new ReadOnlySpan<byte>((void*)item.RawDataPointerOrOffset, item.RawDataLength)
+                    : _rawDataBuffer.AsSpan((int)item.RawDataPointerOrOffset, item.RawDataLength)
+            );
         }
     }
 
@@ -54,10 +81,10 @@ public sealed class KeyValueList
     internal Span<char> GetRemainingBuffer()
         => _buffer.AsSpan(_position);
 
-    internal void Add(string key, int valueLength, ArgumentType valueType)
+    internal void Add(string key, int stringValueLength, byte* rawDataPointer, int rawDataLength)
     {
-        _items.Add(new(key, _position, valueLength, valueType));
-        _position += valueLength;
+        _items.Add(new InternalItem(key, _position, stringValueLength, (nuint)rawDataPointer, rawDataLength));
+        _position += stringValueLength;
     }
 
     /// <summary>
@@ -66,11 +93,12 @@ public sealed class KeyValueList
     public Enumerator GetEnumerator()
         => new(this);
 
-    private readonly record struct InternalItem(
+    private record struct InternalItem(
         string Key,
-        int ValueOffset,
-        int ValueLength,
-        ArgumentType ValueType
+        int StringValueOffset,
+        int StringValueLength,
+        nuint RawDataPointerOrOffset,
+        int RawDataLength
     );
 
     /// <summary>

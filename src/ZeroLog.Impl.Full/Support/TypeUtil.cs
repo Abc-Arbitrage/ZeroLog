@@ -56,4 +56,5 @@ internal static class TypeUtilSlow<T>
     private static readonly Type? _underlyingType = Nullable.GetUnderlyingType(typeof(T));
 
     public static readonly TypeCode UnderlyingTypeCode = Type.GetTypeCode(_underlyingType);
+    public static readonly TypeCode UnderlyingEnumTypeCode = typeof(T).IsEnum ? Type.GetTypeCode(Enum.GetUnderlyingType(typeof(T))) : TypeCode.Empty;
 }

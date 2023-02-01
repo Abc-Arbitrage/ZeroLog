@@ -73,6 +73,69 @@ public class EnumCacheTests
     }
 
     [Test]
+    public void should_round_trip_value_byte()
+    {
+        var value = EnumCache.ToUInt64(EnumByte.Baz);
+        EnumCache.FromUInt64<EnumByte>(value).ShouldEqual(EnumByte.Baz);
+    }
+
+    [Test]
+    public void should_round_trip_value_sbyte()
+    {
+        var value = EnumCache.ToUInt64(EnumSByte.Baz);
+        EnumCache.FromUInt64<EnumSByte>(value).ShouldEqual(EnumSByte.Baz);
+    }
+
+    [Test]
+    public void should_round_trip_value_int16()
+    {
+        var value = EnumCache.ToUInt64(EnumInt16.Baz);
+        EnumCache.FromUInt64<EnumInt16>(value).ShouldEqual(EnumInt16.Baz);
+    }
+
+    [Test]
+    public void should_round_trip_value_uint16()
+    {
+        var value = EnumCache.ToUInt64(EnumUInt16.Baz);
+        EnumCache.FromUInt64<EnumUInt16>(value).ShouldEqual(EnumUInt16.Baz);
+    }
+
+    [Test]
+    public void should_round_trip_value_int32()
+    {
+        var value = EnumCache.ToUInt64(EnumInt32.Baz);
+        EnumCache.FromUInt64<EnumInt32>(value).ShouldEqual(EnumInt32.Baz);
+    }
+
+    [Test]
+    public void should_round_trip_value_uint32()
+    {
+        var value = EnumCache.ToUInt64(EnumUInt32.Baz);
+        EnumCache.FromUInt64<EnumUInt32>(value).ShouldEqual(EnumUInt32.Baz);
+    }
+
+    [Test]
+    public void should_round_trip_value_int64()
+    {
+        var value = EnumCache.ToUInt64(EnumInt64.Baz);
+        EnumCache.FromUInt64<EnumInt64>(value).ShouldEqual(EnumInt64.Baz);
+    }
+
+    [Test]
+    public void should_round_trip_value_uint64()
+    {
+        var value = EnumCache.ToUInt64(EnumUInt64.Baz);
+        EnumCache.FromUInt64<EnumUInt64>(value).ShouldEqual(EnumUInt64.Baz);
+    }
+
+    [Test]
+    public void should_round_trip_negative_value()
+    {
+        var value = EnumCache.ToUInt64(EnumWithNegativeValues.Foo);
+        EnumCache.FromUInt64<EnumWithNegativeValues>(value).ShouldEqual(EnumWithNegativeValues.Foo);
+    }
+
+    [Test]
     public void should_return_null_on_unknown_value()
     {
         GetString((EnumInt32)42).ShouldBeNull();

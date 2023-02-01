@@ -10,10 +10,12 @@ namespace ZeroLog;
 
 [StructLayout(LayoutKind.Sequential)]
 [SuppressMessage("ReSharper", "FieldCanBeMadeReadOnly.Local")]
-internal struct EnumArg
+internal readonly struct EnumArg
 {
-    private IntPtr _typeHandle;
-    private ulong _value;
+    private readonly IntPtr _typeHandle;
+    private readonly ulong _value;
+
+    public Type? Type => TypeUtil.GetTypeFromHandle(_typeHandle);
 
     public EnumArg(IntPtr typeHandle, ulong value)
     {
@@ -62,11 +64,23 @@ internal struct EnumArg
         if (enumRegistered || !config.AutoRegisterEnums)
             return null;
 
-        var type = TypeUtil.GetTypeFromHandle(_typeHandle);
-        if (type is null)
+        if (Type is not { } type)
             return null;
 
         LogManager.RegisterEnum(type);
         return EnumCache.GetString(_typeHandle, _value, out _);
+    }
+
+    public bool TryGetValue<T>(out T result)
+        where T : struct
+    {
+        if (Type == typeof(T))
+        {
+            result = EnumCache.FromUInt64<T>(_value);
+            return true;
+        }
+
+        result = default;
+        return false;
     }
 }

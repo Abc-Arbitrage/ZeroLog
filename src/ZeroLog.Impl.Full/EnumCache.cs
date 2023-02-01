@@ -53,6 +53,57 @@ internal static class EnumCache
         return IL.Return<ulong>();
     }
 
+    [SuppressMessage("ReSharper", "EntityNameCapturedOnly.Global")]
+    public static T FromUInt64<T>(ulong value)
+        where T : struct
+    {
+        switch (TypeUtilSlow<T>.UnderlyingEnumTypeCode)
+        {
+            case TypeCode.SByte:
+                Ldarg(nameof(value));
+                Conv_I1();
+                return IL.Return<T>();
+
+            case TypeCode.Byte:
+                Ldarg(nameof(value));
+                Conv_U1();
+                return IL.Return<T>();
+
+            case TypeCode.Int16:
+                Ldarg(nameof(value));
+                Conv_I2();
+                return IL.Return<T>();
+
+            case TypeCode.UInt16:
+                Ldarg(nameof(value));
+                Conv_U2();
+                return IL.Return<T>();
+
+            case TypeCode.Int32:
+                Ldarg(nameof(value));
+                Conv_I4();
+                return IL.Return<T>();
+
+            case TypeCode.UInt32:
+                Ldarg(nameof(value));
+                Conv_U4();
+                return IL.Return<T>();
+
+            case TypeCode.Int64:
+                Ldarg(nameof(value));
+                Conv_I8();
+                return IL.Return<T>();
+
+            case TypeCode.UInt64:
+                Ldarg(nameof(value));
+                Conv_U8();
+                return IL.Return<T>();
+
+            default:
+                return default;
+        }
+    }
+
     internal static ulong ToUInt64Slow(Enum value)
     {
         // Only used when registering enums.

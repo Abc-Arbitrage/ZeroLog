@@ -54,6 +54,11 @@ unsafe partial class LogMessage
         _dataPointer = _startOfBuffer;
         _stringIndex = 0;
         _isTruncated = false;
+
+#if DEBUG
+        new Span<byte>(_startOfBuffer, (int)(_endOfBuffer - _startOfBuffer)).Fill(0);
+        _strings.AsSpan().Fill(null);
+#endif
     }
 
     public partial void Log()
