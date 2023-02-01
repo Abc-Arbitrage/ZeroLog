@@ -22,7 +22,8 @@
         { "DateTime", "yyyy-MM-dd" },
         { "TimeSpan", "g" },
         { "DateOnly", "yyyy-MM-dd" },
-        { "TimeOnly", "t" }
+        { "TimeOnly", "t" },
+        { "DateTimeOffset", "o" },
     };
 #>
 using System;

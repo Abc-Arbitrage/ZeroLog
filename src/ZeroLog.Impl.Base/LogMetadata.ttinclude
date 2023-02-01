@@ -21,6 +21,7 @@
         ("TimeSpan", "TimeSpan", true, false),
         ("DateOnly", "DateOnly", true, true),
         ("TimeOnly", "TimeOnly", true, true),
+        ("DateTimeOffset", "DateTimeOffset", true, false),
     };
 
     private static readonly string[] _logLevels =

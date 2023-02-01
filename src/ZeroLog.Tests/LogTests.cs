@@ -85,5 +85,6 @@ public partial class LogTests
         public static readonly TimeSpan TimeSpan = DateTime.UtcNow.TimeOfDay;
         public static readonly DateOnly DateOnly = DateOnly.FromDateTime(DateTime.UtcNow);
         public static readonly TimeOnly TimeOnly = TimeOnly.FromDateTime(DateTime.UtcNow);
+        public static readonly DateTimeOffset DateTimeOffset = DateTimeOffset.Now;
     }
 }

@@ -330,6 +330,20 @@ public class DefaultFormatterTests
     }
 
     [Test]
+    public void should_format_json_date_time_offset()
+    {
+        var value = new DateTimeOffset(2020, 01, 02, 03, 04, 05, TimeSpan.FromHours(2.5));
+
+        _logMessage.Append("Foo")
+                   .AppendKeyValue("Hello", value)
+                   .AppendKeyValue("World", (DateTimeOffset?)value)
+                   .AppendKeyValue("Null", (DateTimeOffset?)null)
+                   .Append("Bar");
+
+        GetFormattedSimple().ShouldEqual("""FooBar ~~ { "Hello": "2020-01-02 03:04:05 +02:30", "World": "2020-01-02 03:04:05 +02:30", "Null": null }""");
+    }
+
+    [Test]
     public void should_format_json_enum()
     {
         _logMessage.Append("Foo")

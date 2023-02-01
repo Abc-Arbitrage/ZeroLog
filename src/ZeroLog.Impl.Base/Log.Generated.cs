@@ -975,6 +975,36 @@ partial class Log
 #endif
 
         /// <summary>
+        /// Appends a value of type <c>DateTimeOffset</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        public void AppendFormatted(DateTimeOffset value)
+            => Message.InternalAppendValueType(value, ArgumentType.DateTimeOffset);
+
+        /// <summary>
+        /// Appends a value of type <c>DateTimeOffset?</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        public void AppendFormatted(DateTimeOffset? value)
+            => Message.InternalAppendValueType(value, ArgumentType.DateTimeOffset);
+
+        /// <summary>
+        /// Appends a value of type <c>DateTimeOffset</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        /// <param name="format">The format string.</param>
+        public void AppendFormatted(DateTimeOffset value, string format)
+            => Message.InternalAppendValueType(value, format, ArgumentType.DateTimeOffset);
+
+        /// <summary>
+        /// Appends a value of type <c>DateTimeOffset?</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        /// <param name="format">The format string.</param>
+        public void AppendFormatted(DateTimeOffset? value, string format)
+            => Message.InternalAppendValueType(value, format, ArgumentType.DateTimeOffset);
+
+        /// <summary>
         /// Appends an enum to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
@@ -1625,6 +1655,36 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.TimeOnly);
 
 #endif
+
+        /// <summary>
+        /// Appends a value of type <c>DateTimeOffset</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        public void AppendFormatted(DateTimeOffset value)
+            => Message.InternalAppendValueType(value, ArgumentType.DateTimeOffset);
+
+        /// <summary>
+        /// Appends a value of type <c>DateTimeOffset?</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        public void AppendFormatted(DateTimeOffset? value)
+            => Message.InternalAppendValueType(value, ArgumentType.DateTimeOffset);
+
+        /// <summary>
+        /// Appends a value of type <c>DateTimeOffset</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        /// <param name="format">The format string.</param>
+        public void AppendFormatted(DateTimeOffset value, string format)
+            => Message.InternalAppendValueType(value, format, ArgumentType.DateTimeOffset);
+
+        /// <summary>
+        /// Appends a value of type <c>DateTimeOffset?</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        /// <param name="format">The format string.</param>
+        public void AppendFormatted(DateTimeOffset? value, string format)
+            => Message.InternalAppendValueType(value, format, ArgumentType.DateTimeOffset);
 
         /// <summary>
         /// Appends an enum to the handler.
@@ -2279,6 +2339,36 @@ partial class Log
 #endif
 
         /// <summary>
+        /// Appends a value of type <c>DateTimeOffset</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        public void AppendFormatted(DateTimeOffset value)
+            => Message.InternalAppendValueType(value, ArgumentType.DateTimeOffset);
+
+        /// <summary>
+        /// Appends a value of type <c>DateTimeOffset?</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        public void AppendFormatted(DateTimeOffset? value)
+            => Message.InternalAppendValueType(value, ArgumentType.DateTimeOffset);
+
+        /// <summary>
+        /// Appends a value of type <c>DateTimeOffset</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        /// <param name="format">The format string.</param>
+        public void AppendFormatted(DateTimeOffset value, string format)
+            => Message.InternalAppendValueType(value, format, ArgumentType.DateTimeOffset);
+
+        /// <summary>
+        /// Appends a value of type <c>DateTimeOffset?</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        /// <param name="format">The format string.</param>
+        public void AppendFormatted(DateTimeOffset? value, string format)
+            => Message.InternalAppendValueType(value, format, ArgumentType.DateTimeOffset);
+
+        /// <summary>
         /// Appends an enum to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
@@ -2929,6 +3019,36 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.TimeOnly);
 
 #endif
+
+        /// <summary>
+        /// Appends a value of type <c>DateTimeOffset</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        public void AppendFormatted(DateTimeOffset value)
+            => Message.InternalAppendValueType(value, ArgumentType.DateTimeOffset);
+
+        /// <summary>
+        /// Appends a value of type <c>DateTimeOffset?</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        public void AppendFormatted(DateTimeOffset? value)
+            => Message.InternalAppendValueType(value, ArgumentType.DateTimeOffset);
+
+        /// <summary>
+        /// Appends a value of type <c>DateTimeOffset</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        /// <param name="format">The format string.</param>
+        public void AppendFormatted(DateTimeOffset value, string format)
+            => Message.InternalAppendValueType(value, format, ArgumentType.DateTimeOffset);
+
+        /// <summary>
+        /// Appends a value of type <c>DateTimeOffset?</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        /// <param name="format">The format string.</param>
+        public void AppendFormatted(DateTimeOffset? value, string format)
+            => Message.InternalAppendValueType(value, format, ArgumentType.DateTimeOffset);
 
         /// <summary>
         /// Appends an enum to the handler.
@@ -3583,6 +3703,36 @@ partial class Log
 #endif
 
         /// <summary>
+        /// Appends a value of type <c>DateTimeOffset</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        public void AppendFormatted(DateTimeOffset value)
+            => Message.InternalAppendValueType(value, ArgumentType.DateTimeOffset);
+
+        /// <summary>
+        /// Appends a value of type <c>DateTimeOffset?</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        public void AppendFormatted(DateTimeOffset? value)
+            => Message.InternalAppendValueType(value, ArgumentType.DateTimeOffset);
+
+        /// <summary>
+        /// Appends a value of type <c>DateTimeOffset</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        /// <param name="format">The format string.</param>
+        public void AppendFormatted(DateTimeOffset value, string format)
+            => Message.InternalAppendValueType(value, format, ArgumentType.DateTimeOffset);
+
+        /// <summary>
+        /// Appends a value of type <c>DateTimeOffset?</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        /// <param name="format">The format string.</param>
+        public void AppendFormatted(DateTimeOffset? value, string format)
+            => Message.InternalAppendValueType(value, format, ArgumentType.DateTimeOffset);
+
+        /// <summary>
         /// Appends an enum to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
@@ -4233,6 +4383,36 @@ partial class Log
             => Message.InternalAppendValueType(value, format, ArgumentType.TimeOnly);
 
 #endif
+
+        /// <summary>
+        /// Appends a value of type <c>DateTimeOffset</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        public void AppendFormatted(DateTimeOffset value)
+            => Message.InternalAppendValueType(value, ArgumentType.DateTimeOffset);
+
+        /// <summary>
+        /// Appends a value of type <c>DateTimeOffset?</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        public void AppendFormatted(DateTimeOffset? value)
+            => Message.InternalAppendValueType(value, ArgumentType.DateTimeOffset);
+
+        /// <summary>
+        /// Appends a value of type <c>DateTimeOffset</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        /// <param name="format">The format string.</param>
+        public void AppendFormatted(DateTimeOffset value, string format)
+            => Message.InternalAppendValueType(value, format, ArgumentType.DateTimeOffset);
+
+        /// <summary>
+        /// Appends a value of type <c>DateTimeOffset?</c> to the handler.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        /// <param name="format">The format string.</param>
+        public void AppendFormatted(DateTimeOffset? value, string format)
+            => Message.InternalAppendValueType(value, format, ArgumentType.DateTimeOffset);
 
         /// <summary>
         /// Appends an enum to the handler.

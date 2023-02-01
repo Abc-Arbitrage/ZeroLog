@@ -77,6 +77,7 @@ public readonly unsafe ref struct LoggedKeyValue
         ArgumentType.TimeSpan       => typeof(TimeSpan),
         ArgumentType.DateOnly       => typeof(DateOnly),
         ArgumentType.TimeOnly       => typeof(TimeOnly),
+        ArgumentType.DateTimeOffset => typeof(DateTimeOffset),
         ArgumentType.String         => typeof(string),
         ArgumentType.StringSpan     => typeof(string),
         ArgumentType.Utf8StringSpan => typeof(string),
@@ -128,6 +129,7 @@ public readonly unsafe ref struct LoggedKeyValue
                 case ArgumentType.TimeSpan when typeof(T) == typeof(TimeSpan):
                 case ArgumentType.DateOnly when typeof(T) == typeof(DateOnly):
                 case ArgumentType.TimeOnly when typeof(T) == typeof(TimeOnly):
+                case ArgumentType.DateTimeOffset when typeof(T) == typeof(DateTimeOffset):
                 {
                     result = Unsafe.Read<T>(dataPointer);
                     return true;

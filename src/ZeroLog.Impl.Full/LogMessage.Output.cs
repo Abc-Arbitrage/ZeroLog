@@ -126,11 +126,12 @@ unsafe partial class LogMessage
         {
             format = argType switch
             {
-                ArgumentType.DateTime => "yyyy-MM-dd HH:mm:ss",
-                ArgumentType.TimeSpan => @"hh\:mm\:ss\.fffffff",
-                ArgumentType.DateOnly => @"yyyy-MM-dd",
-                ArgumentType.TimeOnly => @"HH\:mm\:ss\.fffffff",
-                _                     => null
+                ArgumentType.DateTime       => "yyyy-MM-dd HH:mm:ss",
+                ArgumentType.TimeSpan       => @"hh\:mm\:ss\.fffffff",
+                ArgumentType.DateOnly       => @"yyyy-MM-dd",
+                ArgumentType.TimeOnly       => @"HH\:mm\:ss\.fffffff",
+                ArgumentType.DateTimeOffset => @"yyyy-MM-dd HH:mm:ss zzz",
+                _                           => null
             };
         }
 
@@ -347,6 +348,14 @@ unsafe partial class LogMessage
             {
                 var valuePtr = (TimeOnly*)dataPointer;
                 dataPointer += sizeof(TimeOnly);
+
+                return valuePtr->TryFormat(outputBuffer, out charsWritten, format, CultureInfo.InvariantCulture);
+            }
+
+            case ArgumentType.DateTimeOffset:
+            {
+                var valuePtr = (DateTimeOffset*)dataPointer;
+                dataPointer += sizeof(DateTimeOffset);
 
                 return valuePtr->TryFormat(outputBuffer, out charsWritten, format, CultureInfo.InvariantCulture);
             }
@@ -588,6 +597,12 @@ unsafe partial class LogMessage
             case ArgumentType.TimeOnly:
             {
                 dataPointer += sizeof(TimeOnly);
+                return;
+            }
+
+            case ArgumentType.DateTimeOffset:
+            {
+                dataPointer += sizeof(DateTimeOffset);
                 return;
             }
 

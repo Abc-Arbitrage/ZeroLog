@@ -998,6 +998,52 @@ partial class LogTests
     }
 
     [Test]
+    public void should_log_DateTimeOffset_Trace()
+    {
+        _log.Trace($"foo {TestValues.DateTimeOffset} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Trace);
+        message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.DateTimeOffset} bar"));
+    }
+
+    [Test]
+    public void should_log_DateTimeOffset_Trace_nullable()
+    {
+        _log.Trace($"foo {(DateTimeOffset?)TestValues.DateTimeOffset} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Trace);
+        message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.DateTimeOffset} bar"));
+    }
+
+    [Test]
+    public void should_log_DateTimeOffset_Trace_formatted()
+    {
+        _log.Trace($"foo {TestValues.DateTimeOffset:o} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Trace);
+        message.ToString().ShouldEqual($"foo {TestValues.DateTimeOffset.ToString("o", CultureInfo.InvariantCulture)} bar");
+    }
+
+    [Test]
+    public void should_log_DateTimeOffset_Trace_nullable_formatted()
+    {
+        _log.Trace($"foo {(DateTimeOffset?)TestValues.DateTimeOffset:o} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Trace);
+        message.ToString().ShouldEqual($"foo {TestValues.DateTimeOffset.ToString("o", CultureInfo.InvariantCulture)} bar");
+    }
+
+    [Test]
+    public void should_not_allocate_DateTimeOffset_Trace()
+    {
+        GcTester.ShouldNotAllocate(() => _log.Trace($"foo {TestValues.DateTimeOffset} bar"));
+    }
+
+    [Test]
     public void should_log_Enum_Trace()
     {
         _log.Trace($"foo {DayOfWeek.Friday} bar");
@@ -2023,6 +2069,52 @@ partial class LogTests
     public void should_not_allocate_TimeOnly_Debug()
     {
         GcTester.ShouldNotAllocate(() => _log.Debug($"foo {TestValues.TimeOnly} bar"));
+    }
+
+    [Test]
+    public void should_log_DateTimeOffset_Debug()
+    {
+        _log.Debug($"foo {TestValues.DateTimeOffset} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Debug);
+        message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.DateTimeOffset} bar"));
+    }
+
+    [Test]
+    public void should_log_DateTimeOffset_Debug_nullable()
+    {
+        _log.Debug($"foo {(DateTimeOffset?)TestValues.DateTimeOffset} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Debug);
+        message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.DateTimeOffset} bar"));
+    }
+
+    [Test]
+    public void should_log_DateTimeOffset_Debug_formatted()
+    {
+        _log.Debug($"foo {TestValues.DateTimeOffset:o} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Debug);
+        message.ToString().ShouldEqual($"foo {TestValues.DateTimeOffset.ToString("o", CultureInfo.InvariantCulture)} bar");
+    }
+
+    [Test]
+    public void should_log_DateTimeOffset_Debug_nullable_formatted()
+    {
+        _log.Debug($"foo {(DateTimeOffset?)TestValues.DateTimeOffset:o} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Debug);
+        message.ToString().ShouldEqual($"foo {TestValues.DateTimeOffset.ToString("o", CultureInfo.InvariantCulture)} bar");
+    }
+
+    [Test]
+    public void should_not_allocate_DateTimeOffset_Debug()
+    {
+        GcTester.ShouldNotAllocate(() => _log.Debug($"foo {TestValues.DateTimeOffset} bar"));
     }
 
     [Test]
@@ -3054,6 +3146,52 @@ partial class LogTests
     }
 
     [Test]
+    public void should_log_DateTimeOffset_Info()
+    {
+        _log.Info($"foo {TestValues.DateTimeOffset} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Info);
+        message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.DateTimeOffset} bar"));
+    }
+
+    [Test]
+    public void should_log_DateTimeOffset_Info_nullable()
+    {
+        _log.Info($"foo {(DateTimeOffset?)TestValues.DateTimeOffset} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Info);
+        message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.DateTimeOffset} bar"));
+    }
+
+    [Test]
+    public void should_log_DateTimeOffset_Info_formatted()
+    {
+        _log.Info($"foo {TestValues.DateTimeOffset:o} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Info);
+        message.ToString().ShouldEqual($"foo {TestValues.DateTimeOffset.ToString("o", CultureInfo.InvariantCulture)} bar");
+    }
+
+    [Test]
+    public void should_log_DateTimeOffset_Info_nullable_formatted()
+    {
+        _log.Info($"foo {(DateTimeOffset?)TestValues.DateTimeOffset:o} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Info);
+        message.ToString().ShouldEqual($"foo {TestValues.DateTimeOffset.ToString("o", CultureInfo.InvariantCulture)} bar");
+    }
+
+    [Test]
+    public void should_not_allocate_DateTimeOffset_Info()
+    {
+        GcTester.ShouldNotAllocate(() => _log.Info($"foo {TestValues.DateTimeOffset} bar"));
+    }
+
+    [Test]
     public void should_log_Enum_Info()
     {
         _log.Info($"foo {DayOfWeek.Friday} bar");
@@ -4079,6 +4217,52 @@ partial class LogTests
     public void should_not_allocate_TimeOnly_Warn()
     {
         GcTester.ShouldNotAllocate(() => _log.Warn($"foo {TestValues.TimeOnly} bar"));
+    }
+
+    [Test]
+    public void should_log_DateTimeOffset_Warn()
+    {
+        _log.Warn($"foo {TestValues.DateTimeOffset} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Warn);
+        message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.DateTimeOffset} bar"));
+    }
+
+    [Test]
+    public void should_log_DateTimeOffset_Warn_nullable()
+    {
+        _log.Warn($"foo {(DateTimeOffset?)TestValues.DateTimeOffset} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Warn);
+        message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.DateTimeOffset} bar"));
+    }
+
+    [Test]
+    public void should_log_DateTimeOffset_Warn_formatted()
+    {
+        _log.Warn($"foo {TestValues.DateTimeOffset:o} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Warn);
+        message.ToString().ShouldEqual($"foo {TestValues.DateTimeOffset.ToString("o", CultureInfo.InvariantCulture)} bar");
+    }
+
+    [Test]
+    public void should_log_DateTimeOffset_Warn_nullable_formatted()
+    {
+        _log.Warn($"foo {(DateTimeOffset?)TestValues.DateTimeOffset:o} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Warn);
+        message.ToString().ShouldEqual($"foo {TestValues.DateTimeOffset.ToString("o", CultureInfo.InvariantCulture)} bar");
+    }
+
+    [Test]
+    public void should_not_allocate_DateTimeOffset_Warn()
+    {
+        GcTester.ShouldNotAllocate(() => _log.Warn($"foo {TestValues.DateTimeOffset} bar"));
     }
 
     [Test]
@@ -5110,6 +5294,52 @@ partial class LogTests
     }
 
     [Test]
+    public void should_log_DateTimeOffset_Error()
+    {
+        _log.Error($"foo {TestValues.DateTimeOffset} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Error);
+        message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.DateTimeOffset} bar"));
+    }
+
+    [Test]
+    public void should_log_DateTimeOffset_Error_nullable()
+    {
+        _log.Error($"foo {(DateTimeOffset?)TestValues.DateTimeOffset} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Error);
+        message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.DateTimeOffset} bar"));
+    }
+
+    [Test]
+    public void should_log_DateTimeOffset_Error_formatted()
+    {
+        _log.Error($"foo {TestValues.DateTimeOffset:o} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Error);
+        message.ToString().ShouldEqual($"foo {TestValues.DateTimeOffset.ToString("o", CultureInfo.InvariantCulture)} bar");
+    }
+
+    [Test]
+    public void should_log_DateTimeOffset_Error_nullable_formatted()
+    {
+        _log.Error($"foo {(DateTimeOffset?)TestValues.DateTimeOffset:o} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Error);
+        message.ToString().ShouldEqual($"foo {TestValues.DateTimeOffset.ToString("o", CultureInfo.InvariantCulture)} bar");
+    }
+
+    [Test]
+    public void should_not_allocate_DateTimeOffset_Error()
+    {
+        GcTester.ShouldNotAllocate(() => _log.Error($"foo {TestValues.DateTimeOffset} bar"));
+    }
+
+    [Test]
     public void should_log_Enum_Error()
     {
         _log.Error($"foo {DayOfWeek.Friday} bar");
@@ -6135,6 +6365,52 @@ partial class LogTests
     public void should_not_allocate_TimeOnly_Fatal()
     {
         GcTester.ShouldNotAllocate(() => _log.Fatal($"foo {TestValues.TimeOnly} bar"));
+    }
+
+    [Test]
+    public void should_log_DateTimeOffset_Fatal()
+    {
+        _log.Fatal($"foo {TestValues.DateTimeOffset} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Fatal);
+        message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.DateTimeOffset} bar"));
+    }
+
+    [Test]
+    public void should_log_DateTimeOffset_Fatal_nullable()
+    {
+        _log.Fatal($"foo {(DateTimeOffset?)TestValues.DateTimeOffset} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Fatal);
+        message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.DateTimeOffset} bar"));
+    }
+
+    [Test]
+    public void should_log_DateTimeOffset_Fatal_formatted()
+    {
+        _log.Fatal($"foo {TestValues.DateTimeOffset:o} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Fatal);
+        message.ToString().ShouldEqual($"foo {TestValues.DateTimeOffset.ToString("o", CultureInfo.InvariantCulture)} bar");
+    }
+
+    [Test]
+    public void should_log_DateTimeOffset_Fatal_nullable_formatted()
+    {
+        _log.Fatal($"foo {(DateTimeOffset?)TestValues.DateTimeOffset:o} bar");
+
+        var message = _provider.GetSubmittedMessage();
+        message.Level.ShouldEqual(LogLevel.Fatal);
+        message.ToString().ShouldEqual($"foo {TestValues.DateTimeOffset.ToString("o", CultureInfo.InvariantCulture)} bar");
+    }
+
+    [Test]
+    public void should_not_allocate_DateTimeOffset_Fatal()
+    {
+        GcTester.ShouldNotAllocate(() => _log.Fatal($"foo {TestValues.DateTimeOffset} bar"));
     }
 
     [Test]
