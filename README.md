@@ -122,7 +122,25 @@ _log.Info()
 
 You need to instantiate a set of appenders (*output channels*) that can be used by loggers, and pass them to the logger configurations.
 
-Two appenders are provided by default: `ConsoleAppener` and `DateAndSizeRollingFileAppender`, but you can also write your own.
+Several appenders are provided by default, such as `ConsoleAppener` or `DateAndSizeRollingFileAppender`, but you can also write your own.
+
+#### Formatters
+
+The output format of the built-in appenders may be customized through the `Formatter` property, which controls how the message metadata is formatted. A `DefaultFormatter` is provided, which prefixes the logged message with a customizable pattern, and suffixes it with the structured data as JSON.
+
+The prefix pattern is a string with the following placeholders:
+
+| Placeholder | Effect                                            | Format                                                     | 
+|-------------|---------------------------------------------------|------------------------------------------------------------|
+| `%date`     | The message UTC date                              | A `DateTime` format string, default: `yyyy-MM-dd`          |
+| `%time`     | The message UTC timestamp                         | A `TimeSpan` format string, default: `hh\:mm\:ss\.fffffff` |
+| `%thread`   | The thread name (or ID) which logged the message  |                                                            |
+| `%level`    | The log level in uppercase                        | `pad` is equivalent to `5` (the longest level length)      |
+| `%logger`   | The logger name                                   |                                                            | 
+| `%newline`  | Equivalent to `Environment.NewLine`               |                                                            | 
+| `%column`   | Inserts padding spaces until a given column index | The column index to reach                                  | 
+
+Prefixes can be written in the form `%{prefix}` or `%{prefix:format}` to define a format string. String placeholders accept an integer format string which defines their minimum length. For instance, `%{logger:20}` will always be at least 20 characters wide.
 
 ### Loggers
 
@@ -167,3 +185,4 @@ Other settings that can be set on the `ZeroLogConfiguration` object are:
  - `NullDisplayString` (default: `"null"`) - The string which should be logged instead of a `null` value.
  - `TruncatedMessageSuffix` (default: `" [TRUNCATED]"`) - The string which is appended to a message when it is truncated.
  - `AppenderQuarantineDelay` (default: 15 seconds) - The time an appender will be put into quarantine (not used to log messages) after it throws an exception.
+ - `AppendingStrategy` (default: `Asynchronous`) - The way log messages are handled, use `Synchronous` in unit tests.
