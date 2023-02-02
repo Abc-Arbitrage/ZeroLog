@@ -61,6 +61,7 @@ public class PrefixWriterTests
     [TestCase("%foo")]
     [TestCase("%{foo}")]
     [TestCase("%{foo:bar}")]
+    [TestCase("%{newline:5}")]
     public void should_throw_on_invalid_format(string pattern)
     {
         Assert.Throws<FormatException>(() => _ = new PrefixWriter(pattern));
@@ -102,6 +103,16 @@ public class PrefixWriterTests
 
         var result = GetResult(prefixWriter, logMessage);
         result.ShouldEqual("0");
+    }
+
+    [Test]
+    public void should_write_newline()
+    {
+        var prefixWriter = new PrefixWriter("[%{newline}]");
+        var logMessage = new LogMessage("Foo");
+
+        var result = GetResult(prefixWriter, logMessage);
+        result.ShouldEqual($"[{Environment.NewLine}]");
     }
 
     private static string GetResult(PrefixWriter prefixWriter, LogMessage logMessage)

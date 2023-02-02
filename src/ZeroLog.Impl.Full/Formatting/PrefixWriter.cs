@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace ZeroLog.Formatting;
@@ -12,10 +13,10 @@ internal class PrefixWriter
     private static readonly Regex _patternRegex = new(
         """
         %(?:
-            (?<part>\w+)
+            (?<type>\w+)
             |
             \{
-                \s* (?<part>\w+) \s*
+                \s* (?<type>\w+) \s*
                 (?:
                     : \s* (?<format>.*?) \s*
                 )?
@@ -62,21 +63,24 @@ internal class PrefixWriter
             if (position < match!.Index)
                 yield return new PatternPart(pattern.Substring(position, match.Index - position));
 
+            var placeholderType = match.Groups["type"].Value;
+
             var format = match.Groups["format"] is { Success: true } formatGroup
                 ? formatGroup.Value
                 : null;
 
-            var part = match.Groups["part"].Value.ToLowerInvariant() switch
+            var part = placeholderType.ToLowerInvariant() switch
             {
-                "date"   => new PatternPart(PatternPartType.Date, format),
-                "time"   => new PatternPart(PatternPartType.Time, format),
-                "thread" => new PatternPart(PatternPartType.Thread, format),
-                "level"  => new PatternPart(PatternPartType.Level, format),
-                "logger" => new PatternPart(PatternPartType.Logger, format),
-                _        => throw new FormatException($"Invalid placeholder type: %{match.Groups["part"].Value}")
+                "date"    => new PatternPart(PatternPartType.Date, format),
+                "time"    => new PatternPart(PatternPartType.Time, format),
+                "thread"  => new PatternPart(PatternPartType.Thread, format),
+                "level"   => new PatternPart(PatternPartType.Level, format),
+                "logger"  => new PatternPart(PatternPartType.Logger, format),
+                "newline" => new PatternPart(PatternPartType.NewLine, format),
+                _         => throw new FormatException($"Invalid placeholder type: %{placeholderType}")
             };
 
-            yield return ValidatePart(part);
+            yield return ValidatePart(part, placeholderType);
 
             position = match.Index + match.Length;
         }
@@ -85,7 +89,7 @@ internal class PrefixWriter
             yield return new PatternPart(pattern.Substring(position, pattern.Length - position));
     }
 
-    private static PatternPart ValidatePart(PatternPart part)
+    private static PatternPart ValidatePart(PatternPart part, string placeholderType)
     {
         switch (part.Type)
         {
@@ -124,10 +128,18 @@ internal class PrefixWriter
                 goto default;
             }
 
+            case PatternPartType.NewLine:
+            {
+                if (part.Format is not null)
+                    throw new FormatException($"The %{placeholderType} placeholder does not support format strings.");
+
+                break;
+            }
+
             default:
             {
                 if (part is { Format: not null, FormatInt: null })
-                    throw new FormatException($"Invalid format string: {part.Format}");
+                    throw new FormatException($"Invalid format string for the %{placeholderType} placeholder: {part.Format}");
 
                 break;
             }
@@ -138,28 +150,34 @@ internal class PrefixWriter
 
     private static IEnumerable<PatternPart> OptimizeParts(IEnumerable<PatternPart> parts)
     {
-        var currentString = string.Empty;
+        var sb = new StringBuilder();
 
         foreach (var part in parts)
         {
-            if (part.Type == PatternPartType.String)
+            switch (part.Type)
             {
-                currentString += part.Format;
-            }
-            else
-            {
-                if (currentString.Length != 0)
-                {
-                    yield return new PatternPart(currentString);
-                    currentString = string.Empty;
-                }
+                case PatternPartType.String:
+                    sb.Append(part.Format);
+                    break;
 
-                yield return part;
+                case PatternPartType.NewLine:
+                    sb.Append(Environment.NewLine);
+                    break;
+
+                default:
+                    if (sb.Length != 0)
+                    {
+                        yield return new PatternPart(sb.ToString());
+                        sb.Clear();
+                    }
+
+                    yield return part;
+                    break;
             }
         }
 
-        if (currentString.Length != 0)
-            yield return new PatternPart(currentString);
+        if (sb.Length != 0)
+            yield return new PatternPart(sb.ToString());
     }
 
 #if NETCOREAPP
@@ -271,7 +289,8 @@ internal class PrefixWriter
         Time,
         Thread,
         Level,
-        Logger
+        Logger,
+        NewLine
     }
 
     private readonly struct PatternPart
