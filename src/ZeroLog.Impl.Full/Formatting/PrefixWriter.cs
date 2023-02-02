@@ -77,6 +77,7 @@ internal class PrefixWriter
                 "level"   => new PatternPart(PatternPartType.Level, format),
                 "logger"  => new PatternPart(PatternPartType.Logger, format),
                 "newline" => new PatternPart(PatternPartType.NewLine, format),
+                "column"  => new PatternPart(PatternPartType.Column, format),
                 _         => throw new FormatException($"Invalid placeholder type: %{placeholderType}")
             };
 
@@ -134,6 +135,14 @@ internal class PrefixWriter
                     throw new FormatException($"The %{placeholderType} placeholder does not support format strings.");
 
                 break;
+            }
+
+            case PatternPartType.Column:
+            {
+                if (part.Format is null)
+                    throw new FormatException($"The %{placeholderType} placeholder requires a format string.");
+
+                goto default;
             }
 
             default:
@@ -269,6 +278,14 @@ internal class PrefixWriter
 
                     break;
                 }
+
+                case PatternPartType.Column:
+                {
+                    if (part.FormatInt is { } column)
+                        builder.TryAppendPartial(' ', column - builder.Length);
+
+                    continue;
+                }
             }
 
             if (part.FormatInt is { } fieldLength)
@@ -290,7 +307,8 @@ internal class PrefixWriter
         Thread,
         Level,
         Logger,
-        NewLine
+        NewLine,
+        Column
     }
 
     private readonly struct PatternPart

@@ -37,6 +37,7 @@ public class PrefixWriterTests
     [TestCase("%{level:6}", "INFO  ")]
     [TestCase("%{logger:3}", "TestLog")]
     [TestCase("%{logger:10}", "TestLog   ")]
+    [TestCase("abc%{column:10}def%{column:15}ghi", "abc       def  ghi")]
     public void should_write_prefix(string pattern, string expectedResult)
     {
         var prefixWriter = new PrefixWriter(pattern);
@@ -62,6 +63,10 @@ public class PrefixWriterTests
     [TestCase("%{foo}")]
     [TestCase("%{foo:bar}")]
     [TestCase("%{newline:5}")]
+    [TestCase("%column")]
+    [TestCase("%{column}")]
+    [TestCase("%{column:foo}")]
+    [TestCase("%{column:-3}")]
     public void should_throw_on_invalid_format(string pattern)
     {
         Assert.Throws<FormatException>(() => _ = new PrefixWriter(pattern));

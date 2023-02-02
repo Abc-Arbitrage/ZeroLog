@@ -34,6 +34,7 @@ public sealed class DefaultFormatter : Formatter
     /// <item><term><c>%level</c></term><description>The log level in uppercase (specify the <c>pad</c> format to make each level 5 characters wide).</description></item>
     /// <item><term><c>%logger</c></term><description>The logger name.</description></item>
     /// <item><term><c>%newline</c></term><description>Equivalent to <c>Environment.NewLine</c>.</description></item>
+    /// <item><term><c>%column</c></term><description>Inserts padding spaces until the column index specified in the format string is reached.</description></item>
     /// </list>
     /// </para>
     /// <para>
