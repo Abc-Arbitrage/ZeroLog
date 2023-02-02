@@ -72,7 +72,7 @@ internal readonly struct EnumArg
     }
 
     public bool TryGetValue<T>(out T result)
-        where T : struct
+        where T : unmanaged
     {
         if (Type == typeof(T))
         {

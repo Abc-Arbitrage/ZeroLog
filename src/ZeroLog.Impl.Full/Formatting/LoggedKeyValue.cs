@@ -94,7 +94,7 @@ public readonly unsafe ref struct LoggedKeyValue
     /// <returns>True if the value was of type <typeparamref name="T"/> and could be extracted.</returns>
     /// <seealso cref="ValueType"/>
     public bool TryGetValue<T>(out T result)
-        where T : struct
+        where T : unmanaged
     {
         if (_rawData.IsEmpty)
         {
