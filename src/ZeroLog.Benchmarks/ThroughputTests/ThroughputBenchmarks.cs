@@ -12,7 +12,7 @@ using ZeroLog.Configuration;
 namespace ZeroLog.Benchmarks.ThroughputTests;
 
 [MemoryDiagnoser]
-[SimpleJob(RunStrategy.ColdStart, targetCount: 1000, invocationCount: 1, baseline: true)]
+[SimpleJob(RunStrategy.ColdStart, iterationCount: 1000, invocationCount: 1, baseline: true)]
 public class ThroughputBenchmarks
 {
     [Params(4)]

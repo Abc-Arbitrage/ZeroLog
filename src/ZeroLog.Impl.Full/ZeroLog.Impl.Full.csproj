@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="InlineIL.Fody" Version="1.7.1" PrivateAssets="all" />
+    <PackageReference Include="InlineIL.Fody" Version="1.7.4" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
