@@ -6,13 +6,13 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ZeroLog\ZeroLog.csproj" />
-    <PackageReference Include="MarkdownSnippets.MsBuild" Version="24.5.1" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.4.1" />
     <PackageReference Include="NUnit" Version="3.13.3" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.3.1" />
+    <PackageReference Include="MarkdownSnippets.MsBuild" Version="24.5.1" />
     <PackageReference Include="Verify.NUnit" Version="19.8.3" />
     <PackageReference Include="Verify.DiffPlex" Version="2.1.0" />
     <PackageReference Include="PublicApiGenerator" Version="10.3.0" />
