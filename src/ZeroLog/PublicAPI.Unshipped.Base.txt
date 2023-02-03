@@ -1,0 +1,771 @@
+﻿#nullable enable
+override ZeroLog.Log.ToString() -> string!
+override ZeroLog.LogMessage.AppendOperation<T>.ToString() -> string!
+override ZeroLog.LogMessage.ToString() -> string!
+static ZeroLog.LogManager.GetLogger(string! name) -> ZeroLog.Log!
+static ZeroLog.LogManager.GetLogger(System.Type! type) -> ZeroLog.Log!
+static ZeroLog.LogManager.GetLogger<T>() -> ZeroLog.Log!
+ZeroLog.Log
+ZeroLog.Log.Debug() -> ZeroLog.LogMessage!
+ZeroLog.Log.Debug(string? message) -> void
+ZeroLog.Log.Debug(string? message, System.Exception? ex) -> void
+ZeroLog.Log.Debug(ZeroLog.Log.DebugInterpolatedStringHandler message) -> void
+ZeroLog.Log.Debug(ZeroLog.Log.DebugInterpolatedStringHandler message, System.Exception? ex) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(bool value) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(bool? value) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(byte value) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(byte value, string! format) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(byte? value) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(byte? value, string! format) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(char value) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(char? value) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(decimal value) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(decimal value, string! format) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(decimal? value) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(decimal? value, string! format) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(double value) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(double value, string! format) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(double? value) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(double? value, string! format) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(float value) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(float value, string! format) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(float? value) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(float? value, string! format) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(int value) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(int value, string! format) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(int? value) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(int? value, string! format) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(long value) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(long value, string! format) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(long? value) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(long? value, string! format) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(nint value) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(nint value, string! format) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(nint? value) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(nint? value, string! format) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(nuint value) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(nuint value, string! format) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(nuint? value) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(nuint? value, string! format) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(sbyte value) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(sbyte value, string! format) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(sbyte? value) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(sbyte? value, string! format) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(short value) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(short value, string! format) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(short? value) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(short? value, string! format) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(string? value) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(System.DateTime value) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(System.DateTime value, string! format) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(System.DateTime? value) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(System.DateTime? value, string! format) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(System.DateTimeOffset value) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(System.DateTimeOffset value, string! format) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(System.DateTimeOffset? value) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(System.DateTimeOffset? value, string! format) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(System.Guid value) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(System.Guid value, string! format) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(System.Guid? value) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(System.Guid? value, string! format) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(System.ReadOnlySpan<byte> value) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(System.ReadOnlySpan<char> value) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(System.TimeSpan value) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(System.TimeSpan value, string! format) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(System.TimeSpan? value) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(System.TimeSpan? value, string! format) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(uint value) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(uint value, string! format) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(uint? value) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(uint? value, string! format) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(ulong value) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(ulong value, string! format) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(ulong? value) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(ulong? value, string! format) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(ushort value) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(ushort value, string! format) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(ushort? value) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted(ushort? value, string! format) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted<T>(T value) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted<T>(T? value) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendFormatted<T>(ZeroLog.LogMessage.AppendOperation<T> operation) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.AppendLiteral(string! value) -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.DebugInterpolatedStringHandler() -> void
+ZeroLog.Log.DebugInterpolatedStringHandler.DebugInterpolatedStringHandler(int literalLength, int formattedCount, ZeroLog.Log! log, out bool isEnabled) -> void
+ZeroLog.Log.Error() -> ZeroLog.LogMessage!
+ZeroLog.Log.Error(string? message) -> void
+ZeroLog.Log.Error(string? message, System.Exception? ex) -> void
+ZeroLog.Log.Error(ZeroLog.Log.ErrorInterpolatedStringHandler message) -> void
+ZeroLog.Log.Error(ZeroLog.Log.ErrorInterpolatedStringHandler message, System.Exception? ex) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(bool value) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(bool? value) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(byte value) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(byte value, string! format) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(byte? value) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(byte? value, string! format) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(char value) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(char? value) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(decimal value) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(decimal value, string! format) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(decimal? value) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(decimal? value, string! format) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(double value) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(double value, string! format) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(double? value) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(double? value, string! format) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(float value) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(float value, string! format) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(float? value) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(float? value, string! format) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(int value) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(int value, string! format) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(int? value) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(int? value, string! format) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(long value) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(long value, string! format) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(long? value) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(long? value, string! format) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(nint value) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(nint value, string! format) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(nint? value) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(nint? value, string! format) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(nuint value) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(nuint value, string! format) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(nuint? value) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(nuint? value, string! format) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(sbyte value) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(sbyte value, string! format) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(sbyte? value) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(sbyte? value, string! format) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(short value) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(short value, string! format) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(short? value) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(short? value, string! format) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(string? value) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(System.DateTime value) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(System.DateTime value, string! format) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(System.DateTime? value) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(System.DateTime? value, string! format) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(System.DateTimeOffset value) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(System.DateTimeOffset value, string! format) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(System.DateTimeOffset? value) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(System.DateTimeOffset? value, string! format) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(System.Guid value) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(System.Guid value, string! format) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(System.Guid? value) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(System.Guid? value, string! format) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(System.ReadOnlySpan<byte> value) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(System.ReadOnlySpan<char> value) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(System.TimeSpan value) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(System.TimeSpan value, string! format) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(System.TimeSpan? value) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(System.TimeSpan? value, string! format) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(uint value) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(uint value, string! format) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(uint? value) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(uint? value, string! format) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(ulong value) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(ulong value, string! format) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(ulong? value) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(ulong? value, string! format) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(ushort value) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(ushort value, string! format) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(ushort? value) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted(ushort? value, string! format) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted<T>(T value) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted<T>(T? value) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendFormatted<T>(ZeroLog.LogMessage.AppendOperation<T> operation) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.AppendLiteral(string! value) -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.ErrorInterpolatedStringHandler() -> void
+ZeroLog.Log.ErrorInterpolatedStringHandler.ErrorInterpolatedStringHandler(int literalLength, int formattedCount, ZeroLog.Log! log, out bool isEnabled) -> void
+ZeroLog.Log.Fatal() -> ZeroLog.LogMessage!
+ZeroLog.Log.Fatal(string? message) -> void
+ZeroLog.Log.Fatal(string? message, System.Exception? ex) -> void
+ZeroLog.Log.Fatal(ZeroLog.Log.FatalInterpolatedStringHandler message) -> void
+ZeroLog.Log.Fatal(ZeroLog.Log.FatalInterpolatedStringHandler message, System.Exception? ex) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(bool value) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(bool? value) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(byte value) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(byte value, string! format) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(byte? value) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(byte? value, string! format) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(char value) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(char? value) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(decimal value) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(decimal value, string! format) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(decimal? value) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(decimal? value, string! format) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(double value) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(double value, string! format) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(double? value) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(double? value, string! format) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(float value) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(float value, string! format) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(float? value) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(float? value, string! format) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(int value) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(int value, string! format) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(int? value) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(int? value, string! format) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(long value) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(long value, string! format) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(long? value) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(long? value, string! format) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(nint value) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(nint value, string! format) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(nint? value) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(nint? value, string! format) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(nuint value) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(nuint value, string! format) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(nuint? value) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(nuint? value, string! format) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(sbyte value) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(sbyte value, string! format) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(sbyte? value) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(sbyte? value, string! format) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(short value) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(short value, string! format) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(short? value) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(short? value, string! format) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(string? value) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(System.DateTime value) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(System.DateTime value, string! format) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(System.DateTime? value) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(System.DateTime? value, string! format) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(System.DateTimeOffset value) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(System.DateTimeOffset value, string! format) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(System.DateTimeOffset? value) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(System.DateTimeOffset? value, string! format) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(System.Guid value) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(System.Guid value, string! format) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(System.Guid? value) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(System.Guid? value, string! format) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(System.ReadOnlySpan<byte> value) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(System.ReadOnlySpan<char> value) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(System.TimeSpan value) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(System.TimeSpan value, string! format) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(System.TimeSpan? value) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(System.TimeSpan? value, string! format) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(uint value) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(uint value, string! format) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(uint? value) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(uint? value, string! format) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(ulong value) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(ulong value, string! format) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(ulong? value) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(ulong? value, string! format) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(ushort value) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(ushort value, string! format) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(ushort? value) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted(ushort? value, string! format) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted<T>(T value) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted<T>(T? value) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendFormatted<T>(ZeroLog.LogMessage.AppendOperation<T> operation) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.AppendLiteral(string! value) -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.FatalInterpolatedStringHandler() -> void
+ZeroLog.Log.FatalInterpolatedStringHandler.FatalInterpolatedStringHandler(int literalLength, int formattedCount, ZeroLog.Log! log, out bool isEnabled) -> void
+ZeroLog.Log.ForLevel(ZeroLog.LogLevel level) -> ZeroLog.LogMessage!
+ZeroLog.Log.Info() -> ZeroLog.LogMessage!
+ZeroLog.Log.Info(string? message) -> void
+ZeroLog.Log.Info(string? message, System.Exception? ex) -> void
+ZeroLog.Log.Info(ZeroLog.Log.InfoInterpolatedStringHandler message) -> void
+ZeroLog.Log.Info(ZeroLog.Log.InfoInterpolatedStringHandler message, System.Exception? ex) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(bool value) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(bool? value) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(byte value) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(byte value, string! format) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(byte? value) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(byte? value, string! format) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(char value) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(char? value) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(decimal value) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(decimal value, string! format) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(decimal? value) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(decimal? value, string! format) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(double value) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(double value, string! format) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(double? value) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(double? value, string! format) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(float value) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(float value, string! format) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(float? value) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(float? value, string! format) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(int value) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(int value, string! format) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(int? value) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(int? value, string! format) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(long value) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(long value, string! format) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(long? value) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(long? value, string! format) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(nint value) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(nint value, string! format) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(nint? value) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(nint? value, string! format) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(nuint value) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(nuint value, string! format) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(nuint? value) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(nuint? value, string! format) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(sbyte value) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(sbyte value, string! format) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(sbyte? value) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(sbyte? value, string! format) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(short value) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(short value, string! format) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(short? value) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(short? value, string! format) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(string? value) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(System.DateTime value) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(System.DateTime value, string! format) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(System.DateTime? value) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(System.DateTime? value, string! format) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(System.DateTimeOffset value) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(System.DateTimeOffset value, string! format) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(System.DateTimeOffset? value) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(System.DateTimeOffset? value, string! format) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(System.Guid value) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(System.Guid value, string! format) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(System.Guid? value) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(System.Guid? value, string! format) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(System.ReadOnlySpan<byte> value) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(System.ReadOnlySpan<char> value) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(System.TimeSpan value) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(System.TimeSpan value, string! format) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(System.TimeSpan? value) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(System.TimeSpan? value, string! format) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(uint value) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(uint value, string! format) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(uint? value) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(uint? value, string! format) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(ulong value) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(ulong value, string! format) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(ulong? value) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(ulong? value, string! format) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(ushort value) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(ushort value, string! format) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(ushort? value) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted(ushort? value, string! format) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted<T>(T value) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted<T>(T? value) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendFormatted<T>(ZeroLog.LogMessage.AppendOperation<T> operation) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.AppendLiteral(string! value) -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.InfoInterpolatedStringHandler() -> void
+ZeroLog.Log.InfoInterpolatedStringHandler.InfoInterpolatedStringHandler(int literalLength, int formattedCount, ZeroLog.Log! log, out bool isEnabled) -> void
+ZeroLog.Log.IsDebugEnabled.get -> bool
+ZeroLog.Log.IsEnabled(ZeroLog.LogLevel level) -> bool
+ZeroLog.Log.IsErrorEnabled.get -> bool
+ZeroLog.Log.IsFatalEnabled.get -> bool
+ZeroLog.Log.IsInfoEnabled.get -> bool
+ZeroLog.Log.IsTraceEnabled.get -> bool
+ZeroLog.Log.IsWarnEnabled.get -> bool
+ZeroLog.Log.Trace() -> ZeroLog.LogMessage!
+ZeroLog.Log.Trace(string? message) -> void
+ZeroLog.Log.Trace(string? message, System.Exception? ex) -> void
+ZeroLog.Log.Trace(ZeroLog.Log.TraceInterpolatedStringHandler message) -> void
+ZeroLog.Log.Trace(ZeroLog.Log.TraceInterpolatedStringHandler message, System.Exception? ex) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(bool value) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(bool? value) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(byte value) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(byte value, string! format) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(byte? value) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(byte? value, string! format) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(char value) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(char? value) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(decimal value) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(decimal value, string! format) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(decimal? value) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(decimal? value, string! format) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(double value) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(double value, string! format) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(double? value) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(double? value, string! format) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(float value) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(float value, string! format) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(float? value) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(float? value, string! format) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(int value) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(int value, string! format) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(int? value) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(int? value, string! format) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(long value) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(long value, string! format) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(long? value) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(long? value, string! format) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(nint value) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(nint value, string! format) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(nint? value) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(nint? value, string! format) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(nuint value) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(nuint value, string! format) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(nuint? value) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(nuint? value, string! format) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(sbyte value) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(sbyte value, string! format) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(sbyte? value) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(sbyte? value, string! format) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(short value) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(short value, string! format) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(short? value) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(short? value, string! format) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(string? value) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(System.DateTime value) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(System.DateTime value, string! format) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(System.DateTime? value) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(System.DateTime? value, string! format) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(System.DateTimeOffset value) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(System.DateTimeOffset value, string! format) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(System.DateTimeOffset? value) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(System.DateTimeOffset? value, string! format) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(System.Guid value) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(System.Guid value, string! format) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(System.Guid? value) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(System.Guid? value, string! format) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(System.ReadOnlySpan<byte> value) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(System.ReadOnlySpan<char> value) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(System.TimeSpan value) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(System.TimeSpan value, string! format) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(System.TimeSpan? value) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(System.TimeSpan? value, string! format) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(uint value) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(uint value, string! format) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(uint? value) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(uint? value, string! format) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(ulong value) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(ulong value, string! format) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(ulong? value) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(ulong? value, string! format) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(ushort value) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(ushort value, string! format) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(ushort? value) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted(ushort? value, string! format) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted<T>(T value) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted<T>(T? value) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendFormatted<T>(ZeroLog.LogMessage.AppendOperation<T> operation) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.AppendLiteral(string! value) -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.TraceInterpolatedStringHandler() -> void
+ZeroLog.Log.TraceInterpolatedStringHandler.TraceInterpolatedStringHandler(int literalLength, int formattedCount, ZeroLog.Log! log, out bool isEnabled) -> void
+ZeroLog.Log.Warn() -> ZeroLog.LogMessage!
+ZeroLog.Log.Warn(string? message) -> void
+ZeroLog.Log.Warn(string? message, System.Exception? ex) -> void
+ZeroLog.Log.Warn(ZeroLog.Log.WarnInterpolatedStringHandler message) -> void
+ZeroLog.Log.Warn(ZeroLog.Log.WarnInterpolatedStringHandler message, System.Exception? ex) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(bool value) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(bool? value) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(byte value) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(byte value, string! format) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(byte? value) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(byte? value, string! format) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(char value) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(char? value) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(decimal value) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(decimal value, string! format) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(decimal? value) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(decimal? value, string! format) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(double value) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(double value, string! format) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(double? value) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(double? value, string! format) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(float value) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(float value, string! format) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(float? value) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(float? value, string! format) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(int value) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(int value, string! format) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(int? value) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(int? value, string! format) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(long value) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(long value, string! format) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(long? value) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(long? value, string! format) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(nint value) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(nint value, string! format) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(nint? value) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(nint? value, string! format) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(nuint value) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(nuint value, string! format) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(nuint? value) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(nuint? value, string! format) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(sbyte value) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(sbyte value, string! format) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(sbyte? value) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(sbyte? value, string! format) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(short value) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(short value, string! format) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(short? value) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(short? value, string! format) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(string? value) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(System.DateTime value) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(System.DateTime value, string! format) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(System.DateTime? value) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(System.DateTime? value, string! format) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(System.DateTimeOffset value) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(System.DateTimeOffset value, string! format) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(System.DateTimeOffset? value) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(System.DateTimeOffset? value, string! format) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(System.Guid value) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(System.Guid value, string! format) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(System.Guid? value) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(System.Guid? value, string! format) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(System.ReadOnlySpan<byte> value) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(System.ReadOnlySpan<char> value) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(System.TimeSpan value) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(System.TimeSpan value, string! format) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(System.TimeSpan? value) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(System.TimeSpan? value, string! format) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(uint value) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(uint value, string! format) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(uint? value) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(uint? value, string! format) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(ulong value) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(ulong value, string! format) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(ulong? value) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(ulong? value, string! format) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(ushort value) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(ushort value, string! format) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(ushort? value) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted(ushort? value, string! format) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted<T>(T value) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted<T>(T? value) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendFormatted<T>(ZeroLog.LogMessage.AppendOperation<T> operation) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.AppendLiteral(string! value) -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.WarnInterpolatedStringHandler() -> void
+ZeroLog.Log.WarnInterpolatedStringHandler.WarnInterpolatedStringHandler(int literalLength, int formattedCount, ZeroLog.Log! log, out bool isEnabled) -> void
+ZeroLog.LogLevel
+ZeroLog.LogLevel.Debug = 1 -> ZeroLog.LogLevel
+ZeroLog.LogLevel.Error = 4 -> ZeroLog.LogLevel
+ZeroLog.LogLevel.Fatal = 5 -> ZeroLog.LogLevel
+ZeroLog.LogLevel.Info = 2 -> ZeroLog.LogLevel
+ZeroLog.LogLevel.None = 6 -> ZeroLog.LogLevel
+ZeroLog.LogLevel.Trace = 0 -> ZeroLog.LogLevel
+ZeroLog.LogLevel.Warn = 3 -> ZeroLog.LogLevel
+ZeroLog.LogManager
+ZeroLog.LogManager.LogManager() -> void
+ZeroLog.LogMessage
+ZeroLog.LogMessage.Append(bool value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(bool? value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(byte value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(byte value, string! format) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(byte? value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(byte? value, string! format) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(char value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(char? value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(decimal value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(decimal value, string! format) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(decimal? value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(decimal? value, string! format) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(double value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(double value, string! format) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(double? value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(double? value, string! format) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(float value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(float value, string! format) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(float? value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(float? value, string! format) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(int value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(int value, string! format) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(int? value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(int? value, string! format) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(long value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(long value, string! format) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(long? value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(long? value, string! format) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(nint value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(nint value, string! format) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(nint? value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(nint? value, string! format) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(nuint value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(nuint value, string! format) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(nuint? value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(nuint? value, string! format) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(sbyte value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(sbyte value, string! format) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(sbyte? value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(sbyte? value, string! format) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(short value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(short value, string! format) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(short? value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(short? value, string! format) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(string? value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(System.DateTime value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(System.DateTime value, string! format) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(System.DateTime? value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(System.DateTime? value, string! format) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(System.DateTimeOffset value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(System.DateTimeOffset value, string! format) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(System.DateTimeOffset? value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(System.DateTimeOffset? value, string! format) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(System.Guid value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(System.Guid value, string! format) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(System.Guid? value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(System.Guid? value, string! format) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(System.ReadOnlySpan<byte> value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(System.ReadOnlySpan<char> value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(System.TimeSpan value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(System.TimeSpan value, string! format) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(System.TimeSpan? value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(System.TimeSpan? value, string! format) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(uint value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(uint value, string! format) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(uint? value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(uint? value, string! format) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(ulong value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(ulong value, string! format) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(ulong? value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(ulong? value, string! format) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(ushort value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(ushort value, string! format) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(ushort? value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(ushort? value, string! format) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Append(ZeroLog.LogMessage.AppendInterpolatedStringHandler value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.AppendEnum<T>(T value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.AppendEnum<T>(T? value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.AppendInterpolatedStringHandler
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(bool value) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(bool? value) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(byte value) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(byte value, string! format) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(byte? value) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(byte? value, string! format) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(char value) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(char? value) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(decimal value) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(decimal value, string! format) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(decimal? value) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(decimal? value, string! format) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(double value) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(double value, string! format) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(double? value) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(double? value, string! format) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(float value) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(float value, string! format) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(float? value) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(float? value, string! format) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(int value) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(int value, string! format) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(int? value) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(int? value, string! format) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(long value) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(long value, string! format) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(long? value) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(long? value, string! format) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(nint value) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(nint value, string! format) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(nint? value) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(nint? value, string! format) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(nuint value) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(nuint value, string! format) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(nuint? value) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(nuint? value, string! format) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(sbyte value) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(sbyte value, string! format) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(sbyte? value) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(sbyte? value, string! format) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(short value) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(short value, string! format) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(short? value) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(short? value, string! format) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(string? value) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(System.DateTime value) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(System.DateTime value, string! format) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(System.DateTime? value) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(System.DateTime? value, string! format) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(System.DateTimeOffset value) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(System.DateTimeOffset value, string! format) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(System.DateTimeOffset? value) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(System.DateTimeOffset? value, string! format) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(System.Guid value) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(System.Guid value, string! format) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(System.Guid? value) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(System.Guid? value, string! format) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(System.ReadOnlySpan<byte> value) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(System.ReadOnlySpan<char> value) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(System.TimeSpan value) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(System.TimeSpan value, string! format) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(System.TimeSpan? value) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(System.TimeSpan? value, string! format) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(uint value) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(uint value, string! format) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(uint? value) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(uint? value, string! format) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(ulong value) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(ulong value, string! format) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(ulong? value) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(ulong? value, string! format) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(ushort value) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(ushort value, string! format) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(ushort? value) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted(ushort? value, string! format) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted<T>(T value) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted<T>(T? value) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendFormatted<T>(ZeroLog.LogMessage.AppendOperation<T> operation) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendInterpolatedStringHandler() -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendInterpolatedStringHandler(int literalLength, int formattedCount, ZeroLog.LogMessage! message) -> void
+ZeroLog.LogMessage.AppendInterpolatedStringHandler.AppendLiteral(string! value) -> void
+ZeroLog.LogMessage.AppendKeyValue(string! key, bool value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.AppendKeyValue(string! key, bool? value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.AppendKeyValue(string! key, byte value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.AppendKeyValue(string! key, byte? value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.AppendKeyValue(string! key, char value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.AppendKeyValue(string! key, char? value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.AppendKeyValue(string! key, decimal value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.AppendKeyValue(string! key, decimal? value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.AppendKeyValue(string! key, double value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.AppendKeyValue(string! key, double? value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.AppendKeyValue(string! key, float value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.AppendKeyValue(string! key, float? value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.AppendKeyValue(string! key, int value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.AppendKeyValue(string! key, int? value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.AppendKeyValue(string! key, long value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.AppendKeyValue(string! key, long? value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.AppendKeyValue(string! key, nint value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.AppendKeyValue(string! key, nint? value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.AppendKeyValue(string! key, nuint value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.AppendKeyValue(string! key, nuint? value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.AppendKeyValue(string! key, sbyte value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.AppendKeyValue(string! key, sbyte? value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.AppendKeyValue(string! key, short value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.AppendKeyValue(string! key, short? value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.AppendKeyValue(string! key, string? value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.AppendKeyValue(string! key, System.DateTime value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.AppendKeyValue(string! key, System.DateTime? value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.AppendKeyValue(string! key, System.DateTimeOffset value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.AppendKeyValue(string! key, System.DateTimeOffset? value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.AppendKeyValue(string! key, System.Guid value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.AppendKeyValue(string! key, System.Guid? value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.AppendKeyValue(string! key, System.ReadOnlySpan<byte> value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.AppendKeyValue(string! key, System.ReadOnlySpan<char> value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.AppendKeyValue(string! key, System.TimeSpan value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.AppendKeyValue(string! key, System.TimeSpan? value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.AppendKeyValue(string! key, uint value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.AppendKeyValue(string! key, uint? value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.AppendKeyValue(string! key, ulong value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.AppendKeyValue(string! key, ulong? value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.AppendKeyValue(string! key, ushort value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.AppendKeyValue(string! key, ushort? value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.AppendKeyValue<T>(string! key, T value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.AppendKeyValue<T>(string! key, T? value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.AppendOperation<T>
+ZeroLog.LogMessage.AppendOperation<T>.AppendAction.get -> System.Action<ZeroLog.LogMessage!, T?>?
+ZeroLog.LogMessage.AppendOperation<T>.AppendOperation() -> void
+ZeroLog.LogMessage.AppendOperation<T>.AppendOperation(T? value, System.Action<ZeroLog.LogMessage!, T?>! appendAction) -> void
+ZeroLog.LogMessage.AppendOperation<T>.Value.get -> T?
+ZeroLog.LogMessage.AppendUnmanaged<T>(ref T value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.AppendUnmanaged<T>(ref T value, string? format) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.AppendUnmanaged<T>(ref T? value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.AppendUnmanaged<T>(ref T? value, string? format) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.AppendUnmanaged<T>(T value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.AppendUnmanaged<T>(T value, string? format) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.AppendUnmanaged<T>(T? value) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.AppendUnmanaged<T>(T? value, string? format) -> ZeroLog.LogMessage!
+ZeroLog.LogMessage.Exception.get -> System.Exception?
+ZeroLog.LogMessage.Level.get -> ZeroLog.LogLevel
+ZeroLog.LogMessage.Log() -> void
+ZeroLog.LogMessage.Thread.get -> System.Threading.Thread?
+ZeroLog.LogMessage.Timestamp.get -> System.DateTime
+ZeroLog.LogMessage.WithException(System.Exception? exception) -> ZeroLog.LogMessage!

@@ -3,6 +3,7 @@
     <TargetFrameworks>net7.0;net6.0;netstandard2.0</TargetFrameworks>
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);RS0048</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -16,11 +17,12 @@
     <PackageReference Include="Fody" Version="6.6.4" PrivateAssets="all" />
     <PackageReference Include="InlineIL.Fody" Version="1.7.3" PrivateAssets="all" />
     <PackageReference Include="System.Memory" Version="4.5.5" Condition="'$(TargetFrameworkIdentifier)' == '.NETStandard'" />
+    <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="3.3.4" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="../ZeroLog.Impl.Base/**/*.cs" Exclude="../ZeroLog.Impl.Base/obj/**/*;../ZeroLog.Impl.Base/bin/**/*" Visible="false" />
-    <Compile Include="../ZeroLog.Impl.Full/**/*.cs" Exclude="../ZeroLog.Impl.Full/obj/**/*;../ZeroLog.Impl.Full/bin/**/*" Visible="false" Condition="'$(TargetFramework)' != 'netstandard2.0'" />
+    <Compile Include="../ZeroLog.Impl.Base/**/*.cs" Exclude="../ZeroLog.Impl.Base/obj/**/*;../ZeroLog.Impl.Base/bin/**/*" Link="Impl/%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="../ZeroLog.Impl.Full/**/*.cs" Exclude="../ZeroLog.Impl.Full/obj/**/*;../ZeroLog.Impl.Full/bin/**/*" Link="Impl/%(RecursiveDir)%(Filename)%(Extension)" Condition="'$(TargetFramework)' != 'netstandard2.0'" />
   </ItemGroup>
 
   <ItemGroup>
@@ -29,6 +31,11 @@
     <None Include="ZeroLog.targets" Pack="true" PackagePath="build" />
     <None Include="../NuGetReadme.md" Pack="true" PackagePath="/README.md" Visible="false" />
     <None Include="../../icon.png" Pack="true" PackagePath="/" Visible="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AdditionalFiles Include="PublicAPI.Unshipped.Base.txt" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
+    <AdditionalFiles Include="PublicAPI.Unshipped.Full.txt" Condition="'$(TargetFramework)' != 'netstandard2.0'" />
   </ItemGroup>
 
 </Project>

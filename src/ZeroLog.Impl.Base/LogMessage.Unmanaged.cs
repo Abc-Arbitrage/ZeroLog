@@ -10,9 +10,21 @@ partial class LogMessage
     /// Appends an unmanaged value to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
+    /// <typeparam name="T">The value type.</typeparam>
+    public LogMessage AppendUnmanaged<T>(T value)
+        where T : unmanaged
+    {
+        InternalAppendUnmanaged(ref value, null);
+        return this;
+    }
+
+    /// <summary>
+    /// Appends an unmanaged value to the message.
+    /// </summary>
+    /// <param name="value">The value to append.</param>
     /// <param name="format">The format string.</param>
     /// <typeparam name="T">The value type.</typeparam>
-    public LogMessage AppendUnmanaged<T>(T value, string? format = null)
+    public LogMessage AppendUnmanaged<T>(T value, string? format)
         where T : unmanaged
     {
         InternalAppendUnmanaged(ref value, format);
@@ -23,9 +35,21 @@ partial class LogMessage
     /// Appends a nullable unmanaged value to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
+    /// <typeparam name="T">The value type.</typeparam>
+    public LogMessage AppendUnmanaged<T>(T? value)
+        where T : unmanaged
+    {
+        InternalAppendUnmanaged(ref value, null);
+        return this;
+    }
+
+    /// <summary>
+    /// Appends a nullable unmanaged value to the message.
+    /// </summary>
+    /// <param name="value">The value to append.</param>
     /// <param name="format">The format string.</param>
     /// <typeparam name="T">The value type.</typeparam>
-    public LogMessage AppendUnmanaged<T>(T? value, string? format = null)
+    public LogMessage AppendUnmanaged<T>(T? value, string? format)
         where T : unmanaged
     {
         InternalAppendUnmanaged(ref value, format);
@@ -36,9 +60,21 @@ partial class LogMessage
     /// Appends an unmanaged value to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
+    /// <typeparam name="T">The value type.</typeparam>
+    public LogMessage AppendUnmanaged<T>(ref T value)
+        where T : unmanaged
+    {
+        InternalAppendUnmanaged(ref value, null);
+        return this;
+    }
+
+    /// <summary>
+    /// Appends an unmanaged value to the message.
+    /// </summary>
+    /// <param name="value">The value to append.</param>
     /// <param name="format">The format string.</param>
     /// <typeparam name="T">The value type.</typeparam>
-    public LogMessage AppendUnmanaged<T>(ref T value, string? format = null)
+    public LogMessage AppendUnmanaged<T>(ref T value, string? format)
         where T : unmanaged
     {
         InternalAppendUnmanaged(ref value, format);
@@ -49,9 +85,21 @@ partial class LogMessage
     /// Appends a nullable unmanaged value to the message.
     /// </summary>
     /// <param name="value">The value to append.</param>
+    /// <typeparam name="T">The value type.</typeparam>
+    public LogMessage AppendUnmanaged<T>(ref T? value)
+        where T : unmanaged
+    {
+        InternalAppendUnmanaged(ref value, null);
+        return this;
+    }
+
+    /// <summary>
+    /// Appends a nullable unmanaged value to the message.
+    /// </summary>
+    /// <param name="value">The value to append.</param>
     /// <param name="format">The format string.</param>
     /// <typeparam name="T">The value type.</typeparam>
-    public LogMessage AppendUnmanaged<T>(ref T? value, string? format = null)
+    public LogMessage AppendUnmanaged<T>(ref T? value, string? format)
         where T : unmanaged
     {
         InternalAppendUnmanaged(ref value, format);
@@ -67,7 +115,6 @@ partial class LogMessage
         where T : unmanaged;
 
 #if NETSTANDARD
-
     private partial void InternalAppendUnmanaged<T>(ref T value, string? format)
         where T : unmanaged
     {
