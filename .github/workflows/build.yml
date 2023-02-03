@@ -4,6 +4,7 @@ on: [push, pull_request]
 
 env:
   DOTNET_NOLOGO: 1
+  NUGET_CERT_REVOCATION_MODE: offline
 
 jobs:
   windows:
