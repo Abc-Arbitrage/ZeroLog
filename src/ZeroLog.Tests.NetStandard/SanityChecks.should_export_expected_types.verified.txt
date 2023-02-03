@@ -1,0 +1,14 @@
+﻿[
+  ZeroLog.Log,
+  ZeroLog.Log+DebugInterpolatedStringHandler,
+  ZeroLog.Log+ErrorInterpolatedStringHandler,
+  ZeroLog.Log+FatalInterpolatedStringHandler,
+  ZeroLog.Log+InfoInterpolatedStringHandler,
+  ZeroLog.Log+TraceInterpolatedStringHandler,
+  ZeroLog.Log+WarnInterpolatedStringHandler,
+  ZeroLog.LogLevel,
+  ZeroLog.LogManager,
+  ZeroLog.LogMessage,
+  ZeroLog.LogMessage+AppendInterpolatedStringHandler,
+  ZeroLog.LogMessage+AppendOperation`1
+]

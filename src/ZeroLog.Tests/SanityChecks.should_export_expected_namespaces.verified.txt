@@ -1,0 +1,6 @@
+﻿[
+  ZeroLog,
+  ZeroLog.Appenders,
+  ZeroLog.Configuration,
+  ZeroLog.Formatting
+]

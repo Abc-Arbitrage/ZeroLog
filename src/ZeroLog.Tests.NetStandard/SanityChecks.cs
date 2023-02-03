@@ -1,12 +1,11 @@
 using System;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using PublicApiGenerator;
 using VerifyNUnit;
 
-namespace ZeroLog.Tests;
+namespace ZeroLog.Tests.NetStandard;
 
 [TestFixture]
 public class SanityChecks
@@ -45,12 +44,9 @@ public class SanityChecks
                                   IncludeAssemblyAttributes = false,
                                   ExcludeAttributes = new[]
                                   {
-                                      typeof(ObsoleteAttribute).FullName,
-#if NET7_0_OR_GREATER
-                                      typeof(CompilerFeatureRequiredAttribute).FullName
-#endif
+                                      typeof(ObsoleteAttribute).FullName
                                   }
                               })
-        ).UniqueForTargetFrameworkAndVersion();
+        );
     }
 }
