@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Reflection;
 using System.Text;
 using ZeroLog.Formatting;
 
@@ -13,6 +14,7 @@ public abstract class StreamAppender : Appender
     private byte[] _byteBuffer = Array.Empty<byte>();
 
     private Encoding _encoding = Encoding.UTF8;
+    private bool _useSpanGetBytes;
     private Formatter? _formatter;
 
     /// <summary>
@@ -65,9 +67,19 @@ public abstract class StreamAppender : Appender
         if (Stream is null)
             return;
 
-        var chars = Formatter.FormatMessage(message);
-        var byteCount = _encoding.GetBytes(chars, _byteBuffer);
-        Stream.Write(_byteBuffer, 0, byteCount);
+        if (_useSpanGetBytes)
+        {
+            var chars = Formatter.FormatMessage(message);
+            var byteCount = _encoding.GetBytes(chars, _byteBuffer);
+            Stream.Write(_byteBuffer, 0, byteCount);
+        }
+        else
+        {
+            Formatter.FormatMessage(message);
+            var charBuffer = Formatter.GetBuffer(out var charCount);
+            var byteCount = _encoding.GetBytes(charBuffer, 0, charCount, _byteBuffer, 0);
+            Stream.Write(_byteBuffer, 0, byteCount);
+        }
     }
 
     /// <inheritdoc/>
@@ -81,7 +93,16 @@ public abstract class StreamAppender : Appender
     {
         var maxBytes = _encoding.GetMaxByteCount(LogManager.OutputBufferSize);
 
+        // The base Encoding class allocates buffers in all non-abstract GetBytes overloads in order to call the abstract
+        // GetBytes(char[] chars, int charIndex, int charCount, byte[] bytes, int byteIndex) in the end.
+        // If an encoding overrides the Span version of GetBytes, we assume it avoids this allocation
+        // and it skips safety checks as those are guaranteed by the Span struct. In that case, we can call this overload directly.
+        _useSpanGetBytes = OverridesSpanGetBytes(_encoding.GetType());
+
         if (_byteBuffer.Length < maxBytes)
             _byteBuffer = GC.AllocateUninitializedArray<byte>(maxBytes);
     }
+
+    internal static bool OverridesSpanGetBytes(Type encodingType)
+        => encodingType.GetMethod(nameof(System.Text.Encoding.GetBytes), BindingFlags.Public | BindingFlags.Instance, new[] { typeof(ReadOnlySpan<char>), typeof(Span<byte>) })?.DeclaringType == encodingType;
 }

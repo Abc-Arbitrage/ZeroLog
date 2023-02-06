@@ -90,4 +90,10 @@ public abstract class Formatter
     /// <param name="charCount">The character count to advance the position by.</param>
     protected void AdvanceBy(int charCount)
         => _position += charCount;
+
+    internal char[] GetBuffer(out int length)
+    {
+        length = _position;
+        return _buffer;
+    }
 }
