@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using ZeroLog.Formatting;
 
 namespace ZeroLog.Appenders;
@@ -21,10 +22,15 @@ public class ConsoleAppender : StreamAppender
     /// <summary>
     /// Initializes a new instance of the console appender.
     /// </summary>
-    public ConsoleAppender()
+    /// <param name="useDefaultUtf8Encoding">Whether to use default UTF8 encoding or the Console's OutputEncoding.
+    /// Note that the OutputEncoding may allocate when converting from bytes to chars</param>
+    public ConsoleAppender(bool useDefaultUtf8Encoding = false)
     {
         Stream = Console.OpenStandardOutput();
-        Encoding = Console.OutputEncoding;
+
+        if (!useDefaultUtf8Encoding)
+            Encoding = Console.OutputEncoding;
+
         ColorOutput = !Console.IsOutputRedirected;
     }
 
