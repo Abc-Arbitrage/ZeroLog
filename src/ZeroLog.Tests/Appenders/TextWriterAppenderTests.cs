@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Text;
 using System.Threading;
 using NUnit.Framework;
 using ZeroLog.Appenders;
@@ -62,5 +63,95 @@ public class TextWriterAppenderTests
 
         after.ToString().ShouldContain("Bar");
         after.ToString().ShouldNotContain("Foo");
+    }
+
+    [Test]
+    public void should_detect_override_of_span_Write()
+    {
+        TextWriterAppender.OverridesSpanWrite(typeof(WriterWithoutSpanWrite)).ShouldBeFalse();
+        TextWriterAppender.OverridesSpanWrite(typeof(WriterWithSpanWrite)).ShouldBeTrue();
+    }
+
+    [Test]
+    public void should_call_standard_Write_overload()
+    {
+        var writer = new WriterWithoutSpanWrite();
+        var appender = new TextWriterAppender(writer)
+        {
+            Formatter = new DefaultFormatter { PrefixPattern = "" }
+        };
+
+        var loggedMessage = new LoggedMessage(128, ZeroLogConfiguration.Default);
+        loggedMessage.SetMessage(new LogMessage("Hello"));
+        appender.WriteMessage(loggedMessage);
+
+        writer.StandardWriteCalled.ShouldBeTrue();
+        writer.StringBuilder.ToString().ShouldEqual($"Hello{Environment.NewLine}");
+    }
+
+    [Test]
+    public void should_call_span_Write_overload()
+    {
+        var writer = new WriterWithSpanWrite();
+        var appender = new TextWriterAppender(writer)
+        {
+            Formatter = new DefaultFormatter { PrefixPattern = "" }
+        };
+
+        var loggedMessage = new LoggedMessage(128, ZeroLogConfiguration.Default);
+        loggedMessage.SetMessage(new LogMessage("Hello"));
+        appender.WriteMessage(loggedMessage);
+
+        writer.SpanWriteCalled.ShouldBeTrue();
+        writer.StandardWriteCalled.ShouldBeFalse();
+        writer.StringBuilder.ToString().ShouldEqual($"Hello{Environment.NewLine}");
+    }
+
+    [Test]
+    public void should_not_allocate([Values] bool span)
+    {
+        var appender = new TextWriterAppender
+        {
+            TextWriter = span
+                ? new WriterWithSpanWrite { StringBuilder = null }
+                : new WriterWithoutSpanWrite { StringBuilder = null }
+        };
+
+        var loggedMessage = new LoggedMessage(128, ZeroLogConfiguration.Default);
+        loggedMessage.SetMessage(new LogMessage("Hello"));
+
+        GcTester.ShouldNotAllocate(
+            () => appender.WriteMessage(loggedMessage)
+        );
+    }
+
+    private class TextWriterBase : TextWriter
+    {
+        public override Encoding Encoding => Encoding.Default;
+
+        public StringBuilder StringBuilder { get; init; } = new();
+
+        public bool StandardWriteCalled { get; private set; }
+
+        public override void Write(char[] buffer, int index, int count)
+        {
+            StandardWriteCalled = true;
+            StringBuilder?.Append(buffer, index, count);
+        }
+    }
+
+    private class WriterWithoutSpanWrite : TextWriterBase
+    {
+    }
+
+    private class WriterWithSpanWrite : TextWriterBase
+    {
+        public bool SpanWriteCalled { get; private set; }
+
+        public override void Write(ReadOnlySpan<char> buffer)
+        {
+            SpanWriteCalled = true;
+            StringBuilder?.Append(buffer);
+        }
     }
 }

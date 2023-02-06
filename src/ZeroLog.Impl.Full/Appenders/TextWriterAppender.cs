@@ -1,4 +1,6 @@
+using System;
 using System.IO;
+using System.Reflection;
 using ZeroLog.Formatting;
 
 namespace ZeroLog.Appenders;
@@ -10,6 +12,7 @@ public class TextWriterAppender : Appender
 {
     private TextWriter? _textWriter;
     private Formatter? _formatter;
+    private bool _useSpanWrite;
 
     /// <summary>
     /// The target <see cref="System.IO.TextWriter"/>.
@@ -17,11 +20,7 @@ public class TextWriterAppender : Appender
     public TextWriter? TextWriter
     {
         get => _textWriter;
-        set
-        {
-            Flush();
-            _textWriter = value;
-        }
+        set => SetTextWriter(value);
     }
 
     /// <summary>
@@ -62,8 +61,18 @@ public class TextWriterAppender : Appender
         if (TextWriter is not { } writer)
             return;
 
-        var chars = Formatter.FormatMessage(message);
-        writer.Write(chars);
+        // Same logic as in StreamAppender: use the ROS<char> overload if it's overridden, otherwise use the older overload.
+        if (_useSpanWrite)
+        {
+            var chars = Formatter.FormatMessage(message);
+            writer.Write(chars);
+        }
+        else
+        {
+            Formatter.FormatMessage(message);
+            var buffer = Formatter.GetBuffer(out var length);
+            writer.Write(buffer, 0, length);
+        }
     }
 
     /// <inheritdoc/>
@@ -72,4 +81,18 @@ public class TextWriterAppender : Appender
         TextWriter?.Flush();
         base.Flush();
     }
+
+    private void SetTextWriter(TextWriter? newTextWriter)
+    {
+        Flush();
+
+        var isSameType = _textWriter?.GetType() == newTextWriter?.GetType();
+        _textWriter = newTextWriter;
+
+        if (!isSameType)
+            _useSpanWrite = _textWriter is { } textWriter && OverridesSpanWrite(textWriter.GetType());
+    }
+
+    internal static bool OverridesSpanWrite(Type textWriterType)
+        => textWriterType.GetMethod(nameof(System.IO.TextWriter.Write), BindingFlags.Public | BindingFlags.Instance, new[] { typeof(ReadOnlySpan<char>) })?.DeclaringType == textWriterType;
 }
