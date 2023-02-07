@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using ObjectLayoutInspector;
 using ZeroLog.Tests.Support;
 
 namespace ZeroLog.Tests;
@@ -65,7 +66,16 @@ public class ObjectPoolTests
         pool.Count.ShouldEqual(2);
 
         pool.Release(new Item());
-        pool.Count.ShouldEqual(2);
+        pool.Count.ShouldEqual(3); // Allow one cached instance to exceed the capacity
+
+        pool.Release(new Item());
+        pool.Count.ShouldEqual(3);
+    }
+
+    [Test, Explicit]
+    public void show_layout()
+    {
+        TypeLayout.PrintLayout<ObjectPool<Item>>(false);
     }
 
     private class Item
