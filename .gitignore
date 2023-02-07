@@ -15,4 +15,5 @@ Thumbs.db
 *.binlog
 *.orig
 
+BenchmarkDotNet.Artifacts/
 *.received.*

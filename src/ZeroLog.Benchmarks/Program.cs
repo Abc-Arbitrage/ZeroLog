@@ -27,12 +27,16 @@ public class Program
         var nlogSync = new NLogSyncMultiProducer().Bench(warmupMessageCount, messageCount, threadCount);
         var nlogAsync = new NLogAsyncMultiProducer().Bench(queueSize, warmupMessageCount, messageCount, threadCount);
         var log4net = new Log4NetMultiProducer().Bench(warmupMessageCount, messageCount, threadCount);
+        var serilog = new SerilogMultiProducer().Bench(warmupMessageCount, messageCount, threadCount);
 
-        SimpleLatencyBenchmark.PrintSummary($"{threadCount} producers, {messageCount:N0} total log events (queue size={queueSize:N0}) - unit is *us*",
-                                            ("ZeroLog", zeroLog),
-                                            ("NLogSync", nlogSync),
-                                            ("NLogAsync", nlogAsync),
-                                            ("Log4net", log4net));
+        SimpleLatencyBenchmark.PrintSummary(
+            $"{threadCount} producers, {messageCount:N0} total log events (queue size={queueSize:N0}) - unit is *us*",
+            ("ZeroLog", zeroLog),
+            ("NLogSync", nlogSync),
+            ("NLogAsync", nlogAsync),
+            ("Log4net", log4net),
+            ("Serilog", serilog)
+        );
     }
 
     public static void Main()

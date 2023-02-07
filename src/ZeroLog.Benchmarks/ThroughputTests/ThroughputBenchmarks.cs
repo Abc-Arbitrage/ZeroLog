@@ -7,12 +7,14 @@ using log4net.Layout;
 using NLog;
 using NLog.Config;
 using NLog.Targets.Wrappers;
+using ZeroLog.Benchmarks.Tools;
 using ZeroLog.Configuration;
 
 namespace ZeroLog.Benchmarks.ThroughputTests;
 
 [MemoryDiagnoser]
-[SimpleJob(RunStrategy.ColdStart, iterationCount: 1000, invocationCount: 1, baseline: true)]
+[AllStatisticsColumn]
+[SimpleJob(RunStrategy.ColdStart, iterationCount: 100, invocationCount: 1, baseline: true)]
 public class ThroughputBenchmarks
 {
     [Params(4)]
@@ -22,6 +24,7 @@ public class ThroughputBenchmarks
     public int TotalMessageCount;
 
     [Params(8192)]
+    //[Params(4 * 50_000)]
     public int QueueSize;
 
     // ZeroLog
@@ -38,12 +41,17 @@ public class ThroughputBenchmarks
     private NLogTestTarget _nLogAsyncTestTarget;
     private Logger _nLogAsyncLogger;
 
+    // Serilog
+    private SerilogTestSink _serilogTestSink;
+    private Serilog.Core.Logger _serilogLogger;
+
     [GlobalSetup]
     public void Setup()
     {
         SetupZeroLog();
         SetupLog4Net();
         SetupLogNLog();
+        SetupSerilog();
     }
 
     [GlobalCleanup]
@@ -52,6 +60,7 @@ public class ThroughputBenchmarks
         TearDownZeroLog();
         TearDownLog4Net();
         TearDownNLog();
+        TearDownSerilog();
     }
 
     //
@@ -205,6 +214,41 @@ public class ThroughputBenchmarks
             Task.Factory.StartNew(produce, TaskCreationOptions.LongRunning);
 
         Task.Factory.StartNew(flusher, TaskCreationOptions.LongRunning);
+
+        signal.Wait(TimeSpan.FromSeconds(30));
+    }
+
+    //
+    // Serilog
+    //
+
+    private void SetupSerilog()
+    {
+        _serilogTestSink = new SerilogTestSink(false);
+
+        _serilogLogger = new Serilog.LoggerConfiguration()
+                         .WriteTo.Sink(_serilogTestSink)
+                         .CreateLogger();
+    }
+
+    private void TearDownSerilog()
+    {
+        _serilogLogger.Dispose();
+    }
+
+    [Benchmark]
+    public void Serilog()
+    {
+        var signal = _serilogTestSink.SetMessageCountTarget(TotalMessageCount);
+
+        var produce = new Action(() =>
+        {
+            for (var i = 0; i < TotalMessageCount / ProducingThreadCount; i++)
+                _serilogLogger.Information("Hi {name} ! It's {hour:HH:mm:ss}, and the message is #{number}", "dude", DateTime.UtcNow, i);
+        });
+
+        for (var i = 0; i < ProducingThreadCount; i++)
+            Task.Factory.StartNew(produce, TaskCreationOptions.LongRunning);
 
         signal.Wait(TimeSpan.FromSeconds(30));
     }
