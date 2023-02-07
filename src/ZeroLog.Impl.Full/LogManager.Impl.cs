@@ -197,4 +197,7 @@ partial class LogManager : IDisposable
 
     internal void WaitUntilNewConfigurationIsApplied() // For unit tests
         => _runner?.WaitUntilNewConfigurationIsApplied();
+
+    internal static void WaitUntilQueueIsEmpty() // For benchmarks
+        => (_staticLogManager?._runner as AsyncRunner)?.WaitUntilQueueIsEmpty();
 }

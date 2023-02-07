@@ -272,6 +272,14 @@ internal sealed class AsyncRunner : Runner
         ApplyConfigurationUpdate(newConfig);
         return true;
     }
+
+    public void WaitUntilQueueIsEmpty()
+    {
+        var spinWait = new SpinWait();
+
+        while (!_queue.IsEmpty)
+            spinWait.SpinOnce();
+    }
 }
 
 internal sealed class SyncRunner : Runner
