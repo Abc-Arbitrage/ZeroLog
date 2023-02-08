@@ -33,6 +33,8 @@ public sealed class LoggedMessage
     /// </summary>
     public string? LoggerName => _message.Logger?.Name;
 
+    internal Log? Logger => _message.Logger;
+
     /// <summary>
     /// The logged message text.
     /// </summary>

@@ -59,6 +59,25 @@ public partial class LogTests
         _log.IsEnabled(logLevel + 1).ShouldBeTrue();
     }
 
+    [Test]
+    [TestCase(null, ExpectedResult = "")]
+    [TestCase("", ExpectedResult = "")]
+    [TestCase(".", ExpectedResult = "")]
+    [TestCase("...", ExpectedResult = "")]
+    [TestCase("Foo", ExpectedResult = "Foo")]
+    [TestCase("Foo.Bar", ExpectedResult = "F.Bar")]
+    [TestCase("Foo.Bar.Hello", ExpectedResult = "FB.Hello")]
+    [TestCase("Foo.Bar.Hello.World", ExpectedResult = "FBH.World")]
+    [TestCase(".Foo.Bar", ExpectedResult = "F.Bar")]
+    [TestCase("..Foo.Bar", ExpectedResult = "F.Bar")]
+    [TestCase("Foo..Bar", ExpectedResult = "F.Bar")]
+    [TestCase("Foo...Bar", ExpectedResult = "F.Bar")]
+    [TestCase("Foo.Bar.", ExpectedResult = "F.Bar")]
+    [TestCase("Foo.Bar..", ExpectedResult = "F.Bar")]
+    [TestCase("..Foo..", ExpectedResult = "Foo")]
+    public string should_compact_name(string value)
+        => Log.GetCompactName(value);
+
     private static string NoInline(string value)
         => value;
 

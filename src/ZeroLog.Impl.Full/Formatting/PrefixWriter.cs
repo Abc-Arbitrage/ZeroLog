@@ -69,17 +69,22 @@ internal class PrefixWriter
                 ? formatGroup.Value
                 : null;
 
+            // ReSharper disable StringLiteralTypo
+
             var part = placeholderType.ToLowerInvariant() switch
             {
-                "date"    => new PatternPart(PatternPartType.Date, format),
-                "time"    => new PatternPart(PatternPartType.Time, format),
-                "thread"  => new PatternPart(PatternPartType.Thread, format),
-                "level"   => new PatternPart(PatternPartType.Level, format),
-                "logger"  => new PatternPart(PatternPartType.Logger, format),
-                "newline" => new PatternPart(PatternPartType.NewLine, format),
-                "column"  => new PatternPart(PatternPartType.Column, format),
-                _         => throw new FormatException($"Invalid placeholder type: %{placeholderType}")
+                "date"          => new PatternPart(PatternPartType.Date, format),
+                "time"          => new PatternPart(PatternPartType.Time, format),
+                "thread"        => new PatternPart(PatternPartType.Thread, format),
+                "level"         => new PatternPart(PatternPartType.Level, format),
+                "logger"        => new PatternPart(PatternPartType.Logger, format),
+                "loggercompact" => new PatternPart(PatternPartType.LoggerCompact, format),
+                "newline"       => new PatternPart(PatternPartType.NewLine, format),
+                "column"        => new PatternPart(PatternPartType.Column, format),
+                _               => throw new FormatException($"Invalid placeholder type: %{placeholderType}")
             };
+
+            // ReSharper restore StringLiteralTypo
 
             yield return ValidatePart(part, placeholderType);
 
@@ -279,6 +284,14 @@ internal class PrefixWriter
                     break;
                 }
 
+                case PatternPartType.LoggerCompact:
+                {
+                    if (!builder.TryAppendPartial(message.Logger?.CompactName))
+                        goto endOfLoop;
+
+                    break;
+                }
+
                 case PatternPartType.Column:
                 {
                     if (part.FormatInt is { } column)
@@ -307,6 +320,7 @@ internal class PrefixWriter
         Thread,
         Level,
         Logger,
+        LoggerCompact,
         NewLine,
         Column
     }
