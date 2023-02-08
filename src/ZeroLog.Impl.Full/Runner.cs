@@ -78,7 +78,7 @@ internal abstract class Runner : ILogMessageProvider, IDisposable
 
                 while (true)
                 {
-                    spinWait.SpinOnce();
+                    spinWait.SpinOnce(-1);
 
                     if (_pool.TryAcquire(out message))
                     {
