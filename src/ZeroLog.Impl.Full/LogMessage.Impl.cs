@@ -45,6 +45,9 @@ unsafe partial class LogMessage
 
     internal void Initialize(Log? log, LogLevel level)
     {
+        if (ReferenceEquals(this, Empty)) // Avoid overhead for ignored messages
+            return;
+
         Timestamp = DateTime.UtcNow; // TODO clock in Log
         Level = level;
         Thread = Thread.CurrentThread;
