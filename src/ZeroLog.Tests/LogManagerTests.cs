@@ -132,7 +132,7 @@ public partial class LogManagerTests
 
         signal.Wait(TimeSpan.FromSeconds(1)).ShouldBeTrue();
 
-        _testAppender.LoggedMessages.Last().ShouldContain("Log message skipped due to pool exhaustion.");
+        _testAppender.LoggedMessages.Last().ShouldContain("Log message pool is exhausted.");
     }
 
     [Test]

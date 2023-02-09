@@ -10,6 +10,7 @@ namespace ZeroLog.Tests;
 public class AsyncRunnerTests
 {
     private TestAppender _testAppender;
+    private ZeroLogConfiguration _config;
     private AsyncRunner _runner;
     private Log _log;
 
@@ -18,7 +19,7 @@ public class AsyncRunnerTests
     {
         _testAppender = new TestAppender(true);
 
-        var config = new ZeroLogConfiguration
+        _config = new ZeroLogConfiguration
         {
             LogMessagePoolSize = 10,
             LogMessageBufferSize = 256,
@@ -29,10 +30,10 @@ public class AsyncRunnerTests
             }
         };
 
-        _runner = new AsyncRunner(config);
+        _runner = new AsyncRunner(_config);
 
         _log = new Log(nameof(AsyncRunnerTests));
-        _log.UpdateConfiguration(_runner, config);
+        _log.UpdateConfiguration(_runner, _config);
     }
 
     [TearDown]
@@ -74,5 +75,28 @@ public class AsyncRunnerTests
 
         Wait.Until(() => _testAppender.LoggedMessages.Count == 1, TimeSpan.FromSeconds(1));
         _testAppender.LoggedMessages.ShouldHaveSingleItem().ShouldEqual("Foo");
+    }
+
+    [Test]
+    public void should_not_log_pool_exhaustion_message_twice_in_a_row()
+    {
+        var firstMessage = _runner.AcquireLogMessage(LogMessagePoolExhaustionStrategy.DropLogMessageAndNotifyAppenders);
+        firstMessage.ConstantMessage.ShouldBeNull();
+
+        for (var i = 1; i < _config.LogMessagePoolSize; ++i)
+            _runner.AcquireLogMessage(LogMessagePoolExhaustionStrategy.DropLogMessageAndNotifyAppenders).ConstantMessage.ShouldBeNull();
+
+        _runner.AcquireLogMessage(LogMessagePoolExhaustionStrategy.DropLogMessageAndNotifyAppenders).ConstantMessage!.ShouldContain("Log message pool is exhausted");
+        _runner.AcquireLogMessage(LogMessagePoolExhaustionStrategy.DropLogMessageAndNotifyAppenders).ShouldBeTheSameAs(LogMessage.Empty);
+        _runner.AcquireLogMessage(LogMessagePoolExhaustionStrategy.DropLogMessageAndNotifyAppenders).ShouldBeTheSameAs(LogMessage.Empty);
+
+        _runner.Submit(firstMessage);
+        _runner.WaitUntilQueueIsEmpty();
+        Thread.Sleep(500);
+
+        _runner.AcquireLogMessage(LogMessagePoolExhaustionStrategy.DropLogMessageAndNotifyAppenders).ConstantMessage.ShouldBeNull();
+        _runner.AcquireLogMessage(LogMessagePoolExhaustionStrategy.DropLogMessageAndNotifyAppenders).ConstantMessage!.ShouldContain("Log message pool is exhausted");
+        _runner.AcquireLogMessage(LogMessagePoolExhaustionStrategy.DropLogMessageAndNotifyAppenders).ShouldBeTheSameAs(LogMessage.Empty);
+        _runner.AcquireLogMessage(LogMessagePoolExhaustionStrategy.DropLogMessageAndNotifyAppenders).ShouldBeTheSameAs(LogMessage.Empty);
     }
 }

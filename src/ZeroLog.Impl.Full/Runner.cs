@@ -12,13 +12,14 @@ namespace ZeroLog;
 
 internal abstract class Runner : ILogMessageProvider, IDisposable
 {
-    private readonly LogMessage _poolExhaustedMessage = new("Log message skipped due to pool exhaustion.");
+    private readonly LogMessage _poolExhaustedMessage = new("Log message pool is exhausted. No further messages will be logged until previously acquired instances are released.");
 
     private readonly ObjectPool<LogMessage> _pool;
     private readonly LoggedMessage _loggedMessage;
 
     private ZeroLogConfiguration _config;
     private Appender[] _appenders;
+    private bool _previouslyAcquiredPoolExhaustedMessage;
 
     protected bool IsRunning { get; private set; }
 
@@ -58,6 +59,7 @@ internal abstract class Runner : ILogMessageProvider, IDisposable
         if (_pool.TryAcquire(out var message))
         {
             message.ReturnToPool = true;
+            _previouslyAcquiredPoolExhaustedMessage = false;
             return message;
         }
 
@@ -66,11 +68,19 @@ internal abstract class Runner : ILogMessageProvider, IDisposable
 
         switch (poolExhaustionStrategy)
         {
-            case LogMessagePoolExhaustionStrategy.DropLogMessageAndNotifyAppenders:
-                return _poolExhaustedMessage;
-
             case LogMessagePoolExhaustionStrategy.DropLogMessage:
+            {
                 return LogMessage.Empty;
+            }
+
+            case LogMessagePoolExhaustionStrategy.DropLogMessageAndNotifyAppenders:
+            {
+                if (_previouslyAcquiredPoolExhaustedMessage)
+                    return LogMessage.Empty;
+
+                _previouslyAcquiredPoolExhaustedMessage = true;
+                return _poolExhaustedMessage;
+            }
 
             case LogMessagePoolExhaustionStrategy.WaitUntilAvailable:
             {
