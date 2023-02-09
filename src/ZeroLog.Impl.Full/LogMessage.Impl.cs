@@ -7,7 +7,7 @@ namespace ZeroLog;
 
 unsafe partial class LogMessage
 {
-    internal static readonly LogMessage Empty = new(string.Empty);
+    internal static readonly LogMessage Empty = new(string.Empty) { Level = LogLevel.None };
 
     [SuppressMessage("ReSharper", "NotAccessedField.Local", Justification = "This field is a GC root for the underlying buffer")]
     private readonly byte[]? _underlyingBuffer;

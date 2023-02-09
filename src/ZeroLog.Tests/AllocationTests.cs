@@ -6,29 +6,48 @@ using NUnit.Framework;
 using ZeroLog.Appenders;
 using ZeroLog.Configuration;
 using ZeroLog.Formatting;
-using ZeroLog.Tests.Support;
 
 namespace ZeroLog.Tests;
 
-[TestFixture, NonParallelizable]
+[NonParallelizable]
+[TestFixture(LogMessagePoolExhaustionStrategy.WaitUntilAvailable)]
+[TestFixture(LogMessagePoolExhaustionStrategy.DropLogMessageAndNotifyAppenders)]
 public class AllocationTests
 {
-    private WaitableAppender _waitableAppender;
+    private readonly LogMessagePoolExhaustionStrategy _exhaustionStrategy;
+    private AwaitableAppender _awaitableAppender;
     private string _tempDirectory;
 
-    public class WaitableAppender : DateAndSizeRollingFileAppender
+    public AllocationTests(LogMessagePoolExhaustionStrategy exhaustionStrategy)
     {
-        public int WrittenEventCount { get; private set; }
+        _exhaustionStrategy = exhaustionStrategy;
+    }
 
-        public WaitableAppender(string directory)
+    private class AwaitableAppender : DateAndSizeRollingFileAppender
+    {
+        private int _writtenEventCount;
+
+        public long AllocatedBytesOnAppenderThread { get; private set; }
+
+        public AwaitableAppender(string directory)
             : base(directory)
         {
+            MaxFileSizeInBytes = 0;
         }
 
         public override void WriteMessage(LoggedMessage message)
         {
-            WrittenEventCount++;
             base.WriteMessage(message);
+
+            AllocatedBytesOnAppenderThread = GC.GetAllocatedBytesForCurrentThread();
+            Thread.MemoryBarrier();
+            ++_writtenEventCount;
+        }
+
+        public void WaitForMessageCount(int count)
+        {
+            while (Volatile.Read(ref _writtenEventCount) < count)
+                Thread.Yield();
         }
     }
 
@@ -38,7 +57,7 @@ public class AllocationTests
         _tempDirectory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(_tempDirectory);
 
-        _waitableAppender = new WaitableAppender(_tempDirectory) { FileNamePrefix = "allocation-test" };
+        _awaitableAppender = new AwaitableAppender(_tempDirectory) { FileNamePrefix = "allocation-test" };
 
         LogManager.Initialize(new ZeroLogConfiguration
         {
@@ -46,7 +65,8 @@ public class AllocationTests
             LogMessageBufferSize = 512,
             RootLogger =
             {
-                Appenders = { _waitableAppender }
+                LogMessagePoolExhaustionStrategy = _exhaustionStrategy,
+                Appenders = { _awaitableAppender }
             }
         });
 
@@ -67,48 +87,55 @@ public class AllocationTests
     {
         var log = LogManager.GetLogger("AllocationTest");
 
-        GC.Collect(2, GCCollectionMode.Forced, true);
-        var gcCountBefore = GC.CollectionCount(0);
+        var allocationsOnLoggingThread = 0L;
+        var allocationsOnAppenderThread = 0L;
 
-        var numberOfEvents = 2048 * 10;
+        const int numberOfEvents = 2048 * 10;
+        const int warmupEvents = 10;
 
-        for (var i = 0; i < numberOfEvents; i++)
+        for (var i = 0; i < numberOfEvents; ++i)
         {
-            log
-                .Info()
-                .Append("Int ")
-                .Append(123243)
-                .Append("Double ")
-                .Append(32423432.4398438, "N4")
-                .Append("String ")
-                .Append("Some random string")
-                .Append("Bool ")
-                .Append(true)
-                .Append("Decimal ")
-                .Append(4234324324.23423423, "N4")
-                .Append("Guid ")
-                .Append(Guid.NewGuid())
-                .Append("Timestamp ")
-                .Append(DateTime.UtcNow.TimeOfDay)
-                .Append("DateTime ")
-                .Append(DateTime.UtcNow)
-                .Log();
+            if (i == warmupEvents)
+            {
+                _awaitableAppender.WaitForMessageCount(warmupEvents);
 
-            log
-                .Info()
-                .Append("Enum ")
-                .AppendEnum(DayOfWeek.Friday)
-                .Append("UnknownEnum ")
-                .AppendEnum(UnregisteredEnum.Bar)
-                .Append("NullableEnum ")
-                .AppendEnum((DayOfWeek?)DayOfWeek.Monday)
-                .Append("NullableNullEnum ")
-                .AppendEnum((DayOfWeek?)null)
-                .Append("NullableInt ")
-                .Append((int?)42)
-                .Append("NullableNullInt ")
-                .Append((int?)null)
-                .Log();
+                allocationsOnLoggingThread = GC.GetAllocatedBytesForCurrentThread();
+                allocationsOnAppenderThread = _awaitableAppender.AllocatedBytesOnAppenderThread;
+            }
+
+            log.Info()
+               .Append("Int ")
+               .Append(123243)
+               .Append("Double ")
+               .Append(32423432.4398438, "N4")
+               .Append("String ")
+               .Append("Some random string")
+               .Append("Bool ")
+               .Append(true)
+               .Append("Decimal ")
+               .Append(4234324324.23423423, "N4")
+               .Append("Guid ")
+               .Append(Guid.NewGuid())
+               .Append("Timestamp ")
+               .Append(DateTime.UtcNow.TimeOfDay)
+               .Append("DateTime ")
+               .Append(DateTime.UtcNow)
+               .Log();
+
+            log.Info()
+               .Append("Enum ")
+               .AppendEnum(DayOfWeek.Friday)
+               .Append("UnknownEnum ")
+               .AppendEnum(UnregisteredEnum.Bar)
+               .Append("NullableEnum ")
+               .AppendEnum((DayOfWeek?)DayOfWeek.Monday)
+               .Append("NullableNullEnum ")
+               .AppendEnum((DayOfWeek?)null)
+               .Append("NullableInt ")
+               .Append((int?)42)
+               .Append("NullableNullInt ")
+               .Append((int?)null)
+               .Log();
 
             var unmanaged = new UnmanagedStruct(1, 2, 3);
             var unregisteredUnmanaged = new UnregisteredUnmanagedStruct(4, 5, 6);
@@ -117,42 +144,42 @@ public class AllocationTests
             var nullableUnregisteredUnmanaged = (UnregisteredUnmanagedStruct?)new UnregisteredUnmanagedStruct(4, 5, 6);
             var nullNullableUnregisteredUnmanaged = (UnregisteredUnmanagedStruct?)null;
 
-            log
-                .Info()
-                .Append("Unmanaged Struct ")
-                .AppendUnmanaged(unmanaged)
-                .Append("Unregistered Unmanaged Struct ")
-                .AppendUnmanaged(unregisteredUnmanaged)
-                .Append("Unmanaged Struct byref ")
-                .AppendUnmanaged(ref unmanaged)
-                .Append("Unregistered Unmanaged byref ")
-                .AppendUnmanaged(ref unregisteredUnmanaged)
-                .Append("Nullable Unmanaged ")
-                .AppendUnmanaged(nullableUnmanaged)
-                .Append("Null Nullable Unmanaged ")
-                .AppendUnmanaged(nullNullableUnmanaged)
-                .Append("Nullable Unregistered Unmanaged ")
-                .AppendUnmanaged(nullableUnregisteredUnmanaged)
-                .Append("Null Nullable Unregistered Unmanaged")
-                .AppendUnmanaged(nullNullableUnregisteredUnmanaged)
-                .Append("Nullable Unmanaged byref ")
-                .AppendUnmanaged(ref nullableUnmanaged)
-                .Append("Null Nullable Unmanaged byref ")
-                .AppendUnmanaged(ref nullNullableUnmanaged)
-                .Append("Nullable Unregistered Unmanaged byref ")
-                .AppendUnmanaged(ref nullableUnregisteredUnmanaged)
-                .Append("Null Nullable Unregistered Unmanaged byref ")
-                .AppendUnmanaged(ref nullNullableUnregisteredUnmanaged)
-                .Log();
+            log.Info()
+               .Append("Unmanaged Struct ")
+               .AppendUnmanaged(unmanaged)
+               .Append("Unregistered Unmanaged Struct ")
+               .AppendUnmanaged(unregisteredUnmanaged)
+               .Append("Unmanaged Struct byref ")
+               .AppendUnmanaged(ref unmanaged)
+               .Append("Unregistered Unmanaged byref ")
+               .AppendUnmanaged(ref unregisteredUnmanaged)
+               .Append("Nullable Unmanaged ")
+               .AppendUnmanaged(nullableUnmanaged)
+               .Append("Null Nullable Unmanaged ")
+               .AppendUnmanaged(nullNullableUnmanaged)
+               .Append("Nullable Unregistered Unmanaged ")
+               .AppendUnmanaged(nullableUnregisteredUnmanaged)
+               .Append("Null Nullable Unregistered Unmanaged")
+               .AppendUnmanaged(nullNullableUnregisteredUnmanaged)
+               .Append("Nullable Unmanaged byref ")
+               .AppendUnmanaged(ref nullableUnmanaged)
+               .Append("Null Nullable Unmanaged byref ")
+               .AppendUnmanaged(ref nullNullableUnmanaged)
+               .Append("Nullable Unregistered Unmanaged byref ")
+               .AppendUnmanaged(ref nullableUnregisteredUnmanaged)
+               .Append("Null Nullable Unregistered Unmanaged byref ")
+               .AppendUnmanaged(ref nullNullableUnregisteredUnmanaged)
+               .Log();
         }
 
         // Give the appender some time to finish writing to file
-        while (_waitableAppender.WrittenEventCount < numberOfEvents)
-            Thread.Sleep(1);
+        _awaitableAppender.WaitForMessageCount(numberOfEvents);
 
-        var gcCountAfter = GC.CollectionCount(0);
+        allocationsOnLoggingThread = GC.GetAllocatedBytesForCurrentThread() - allocationsOnLoggingThread;
+        allocationsOnAppenderThread = _awaitableAppender.AllocatedBytesOnAppenderThread - allocationsOnAppenderThread;
 
-        gcCountAfter.ShouldEqual(gcCountBefore);
+        Assert.Zero(allocationsOnLoggingThread, "Allocations on logging thread");
+        Assert.Zero(allocationsOnAppenderThread, "Allocations on appender thread");
     }
 
     private enum UnregisteredEnum

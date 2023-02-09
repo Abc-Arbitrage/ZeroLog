@@ -171,7 +171,9 @@ internal sealed class AsyncRunner : Runner
     public AsyncRunner(ZeroLogConfiguration config)
         : base(config)
     {
-        _queue = new ConcurrentQueue<LogMessage>(new ConcurrentQueueCapacityInitializer<LogMessage>(config.LogMessagePoolSize));
+        // Allocate a larger queue than the message pool size, as the DropLogMessageAndNotifyAppenders exhaustion strategy
+        // may end up enqueuing more messages than the pool can provide.
+        _queue = new ConcurrentQueue<LogMessage>(new ConcurrentQueueCapacityInitializer<LogMessage>(4 * config.LogMessagePoolSize));
 
         _thread = new Thread(WriteThread)
         {
