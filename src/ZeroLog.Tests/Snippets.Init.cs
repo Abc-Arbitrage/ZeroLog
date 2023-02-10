@@ -1,7 +1,8 @@
 ﻿using NUnit.Framework;
 using ZeroLog.Configuration;
 
-namespace ZeroLog.Tests.Snippets;
+// ReSharper disable once CheckNamespace
+namespace ZeroLog.Tests.IsolatedNamespace;
 
 // This initializer is not supposed to be executed, it only defines a snippet for the readme.
 // Do not put unit tests in this namespace.

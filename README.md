@@ -44,7 +44,7 @@ LogManager.Initialize(new ZeroLogConfiguration
     }
 });
 ```
-<sup><a href='/src/ZeroLog.Tests/Snippets.cs#L20-L31' title='Snippet source file'>snippet source</a> | <a href='#snippet-initialize' title='Start of snippet'>anchor</a></sup>
+<sup><a href='/src/ZeroLog.Tests/Snippets.cs#L21-L34' title='Snippet source file'>snippet source</a> | <a href='#snippet-initialize' title='Start of snippet'>anchor</a></sup>
 <!-- endSnippet -->
 
 The `LogManager` needs to be shut down by calling `LogManager.Shutdown()` when your application needs to exit.
@@ -56,7 +56,7 @@ You can retrieve a logger that will be the logging API entry point. Store this l
 ```cs
 private static readonly Log _log = LogManager.GetLogger(typeof(YourClass));
 ```
-<sup><a href='/src/ZeroLog.Tests/Snippets.cs#L10-L12' title='Snippet source file'>snippet source</a> | <a href='#snippet-getlogger' title='Start of snippet'>anchor</a></sup>
+<sup><a href='/src/ZeroLog.Tests/Snippets.cs#L12-L16' title='Snippet source file'>snippet source</a> | <a href='#snippet-getlogger' title='Start of snippet'>anchor</a></sup>
 <!-- endSnippet -->
 
 ### Logging APIs
@@ -71,7 +71,7 @@ Two logging APIs are provided:
 var date = DateTime.Today.AddDays(1);
 _log.Info($"Tomorrow ({date:yyyy-MM-dd}) will be in {GetNumberOfSecondsUntilTomorrow():N0} seconds.");
 ```
-<sup><a href='/src/ZeroLog.Tests/Snippets.cs#L37-L40' title='Snippet source file'>snippet source</a> | <a href='#snippet-stringinterpolationapi' title='Start of snippet'>anchor</a></sup>
+<sup><a href='/src/ZeroLog.Tests/Snippets.cs#L40-L45' title='Snippet source file'>snippet source</a> | <a href='#snippet-stringinterpolationapi' title='Start of snippet'>anchor</a></sup>
 <!-- endSnippet -->
 
 This API uses C# 10 string interpolation handlers to implement custom interpolation support without allocations.
@@ -86,12 +86,12 @@ Note that if the log level is disabled (`Info` in this example), method calls su
 _log.Info()
     .Append("Tomorrow (")
     .Append(DateTime.Today.AddDays(1), "yyyy-MM-dd")
-    .Append(") will occur in ")
+    .Append(") will be in ")
     .Append(GetNumberOfSecondsUntilTomorrow(), "N0")
     .Append(" seconds.")
     .Log();
 ```
-<sup><a href='/src/ZeroLog.Tests/Snippets.cs#L46-L54' title='Snippet source file'>snippet source</a> | <a href='#snippet-stringbuilderapi' title='Start of snippet'>anchor</a></sup>
+<sup><a href='/src/ZeroLog.Tests/Snippets.cs#L51-L61' title='Snippet source file'>snippet source</a> | <a href='#snippet-stringbuilderapi' title='Start of snippet'>anchor</a></sup>
 <!-- endSnippet -->
 
 This API supports more features, but is less convenient to use. You need to call `Log` at the end of the chain. Note that an `Append` overload with a string interpolation handler is provided though.
@@ -113,7 +113,7 @@ _log.Info()
     .AppendKeyValue("NumSecondsUntilTomorrow", GetNumberOfSecondsUntilTomorrow())
     .Log();
 ```
-<sup><a href='/src/ZeroLog.Tests/Snippets.cs#L60-L65' title='Snippet source file'>snippet source</a> | <a href='#snippet-structureddata' title='Start of snippet'>anchor</a></sup>
+<sup><a href='/src/ZeroLog.Tests/Snippets.cs#L67-L74' title='Snippet source file'>snippet source</a> | <a href='#snippet-structureddata' title='Start of snippet'>anchor</a></sup>
 <!-- endSnippet -->
 
 ## Configuration
@@ -209,7 +209,7 @@ public class Initializer
         => LogManager.Shutdown();
 }
 ```
-<sup><a href='/src/ZeroLog.Tests/Snippets/Initializer.cs#L9-L23' title='Snippet source file'>snippet source</a> | <a href='#snippet-nunitinitializer' title='Start of snippet'>anchor</a></sup>
+<sup><a href='/src/ZeroLog.Tests/Snippets.Init.cs#L10-L24' title='Snippet source file'>snippet source</a> | <a href='#snippet-nunitinitializer' title='Start of snippet'>anchor</a></sup>
 <!-- endSnippet -->
 
 The [Verify.ZeroLog](https://github.com/VerifyTests/Verify.ZeroLog) project provides support for snapshot testing with [Verify](https://github.com/VerifyTests/Verify). It can be used to validate that the tested project takes the expected code path, with the expected intermediate values, thanks to the messages it logs in the process.
