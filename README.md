@@ -187,3 +187,29 @@ Other settings that can be set on the `ZeroLogConfiguration` object are:
  - `TruncatedMessageSuffix` (default: `" [TRUNCATED]"`) - The string which is appended to a message when it is truncated.
  - `AppenderQuarantineDelay` (default: 15 seconds) - The time an appender will be put into quarantine (not used to log messages) after it throws an exception.
  - `AppendingStrategy` (default: `Asynchronous`) - The way log messages are handled, use `Synchronous` in unit tests.
+
+## Unit testing
+
+ZeroLog can be used in unit tests. The easiest way to initialize it is to use the `ZeroLogConfiguration.CreateTestConfiguration()` method, which returns suitable defaults for unit tests. It will log messages to `Console.Out` from the current thread, which can then be intercepted by a logging framework.
+
+Here is a minimal ZeroLog initializer for NUnit:
+
+<!-- snippet: NUnitInitializer -->
+<a id='snippet-nunitinitializer'></a>
+```cs
+[SetUpFixture]
+public class Initializer
+{
+    [OneTimeSetUp]
+    public void SetUp()
+        => LogManager.Initialize(ZeroLogConfiguration.CreateTestConfiguration());
+
+    [OneTimeTearDown]
+    public void TearDown()
+        => LogManager.Shutdown();
+}
+```
+<sup><a href='/src/ZeroLog.Tests/Snippets/Initializer.cs#L9-L23' title='Snippet source file'>snippet source</a> | <a href='#snippet-nunitinitializer' title='Start of snippet'>anchor</a></sup>
+<!-- endSnippet -->
+
+The [Verify.ZeroLog](https://github.com/VerifyTests/Verify.ZeroLog) project provides support for snapshot testing with [Verify](https://github.com/VerifyTests/Verify). It can be used to validate that the tested project takes the expected code path, with the expected intermediate values, thanks to the messages it logs in the process.
