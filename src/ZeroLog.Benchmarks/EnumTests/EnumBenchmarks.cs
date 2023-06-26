@@ -68,9 +68,11 @@ public unsafe class EnumBenchmarks
     private static IntPtr TypedRefImpl<T>()
         where T : struct
     {
+#pragma warning disable CS8500
         var value = default(T);
         var typedRef = __makeref(value);
         return ((IntPtr*)&typedRef)[1];
+#pragma warning restore CS8500
     }
 
     [Benchmark]
