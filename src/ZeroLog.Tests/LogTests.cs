@@ -37,6 +37,17 @@ public partial class LogTests
         _log.Fatal().ShouldBeTheSameAs(LogMessage.Empty);
     }
 
+    [Test]
+    public void should_disable_logging()
+    {
+        _log.IsFatalEnabled.ShouldBeTrue();
+
+        _log.DisableLogging();
+
+        _log.IsFatalEnabled.ShouldBeFalse();
+        _log.Fatal().ShouldBeTheSameAs(LogMessage.Empty);
+    }
+
     [TestCase(LogLevel.Trace, true, true, true, true, true, true)]
     [TestCase(LogLevel.Debug, false, true, true, true, true, true)]
     [TestCase(LogLevel.Info, false, false, true, true, true, true)]

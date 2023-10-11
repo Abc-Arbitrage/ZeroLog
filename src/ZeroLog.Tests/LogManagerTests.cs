@@ -72,6 +72,16 @@ public partial class LogManagerTests
     }
 
     [Test]
+    public void should_log_all_remaining_messages_on_shutdown()
+    {
+        var log = LogManager.GetLogger<LogManagerTests>();
+        log.Info("test");
+        LogManager.Shutdown();
+
+        _testAppender.LoggedMessages.ShouldHaveSingleItem().ShouldEqual("test");
+    }
+
+    [Test]
     public void should_prevent_initializing_already_initialized_log_manager()
     {
         Assert.Throws<InvalidOperationException>(() => LogManager.Initialize(new ZeroLogConfiguration()));

@@ -54,9 +54,20 @@ partial class LogManager : IDisposable
         Interlocked.CompareExchange(ref _staticLogManager, null, this);
 
         _userConfig.ApplyChangesRequested -= ApplyConfigurationChanges;
-        ResetAllLogConfigurations();
 
-        runner.Dispose();
+        try
+        {
+            // The appender list of each logger is needed until the runner is stopped, so we can't clear the configuration at this point
+            foreach (var log in _loggers.Values)
+                log.DisableLogging();
+
+            runner.Dispose();
+        }
+        finally
+        {
+            foreach (var log in _loggers.Values)
+                log.UpdateConfiguration(null, (ResolvedLoggerConfiguration?)null);
+        }
     }
 
     /// <summary>
@@ -187,12 +198,6 @@ partial class LogManager : IDisposable
     {
         foreach (var log in _loggers.Values)
             UpdateLogConfiguration(log);
-    }
-
-    private static void ResetAllLogConfigurations()
-    {
-        foreach (var log in _loggers.Values)
-            log.UpdateConfiguration(null, (ResolvedLoggerConfiguration?)null);
     }
 
     internal void WaitUntilNewConfigurationIsApplied() // For unit tests

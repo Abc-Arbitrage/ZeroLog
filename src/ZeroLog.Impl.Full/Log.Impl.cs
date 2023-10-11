@@ -18,6 +18,12 @@ partial class Log
         _logLevel = _config.Level;
     }
 
+    internal void DisableLogging()
+    {
+        _logMessageProvider = null;
+        _logLevel = LogLevel.None;
+    }
+
     public partial bool IsEnabled(LogLevel level)
         => level >= _logLevel;
 
