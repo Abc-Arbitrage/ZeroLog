@@ -169,6 +169,7 @@ There are currently three strategies to handle a full queue scenario:
  - `DropLogMessageAndNotifyAppenders` (default) - Drop the log message and log an error instead.
  - `DropLogMessage` - Forget about the message.
  - `WaitUntilAvailable` - Block until it's possible to log.
+ - `Allocate` - Allocates a new message.
 
 ### Queue and Message Size
 
