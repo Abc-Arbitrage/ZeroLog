@@ -22,7 +22,7 @@ public class FormatterTests
         _formatter.Write("Foo");
         _formatter.Write("Bar");
 
-        _formatter.GetOutput().SequenceEqual("FooBar").ShouldBeTrue();
+        (_formatter.GetOutput() is "FooBar").ShouldBeTrue();
     }
 
     [Test]

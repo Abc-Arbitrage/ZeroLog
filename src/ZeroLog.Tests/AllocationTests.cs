@@ -11,16 +11,10 @@ namespace ZeroLog.Tests;
 [NonParallelizable]
 [TestFixture(LogMessagePoolExhaustionStrategy.WaitUntilAvailable)]
 [TestFixture(LogMessagePoolExhaustionStrategy.DropLogMessageAndNotifyAppenders)]
-public class AllocationTests
+public class AllocationTests(LogMessagePoolExhaustionStrategy exhaustionStrategy)
 {
-    private readonly LogMessagePoolExhaustionStrategy _exhaustionStrategy;
     private AwaitableAppender _awaitableAppender;
     private string _tempDirectory;
-
-    public AllocationTests(LogMessagePoolExhaustionStrategy exhaustionStrategy)
-    {
-        _exhaustionStrategy = exhaustionStrategy;
-    }
 
     private class AwaitableAppender : DateAndSizeRollingFileAppender
     {
@@ -54,7 +48,7 @@ public class AllocationTests
             LogMessageBufferSize = 512,
             RootLogger =
             {
-                LogMessagePoolExhaustionStrategy = _exhaustionStrategy,
+                LogMessagePoolExhaustionStrategy = exhaustionStrategy,
                 Appenders = { _awaitableAppender }
             }
         });
@@ -178,6 +172,7 @@ public class AllocationTests
 #endif
     }
 
+    [SuppressMessage("ReSharper", "UnusedMember.Local")]
     private enum UnregisteredEnum
     {
         Foo,
@@ -185,59 +180,37 @@ public class AllocationTests
         Baz
     }
 
-    private readonly struct UnmanagedStruct : ISpanFormattable
+    private readonly struct UnmanagedStruct(long a, int b, byte c) : ISpanFormattable
     {
-        public readonly long A;
-        public readonly int B;
-        public readonly byte C;
-
-        public UnmanagedStruct(long a, int b, byte c)
-        {
-            A = a;
-            B = b;
-            C = c;
-        }
-
         public string ToString(string format, IFormatProvider formatProvider)
             => throw new NotSupportedException();
 
         public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider provider)
         {
             var builder = new CharBufferBuilder(destination);
-            builder.TryAppend(A);
+            builder.TryAppend(a);
             builder.Append('-');
-            builder.TryAppend(B);
+            builder.TryAppend(b);
             builder.Append('-');
-            builder.TryAppend(C);
+            builder.TryAppend(c);
             charsWritten = builder.Length;
             return true;
         }
     }
 
-    private readonly struct UnregisteredUnmanagedStruct : ISpanFormattable
+    private readonly struct UnregisteredUnmanagedStruct(long d, int e, byte f) : ISpanFormattable
     {
-        public readonly long D;
-        public readonly int E;
-        public readonly byte F;
-
-        public UnregisteredUnmanagedStruct(long d, int e, byte f)
-        {
-            D = d;
-            E = e;
-            F = f;
-        }
-
         public string ToString(string format, IFormatProvider formatProvider)
             => throw new NotSupportedException();
 
         public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider provider)
         {
             var builder = new CharBufferBuilder(destination);
-            builder.TryAppend(D);
+            builder.TryAppend(d);
             builder.Append('-');
-            builder.TryAppend(E);
+            builder.TryAppend(e);
             builder.Append('-');
-            builder.TryAppend(F);
+            builder.TryAppend(f);
             charsWritten = builder.Length;
             return true;
         }

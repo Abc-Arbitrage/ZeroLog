@@ -54,7 +54,7 @@ internal static unsafe class UnmanagedCache
 
         lock (_unmanagedStructs)
         {
-            _unmanagedStructs[typeof(T).TypeHandle.Value] = (byte* valuePtr, Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, ZeroLogConfiguration config)
+            _unmanagedStructs[typeof(T).TypeHandle.Value] = (byte* valuePtr, Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, ZeroLogConfiguration _)
                 => FormatterGeneric(valuePtr, destination, out charsWritten, format, formatter);
 
             _unmanagedStructs[typeof(T?).TypeHandle.Value] = (byte* valuePtr, Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, ZeroLogConfiguration config)

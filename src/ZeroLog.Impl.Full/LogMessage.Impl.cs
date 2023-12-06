@@ -29,13 +29,13 @@ unsafe partial class LogMessage
     internal LogMessage(string message)
     {
         ConstantMessage = message;
-        _strings = Array.Empty<string>();
+        _strings = [];
     }
 
     internal LogMessage(BufferSegment bufferSegment, int stringCapacity)
     {
         stringCapacity = Math.Min(stringCapacity, byte.MaxValue);
-        _strings = stringCapacity > 0 ? new string[stringCapacity] : Array.Empty<string>();
+        _strings = stringCapacity > 0 ? new string[stringCapacity] : [];
 
         _startOfBuffer = bufferSegment.Data;
         _dataPointer = bufferSegment.Data;

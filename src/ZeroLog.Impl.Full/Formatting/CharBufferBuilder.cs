@@ -6,18 +6,13 @@ using System.Runtime.CompilerServices;
 namespace ZeroLog.Formatting;
 
 [SuppressMessage("ReSharper", "ReplaceSliceWithRangeIndexer")]
-internal ref struct CharBufferBuilder
+[SuppressMessage("ReSharper", "ReplaceWithPrimaryConstructorParameter")]
+internal ref struct CharBufferBuilder(Span<char> buffer)
 {
-    private readonly Span<char> _buffer;
-    private int _pos;
+    private readonly Span<char> _buffer = buffer;
+    private int _pos = 0;
 
     public int Length => _pos;
-
-    public CharBufferBuilder(Span<char> buffer)
-    {
-        _buffer = buffer;
-        _pos = 0;
-    }
 
     public ReadOnlySpan<char> GetOutput()
         => _buffer.Slice(0, _pos);

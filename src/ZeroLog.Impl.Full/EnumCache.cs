@@ -205,7 +205,7 @@ internal static class EnumCache
         {
             if (enumItems.Count == 0)
             {
-                _strings = Array.Empty<string>();
+                _strings = [];
                 return;
             }
 
@@ -239,15 +239,9 @@ internal static class EnumCache
         }
     }
 
-    private struct EnumItem
+    private readonly struct EnumItem(Enum item)
     {
-        public ulong Value { get; }
-        public string Name { get; }
-
-        public EnumItem(Enum item)
-        {
-            Value = ToUInt64Slow(item);
-            Name = item.ToString();
-        }
+        public ulong Value { get; } = ToUInt64Slow(item);
+        public string Name { get; } = item.ToString();
     }
 }

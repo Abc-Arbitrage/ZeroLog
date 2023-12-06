@@ -43,13 +43,13 @@ public class SanityChecks
                               .GeneratePublicApi(new ApiGeneratorOptions
                               {
                                   IncludeAssemblyAttributes = false,
-                                  ExcludeAttributes = new[]
-                                  {
+                                  ExcludeAttributes =
+                                  [
                                       typeof(ObsoleteAttribute).FullName,
 #if NET7_0_OR_GREATER
                                       typeof(CompilerFeatureRequiredAttribute).FullName
 #endif
-                                  }
+                                  ]
                               })
         ).UniqueForTargetFrameworkAndVersion();
     }

@@ -73,7 +73,7 @@ public class UseStringInterpolationCodeFixProvider : CodeFixProvider
 
         rootNode = rootNode.ReplaceNode(
             logMethodInvocation,
-            logBuilderInvocation.WithArgumentList(ArgumentList(SeparatedList(new[] { Argument(resultExpression) })))
+            logBuilderInvocation.WithArgumentList(ArgumentList(SeparatedList([Argument(resultExpression)])))
                                 .WithTrailingTrivia(logMethodInvocation.GetTrailingTrivia())
         );
 

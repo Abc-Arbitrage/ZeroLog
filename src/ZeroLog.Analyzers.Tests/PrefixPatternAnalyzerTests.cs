@@ -70,7 +70,5 @@ public class PrefixPatternAnalyzerTests
         return test.RunAsync();
     }
 
-    private class Test : ZeroLogAnalyzerTest<PrefixPatternAnalyzer>
-    {
-    }
+    private class Test : ZeroLogAnalyzerTest<PrefixPatternAnalyzer>;
 }

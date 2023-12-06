@@ -78,7 +78,5 @@ public class ObjectPoolTests
         TypeLayout.PrintLayout<ObjectPool<Item>>(false);
     }
 
-    private class Item
-    {
-    }
+    private class Item;
 }

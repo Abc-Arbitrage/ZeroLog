@@ -94,5 +94,5 @@ public class TextWriterAppender : Appender
     }
 
     internal static bool OverridesSpanWrite(Type textWriterType)
-        => textWriterType.GetMethod(nameof(System.IO.TextWriter.Write), BindingFlags.Public | BindingFlags.Instance, new[] { typeof(ReadOnlySpan<char>) })?.DeclaringType == textWriterType;
+        => textWriterType.GetMethod(nameof(System.IO.TextWriter.Write), BindingFlags.Public | BindingFlags.Instance, [typeof(ReadOnlySpan<char>)])?.DeclaringType == textWriterType;
 }

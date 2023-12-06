@@ -89,7 +89,5 @@ public class LegacyStringInterpolationAnalyzerTests
         return test.RunAsync();
     }
 
-    private class Test : ZeroLogAnalyzerTest<LegacyStringInterpolationAnalyzer>
-    {
-    }
+    private class Test : ZeroLogAnalyzerTest<LegacyStringInterpolationAnalyzer>;
 }

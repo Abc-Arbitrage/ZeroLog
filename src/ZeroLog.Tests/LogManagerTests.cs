@@ -16,18 +16,11 @@ namespace ZeroLog.Tests;
 [TestFixture(AppendingStrategy.Synchronous)]
 [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
 [SuppressMessage("ReSharper", "NotAccessedField.Global")]
-public partial class LogManagerTests
+public partial class LogManagerTests(AppendingStrategy appendingStrategy)
 {
-    private readonly AppendingStrategy _appendingStrategy;
-
     private TestAppender _testAppender;
     private ZeroLogConfiguration _config;
     private LogManager _logManager;
-
-    public LogManagerTests(AppendingStrategy appendingStrategy)
-    {
-        _appendingStrategy = appendingStrategy;
-    }
 
     [SetUp]
     public void SetUpFixture()
@@ -38,7 +31,7 @@ public partial class LogManagerTests
         {
             LogMessagePoolSize = 10,
             LogMessageBufferSize = 256,
-            AppendingStrategy = _appendingStrategy,
+            AppendingStrategy = appendingStrategy,
             RootLogger =
             {
                 Appenders = { _testAppender }
@@ -235,7 +228,7 @@ public partial class LogManagerTests
            .Append(guid, "meh, this is going to break formatting")
            .Append(date)
            .Append(timespan)
-           .Append(new[] { 'a', 'b', 'c' })
+           .Append(['a', 'b', 'c'])
            .Append("def"u8)
            .AppendEnum(DayOfWeek.Friday)
            .Log();

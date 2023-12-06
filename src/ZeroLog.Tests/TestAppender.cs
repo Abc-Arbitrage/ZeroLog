@@ -5,9 +5,8 @@ using ZeroLog.Formatting;
 
 namespace ZeroLog.Tests;
 
-public class TestAppender : Appender
+public class TestAppender(bool captureLoggedMessages) : Appender
 {
-    private readonly bool _captureLoggedMessages;
     private int _messageCount;
     private ManualResetEventSlim _signal;
     private int _messageCountTarget;
@@ -17,11 +16,6 @@ public class TestAppender : Appender
     public bool IsDisposed { get; private set; }
 
     public ManualResetEventSlim WaitOnWriteEvent { get; set; }
-
-    public TestAppender(bool captureLoggedMessages)
-    {
-        _captureLoggedMessages = captureLoggedMessages;
-    }
 
     public ManualResetEventSlim SetMessageCountTarget(int expectedMessageCount)
     {
@@ -33,7 +27,7 @@ public class TestAppender : Appender
 
     public override void WriteMessage(LoggedMessage message)
     {
-        if (_captureLoggedMessages)
+        if (captureLoggedMessages)
             LoggedMessages.Add(message.ToString());
 
         if (++_messageCount == _messageCountTarget)

@@ -10,18 +10,13 @@ namespace ZeroLog;
 
 [StructLayout(LayoutKind.Sequential)]
 [SuppressMessage("ReSharper", "FieldCanBeMadeReadOnly.Local")]
-internal readonly struct EnumArg
+[SuppressMessage("ReSharper", "ReplaceWithPrimaryConstructorParameter")]
+internal readonly struct EnumArg(IntPtr typeHandle, ulong value)
 {
-    private readonly IntPtr _typeHandle;
-    private readonly ulong _value;
+    private readonly IntPtr _typeHandle = typeHandle;
+    private readonly ulong _value = value;
 
     public Type? Type => TypeUtil.GetTypeFromHandle(_typeHandle);
-
-    public EnumArg(IntPtr typeHandle, ulong value)
-    {
-        _typeHandle = typeHandle;
-        _value = value;
-    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool TryFormat(Span<char> destination, out int charsWritten, ZeroLogConfiguration config)

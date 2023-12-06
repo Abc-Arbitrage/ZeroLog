@@ -24,7 +24,7 @@ internal sealed class ResolvedLoggerConfiguration
     private ResolvedLoggerConfiguration(IEnumerable<Appender[]> appendersByLogLevel)
     {
         _appendersByLogLevel = appendersByLogLevel.ToArray();
-        _appendersByLogLevel[(int)LogLevel.None] = Array.Empty<Appender>();
+        _appendersByLogLevel[(int)LogLevel.None] = [];
         Debug.Assert(_appendersByLogLevel.Length == _levelCount);
 
         Level = LogLevel.None;
@@ -103,7 +103,7 @@ internal sealed class ResolvedLoggerConfiguration
         var appenderArray = new[] { appender ?? new NoopAppender() };
 
         var appendersByLogLevel = Enumerable.Range(0, _levelCount)
-                                            .Select(i => i >= (int)level ? appenderArray : Array.Empty<Appender>());
+                                            .Select(i => i >= (int)level ? appenderArray : []);
 
         return new ResolvedLoggerConfiguration(appendersByLogLevel);
     }

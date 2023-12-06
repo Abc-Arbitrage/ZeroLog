@@ -140,9 +140,7 @@ public class TextWriterAppenderTests
         }
     }
 
-    private class WriterWithoutSpanWrite : TextWriterBase
-    {
-    }
+    private class WriterWithoutSpanWrite : TextWriterBase;
 
     private class WriterWithSpanWrite : TextWriterBase
     {

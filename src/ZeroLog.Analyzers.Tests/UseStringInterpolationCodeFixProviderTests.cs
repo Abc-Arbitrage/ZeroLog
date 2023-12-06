@@ -414,7 +414,5 @@ public class UseStringInterpolationCodeFixProviderTests
         return test.RunAsync();
     }
 
-    private class Test : ZeroLogCodeFixTest<UseStringInterpolationAnalyzer, UseStringInterpolationCodeFixProvider>
-    {
-    }
+    private class Test : ZeroLogCodeFixTest<UseStringInterpolationAnalyzer, UseStringInterpolationCodeFixProvider>;
 }

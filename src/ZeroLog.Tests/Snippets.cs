@@ -77,7 +77,5 @@ public class Snippets
     private static int GetNumberOfSecondsUntilTomorrow()
         => 10;
 
-    private class YourClass
-    {
-    }
+    private class YourClass;
 }

@@ -42,10 +42,10 @@ public class SanityChecks
                               .GeneratePublicApi(new ApiGeneratorOptions
                               {
                                   IncludeAssemblyAttributes = false,
-                                  ExcludeAttributes = new[]
-                                  {
+                                  ExcludeAttributes =
+                                  [
                                       typeof(ObsoleteAttribute).FullName
-                                  }
+                                  ]
                               })
         );
     }

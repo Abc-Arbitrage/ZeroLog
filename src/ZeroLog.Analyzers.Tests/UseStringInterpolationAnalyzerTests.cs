@@ -132,7 +132,5 @@ public class UseStringInterpolationAnalyzerTests
         return test.RunAsync();
     }
 
-    private class Test : ZeroLogAnalyzerTest<UseStringInterpolationAnalyzer>
-    {
-    }
+    private class Test : ZeroLogAnalyzerTest<UseStringInterpolationAnalyzer>;
 }

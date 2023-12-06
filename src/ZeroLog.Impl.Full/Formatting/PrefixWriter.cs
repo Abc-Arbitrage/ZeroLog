@@ -30,6 +30,7 @@ internal class PrefixWriter
 
     public string Pattern { get; }
 
+    [SuppressMessage("ReSharper", "ConvertToPrimaryConstructor")]
     public PrefixWriter(string pattern)
     {
         Pattern = pattern;

@@ -8,25 +8,15 @@ using ZeroLog.Support;
 namespace ZeroLog;
 
 [StructLayout(LayoutKind.Sequential)]
-[SuppressMessage("ReSharper", "FieldCanBeMadeReadOnly.Local")]
 [SuppressMessage("ReSharper", "ReplaceSliceWithRangeIndexer")]
-internal readonly unsafe struct UnmanagedArgHeader
+internal readonly unsafe struct UnmanagedArgHeader(IntPtr typeHandle, int typeSize)
 {
-    private readonly IntPtr _typeHandle;
-    private readonly int _typeSize;
-
-    public Type? Type => TypeUtil.GetTypeFromHandle(_typeHandle);
-    public int Size => _typeSize;
-
-    public UnmanagedArgHeader(IntPtr typeHandle, int typeSize)
-    {
-        _typeHandle = typeHandle;
-        _typeSize = typeSize;
-    }
+    public Type? Type => TypeUtil.GetTypeFromHandle(typeHandle);
+    public int Size => typeSize;
 
     public bool TryAppendTo(byte* valuePtr, Span<char> destination, out int charsWritten, string? format, ZeroLogConfiguration config)
     {
-        if (UnmanagedCache.TryGetFormatter(_typeHandle, out var formatter))
+        if (UnmanagedCache.TryGetFormatter(typeHandle, out var formatter))
             return formatter.Invoke(valuePtr, destination, out charsWritten, format, config);
 
         return TryAppendUnformattedTo(valuePtr, destination, out charsWritten);
@@ -37,7 +27,7 @@ internal readonly unsafe struct UnmanagedArgHeader
         const string prefix = "Unmanaged(0x";
         const string suffix = ")";
 
-        var outputSize = prefix.Length + suffix.Length + 2 * _typeSize;
+        var outputSize = prefix.Length + suffix.Length + 2 * typeSize;
 
         if (destination.Length < outputSize)
         {
@@ -46,8 +36,8 @@ internal readonly unsafe struct UnmanagedArgHeader
         }
 
         prefix.CopyTo(destination);
-        HexUtils.AppendValueAsHex(valuePtr, _typeSize, destination.Slice(prefix.Length));
-        suffix.CopyTo(destination.Slice(prefix.Length + 2 * _typeSize));
+        HexUtils.AppendValueAsHex(valuePtr, typeSize, destination.Slice(prefix.Length));
+        suffix.CopyTo(destination.Slice(prefix.Length + 2 * typeSize));
 
         charsWritten = outputSize;
         return true;

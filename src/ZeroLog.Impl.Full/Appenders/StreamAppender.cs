@@ -11,7 +11,7 @@ namespace ZeroLog.Appenders;
 /// </summary>
 public abstract class StreamAppender : Appender
 {
-    private byte[] _byteBuffer = Array.Empty<byte>();
+    private byte[] _byteBuffer = [];
 
     private Encoding _encoding = Encoding.UTF8;
     private bool _useSpanGetBytes;
@@ -104,5 +104,5 @@ public abstract class StreamAppender : Appender
     }
 
     internal static bool OverridesSpanGetBytes(Type encodingType)
-        => encodingType.GetMethod(nameof(System.Text.Encoding.GetBytes), BindingFlags.Public | BindingFlags.Instance, new[] { typeof(ReadOnlySpan<char>), typeof(Span<byte>) })?.DeclaringType == encodingType;
+        => encodingType.GetMethod(nameof(System.Text.Encoding.GetBytes), BindingFlags.Public | BindingFlags.Instance, [typeof(ReadOnlySpan<char>), typeof(Span<byte>)])?.DeclaringType == encodingType;
 }

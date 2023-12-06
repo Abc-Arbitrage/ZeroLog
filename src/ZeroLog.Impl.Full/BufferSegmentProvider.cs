@@ -60,16 +60,9 @@ internal unsafe class BufferSegmentProvider
     }
 }
 
-internal unsafe struct BufferSegment
+internal unsafe struct BufferSegment(byte* data, int length, byte[]? underlyingBuffer)
 {
-    public readonly byte* Data;
-    public readonly int Length;
-    public readonly byte[]? UnderlyingBuffer;
-
-    public BufferSegment(byte* data, int length, byte[]? underlyingBuffer)
-    {
-        Data = data;
-        Length = length;
-        UnderlyingBuffer = underlyingBuffer;
-    }
+    public readonly byte* Data = data;
+    public readonly int Length = length;
+    public readonly byte[]? UnderlyingBuffer = underlyingBuffer;
 }

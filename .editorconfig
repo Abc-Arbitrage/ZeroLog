@@ -1,5 +1,5 @@
-
 root = true
+
 
 [*]
 trim_trailing_whitespace = true
@@ -28,5 +28,5 @@ trim_trailing_whitespace = false
 [*.sh]
 end_of_line = lf
 
-[*.g4]
-indent_style = tab
+[*.cs]
+resharper_indent_raw_literal_string = indent

@@ -5,19 +5,14 @@ using System.Linq;
 
 namespace ZeroLog.Support;
 
-internal class ConcurrentQueueCapacityInitializer<T> : ICollection<T>
+internal class ConcurrentQueueCapacityInitializer<T>(int size) : ICollection<T>
 {
     // Fake collection used to initialize the capacity of a ConcurrentQueue:
     // - Has a Count property set to the desired initial capacity
     // - Has a noop iterator
 
-    public int Count { get; }
+    public int Count { get; } = size;
     public bool IsReadOnly => true;
-
-    public ConcurrentQueueCapacityInitializer(int size)
-    {
-        Count = size;
-    }
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     public IEnumerator<T> GetEnumerator() => Enumerable.Empty<T>().GetEnumerator();

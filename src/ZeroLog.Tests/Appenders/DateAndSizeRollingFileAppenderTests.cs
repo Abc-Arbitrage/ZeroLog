@@ -132,16 +132,16 @@ public class DateAndSizeRollingFileAppenderTests
         formattedMessage.SetMessage(logMessage);
 
         Directory.CreateDirectory(_appender.Directory);
-        File.WriteAllLines(Path.Combine(_appender.Directory, "0"), new[] { "File 0" });
-        File.WriteAllLines(Path.Combine(_appender.Directory, "1"), new[] { "File 1" });
-        File.WriteAllLines(Path.Combine(_appender.Directory, "2"), new[] { "File 2" });
+        File.WriteAllLines(Path.Combine(_appender.Directory, "0"), ["File 0"]);
+        File.WriteAllLines(Path.Combine(_appender.Directory, "1"), ["File 1"]);
+        File.WriteAllLines(Path.Combine(_appender.Directory, "2"), ["File 2"]);
 
         _appender.WriteMessage(formattedMessage);
         _appender.Dispose();
 
-        File.ReadAllLines(Path.Combine(_appender.Directory, "0")).ShouldEqual(new[] { "File 0" });
-        File.ReadAllLines(Path.Combine(_appender.Directory, "1")).ShouldEqual(new[] { "File 1" });
-        File.ReadAllLines(Path.Combine(_appender.Directory, "2")).ShouldEqual(new[] { "File 2", logMessage.ToString() });
+        File.ReadAllLines(Path.Combine(_appender.Directory, "0")).ShouldEqual(["File 0"]);
+        File.ReadAllLines(Path.Combine(_appender.Directory, "1")).ShouldEqual(["File 1"]);
+        File.ReadAllLines(Path.Combine(_appender.Directory, "2")).ShouldEqual(["File 2", logMessage.ToString()]);
     }
 
     [Test]
@@ -159,9 +159,9 @@ public class DateAndSizeRollingFileAppenderTests
         formattedMessage.SetMessage(logMessage);
 
         Directory.CreateDirectory(_appender.Directory);
-        File.WriteAllLines(Path.Combine(_appender.Directory, "0"), new[] { "File 0" });
-        File.WriteAllLines(Path.Combine(_appender.Directory, "1"), new[] { "File 1" });
-        File.WriteAllLines(Path.Combine(_appender.Directory, "2"), new[] { "File 2" });
+        File.WriteAllLines(Path.Combine(_appender.Directory, "0"), ["File 0"]);
+        File.WriteAllLines(Path.Combine(_appender.Directory, "1"), ["File 1"]);
+        File.WriteAllLines(Path.Combine(_appender.Directory, "2"), ["File 2"]);
 
         using (File.OpenHandle(Path.Combine(_appender.Directory, "2"), FileMode.Append, FileAccess.Write, FileShare.None))
         {
@@ -169,10 +169,10 @@ public class DateAndSizeRollingFileAppenderTests
             _appender.Dispose();
         }
 
-        File.ReadAllLines(Path.Combine(_appender.Directory, "0")).ShouldEqual(new[] { "File 0" });
-        File.ReadAllLines(Path.Combine(_appender.Directory, "1")).ShouldEqual(new[] { "File 1" });
-        File.ReadAllLines(Path.Combine(_appender.Directory, "2")).ShouldEqual(new[] { "File 2" });
-        File.ReadAllLines(Path.Combine(_appender.Directory, "3")).ShouldEqual(new[] { logMessage.ToString() });
+        File.ReadAllLines(Path.Combine(_appender.Directory, "0")).ShouldEqual(["File 0"]);
+        File.ReadAllLines(Path.Combine(_appender.Directory, "1")).ShouldEqual(["File 1"]);
+        File.ReadAllLines(Path.Combine(_appender.Directory, "2")).ShouldEqual(["File 2"]);
+        File.ReadAllLines(Path.Combine(_appender.Directory, "3")).ShouldEqual([logMessage.ToString()]);
     }
 
     [Test]
@@ -191,7 +191,7 @@ public class DateAndSizeRollingFileAppenderTests
         formattedMessage.SetMessage(logMessage);
 
         Directory.CreateDirectory(_appender.Directory);
-        File.WriteAllLines(Path.Combine(_appender.Directory, ConstantFileNameAppender.FileName), new[] { "First line" });
+        File.WriteAllLines(Path.Combine(_appender.Directory, ConstantFileNameAppender.FileName), ["First line"]);
 
         _appender.WriteMessage(formattedMessage);
         _appender.WriteMessage(formattedMessage);
@@ -204,7 +204,7 @@ public class DateAndSizeRollingFileAppenderTests
 
         _appender.Dispose();
 
-        File.ReadAllLines(Path.Combine(_appender.Directory, ConstantFileNameAppender.FileName)).ShouldEqual(new[] { "First line", "Test message", "Test message", "Test message", "Test message" });
+        File.ReadAllLines(Path.Combine(_appender.Directory, ConstantFileNameAppender.FileName)).ShouldEqual(["First line", "Test message", "Test message", "Test message", "Test message"]);
     }
 
     [Test]
@@ -227,39 +227,24 @@ public class DateAndSizeRollingFileAppenderTests
 
         Directory.GetFiles(_appender.Directory)
                  .Select(Path.GetFileName)
-                 .ShouldEqual(new[] { "Foo.20220215.000.bar" });
+                 .ShouldEqual(["Foo.20220215.000.bar"]);
     }
 
-    private class FileNumberPatternAppender : DateAndSizeRollingFileAppender
+    private class FileNumberPatternAppender(string directory) : DateAndSizeRollingFileAppender(directory)
     {
-        public FileNumberPatternAppender(string directory)
-            : base(directory)
-        {
-        }
-
         protected override string GetFileName(DateOnly date, int number)
             => number.ToString(CultureInfo.InvariantCulture);
     }
 
-    private class DatePatternAppender : DateAndSizeRollingFileAppender
+    private class DatePatternAppender(string directory) : DateAndSizeRollingFileAppender(directory)
     {
-        public DatePatternAppender(string directory)
-            : base(directory)
-        {
-        }
-
         protected override string GetFileName(DateOnly date, int number)
             => date.ToString("yyyyMMdd");
     }
 
-    private class ConstantFileNameAppender : DateAndSizeRollingFileAppender
+    private class ConstantFileNameAppender(string directory) : DateAndSizeRollingFileAppender(directory)
     {
         public const string FileName = "Foo.log";
-
-        public ConstantFileNameAppender(string directory)
-            : base(directory)
-        {
-        }
 
         protected override string GetFileName(DateOnly date, int number)
             => FileName;

@@ -22,7 +22,7 @@ internal static class TypeUtil
 
     private static Func<IntPtr, Type>? BuildGetTypeFromHandleFunc()
     {
-        var method = typeof(Type).GetMethod("GetTypeFromHandleUnsafe", BindingFlags.Static | BindingFlags.NonPublic, null, new[] { typeof(IntPtr) }, null);
+        var method = typeof(Type).GetMethod("GetTypeFromHandleUnsafe", BindingFlags.Static | BindingFlags.NonPublic, null, [typeof(IntPtr)], null);
         if (method == null)
             return null;
 

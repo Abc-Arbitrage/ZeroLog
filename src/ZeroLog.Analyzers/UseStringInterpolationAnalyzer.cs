@@ -61,24 +61,13 @@ public class UseStringInterpolationAnalyzer : DiagnosticAnalyzer
         );
     }
 
-    private class Analysis
+    private class Analysis(INamedTypeSymbol logTypeSymbol, INamedTypeSymbol logMessageTypeSymbol, IMethodSymbol logMethodSymbol)
     {
-        private readonly INamedTypeSymbol _logTypeSymbol;
-        private readonly INamedTypeSymbol _logMessageTypeSymbol;
-        private readonly IMethodSymbol _logMethodSymbol;
-
-        public Analysis(INamedTypeSymbol logTypeSymbol, INamedTypeSymbol logMessageTypeSymbol, IMethodSymbol logMethodSymbol)
-        {
-            _logTypeSymbol = logTypeSymbol;
-            _logMessageTypeSymbol = logMessageTypeSymbol;
-            _logMethodSymbol = logMethodSymbol;
-        }
-
         public void AnalyzeOperation(OperationAnalysisContext operationContext)
         {
             var invocation = (IInvocationOperation)operationContext.Operation;
 
-            if (!SymbolEqualityComparer.Default.Equals(invocation.TargetMethod, _logMethodSymbol))
+            if (!SymbolEqualityComparer.Default.Equals(invocation.TargetMethod, logMethodSymbol))
                 return;
 
             var rootMethodInvocation = FindSimplifiableLogBuilderInvocationOperation(invocation.Instance);
@@ -96,7 +85,7 @@ public class UseStringInterpolationAnalyzer : DiagnosticAnalyzer
 
                 var invocationOperation = (IInvocationOperation)operation;
 
-                if (SymbolEqualityComparer.Default.Equals(invocationOperation.TargetMethod.ContainingType, _logMessageTypeSymbol))
+                if (SymbolEqualityComparer.Default.Equals(invocationOperation.TargetMethod.ContainingType, logMessageTypeSymbol))
                 {
                     if (invocationOperation.TargetMethod.Name is not (ZeroLogFacts.MethodNames.Append or ZeroLogFacts.MethodNames.AppendEnum))
                         return null;
@@ -106,8 +95,7 @@ public class UseStringInterpolationAnalyzer : DiagnosticAnalyzer
                         return null;
 
                     // Don't suggest a simplification if there is a verbatim string interpolation
-                    if (valueArgument.Value.Kind == OperationKind.InterpolatedString
-                        && valueArgument.Value.Syntax is InterpolatedStringExpressionSyntax interpolatedStringSyntax
+                    if (valueArgument.Value is { Kind: OperationKind.InterpolatedString, Syntax: InterpolatedStringExpressionSyntax interpolatedStringSyntax }
                         && interpolatedStringSyntax.StringStartToken.IsKind(SyntaxKind.InterpolatedVerbatimStringStartToken))
                     {
                         return null;
@@ -123,7 +111,7 @@ public class UseStringInterpolationAnalyzer : DiagnosticAnalyzer
 
                     operation = invocationOperation.Instance;
                 }
-                else if (SymbolEqualityComparer.Default.Equals(invocationOperation.TargetMethod.ContainingType, _logTypeSymbol))
+                else if (SymbolEqualityComparer.Default.Equals(invocationOperation.TargetMethod.ContainingType, logTypeSymbol))
                 {
                     if (invocationOperation.TargetMethod.Parameters.IsEmpty && ZeroLogFacts.IsLogLevelName(invocationOperation.TargetMethod.Name))
                         return invocationOperation;

@@ -80,8 +80,6 @@ partial class LogMessageTests
                 => Value.TryFormat(destination, out charsWritten, format, provider);
         }
 
-        public struct ForwardFormatToOutputStruct
-        {
-        }
+        public struct ForwardFormatToOutputStruct;
     }
 }

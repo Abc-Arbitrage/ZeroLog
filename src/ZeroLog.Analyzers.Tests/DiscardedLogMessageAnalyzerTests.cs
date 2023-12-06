@@ -103,7 +103,5 @@ public class DiscardedLogMessageAnalyzerTests
         return test.RunAsync();
     }
 
-    private class Test : ZeroLogAnalyzerTest<DiscardedLogMessageAnalyzer>
-    {
-    }
+    private class Test : ZeroLogAnalyzerTest<DiscardedLogMessageAnalyzer>;
 }

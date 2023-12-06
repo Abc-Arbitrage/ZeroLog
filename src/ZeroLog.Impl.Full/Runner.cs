@@ -48,7 +48,7 @@ internal abstract class Runner : ILogMessageProvider, IDisposable
         Stop();
 
         var appenders = _appenders;
-        _appenders = Array.Empty<Appender>();
+        _appenders = [];
 
         foreach (var appender in appenders)
             appender.Dispose();
@@ -126,7 +126,7 @@ internal abstract class Runner : ILogMessageProvider, IDisposable
     {
         try
         {
-            var appenders = message.Logger?.GetAppenders(message.Level) ?? Array.Empty<Appender>();
+            var appenders = message.Logger?.GetAppenders(message.Level) ?? [];
             if (appenders.Length == 0)
                 return;
 
@@ -294,14 +294,9 @@ internal sealed class AsyncRunner : Runner
     }
 }
 
-internal sealed class SyncRunner : Runner
+internal sealed class SyncRunner(ZeroLogConfiguration config) : Runner(config)
 {
     private readonly object _lock = new();
-
-    public SyncRunner(ZeroLogConfiguration config)
-        : base(config)
-    {
-    }
 
     public override void Submit(LogMessage message)
     {

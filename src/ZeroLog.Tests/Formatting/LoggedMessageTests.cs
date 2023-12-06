@@ -264,7 +264,7 @@ public class LoggedMessageTests
     [Test]
     public void should_return_string_type_for_span_of_byte()
     {
-        _logMessage.AppendKeyValue("Foo", new[] { (byte)'A' });
+        _logMessage.AppendKeyValue("Foo", [(byte)'A']);
         GetFirstValue().ValueType.ShouldEqual(typeof(string));
     }
 

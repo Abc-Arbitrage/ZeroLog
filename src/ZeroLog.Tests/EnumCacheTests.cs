@@ -352,9 +352,7 @@ public class EnumCacheTests
         Foo = 4
     }
 
-    private enum EmptyEnum
-    {
-    }
+    private enum EmptyEnum;
 
     private enum EnumMinMaxByte : byte
     {
