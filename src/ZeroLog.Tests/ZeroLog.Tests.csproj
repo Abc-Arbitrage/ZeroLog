@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net7.0;net6.0</TargetFrameworks>
+    <TargetFrameworks>net8.0;net7.0;net6.0</TargetFrameworks>
     <NoWarn>$(NoWarn);CS8002</NoWarn>
   </PropertyGroup>
 
@@ -9,13 +9,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.4.1" />
-    <PackageReference Include="NUnit" Version="3.13.3" />
-    <PackageReference Include="NUnit3TestAdapter" Version="4.3.1" />
-    <PackageReference Include="MarkdownSnippets.MsBuild" Version="24.5.1" />
-    <PackageReference Include="Verify.NUnit" Version="19.9.2" />
-    <PackageReference Include="Verify.DiffPlex" Version="2.2.0" />
-    <PackageReference Include="PublicApiGenerator" Version="10.3.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
+    <PackageReference Include="NUnit" Version="4.0.1" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
+    <PackageReference Include="MarkdownSnippets.MsBuild" Version="25.1.0" PrivateAssets="all" />
+    <PackageReference Include="Verify.NUnit" Version="22.7.1" />
+    <PackageReference Include="Verify.DiffPlex" Version="2.3.0" />
+    <PackageReference Include="PublicApiGenerator" Version="11.1.0" />
     <PackageReference Include="ObjectLayoutInspector" Version="0.1.4" />
   </ItemGroup>
 

@@ -3,7 +3,7 @@
     public abstract class Appender : System.IDisposable
     {
         protected Appender() { }
-        public ZeroLog.LogLevel Level { get; set; }
+        public ZeroLog.LogLevel Level { get; init; }
         public virtual void Dispose() { }
         public virtual void Flush() { }
         public abstract void WriteMessage(ZeroLog.Formatting.LoggedMessage message);
@@ -11,7 +11,7 @@
     public class ConsoleAppender : ZeroLog.Appenders.StreamAppender
     {
         public ConsoleAppender() { }
-        public bool ColorOutput { get; set; }
+        public bool ColorOutput { get; init; }
         public override void Flush() { }
         public override void WriteMessage(ZeroLog.Formatting.LoggedMessage message) { }
     }
@@ -19,9 +19,9 @@
     {
         public DateAndSizeRollingFileAppender(string directory) { }
         public string Directory { get; }
-        public string FileExtension { get; set; }
-        public string FileNamePrefix { get; set; }
-        public long MaxFileSizeInBytes { get; set; }
+        public string FileExtension { get; init; }
+        public string FileNamePrefix { get; init; }
+        public long MaxFileSizeInBytes { get; init; }
         public override void Dispose() { }
         protected virtual void FileClosing() { }
         protected virtual void FileOpened() { }
@@ -37,8 +37,8 @@
     {
         protected StreamAppender() { }
         protected System.Text.Encoding Encoding { get; set; }
-        public ZeroLog.Formatting.Formatter Formatter { get; set; }
         protected System.IO.Stream? Stream { get; set; }
+        public ZeroLog.Formatting.Formatter Formatter { get; init; }
         public override void Dispose() { }
         public override void Flush() { }
         public override void WriteMessage(ZeroLog.Formatting.LoggedMessage message) { }
@@ -47,8 +47,8 @@
     {
         public TextWriterAppender() { }
         public TextWriterAppender(System.IO.TextWriter? textWriter) { }
-        public ZeroLog.Formatting.Formatter Formatter { get; set; }
         public System.IO.TextWriter? TextWriter { get; set; }
+        public ZeroLog.Formatting.Formatter Formatter { get; init; }
         public override void Dispose() { }
         public override void Flush() { }
         public override void WriteMessage(ZeroLog.Formatting.LoggedMessage message) { }
@@ -102,16 +102,16 @@ namespace ZeroLog.Configuration
     {
         public ZeroLogConfiguration() { }
         public System.TimeSpan AppenderQuarantineDelay { get; set; }
-        public ZeroLog.Configuration.AppendingStrategy AppendingStrategy { get; set; }
         public bool AutoRegisterEnums { get; set; }
-        public int LogMessageBufferSize { get; set; }
-        public int LogMessagePoolSize { get; set; }
-        public int LogMessageStringCapacity { get; set; }
         public ZeroLog.Configuration.ILoggerConfigurationCollection Loggers { get; }
         public string NullDisplayString { get; set; }
         public ZeroLog.Configuration.RootLoggerConfiguration RootLogger { get; }
         public string TruncatedMessageSuffix { get; set; }
-        public bool UseBackgroundThread { get; set; }
+        public ZeroLog.Configuration.AppendingStrategy AppendingStrategy { get; init; }
+        public int LogMessageBufferSize { get; init; }
+        public int LogMessagePoolSize { get; init; }
+        public int LogMessageStringCapacity { get; init; }
+        public bool UseBackgroundThread { get; init; }
         public void ApplyChanges() { }
         public void SetLogLevel(string? loggerName, ZeroLog.LogLevel? logLevel) { }
         public static ZeroLog.Configuration.ZeroLogConfiguration CreateTestConfiguration() { }
@@ -122,8 +122,8 @@ namespace ZeroLog.Formatting
     public sealed class DefaultFormatter : ZeroLog.Formatting.Formatter
     {
         public DefaultFormatter() { }
-        public string JsonSeparator { get; set; }
-        public string PrefixPattern { get; set; }
+        public string JsonSeparator { get; init; }
+        public string PrefixPattern { get; init; }
         protected override void WriteMessage(ZeroLog.Formatting.LoggedMessage message) { }
     }
     public abstract class Formatter

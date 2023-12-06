@@ -167,14 +167,14 @@ public class AllocationTests
         allocationsOnLoggingThread = GC.GetAllocatedBytesForCurrentThread() - allocationsOnLoggingThread;
         allocationsOnAppenderThread = _awaitableAppender.AllocatedBytesOnAppenderThread - allocationsOnAppenderThread;
 
-        Assert.Zero(allocationsOnLoggingThread, "Allocations on logging thread");
+        Assert.That(allocationsOnLoggingThread, Is.Zero, "Allocations on logging thread");
 
 #if NET7_0_OR_GREATER
-        Assert.Zero(allocationsOnAppenderThread, "Allocations on appender thread");
+        Assert.That(allocationsOnAppenderThread, Is.Zero, "Allocations on appender thread");
 #else
         // .NET 6 allocates 40 bytes on the appender thread, independently of the event count.
         // I don't know why, but .NET 7 doesn't exhibit this behavior anymore, so I suppose it's just some glitch.
-        Assert.LessOrEqual(allocationsOnAppenderThread, 40, "Allocations on appender thread");
+        Assert.That(allocationsOnAppenderThread, Is.LessThanOrEqualTo(40), "Allocations on appender thread");
 #endif
     }
 
