@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Threading;
 using ZeroLog.Configuration;
 
@@ -10,8 +11,13 @@ namespace ZeroLog.Formatting;
 /// </summary>
 public sealed class LoggedMessage
 {
-    private readonly char[] _messageBuffer;
-    private int _messageLength;
+    private readonly char[] _charBuffer;
+    private readonly byte[] _byteBuffer;
+    private readonly KeyValueList _keyValues;
+
+    private int _charBufferLength;
+    private int _byteBufferLength;
+
     private ZeroLogConfiguration _config;
 
     private LogMessage _message = LogMessage.Empty;
@@ -38,18 +44,25 @@ public sealed class LoggedMessage
     /// <summary>
     /// The logged message text.
     /// </summary>
-    public ReadOnlySpan<char> Message => _messageBuffer.AsSpan(0, _messageLength);
+    public ReadOnlySpan<char> Message => GetMessageUtf16();
+
+    /// <summary>
+    /// The logged message text, encoded in UTF-8.
+    /// </summary>
+    public ReadOnlySpan<byte> MessageUtf8 => GetMessageUtf8();
 
     /// <summary>
     /// The logged message metadata as a list of key/value pairs.
     /// </summary>
-    public KeyValueList KeyValues { get; }
+    public KeyValueList KeyValues => GetKeyValues();
 
     internal LoggedMessage(int bufferSize, ZeroLogConfiguration config)
     {
         _config = config;
-        _messageBuffer = GC.AllocateUninitializedArray<char>(bufferSize);
-        KeyValues = new KeyValueList(bufferSize);
+        _charBuffer = GC.AllocateUninitializedArray<char>(bufferSize);
+        _byteBuffer = GC.AllocateUninitializedArray<byte>(bufferSize * Utf8Formatter.MaxUtf8BytesPerChar);
+
+        _keyValues = new KeyValueList(bufferSize);
 
         SetMessage(LogMessage.Empty);
     }
@@ -58,29 +71,86 @@ public sealed class LoggedMessage
     {
         _config = other._config;
 
-        _messageBuffer = other._messageBuffer.AsSpan(0, other._messageLength).ToArray();
-        _messageLength = other._messageLength;
+        _charBuffer = other.Message.ToArray();
+        _charBufferLength = other._charBufferLength;
 
-        KeyValues = new KeyValueList(other.KeyValues);
+        _byteBuffer = other.MessageUtf8.ToArray();
+        _byteBufferLength = other._byteBufferLength;
+
+        _keyValues = new KeyValueList(other.KeyValues);
         _message = other._message.CloneMetadata();
     }
 
     internal void SetMessage(LogMessage message)
     {
         _message = message;
+        _charBufferLength = -1;
+        _byteBufferLength = -1;
+        _keyValues.Clear();
 
-        try
-        {
 #if DEBUG
-            _messageBuffer.AsSpan().Fill((char)0);
+        _charBuffer.AsSpan().Clear();
+        _byteBuffer.AsSpan().Clear();
 #endif
+    }
 
-            _messageLength = _message.WriteTo(_messageBuffer, _config, LogMessage.FormatType.Formatted, KeyValues);
-        }
-        catch (Exception ex)
+    private ReadOnlySpan<char> GetMessageUtf16()
+    {
+        if (_charBufferLength < 0)
+            FormatMessage();
+
+        return _charBuffer.AsSpan(0, _charBufferLength);
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        void FormatMessage()
         {
-            HandleFormattingError(ex);
+            try
+            {
+                _charBufferLength = _byteBufferLength >= 0
+                    ? Encoding.UTF8.GetChars(_byteBuffer.AsSpan(0, _byteBufferLength), _charBuffer)
+                    : _message.WriteTo(_charBuffer, _config, LogMessage.FormatType.Formatted, _keyValues);
+            }
+            catch (Exception ex)
+            {
+                HandleFormattingError(ex);
+            }
         }
+    }
+
+    private ReadOnlySpan<byte> GetMessageUtf8()
+    {
+        if (_byteBufferLength < 0)
+            FormatMessage();
+
+        return _byteBuffer.AsSpan(0, _byteBufferLength);
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        void FormatMessage()
+        {
+            try
+            {
+#if NET8_0_OR_GREATER
+                _byteBufferLength = _charBufferLength >= 0
+                    ? Encoding.UTF8.GetBytes(_charBuffer.AsSpan(0, _charBufferLength), _byteBuffer)
+                    : _message.WriteTo(_byteBuffer, _config, LogMessage.FormatType.Formatted, _keyValues);
+#else
+                _byteBufferLength = Encoding.UTF8.GetBytes(GetMessageUtf16(), _byteBuffer);
+#endif
+            }
+            catch (Exception ex)
+            {
+                HandleFormattingError(ex);
+                _byteBufferLength = Encoding.UTF8.GetBytes(_charBuffer.AsSpan(0, _charBufferLength), _byteBuffer);
+            }
+        }
+    }
+
+    private KeyValueList GetKeyValues()
+    {
+        if (_charBufferLength < 0 && _byteBufferLength < 0)
+            GetMessageUtf8();
+
+        return _keyValues;
     }
 
     internal void UpdateConfiguration(ZeroLogConfiguration config)
@@ -93,20 +163,20 @@ public sealed class LoggedMessage
     {
         try
         {
-            var builder = new CharBufferBuilder(_messageBuffer);
+            var builder = new CharBufferBuilder(_charBuffer);
             builder.TryAppendPartial("An error occurred during formatting: ");
             builder.TryAppendPartial(ex.Message);
             builder.TryAppendPartial(" - Unformatted message: ");
 
             var length = _message.WriteTo(builder.GetRemainingBuffer(), _config, LogMessage.FormatType.Unformatted, null);
-            _messageLength = builder.Length + length;
+            _charBufferLength = builder.Length + length;
         }
         catch
         {
-            var builder = new CharBufferBuilder(_messageBuffer);
+            var builder = new CharBufferBuilder(_charBuffer);
             builder.TryAppendPartial("An error occurred during formatting: ");
             builder.TryAppendPartial(ex.Message);
-            _messageLength = builder.Length;
+            _charBufferLength = builder.Length;
         }
     }
 

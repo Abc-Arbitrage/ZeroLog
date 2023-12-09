@@ -2,7 +2,9 @@
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Running;
+using JetBrains.Profiler.Api;
 using ZeroLog.Benchmarks.LatencyTests;
+using ZeroLog.Benchmarks.Logging;
 using ZeroLog.Benchmarks.ThroughputTests;
 using ZeroLog.Benchmarks.Tools;
 
@@ -39,6 +41,32 @@ public class Program
         );
     }
 
+    private static void RunProfiler()
+    {
+        var bench = new StreamAppenderBenchmarks();
+
+        for (var i = 0; i < 100; ++i)
+            bench.Utf8Formatter();
+
+        MeasureProfiler.StartCollectingData();
+
+        for (var i = 0; i < 100_000; ++i)
+            bench.Utf8Formatter();
+
+        MeasureProfiler.SaveData();
+    }
+
+    private static void RunBenchmark()
+    {
+        BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run();
+
+        while (Console.KeyAvailable)
+            Console.ReadKey(true);
+
+        Console.WriteLine("Press enter to exit");
+        Console.ReadLine();
+    }
+
     public static void Main()
     {
         //Throughput();
@@ -51,12 +79,8 @@ public class Program
         //EnumBenchmarksRunner.Run();
         //ThroughputToFileBench.Run();
 
-        BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run();
+        //RunProfiler();
 
-        while (Console.KeyAvailable)
-            Console.ReadKey(true);
-
-        Console.WriteLine("Press enter to exit");
-        Console.ReadLine();
+        RunBenchmark();
     }
 }

@@ -311,6 +311,123 @@ internal class PrefixWriter
         charsWritten = builder.Length;
     }
 
+#if NET8_0_OR_GREATER
+
+    public void WritePrefix(LoggedMessage message, Span<byte> destination, out int bytesWritten)
+    {
+        var builder = new ByteBufferBuilder(destination);
+
+        foreach (var part in _parts)
+        {
+            var partStartOffset = builder.Length;
+
+            switch (part.Type)
+            {
+                case PatternPartType.String:
+                {
+                    if (!builder.TryAppendPartial(part.ValueUtf8))
+                        goto endOfLoop;
+
+                    break;
+                }
+
+                case PatternPartType.Date:
+                {
+                    if (!builder.TryAppend(message.Timestamp, part.Format))
+                        goto endOfLoop;
+
+                    break;
+                }
+
+                case PatternPartType.Time:
+                {
+                    if (!builder.TryAppend(message.Timestamp.TimeOfDay, part.Format))
+                        goto endOfLoop;
+
+                    break;
+                }
+
+                case PatternPartType.Thread:
+                {
+                    var thread = message.Thread;
+
+                    if (thread != null)
+                    {
+                        if (thread.Name != null)
+                        {
+                            if (!builder.TryAppendPartialChars(thread.Name))
+                                goto endOfLoop;
+                        }
+                        else
+                        {
+                            if (!builder.TryAppend(thread.ManagedThreadId))
+                                goto endOfLoop;
+                        }
+                    }
+                    else
+                    {
+                        if (!builder.TryAppendAscii('0'))
+                            goto endOfLoop;
+                    }
+
+                    break;
+                }
+
+                case PatternPartType.Level:
+                {
+                    var levelString = message.Level switch
+                    {
+                        LogLevel.Trace => "TRACE"u8,
+                        LogLevel.Debug => "DEBUG"u8,
+                        LogLevel.Info  => "INFO"u8,
+                        LogLevel.Warn  => "WARN"u8,
+                        LogLevel.Error => "ERROR"u8,
+                        LogLevel.Fatal => "FATAL"u8,
+                        _              => "???"u8
+                    };
+
+                    if (!builder.TryAppendWhole(levelString))
+                        goto endOfLoop;
+
+                    break;
+                }
+
+                case PatternPartType.Logger:
+                {
+                    if (!builder.TryAppendPartial(message.Logger?.NameUtf8))
+                        goto endOfLoop;
+
+                    break;
+                }
+
+                case PatternPartType.LoggerCompact:
+                {
+                    if (!builder.TryAppendPartial(message.Logger?.CompactNameUtf8))
+                        goto endOfLoop;
+
+                    break;
+                }
+
+                case PatternPartType.Column:
+                {
+                    if (part.FormatInt is { } column)
+                        builder.TryAppendPartialAscii(' ', column - builder.Length);
+
+                    continue;
+                }
+            }
+
+            if (part.FormatInt is { } fieldLength)
+                builder.TryAppendPartialAscii(' ', fieldLength - builder.Length + partStartOffset);
+        }
+
+        endOfLoop:
+
+        bytesWritten = builder.Length;
+    }
+
+#endif
+
 #endif
 
     private enum PatternPartType
@@ -331,6 +448,7 @@ internal class PrefixWriter
         public PatternPartType Type { get; }
         public string? Format { get; }
         public int? FormatInt { get; }
+        public byte[]? ValueUtf8 { get; }
 
         public PatternPart(PatternPartType type, string? format = null)
         {
@@ -350,6 +468,7 @@ internal class PrefixWriter
         {
             Type = PatternPartType.String;
             Format = value;
+            ValueUtf8 = Encoding.UTF8.GetBytes(value);
         }
     }
 }

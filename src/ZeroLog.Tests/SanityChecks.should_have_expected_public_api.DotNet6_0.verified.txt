@@ -130,6 +130,7 @@ namespace ZeroLog.Formatting
     {
         protected Formatter() { }
         protected void AdvanceBy(int charCount) { }
+        public virtual ZeroLog.Formatting.Utf8Formatter? AsUtf8Formatter() { }
         public System.ReadOnlySpan<char> FormatMessage(ZeroLog.Formatting.LoggedMessage message) { }
         protected System.Span<char> GetOutput() { }
         protected System.Span<char> GetRemainingBuffer() { }
@@ -170,10 +171,23 @@ namespace ZeroLog.Formatting
         public ZeroLog.LogLevel Level { get; }
         public string? LoggerName { get; }
         public System.ReadOnlySpan<char> Message { get; }
+        public System.ReadOnlySpan<byte> MessageUtf8 { get; }
         public System.Threading.Thread? Thread { get; }
         public System.DateTime Timestamp { get; }
         public ZeroLog.Formatting.LoggedMessage Clone() { }
         public override string ToString() { }
+    }
+    public abstract class Utf8Formatter
+    {
+        protected Utf8Formatter() { }
+        protected void AdvanceBy(int charCount) { }
+        public System.ReadOnlySpan<byte> FormatMessage(ZeroLog.Formatting.LoggedMessage message) { }
+        protected System.Span<byte> GetOutput() { }
+        protected System.Span<byte> GetRemainingBuffer() { }
+        protected void Write(System.ReadOnlySpan<byte> value) { }
+        protected void WriteLine() { }
+        protected void WriteLine(System.ReadOnlySpan<byte> value) { }
+        protected abstract void WriteMessage(ZeroLog.Formatting.LoggedMessage message);
     }
 }
 namespace ZeroLog

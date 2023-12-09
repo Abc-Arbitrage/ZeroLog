@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Text;
 using System.Threading;
 using ZeroLog.Configuration;
 
@@ -24,11 +25,13 @@ unsafe partial class LogMessage
     internal bool IsTruncated => _isTruncated;
 
     internal string? ConstantMessage { get; }
+    internal byte[]? ConstantMessageUtf8 { get; }
     internal bool ReturnToPool { get; set; }
 
     internal LogMessage(string message)
     {
         ConstantMessage = message;
+        ConstantMessageUtf8 = Encoding.UTF8.GetBytes(message);
         _strings = [];
     }
 

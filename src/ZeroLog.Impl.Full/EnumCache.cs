@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text;
 using InlineIL;
 using ZeroLog.Support;
 using static InlineIL.IL.Emit;
@@ -37,6 +38,18 @@ internal static class EnumCache
         {
             registered = true;
             return values.TryGetString(value);
+        }
+
+        registered = false;
+        return null;
+    }
+
+    public static byte[]? GetUtf8String(IntPtr typeHandle, ulong value, out bool registered)
+    {
+        if (_enums.TryGetValue(typeHandle, out var values))
+        {
+            registered = true;
+            return values.TryGetUtf8String(value);
         }
 
         registered = false;
@@ -192,11 +205,13 @@ internal static class EnumCache
         }
 
         public abstract string? TryGetString(ulong value);
+        public abstract byte[]? TryGetUtf8String(ulong value);
     }
 
     private sealed class ArrayEnumStrings : EnumStrings
     {
         private readonly string[] _strings;
+        private readonly byte[][] _utf8Strings;
 
         public static bool CanHandle(IEnumerable<EnumItem> enumItems)
             => enumItems.All(i => i.Value < 32);
@@ -206,36 +221,52 @@ internal static class EnumCache
             if (enumItems.Count == 0)
             {
                 _strings = [];
+                _utf8Strings = [];
                 return;
             }
 
             var maxValue = enumItems.Select(i => i.Value).Max();
             _strings = new string[maxValue + 1];
+            _utf8Strings = new byte[maxValue + 1][];
 
             foreach (var item in enumItems)
+            {
                 _strings[item.Value] = item.Name;
+                _utf8Strings[item.Value] = Encoding.UTF8.GetBytes(item.Name);
+            }
         }
 
         public override string? TryGetString(ulong value)
             => value < (ulong)_strings.Length
                 ? _strings[unchecked((int)value)]
                 : null;
+
+        public override byte[]? TryGetUtf8String(ulong value)
+            => value < (ulong)_strings.Length
+                ? _utf8Strings[unchecked((int)value)]
+                : null;
     }
 
     private sealed class DictionaryEnumStrings : EnumStrings
     {
-        private readonly Dictionary<ulong, string> _strings = new();
+        private readonly Dictionary<ulong, (string utf16, byte[] utf8)> _strings = new();
 
         public DictionaryEnumStrings(List<EnumItem> enumItems)
         {
             foreach (var item in enumItems)
-                _strings[item.Value] = item.Name;
+                _strings[item.Value] = (item.Name, Encoding.UTF8.GetBytes(item.Name));
         }
 
         public override string? TryGetString(ulong value)
         {
             _strings.TryGetValue(value, out var str);
-            return str;
+            return str.utf16;
+        }
+
+        public override byte[]? TryGetUtf8String(ulong value)
+        {
+            _strings.TryGetValue(value, out var str);
+            return str.utf8;
         }
     }
 

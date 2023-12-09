@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Text;
 using ZeroLog.Appenders;
 using ZeroLog.Formatting;
 
@@ -15,6 +16,9 @@ public sealed class ZeroLogConfiguration
     internal static ZeroLogConfiguration Default { get; } = new();
 
     private LoggerConfigurationCollection _loggers = new();
+
+    private string _nullDisplayString = "null";
+    private string _truncatedMessageSuffix = " [TRUNCATED]";
 
     internal event Action? ApplyChangesRequested;
 
@@ -86,7 +90,17 @@ public sealed class ZeroLogConfiguration
     /// <remarks>
     /// Default: "null"
     /// </remarks>
-    public string NullDisplayString { get; set; } = "null";
+    public string NullDisplayString
+    {
+        get => _nullDisplayString;
+        set
+        {
+            _nullDisplayString = value;
+            NullDisplayStringUtf8 = Encoding.UTF8.GetBytes(value);
+        }
+    }
+
+    internal byte[] NullDisplayStringUtf8 { get; private set; }
 
     /// <summary>
     /// The string which is appended to a message when it is truncated.
@@ -94,7 +108,17 @@ public sealed class ZeroLogConfiguration
     /// <remarks>
     /// Default: " [TRUNCATED]"
     /// </remarks>
-    public string TruncatedMessageSuffix { get; set; } = " [TRUNCATED]";
+    public string TruncatedMessageSuffix
+    {
+        get => _truncatedMessageSuffix;
+        set
+        {
+            _truncatedMessageSuffix = value;
+            TruncatedMessageSuffixUtf8 = Encoding.UTF8.GetBytes(value);
+        }
+    }
+
+    internal byte[] TruncatedMessageSuffixUtf8 { get; private set; }
 
     /// <summary>
     /// The time an appender will be put into quarantine (not used to log messages) after it throws an exception.
@@ -120,6 +144,15 @@ public sealed class ZeroLogConfiguration
     /// If <c>Foo.Bar</c> is configured, but <c>Foo.Bar.Baz</c> is not, it will use the configuration for <c>Foo.Bar</c>.
     /// </remarks>
     public ILoggerConfigurationCollection Loggers => _loggers;
+
+    /// <summary>
+    /// Creates a new ZeroLog configuration.
+    /// </summary>
+    public ZeroLogConfiguration()
+    {
+        NullDisplayStringUtf8 = Encoding.UTF8.GetBytes(NullDisplayString);
+        TruncatedMessageSuffixUtf8 = Encoding.UTF8.GetBytes(TruncatedMessageSuffix);
+    }
 
     /// <summary>
     /// Applies the changes made to this object since the call to <see cref="LogManager.Initialize"/>

@@ -13,9 +13,11 @@ public abstract class StreamAppender : Appender
 {
     private byte[] _byteBuffer = [];
 
+    private readonly Formatter _formatter = new DefaultFormatter();
     private Encoding _encoding = Encoding.UTF8;
+    private Utf8Formatter? _utf8Formatter;
     private bool _useSpanGetBytes;
-    private Formatter? _formatter;
+    private bool _allowUtf8Formatter = true;
 
     /// <summary>
     /// The stream to write to.
@@ -30,6 +32,9 @@ public abstract class StreamAppender : Appender
         get => _encoding;
         set
         {
+            if (ReferenceEquals(value, _encoding))
+                return;
+
             _encoding = value;
             UpdateEncodingSpecificData();
         }
@@ -40,8 +45,28 @@ public abstract class StreamAppender : Appender
     /// </summary>
     public Formatter Formatter
     {
-        get => _formatter ??= new DefaultFormatter();
-        init => _formatter = value;
+        get => _formatter;
+        init
+        {
+            if (ReferenceEquals(value, _formatter))
+                return;
+
+            _formatter = value;
+            UpdateEncodingSpecificData();
+        }
+    }
+
+    /// <summary>
+    /// For benchmarks.
+    /// </summary>
+    internal bool AllowUtf8Formatter
+    {
+        get => _allowUtf8Formatter;
+        set
+        {
+            _allowUtf8Formatter = value;
+            UpdateEncodingSpecificData();
+        }
     }
 
     /// <summary>
@@ -64,21 +89,25 @@ public abstract class StreamAppender : Appender
     /// <inheritdoc/>
     public override void WriteMessage(LoggedMessage message)
     {
-        if (Stream is null)
+        if (Stream is not { } stream)
             return;
 
-        if (_useSpanGetBytes)
+        if (_utf8Formatter is { } utf8Formatter)
         {
-            var chars = Formatter.FormatMessage(message);
+            stream.Write(utf8Formatter.FormatMessage(message));
+        }
+        else if (_useSpanGetBytes)
+        {
+            var chars = _formatter.FormatMessage(message);
             var byteCount = _encoding.GetBytes(chars, _byteBuffer);
-            Stream.Write(_byteBuffer, 0, byteCount);
+            stream.Write(_byteBuffer, 0, byteCount);
         }
         else
         {
-            Formatter.FormatMessage(message);
-            var charBuffer = Formatter.GetBuffer(out var charCount);
+            _formatter.FormatMessage(message);
+            var charBuffer = _formatter.GetBuffer(out var charCount);
             var byteCount = _encoding.GetBytes(charBuffer, 0, charCount, _byteBuffer, 0);
-            Stream.Write(_byteBuffer, 0, byteCount);
+            stream.Write(_byteBuffer, 0, byteCount);
         }
     }
 
@@ -91,13 +120,22 @@ public abstract class StreamAppender : Appender
 
     private void UpdateEncodingSpecificData()
     {
-        var maxBytes = _encoding.GetMaxByteCount(LogManager.OutputBufferSize);
+        if (_encoding is UTF8Encoding && _formatter.AsUtf8Formatter() is { } utf8Formatter && _allowUtf8Formatter)
+        {
+            // Fast path
+            _utf8Formatter = utf8Formatter;
+            return;
+        }
+
+        _utf8Formatter = null;
 
         // The base Encoding class allocates buffers in all non-abstract GetBytes overloads in order to call the abstract
         // GetBytes(char[] chars, int charIndex, int charCount, byte[] bytes, int byteIndex) in the end.
         // If an encoding overrides the Span version of GetBytes, we assume it avoids this allocation
         // and it skips safety checks as those are guaranteed by the Span struct. In that case, we can call this overload directly.
         _useSpanGetBytes = OverridesSpanGetBytes(_encoding.GetType());
+
+        var maxBytes = _encoding.GetMaxByteCount(LogManager.OutputBufferSize);
 
         if (_byteBuffer.Length < maxBytes)
             _byteBuffer = GC.AllocateUninitializedArray<byte>(maxBytes);

@@ -16,6 +16,7 @@
     <PackageReference Include="HdrHistogram" Version="2.5.0" />
     <PackageReference Include="Fody" Version="6.8.0" PrivateAssets="all" />
     <PackageReference Include="InlineIL.Fody" Version="1.7.4" PrivateAssets="all" />
+    <PackageReference Include="JetBrains.Profiler.Api" Version="1.4.0" />
     <PackageReference Include="log4net" Version="2.0.15" />
     <PackageReference Include="NLog" Version="5.2.7" />
     <PackageReference Include="Serilog" Version="3.1.1" />

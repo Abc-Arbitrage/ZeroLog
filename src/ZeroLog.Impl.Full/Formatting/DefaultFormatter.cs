@@ -1,3 +1,4 @@
+using System.Text;
 using ZeroLog.Appenders;
 
 namespace ZeroLog.Formatting;
@@ -84,4 +85,45 @@ public sealed class DefaultFormatter : Formatter
             WriteLine(message.Exception.ToString());
         }
     }
+
+#if NET8_0_OR_GREATER
+
+    /// <inheritdoc/>
+    public override Utf8Formatter AsUtf8Formatter()
+        => new DefaultUtf8Formatter(this);
+
+    private sealed class DefaultUtf8Formatter(DefaultFormatter formatter) : Utf8Formatter
+    {
+        private readonly PrefixWriter? _prefixWriter = formatter._prefixWriter;
+        private readonly byte[] _jsonSeparator = Encoding.UTF8.GetBytes(formatter.JsonSeparator);
+
+        protected override void WriteMessage(LoggedMessage message)
+        {
+            if (_prefixWriter != null)
+            {
+                _prefixWriter.WritePrefix(message, GetRemainingBuffer(), out var bytesWritten);
+                AdvanceBy(bytesWritten);
+            }
+
+            Write(message.MessageUtf8);
+
+            if (message.KeyValues.Count != 0)
+            {
+                Write(_jsonSeparator);
+
+                JsonWriterUtf8.WriteJsonToStringBuffer(message.KeyValues, GetRemainingBuffer(), out var bytesWritten);
+                AdvanceBy(bytesWritten);
+            }
+
+            WriteLine();
+
+            if (message.Exception != null)
+            {
+                // This allocates, but there's no better way to get the details.
+                WriteLine(Encoding.UTF8.GetBytes(message.Exception.ToString()));
+            }
+        }
+    }
+
+#endif
 }

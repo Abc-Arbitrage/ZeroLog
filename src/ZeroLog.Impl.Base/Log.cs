@@ -13,12 +13,18 @@ public sealed partial class Log
     private LogLevel _logLevel = LogLevel.None;
 
     internal string Name { get; }
+    internal byte[] NameUtf8 { get; }
+
     internal string CompactName { get; }
+    internal byte[] CompactNameUtf8 { get; }
 
     internal Log(string name)
     {
         Name = name;
+        NameUtf8 = Encoding.UTF8.GetBytes(Name);
+
         CompactName = GetCompactName(name);
+        CompactNameUtf8 = Encoding.UTF8.GetBytes(CompactName);
     }
 
     /// <summary>
