@@ -804,6 +804,7 @@ namespace ZeroLog
     {
         public static ZeroLog.Configuration.ZeroLogConfiguration? Configuration { get; }
         public void Dispose() { }
+        public static void Flush() { }
         public static ZeroLog.Log GetLogger(string name) { }
         public static ZeroLog.Log GetLogger(System.Type type) { }
         public static ZeroLog.Log GetLogger<T>() { }

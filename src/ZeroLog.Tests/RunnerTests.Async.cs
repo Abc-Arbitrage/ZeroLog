@@ -1,5 +1,6 @@
 using System;
 using System.Threading;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using ZeroLog.Configuration;
 using ZeroLog.Tests.Support;
@@ -62,6 +63,24 @@ public class AsyncRunnerTests
     }
 
     [Test]
+    public void should_flush_appenders_explicitly()
+    {
+        _testAppender.WaitOnWriteEvent = new ManualResetEventSlim(false);
+
+        _log.Info("Foo");
+        _log.Info("Bar");
+        _log.Info("Baz");
+
+        var flushTask = Task.Factory.StartNew(() => _runner.Flush(), TaskCreationOptions.LongRunning);
+        flushTask.Wait(TimeSpan.FromSeconds(1)).ShouldBeFalse();
+
+        _testAppender.WaitOnWriteEvent.Set();
+
+        flushTask.Wait(TimeSpan.FromSeconds(1)).ShouldBeTrue();
+        _testAppender.FlushCount.ShouldEqual(1);
+    }
+
+    [Test]
     public void should_apply_configuration_updates()
     {
         _runner.UpdateConfiguration(new ZeroLogConfiguration
@@ -91,7 +110,7 @@ public class AsyncRunnerTests
         _runner.AcquireLogMessage(LogMessagePoolExhaustionStrategy.DropLogMessageAndNotifyAppenders).ShouldBeTheSameAs(LogMessage.Empty);
 
         _runner.Submit(firstMessage);
-        _runner.WaitUntilQueueIsEmpty();
+        _runner.Flush();
         Thread.Sleep(500);
 
         _runner.AcquireLogMessage(LogMessagePoolExhaustionStrategy.DropLogMessageAndNotifyAppenders).ConstantMessage.ShouldBeNull();

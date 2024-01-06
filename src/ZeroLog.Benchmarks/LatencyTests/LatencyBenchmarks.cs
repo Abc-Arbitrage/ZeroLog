@@ -72,7 +72,7 @@ public class LatencyBenchmarks
 
     [IterationCleanup(Target = nameof(ZeroLog))]
     public void CleanupZeroLogIteration()
-        => LogManager.WaitUntilQueueIsEmpty();
+        => LogManager.Flush();
 
     //
     // Serilog

@@ -75,6 +75,16 @@ public partial class LogManagerTests(AppendingStrategy appendingStrategy)
     }
 
     [Test]
+    public void should_flush()
+    {
+        var log = LogManager.GetLogger<LogManagerTests>();
+        log.Info("test");
+        LogManager.Flush();
+
+        _testAppender.LoggedMessages.ShouldHaveSingleItem().ShouldEqual("test");
+    }
+
+    [Test]
     public void should_prevent_initializing_already_initialized_log_manager()
     {
         Assert.Throws<InvalidOperationException>(() => LogManager.Initialize(new ZeroLogConfiguration()));

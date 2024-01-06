@@ -80,7 +80,7 @@ public class AllocationTests(LogMessagePoolExhaustionStrategy exhaustionStrategy
         {
             if (i == warmupEvents)
             {
-                LogManager.WaitUntilQueueIsEmpty();
+                LogManager.Flush();
 
                 allocationsOnLoggingThread = GC.GetAllocatedBytesForCurrentThread();
                 allocationsOnAppenderThread = _awaitableAppender.AllocatedBytesOnAppenderThread;
@@ -156,7 +156,7 @@ public class AllocationTests(LogMessagePoolExhaustionStrategy exhaustionStrategy
         }
 
         // Give the appender some time to finish writing to file
-        LogManager.WaitUntilQueueIsEmpty();
+        LogManager.Flush();
 
         allocationsOnLoggingThread = GC.GetAllocatedBytesForCurrentThread() - allocationsOnLoggingThread;
         allocationsOnAppenderThread = _awaitableAppender.AllocatedBytesOnAppenderThread - allocationsOnAppenderThread;

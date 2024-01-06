@@ -51,7 +51,10 @@ internal abstract class Runner : ILogMessageProvider, IDisposable
         _appenders = [];
 
         foreach (var appender in appenders)
+        {
+            appender.InternalFlush();
             appender.Dispose();
+        }
     }
 
     public LogMessage AcquireLogMessage(LogMessagePoolExhaustionStrategy poolExhaustionStrategy)
@@ -116,6 +119,7 @@ internal abstract class Runner : ILogMessageProvider, IDisposable
     public abstract void Submit(LogMessage message);
 
     public abstract void UpdateConfiguration(ZeroLogConfiguration newConfig);
+    public abstract void Flush();
     protected abstract void Stop();
 
     internal virtual void WaitUntilNewConfigurationIsApplied() // For unit tests
@@ -173,6 +177,8 @@ internal abstract class Runner : ILogMessageProvider, IDisposable
 
 internal sealed class AsyncRunner : Runner
 {
+    private static readonly LogMessage _flushMessage = new(string.Empty);
+
     private readonly ConcurrentQueue<LogMessage> _queue;
     private readonly Thread _thread;
 
@@ -270,7 +276,11 @@ internal sealed class AsyncRunner : Runner
         if (!_queue.TryDequeue(out var logMessage))
             return false;
 
-        ProcessMessage(logMessage);
+        if (ReferenceEquals(logMessage, _flushMessage))
+            FlushAppenders();
+        else
+            ProcessMessage(logMessage);
+
         return true;
     }
 
@@ -285,9 +295,13 @@ internal sealed class AsyncRunner : Runner
         return true;
     }
 
-    public void WaitUntilQueueIsEmpty()
+    public override void Flush()
     {
+        if (!IsRunning)
+            return;
+
         var spinWait = new SpinWait();
+        _queue.Enqueue(_flushMessage);
 
         while (!_queue.IsEmpty)
             spinWait.SpinOnce();
@@ -312,6 +326,16 @@ internal sealed class SyncRunner(ZeroLogConfiguration config) : Runner(config)
         lock (_lock)
         {
             ApplyConfigurationUpdate(newConfig);
+        }
+    }
+
+    public override void Flush()
+    {
+        lock (_lock)
+        {
+            // An explicit flush should be a no-op with this runner,
+            // but the lock can cause an observable delay, so do it anyway.
+            FlushAppenders();
         }
     }
 

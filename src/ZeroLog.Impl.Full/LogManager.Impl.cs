@@ -99,6 +99,22 @@ partial class LogManager : IDisposable
         => _staticLogManager?.Dispose();
 
     /// <summary>
+    /// Waits until all the messages logged so far have been processed by the appenders.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// This is mostly meant for benchmarking, to ensure all the enqueued data has been processed.
+    /// </para>
+    /// <para>
+    /// It could also be used for unit testing, but in that case it is recommended to set
+    /// the <see cref="ZeroLogConfiguration.AppendingStrategy"/> property in the configuration
+    /// to <see cref="AppendingStrategy.Synchronous"/> instead, which removes all threading-related issues.
+    /// </para>
+    /// </remarks>
+    public static void Flush()
+        => _staticLogManager?._runner?.Flush();
+
+    /// <summary>
     /// Registers an enum type.
     /// Member names will be used when formatting the message (instead of numeric values).
     /// </summary>
@@ -202,7 +218,4 @@ partial class LogManager : IDisposable
 
     internal void WaitUntilNewConfigurationIsApplied() // For unit tests
         => _runner?.WaitUntilNewConfigurationIsApplied();
-
-    internal static void WaitUntilQueueIsEmpty() // For benchmarks
-        => (_staticLogManager?._runner as AsyncRunner)?.WaitUntilQueueIsEmpty();
 }
