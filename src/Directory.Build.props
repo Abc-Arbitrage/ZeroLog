@@ -5,7 +5,7 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <LangVersion>12.0</LangVersion>
     <Prefer32Bit>false</Prefer32Bit>
-    <DefaultItemExcludes>$(DefaultItemExcludes);*.DotSettings;*.ncrunchproject</DefaultItemExcludes>
+    <DefaultItemExcludes>$(DefaultItemExcludes);*.DotSettings;*.ncrunchproject;BenchmarkDotNet.Artifacts/**</DefaultItemExcludes>
     <DebugType>embedded</DebugType>
     <IsPackable>false</IsPackable>
     <Deterministic>true</Deterministic>
