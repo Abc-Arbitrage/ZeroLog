@@ -16,8 +16,8 @@
     <PackageReference Include="BenchmarkDotNet.TestAdapter" Version="0.13.12" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
     <PackageReference Include="HdrHistogram" Version="2.5.0" />
-    <PackageReference Include="Fody" Version="6.8.0" PrivateAssets="all" />
-    <PackageReference Include="InlineIL.Fody" Version="1.7.4" PrivateAssets="all" />
+    <PackageReference Include="Fody" Version="6.8.1" PrivateAssets="all" />
+    <PackageReference Include="InlineIL.Fody" Version="1.8.0" PrivateAssets="all" />
     <PackageReference Include="log4net" Version="2.0.15" />
     <PackageReference Include="NLog" Version="5.2.8" />
     <PackageReference Include="Serilog" Version="3.1.1" />

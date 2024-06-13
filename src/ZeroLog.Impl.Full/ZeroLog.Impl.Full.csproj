@@ -3,10 +3,11 @@
     <TargetFrameworks>net7.0;net6.0</TargetFrameworks>
     <RootNamespace>ZeroLog</RootNamespace>
     <Nullable>enable</Nullable>
+    <DisableFody>true</DisableFody>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="InlineIL.Fody" Version="1.7.4" PrivateAssets="all" />
+    <PackageReference Include="InlineIL.Fody" Version="1.8.0" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
