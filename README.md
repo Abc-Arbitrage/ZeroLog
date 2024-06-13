@@ -31,7 +31,7 @@ Internally, each logging call data (context, log messages, arguments, etc.) will
 Before using ZeroLog, you need to initialize the `LogManager` by calling `LogManager.Initialize` and providing a configuration.
 
 <!-- snippet: Initialize -->
-<a id='snippet-initialize'></a>
+<a id='snippet-Initialize'></a>
 ```cs
 LogManager.Initialize(new ZeroLogConfiguration
 {
@@ -44,7 +44,7 @@ LogManager.Initialize(new ZeroLogConfiguration
     }
 });
 ```
-<sup><a href='/src/ZeroLog.Tests/Snippets.cs#L21-L34' title='Snippet source file'>snippet source</a> | <a href='#snippet-initialize' title='Start of snippet'>anchor</a></sup>
+<sup><a href='/src/ZeroLog.Tests/Snippets.cs#L21-L34' title='Snippet source file'>snippet source</a> | <a href='#snippet-Initialize' title='Start of snippet'>anchor</a></sup>
 <!-- endSnippet -->
 
 The `LogManager` needs to be shut down by calling `LogManager.Shutdown()` when your application needs to exit.
@@ -52,11 +52,11 @@ The `LogManager` needs to be shut down by calling `LogManager.Shutdown()` when y
 You can retrieve a logger that will be the logging API entry point. Store this logger in a field.
 
 <!-- snippet: GetLogger -->
-<a id='snippet-getlogger'></a>
+<a id='snippet-GetLogger'></a>
 ```cs
 private static readonly Log _log = LogManager.GetLogger(typeof(YourClass));
 ```
-<sup><a href='/src/ZeroLog.Tests/Snippets.cs#L12-L16' title='Snippet source file'>snippet source</a> | <a href='#snippet-getlogger' title='Start of snippet'>anchor</a></sup>
+<sup><a href='/src/ZeroLog.Tests/Snippets.cs#L12-L16' title='Snippet source file'>snippet source</a> | <a href='#snippet-GetLogger' title='Start of snippet'>anchor</a></sup>
 <!-- endSnippet -->
 
 ### Logging APIs
@@ -66,12 +66,12 @@ Two logging APIs are provided:
 #### A string interpolation API:
 
 <!-- snippet: StringInterpolationApi -->
-<a id='snippet-stringinterpolationapi'></a>
+<a id='snippet-StringInterpolationApi'></a>
 ```cs
 var date = DateTime.Today.AddDays(1);
 _log.Info($"Tomorrow ({date:yyyy-MM-dd}) will be in {GetNumberOfSecondsUntilTomorrow():N0} seconds.");
 ```
-<sup><a href='/src/ZeroLog.Tests/Snippets.cs#L40-L45' title='Snippet source file'>snippet source</a> | <a href='#snippet-stringinterpolationapi' title='Start of snippet'>anchor</a></sup>
+<sup><a href='/src/ZeroLog.Tests/Snippets.cs#L40-L45' title='Snippet source file'>snippet source</a> | <a href='#snippet-StringInterpolationApi' title='Start of snippet'>anchor</a></sup>
 <!-- endSnippet -->
 
 This API uses C# 10 string interpolation handlers to implement custom interpolation support without allocations.
@@ -81,7 +81,7 @@ Note that if the log level is disabled (`Info` in this example), method calls su
 #### A `StringBuilder`-like API:
 
 <!-- snippet: StringBuilderApi -->
-<a id='snippet-stringbuilderapi'></a>
+<a id='snippet-StringBuilderApi'></a>
 ```cs
 _log.Info()
     .Append("Tomorrow (")
@@ -91,7 +91,7 @@ _log.Info()
     .Append(" seconds.")
     .Log();
 ```
-<sup><a href='/src/ZeroLog.Tests/Snippets.cs#L51-L61' title='Snippet source file'>snippet source</a> | <a href='#snippet-stringbuilderapi' title='Start of snippet'>anchor</a></sup>
+<sup><a href='/src/ZeroLog.Tests/Snippets.cs#L51-L61' title='Snippet source file'>snippet source</a> | <a href='#snippet-StringBuilderApi' title='Start of snippet'>anchor</a></sup>
 <!-- endSnippet -->
 
 This API supports more features, but is less convenient to use. You need to call `Log` at the end of the chain. Note that an `Append` overload with a string interpolation handler is provided though.
@@ -106,14 +106,14 @@ ZeroLog supports appending structured data (formatted as JSON) to log messages.
 Structured data can be appended by calling `AppendKeyValue`, like so:
 
 <!-- snippet: StructuredData -->
-<a id='snippet-structureddata'></a>
+<a id='snippet-StructuredData'></a>
 ```cs
 _log.Info()
     .Append("Tomorrow is another day.")
     .AppendKeyValue("NumSecondsUntilTomorrow", GetNumberOfSecondsUntilTomorrow())
     .Log();
 ```
-<sup><a href='/src/ZeroLog.Tests/Snippets.cs#L67-L74' title='Snippet source file'>snippet source</a> | <a href='#snippet-structureddata' title='Start of snippet'>anchor</a></sup>
+<sup><a href='/src/ZeroLog.Tests/Snippets.cs#L67-L74' title='Snippet source file'>snippet source</a> | <a href='#snippet-StructuredData' title='Start of snippet'>anchor</a></sup>
 <!-- endSnippet -->
 
 ## Configuration
@@ -196,7 +196,7 @@ ZeroLog can be used in unit tests. The easiest way to initialize it is to use th
 Here is a minimal ZeroLog initializer for NUnit:
 
 <!-- snippet: NUnitInitializer -->
-<a id='snippet-nunitinitializer'></a>
+<a id='snippet-NUnitInitializer'></a>
 ```cs
 [SetUpFixture]
 public class Initializer
@@ -210,7 +210,7 @@ public class Initializer
         => LogManager.Shutdown();
 }
 ```
-<sup><a href='/src/ZeroLog.Tests/Snippets.Init.cs#L10-L24' title='Snippet source file'>snippet source</a> | <a href='#snippet-nunitinitializer' title='Start of snippet'>anchor</a></sup>
+<sup><a href='/src/ZeroLog.Tests/Snippets.Init.cs#L10-L24' title='Snippet source file'>snippet source</a> | <a href='#snippet-NUnitInitializer' title='Start of snippet'>anchor</a></sup>
 <!-- endSnippet -->
 
 The [Verify.ZeroLog](https://github.com/VerifyTests/Verify.ZeroLog) project provides support for snapshot testing with [Verify](https://github.com/VerifyTests/Verify). It can be used to validate that the tested project takes the expected code path, with the expected intermediate values, thanks to the messages it logs in the process.
