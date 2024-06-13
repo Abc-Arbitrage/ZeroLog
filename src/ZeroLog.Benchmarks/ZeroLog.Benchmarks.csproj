@@ -14,15 +14,15 @@
 
   <ItemGroup>
     <PackageReference Include="BenchmarkDotNet.TestAdapter" Version="0.13.12" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />
     <PackageReference Include="HdrHistogram" Version="2.5.0" />
     <PackageReference Include="Fody" Version="6.8.1" PrivateAssets="all" />
     <PackageReference Include="InlineIL.Fody" Version="1.8.0" PrivateAssets="all" />
-    <PackageReference Include="log4net" Version="2.0.15" />
-    <PackageReference Include="NLog" Version="5.2.8" />
-    <PackageReference Include="Serilog" Version="3.1.1" />
+    <PackageReference Include="log4net" Version="2.0.17" />
+    <PackageReference Include="NLog" Version="5.3.2" />
+    <PackageReference Include="Serilog" Version="4.0.0" />
     <PackageReference Include="System.Net.Sockets" Version="4.3.0" />
-    <PackageReference Include="ZLogger" Version="2.1.0" />
+    <PackageReference Include="ZLogger" Version="2.4.1" />
   </ItemGroup>
 
 </Project>
