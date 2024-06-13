@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using ZeroLog.Configuration;
+using ZeroLog.Support;
 
 namespace ZeroLog;
 
@@ -142,7 +143,7 @@ partial class LogManager : IDisposable
         if (assembly == null)
             throw new ArgumentNullException(nameof(assembly));
 
-        foreach (var type in assembly.GetTypes().Where(t => t.IsEnum))
+        foreach (var type in TypeUtil.GetLoadableTypes(assembly).Where(t => t.IsEnum))
             RegisterEnum(type);
     }
 

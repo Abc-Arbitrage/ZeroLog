@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using static System.Linq.Expressions.Expression;
@@ -40,6 +42,22 @@ internal static class TypeUtil
         return !(bool)typeof(RuntimeHelpers).GetMethod(nameof(RuntimeHelpers.IsReferenceOrContainsReferences), BindingFlags.Static | BindingFlags.Public)!
                                             .MakeGenericMethod(type)
                                             .Invoke(null, null)!;
+    }
+
+    /// <summary>
+    /// Gets the types defined in the given assembly, except those which could not be loaded.
+    /// </summary>
+    [DebuggerStepThrough]
+    public static Type[] GetLoadableTypes(Assembly assembly)
+    {
+        try
+        {
+            return assembly.GetTypes();
+        }
+        catch (ReflectionTypeLoadException ex)
+        {
+            return ex.Types.Where(t => t is not null).ToArray()!;
+        }
     }
 }
 
