@@ -1,10 +1,10 @@
-
 name: Build
-on: [push, pull_request]
+on: [ push, pull_request ]
 
 env:
   DOTNET_NOLOGO: 1
   NUGET_CERT_REVOCATION_MODE: offline
+  BUILD_DOTNET_VERSION: 8.0.x
 
 jobs:
   windows:
@@ -17,7 +17,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 8.0.x
+          dotnet-version: ${{ env.BUILD_DOTNET_VERSION }}
 
       - name: Restore
         run: dotnet restore src/ZeroLog.sln
@@ -32,7 +32,31 @@ jobs:
         run: dotnet test --configuration Release --no-build src/ZeroLog.sln
 
       - name: Upload NuGet
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: NuGet
           path: output/*.nupkg
+
+  linux:
+    name: Linux
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.BUILD_DOTNET_VERSION }}
+
+      - name: Restore
+        run: dotnet restore src/ZeroLog.sln
+
+      - name: Build
+        run: dotnet build --configuration Release --no-restore src/ZeroLog.sln
+
+      - name: Test ZeroLog
+        run: dotnet test --configuration Release --no-build src/ZeroLog.Tests/ZeroLog.Tests.csproj
+
+      - name: Test Analyzers
+        run: dotnet test --configuration Release --no-build src/ZeroLog.Analyzers.Tests/ZeroLog.Analyzers.Tests.csproj
