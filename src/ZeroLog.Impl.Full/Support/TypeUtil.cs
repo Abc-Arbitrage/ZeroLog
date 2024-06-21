@@ -4,6 +4,8 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using InlineIL;
 using static System.Linq.Expressions.Expression;
 
 namespace ZeroLog.Support;
@@ -18,22 +20,33 @@ internal static class TypeUtil
         => Type.GetTypeFromHandle(RuntimeTypeHandle.FromIntPtr(typeHandle));
 #else
     public static Type? GetTypeFromHandle(IntPtr typeHandle)
-        => _getTypeFromHandleFunc?.Invoke(typeHandle);
+        => _getTypeFromHandleFunc.Invoke(typeHandle);
 
-    private static readonly Func<IntPtr, Type>? _getTypeFromHandleFunc = BuildGetTypeFromHandleFunc();
+    private static readonly Func<IntPtr, Type?> _getTypeFromHandleFunc = BuildGetTypeFromHandleFunc();
 
-    private static Func<IntPtr, Type>? BuildGetTypeFromHandleFunc()
+    private static Func<IntPtr, Type?> BuildGetTypeFromHandleFunc()
     {
         var method = typeof(Type).GetMethod("GetTypeFromHandleUnsafe", BindingFlags.Static | BindingFlags.NonPublic, null, [typeof(IntPtr)], null);
-        if (method == null)
-            return null;
+        if (method is not null)
+        {
+            var param = Parameter(typeof(IntPtr));
+            return Lambda<Func<IntPtr, Type?>>(Call(method, param), param).Compile();
+        }
 
-        var param = Parameter(typeof(IntPtr));
+        return static handle =>
+        {
+            IL.Push(new TypedReferenceLayout { Value = default, Type = handle });
+            IL.Emit.Refanytype();
+            IL.Emit.Call(MethodRef.Method(typeof(Type), nameof(Type.GetTypeFromHandle)));
+            return IL.Return<Type?>();
+        };
+    }
 
-        return Lambda<Func<IntPtr, Type>>(
-            Call(method, param),
-            param
-        ).Compile();
+    [StructLayout(LayoutKind.Sequential)]
+    private struct TypedReferenceLayout
+    {
+        public IntPtr Value;
+        public IntPtr Type;
     }
 #endif
 

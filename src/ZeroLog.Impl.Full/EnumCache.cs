@@ -151,7 +151,7 @@ internal static class EnumCache
     [SuppressMessage("ReSharper", "ConvertClosureToMethodGroup")]
     public static bool IsEnumSigned(IntPtr typeHandle)
     {
-        return _isEnumSigned.GetOrAdd(typeHandle, h => IsEnumSignedImpl(h));
+        return _isEnumSigned.GetOrAdd(typeHandle, static h => IsEnumSignedImpl(h));
 
         static bool IsEnumSignedImpl(IntPtr h)
         {
