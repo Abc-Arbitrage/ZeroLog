@@ -21,6 +21,10 @@ internal sealed class ResolvedLoggerConfiguration
     public LogLevel Level { get; }
     public LogMessagePoolExhaustionStrategy LogMessagePoolExhaustionStrategy { get; private init; } = LogMessagePoolExhaustionStrategy.Default;
 
+#if NET8_0_OR_GREATER
+    public TimeProvider TimeProvider { get; private init; } = TimeProvider.System;
+#endif
+
     private ResolvedLoggerConfiguration(IEnumerable<Appender[]> appendersByLogLevel)
     {
         _appendersByLogLevel = appendersByLogLevel.ToArray();
@@ -61,7 +65,11 @@ internal sealed class ResolvedLoggerConfiguration
 
         return new ResolvedLoggerConfiguration(appendersByLogLevel.Select(i => i.ToArray()))
         {
-            LogMessagePoolExhaustionStrategy = effectiveLogMessagePoolExhaustionStrategy
+            LogMessagePoolExhaustionStrategy = effectiveLogMessagePoolExhaustionStrategy,
+#if NET8_0_OR_GREATER
+            // ReSharper disable once NullCoalescingConditionIsAlwaysNotNullAccordingToAPIContract
+            TimeProvider = configuration.TimeProvider ?? TimeProvider.System
+#endif
         };
 
         IEnumerable<ILoggerConfiguration> GetOrderedLoggerConfigurations()
@@ -96,7 +104,11 @@ internal sealed class ResolvedLoggerConfiguration
         }
     }
 
-    internal static ResolvedLoggerConfiguration SingleAppender(LogLevel level, Appender? appender = null)
+    internal static ResolvedLoggerConfiguration SingleAppender(LogLevel level, Appender? appender = null
+#if NET8_0_OR_GREATER
+                                                               , TimeProvider? timeProvider = null
+#endif
+    )
     {
         // For unit tests
 
@@ -105,6 +117,11 @@ internal sealed class ResolvedLoggerConfiguration
         var appendersByLogLevel = Enumerable.Range(0, _levelCount)
                                             .Select(i => i >= (int)level ? appenderArray : []);
 
-        return new ResolvedLoggerConfiguration(appendersByLogLevel);
+        return new ResolvedLoggerConfiguration(appendersByLogLevel)
+        {
+#if NET8_0_OR_GREATER
+            TimeProvider = timeProvider ?? TimeProvider.System
+#endif
+        };
     }
 }

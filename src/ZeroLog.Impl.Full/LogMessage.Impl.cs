@@ -48,7 +48,12 @@ unsafe partial class LogMessage
         if (ReferenceEquals(this, Empty)) // Avoid overhead for ignored messages
             return;
 
-        Timestamp = DateTime.UtcNow; // TODO clock in Log
+#if NET8_0_OR_GREATER
+        Timestamp = log?.Config.TimeProvider.GetUtcNow().DateTime ?? DateTime.UtcNow;
+#else
+        Timestamp = DateTime.UtcNow;
+#endif
+
         Level = level;
         Thread = Thread.CurrentThread;
         Exception = null;

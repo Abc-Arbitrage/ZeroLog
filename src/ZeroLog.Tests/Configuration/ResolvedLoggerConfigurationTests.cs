@@ -1,3 +1,4 @@
+using System;
 using NUnit.Framework;
 using ZeroLog.Appenders;
 using ZeroLog.Configuration;
@@ -20,6 +21,10 @@ public class ResolvedLoggerConfigurationTests
         emptyConfig.GetAppenders(LogLevel.Warn).ShouldBeEmpty();
         emptyConfig.GetAppenders(LogLevel.Error).ShouldBeEmpty();
         emptyConfig.GetAppenders(LogLevel.Fatal).ShouldBeEmpty();
+
+#if NET8_0_OR_GREATER
+        emptyConfig.TimeProvider.ShouldBeTheSameAs(TimeProvider.System);
+#endif
     }
 
     [Test]
@@ -244,4 +249,20 @@ public class ResolvedLoggerConfigurationTests
         fooBarConfig.GetAppenders(LogLevel.Error).ShouldBeEquivalentTo([appenderA, appenderB]);
         fooBarConfig.GetAppenders(LogLevel.Fatal).ShouldBeEquivalentTo([appenderA, appenderB]);
     }
+
+#if NET8_0_OR_GREATER
+    [Test]
+    public void should_forward_time_provider()
+    {
+        var timeProvider = new TestTimeProvider();
+
+        var config = new ZeroLogConfiguration
+        {
+            TimeProvider = timeProvider
+        };
+
+        var logConfig = config.ResolveLoggerConfiguration("Foo");
+        logConfig.TimeProvider.ShouldBeTheSameAs(timeProvider);
+    }
+#endif
 }

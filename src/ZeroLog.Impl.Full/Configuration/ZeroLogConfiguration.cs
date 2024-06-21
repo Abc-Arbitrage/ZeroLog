@@ -121,6 +121,16 @@ public sealed class ZeroLogConfiguration
     /// </remarks>
     public ILoggerConfigurationCollection Loggers => _loggers;
 
+#if NET8_0_OR_GREATER
+    /// <summary>
+    /// The time provider to use for message timestamps.
+    /// </summary>
+    /// <remarks>
+    /// Default: <see cref="System.TimeProvider.System"/>.
+    /// </remarks>
+    public TimeProvider TimeProvider { get; init; } = TimeProvider.System;
+#endif
+
     /// <summary>
     /// Applies the changes made to this object since the call to <see cref="LogManager.Initialize"/>
     /// or the last call to <see cref="ApplyChanges"/>.

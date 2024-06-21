@@ -111,6 +111,7 @@ namespace ZeroLog.Configuration
         public int LogMessageBufferSize { get; init; }
         public int LogMessagePoolSize { get; init; }
         public int LogMessageStringCapacity { get; init; }
+        public System.TimeProvider TimeProvider { get; init; }
         public bool UseBackgroundThread { get; init; }
         public void ApplyChanges() { }
         public void SetLogLevel(string? loggerName, ZeroLog.LogLevel? logLevel) { }

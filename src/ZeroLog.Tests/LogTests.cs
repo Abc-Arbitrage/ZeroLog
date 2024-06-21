@@ -89,6 +89,18 @@ public partial class LogTests
     public string should_compact_name(string value)
         => Log.GetCompactName(value);
 
+#if NET8_0_OR_GREATER
+    [Test]
+    public void should_use_custom_time_provider()
+    {
+        var timeProvider = new TestTimeProvider { Timestamp = TestTimeProvider.ExampleTimestamp };
+        _log.UpdateConfiguration(_provider, ResolvedLoggerConfiguration.SingleAppender(LogLevel.Trace, timeProvider: timeProvider));
+
+        _log.Config.TimeProvider.ShouldBeTheSameAs(timeProvider);
+        _log.Info().Timestamp.ShouldEqual(TestTimeProvider.ExampleTimestamp);
+    }
+#endif
+
     private static string NoInline(string value)
         => value;
 

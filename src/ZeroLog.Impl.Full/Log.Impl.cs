@@ -6,7 +6,8 @@ namespace ZeroLog;
 partial class Log
 {
     private ILogMessageProvider? _logMessageProvider;
-    private ResolvedLoggerConfiguration _config = ResolvedLoggerConfiguration.Empty;
+
+    internal ResolvedLoggerConfiguration Config { get; private set; } = ResolvedLoggerConfiguration.Empty;
 
     internal void UpdateConfiguration(ILogMessageProvider? provider, ZeroLogConfiguration? config)
         => UpdateConfiguration(provider, config?.ResolveLoggerConfiguration(Name));
@@ -14,8 +15,8 @@ partial class Log
     internal void UpdateConfiguration(ILogMessageProvider? provider, ResolvedLoggerConfiguration? config)
     {
         _logMessageProvider = provider;
-        _config = config ?? ResolvedLoggerConfiguration.Empty;
-        _logLevel = _config.Level;
+        Config = config ?? ResolvedLoggerConfiguration.Empty;
+        _logLevel = Config.Level;
     }
 
     internal void DisableLogging()
@@ -28,14 +29,14 @@ partial class Log
         => level >= _logLevel;
 
     internal Appender[] GetAppenders(LogLevel level)
-        => _config.GetAppenders(level);
+        => Config.GetAppenders(level);
 
     private partial LogMessage InternalAcquireLogMessage(LogLevel level)
     {
         var provider = _logMessageProvider;
 
         var logMessage = provider is not null
-            ? provider.AcquireLogMessage(_config.LogMessagePoolExhaustionStrategy)
+            ? provider.AcquireLogMessage(Config.LogMessagePoolExhaustionStrategy)
             : LogMessage.Empty;
 
         logMessage.Initialize(this, level);
