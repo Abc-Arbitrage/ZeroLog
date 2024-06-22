@@ -26,6 +26,7 @@ internal static class TypeUtil
 
     private static Func<IntPtr, Type?> BuildGetTypeFromHandleFunc()
     {
+        // The GetTypeFromHandleUnsafe method is the preferred way to get a Type from a handle before .NET 7, as it dates back to the .NET Framework.
         var method = typeof(Type).GetMethod("GetTypeFromHandleUnsafe", BindingFlags.Static | BindingFlags.NonPublic, null, [typeof(IntPtr)], null);
         if (method is not null)
         {
@@ -33,6 +34,9 @@ internal static class TypeUtil
             return Lambda<Func<IntPtr, Type?>>(Call(method, param), param).Compile();
         }
 
+        // The GetTypeFromHandleUnsafe method can get trimmed away on .NET 6: ArgIterator is the only type which uses this internal method of the core library,
+        // and since varargs are only supported on non-ARM Windows, GetTypeFromHandleUnsafe will get removed on other platforms such as Linux.
+        // To get around this, we use __reftype to convert the handle, but we need to build a TypedReference equivalent manually.
         return static handle =>
         {
             IL.Push(new TypedReferenceLayout { Value = default, Type = handle });
