@@ -15,7 +15,9 @@ public class PrefixWriterTests
     [TestCase("", "")]
     [TestCase("foo", "foo")]
     [TestCase("%date", "2020-01-02")]
+    [TestCase("%localDate", "2020-01-01")]
     [TestCase("%time", "03:04:05.0060000")]
+    [TestCase("%localTime", "17:04:05.0060000")]
     [TestCase("%level", "INFO")]
     [TestCase("%logger", "Foo.Bar.TestLog")]
     [TestCase("%loggerCompact", "FB.TestLog")]
@@ -31,6 +33,7 @@ public class PrefixWriterTests
     [TestCase("%{level}Bar", "INFOBar")]
     [TestCase("%{level}%{logger}", "INFOFoo.Bar.TestLog")]
     [TestCase("%{date:dd MM yyyy}", "02 01 2020")]
+    [TestCase("%{localDate:dd MM yyyy HH mm ss}", "01 01 2020 17 04 05")]
     [TestCase("%{date:lol}", "lol")]
     [TestCase("%{time:hh\\:mm}", "03:04")]
     [TestCase("%{level:pad}", "INFO ")]
@@ -42,7 +45,12 @@ public class PrefixWriterTests
     [TestCase("abc%{column:10}def%{column:15}ghi", "abc       def  ghi")]
     public void should_write_prefix(string pattern, string expectedResult)
     {
-        var prefixWriter = new PrefixWriter(pattern);
+        var localTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Etc/GMT+10");
+
+        var prefixWriter = new PrefixWriter(pattern)
+        {
+            LocalTimeZone = localTimeZone
+        };
 
         var logMessage = new LogMessage("Foo");
         logMessage.Initialize(new Log("Foo.Bar.TestLog"), LogLevel.Info);

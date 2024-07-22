@@ -30,6 +30,8 @@ internal class PrefixWriter
 
     public string Pattern { get; }
 
+    internal TimeZoneInfo? LocalTimeZone { get; init; } // For unit tests
+
     [SuppressMessage("ReSharper", "ConvertToPrimaryConstructor")]
     public PrefixWriter(string pattern)
     {
@@ -75,7 +77,9 @@ internal class PrefixWriter
             var part = placeholderType.ToLowerInvariant() switch
             {
                 "date"          => new PatternPart(PatternPartType.Date, format),
+                "localdate"     => new PatternPart(PatternPartType.LocalDate, format),
                 "time"          => new PatternPart(PatternPartType.Time, format),
+                "localtime"     => new PatternPart(PatternPartType.LocalTime, format),
                 "thread"        => new PatternPart(PatternPartType.Thread, format),
                 "level"         => new PatternPart(PatternPartType.Level, format),
                 "logger"        => new PatternPart(PatternPartType.Logger, format),
@@ -106,6 +110,7 @@ internal class PrefixWriter
             }
 
             case PatternPartType.Date:
+            case PatternPartType.LocalDate:
             {
                 if (part.Format is not null)
                 {
@@ -113,10 +118,11 @@ internal class PrefixWriter
                     return part;
                 }
 
-                return new PatternPart(PatternPartType.Date, "yyyy-MM-dd", null);
+                return new PatternPart(part.Type, "yyyy-MM-dd", null);
             }
 
             case PatternPartType.Time:
+            case PatternPartType.LocalTime:
             {
                 if (part.Format is not null)
                 {
@@ -124,7 +130,7 @@ internal class PrefixWriter
                     return part;
                 }
 
-                return new PatternPart(PatternPartType.Time, @"hh\:mm\:ss\.fffffff", null);
+                return new PatternPart(part.Type, @"hh\:mm\:ss\.fffffff", null);
             }
 
             case PatternPartType.Level:
@@ -224,9 +230,25 @@ internal class PrefixWriter
                     break;
                 }
 
+                case PatternPartType.LocalDate:
+                {
+                    if (!builder.TryAppend(ToLocalDate(message.Timestamp), part.Format))
+                        goto endOfLoop;
+
+                    break;
+                }
+
                 case PatternPartType.Time:
                 {
                     if (!builder.TryAppend(message.Timestamp.TimeOfDay, part.Format))
+                        goto endOfLoop;
+
+                    break;
+                }
+
+                case PatternPartType.LocalTime:
+                {
+                    if (!builder.TryAppend(ToLocalDate(message.Timestamp).TimeOfDay, part.Format))
                         goto endOfLoop;
 
                     break;
@@ -311,13 +333,18 @@ internal class PrefixWriter
         charsWritten = builder.Length;
     }
 
+    private DateTime ToLocalDate(DateTime value)
+        => LocalTimeZone is not null ? TimeZoneInfo.ConvertTimeFromUtc(value, LocalTimeZone) : value.ToLocalTime();
+
 #endif
 
     private enum PatternPartType
     {
         String,
         Date,
+        LocalDate,
         Time,
+        LocalTime,
         Thread,
         Level,
         Logger,
