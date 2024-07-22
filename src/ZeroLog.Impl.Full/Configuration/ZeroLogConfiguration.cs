@@ -126,9 +126,9 @@ public sealed class ZeroLogConfiguration
     /// The time provider to use for message timestamps.
     /// </summary>
     /// <remarks>
-    /// Default: <see cref="System.TimeProvider.System"/>.
+    /// Default: <c>null</c>, which falls back to <see cref="System.TimeProvider.System"/>.
     /// </remarks>
-    public TimeProvider TimeProvider { get; init; } = TimeProvider.System;
+    public TimeProvider? TimeProvider { get; init; }
 #endif
 
     /// <summary>

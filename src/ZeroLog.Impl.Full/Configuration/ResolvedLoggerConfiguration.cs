@@ -67,7 +67,6 @@ internal sealed class ResolvedLoggerConfiguration
         {
             LogMessagePoolExhaustionStrategy = effectiveLogMessagePoolExhaustionStrategy,
 #if NET8_0_OR_GREATER
-            // ReSharper disable once NullCoalescingConditionIsAlwaysNotNullAccordingToAPIContract
             TimeProvider = configuration.TimeProvider ?? TimeProvider.System
 #endif
         };
