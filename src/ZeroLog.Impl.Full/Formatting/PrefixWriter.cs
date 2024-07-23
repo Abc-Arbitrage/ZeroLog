@@ -195,7 +195,7 @@ internal class PrefixWriter
             yield return new PatternPart(sb.ToString());
     }
 
-#if NETCOREAPP
+#if NET
 
     [SuppressMessage("ReSharper", "ReplaceSliceWithRangeIndexer")]
     public void WritePrefix(LoggedMessage message, Span<char> destination, out int charsWritten)

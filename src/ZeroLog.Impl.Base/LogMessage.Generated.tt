@@ -24,7 +24,7 @@ partial class LogMessage
         if (type.isNetCoreOnly)
         {
 #>
-#if NETCOREAPP
+#if NET
 
 <#
         }
@@ -125,7 +125,7 @@ partial class LogMessage
             if (type.isNetCoreOnly)
             {
 #>
-#if NETCOREAPP
+#if NET
 
 <#
             }

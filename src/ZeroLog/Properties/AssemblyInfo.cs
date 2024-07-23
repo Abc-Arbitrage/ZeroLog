@@ -5,6 +5,6 @@ using ZeroLog;
 [assembly: InternalsVisibleTo($"ZeroLog.Tests.NetStandard, PublicKey={AssemblyData.PublicKey}")]
 [assembly: InternalsVisibleTo($"ZeroLog.Benchmarks, PublicKey={AssemblyData.PublicKey}")]
 
-#if NETCOREAPP
+#if NET
 [module: SkipLocalsInit]
 #endif

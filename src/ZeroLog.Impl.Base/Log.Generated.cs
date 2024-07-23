@@ -906,7 +906,7 @@ partial class Log
         public void AppendFormatted(TimeSpan? value, string format)
             => Message.InternalAppendValueType(value, format, ArgumentType.TimeSpan);
 
-#if NETCOREAPP
+#if NET
 
         /// <summary>
         /// Appends a value of type <c>DateOnly</c> to the handler.
@@ -940,7 +940,7 @@ partial class Log
 
 #endif
 
-#if NETCOREAPP
+#if NET
 
         /// <summary>
         /// Appends a value of type <c>TimeOnly</c> to the handler.
@@ -1588,7 +1588,7 @@ partial class Log
         public void AppendFormatted(TimeSpan? value, string format)
             => Message.InternalAppendValueType(value, format, ArgumentType.TimeSpan);
 
-#if NETCOREAPP
+#if NET
 
         /// <summary>
         /// Appends a value of type <c>DateOnly</c> to the handler.
@@ -1622,7 +1622,7 @@ partial class Log
 
 #endif
 
-#if NETCOREAPP
+#if NET
 
         /// <summary>
         /// Appends a value of type <c>TimeOnly</c> to the handler.
@@ -2270,7 +2270,7 @@ partial class Log
         public void AppendFormatted(TimeSpan? value, string format)
             => Message.InternalAppendValueType(value, format, ArgumentType.TimeSpan);
 
-#if NETCOREAPP
+#if NET
 
         /// <summary>
         /// Appends a value of type <c>DateOnly</c> to the handler.
@@ -2304,7 +2304,7 @@ partial class Log
 
 #endif
 
-#if NETCOREAPP
+#if NET
 
         /// <summary>
         /// Appends a value of type <c>TimeOnly</c> to the handler.
@@ -2952,7 +2952,7 @@ partial class Log
         public void AppendFormatted(TimeSpan? value, string format)
             => Message.InternalAppendValueType(value, format, ArgumentType.TimeSpan);
 
-#if NETCOREAPP
+#if NET
 
         /// <summary>
         /// Appends a value of type <c>DateOnly</c> to the handler.
@@ -2986,7 +2986,7 @@ partial class Log
 
 #endif
 
-#if NETCOREAPP
+#if NET
 
         /// <summary>
         /// Appends a value of type <c>TimeOnly</c> to the handler.
@@ -3634,7 +3634,7 @@ partial class Log
         public void AppendFormatted(TimeSpan? value, string format)
             => Message.InternalAppendValueType(value, format, ArgumentType.TimeSpan);
 
-#if NETCOREAPP
+#if NET
 
         /// <summary>
         /// Appends a value of type <c>DateOnly</c> to the handler.
@@ -3668,7 +3668,7 @@ partial class Log
 
 #endif
 
-#if NETCOREAPP
+#if NET
 
         /// <summary>
         /// Appends a value of type <c>TimeOnly</c> to the handler.
@@ -4316,7 +4316,7 @@ partial class Log
         public void AppendFormatted(TimeSpan? value, string format)
             => Message.InternalAppendValueType(value, format, ArgumentType.TimeSpan);
 
-#if NETCOREAPP
+#if NET
 
         /// <summary>
         /// Appends a value of type <c>DateOnly</c> to the handler.
@@ -4350,7 +4350,7 @@ partial class Log
 
 #endif
 
-#if NETCOREAPP
+#if NET
 
         /// <summary>
         /// Appends a value of type <c>TimeOnly</c> to the handler.
