@@ -45,11 +45,9 @@ public class PrefixWriterTests
     [TestCase("abc%{column:10}def%{column:15}ghi", "abc       def  ghi")]
     public void should_write_prefix(string pattern, string expectedResult)
     {
-        var localTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Etc/GMT+10");
-
         var prefixWriter = new PrefixWriter(pattern)
         {
-            LocalTimeZone = localTimeZone
+            LocalTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Etc/GMT+10")
         };
 
         var logMessage = new LogMessage("Foo");
@@ -64,7 +62,9 @@ public class PrefixWriterTests
 
     [Test]
     [TestCase("%{date:\\}")]
+    [TestCase("%{localDate:\\}")]
     [TestCase("%{time:\\}")]
+    [TestCase("%{localTime:\\}")]
     [TestCase("%{level:-3}")]
     [TestCase("%{level:lol}")]
     [TestCase("%{logger:-3}")]
@@ -81,6 +81,43 @@ public class PrefixWriterTests
     {
         Assert.Throws<FormatException>(() => _ = new PrefixWriter(pattern));
         PrefixWriter.IsValidPattern(pattern).ShouldBeFalse();
+    }
+
+    [Test]
+    [TestCase("")]
+    [TestCase("foo")]
+    [TestCase("%date")]
+    [TestCase("%localDate")]
+    [TestCase("%time")]
+    [TestCase("%localTime")]
+    [TestCase("%thread")]
+    [TestCase("%level")]
+    [TestCase("%logger")]
+    [TestCase("%loggerCompact")]
+    [TestCase("%newline")]
+    [TestCase("abc%{column:10}def")]
+    [TestCase("foo %level bar %logger baz")]
+    [TestCase("%{date:dd MM yyyy HH mm ss}")]
+    [TestCase("%{localDate:dd MM yyyy HH mm ss}")]
+    [TestCase("%{level:pad}")]
+    public void should_not_allocate(string pattern)
+    {
+        var prefixWriter = new PrefixWriter(pattern);
+
+        var logMessage = new LogMessage("Foo");
+        logMessage.Initialize(new Log("Foo.Bar.TestLog"), LogLevel.Info);
+        logMessage.Timestamp = new DateTime(2020, 01, 02, 03, 04, 05, 06);
+
+        var buffer = new char[256];
+        var formattedLogMessage = new LoggedMessage(256, ZeroLogConfiguration.Default);
+        formattedLogMessage.SetMessage(logMessage);
+
+        GcTester.ShouldNotAllocate(() =>
+        {
+            prefixWriter.WritePrefix(formattedLogMessage, buffer, out _);
+        });
+
+        PrefixWriter.IsValidPattern(pattern).ShouldBeTrue();
     }
 
     [Test, RequiresThread]
