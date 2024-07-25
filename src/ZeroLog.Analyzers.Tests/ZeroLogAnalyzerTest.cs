@@ -6,7 +6,6 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Testing;
-using Microsoft.CodeAnalysis.Testing.Verifiers;
 
 namespace ZeroLog.Analyzers.Tests;
 
@@ -18,14 +17,14 @@ internal static class ZeroLogAnalyzerTest
         Path.Combine("ref", "net8.0")
     );
 
-    public static void ConfigureTest(AnalyzerTest<NUnitVerifier> test)
+    public static void ConfigureTest(AnalyzerTest<DefaultVerifier> test)
     {
         test.ReferenceAssemblies = _netReferenceAssemblies;
         test.TestState.AdditionalReferences.Add(typeof(LogManager).Assembly);
     }
 }
 
-internal abstract class ZeroLogAnalyzerTest<TAnalyzer> : CSharpAnalyzerTest<TAnalyzer, NUnitVerifier>
+internal abstract class ZeroLogAnalyzerTest<TAnalyzer> : CSharpAnalyzerTest<TAnalyzer, DefaultVerifier>
     where TAnalyzer : DiagnosticAnalyzer, new()
 {
     [StringSyntax("csharp")]
@@ -45,7 +44,7 @@ internal abstract class ZeroLogAnalyzerTest<TAnalyzer> : CSharpAnalyzerTest<TAna
         => ((CSharpParseOptions)base.CreateParseOptions()).WithLanguageVersion(LanguageVersion);
 }
 
-internal abstract class ZeroLogCodeFixTest<TAnalyzer, TCodeFix> : CSharpCodeFixTest<TAnalyzer, TCodeFix, NUnitVerifier>
+internal abstract class ZeroLogCodeFixTest<TAnalyzer, TCodeFix> : CSharpCodeFixTest<TAnalyzer, TCodeFix, DefaultVerifier>
     where TAnalyzer : DiagnosticAnalyzer, new()
     where TCodeFix : CodeFixProvider, new()
 {
