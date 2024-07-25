@@ -130,16 +130,18 @@ The output format of the built-in appenders may be customized through the `Forma
 
 The prefix pattern is a string with the following placeholders:
 
-| Placeholder      | Effect                                                        | Format                                                     | 
-|------------------|---------------------------------------------------------------|------------------------------------------------------------|
-| `%date`          | The message UTC date                                          | A `DateTime` format string, default: `yyyy-MM-dd`          |
-| `%time`          | The message UTC timestamp                                     | A `TimeSpan` format string, default: `hh\:mm\:ss\.fffffff` |
-| `%thread`        | The thread name (or ID) which logged the message              |                                                            |
-| `%level`         | The log level in uppercase                                    | `pad` is equivalent to `5` (the longest level length)      |
-| `%logger`        | The logger name                                               |                                                            | 
-| `%loggerCompact` | The logger name, with the namespace shortened to its initials |                                                            | 
-| `%newline`       | Equivalent to `Environment.NewLine`                           |                                                            | 
-| `%column`        | Inserts padding spaces until a given column index             | The column index to reach                                  | 
+| Placeholder      | Effect                                                           | Format                                                     | 
+|------------------|------------------------------------------------------------------|------------------------------------------------------------|
+| `%date`          | The message date in UTC (recommended, also contains time of day) | A `DateTime` format string, default: `yyyy-MM-dd`          |
+| `%localDate`     | The message date converted to the local time zone                | A `DateTime` format string, default: `yyyy-MM-dd`          |
+| `%time`          | The message time of day (in UTC)                                 | A `TimeSpan` format string, default: `hh\:mm\:ss\.fffffff` |
+| `%localTime`     | The message time of day (converted to the local time zone)       | A `TimeSpan` format string, default: `hh\:mm\:ss\.fffffff` |
+| `%thread`        | The thread name (or ID) which logged the message                 |                                                            |
+| `%level`         | The log level in uppercase                                       | `pad` is equivalent to `5` (the longest level length)      |
+| `%logger`        | The logger name                                                  |                                                            | 
+| `%loggerCompact` | The logger name, with the namespace shortened to its initials    |                                                            | 
+| `%newline`       | Equivalent to `Environment.NewLine`                              |                                                            | 
+| `%column`        | Inserts padding spaces until a given column index                | The column index to reach                                  | 
 
 Prefixes can be written in the form `%{prefix}` or `%{prefix:format}` to define a format string. String placeholders accept an integer format string which defines their minimum length. For instance, `%{logger:20}` will always be at least 20 characters wide.
 
