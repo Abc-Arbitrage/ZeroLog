@@ -4,7 +4,7 @@ on: [ push, pull_request ]
 env:
   DOTNET_NOLOGO: 1
   NUGET_CERT_REVOCATION_MODE: offline
-  BUILD_DOTNET_VERSION: 8.0.x
+  BUILD_DOTNET_VERSION: 9.0.x
 
 jobs:
   windows:
