@@ -9,6 +9,7 @@
     <DebugType>embedded</DebugType>
     <IsPackable>false</IsPackable>
     <Deterministic>true</Deterministic>
+    <NuGetAuditMode>direct</NuGetAuditMode>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)ZeroLog.snk</AssemblyOriginatorKeyFile>
     <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' != ''">true</ContinuousIntegrationBuild>
@@ -34,7 +35,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="JetBrains.Annotations" Version="2024.2.0" PrivateAssets="all" />
+    <PackageReference Include="JetBrains.Annotations" Version="2024.3.0" PrivateAssets="all" />
   </ItemGroup>
 
 </Project>
