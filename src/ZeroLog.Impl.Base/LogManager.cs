@@ -20,6 +20,9 @@ public sealed partial class LogManager
     /// </remarks>
     /// <typeparam name="T">The type.</typeparam>
     public static Log GetLogger<T>()
+#if NET9_0_OR_GREATER
+        where T : allows ref struct
+#endif
         => GetLogger(typeof(T));
 
     /// <summary>

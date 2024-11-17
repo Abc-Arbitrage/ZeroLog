@@ -7,6 +7,9 @@ namespace ZeroLog.Tests.Support;
 
 #nullable enable
 
+#if NET6_0_OR_GREATER
+[System.Diagnostics.StackTraceHidden]
+#endif
 internal static class AssertExtensions
 {
     public static void ShouldEqual<T>(this T? actual, T? expected)

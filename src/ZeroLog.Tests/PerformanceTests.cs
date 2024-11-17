@@ -55,7 +55,7 @@ public class PerformanceTests
         var signal = _testAppender.SetMessageCountTarget(totalMessageCount);
         var utcNow = DateTime.UtcNow;
 
-        Parallel.For(0, threadCount, i =>
+        Parallel.For(0, threadCount, _ =>
         {
             for (var k = 0; k < threadMessageCount; k++)
             {
