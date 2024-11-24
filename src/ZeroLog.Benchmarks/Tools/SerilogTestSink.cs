@@ -1,15 +1,14 @@
-﻿using System;
+﻿using Serilog.Core;
+using Serilog.Events;
 using System.Collections.Generic;
 using System.Threading;
-using Serilog.Core;
-using Serilog.Events;
 
 namespace ZeroLog.Benchmarks.Tools;
 
 public class SerilogTestSink : ILogEventSink
 {
     private readonly bool _captureLoggedMessages;
-    private readonly object _lock = new();
+    private readonly Lock _lock = new();
     private int _messageCount;
     private ManualResetEventSlim _signal;
     private int _messageCountTarget;

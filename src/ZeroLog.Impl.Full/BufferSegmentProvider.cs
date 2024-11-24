@@ -4,12 +4,7 @@ namespace ZeroLog;
 
 internal unsafe class BufferSegmentProvider
 {
-#if NET9_0_OR_GREATER
-    private readonly System.Threading.Lock _lock = new();
-#else
-    private readonly object _lock = new();
-#endif
-
+    private readonly Lock _lock = LockFactory.Create();
     private readonly int _segmentCount;
     private readonly int _segmentSize;
 
