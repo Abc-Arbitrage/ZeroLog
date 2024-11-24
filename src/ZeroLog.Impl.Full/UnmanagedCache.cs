@@ -31,12 +31,7 @@ internal static unsafe class UnmanagedCache
         ZeroLogConfiguration config
     );
 
-#if NET9_0_OR_GREATER
-    private static readonly System.Threading.Lock _lock = new();
-#else
-    private static readonly object _lock = new();
-#endif
-
+    private static readonly Lock _lock = LockFactory.Create();
     private static readonly Dictionary<IntPtr, FormatterDelegate> _unmanagedStructs = new();
     private static readonly MethodInfo _registerMethod = typeof(UnmanagedCache).GetMethod(nameof(Register), Type.EmptyTypes)!;
 
