@@ -310,11 +310,7 @@ internal sealed class AsyncRunner : Runner
 
 internal sealed class SyncRunner(ZeroLogConfiguration config) : Runner(config)
 {
-#if NET9_0_OR_GREATER
     private readonly Lock _lock = new();
-#else
-    private readonly object _lock = new();
-#endif
 
     public override void Submit(LogMessage message)
     {
