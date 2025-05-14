@@ -355,6 +355,12 @@ public class DefaultFormatterTests
         GetFormattedSimple().ShouldEqual("""FooBar ~~ { "Hello": "Friday", "World": "Saturday", "Null": null }""");
     }
 
+    [Test]
+    public void should_escape_prefix()
+    {
+        DefaultFormatter.EscapePlaceholders("foo%bar").ShouldEqual("foo%%bar");
+    }
+
     private string GetFormattedFull()
     {
         var message = new LoggedMessage(_bufferLength, ZeroLogConfiguration.Default);

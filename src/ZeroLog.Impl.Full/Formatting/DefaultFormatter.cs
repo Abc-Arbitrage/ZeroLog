@@ -38,6 +38,7 @@ public sealed class DefaultFormatter : Formatter
     /// <item><term><c>%loggerCompact</c></term><description>The logger name, with the namespace shortened to its initials.</description></item>
     /// <item><term><c>%newline</c></term><description>Equivalent to <c>Environment.NewLine</c>.</description></item>
     /// <item><term><c>%column</c></term><description>Inserts padding spaces until the column index specified in the format string is reached.</description></item>
+    /// <item><term><c>%%</c></term><description>Inserts a single '%' character (escaping).</description></item>
     /// </list>
     /// </para>
     /// <para>
@@ -58,6 +59,16 @@ public sealed class DefaultFormatter : Formatter
     /// The separator to write before the JSON metadata.
     /// </summary>
     public string JsonSeparator { get; init; } = " ~~ ";
+
+    /// <summary>
+    /// Escapes the provided value so it can be used in <see cref="PrefixPattern"/> without triggering placeholders.
+    /// </summary>
+    /// <remarks>
+    /// This replaces <c>%</c> with <c>%%</c>.
+    /// </remarks>
+    /// <param name="value">The value to escape.</param>
+    public static string EscapePlaceholders(string? value)
+        => PrefixWriter.EscapePattern(value);
 
     /// <inheritdoc/>
     protected override void WriteMessage(LoggedMessage message)

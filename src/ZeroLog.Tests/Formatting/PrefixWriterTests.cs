@@ -14,6 +14,7 @@ public class PrefixWriterTests
     [Test]
     [TestCase("", "")]
     [TestCase("foo", "foo")]
+    [TestCase("%%", "%")]
     [TestCase("%date", "2020-01-02")]
     [TestCase("%localDate", "2020-01-01")]
     [TestCase("%time", "03:04:05.0060000")]
@@ -43,6 +44,12 @@ public class PrefixWriterTests
     [TestCase("%{logger:18}", "Foo.Bar.TestLog   ")]
     [TestCase("%{loggerCompact:12}", "FB.TestLog  ")]
     [TestCase("abc%{column:10}def%{column:15}ghi", "abc       def  ghi")]
+    [TestCase("%%level", "%level")]
+    [TestCase("%%%level", "%INFO")]
+    [TestCase("%%{level}", "%{level}")]
+    [TestCase("foo%%{level}bar", "foo%{level}bar")]
+    [TestCase("%%%{level}", "%INFO")]
+    [TestCase("foo%%%{level}Bar", "foo%INFOBar")]
     public void should_write_prefix(string pattern, string expectedResult)
     {
         var prefixWriter = new PrefixWriter(pattern)
@@ -86,6 +93,7 @@ public class PrefixWriterTests
     [Test]
     [TestCase("")]
     [TestCase("foo")]
+    [TestCase("%%")]
     [TestCase("%date")]
     [TestCase("%localDate")]
     [TestCase("%time")]
@@ -166,6 +174,15 @@ public class PrefixWriterTests
         var result = GetResult(prefixWriter, logMessage);
         result.ShouldEqual($"[{Environment.NewLine}]");
     }
+
+    [Test]
+    [TestCase(null, "")]
+    [TestCase("", "")]
+    [TestCase("foo", "foo")]
+    [TestCase("%foo", "%%foo")]
+    [TestCase("%foo %%bar", "%%foo %%%%bar")]
+    public void should_escape_pattern(string pattern, string expectedResult)
+        => PrefixWriter.EscapePattern(pattern).ShouldEqual(expectedResult);
 
     private static string GetResult(PrefixWriter prefixWriter, LogMessage logMessage)
     {

@@ -125,6 +125,7 @@ namespace ZeroLog.Formatting
         public string JsonSeparator { get; init; }
         public string PrefixPattern { get; init; }
         protected override void WriteMessage(ZeroLog.Formatting.LoggedMessage message) { }
+        public static string EscapePlaceholders(string? value) { }
     }
     public abstract class Formatter
     {

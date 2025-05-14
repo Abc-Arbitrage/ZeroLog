@@ -13,7 +13,7 @@ internal class PrefixWriter
     private static readonly Regex _patternRegex = new(
         """
         %(?:
-            (?<type>\w+)
+            (?<type>\w+|%)
             |
             \{
                 \s* (?<type>\w+) \s*
@@ -55,6 +55,9 @@ internal class PrefixWriter
         }
     }
 
+    public static string EscapePattern(string? value)
+        => value?.Replace("%", "%%") ?? string.Empty;
+
     private static IEnumerable<PatternPart> ParsePattern(string pattern)
     {
         var position = 0;
@@ -86,6 +89,7 @@ internal class PrefixWriter
                 "loggercompact" => new PatternPart(PatternPartType.LoggerCompact, format),
                 "newline"       => new PatternPart(PatternPartType.NewLine, format),
                 "column"        => new PatternPart(PatternPartType.Column, format),
+                "%"             => new PatternPart("%"),
                 _               => throw new FormatException($"Invalid placeholder type: %{placeholderType}")
             };
 
