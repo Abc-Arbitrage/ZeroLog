@@ -392,7 +392,7 @@ partial class Log
             => Message.InternalAppendStringSpan(value);
 
         /// <summary>
-        /// Appends an UTF-8 string represented by a <c>ReadOnlySpanReadOnlySpan&lt;byte&gt;</c> to the handler.
+        /// Appends a UTF-8 string represented by a <c>ReadOnlySpanReadOnlySpan&lt;byte&gt;</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(ReadOnlySpan<byte> value)
@@ -1074,7 +1074,7 @@ partial class Log
             => Message.InternalAppendStringSpan(value);
 
         /// <summary>
-        /// Appends an UTF-8 string represented by a <c>ReadOnlySpanReadOnlySpan&lt;byte&gt;</c> to the handler.
+        /// Appends a UTF-8 string represented by a <c>ReadOnlySpanReadOnlySpan&lt;byte&gt;</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(ReadOnlySpan<byte> value)
@@ -1756,7 +1756,7 @@ partial class Log
             => Message.InternalAppendStringSpan(value);
 
         /// <summary>
-        /// Appends an UTF-8 string represented by a <c>ReadOnlySpanReadOnlySpan&lt;byte&gt;</c> to the handler.
+        /// Appends a UTF-8 string represented by a <c>ReadOnlySpanReadOnlySpan&lt;byte&gt;</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(ReadOnlySpan<byte> value)
@@ -2438,7 +2438,7 @@ partial class Log
             => Message.InternalAppendStringSpan(value);
 
         /// <summary>
-        /// Appends an UTF-8 string represented by a <c>ReadOnlySpanReadOnlySpan&lt;byte&gt;</c> to the handler.
+        /// Appends a UTF-8 string represented by a <c>ReadOnlySpanReadOnlySpan&lt;byte&gt;</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(ReadOnlySpan<byte> value)
@@ -3120,7 +3120,7 @@ partial class Log
             => Message.InternalAppendStringSpan(value);
 
         /// <summary>
-        /// Appends an UTF-8 string represented by a <c>ReadOnlySpanReadOnlySpan&lt;byte&gt;</c> to the handler.
+        /// Appends a UTF-8 string represented by a <c>ReadOnlySpanReadOnlySpan&lt;byte&gt;</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(ReadOnlySpan<byte> value)
@@ -3802,7 +3802,7 @@ partial class Log
             => Message.InternalAppendStringSpan(value);
 
         /// <summary>
-        /// Appends an UTF-8 string represented by a <c>ReadOnlySpanReadOnlySpan&lt;byte&gt;</c> to the handler.
+        /// Appends a UTF-8 string represented by a <c>ReadOnlySpanReadOnlySpan&lt;byte&gt;</c> to the handler.
         /// </summary>
         /// <param name="value">The value to append.</param>
         public void AppendFormatted(ReadOnlySpan<byte> value)

@@ -225,7 +225,7 @@ internal sealed class AsyncRunner : Runner
         {
             try
             {
-                Console.Error.WriteLine("Fatal error in ZeroLog." + nameof(WriteThread) + ":");
+                Console.Error.WriteLine("Fatal error in ZeroLog. " + nameof(WriteThread) + ":");
                 Console.Error.WriteLine(ex);
 
                 Dispose();

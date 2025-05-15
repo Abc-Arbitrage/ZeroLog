@@ -50,7 +50,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends an UTF-8 string to the message. This will copy the span and use buffer space.
+    /// Appends a UTF-8 string to the message. This will copy the span and use buffer space.
     /// </summary>
     /// <param name="value">The value to append.</param>
     public LogMessage Append(ReadOnlySpan<byte> value)

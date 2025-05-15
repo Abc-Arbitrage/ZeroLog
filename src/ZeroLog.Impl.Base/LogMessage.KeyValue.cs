@@ -54,7 +54,7 @@ partial class LogMessage
     }
 
     /// <summary>
-    /// Appends an UTF-8 string to the message metadata. This will copy the span and use buffer space.
+    /// Appends a UTF-8 string to the message metadata. This will copy the span and use buffer space.
     /// </summary>
     /// <param name="key">The key.</param>
     /// <param name="value">The value.</param>
