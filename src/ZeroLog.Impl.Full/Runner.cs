@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
@@ -21,6 +22,7 @@ internal abstract class Runner : ILogMessageProvider, IDisposable
     private Appender[] _appenders;
     private bool _previouslyAcquiredPoolExhaustedMessage;
 
+    protected ZeroLogConfiguration Configuration => _config;
     protected bool IsRunning { get; private set; }
 
     protected Runner(ZeroLogConfiguration config)
@@ -107,7 +109,7 @@ internal abstract class Runner : ILogMessageProvider, IDisposable
             case LogMessagePoolExhaustionStrategy.Allocate:
             {
                 message = _pool.CreateObject();
-                message.ReturnToPool = true; // Will only be returned to the pool if its not full.
+                message.ReturnToPool = true; // Will only be returned to the pool if it's not full.
                 return message;
             }
 
@@ -184,6 +186,8 @@ internal sealed class AsyncRunner : Runner
 
     private ZeroLogConfiguration? _nextConfig;
 
+    internal Thread Thread => _thread;
+
     public AsyncRunner(ZeroLogConfiguration config)
         : base(config)
     {
@@ -193,7 +197,6 @@ internal sealed class AsyncRunner : Runner
 
         _thread = new Thread(WriteThread)
         {
-            Name = $"{nameof(ZeroLog)}.{nameof(AsyncRunner)}",
             IsBackground = true
         };
 
@@ -219,22 +222,53 @@ internal sealed class AsyncRunner : Runner
     {
         try
         {
+            ConfigureThread();
+        }
+        catch (Exception ex)
+        {
+            try
+            {
+                Console.Error.WriteLine($"Error in ZeroLog thread initializer ({nameof(ZeroLogConfiguration.LoggingThreadInitializer)}):");
+                Console.Error.WriteLine(ex);
+            }
+            catch
+            {
+                // Don't kill the process (ex.ToString() could throw for instance).
+                // Initializer failure is not fatal, continue running the thread.
+            }
+        }
+
+        try
+        {
             WriteToAppenders();
         }
         catch (Exception ex)
         {
             try
             {
-                Console.Error.WriteLine("Fatal error in ZeroLog. " + nameof(WriteThread) + ":");
+                Console.Error.WriteLine($"Fatal error in ZeroLog. {nameof(WriteThread)}:");
                 Console.Error.WriteLine(ex);
 
                 Dispose();
             }
             catch
             {
-                // Don't kill the process
+                // Don't kill the process.
             }
         }
+    }
+
+    private void ConfigureThread()
+    {
+        Debug.Assert(_thread == Thread.CurrentThread);
+
+        if (Configuration.LoggingThreadInitializer is { } initializer)
+        {
+            var config = new ThreadConfiguration(_thread);
+            initializer.Invoke(config);
+        }
+
+        _thread.Name ??= "ZeroLog.Logger";
     }
 
     private void WriteToAppenders()

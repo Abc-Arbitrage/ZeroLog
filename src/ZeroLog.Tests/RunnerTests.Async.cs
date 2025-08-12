@@ -25,6 +25,11 @@ public class AsyncRunnerTests
             LogMessagePoolSize = 10,
             LogMessageBufferSize = 256,
             AppendingStrategy = AppendingStrategy.Asynchronous,
+            LoggingThreadInitializer = cfg =>
+            {
+                cfg.Thread.Name = "TestLoggingThread";
+                cfg.Thread.Priority = ThreadPriority.BelowNormal;
+            },
             RootLogger =
             {
                 Appenders = { _testAppender }
@@ -117,5 +122,15 @@ public class AsyncRunnerTests
         _runner.AcquireLogMessage(LogMessagePoolExhaustionStrategy.DropLogMessageAndNotifyAppenders).ConstantMessage!.ShouldContain("Log message pool is exhausted");
         _runner.AcquireLogMessage(LogMessagePoolExhaustionStrategy.DropLogMessageAndNotifyAppenders).ShouldBeTheSameAs(LogMessage.Empty);
         _runner.AcquireLogMessage(LogMessagePoolExhaustionStrategy.DropLogMessageAndNotifyAppenders).ShouldBeTheSameAs(LogMessage.Empty);
+    }
+
+    [Test]
+    public void should_configure_logging_thread()
+    {
+        _log.Info("Foo");
+        Wait.Until(() => _testAppender.FlushCount >= 1, TimeSpan.FromSeconds(1));
+
+        _runner.Thread.Name.ShouldEqual("TestLoggingThread");
+        _runner.Thread.Priority.ShouldEqual(ThreadPriority.BelowNormal);
     }
 }

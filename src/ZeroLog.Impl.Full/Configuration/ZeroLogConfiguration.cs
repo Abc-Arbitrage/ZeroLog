@@ -67,6 +67,15 @@ public sealed class ZeroLogConfiguration
     }
 
     /// <summary>
+    /// A callback which is invoked on the background logging thread right after it is started.
+    /// </summary>
+    /// <remarks>
+    /// This can be used to configure the background thread used when <see cref="AppendingStrategy"/> is <see cref="Configuration.AppendingStrategy.Asynchronous"/>.
+    /// It is especially useful for setting its thread affinity (pinning the thread) or priority.
+    /// </remarks>
+    public Action<ThreadConfiguration>? LoggingThreadInitializer { get; init; }
+
+    /// <summary>
     /// Determines the way log messages are formatted and passed to appenders.
     /// </summary>
     /// <remarks>
