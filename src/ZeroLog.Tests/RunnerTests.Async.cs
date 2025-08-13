@@ -153,4 +153,29 @@ public class AsyncRunnerTests
         _runner.Thread.Name.ShouldEqual("TestLoggingThread");
         _runner.Thread.Priority.ShouldEqual(ThreadPriority.BelowNormal);
     }
+
+    [Test]
+    public void should_not_deadlock_when_logging_from_thread_initializer()
+    {
+        var messageCount = _config.LogMessagePoolSize + 10;
+        var initSignal = new ManualResetEventSlim(false);
+
+        _loggingThreadInitializer = _ =>
+        {
+            for (var i = 0; i < messageCount; ++i)
+                _log.Info($"Init {i}");
+
+            initSignal.Set();
+        };
+
+        _config.RootLogger.LogMessagePoolExhaustionStrategy = LogMessagePoolExhaustionStrategy.WaitUntilAvailable;
+
+        Start();
+
+        initSignal.Wait(TimeSpan.FromSeconds(1)).ShouldBeTrue();
+        _runner.Flush();
+
+        // Make sure we drop messages logged from the thread initializer which we cannot handle
+        _testAppender.LoggedMessages.Count.ShouldEqual(_config.LogMessagePoolSize);
+    }
 }

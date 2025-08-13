@@ -99,7 +99,7 @@ internal abstract class Runner : ILogMessageProvider, IDisposable
                         return message;
                     }
 
-                    if (!IsRunning)
+                    if (!ShouldWaitUntilAvailable())
                         return LogMessage.Empty;
                 }
             }
@@ -138,6 +138,9 @@ internal abstract class Runner : ILogMessageProvider, IDisposable
     internal virtual void WaitUntilNewConfigurationIsApplied() // For unit tests
     {
     }
+
+    protected virtual bool ShouldWaitUntilAvailable()
+        => IsRunning;
 
     protected void ProcessMessage(LogMessage message)
     {
@@ -235,6 +238,9 @@ internal sealed class AsyncRunner : Runner
         while (Volatile.Read(ref _nextConfig) != null)
             Thread.Yield();
     }
+
+    protected override bool ShouldWaitUntilAvailable()
+        => base.ShouldWaitUntilAvailable() && Thread.CurrentThread != _thread;
 
     private void WriteThread()
     {
