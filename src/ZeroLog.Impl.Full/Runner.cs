@@ -35,8 +35,6 @@ internal abstract class Runner : ILogMessageProvider, IDisposable
         _appenders = config.GetAllAppenders().ToArray();
 
         _loggedMessage = new LoggedMessage(LogManager.OutputBufferSize, _config);
-
-        IsRunning = true;
     }
 
     public void Dispose()
@@ -118,11 +116,24 @@ internal abstract class Runner : ILogMessageProvider, IDisposable
         }
     }
 
+    public virtual void Start()
+    {
+        if (IsRunning)
+            throw new InvalidOperationException("Runner is already started.");
+
+        IsRunning = true;
+    }
+
+    protected virtual void Stop()
+    {
+        // IsRunning is set to false in Dispose, but set it here as well for clarity.
+        IsRunning = false;
+    }
+
     public abstract void Submit(LogMessage message);
 
     public abstract void UpdateConfiguration(ZeroLogConfiguration newConfig);
     public abstract void Flush();
-    protected abstract void Stop();
 
     internal virtual void WaitUntilNewConfigurationIsApplied() // For unit tests
     {
@@ -199,12 +210,19 @@ internal sealed class AsyncRunner : Runner
         {
             IsBackground = true
         };
+    }
 
+    public override void Start()
+    {
+        base.Start();
         _thread.Start();
     }
 
     protected override void Stop()
-        => _thread.Join();
+    {
+        base.Stop();
+        _thread.Join();
+    }
 
     public override void Submit(LogMessage message)
         => _queue.Enqueue(message);
@@ -371,9 +389,5 @@ internal sealed class SyncRunner(ZeroLogConfiguration config) : Runner(config)
             // but the lock can cause an observable delay, so do it anyway.
             FlushAppenders();
         }
-    }
-
-    protected override void Stop()
-    {
     }
 }
