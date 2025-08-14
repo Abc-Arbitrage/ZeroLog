@@ -98,6 +98,10 @@ namespace ZeroLog.Configuration
         public ZeroLog.LogLevel Level { get; set; }
         public ZeroLog.Configuration.LogMessagePoolExhaustionStrategy LogMessagePoolExhaustionStrategy { get; set; }
     }
+    public sealed class ThreadConfiguration
+    {
+        public System.Threading.Thread Thread { get; }
+    }
     public sealed class ZeroLogConfiguration
     {
         public ZeroLogConfiguration() { }
@@ -111,6 +115,7 @@ namespace ZeroLog.Configuration
         public int LogMessageBufferSize { get; init; }
         public int LogMessagePoolSize { get; init; }
         public int LogMessageStringCapacity { get; init; }
+        public System.Action<ZeroLog.Configuration.ThreadConfiguration>? LoggingThreadInitializer { get; init; }
         public System.TimeProvider? TimeProvider { get; init; }
         public bool UseBackgroundThread { get; init; }
         public void ApplyChanges() { }

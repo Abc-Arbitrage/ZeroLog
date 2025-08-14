@@ -39,6 +39,8 @@ partial class LogManager : IDisposable
             _                              => throw new ArgumentException("Unknown execution mode")
         };
 
+        _runner.Start();
+
         UpdateAllLogConfigurations();
         _userConfig.ApplyChangesRequested += ApplyConfigurationChanges;
     }

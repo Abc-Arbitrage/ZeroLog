@@ -5,6 +5,8 @@ using ZeroLog.Tests.Support;
 namespace ZeroLog.Tests;
 
 [TestFixture]
+[Parallelizable(ParallelScope.All)]
+[FixtureLifeCycle(LifeCycle.InstancePerTestCase)]
 public class SyncRunnerTests
 {
     private TestAppender _testAppender;
@@ -12,7 +14,7 @@ public class SyncRunnerTests
     private Log _log;
 
     [SetUp]
-    public void SetUpFixture()
+    public void SetUp()
     {
         _testAppender = new TestAppender(true);
 
@@ -31,10 +33,12 @@ public class SyncRunnerTests
 
         _log = new Log(nameof(SyncRunnerTests));
         _log.UpdateConfiguration(_runner, config);
+
+        _runner.Start();
     }
 
     [TearDown]
-    public void Teardown()
+    public void TearDown()
     {
         _runner.Dispose();
     }

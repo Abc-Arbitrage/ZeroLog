@@ -11,6 +11,7 @@
   ZeroLog.Configuration.LoggerConfiguration,
   ZeroLog.Configuration.LogMessagePoolExhaustionStrategy,
   ZeroLog.Configuration.RootLoggerConfiguration,
+  ZeroLog.Configuration.ThreadConfiguration,
   ZeroLog.Configuration.ZeroLogConfiguration,
   ZeroLog.Formatting.DefaultFormatter,
   ZeroLog.Formatting.Formatter,
