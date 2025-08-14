@@ -50,6 +50,9 @@ public class PrefixWriterTests
     [TestCase("foo%%{level}bar", "foo%{level}bar")]
     [TestCase("%%%{level}", "%INFO")]
     [TestCase("foo%%%{level}Bar", "foo%INFOBar")]
+    [TestCase("%{%}", "%{%}")]
+    [TestCase("%{%:%}", "%{%:%}")]
+    [TestCase("%%{%}", "%{%}")]
     public void should_write_prefix(string pattern, string expectedResult)
     {
         var prefixWriter = new PrefixWriter(pattern)

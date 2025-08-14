@@ -142,6 +142,7 @@ The prefix pattern is a string with the following placeholders:
 | `%loggerCompact` | The logger name, with the namespace shortened to its initials    |                                                            | 
 | `%newline`       | Equivalent to `Environment.NewLine`                              |                                                            | 
 | `%column`        | Inserts padding spaces until a given column index                | The column index to reach                                  | 
+| `%%`             | Inserts a single `%` character (escaping)                        |                                                            | 
 
 Prefixes can be written in the form `%{prefix}` or `%{prefix:format}` to define a format string. String placeholders accept an integer format string which defines their minimum length. For instance, `%{logger:20}` will always be at least 20 characters wide.
 
