@@ -39,7 +39,8 @@ public class TextWriterAppenderTests
         appender.WriteMessage(message);
         appender.Flush();
 
-        var logLine = $"{logMessage.Timestamp.Date:yyyy-MM-dd} - {logMessage.Timestamp.TimeOfDay:hh\\:mm\\:ss\\.fffffff} - {Thread.CurrentThread.ManagedThreadId} - INFO - TestLog || {message}{Environment.NewLine}";
+        var thread = Thread.CurrentThread.Name ?? Thread.CurrentThread.ManagedThreadId.ToString();
+        var logLine = $"{logMessage.Timestamp.Date:yyyy-MM-dd} - {logMessage.Timestamp.TimeOfDay:hh\\:mm\\:ss\\.fffffff} - {thread} - INFO - TestLog || {message}{Environment.NewLine}";
 
         appender.TextWriter.ToString().ShouldEqual(logLine + logLine);
     }

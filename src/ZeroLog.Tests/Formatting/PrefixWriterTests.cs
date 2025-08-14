@@ -128,41 +128,50 @@ public class PrefixWriterTests
         PrefixWriter.IsValidPattern(pattern).ShouldBeTrue();
     }
 
-    [Test, RequiresThread]
+    [Test]
     public void should_write_thread_name()
     {
-        Thread.CurrentThread.Name = "Hello";
+        RunOnCustomThread(() =>
+        {
+            Thread.CurrentThread.Name = "Hello";
 
-        var prefixWriter = new PrefixWriter("%thread world!");
+            var prefixWriter = new PrefixWriter("%thread world!");
 
-        var logMessage = new LogMessage("Foo");
-        logMessage.Initialize(null, LogLevel.Info);
+            var logMessage = new LogMessage("Foo");
+            logMessage.Initialize(null, LogLevel.Info);
 
-        var result = GetResult(prefixWriter, logMessage);
-        result.ShouldEqual("Hello world!");
+            var result = GetResult(prefixWriter, logMessage);
+            result.ShouldEqual("Hello world!");
+        });
     }
 
-    [Test, RequiresThread]
+    [Test]
     public void should_write_thread_id()
     {
-        var prefixWriter = new PrefixWriter("%thread");
+        RunOnCustomThread(() =>
+        {
+            var prefixWriter = new PrefixWriter("%thread");
 
-        var logMessage = new LogMessage("Foo");
-        logMessage.Initialize(null, LogLevel.Info);
+            var logMessage = new LogMessage("Foo");
+            logMessage.Initialize(null, LogLevel.Info);
 
-        var result = GetResult(prefixWriter, logMessage);
-        result.ShouldEqual(Thread.CurrentThread.ManagedThreadId.ToString(CultureInfo.InvariantCulture));
+            var result = GetResult(prefixWriter, logMessage);
+            result.ShouldEqual(Thread.CurrentThread.ManagedThreadId.ToString(CultureInfo.InvariantCulture));
+        });
     }
 
-    [Test, RequiresThread]
+    [Test]
     public void should_write_zero_when_no_thread_provided()
     {
-        var prefixWriter = new PrefixWriter("%thread");
+        RunOnCustomThread(() =>
+        {
+            var prefixWriter = new PrefixWriter("%thread");
 
-        var logMessage = new LogMessage("Foo");
+            var logMessage = new LogMessage("Foo");
 
-        var result = GetResult(prefixWriter, logMessage);
-        result.ShouldEqual("0");
+            var result = GetResult(prefixWriter, logMessage);
+            result.ShouldEqual("0");
+        });
     }
 
     [Test]
@@ -191,5 +200,30 @@ public class PrefixWriterTests
         formattedLogMessage.SetMessage(logMessage);
         prefixWriter.WritePrefix(formattedLogMessage, buffer, out var charsWritten);
         return buffer.AsSpan(0, charsWritten).ToString();
+    }
+
+    private static void RunOnCustomThread(Action action)
+    {
+        // NUnit assigns the thread a name when using [RequiresThread],
+        // so create a custom thread to avoid that.
+
+        Exception threadException = null;
+
+        var thread = new Thread(() =>
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception ex)
+            {
+                threadException = ex;
+            }
+        });
+
+        thread.Start();
+        thread.Join();
+
+        threadException.ShouldBeNull();
     }
 }

@@ -37,8 +37,8 @@
     {
         protected StreamAppender() { }
         protected System.Text.Encoding Encoding { get; set; }
-        protected System.IO.Stream? Stream { get; set; }
         public ZeroLog.Formatting.Formatter Formatter { get; init; }
+        protected System.IO.Stream? Stream { get; set; }
         public override void Dispose() { }
         public override void Flush() { }
         public override void WriteMessage(ZeroLog.Formatting.LoggedMessage message) { }
@@ -47,8 +47,8 @@
     {
         public TextWriterAppender() { }
         public TextWriterAppender(System.IO.TextWriter? textWriter) { }
-        public System.IO.TextWriter? TextWriter { get; set; }
         public ZeroLog.Formatting.Formatter Formatter { get; init; }
+        public System.IO.TextWriter? TextWriter { get; set; }
         public override void Dispose() { }
         public override void Flush() { }
         public override void WriteMessage(ZeroLog.Formatting.LoggedMessage message) { }
@@ -82,10 +82,10 @@ namespace ZeroLog.Configuration
     }
     public sealed class LoggerConfiguration
     {
-        public LoggerConfiguration(string name) { }
         public LoggerConfiguration(System.Type type) { }
-        public LoggerConfiguration(string name, ZeroLog.LogLevel level) { }
+        public LoggerConfiguration(string name) { }
         public LoggerConfiguration(System.Type type, ZeroLog.LogLevel level) { }
+        public LoggerConfiguration(string name, ZeroLog.LogLevel level) { }
         public System.Collections.Generic.ICollection<ZeroLog.Configuration.AppenderConfiguration> Appenders { get; }
         public bool IncludeParentAppenders { get; set; }
         public ZeroLog.LogLevel? Level { get; set; }
@@ -106,17 +106,17 @@ namespace ZeroLog.Configuration
     {
         public ZeroLogConfiguration() { }
         public System.TimeSpan AppenderQuarantineDelay { get; set; }
-        public bool AutoRegisterEnums { get; set; }
-        public ZeroLog.Configuration.ILoggerConfigurationCollection Loggers { get; }
-        public string NullDisplayString { get; set; }
-        public ZeroLog.Configuration.RootLoggerConfiguration RootLogger { get; }
-        public string TruncatedMessageSuffix { get; set; }
         public ZeroLog.Configuration.AppendingStrategy AppendingStrategy { get; init; }
+        public bool AutoRegisterEnums { get; set; }
         public int LogMessageBufferSize { get; init; }
         public int LogMessagePoolSize { get; init; }
         public int LogMessageStringCapacity { get; init; }
+        public ZeroLog.Configuration.ILoggerConfigurationCollection Loggers { get; }
         public System.Action<ZeroLog.Configuration.ThreadConfiguration>? LoggingThreadInitializer { get; init; }
+        public string NullDisplayString { get; set; }
+        public ZeroLog.Configuration.RootLoggerConfiguration RootLogger { get; }
         public System.TimeProvider? TimeProvider { get; init; }
+        public string TruncatedMessageSuffix { get; set; }
         public bool UseBackgroundThread { get; init; }
         public void ApplyChanges() { }
         public void SetLogLevel(string? loggerName, ZeroLog.LogLevel? logLevel) { }
@@ -150,15 +150,13 @@ namespace ZeroLog.Formatting
         public int Count { get; }
         public ZeroLog.Formatting.LoggedKeyValue this[int index] { get; }
         public ZeroLog.Formatting.KeyValueList.Enumerator GetEnumerator() { }
-        [System.Runtime.CompilerServices.IsByRefLike]
-        public struct Enumerator
+        public ref struct Enumerator
         {
             public ZeroLog.Formatting.LoggedKeyValue Current { get; }
             public bool MoveNext() { }
         }
     }
-    [System.Runtime.CompilerServices.IsByRefLike]
-    public readonly struct LoggedKeyValue
+    public readonly ref struct LoggedKeyValue
     {
         public bool IsBoolean { get; }
         public bool IsNull { get; }
@@ -227,92 +225,91 @@ namespace ZeroLog
         public void Warn([System.Runtime.CompilerServices.InterpolatedStringHandlerArgument("")] ZeroLog.Log.WarnInterpolatedStringHandler message, System.Exception? ex) { }
         public void Warn(string? message, System.Exception? ex) { }
         [System.Runtime.CompilerServices.InterpolatedStringHandler]
-        [System.Runtime.CompilerServices.IsByRefLike]
-        public readonly struct DebugInterpolatedStringHandler
+        public readonly ref struct DebugInterpolatedStringHandler
         {
             public DebugInterpolatedStringHandler(int literalLength, int formattedCount, ZeroLog.Log log, out bool isEnabled) { }
-            public void AppendFormatted(bool value) { }
-            public void AppendFormatted(byte value) { }
-            public void AppendFormatted(char value) { }
-            public void AppendFormatted(System.Char? value) { }
             public void AppendFormatted(System.DateOnly value) { }
             public void AppendFormatted(System.DateOnly? value) { }
             public void AppendFormatted(System.DateTime value) { }
             public void AppendFormatted(System.DateTime? value) { }
             public void AppendFormatted(System.DateTimeOffset value) { }
             public void AppendFormatted(System.DateTimeOffset? value) { }
-            public void AppendFormatted(decimal value) { }
-            public void AppendFormatted(double value) { }
             public void AppendFormatted(System.Guid value) { }
             public void AppendFormatted(System.Guid? value) { }
-            public void AppendFormatted(short value) { }
-            public void AppendFormatted(int value) { }
-            public void AppendFormatted(long value) { }
-            public void AppendFormatted(System.IntPtr value) { }
+            public void AppendFormatted(nint value) { }
             public void AppendFormatted(System.IntPtr? value) { }
             public void AppendFormatted(System.ReadOnlySpan<byte> value) { }
             public void AppendFormatted(System.ReadOnlySpan<char> value) { }
-            public void AppendFormatted(sbyte value) { }
-            public void AppendFormatted(float value) { }
             public void AppendFormatted(System.TimeOnly value) { }
             public void AppendFormatted(System.TimeOnly? value) { }
             public void AppendFormatted(System.TimeSpan value) { }
             public void AppendFormatted(System.TimeSpan? value) { }
-            public void AppendFormatted(ushort value) { }
-            public void AppendFormatted(uint value) { }
-            public void AppendFormatted(ulong value) { }
-            public void AppendFormatted(System.UIntPtr value) { }
+            public void AppendFormatted(nuint value) { }
             public void AppendFormatted(System.UIntPtr? value) { }
+            public void AppendFormatted(bool value) { }
             public void AppendFormatted(bool? value) { }
+            public void AppendFormatted(byte value) { }
             public void AppendFormatted(byte? value) { }
+            public void AppendFormatted(char value) { }
+            public void AppendFormatted(char? value) { }
+            public void AppendFormatted(decimal value) { }
             public void AppendFormatted(decimal? value) { }
+            public void AppendFormatted(double value) { }
             public void AppendFormatted(double? value) { }
+            public void AppendFormatted(float value) { }
             public void AppendFormatted(float? value) { }
+            public void AppendFormatted(int value) { }
             public void AppendFormatted(int? value) { }
+            public void AppendFormatted(long value) { }
             public void AppendFormatted(long? value) { }
+            public void AppendFormatted(sbyte value) { }
             public void AppendFormatted(sbyte? value) { }
+            public void AppendFormatted(short value) { }
             public void AppendFormatted(short? value) { }
             public void AppendFormatted(string? value) { }
+            public void AppendFormatted(uint value) { }
             public void AppendFormatted(uint? value) { }
+            public void AppendFormatted(ulong value) { }
             public void AppendFormatted(ulong? value) { }
+            public void AppendFormatted(ushort value) { }
             public void AppendFormatted(ushort? value) { }
-            public void AppendFormatted(byte value, string format) { }
             public void AppendFormatted(System.DateOnly value, string format) { }
             public void AppendFormatted(System.DateOnly? value, string format) { }
             public void AppendFormatted(System.DateTime value, string format) { }
             public void AppendFormatted(System.DateTime? value, string format) { }
             public void AppendFormatted(System.DateTimeOffset value, string format) { }
             public void AppendFormatted(System.DateTimeOffset? value, string format) { }
-            public void AppendFormatted(decimal value, string format) { }
-            public void AppendFormatted(double value, string format) { }
             public void AppendFormatted(System.Guid value, string format) { }
             public void AppendFormatted(System.Guid? value, string format) { }
-            public void AppendFormatted(short value, string format) { }
-            public void AppendFormatted(int value, string format) { }
-            public void AppendFormatted(long value, string format) { }
-            public void AppendFormatted(System.IntPtr value, string format) { }
+            public void AppendFormatted(nint value, string format) { }
             public void AppendFormatted(System.IntPtr? value, string format) { }
-            public void AppendFormatted(sbyte value, string format) { }
-            public void AppendFormatted(float value, string format) { }
             public void AppendFormatted(System.TimeOnly value, string format) { }
             public void AppendFormatted(System.TimeOnly? value, string format) { }
             public void AppendFormatted(System.TimeSpan value, string format) { }
             public void AppendFormatted(System.TimeSpan? value, string format) { }
-            public void AppendFormatted(ushort value, string format) { }
-            public void AppendFormatted(uint value, string format) { }
-            public void AppendFormatted(ulong value, string format) { }
-            public void AppendFormatted(System.UIntPtr value, string format) { }
+            public void AppendFormatted(nuint value, string format) { }
             public void AppendFormatted(System.UIntPtr? value, string format) { }
+            public void AppendFormatted(byte value, string format) { }
             public void AppendFormatted(byte? value, string format) { }
+            public void AppendFormatted(decimal value, string format) { }
             public void AppendFormatted(decimal? value, string format) { }
+            public void AppendFormatted(double value, string format) { }
             public void AppendFormatted(double? value, string format) { }
+            public void AppendFormatted(float value, string format) { }
             public void AppendFormatted(float? value, string format) { }
+            public void AppendFormatted(int value, string format) { }
             public void AppendFormatted(int? value, string format) { }
+            public void AppendFormatted(long value, string format) { }
             public void AppendFormatted(long? value, string format) { }
+            public void AppendFormatted(sbyte value, string format) { }
             public void AppendFormatted(sbyte? value, string format) { }
+            public void AppendFormatted(short value, string format) { }
             public void AppendFormatted(short? value, string format) { }
+            public void AppendFormatted(uint value, string format) { }
             public void AppendFormatted(uint? value, string format) { }
+            public void AppendFormatted(ulong value, string format) { }
             public void AppendFormatted(ulong? value, string format) { }
+            public void AppendFormatted(ushort value, string format) { }
             public void AppendFormatted(ushort? value, string format) { }
             public void AppendFormatted<T>(T value)
                 where T :  struct, System.Enum { }
@@ -322,92 +319,91 @@ namespace ZeroLog
             public void AppendLiteral(string value) { }
         }
         [System.Runtime.CompilerServices.InterpolatedStringHandler]
-        [System.Runtime.CompilerServices.IsByRefLike]
-        public readonly struct ErrorInterpolatedStringHandler
+        public readonly ref struct ErrorInterpolatedStringHandler
         {
             public ErrorInterpolatedStringHandler(int literalLength, int formattedCount, ZeroLog.Log log, out bool isEnabled) { }
-            public void AppendFormatted(bool value) { }
-            public void AppendFormatted(byte value) { }
-            public void AppendFormatted(char value) { }
-            public void AppendFormatted(System.Char? value) { }
             public void AppendFormatted(System.DateOnly value) { }
             public void AppendFormatted(System.DateOnly? value) { }
             public void AppendFormatted(System.DateTime value) { }
             public void AppendFormatted(System.DateTime? value) { }
             public void AppendFormatted(System.DateTimeOffset value) { }
             public void AppendFormatted(System.DateTimeOffset? value) { }
-            public void AppendFormatted(decimal value) { }
-            public void AppendFormatted(double value) { }
             public void AppendFormatted(System.Guid value) { }
             public void AppendFormatted(System.Guid? value) { }
-            public void AppendFormatted(short value) { }
-            public void AppendFormatted(int value) { }
-            public void AppendFormatted(long value) { }
-            public void AppendFormatted(System.IntPtr value) { }
+            public void AppendFormatted(nint value) { }
             public void AppendFormatted(System.IntPtr? value) { }
             public void AppendFormatted(System.ReadOnlySpan<byte> value) { }
             public void AppendFormatted(System.ReadOnlySpan<char> value) { }
-            public void AppendFormatted(sbyte value) { }
-            public void AppendFormatted(float value) { }
             public void AppendFormatted(System.TimeOnly value) { }
             public void AppendFormatted(System.TimeOnly? value) { }
             public void AppendFormatted(System.TimeSpan value) { }
             public void AppendFormatted(System.TimeSpan? value) { }
-            public void AppendFormatted(ushort value) { }
-            public void AppendFormatted(uint value) { }
-            public void AppendFormatted(ulong value) { }
-            public void AppendFormatted(System.UIntPtr value) { }
+            public void AppendFormatted(nuint value) { }
             public void AppendFormatted(System.UIntPtr? value) { }
+            public void AppendFormatted(bool value) { }
             public void AppendFormatted(bool? value) { }
+            public void AppendFormatted(byte value) { }
             public void AppendFormatted(byte? value) { }
+            public void AppendFormatted(char value) { }
+            public void AppendFormatted(char? value) { }
+            public void AppendFormatted(decimal value) { }
             public void AppendFormatted(decimal? value) { }
+            public void AppendFormatted(double value) { }
             public void AppendFormatted(double? value) { }
+            public void AppendFormatted(float value) { }
             public void AppendFormatted(float? value) { }
+            public void AppendFormatted(int value) { }
             public void AppendFormatted(int? value) { }
+            public void AppendFormatted(long value) { }
             public void AppendFormatted(long? value) { }
+            public void AppendFormatted(sbyte value) { }
             public void AppendFormatted(sbyte? value) { }
+            public void AppendFormatted(short value) { }
             public void AppendFormatted(short? value) { }
             public void AppendFormatted(string? value) { }
+            public void AppendFormatted(uint value) { }
             public void AppendFormatted(uint? value) { }
+            public void AppendFormatted(ulong value) { }
             public void AppendFormatted(ulong? value) { }
+            public void AppendFormatted(ushort value) { }
             public void AppendFormatted(ushort? value) { }
-            public void AppendFormatted(byte value, string format) { }
             public void AppendFormatted(System.DateOnly value, string format) { }
             public void AppendFormatted(System.DateOnly? value, string format) { }
             public void AppendFormatted(System.DateTime value, string format) { }
             public void AppendFormatted(System.DateTime? value, string format) { }
             public void AppendFormatted(System.DateTimeOffset value, string format) { }
             public void AppendFormatted(System.DateTimeOffset? value, string format) { }
-            public void AppendFormatted(decimal value, string format) { }
-            public void AppendFormatted(double value, string format) { }
             public void AppendFormatted(System.Guid value, string format) { }
             public void AppendFormatted(System.Guid? value, string format) { }
-            public void AppendFormatted(short value, string format) { }
-            public void AppendFormatted(int value, string format) { }
-            public void AppendFormatted(long value, string format) { }
-            public void AppendFormatted(System.IntPtr value, string format) { }
+            public void AppendFormatted(nint value, string format) { }
             public void AppendFormatted(System.IntPtr? value, string format) { }
-            public void AppendFormatted(sbyte value, string format) { }
-            public void AppendFormatted(float value, string format) { }
             public void AppendFormatted(System.TimeOnly value, string format) { }
             public void AppendFormatted(System.TimeOnly? value, string format) { }
             public void AppendFormatted(System.TimeSpan value, string format) { }
             public void AppendFormatted(System.TimeSpan? value, string format) { }
-            public void AppendFormatted(ushort value, string format) { }
-            public void AppendFormatted(uint value, string format) { }
-            public void AppendFormatted(ulong value, string format) { }
-            public void AppendFormatted(System.UIntPtr value, string format) { }
+            public void AppendFormatted(nuint value, string format) { }
             public void AppendFormatted(System.UIntPtr? value, string format) { }
+            public void AppendFormatted(byte value, string format) { }
             public void AppendFormatted(byte? value, string format) { }
+            public void AppendFormatted(decimal value, string format) { }
             public void AppendFormatted(decimal? value, string format) { }
+            public void AppendFormatted(double value, string format) { }
             public void AppendFormatted(double? value, string format) { }
+            public void AppendFormatted(float value, string format) { }
             public void AppendFormatted(float? value, string format) { }
+            public void AppendFormatted(int value, string format) { }
             public void AppendFormatted(int? value, string format) { }
+            public void AppendFormatted(long value, string format) { }
             public void AppendFormatted(long? value, string format) { }
+            public void AppendFormatted(sbyte value, string format) { }
             public void AppendFormatted(sbyte? value, string format) { }
+            public void AppendFormatted(short value, string format) { }
             public void AppendFormatted(short? value, string format) { }
+            public void AppendFormatted(uint value, string format) { }
             public void AppendFormatted(uint? value, string format) { }
+            public void AppendFormatted(ulong value, string format) { }
             public void AppendFormatted(ulong? value, string format) { }
+            public void AppendFormatted(ushort value, string format) { }
             public void AppendFormatted(ushort? value, string format) { }
             public void AppendFormatted<T>(T value)
                 where T :  struct, System.Enum { }
@@ -417,92 +413,91 @@ namespace ZeroLog
             public void AppendLiteral(string value) { }
         }
         [System.Runtime.CompilerServices.InterpolatedStringHandler]
-        [System.Runtime.CompilerServices.IsByRefLike]
-        public readonly struct FatalInterpolatedStringHandler
+        public readonly ref struct FatalInterpolatedStringHandler
         {
             public FatalInterpolatedStringHandler(int literalLength, int formattedCount, ZeroLog.Log log, out bool isEnabled) { }
-            public void AppendFormatted(bool value) { }
-            public void AppendFormatted(byte value) { }
-            public void AppendFormatted(char value) { }
-            public void AppendFormatted(System.Char? value) { }
             public void AppendFormatted(System.DateOnly value) { }
             public void AppendFormatted(System.DateOnly? value) { }
             public void AppendFormatted(System.DateTime value) { }
             public void AppendFormatted(System.DateTime? value) { }
             public void AppendFormatted(System.DateTimeOffset value) { }
             public void AppendFormatted(System.DateTimeOffset? value) { }
-            public void AppendFormatted(decimal value) { }
-            public void AppendFormatted(double value) { }
             public void AppendFormatted(System.Guid value) { }
             public void AppendFormatted(System.Guid? value) { }
-            public void AppendFormatted(short value) { }
-            public void AppendFormatted(int value) { }
-            public void AppendFormatted(long value) { }
-            public void AppendFormatted(System.IntPtr value) { }
+            public void AppendFormatted(nint value) { }
             public void AppendFormatted(System.IntPtr? value) { }
             public void AppendFormatted(System.ReadOnlySpan<byte> value) { }
             public void AppendFormatted(System.ReadOnlySpan<char> value) { }
-            public void AppendFormatted(sbyte value) { }
-            public void AppendFormatted(float value) { }
             public void AppendFormatted(System.TimeOnly value) { }
             public void AppendFormatted(System.TimeOnly? value) { }
             public void AppendFormatted(System.TimeSpan value) { }
             public void AppendFormatted(System.TimeSpan? value) { }
-            public void AppendFormatted(ushort value) { }
-            public void AppendFormatted(uint value) { }
-            public void AppendFormatted(ulong value) { }
-            public void AppendFormatted(System.UIntPtr value) { }
+            public void AppendFormatted(nuint value) { }
             public void AppendFormatted(System.UIntPtr? value) { }
+            public void AppendFormatted(bool value) { }
             public void AppendFormatted(bool? value) { }
+            public void AppendFormatted(byte value) { }
             public void AppendFormatted(byte? value) { }
+            public void AppendFormatted(char value) { }
+            public void AppendFormatted(char? value) { }
+            public void AppendFormatted(decimal value) { }
             public void AppendFormatted(decimal? value) { }
+            public void AppendFormatted(double value) { }
             public void AppendFormatted(double? value) { }
+            public void AppendFormatted(float value) { }
             public void AppendFormatted(float? value) { }
+            public void AppendFormatted(int value) { }
             public void AppendFormatted(int? value) { }
+            public void AppendFormatted(long value) { }
             public void AppendFormatted(long? value) { }
+            public void AppendFormatted(sbyte value) { }
             public void AppendFormatted(sbyte? value) { }
+            public void AppendFormatted(short value) { }
             public void AppendFormatted(short? value) { }
             public void AppendFormatted(string? value) { }
+            public void AppendFormatted(uint value) { }
             public void AppendFormatted(uint? value) { }
+            public void AppendFormatted(ulong value) { }
             public void AppendFormatted(ulong? value) { }
+            public void AppendFormatted(ushort value) { }
             public void AppendFormatted(ushort? value) { }
-            public void AppendFormatted(byte value, string format) { }
             public void AppendFormatted(System.DateOnly value, string format) { }
             public void AppendFormatted(System.DateOnly? value, string format) { }
             public void AppendFormatted(System.DateTime value, string format) { }
             public void AppendFormatted(System.DateTime? value, string format) { }
             public void AppendFormatted(System.DateTimeOffset value, string format) { }
             public void AppendFormatted(System.DateTimeOffset? value, string format) { }
-            public void AppendFormatted(decimal value, string format) { }
-            public void AppendFormatted(double value, string format) { }
             public void AppendFormatted(System.Guid value, string format) { }
             public void AppendFormatted(System.Guid? value, string format) { }
-            public void AppendFormatted(short value, string format) { }
-            public void AppendFormatted(int value, string format) { }
-            public void AppendFormatted(long value, string format) { }
-            public void AppendFormatted(System.IntPtr value, string format) { }
+            public void AppendFormatted(nint value, string format) { }
             public void AppendFormatted(System.IntPtr? value, string format) { }
-            public void AppendFormatted(sbyte value, string format) { }
-            public void AppendFormatted(float value, string format) { }
             public void AppendFormatted(System.TimeOnly value, string format) { }
             public void AppendFormatted(System.TimeOnly? value, string format) { }
             public void AppendFormatted(System.TimeSpan value, string format) { }
             public void AppendFormatted(System.TimeSpan? value, string format) { }
-            public void AppendFormatted(ushort value, string format) { }
-            public void AppendFormatted(uint value, string format) { }
-            public void AppendFormatted(ulong value, string format) { }
-            public void AppendFormatted(System.UIntPtr value, string format) { }
+            public void AppendFormatted(nuint value, string format) { }
             public void AppendFormatted(System.UIntPtr? value, string format) { }
+            public void AppendFormatted(byte value, string format) { }
             public void AppendFormatted(byte? value, string format) { }
+            public void AppendFormatted(decimal value, string format) { }
             public void AppendFormatted(decimal? value, string format) { }
+            public void AppendFormatted(double value, string format) { }
             public void AppendFormatted(double? value, string format) { }
+            public void AppendFormatted(float value, string format) { }
             public void AppendFormatted(float? value, string format) { }
+            public void AppendFormatted(int value, string format) { }
             public void AppendFormatted(int? value, string format) { }
+            public void AppendFormatted(long value, string format) { }
             public void AppendFormatted(long? value, string format) { }
+            public void AppendFormatted(sbyte value, string format) { }
             public void AppendFormatted(sbyte? value, string format) { }
+            public void AppendFormatted(short value, string format) { }
             public void AppendFormatted(short? value, string format) { }
+            public void AppendFormatted(uint value, string format) { }
             public void AppendFormatted(uint? value, string format) { }
+            public void AppendFormatted(ulong value, string format) { }
             public void AppendFormatted(ulong? value, string format) { }
+            public void AppendFormatted(ushort value, string format) { }
             public void AppendFormatted(ushort? value, string format) { }
             public void AppendFormatted<T>(T value)
                 where T :  struct, System.Enum { }
@@ -512,92 +507,91 @@ namespace ZeroLog
             public void AppendLiteral(string value) { }
         }
         [System.Runtime.CompilerServices.InterpolatedStringHandler]
-        [System.Runtime.CompilerServices.IsByRefLike]
-        public readonly struct InfoInterpolatedStringHandler
+        public readonly ref struct InfoInterpolatedStringHandler
         {
             public InfoInterpolatedStringHandler(int literalLength, int formattedCount, ZeroLog.Log log, out bool isEnabled) { }
-            public void AppendFormatted(bool value) { }
-            public void AppendFormatted(byte value) { }
-            public void AppendFormatted(char value) { }
-            public void AppendFormatted(System.Char? value) { }
             public void AppendFormatted(System.DateOnly value) { }
             public void AppendFormatted(System.DateOnly? value) { }
             public void AppendFormatted(System.DateTime value) { }
             public void AppendFormatted(System.DateTime? value) { }
             public void AppendFormatted(System.DateTimeOffset value) { }
             public void AppendFormatted(System.DateTimeOffset? value) { }
-            public void AppendFormatted(decimal value) { }
-            public void AppendFormatted(double value) { }
             public void AppendFormatted(System.Guid value) { }
             public void AppendFormatted(System.Guid? value) { }
-            public void AppendFormatted(short value) { }
-            public void AppendFormatted(int value) { }
-            public void AppendFormatted(long value) { }
-            public void AppendFormatted(System.IntPtr value) { }
+            public void AppendFormatted(nint value) { }
             public void AppendFormatted(System.IntPtr? value) { }
             public void AppendFormatted(System.ReadOnlySpan<byte> value) { }
             public void AppendFormatted(System.ReadOnlySpan<char> value) { }
-            public void AppendFormatted(sbyte value) { }
-            public void AppendFormatted(float value) { }
             public void AppendFormatted(System.TimeOnly value) { }
             public void AppendFormatted(System.TimeOnly? value) { }
             public void AppendFormatted(System.TimeSpan value) { }
             public void AppendFormatted(System.TimeSpan? value) { }
-            public void AppendFormatted(ushort value) { }
-            public void AppendFormatted(uint value) { }
-            public void AppendFormatted(ulong value) { }
-            public void AppendFormatted(System.UIntPtr value) { }
+            public void AppendFormatted(nuint value) { }
             public void AppendFormatted(System.UIntPtr? value) { }
+            public void AppendFormatted(bool value) { }
             public void AppendFormatted(bool? value) { }
+            public void AppendFormatted(byte value) { }
             public void AppendFormatted(byte? value) { }
+            public void AppendFormatted(char value) { }
+            public void AppendFormatted(char? value) { }
+            public void AppendFormatted(decimal value) { }
             public void AppendFormatted(decimal? value) { }
+            public void AppendFormatted(double value) { }
             public void AppendFormatted(double? value) { }
+            public void AppendFormatted(float value) { }
             public void AppendFormatted(float? value) { }
+            public void AppendFormatted(int value) { }
             public void AppendFormatted(int? value) { }
+            public void AppendFormatted(long value) { }
             public void AppendFormatted(long? value) { }
+            public void AppendFormatted(sbyte value) { }
             public void AppendFormatted(sbyte? value) { }
+            public void AppendFormatted(short value) { }
             public void AppendFormatted(short? value) { }
             public void AppendFormatted(string? value) { }
+            public void AppendFormatted(uint value) { }
             public void AppendFormatted(uint? value) { }
+            public void AppendFormatted(ulong value) { }
             public void AppendFormatted(ulong? value) { }
+            public void AppendFormatted(ushort value) { }
             public void AppendFormatted(ushort? value) { }
-            public void AppendFormatted(byte value, string format) { }
             public void AppendFormatted(System.DateOnly value, string format) { }
             public void AppendFormatted(System.DateOnly? value, string format) { }
             public void AppendFormatted(System.DateTime value, string format) { }
             public void AppendFormatted(System.DateTime? value, string format) { }
             public void AppendFormatted(System.DateTimeOffset value, string format) { }
             public void AppendFormatted(System.DateTimeOffset? value, string format) { }
-            public void AppendFormatted(decimal value, string format) { }
-            public void AppendFormatted(double value, string format) { }
             public void AppendFormatted(System.Guid value, string format) { }
             public void AppendFormatted(System.Guid? value, string format) { }
-            public void AppendFormatted(short value, string format) { }
-            public void AppendFormatted(int value, string format) { }
-            public void AppendFormatted(long value, string format) { }
-            public void AppendFormatted(System.IntPtr value, string format) { }
+            public void AppendFormatted(nint value, string format) { }
             public void AppendFormatted(System.IntPtr? value, string format) { }
-            public void AppendFormatted(sbyte value, string format) { }
-            public void AppendFormatted(float value, string format) { }
             public void AppendFormatted(System.TimeOnly value, string format) { }
             public void AppendFormatted(System.TimeOnly? value, string format) { }
             public void AppendFormatted(System.TimeSpan value, string format) { }
             public void AppendFormatted(System.TimeSpan? value, string format) { }
-            public void AppendFormatted(ushort value, string format) { }
-            public void AppendFormatted(uint value, string format) { }
-            public void AppendFormatted(ulong value, string format) { }
-            public void AppendFormatted(System.UIntPtr value, string format) { }
+            public void AppendFormatted(nuint value, string format) { }
             public void AppendFormatted(System.UIntPtr? value, string format) { }
+            public void AppendFormatted(byte value, string format) { }
             public void AppendFormatted(byte? value, string format) { }
+            public void AppendFormatted(decimal value, string format) { }
             public void AppendFormatted(decimal? value, string format) { }
+            public void AppendFormatted(double value, string format) { }
             public void AppendFormatted(double? value, string format) { }
+            public void AppendFormatted(float value, string format) { }
             public void AppendFormatted(float? value, string format) { }
+            public void AppendFormatted(int value, string format) { }
             public void AppendFormatted(int? value, string format) { }
+            public void AppendFormatted(long value, string format) { }
             public void AppendFormatted(long? value, string format) { }
+            public void AppendFormatted(sbyte value, string format) { }
             public void AppendFormatted(sbyte? value, string format) { }
+            public void AppendFormatted(short value, string format) { }
             public void AppendFormatted(short? value, string format) { }
+            public void AppendFormatted(uint value, string format) { }
             public void AppendFormatted(uint? value, string format) { }
+            public void AppendFormatted(ulong value, string format) { }
             public void AppendFormatted(ulong? value, string format) { }
+            public void AppendFormatted(ushort value, string format) { }
             public void AppendFormatted(ushort? value, string format) { }
             public void AppendFormatted<T>(T value)
                 where T :  struct, System.Enum { }
@@ -607,92 +601,91 @@ namespace ZeroLog
             public void AppendLiteral(string value) { }
         }
         [System.Runtime.CompilerServices.InterpolatedStringHandler]
-        [System.Runtime.CompilerServices.IsByRefLike]
-        public readonly struct TraceInterpolatedStringHandler
+        public readonly ref struct TraceInterpolatedStringHandler
         {
             public TraceInterpolatedStringHandler(int literalLength, int formattedCount, ZeroLog.Log log, out bool isEnabled) { }
-            public void AppendFormatted(bool value) { }
-            public void AppendFormatted(byte value) { }
-            public void AppendFormatted(char value) { }
-            public void AppendFormatted(System.Char? value) { }
             public void AppendFormatted(System.DateOnly value) { }
             public void AppendFormatted(System.DateOnly? value) { }
             public void AppendFormatted(System.DateTime value) { }
             public void AppendFormatted(System.DateTime? value) { }
             public void AppendFormatted(System.DateTimeOffset value) { }
             public void AppendFormatted(System.DateTimeOffset? value) { }
-            public void AppendFormatted(decimal value) { }
-            public void AppendFormatted(double value) { }
             public void AppendFormatted(System.Guid value) { }
             public void AppendFormatted(System.Guid? value) { }
-            public void AppendFormatted(short value) { }
-            public void AppendFormatted(int value) { }
-            public void AppendFormatted(long value) { }
-            public void AppendFormatted(System.IntPtr value) { }
+            public void AppendFormatted(nint value) { }
             public void AppendFormatted(System.IntPtr? value) { }
             public void AppendFormatted(System.ReadOnlySpan<byte> value) { }
             public void AppendFormatted(System.ReadOnlySpan<char> value) { }
-            public void AppendFormatted(sbyte value) { }
-            public void AppendFormatted(float value) { }
             public void AppendFormatted(System.TimeOnly value) { }
             public void AppendFormatted(System.TimeOnly? value) { }
             public void AppendFormatted(System.TimeSpan value) { }
             public void AppendFormatted(System.TimeSpan? value) { }
-            public void AppendFormatted(ushort value) { }
-            public void AppendFormatted(uint value) { }
-            public void AppendFormatted(ulong value) { }
-            public void AppendFormatted(System.UIntPtr value) { }
+            public void AppendFormatted(nuint value) { }
             public void AppendFormatted(System.UIntPtr? value) { }
+            public void AppendFormatted(bool value) { }
             public void AppendFormatted(bool? value) { }
+            public void AppendFormatted(byte value) { }
             public void AppendFormatted(byte? value) { }
+            public void AppendFormatted(char value) { }
+            public void AppendFormatted(char? value) { }
+            public void AppendFormatted(decimal value) { }
             public void AppendFormatted(decimal? value) { }
+            public void AppendFormatted(double value) { }
             public void AppendFormatted(double? value) { }
+            public void AppendFormatted(float value) { }
             public void AppendFormatted(float? value) { }
+            public void AppendFormatted(int value) { }
             public void AppendFormatted(int? value) { }
+            public void AppendFormatted(long value) { }
             public void AppendFormatted(long? value) { }
+            public void AppendFormatted(sbyte value) { }
             public void AppendFormatted(sbyte? value) { }
+            public void AppendFormatted(short value) { }
             public void AppendFormatted(short? value) { }
             public void AppendFormatted(string? value) { }
+            public void AppendFormatted(uint value) { }
             public void AppendFormatted(uint? value) { }
+            public void AppendFormatted(ulong value) { }
             public void AppendFormatted(ulong? value) { }
+            public void AppendFormatted(ushort value) { }
             public void AppendFormatted(ushort? value) { }
-            public void AppendFormatted(byte value, string format) { }
             public void AppendFormatted(System.DateOnly value, string format) { }
             public void AppendFormatted(System.DateOnly? value, string format) { }
             public void AppendFormatted(System.DateTime value, string format) { }
             public void AppendFormatted(System.DateTime? value, string format) { }
             public void AppendFormatted(System.DateTimeOffset value, string format) { }
             public void AppendFormatted(System.DateTimeOffset? value, string format) { }
-            public void AppendFormatted(decimal value, string format) { }
-            public void AppendFormatted(double value, string format) { }
             public void AppendFormatted(System.Guid value, string format) { }
             public void AppendFormatted(System.Guid? value, string format) { }
-            public void AppendFormatted(short value, string format) { }
-            public void AppendFormatted(int value, string format) { }
-            public void AppendFormatted(long value, string format) { }
-            public void AppendFormatted(System.IntPtr value, string format) { }
+            public void AppendFormatted(nint value, string format) { }
             public void AppendFormatted(System.IntPtr? value, string format) { }
-            public void AppendFormatted(sbyte value, string format) { }
-            public void AppendFormatted(float value, string format) { }
             public void AppendFormatted(System.TimeOnly value, string format) { }
             public void AppendFormatted(System.TimeOnly? value, string format) { }
             public void AppendFormatted(System.TimeSpan value, string format) { }
             public void AppendFormatted(System.TimeSpan? value, string format) { }
-            public void AppendFormatted(ushort value, string format) { }
-            public void AppendFormatted(uint value, string format) { }
-            public void AppendFormatted(ulong value, string format) { }
-            public void AppendFormatted(System.UIntPtr value, string format) { }
+            public void AppendFormatted(nuint value, string format) { }
             public void AppendFormatted(System.UIntPtr? value, string format) { }
+            public void AppendFormatted(byte value, string format) { }
             public void AppendFormatted(byte? value, string format) { }
+            public void AppendFormatted(decimal value, string format) { }
             public void AppendFormatted(decimal? value, string format) { }
+            public void AppendFormatted(double value, string format) { }
             public void AppendFormatted(double? value, string format) { }
+            public void AppendFormatted(float value, string format) { }
             public void AppendFormatted(float? value, string format) { }
+            public void AppendFormatted(int value, string format) { }
             public void AppendFormatted(int? value, string format) { }
+            public void AppendFormatted(long value, string format) { }
             public void AppendFormatted(long? value, string format) { }
+            public void AppendFormatted(sbyte value, string format) { }
             public void AppendFormatted(sbyte? value, string format) { }
+            public void AppendFormatted(short value, string format) { }
             public void AppendFormatted(short? value, string format) { }
+            public void AppendFormatted(uint value, string format) { }
             public void AppendFormatted(uint? value, string format) { }
+            public void AppendFormatted(ulong value, string format) { }
             public void AppendFormatted(ulong? value, string format) { }
+            public void AppendFormatted(ushort value, string format) { }
             public void AppendFormatted(ushort? value, string format) { }
             public void AppendFormatted<T>(T value)
                 where T :  struct, System.Enum { }
@@ -702,92 +695,91 @@ namespace ZeroLog
             public void AppendLiteral(string value) { }
         }
         [System.Runtime.CompilerServices.InterpolatedStringHandler]
-        [System.Runtime.CompilerServices.IsByRefLike]
-        public readonly struct WarnInterpolatedStringHandler
+        public readonly ref struct WarnInterpolatedStringHandler
         {
             public WarnInterpolatedStringHandler(int literalLength, int formattedCount, ZeroLog.Log log, out bool isEnabled) { }
-            public void AppendFormatted(bool value) { }
-            public void AppendFormatted(byte value) { }
-            public void AppendFormatted(char value) { }
-            public void AppendFormatted(System.Char? value) { }
             public void AppendFormatted(System.DateOnly value) { }
             public void AppendFormatted(System.DateOnly? value) { }
             public void AppendFormatted(System.DateTime value) { }
             public void AppendFormatted(System.DateTime? value) { }
             public void AppendFormatted(System.DateTimeOffset value) { }
             public void AppendFormatted(System.DateTimeOffset? value) { }
-            public void AppendFormatted(decimal value) { }
-            public void AppendFormatted(double value) { }
             public void AppendFormatted(System.Guid value) { }
             public void AppendFormatted(System.Guid? value) { }
-            public void AppendFormatted(short value) { }
-            public void AppendFormatted(int value) { }
-            public void AppendFormatted(long value) { }
-            public void AppendFormatted(System.IntPtr value) { }
+            public void AppendFormatted(nint value) { }
             public void AppendFormatted(System.IntPtr? value) { }
             public void AppendFormatted(System.ReadOnlySpan<byte> value) { }
             public void AppendFormatted(System.ReadOnlySpan<char> value) { }
-            public void AppendFormatted(sbyte value) { }
-            public void AppendFormatted(float value) { }
             public void AppendFormatted(System.TimeOnly value) { }
             public void AppendFormatted(System.TimeOnly? value) { }
             public void AppendFormatted(System.TimeSpan value) { }
             public void AppendFormatted(System.TimeSpan? value) { }
-            public void AppendFormatted(ushort value) { }
-            public void AppendFormatted(uint value) { }
-            public void AppendFormatted(ulong value) { }
-            public void AppendFormatted(System.UIntPtr value) { }
+            public void AppendFormatted(nuint value) { }
             public void AppendFormatted(System.UIntPtr? value) { }
+            public void AppendFormatted(bool value) { }
             public void AppendFormatted(bool? value) { }
+            public void AppendFormatted(byte value) { }
             public void AppendFormatted(byte? value) { }
+            public void AppendFormatted(char value) { }
+            public void AppendFormatted(char? value) { }
+            public void AppendFormatted(decimal value) { }
             public void AppendFormatted(decimal? value) { }
+            public void AppendFormatted(double value) { }
             public void AppendFormatted(double? value) { }
+            public void AppendFormatted(float value) { }
             public void AppendFormatted(float? value) { }
+            public void AppendFormatted(int value) { }
             public void AppendFormatted(int? value) { }
+            public void AppendFormatted(long value) { }
             public void AppendFormatted(long? value) { }
+            public void AppendFormatted(sbyte value) { }
             public void AppendFormatted(sbyte? value) { }
+            public void AppendFormatted(short value) { }
             public void AppendFormatted(short? value) { }
             public void AppendFormatted(string? value) { }
+            public void AppendFormatted(uint value) { }
             public void AppendFormatted(uint? value) { }
+            public void AppendFormatted(ulong value) { }
             public void AppendFormatted(ulong? value) { }
+            public void AppendFormatted(ushort value) { }
             public void AppendFormatted(ushort? value) { }
-            public void AppendFormatted(byte value, string format) { }
             public void AppendFormatted(System.DateOnly value, string format) { }
             public void AppendFormatted(System.DateOnly? value, string format) { }
             public void AppendFormatted(System.DateTime value, string format) { }
             public void AppendFormatted(System.DateTime? value, string format) { }
             public void AppendFormatted(System.DateTimeOffset value, string format) { }
             public void AppendFormatted(System.DateTimeOffset? value, string format) { }
-            public void AppendFormatted(decimal value, string format) { }
-            public void AppendFormatted(double value, string format) { }
             public void AppendFormatted(System.Guid value, string format) { }
             public void AppendFormatted(System.Guid? value, string format) { }
-            public void AppendFormatted(short value, string format) { }
-            public void AppendFormatted(int value, string format) { }
-            public void AppendFormatted(long value, string format) { }
-            public void AppendFormatted(System.IntPtr value, string format) { }
+            public void AppendFormatted(nint value, string format) { }
             public void AppendFormatted(System.IntPtr? value, string format) { }
-            public void AppendFormatted(sbyte value, string format) { }
-            public void AppendFormatted(float value, string format) { }
             public void AppendFormatted(System.TimeOnly value, string format) { }
             public void AppendFormatted(System.TimeOnly? value, string format) { }
             public void AppendFormatted(System.TimeSpan value, string format) { }
             public void AppendFormatted(System.TimeSpan? value, string format) { }
-            public void AppendFormatted(ushort value, string format) { }
-            public void AppendFormatted(uint value, string format) { }
-            public void AppendFormatted(ulong value, string format) { }
-            public void AppendFormatted(System.UIntPtr value, string format) { }
+            public void AppendFormatted(nuint value, string format) { }
             public void AppendFormatted(System.UIntPtr? value, string format) { }
+            public void AppendFormatted(byte value, string format) { }
             public void AppendFormatted(byte? value, string format) { }
+            public void AppendFormatted(decimal value, string format) { }
             public void AppendFormatted(decimal? value, string format) { }
+            public void AppendFormatted(double value, string format) { }
             public void AppendFormatted(double? value, string format) { }
+            public void AppendFormatted(float value, string format) { }
             public void AppendFormatted(float? value, string format) { }
+            public void AppendFormatted(int value, string format) { }
             public void AppendFormatted(int? value, string format) { }
+            public void AppendFormatted(long value, string format) { }
             public void AppendFormatted(long? value, string format) { }
+            public void AppendFormatted(sbyte value, string format) { }
             public void AppendFormatted(sbyte? value, string format) { }
+            public void AppendFormatted(short value, string format) { }
             public void AppendFormatted(short? value, string format) { }
+            public void AppendFormatted(uint value, string format) { }
             public void AppendFormatted(uint? value, string format) { }
+            public void AppendFormatted(ulong value, string format) { }
             public void AppendFormatted(ulong? value, string format) { }
+            public void AppendFormatted(ushort value, string format) { }
             public void AppendFormatted(ushort? value, string format) { }
             public void AppendFormatted<T>(T value)
                 where T :  struct, System.Enum { }
@@ -812,8 +804,8 @@ namespace ZeroLog
         public static ZeroLog.Configuration.ZeroLogConfiguration? Configuration { get; }
         public void Dispose() { }
         public static void Flush() { }
-        public static ZeroLog.Log GetLogger(string name) { }
         public static ZeroLog.Log GetLogger(System.Type type) { }
+        public static ZeroLog.Log GetLogger(string name) { }
         public static ZeroLog.Log GetLogger<T>() { }
         public static System.IDisposable Initialize(ZeroLog.Configuration.ZeroLogConfiguration configuration) { }
         public static void RegisterAllEnumsFrom(System.Reflection.Assembly assembly) { }
@@ -833,138 +825,138 @@ namespace ZeroLog
         public ZeroLog.LogLevel Level { get; }
         public System.Threading.Thread? Thread { get; }
         public System.DateTime Timestamp { get; }
-        public ZeroLog.LogMessage Append(bool value) { }
-        public ZeroLog.LogMessage Append(byte value) { }
-        public ZeroLog.LogMessage Append(char value) { }
-        public ZeroLog.LogMessage Append(System.Char? value) { }
         public ZeroLog.LogMessage Append(System.DateOnly value) { }
         public ZeroLog.LogMessage Append(System.DateOnly? value) { }
         public ZeroLog.LogMessage Append(System.DateTime value) { }
         public ZeroLog.LogMessage Append(System.DateTime? value) { }
         public ZeroLog.LogMessage Append(System.DateTimeOffset value) { }
         public ZeroLog.LogMessage Append(System.DateTimeOffset? value) { }
-        public ZeroLog.LogMessage Append(decimal value) { }
-        public ZeroLog.LogMessage Append(double value) { }
         public ZeroLog.LogMessage Append(System.Guid value) { }
         public ZeroLog.LogMessage Append(System.Guid? value) { }
-        public ZeroLog.LogMessage Append(short value) { }
-        public ZeroLog.LogMessage Append(int value) { }
-        public ZeroLog.LogMessage Append(long value) { }
-        public ZeroLog.LogMessage Append(System.IntPtr value) { }
+        public ZeroLog.LogMessage Append(nint value) { }
         public ZeroLog.LogMessage Append(System.IntPtr? value) { }
         public ZeroLog.LogMessage Append(System.ReadOnlySpan<byte> value) { }
         public ZeroLog.LogMessage Append(System.ReadOnlySpan<char> value) { }
-        public ZeroLog.LogMessage Append(sbyte value) { }
-        public ZeroLog.LogMessage Append(float value) { }
         public ZeroLog.LogMessage Append(System.TimeOnly value) { }
         public ZeroLog.LogMessage Append(System.TimeOnly? value) { }
         public ZeroLog.LogMessage Append(System.TimeSpan value) { }
         public ZeroLog.LogMessage Append(System.TimeSpan? value) { }
-        public ZeroLog.LogMessage Append(ushort value) { }
-        public ZeroLog.LogMessage Append(uint value) { }
-        public ZeroLog.LogMessage Append(ulong value) { }
-        public ZeroLog.LogMessage Append(System.UIntPtr value) { }
+        public ZeroLog.LogMessage Append(nuint value) { }
         public ZeroLog.LogMessage Append(System.UIntPtr? value) { }
         public ZeroLog.LogMessage Append([System.Runtime.CompilerServices.InterpolatedStringHandlerArgument("")] ZeroLog.LogMessage.AppendInterpolatedStringHandler value) { }
+        public ZeroLog.LogMessage Append(bool value) { }
         public ZeroLog.LogMessage Append(bool? value) { }
+        public ZeroLog.LogMessage Append(byte value) { }
         public ZeroLog.LogMessage Append(byte? value) { }
+        public ZeroLog.LogMessage Append(char value) { }
+        public ZeroLog.LogMessage Append(char? value) { }
+        public ZeroLog.LogMessage Append(decimal value) { }
         public ZeroLog.LogMessage Append(decimal? value) { }
+        public ZeroLog.LogMessage Append(double value) { }
         public ZeroLog.LogMessage Append(double? value) { }
+        public ZeroLog.LogMessage Append(float value) { }
         public ZeroLog.LogMessage Append(float? value) { }
+        public ZeroLog.LogMessage Append(int value) { }
         public ZeroLog.LogMessage Append(int? value) { }
+        public ZeroLog.LogMessage Append(long value) { }
         public ZeroLog.LogMessage Append(long? value) { }
+        public ZeroLog.LogMessage Append(sbyte value) { }
         public ZeroLog.LogMessage Append(sbyte? value) { }
+        public ZeroLog.LogMessage Append(short value) { }
         public ZeroLog.LogMessage Append(short? value) { }
         public ZeroLog.LogMessage Append(string? value) { }
+        public ZeroLog.LogMessage Append(uint value) { }
         public ZeroLog.LogMessage Append(uint? value) { }
+        public ZeroLog.LogMessage Append(ulong value) { }
         public ZeroLog.LogMessage Append(ulong? value) { }
+        public ZeroLog.LogMessage Append(ushort value) { }
         public ZeroLog.LogMessage Append(ushort? value) { }
-        public ZeroLog.LogMessage Append(byte value, string format) { }
         public ZeroLog.LogMessage Append(System.DateOnly value, string format) { }
         public ZeroLog.LogMessage Append(System.DateOnly? value, string format) { }
         public ZeroLog.LogMessage Append(System.DateTime value, string format) { }
         public ZeroLog.LogMessage Append(System.DateTime? value, string format) { }
         public ZeroLog.LogMessage Append(System.DateTimeOffset value, string format) { }
         public ZeroLog.LogMessage Append(System.DateTimeOffset? value, string format) { }
-        public ZeroLog.LogMessage Append(decimal value, string format) { }
-        public ZeroLog.LogMessage Append(double value, string format) { }
         public ZeroLog.LogMessage Append(System.Guid value, string format) { }
         public ZeroLog.LogMessage Append(System.Guid? value, string format) { }
-        public ZeroLog.LogMessage Append(short value, string format) { }
-        public ZeroLog.LogMessage Append(int value, string format) { }
-        public ZeroLog.LogMessage Append(long value, string format) { }
-        public ZeroLog.LogMessage Append(System.IntPtr value, string format) { }
+        public ZeroLog.LogMessage Append(nint value, string format) { }
         public ZeroLog.LogMessage Append(System.IntPtr? value, string format) { }
-        public ZeroLog.LogMessage Append(sbyte value, string format) { }
-        public ZeroLog.LogMessage Append(float value, string format) { }
         public ZeroLog.LogMessage Append(System.TimeOnly value, string format) { }
         public ZeroLog.LogMessage Append(System.TimeOnly? value, string format) { }
         public ZeroLog.LogMessage Append(System.TimeSpan value, string format) { }
         public ZeroLog.LogMessage Append(System.TimeSpan? value, string format) { }
-        public ZeroLog.LogMessage Append(ushort value, string format) { }
-        public ZeroLog.LogMessage Append(uint value, string format) { }
-        public ZeroLog.LogMessage Append(ulong value, string format) { }
-        public ZeroLog.LogMessage Append(System.UIntPtr value, string format) { }
+        public ZeroLog.LogMessage Append(nuint value, string format) { }
         public ZeroLog.LogMessage Append(System.UIntPtr? value, string format) { }
+        public ZeroLog.LogMessage Append(byte value, string format) { }
         public ZeroLog.LogMessage Append(byte? value, string format) { }
+        public ZeroLog.LogMessage Append(decimal value, string format) { }
         public ZeroLog.LogMessage Append(decimal? value, string format) { }
+        public ZeroLog.LogMessage Append(double value, string format) { }
         public ZeroLog.LogMessage Append(double? value, string format) { }
+        public ZeroLog.LogMessage Append(float value, string format) { }
         public ZeroLog.LogMessage Append(float? value, string format) { }
+        public ZeroLog.LogMessage Append(int value, string format) { }
         public ZeroLog.LogMessage Append(int? value, string format) { }
+        public ZeroLog.LogMessage Append(long value, string format) { }
         public ZeroLog.LogMessage Append(long? value, string format) { }
+        public ZeroLog.LogMessage Append(sbyte value, string format) { }
         public ZeroLog.LogMessage Append(sbyte? value, string format) { }
+        public ZeroLog.LogMessage Append(short value, string format) { }
         public ZeroLog.LogMessage Append(short? value, string format) { }
+        public ZeroLog.LogMessage Append(uint value, string format) { }
         public ZeroLog.LogMessage Append(uint? value, string format) { }
+        public ZeroLog.LogMessage Append(ulong value, string format) { }
         public ZeroLog.LogMessage Append(ulong? value, string format) { }
+        public ZeroLog.LogMessage Append(ushort value, string format) { }
         public ZeroLog.LogMessage Append(ushort? value, string format) { }
         public ZeroLog.LogMessage AppendEnum<T>(T value)
             where T :  struct, System.Enum { }
         public ZeroLog.LogMessage AppendEnum<T>(T? value)
             where T :  struct, System.Enum { }
-        public ZeroLog.LogMessage AppendKeyValue(string key, bool value) { }
-        public ZeroLog.LogMessage AppendKeyValue(string key, byte value) { }
-        public ZeroLog.LogMessage AppendKeyValue(string key, char value) { }
-        public ZeroLog.LogMessage AppendKeyValue(string key, System.Char? value) { }
         public ZeroLog.LogMessage AppendKeyValue(string key, System.DateOnly value) { }
         public ZeroLog.LogMessage AppendKeyValue(string key, System.DateOnly? value) { }
         public ZeroLog.LogMessage AppendKeyValue(string key, System.DateTime value) { }
         public ZeroLog.LogMessage AppendKeyValue(string key, System.DateTime? value) { }
         public ZeroLog.LogMessage AppendKeyValue(string key, System.DateTimeOffset value) { }
         public ZeroLog.LogMessage AppendKeyValue(string key, System.DateTimeOffset? value) { }
-        public ZeroLog.LogMessage AppendKeyValue(string key, decimal value) { }
-        public ZeroLog.LogMessage AppendKeyValue(string key, double value) { }
         public ZeroLog.LogMessage AppendKeyValue(string key, System.Guid value) { }
         public ZeroLog.LogMessage AppendKeyValue(string key, System.Guid? value) { }
-        public ZeroLog.LogMessage AppendKeyValue(string key, short value) { }
-        public ZeroLog.LogMessage AppendKeyValue(string key, int value) { }
-        public ZeroLog.LogMessage AppendKeyValue(string key, long value) { }
-        public ZeroLog.LogMessage AppendKeyValue(string key, System.IntPtr value) { }
+        public ZeroLog.LogMessage AppendKeyValue(string key, nint value) { }
         public ZeroLog.LogMessage AppendKeyValue(string key, System.IntPtr? value) { }
         public ZeroLog.LogMessage AppendKeyValue(string key, System.ReadOnlySpan<byte> value) { }
         public ZeroLog.LogMessage AppendKeyValue(string key, System.ReadOnlySpan<char> value) { }
-        public ZeroLog.LogMessage AppendKeyValue(string key, sbyte value) { }
-        public ZeroLog.LogMessage AppendKeyValue(string key, float value) { }
         public ZeroLog.LogMessage AppendKeyValue(string key, System.TimeOnly value) { }
         public ZeroLog.LogMessage AppendKeyValue(string key, System.TimeOnly? value) { }
         public ZeroLog.LogMessage AppendKeyValue(string key, System.TimeSpan value) { }
         public ZeroLog.LogMessage AppendKeyValue(string key, System.TimeSpan? value) { }
-        public ZeroLog.LogMessage AppendKeyValue(string key, ushort value) { }
-        public ZeroLog.LogMessage AppendKeyValue(string key, uint value) { }
-        public ZeroLog.LogMessage AppendKeyValue(string key, ulong value) { }
-        public ZeroLog.LogMessage AppendKeyValue(string key, System.UIntPtr value) { }
+        public ZeroLog.LogMessage AppendKeyValue(string key, nuint value) { }
         public ZeroLog.LogMessage AppendKeyValue(string key, System.UIntPtr? value) { }
+        public ZeroLog.LogMessage AppendKeyValue(string key, bool value) { }
         public ZeroLog.LogMessage AppendKeyValue(string key, bool? value) { }
+        public ZeroLog.LogMessage AppendKeyValue(string key, byte value) { }
         public ZeroLog.LogMessage AppendKeyValue(string key, byte? value) { }
+        public ZeroLog.LogMessage AppendKeyValue(string key, char value) { }
+        public ZeroLog.LogMessage AppendKeyValue(string key, char? value) { }
+        public ZeroLog.LogMessage AppendKeyValue(string key, decimal value) { }
         public ZeroLog.LogMessage AppendKeyValue(string key, decimal? value) { }
+        public ZeroLog.LogMessage AppendKeyValue(string key, double value) { }
         public ZeroLog.LogMessage AppendKeyValue(string key, double? value) { }
+        public ZeroLog.LogMessage AppendKeyValue(string key, float value) { }
         public ZeroLog.LogMessage AppendKeyValue(string key, float? value) { }
+        public ZeroLog.LogMessage AppendKeyValue(string key, int value) { }
         public ZeroLog.LogMessage AppendKeyValue(string key, int? value) { }
+        public ZeroLog.LogMessage AppendKeyValue(string key, long value) { }
         public ZeroLog.LogMessage AppendKeyValue(string key, long? value) { }
+        public ZeroLog.LogMessage AppendKeyValue(string key, sbyte value) { }
         public ZeroLog.LogMessage AppendKeyValue(string key, sbyte? value) { }
+        public ZeroLog.LogMessage AppendKeyValue(string key, short value) { }
         public ZeroLog.LogMessage AppendKeyValue(string key, short? value) { }
         public ZeroLog.LogMessage AppendKeyValue(string key, string? value) { }
+        public ZeroLog.LogMessage AppendKeyValue(string key, uint value) { }
         public ZeroLog.LogMessage AppendKeyValue(string key, uint? value) { }
+        public ZeroLog.LogMessage AppendKeyValue(string key, ulong value) { }
         public ZeroLog.LogMessage AppendKeyValue(string key, ulong? value) { }
+        public ZeroLog.LogMessage AppendKeyValue(string key, ushort value) { }
         public ZeroLog.LogMessage AppendKeyValue(string key, ushort? value) { }
         public ZeroLog.LogMessage AppendKeyValue<T>(string key, T value)
             where T :  struct, System.Enum { }
@@ -983,92 +975,91 @@ namespace ZeroLog
         public ZeroLog.LogMessage WithException(System.Exception? exception) { }
         public static ZeroLog.LogMessage CreateTestMessage(ZeroLog.LogLevel level, int bufferSize, int stringCapacity) { }
         [System.Runtime.CompilerServices.InterpolatedStringHandler]
-        [System.Runtime.CompilerServices.IsByRefLike]
-        public readonly struct AppendInterpolatedStringHandler
+        public readonly ref struct AppendInterpolatedStringHandler
         {
             public AppendInterpolatedStringHandler(int literalLength, int formattedCount, ZeroLog.LogMessage message) { }
-            public void AppendFormatted(bool value) { }
-            public void AppendFormatted(byte value) { }
-            public void AppendFormatted(char value) { }
-            public void AppendFormatted(System.Char? value) { }
             public void AppendFormatted(System.DateOnly value) { }
             public void AppendFormatted(System.DateOnly? value) { }
             public void AppendFormatted(System.DateTime value) { }
             public void AppendFormatted(System.DateTime? value) { }
             public void AppendFormatted(System.DateTimeOffset value) { }
             public void AppendFormatted(System.DateTimeOffset? value) { }
-            public void AppendFormatted(decimal value) { }
-            public void AppendFormatted(double value) { }
             public void AppendFormatted(System.Guid value) { }
             public void AppendFormatted(System.Guid? value) { }
-            public void AppendFormatted(short value) { }
-            public void AppendFormatted(int value) { }
-            public void AppendFormatted(long value) { }
-            public void AppendFormatted(System.IntPtr value) { }
+            public void AppendFormatted(nint value) { }
             public void AppendFormatted(System.IntPtr? value) { }
             public void AppendFormatted(System.ReadOnlySpan<byte> value) { }
             public void AppendFormatted(System.ReadOnlySpan<char> value) { }
-            public void AppendFormatted(sbyte value) { }
-            public void AppendFormatted(float value) { }
             public void AppendFormatted(System.TimeOnly value) { }
             public void AppendFormatted(System.TimeOnly? value) { }
             public void AppendFormatted(System.TimeSpan value) { }
             public void AppendFormatted(System.TimeSpan? value) { }
-            public void AppendFormatted(ushort value) { }
-            public void AppendFormatted(uint value) { }
-            public void AppendFormatted(ulong value) { }
-            public void AppendFormatted(System.UIntPtr value) { }
+            public void AppendFormatted(nuint value) { }
             public void AppendFormatted(System.UIntPtr? value) { }
+            public void AppendFormatted(bool value) { }
             public void AppendFormatted(bool? value) { }
+            public void AppendFormatted(byte value) { }
             public void AppendFormatted(byte? value) { }
+            public void AppendFormatted(char value) { }
+            public void AppendFormatted(char? value) { }
+            public void AppendFormatted(decimal value) { }
             public void AppendFormatted(decimal? value) { }
+            public void AppendFormatted(double value) { }
             public void AppendFormatted(double? value) { }
+            public void AppendFormatted(float value) { }
             public void AppendFormatted(float? value) { }
+            public void AppendFormatted(int value) { }
             public void AppendFormatted(int? value) { }
+            public void AppendFormatted(long value) { }
             public void AppendFormatted(long? value) { }
+            public void AppendFormatted(sbyte value) { }
             public void AppendFormatted(sbyte? value) { }
+            public void AppendFormatted(short value) { }
             public void AppendFormatted(short? value) { }
             public void AppendFormatted(string? value) { }
+            public void AppendFormatted(uint value) { }
             public void AppendFormatted(uint? value) { }
+            public void AppendFormatted(ulong value) { }
             public void AppendFormatted(ulong? value) { }
+            public void AppendFormatted(ushort value) { }
             public void AppendFormatted(ushort? value) { }
-            public void AppendFormatted(byte value, string format) { }
             public void AppendFormatted(System.DateOnly value, string format) { }
             public void AppendFormatted(System.DateOnly? value, string format) { }
             public void AppendFormatted(System.DateTime value, string format) { }
             public void AppendFormatted(System.DateTime? value, string format) { }
             public void AppendFormatted(System.DateTimeOffset value, string format) { }
             public void AppendFormatted(System.DateTimeOffset? value, string format) { }
-            public void AppendFormatted(decimal value, string format) { }
-            public void AppendFormatted(double value, string format) { }
             public void AppendFormatted(System.Guid value, string format) { }
             public void AppendFormatted(System.Guid? value, string format) { }
-            public void AppendFormatted(short value, string format) { }
-            public void AppendFormatted(int value, string format) { }
-            public void AppendFormatted(long value, string format) { }
-            public void AppendFormatted(System.IntPtr value, string format) { }
+            public void AppendFormatted(nint value, string format) { }
             public void AppendFormatted(System.IntPtr? value, string format) { }
-            public void AppendFormatted(sbyte value, string format) { }
-            public void AppendFormatted(float value, string format) { }
             public void AppendFormatted(System.TimeOnly value, string format) { }
             public void AppendFormatted(System.TimeOnly? value, string format) { }
             public void AppendFormatted(System.TimeSpan value, string format) { }
             public void AppendFormatted(System.TimeSpan? value, string format) { }
-            public void AppendFormatted(ushort value, string format) { }
-            public void AppendFormatted(uint value, string format) { }
-            public void AppendFormatted(ulong value, string format) { }
-            public void AppendFormatted(System.UIntPtr value, string format) { }
+            public void AppendFormatted(nuint value, string format) { }
             public void AppendFormatted(System.UIntPtr? value, string format) { }
+            public void AppendFormatted(byte value, string format) { }
             public void AppendFormatted(byte? value, string format) { }
+            public void AppendFormatted(decimal value, string format) { }
             public void AppendFormatted(decimal? value, string format) { }
+            public void AppendFormatted(double value, string format) { }
             public void AppendFormatted(double? value, string format) { }
+            public void AppendFormatted(float value, string format) { }
             public void AppendFormatted(float? value, string format) { }
+            public void AppendFormatted(int value, string format) { }
             public void AppendFormatted(int? value, string format) { }
+            public void AppendFormatted(long value, string format) { }
             public void AppendFormatted(long? value, string format) { }
+            public void AppendFormatted(sbyte value, string format) { }
             public void AppendFormatted(sbyte? value, string format) { }
+            public void AppendFormatted(short value, string format) { }
             public void AppendFormatted(short? value, string format) { }
+            public void AppendFormatted(uint value, string format) { }
             public void AppendFormatted(uint? value, string format) { }
+            public void AppendFormatted(ulong value, string format) { }
             public void AppendFormatted(ulong? value, string format) { }
+            public void AppendFormatted(ushort value, string format) { }
             public void AppendFormatted(ushort? value, string format) { }
             public void AppendFormatted<T>(T value)
                 where T :  struct, System.Enum { }

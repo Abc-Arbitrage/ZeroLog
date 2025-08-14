@@ -54,7 +54,8 @@ public class DateAndSizeRollingFileAppenderTests
         using var reader = new StreamReader(File.Open(_appender.Stream.ShouldBe<FileStream>().Name.ShouldNotBeNull(), FileMode.Open, FileAccess.Read, FileShare.ReadWrite), _appender.Encoding);
         var text = reader.ReadToEnd();
 
-        var expectedLine = $"{logMessage.Timestamp.Date:yyyy-MM-dd} - {logMessage.Timestamp.TimeOfDay:hh\\:mm\\:ss\\.fffffff} - {Thread.CurrentThread.ManagedThreadId} - INFO - TestLog || {logMessage}";
+        var thread = Thread.CurrentThread.Name ?? Thread.CurrentThread.ManagedThreadId.ToString();
+        var expectedLine = $"{logMessage.Timestamp.Date:yyyy-MM-dd} - {logMessage.Timestamp.TimeOfDay:hh\\:mm\\:ss\\.fffffff} - {thread} - INFO - TestLog || {logMessage}";
         text.ShouldEqual(expectedLine + Environment.NewLine + expectedLine + Environment.NewLine);
     }
 
