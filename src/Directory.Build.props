@@ -36,7 +36,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="JetBrains.Annotations" Version="2024.3.0" PrivateAssets="all" />
+    <PackageReference Include="JetBrains.Annotations" Version="2025.2.0" PrivateAssets="all" />
   </ItemGroup>
 
 </Project>
