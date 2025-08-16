@@ -36,6 +36,17 @@ public class SanityChecks
     }
 
     [Test]
+    public Task should_reference_expected_assemblies()
+    {
+        return Verifier.Verify(
+            typeof(LogManager).Assembly
+                              .GetReferencedAssemblies()
+                              .Select(i => i.FullName)
+                              .OrderBy(i => i)
+        ).UniqueForTargetFrameworkAndVersion();
+    }
+
+    [Test]
     public Task should_have_expected_public_api()
     {
         return Verifier.Verify(

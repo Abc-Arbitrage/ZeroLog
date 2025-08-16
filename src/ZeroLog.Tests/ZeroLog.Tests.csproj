@@ -18,6 +18,7 @@
     <PackageReference Include="Verify.DiffPlex" Version="3.1.2" />
     <PackageReference Include="PublicApiGenerator" Version="11.4.6" />
     <PackageReference Include="ObjectLayoutInspector" Version="0.1.4" />
+    <PackageReference Include="JetBrains.Annotations" Version="2025.2.0" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
