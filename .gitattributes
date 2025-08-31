@@ -1,3 +1,2 @@
-*.verified.txt text eol=lf
-*.verified.xml text eol=lf
-*.verified.json text eol=lf
+# Verify
+*.verified.txt text eol=lf working-tree-encoding=UTF-8
