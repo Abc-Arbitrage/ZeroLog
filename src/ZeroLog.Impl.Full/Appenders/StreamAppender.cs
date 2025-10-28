@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
 using System.Text;
@@ -103,6 +104,7 @@ public abstract class StreamAppender : Appender
             _byteBuffer = GC.AllocateUninitializedArray<byte>(maxBytes);
     }
 
+    [UnconditionalSuppressMessage("AssemblyLoadTrimming", "IL2070", Justification = "Returning false is OK, it just skips an optimization.")]
     internal static bool OverridesSpanGetBytes(Type encodingType)
         => encodingType.GetMethod(nameof(System.Text.Encoding.GetBytes), BindingFlags.Public | BindingFlags.Instance, [typeof(ReadOnlySpan<char>), typeof(Span<byte>)])?.DeclaringType == encodingType;
 }

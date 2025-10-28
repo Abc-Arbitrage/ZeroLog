@@ -15,6 +15,9 @@ internal static class EnumCache
     private static readonly ConcurrentDictionary<IntPtr, EnumStrings> _enums = new();
     private static readonly ConcurrentDictionary<IntPtr, bool> _isEnumSigned = new();
 
+#if NET7_0_OR_GREATER
+    [RequiresDynamicCode("Uses reflection to get enum values.")]
+#endif
     public static void Register(Type enumType)
     {
         ArgumentNullException.ThrowIfNull(enumType);
@@ -27,6 +30,10 @@ internal static class EnumCache
 
         _enums.TryAdd(TypeUtil.GetTypeHandleSlow(enumType), EnumStrings.Create(enumType));
     }
+
+    public static void Register<TEnum>()
+        where TEnum : struct, Enum
+        => _enums.TryAdd(TypeUtil.GetTypeHandleSlow(typeof(TEnum)), EnumStrings.Create<TEnum>());
 
     public static bool IsRegistered(Type enumType)
         => _enums.ContainsKey(TypeUtil.GetTypeHandleSlow(enumType));
@@ -179,16 +186,23 @@ internal static class EnumCache
 
     private abstract class EnumStrings
     {
+#if NET7_0_OR_GREATER
+        [RequiresDynamicCode("This code uses Enum.GetValues which is not compatible with AOT compilation. Use Create<TEnum> if possible.")]
+#endif
         public static EnumStrings Create(Type enumType)
-        {
-            var enumItems = Enum.GetValues(enumType)
-                                .Cast<Enum>()
-                                .Select(i => new EnumItem(i))
-                                .ToList();
+            => Create(Enum.GetValues(enumType).Cast<Enum>().Select(i => new EnumItem(i)));
 
-            return ArrayEnumStrings.CanHandle(enumItems)
-                ? new ArrayEnumStrings(enumItems)
-                : new DictionaryEnumStrings(enumItems);
+        public static EnumStrings Create<TEnum>()
+            where TEnum : struct, Enum
+            => Create(Enum.GetValues<TEnum>().Select(i => new EnumItem(i)));
+
+        private static EnumStrings Create(IEnumerable<EnumItem> enumItems)
+        {
+            var itemList = enumItems.ToList();
+
+            return ArrayEnumStrings.CanHandle(itemList)
+                ? new ArrayEnumStrings(itemList)
+                : new DictionaryEnumStrings(itemList);
         }
 
         public abstract string? TryGetString(ulong value);

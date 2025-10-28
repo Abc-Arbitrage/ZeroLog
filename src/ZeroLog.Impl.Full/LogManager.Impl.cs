@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -122,6 +123,9 @@ partial class LogManager : IDisposable
     /// Member names will be used when formatting the message (instead of numeric values).
     /// </summary>
     /// <param name="enumType">The enum type.</param>
+#if NET7_0_OR_GREATER
+    [RequiresDynamicCode("This code uses reflection which is not compatible with AOT compilation. Use the generic version if possible.")]
+#endif
     public static void RegisterEnum(Type enumType)
         => EnumCache.Register(enumType);
 
@@ -132,7 +136,7 @@ partial class LogManager : IDisposable
     /// <typeparam name="T">The enum type.</typeparam>
     public static void RegisterEnum<T>()
         where T : struct, Enum
-        => RegisterEnum(typeof(T));
+        => EnumCache.Register<T>();
 
     /// <summary>
     /// Registers all enum types from the given assembly.
@@ -140,6 +144,10 @@ partial class LogManager : IDisposable
     /// </summary>
     /// <param name="assembly">The assembly.</param>
     /// <exception cref="ArgumentNullException"><paramref name="assembly"/> was null.</exception>
+#if NET7_0_OR_GREATER
+    [RequiresDynamicCode("This code uses reflection which is not compatible with AOT compilation.")]
+    [RequiresUnreferencedCode("This code uses reflection which is not compatible with trimming.")]
+#endif
     public static void RegisterAllEnumsFrom(Assembly assembly)
     {
         if (assembly == null)
@@ -156,6 +164,10 @@ partial class LogManager : IDisposable
     /// <param name="type">The unmanaged type.</param>
     /// <exception cref="ArgumentNullException"><paramref name="type"/> was null.</exception>
     /// <exception cref="ArgumentException"><paramref name="type"/> is not an unmanaged type or does not implement <see cref="ISpanFormattable"/>.</exception>
+#if NET7_0_OR_GREATER
+    [RequiresDynamicCode("This code uses reflection which is not compatible with AOT compilation. Use the generic version if possible.")]
+    [RequiresUnreferencedCode("This code uses reflection which is not compatible with trimming.")]
+#endif
     public static void RegisterUnmanaged(Type type)
         => UnmanagedCache.Register(type);
 

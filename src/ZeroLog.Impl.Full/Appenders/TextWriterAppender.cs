@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
 using ZeroLog.Formatting;
@@ -93,6 +94,7 @@ public class TextWriterAppender : Appender
             _useSpanWrite = _textWriter is { } textWriter && OverridesSpanWrite(textWriter.GetType());
     }
 
+    [UnconditionalSuppressMessage("AssemblyLoadTrimming", "IL2070", Justification = "Returning false is OK, it just skips an optimization.")]
     internal static bool OverridesSpanWrite(Type textWriterType)
         => textWriterType.GetMethod(nameof(System.IO.TextWriter.Write), BindingFlags.Public | BindingFlags.Instance, [typeof(ReadOnlySpan<char>)])?.DeclaringType == textWriterType;
 }
