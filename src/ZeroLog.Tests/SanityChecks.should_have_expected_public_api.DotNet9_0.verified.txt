@@ -164,6 +164,7 @@ namespace ZeroLog.Formatting
         public string Key { get; }
         public System.ReadOnlySpan<char> Value { get; }
         public System.Type? ValueType { get; }
+        public void Deconstruct(out string key, out System.ReadOnlySpan<char> value) { }
         public override string ToString() { }
         public bool TryGetValue<T>(out T result)
             where T :  unmanaged { }
@@ -179,6 +180,7 @@ namespace ZeroLog.Formatting
         public System.DateTime Timestamp { get; }
         public ZeroLog.Formatting.LoggedMessage Clone() { }
         public override string ToString() { }
+        public static ZeroLog.Formatting.LoggedMessage CreateTestMessage(ZeroLog.LogMessage message, ZeroLog.Configuration.ZeroLogConfiguration? config = null) { }
     }
 }
 namespace ZeroLog

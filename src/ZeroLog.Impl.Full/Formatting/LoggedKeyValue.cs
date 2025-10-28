@@ -44,6 +44,15 @@ public readonly unsafe ref struct LoggedKeyValue
     }
 
     /// <summary>
+    /// Deconstructs the key/value pair into its components.
+    /// </summary>
+    public void Deconstruct(out string key, out ReadOnlySpan<char> value)
+    {
+        key = Key;
+        value = Value;
+    }
+
+    /// <summary>
     /// Returns a string which represents the key/value pair.
     /// </summary>
     public override string ToString()
