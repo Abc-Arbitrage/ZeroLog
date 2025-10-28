@@ -39,6 +39,30 @@ public class AppenderTests
     }
 
     [Test]
+    public void test_messages_should_work_correctly()
+    {
+        var realMessage = new LogMessage(BufferSegmentProvider.CreateStandaloneSegment(1024), 16);
+        realMessage.Append("Hello, World! 42 is the answer.")
+                   .AppendKeyValue("Answer", 42);
+
+        var realLoggedMessage = new LoggedMessage(1024, ZeroLogConfiguration.Default);
+        realLoggedMessage.SetMessage(realMessage);
+
+        var testMessage = LogMessage.CreateTestMessage(LogLevel.Info, 1024, 16);
+        testMessage.Append("Hello, World! 42 is the answer.")
+                   .AppendKeyValue("Answer", 42);
+
+        var testLoggedMessage = LoggedMessage.CreateTestMessage(testMessage, ZeroLogConfiguration.Default);
+
+        testLoggedMessage.Message.ToString().ShouldEqual(realLoggedMessage.Message.ToString());
+        var (realKey, realValue) = realLoggedMessage.KeyValues[0];
+        var (testKey, testValue) = testLoggedMessage.KeyValues[0];
+
+        testKey.ShouldEqual(realKey);
+        testValue.SequenceEqual(realValue).ShouldBeTrue();
+    }
+
+    [Test]
     public void should_not_throw_if_appender_implementation_throws()
     {
         _appender.FailOnAppend = true;

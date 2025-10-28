@@ -18,10 +18,7 @@ public class StreamAppenderTests
         logMessage = new LogMessage(message);
         logMessage.Initialize(new Log("TestLog"), LogLevel.Info);
 
-        var formattedMessage = new LoggedMessage(logMessage.ToString().Length, ZeroLogConfiguration.Default);
-        formattedMessage.SetMessage(logMessage);
-
-        return formattedMessage;
+        return LoggedMessage.CreateTestMessage(logMessage);
     }
 
     [Test, RequiresThread]
@@ -64,8 +61,7 @@ public class StreamAppenderTests
         logMessage.Initialize(new Log("TestLog"), LogLevel.Info);
         logMessage.Exception = new InvalidOperationException("Simulated exception");
 
-        var formattedMessage = new LoggedMessage(logMessage.ToString().Length, ZeroLogConfiguration.Default);
-        formattedMessage.SetMessage(logMessage);
+        var formattedMessage = LoggedMessage.CreateTestMessage(logMessage);
 
         var appender = new MemoryAppender();
 
@@ -89,8 +85,7 @@ public class StreamAppenderTests
         var appender = new MemoryAppender();
         appender.SetEncoding(encoding);
 
-        var loggedMessage = new LoggedMessage(128, ZeroLogConfiguration.Default);
-        loggedMessage.SetMessage(new LogMessage("Hello"));
+        var loggedMessage = LoggedMessage.CreateTestMessage(new LogMessage("Hello"));
         appender.WriteMessage(loggedMessage);
 
         encoding.StandardGetBytesCalled.ShouldBeTrue();
@@ -104,8 +99,7 @@ public class StreamAppenderTests
         var appender = new MemoryAppender();
         appender.SetEncoding(encoding);
 
-        var loggedMessage = new LoggedMessage(128, ZeroLogConfiguration.Default);
-        loggedMessage.SetMessage(new LogMessage("Hello"));
+        var loggedMessage = LoggedMessage.CreateTestMessage(new LogMessage("Hello"));
         appender.WriteMessage(loggedMessage);
 
         encoding.SpanGetBytesCalled.ShouldBeTrue();

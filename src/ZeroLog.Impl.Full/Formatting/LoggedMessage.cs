@@ -131,4 +131,23 @@ public sealed class LoggedMessage
     /// </returns>
     public LoggedMessage Clone()
         => new(this);
+
+    /// <summary>
+    /// Creates a <see cref="LoggedMessage"/> for unit testing purposes.
+    /// </summary>
+    /// <remarks>
+    /// Do not modify the provided <paramref name="message"/> while using the returned <see cref="LoggedMessage"/>.
+    /// </remarks>
+    /// <param name="message">The message to convert.</param>
+    /// <param name="config">The configuration to use. Uses <see cref="ZeroLogConfiguration.Default"/> by default.</param>
+    /// <returns>A standalone log message.</returns>
+    /// <seealso cref="LogMessage.CreateTestMessage"/>
+    public static LoggedMessage CreateTestMessage(LogMessage message, ZeroLogConfiguration? config = null)
+    {
+        ArgumentNullException.ThrowIfNull(message);
+
+        var loggedMessage = new LoggedMessage(LogManager.OutputBufferSize, config ?? ZeroLogConfiguration.Default);
+        loggedMessage.SetMessage(message);
+        return loggedMessage;
+    }
 }

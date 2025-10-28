@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading;
 using NUnit.Framework;
 using ZeroLog.Appenders;
-using ZeroLog.Configuration;
 using ZeroLog.Formatting;
 using ZeroLog.Tests.Support;
 
@@ -44,8 +43,7 @@ public class DateAndSizeRollingFileAppenderTests
         var logMessage = new LogMessage("Test log message");
         logMessage.Initialize(new Log("TestLog"), LogLevel.Info);
 
-        var formattedMessage = new LoggedMessage(logMessage.ToString().Length, ZeroLogConfiguration.Default);
-        formattedMessage.SetMessage(logMessage);
+        var formattedMessage = LoggedMessage.CreateTestMessage(logMessage);
 
         _appender.WriteMessage(formattedMessage);
         _appender.WriteMessage(formattedMessage);
@@ -71,8 +69,7 @@ public class DateAndSizeRollingFileAppenderTests
         var logMessage = new LogMessage(new string('a', 50));
         logMessage.Initialize(new Log("TestLog"), LogLevel.Info);
 
-        var formattedMessage = new LoggedMessage(logMessage.ToString().Length, ZeroLogConfiguration.Default);
-        formattedMessage.SetMessage(logMessage);
+        var formattedMessage = LoggedMessage.CreateTestMessage(logMessage);
 
         _appender.WriteMessage(formattedMessage);
         Path.GetFileName(_appender.Stream.ShouldBe<FileStream>().Name).ShouldEqual("0");
@@ -98,8 +95,7 @@ public class DateAndSizeRollingFileAppenderTests
         var logMessage = new LogMessage("Test message");
         logMessage.Initialize(new Log("TestLog"), LogLevel.Info);
 
-        var formattedMessage = new LoggedMessage(logMessage.ToString().Length, ZeroLogConfiguration.Default);
-        formattedMessage.SetMessage(logMessage);
+        var formattedMessage = LoggedMessage.CreateTestMessage(logMessage);
 
         _appender.WriteMessage(formattedMessage);
         Path.GetFileName(_appender.Stream.ShouldBe<FileStream>().Name).ShouldEqual(logMessage.Timestamp.ToString("yyyyMMdd"));
@@ -129,8 +125,7 @@ public class DateAndSizeRollingFileAppenderTests
         var logMessage = new LogMessage("Test message");
         logMessage.Initialize(new Log("TestLog"), LogLevel.Info);
 
-        var formattedMessage = new LoggedMessage(logMessage.ToString().Length, ZeroLogConfiguration.Default);
-        formattedMessage.SetMessage(logMessage);
+        var formattedMessage = LoggedMessage.CreateTestMessage(logMessage);
 
         Directory.CreateDirectory(_appender.Directory);
         File.WriteAllLines(Path.Combine(_appender.Directory, "0"), ["File 0"]);
@@ -156,8 +151,7 @@ public class DateAndSizeRollingFileAppenderTests
         var logMessage = new LogMessage("Test message");
         logMessage.Initialize(new Log("TestLog"), LogLevel.Info);
 
-        var formattedMessage = new LoggedMessage(logMessage.ToString().Length, ZeroLogConfiguration.Default);
-        formattedMessage.SetMessage(logMessage);
+        var formattedMessage = LoggedMessage.CreateTestMessage(logMessage);
 
         Directory.CreateDirectory(_appender.Directory);
         File.WriteAllLines(Path.Combine(_appender.Directory, "0"), ["File 0"]);
@@ -188,8 +182,7 @@ public class DateAndSizeRollingFileAppenderTests
         var logMessage = new LogMessage("Test message");
         logMessage.Initialize(new Log("TestLog"), LogLevel.Info);
 
-        var formattedMessage = new LoggedMessage(logMessage.ToString().Length, ZeroLogConfiguration.Default);
-        formattedMessage.SetMessage(logMessage);
+        var formattedMessage = LoggedMessage.CreateTestMessage(logMessage);
 
         Directory.CreateDirectory(_appender.Directory);
         File.WriteAllLines(Path.Combine(_appender.Directory, ConstantFileNameAppender.FileName), ["First line"]);
@@ -221,8 +214,7 @@ public class DateAndSizeRollingFileAppenderTests
         logMessage.Initialize(new Log("TestLog"), LogLevel.Info);
         logMessage.Timestamp = new DateTime(2022, 02, 15);
 
-        var formattedMessage = new LoggedMessage(logMessage.ToString().Length, ZeroLogConfiguration.Default);
-        formattedMessage.SetMessage(logMessage);
+        var formattedMessage = LoggedMessage.CreateTestMessage(logMessage);
 
         _appender.WriteMessage(formattedMessage);
 

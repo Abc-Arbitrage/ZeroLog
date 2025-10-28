@@ -76,12 +76,13 @@ unsafe partial class LogMessage
     }
 
     /// <summary>
-    /// Creates a log message for unit testing purposes.
+    /// Creates a <see cref="LogMessage"/> for unit testing purposes.
     /// </summary>
     /// <param name="level">The message log level.</param>
     /// <param name="bufferSize">The message buffer size. See <see cref="ZeroLogConfiguration.LogMessageBufferSize"/>.</param>
     /// <param name="stringCapacity">The string argument capacity. See <see cref="ZeroLogConfiguration.LogMessageStringCapacity"/>.</param>
     /// <returns>A standalone log message.</returns>
+    /// <seealso cref="Formatting.LoggedMessage.CreateTestMessage"/>
     public static LogMessage CreateTestMessage(LogLevel level, int bufferSize, int stringCapacity)
     {
         var message = new LogMessage(BufferSegmentProvider.CreateStandaloneSegment(bufferSize), stringCapacity);

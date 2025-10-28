@@ -18,10 +18,7 @@ public class TextWriterAppenderTests
         logMessage = new LogMessage(message);
         logMessage.Initialize(new Log("TestLog"), LogLevel.Info);
 
-        var formattedMessage = new LoggedMessage(logMessage.ToString().Length, ZeroLogConfiguration.Default);
-        formattedMessage.SetMessage(logMessage);
-
-        return formattedMessage;
+        return LoggedMessage.CreateTestMessage(logMessage);
     }
 
     [Test, RequiresThread]
@@ -82,8 +79,7 @@ public class TextWriterAppenderTests
             Formatter = new DefaultFormatter { PrefixPattern = "" }
         };
 
-        var loggedMessage = new LoggedMessage(128, ZeroLogConfiguration.Default);
-        loggedMessage.SetMessage(new LogMessage("Hello"));
+        var loggedMessage = LoggedMessage.CreateTestMessage(new LogMessage("Hello"));
         appender.WriteMessage(loggedMessage);
 
         writer.StandardWriteCalled.ShouldBeTrue();
@@ -99,8 +95,7 @@ public class TextWriterAppenderTests
             Formatter = new DefaultFormatter { PrefixPattern = "" }
         };
 
-        var loggedMessage = new LoggedMessage(128, ZeroLogConfiguration.Default);
-        loggedMessage.SetMessage(new LogMessage("Hello"));
+        var loggedMessage = LoggedMessage.CreateTestMessage(new LogMessage("Hello"));
         appender.WriteMessage(loggedMessage);
 
         writer.SpanWriteCalled.ShouldBeTrue();
