@@ -66,8 +66,15 @@ public class TextWriterAppenderTests
     [Test]
     public void should_detect_override_of_span_Write()
     {
-        TextWriterAppender.OverridesSpanWrite(typeof(WriterWithoutSpanWrite)).ShouldBeFalse();
-        TextWriterAppender.OverridesSpanWrite(typeof(WriterWithSpanWrite)).ShouldBeTrue();
+        TextWriterAppender.UseSpanGetBytesOverload(new WriterWithoutSpanWrite()).ShouldBeFalse();
+        TextWriterAppender.UseSpanGetBytesOverload(typeof(WriterWithoutSpanWrite)).ShouldBeFalse();
+        TextWriterAppender.UseSpanGetBytesOverload(new WriterWithSpanWrite()).ShouldBeTrue();
+        TextWriterAppender.UseSpanGetBytesOverload(typeof(WriterWithSpanWrite)).ShouldBeTrue();
+
+        TextWriterAppender.UseSpanGetBytesOverload(new StringWriter()).ShouldBeTrue();
+        TextWriterAppender.UseSpanGetBytesOverload(typeof(StringWriter)).ShouldBeTrue();
+        TextWriterAppender.UseSpanGetBytesOverload(new StreamWriter(new MemoryStream())).ShouldBeTrue();
+        TextWriterAppender.UseSpanGetBytesOverload(typeof(StreamWriter)).ShouldBeTrue();
     }
 
     [Test]

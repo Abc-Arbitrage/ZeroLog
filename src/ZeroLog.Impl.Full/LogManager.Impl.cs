@@ -2,6 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using ZeroLog.Configuration;
 using ZeroLog.Support;
@@ -152,6 +153,9 @@ partial class LogManager : IDisposable
     {
         if (assembly == null)
             throw new ArgumentNullException(nameof(assembly));
+
+        if (!RuntimeFeature.IsDynamicCodeSupported)
+            return;
 
         foreach (var type in TypeUtil.GetLoadableTypes(assembly).Where(t => t.IsEnum))
             RegisterEnum(type);

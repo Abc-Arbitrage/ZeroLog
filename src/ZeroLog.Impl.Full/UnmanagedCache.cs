@@ -43,6 +43,9 @@ internal static unsafe class UnmanagedCache
     {
         ArgumentNullException.ThrowIfNull(unmanagedType);
 
+        if (!RuntimeFeature.IsDynamicCodeSupported)
+            return;
+
         if (!typeof(ISpanFormattable).IsAssignableFrom(unmanagedType))
             throw new ArgumentException($"Not an {nameof(ISpanFormattable)} type: {unmanagedType}");
 

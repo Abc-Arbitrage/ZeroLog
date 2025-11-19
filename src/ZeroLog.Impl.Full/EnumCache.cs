@@ -28,7 +28,11 @@ internal static class EnumCache
         if (enumType.ContainsGenericParameters)
             return;
 
-        _enums.TryAdd(TypeUtil.GetTypeHandleSlow(enumType), EnumStrings.Create(enumType));
+        if (!RuntimeFeature.IsDynamicCodeSupported)
+            return;
+
+        if (EnumStrings.Create(enumType) is { } enumStrings)
+            _enums.TryAdd(TypeUtil.GetTypeHandleSlow(enumType), enumStrings);
     }
 
     public static void Register<TEnum>()
@@ -189,8 +193,13 @@ internal static class EnumCache
 #if NET7_0_OR_GREATER
         [RequiresDynamicCode("This code uses Enum.GetValues which is not compatible with AOT compilation. Use Create<TEnum> if possible.")]
 #endif
-        public static EnumStrings Create(Type enumType)
-            => Create(Enum.GetValues(enumType).Cast<Enum>().Select(i => new EnumItem(i)));
+        public static EnumStrings? Create(Type enumType)
+        {
+            if (!RuntimeFeature.IsDynamicCodeSupported)
+                return null;
+
+            return Create(Enum.GetValues(enumType).Cast<Enum>().Select(i => new EnumItem(i)));
+        }
 
         public static EnumStrings Create<TEnum>()
             where TEnum : struct, Enum
