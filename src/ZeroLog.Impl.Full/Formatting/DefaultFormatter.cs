@@ -33,6 +33,8 @@ public sealed class DefaultFormatter : Formatter
     /// <item><term><c>%time</c></term><description>The message time of day in UTC (default format: <c>hh\:mm\:ss\.fffffff</c>).</description></item>
     /// <item><term><c>%localTime</c></term><description>The message time of day converted to the local time zone (default format: <c>hh\:mm\:ss\.fffffff</c>).</description></item>
     /// <item><term><c>%thread</c></term><description>The thread name (or ID) which logged the message.</description></item>
+    /// <item><term><c>%threadId</c></term><description>The thread ID which logged the message.</description></item>
+    /// <item><term><c>%threadName</c></term><description>The thread name which logged the message, or empty if the thread was unnamed.</description></item>
     /// <item><term><c>%level</c></term><description>The log level in uppercase (specify the <c>pad</c> format to make each level 5 characters wide).</description></item>
     /// <item><term><c>%logger</c></term><description>The logger name.</description></item>
     /// <item><term><c>%loggerCompact</c></term><description>The logger name, with the namespace shortened to its initials.</description></item>

@@ -102,6 +102,8 @@ public class PrefixWriterTests
     [TestCase("%time")]
     [TestCase("%localTime")]
     [TestCase("%thread")]
+    [TestCase("%threadId")]
+    [TestCase("%threadName")]
     [TestCase("%level")]
     [TestCase("%logger")]
     [TestCase("%loggerCompact")]
@@ -123,22 +125,21 @@ public class PrefixWriterTests
         var formattedLogMessage = new LoggedMessage(256, ZeroLogConfiguration.Default);
         formattedLogMessage.SetMessage(logMessage);
 
-        GcTester.ShouldNotAllocate(() =>
-        {
-            prefixWriter.WritePrefix(formattedLogMessage, buffer, out _);
-        });
+        GcTester.ShouldNotAllocate(() => { prefixWriter.WritePrefix(formattedLogMessage, buffer, out _); });
 
         PrefixWriter.IsValidPattern(pattern).ShouldBeTrue();
     }
 
     [Test]
-    public void should_write_thread_name()
+    [TestCase("%thread")]
+    [TestCase("%threadName")]
+    public void should_write_thread_name(string format)
     {
         RunOnCustomThread(() =>
         {
             Thread.CurrentThread.Name = "Hello";
 
-            var prefixWriter = new PrefixWriter("%thread world!");
+            var prefixWriter = new PrefixWriter($"{format} world!");
 
             var logMessage = new LogMessage("Foo");
             logMessage.Initialize(null, LogLevel.Info);
@@ -149,11 +150,13 @@ public class PrefixWriterTests
     }
 
     [Test]
-    public void should_write_thread_id()
+    [TestCase("%thread")]
+    [TestCase("%threadId")]
+    public void should_write_thread_id(string format)
     {
         RunOnCustomThread(() =>
         {
-            var prefixWriter = new PrefixWriter("%thread");
+            var prefixWriter = new PrefixWriter(format);
 
             var logMessage = new LogMessage("Foo");
             logMessage.Initialize(null, LogLevel.Info);
@@ -164,16 +167,32 @@ public class PrefixWriterTests
     }
 
     [Test]
-    public void should_write_zero_when_no_thread_provided()
+    [TestCase("%thread")]
+    [TestCase("%threadId")]
+    public void should_write_zero_when_no_thread_provided(string format)
     {
         RunOnCustomThread(() =>
         {
-            var prefixWriter = new PrefixWriter("%thread");
+            var prefixWriter = new PrefixWriter(format);
 
             var logMessage = new LogMessage("Foo");
 
             var result = GetResult(prefixWriter, logMessage);
             result.ShouldEqual("0");
+        });
+    }
+
+    [Test]
+    public void should_not_write_anything_for_unnamed_thread_with_threadName()
+    {
+        RunOnCustomThread(() =>
+        {
+            var prefixWriter = new PrefixWriter("foo%{threadName}bar");
+
+            var logMessage = new LogMessage("Foo");
+
+            var result = GetResult(prefixWriter, logMessage);
+            result.ShouldEqual("foobar");
         });
     }
 
