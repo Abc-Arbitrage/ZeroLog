@@ -15,9 +15,7 @@ internal static class EnumCache
     private static readonly ConcurrentDictionary<IntPtr, EnumStrings> _enums = new();
     private static readonly ConcurrentDictionary<IntPtr, bool> _isEnumSigned = new();
 
-#if NET7_0_OR_GREATER
     [RequiresDynamicCode("Uses reflection to get enum values.")]
-#endif
     public static void Register(Type enumType)
     {
         ArgumentNullException.ThrowIfNull(enumType);
@@ -190,9 +188,7 @@ internal static class EnumCache
 
     private abstract class EnumStrings
     {
-#if NET7_0_OR_GREATER
         [RequiresDynamicCode("This code uses Enum.GetValues which is not compatible with AOT compilation. Use Create<TEnum> if possible.")]
-#endif
         public static EnumStrings? Create(Type enumType)
         {
             if (!RuntimeFeature.IsDynamicCodeSupported)
