@@ -82,6 +82,10 @@ public class AllocationTests(LogMessagePoolExhaustionStrategy exhaustionStrategy
             {
                 LogManager.Flush();
 
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+                GC.Collect();
+
                 allocationsOnLoggingThread = GC.GetAllocatedBytesForCurrentThread();
                 allocationsOnAppenderThread = _awaitableAppender.AllocatedBytesOnAppenderThread;
             }
