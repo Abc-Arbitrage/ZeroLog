@@ -809,10 +809,12 @@ namespace ZeroLog
         public static ZeroLog.Log GetLogger(string name) { }
         public static ZeroLog.Log GetLogger<T>() { }
         public static System.IDisposable Initialize(ZeroLog.Configuration.ZeroLogConfiguration configuration) { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This code uses reflection which is not compatible with trimming.")]
         public static void RegisterAllEnumsFrom(System.Reflection.Assembly assembly) { }
         public static void RegisterEnum(System.Type enumType) { }
         public static void RegisterEnum<T>()
             where T :  struct, System.Enum { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This code uses reflection which is not compatible with trimming.")]
         public static void RegisterUnmanaged(System.Type type) { }
         public static void RegisterUnmanaged<T>()
             where T :  unmanaged, System.ISpanFormattable { }

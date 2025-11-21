@@ -29,8 +29,7 @@ internal static class EnumCache
         if (!RuntimeFeature.IsDynamicCodeSupported)
             return;
 
-        if (EnumStrings.Create(enumType) is { } enumStrings)
-            _enums.TryAdd(TypeUtil.GetTypeHandleSlow(enumType), enumStrings);
+        _enums.TryAdd(TypeUtil.GetTypeHandleSlow(enumType), EnumStrings.Create(enumType));
     }
 
     public static void Register<TEnum>()
@@ -189,10 +188,10 @@ internal static class EnumCache
     private abstract class EnumStrings
     {
         [RequiresDynamicCode("This code uses Enum.GetValues which is not compatible with AOT compilation. Use Create<TEnum> if possible.")]
-        public static EnumStrings? Create(Type enumType)
+        public static EnumStrings Create(Type enumType)
         {
             if (!RuntimeFeature.IsDynamicCodeSupported)
-                return null;
+                return NullEnumStrings.Instance;
 
             return Create(Enum.GetValues(enumType).Cast<Enum>().Select(i => new EnumItem(i)));
         }
@@ -256,6 +255,14 @@ internal static class EnumCache
             _strings.TryGetValue(value, out var str);
             return str;
         }
+    }
+
+    private sealed class NullEnumStrings : EnumStrings
+    {
+        public static NullEnumStrings Instance { get; } = new();
+
+        public override string? TryGetString(ulong value)
+            => null;
     }
 
     private readonly struct EnumItem(Enum item)

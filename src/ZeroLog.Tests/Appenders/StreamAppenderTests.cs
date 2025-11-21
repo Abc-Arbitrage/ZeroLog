@@ -126,8 +126,7 @@ public class StreamAppenderTests
         var loggedMessage = new LoggedMessage(128, ZeroLogConfiguration.Default);
         loggedMessage.SetMessage(new LogMessage("Hello"));
 
-        GcTester.ShouldNotAllocate(() => appender.WriteMessage(loggedMessage)
-        );
+        GcTester.ShouldNotAllocate(() => appender.WriteMessage(loggedMessage));
     }
 
     private sealed class MemoryAppender : StreamAppender
