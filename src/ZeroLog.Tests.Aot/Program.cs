@@ -12,9 +12,78 @@ namespace ZeroLog.Tests.Aot;
 [SuppressMessage("ReSharper", "UnusedMember.Local")]
 internal static class Program
 {
+    private const string _buildConfiguration =
+#if DEBUG
+        "Debug";
+#else
+        "Release";
+#endif
+
     private static readonly Log _log = LogManager.GetLogger(typeof(Program));
 
-    private static void Main()
+    private const string _reset = "\e[0m";
+    private const string _bold = "\e[1m";
+    private const string _red = "\e[91m";
+    private const string _green = "\e[92m";
+
+    private static int Main()
+    {
+        Console.WriteLine();
+        Console.WriteLine($"{_bold}Running AOT tests on {RuntimeInformation.FrameworkDescription}, {RuntimeInformation.RuntimeIdentifier} in {_buildConfiguration}...{_reset}");
+        Console.WriteLine();
+
+        var stringBuilder = new StringBuilder();
+        RunSession(stringBuilder);
+        var stringOutput = stringBuilder.ToString();
+
+        Console.WriteLine();
+        Console.WriteLine($"{_bold}Results:{_reset}");
+        Console.WriteLine();
+
+        var success = true;
+
+        CheckExpectation(!RuntimeFeature.IsDynamicCodeSupported, "RuntimeFeature.IsDynamicCodeSupported is false");
+        CheckExpectation(string.IsNullOrEmpty(GetAssemblyLocation()), "typeof(Program).Assembly.Location is empty");
+
+        CheckSubstring("Registered enum: Bar");
+        CheckSubstring("""Structured value ~~ { "RegisteredEnum": "Bar" }""");
+
+        CheckSubstring("Unregistered enum: 1");
+        CheckSubstring("""Structured value ~~ { "UnregisteredEnum": "1" }""");
+
+        CheckSubstring("Registered unmanaged type: foo 42 bar");
+        CheckSubstring("Unregistered unmanaged type: Unmanaged(0x2a00000000000000)");
+
+        CheckSubstring("Uses Span overload with Encoding.Default: True");
+        CheckSubstring("Uses Span overload with Encoding.UTF8: True");
+        CheckSubstring("Uses Span overload with Encoding.ASCII: True");
+        CheckSubstring("Uses Span overload with Encoding.Latin1: True");
+
+        CheckSubstring("Goodbye!");
+
+        Console.WriteLine();
+        Console.WriteLine($"{_bold}AOT tests: {(success ? $"{_green}PASSED" : $"{_red}FAILED")}{_reset}");
+        Console.WriteLine();
+
+        return success ? 0 : 1;
+
+        void CheckSubstring(string expected)
+            => CheckExpectation(stringOutput.Contains(expected), expected);
+
+        void CheckExpectation(bool result, string label)
+        {
+            Console.WriteLine($"  - {(result ? $"{_green}PASSED" : $"{_red}FAILED")}{_reset}: {label}");
+
+            if (!result)
+                success = false;
+        }
+
+        [UnconditionalSuppressMessage("SingleFile", "IL3000")]
+        static string GetAssemblyLocation()
+            => typeof(Program).Assembly.Location;
+    }
+
+    private static void RunSession(StringBuilder stringBuilder)
     {
         using var logs = LogManager.Initialize(new ZeroLogConfiguration
         {
@@ -22,7 +91,11 @@ internal static class Program
             RootLogger =
             {
                 Level = LogLevel.Debug,
-                Appenders = { new ConsoleAppender() }
+                Appenders =
+                {
+                    new ConsoleAppender(),
+                    new TextWriterAppender(new StringWriter(stringBuilder))
+                }
             }
         });
 
@@ -30,6 +103,7 @@ internal static class Program
         LogManager.RegisterUnmanaged<RegisteredUnmanagedType>();
 
         _log.Info("Hello, world!");
+        _log.Info("-----");
 
         _log.Info()
             .Append(nameof(RuntimeInformation))
@@ -84,6 +158,7 @@ internal static class Program
         UseSpanOverloadWithTextWriter(new StringWriter());
         UseSpanOverloadWithTextWriter(new StreamWriter(new MemoryStream()));
 
+        _log.Info("-----");
         _log.Info("Goodbye!");
 
         return;

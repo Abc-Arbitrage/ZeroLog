@@ -51,6 +51,9 @@ jobs:
       - name: Test Allocations
         run: ${{ env.BUILD_TEST_ALLOCATIONS }}
 
+      - name: Test AOT
+        run: dotnet publish src/ZeroLog.Tests.Aot --output ./bin/aot && ./bin/aot/ZeroLog.Tests.Aot.exe
+
       - name: Upload NuGet
         uses: actions/upload-artifact@v4
         with:
@@ -84,3 +87,6 @@ jobs:
       - name: Test Allocations
         shell: pwsh
         run: ${{ env.BUILD_TEST_ALLOCATIONS }}
+
+      - name: Test AOT
+        run: dotnet publish src/ZeroLog.Tests.Aot --output ./bin/aot && ./bin/aot/ZeroLog.Tests.Aot
