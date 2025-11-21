@@ -1,7 +1,4 @@
-using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using PublicApiGenerator;
@@ -58,16 +55,7 @@ public class SanityChecks
             typeof(LogManager).Assembly
                               .GeneratePublicApi(new ApiGeneratorOptions
                               {
-                                  IncludeAssemblyAttributes = false,
-                                  ExcludeAttributes =
-                                  [
-                                      typeof(ObsoleteAttribute).FullName,
-#if NET7_0_OR_GREATER
-                                      typeof(CompilerFeatureRequiredAttribute).FullName,
-                                      typeof(RequiresDynamicCodeAttribute).FullName,
-                                      typeof(RequiresUnreferencedCodeAttribute).FullName
-#endif
-                                  ]
+                                  IncludeAssemblyAttributes = false
                               })
         ).UniqueForTargetFrameworkAndVersion();
     }
