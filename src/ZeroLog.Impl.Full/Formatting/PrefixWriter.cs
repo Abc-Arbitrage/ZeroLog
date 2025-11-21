@@ -84,6 +84,8 @@ internal class PrefixWriter
                 "time"          => new PatternPart(PatternPartType.Time, format),
                 "localtime"     => new PatternPart(PatternPartType.LocalTime, format),
                 "thread"        => new PatternPart(PatternPartType.Thread, format),
+                "threadid"      => new PatternPart(PatternPartType.ThreadId, format),
+                "threadname"    => new PatternPart(PatternPartType.ThreadName, format),
                 "level"         => new PatternPart(PatternPartType.Level, format),
                 "logger"        => new PatternPart(PatternPartType.Logger, format),
                 "loggercompact" => new PatternPart(PatternPartType.LoggerCompact, format),
@@ -284,6 +286,25 @@ internal class PrefixWriter
                     break;
                 }
 
+                case PatternPartType.ThreadId:
+                {
+                    if (!builder.TryAppend(message.Thread?.ManagedThreadId ?? 0))
+                        goto endOfLoop;
+
+                    break;
+                }
+
+                case PatternPartType.ThreadName:
+                {
+                    if (message.Thread?.Name is { } threadName)
+                    {
+                        if (!builder.TryAppendPartial(threadName))
+                            goto endOfLoop;
+                    }
+
+                    break;
+                }
+
                 case PatternPartType.Level:
                 {
                     var levelString = message.Level switch
@@ -350,6 +371,8 @@ internal class PrefixWriter
         Time,
         LocalTime,
         Thread,
+        ThreadId,
+        ThreadName,
         Level,
         Logger,
         LoggerCompact,

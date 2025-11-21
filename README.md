@@ -137,6 +137,8 @@ The prefix pattern is a string with the following placeholders:
 | `%time`          | The message time of day (in UTC)                                 | A `TimeSpan` format string, default: `hh\:mm\:ss\.fffffff` |
 | `%localTime`     | The message time of day (converted to the local time zone)       | A `TimeSpan` format string, default: `hh\:mm\:ss\.fffffff` |
 | `%thread`        | The thread name (or ID) which logged the message                 |                                                            |
+| `%threadId`      | The thread ID which logged the message                           |                                                            |
+| `%threadName`    | The thread name which logged the message, or an empty string     |                                                            |
 | `%level`         | The log level in uppercase                                       | `pad` is equivalent to `5` (the longest level length)      |
 | `%logger`        | The logger name                                                  |                                                            | 
 | `%loggerCompact` | The logger name, with the namespace shortened to its initials    |                                                            | 

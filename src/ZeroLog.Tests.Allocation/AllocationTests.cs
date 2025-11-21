@@ -1,80 +1,90 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using NUnit.Framework;
+using System.Linq;
+using System.Runtime.InteropServices;
 using ZeroLog.Appenders;
 using ZeroLog.Configuration;
 using ZeroLog.Formatting;
 
-namespace ZeroLog.Tests;
+namespace ZeroLog.Tests.Allocation;
 
-[NonParallelizable]
-[TestFixture(LogMessagePoolExhaustionStrategy.WaitUntilAvailable)]
-[TestFixture(LogMessagePoolExhaustionStrategy.DropLogMessageAndNotifyAppenders)]
-public class AllocationTests(LogMessagePoolExhaustionStrategy exhaustionStrategy)
+public static class AllocationTests
 {
-    private AwaitableAppender _awaitableAppender;
-    private string _tempDirectory;
+    private const string _buildConfiguration =
+#if DEBUG
+        "Debug";
+#else
+        "Release";
+#endif
 
-    private class AwaitableAppender : DateAndSizeRollingFileAppender
+    private const string _reset = "\e[0m";
+    private const string _bold = "\e[1m";
+    private const string _red = "\e[91m";
+    private const string _green = "\e[92m";
+
+    public static bool Run()
     {
-        public long AllocatedBytesOnAppenderThread { get; private set; }
+        Console.WriteLine();
+        Console.WriteLine($"{_bold}Running allocation tests on {RuntimeInformation.FrameworkDescription}, {RuntimeInformation.RuntimeIdentifier} in {_buildConfiguration}...{_reset}");
+        Console.WriteLine();
 
-        public AwaitableAppender(string directory)
-            : base(directory)
-        {
-            MaxFileSizeInBytes = 0;
-        }
+        bool[] results =
+        [
+            Run(LogMessagePoolExhaustionStrategy.WaitUntilAvailable),
+            Run(LogMessagePoolExhaustionStrategy.DropLogMessage),
+            Run(LogMessagePoolExhaustionStrategy.DropLogMessageAndNotifyAppenders),
+            !Run(LogMessagePoolExhaustionStrategy.Allocate) // This one is obviously expected to allocate
+        ];
 
-        public override void WriteMessage(LoggedMessage message)
-        {
-            base.WriteMessage(message);
+        var success = results.All(i => i);
 
-            AllocatedBytesOnAppenderThread = GC.GetAllocatedBytesForCurrentThread();
-        }
+        Console.WriteLine($"{_bold}Allocation tests {(success ? $"{_green}PASSED" : $"{_red}FAILED")}{_reset}{_bold} on {RuntimeInformation.FrameworkDescription}{_reset}");
+        Console.WriteLine();
+        return success;
     }
 
-    [SetUp]
-    public void Setup()
+    private static bool Run(LogMessagePoolExhaustionStrategy exhaustionStrategy)
     {
-        _tempDirectory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
-        Directory.CreateDirectory(_tempDirectory);
+        var tempDirectory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(tempDirectory);
 
-        _awaitableAppender = new AwaitableAppender(_tempDirectory) { FileNamePrefix = "allocation-test" };
-
-        LogManager.Initialize(new ZeroLogConfiguration
+        try
         {
-            LogMessagePoolSize = 2048 * 10,
-            LogMessageBufferSize = 512,
-            RootLogger =
+            using var awaitableAppender = new AwaitableAppender(tempDirectory);
+
+            using var logs = LogManager.Initialize(new ZeroLogConfiguration
             {
-                LogMessagePoolExhaustionStrategy = exhaustionStrategy,
-                Appenders = { _awaitableAppender }
-            }
-        });
+                LogMessagePoolSize = 2048 * 10,
+                LogMessageBufferSize = 512,
+                RootLogger =
+                {
+                    LogMessagePoolExhaustionStrategy = exhaustionStrategy,
+                    Appenders = { awaitableAppender }
+                }
+            });
 
-        LogManager.RegisterEnum<DayOfWeek>();
-        LogManager.RegisterUnmanaged<UnmanagedStruct>();
+            LogManager.RegisterEnum<DayOfWeek>();
+            LogManager.RegisterUnmanaged<UnmanagedStruct>();
+
+            return Run(exhaustionStrategy, awaitableAppender);
+        }
+        finally
+        {
+            Directory.Delete(tempDirectory, true);
+        }
     }
 
-    [TearDown]
-    public void Teardown()
-    {
-        LogManager.Shutdown();
-        Directory.Delete(_tempDirectory, true);
-    }
-
-    [Test]
-    [SuppressMessage("ReSharper", "ExpressionIsAlwaysNull")]
-    public void should_not_allocate_using_all_formats_and_file_appender_builder()
+    private static bool Run(LogMessagePoolExhaustionStrategy exhaustionStrategy,
+                            AwaitableAppender awaitableAppender)
     {
         var log = LogManager.GetLogger("AllocationTest");
 
         var allocationsOnLoggingThread = 0L;
         var allocationsOnAppenderThread = 0L;
 
-        const int numberOfEvents = 2048 * 10;
-        const int warmupEvents = 10;
+        const int numberOfEvents = 2048 * 100;
+        const int warmupEvents = 2048 * 10;
 
         for (var i = 0; i < numberOfEvents; ++i)
         {
@@ -82,8 +92,12 @@ public class AllocationTests(LogMessagePoolExhaustionStrategy exhaustionStrategy
             {
                 LogManager.Flush();
 
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+                GC.Collect();
+
                 allocationsOnLoggingThread = GC.GetAllocatedBytesForCurrentThread();
-                allocationsOnAppenderThread = _awaitableAppender.AllocatedBytesOnAppenderThread;
+                allocationsOnAppenderThread = awaitableAppender.AllocatedBytesOnAppenderThread;
             }
 
             log.Info()
@@ -159,18 +173,45 @@ public class AllocationTests(LogMessagePoolExhaustionStrategy exhaustionStrategy
         LogManager.Flush();
 
         allocationsOnLoggingThread = GC.GetAllocatedBytesForCurrentThread() - allocationsOnLoggingThread;
-        allocationsOnAppenderThread = _awaitableAppender.AllocatedBytesOnAppenderThread - allocationsOnAppenderThread;
+        allocationsOnAppenderThread = awaitableAppender.AllocatedBytesOnAppenderThread - allocationsOnAppenderThread;
 
-#if NET7_0_OR_GREATER
-        Assert.That(allocationsOnLoggingThread, Is.Zero, "Allocations on logging thread");
-        Assert.That(allocationsOnAppenderThread, Is.Zero, "Allocations on appender thread");
-#else
-        // .NET 6 allocates 40 bytes on both threads, independently of the event count.
+        Console.WriteLine($"Allocations with pool exhaustion strategy: {exhaustionStrategy}");
+        Console.WriteLine($"  - On logging thread:  {FormatBytes(allocationsOnLoggingThread)}");
+        Console.WriteLine($"  - On appender thread: {FormatBytes(allocationsOnAppenderThread)}");
+
+#if NET6_0
+        // .NET 6 always allocates 40 bytes on the appender thread, independently of the event count.
         // I don't know why, but .NET 7 doesn't exhibit this behavior anymore, so I suppose it's just some glitch.
-
-        Assert.That(allocationsOnLoggingThread, Is.LessThanOrEqualTo(40), "Allocations on logging thread");
-        Assert.That(allocationsOnAppenderThread, Is.LessThanOrEqualTo(40), "Allocations on appender thread");
+        if (allocationsOnAppenderThread == 40)
+        {
+            Console.WriteLine("Forgiving the 40 bytes allocation on appender thread in .NET 6.");
+            allocationsOnAppenderThread = 0;
+        }
 #endif
+
+        Console.WriteLine();
+        return allocationsOnLoggingThread == 0 && allocationsOnAppenderThread == 0;
+
+        static string FormatBytes(long bytes)
+            => bytes == 0 ? "0 bytes" : $"{_red}{bytes:N0}{_reset} bytes";
+    }
+
+    private class AwaitableAppender : DateAndSizeRollingFileAppender
+    {
+        public long AllocatedBytesOnAppenderThread { get; private set; }
+
+        public AwaitableAppender(string directory)
+            : base(directory)
+        {
+            MaxFileSizeInBytes = 0;
+        }
+
+        public override void WriteMessage(LoggedMessage message)
+        {
+            base.WriteMessage(message);
+
+            AllocatedBytesOnAppenderThread = GC.GetAllocatedBytesForCurrentThread();
+        }
     }
 
     [SuppressMessage("ReSharper", "UnusedMember.Local")]
@@ -183,10 +224,10 @@ public class AllocationTests(LogMessagePoolExhaustionStrategy exhaustionStrategy
 
     private readonly struct UnmanagedStruct(long a, int b, byte c) : ISpanFormattable
     {
-        public string ToString(string format, IFormatProvider formatProvider)
+        public string ToString(string? format, IFormatProvider? formatProvider)
             => throw new NotSupportedException();
 
-        public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider provider)
+        public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider? provider)
         {
             var builder = new CharBufferBuilder(destination);
             builder.TryAppend(a);
@@ -201,10 +242,10 @@ public class AllocationTests(LogMessagePoolExhaustionStrategy exhaustionStrategy
 
     private readonly struct UnregisteredUnmanagedStruct(long d, int e, byte f) : ISpanFormattable
     {
-        public string ToString(string format, IFormatProvider formatProvider)
+        public string ToString(string? format, IFormatProvider? formatProvider)
             => throw new NotSupportedException();
 
-        public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider provider)
+        public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider? provider)
         {
             var builder = new CharBufferBuilder(destination);
             builder.TryAppend(d);

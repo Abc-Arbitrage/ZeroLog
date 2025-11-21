@@ -4,12 +4,24 @@ on: [ push, pull_request ]
 env:
   DOTNET_NOLOGO: 1
   NUGET_CERT_REVOCATION_MODE: offline
+
   BUILD_DOTNET_VERSION: |
     6.0.x
     7.0.x
     8.0.x
     9.0.x
     10.0.x
+
+  BUILD_TEST_ALLOCATIONS: |
+    $success = $true
+    foreach ($fwk in @('net6.0', 'net7.0', 'net8.0', 'net9.0', 'net10.0')) {
+      dotnet run --configuration Release --no-build --framework $fwk --project src/ZeroLog.Tests.Allocation/ZeroLog.Tests.Allocation.csproj
+      if ($LASTEXITCODE -ne 0) { $success = $false }
+    }
+    if (-not $success) {
+      Write-Host -ForegroundColor Red 'One or more allocation tests failed.'
+      exit 1
+    }
 
 jobs:
   windows:
@@ -35,6 +47,9 @@ jobs:
 
       - name: Test
         run: dotnet test --configuration Release --no-build src/ZeroLog.sln
+
+      - name: Test Allocations
+        run: ${{ env.BUILD_TEST_ALLOCATIONS }}
 
       - name: Upload NuGet
         uses: actions/upload-artifact@v4
@@ -65,3 +80,7 @@ jobs:
 
       - name: Test Analyzers
         run: dotnet test --configuration Release --no-build src/ZeroLog.Analyzers.Tests/ZeroLog.Analyzers.Tests.csproj
+
+      - name: Test Allocations
+        shell: pwsh
+        run: ${{ env.BUILD_TEST_ALLOCATIONS }}
