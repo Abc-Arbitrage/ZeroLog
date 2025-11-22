@@ -35,9 +35,14 @@ internal static unsafe class UnmanagedCache
     private static readonly Dictionary<IntPtr, FormatterDelegate> _unmanagedStructs = new();
     private static readonly MethodInfo _registerMethod = typeof(UnmanagedCache).GetMethod(nameof(Register), Type.EmptyTypes)!;
 
+    [RequiresDynamicCode("This code uses reflection which is not compatible with AOT compilation.")]
+    [RequiresUnreferencedCode("This code uses reflection which is not compatible with trimming.")]
     internal static void Register(Type unmanagedType)
     {
         ArgumentNullException.ThrowIfNull(unmanagedType);
+
+        if (!RuntimeFeature.IsDynamicCodeSupported)
+            return;
 
         if (!typeof(ISpanFormattable).IsAssignableFrom(unmanagedType))
             throw new ArgumentException($"Not an {nameof(ISpanFormattable)} type: {unmanagedType}");

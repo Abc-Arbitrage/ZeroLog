@@ -54,6 +54,7 @@ internal static class TypeUtil
     }
 #endif
 
+    [RequiresDynamicCode("This code uses reflection which is not compatible with AOT compilation.")]
     public static bool GetIsUnmanagedSlow(Type type)
     {
         return !(bool)typeof(RuntimeHelpers).GetMethod(nameof(RuntimeHelpers.IsReferenceOrContainsReferences), BindingFlags.Static | BindingFlags.Public)!
@@ -64,6 +65,7 @@ internal static class TypeUtil
     /// <summary>
     /// Gets the types defined in the given assembly, except those which could not be loaded.
     /// </summary>
+    [RequiresUnreferencedCode("Types may be removed.")]
     [DebuggerStepThrough]
     public static Type[] GetLoadableTypes(Assembly assembly)
     {

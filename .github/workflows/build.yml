@@ -40,6 +40,9 @@ jobs:
       - name: Test Allocations
         run: ./src/ZeroLog.Tests.Allocation/run.ps1 --configuration Release --no-build
 
+      - name: Test AOT
+        run: dotnet publish src/ZeroLog.Tests.Aot --output ./bin/aot && ./bin/aot/ZeroLog.Tests.Aot.exe
+
       - name: Upload NuGet
         uses: actions/upload-artifact@v4
         with:
@@ -73,3 +76,6 @@ jobs:
       - name: Test Allocations
         run: ./src/ZeroLog.Tests.Allocation/run.ps1 --configuration Release --no-build
         shell: pwsh
+
+      - name: Test AOT
+        run: dotnet publish src/ZeroLog.Tests.Aot --output ./bin/aot && ./bin/aot/ZeroLog.Tests.Aot

@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
 using ZeroLog.Formatting;
@@ -90,9 +91,24 @@ public class TextWriterAppender : Appender
         _textWriter = newTextWriter;
 
         if (!isSameType)
-            _useSpanWrite = _textWriter is { } textWriter && OverridesSpanWrite(textWriter.GetType());
+            _useSpanWrite = _textWriter is { } textWriter && UseSpanGetBytesOverload(textWriter);
     }
 
-    internal static bool OverridesSpanWrite(Type textWriterType)
-        => textWriterType.GetMethod(nameof(System.IO.TextWriter.Write), BindingFlags.Public | BindingFlags.Instance, [typeof(ReadOnlySpan<char>)])?.DeclaringType == textWriterType;
+    internal static bool UseSpanGetBytesOverload(TextWriter textWriter)
+    {
+        if (textWriter is StringWriter)
+            return true;
+
+        if (textWriter is StreamWriter { Encoding: { } encoding })
+            return StreamAppender.UseSpanGetBytesOverload(encoding);
+
+        return UseSpanGetBytesOverload(textWriter.GetType());
+    }
+
+    [UnconditionalSuppressMessage("AssemblyLoadTrimming", "IL2070", Justification = "Returning false is OK, it just skips an optimization.")]
+    internal static bool UseSpanGetBytesOverload(Type textWriterType)
+    {
+        var declaringType = textWriterType.GetMethod(nameof(System.IO.TextWriter.Write), BindingFlags.Public | BindingFlags.Instance, [typeof(ReadOnlySpan<char>)])?.DeclaringType;
+        return declaringType is not null && declaringType != typeof(TextWriter);
+    }
 }
