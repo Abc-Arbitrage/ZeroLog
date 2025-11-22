@@ -1,6 +1,5 @@
 root = true
 
-
 [*]
 trim_trailing_whitespace = true
 insert_final_newline = true
@@ -27,6 +26,9 @@ trim_trailing_whitespace = false
 
 [*.sh]
 end_of_line = lf
+
+[*.ps1]
+ij_powershell_block_brace_style = end_of_line
 
 # Verify
 [*.{received,verified}.txt]
