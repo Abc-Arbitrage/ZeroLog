@@ -65,8 +65,8 @@ internal static class TypeUtil
     /// <summary>
     /// Gets the types defined in the given assembly, except those which could not be loaded.
     /// </summary>
-    [RequiresUnreferencedCode("Types may be removed.")]
     [DebuggerStepThrough]
+    [UnconditionalSuppressMessage("AssemblyLoadTrimming", "IL2026", Justification = "Native values can be printed instead of strings.")]
     public static Type[] GetLoadableTypes(Assembly assembly)
     {
         try

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.CompilerServices;
@@ -10,6 +11,7 @@ using ZeroLog.Configuration;
 namespace ZeroLog.Tests.Aot;
 
 [SuppressMessage("ReSharper", "UnusedMember.Local")]
+[SuppressMessage("ReSharper", "RawStringCanBeSimplified")]
 internal static class Program
 {
     private const string _buildConfiguration =
@@ -33,7 +35,8 @@ internal static class Program
         Console.WriteLine();
 
         var stringBuilder = new StringBuilder();
-        RunSession(stringBuilder);
+        var expectations = new List<string>();
+        RunSession(stringBuilder, expectations);
         var stringOutput = stringBuilder.ToString();
 
         Console.WriteLine();
@@ -45,25 +48,8 @@ internal static class Program
         CheckExpectation(!RuntimeFeature.IsDynamicCodeSupported, "RuntimeFeature.IsDynamicCodeSupported is false");
         CheckExpectation(string.IsNullOrEmpty(GetAssemblyLocation()), "typeof(Program).Assembly.Location is empty");
 
-        CheckSubstring("System enum: Friday");
-        CheckSubstring("""Structured value ~~ { "DayOfWeek": "Friday" }""");
-
-        CheckSubstring("Registered enum with generic: Bar");
-        CheckSubstring("""Structured value ~~ { "RegisteredEnumWithGeneric": "Bar" }""");
-
-        CheckSubstring("Registered enum with typeof: FizzBuzz");
-        CheckSubstring("""Structured value ~~ { "RegisteredEnumWithTypeof": "FizzBuzz" }""");
-
-        CheckSubstring("Unregistered enum: Bar");
-        CheckSubstring("""Structured value ~~ { "UnregisteredEnum": "Bar" }""");
-
-        CheckSubstring("Registered unmanaged type: foo 42 bar");
-        CheckSubstring("Unregistered unmanaged type: Unmanaged(0x2a00000000000000)");
-
-        CheckSubstring("Uses Span overload with Encoding.Default: True");
-        CheckSubstring("Uses Span overload with Encoding.UTF8: True");
-        CheckSubstring("Uses Span overload with Encoding.ASCII: True");
-        CheckSubstring("Uses Span overload with Encoding.Latin1: True");
+        foreach (var expectation in expectations)
+            CheckSubstring(expectation);
 
         CheckSubstring("Goodbye!");
 
@@ -89,11 +75,11 @@ internal static class Program
             => typeof(Program).Assembly.Location;
     }
 
-    private static void RunSession(StringBuilder stringBuilder)
+    private static void RunSession(StringBuilder stringBuilder, List<string> expectations)
     {
-        using var logs = LogManager.Initialize(new ZeroLogConfiguration
+        using var logManager = (LogManager)LogManager.Initialize(new ZeroLogConfiguration
         {
-            AutoRegisterEnums = true,
+            AutoRegisterEnums = false,
             RootLogger =
             {
                 Level = LogLevel.Debug,
@@ -104,10 +90,6 @@ internal static class Program
                 }
             }
         });
-
-        LogManager.RegisterEnum<RegisteredEnumWithGeneric>();
-        LogManager.RegisterEnum(typeof(RegisteredEnumWithTypeof));
-        LogManager.RegisterUnmanaged<RegisteredUnmanagedType>();
 
         _log.Info("Hello, world!");
         _log.Info("-----");
@@ -127,12 +109,89 @@ internal static class Program
 
         _log.Info("-----");
 
-        WriteEnumInfo("System enum", DayOfWeek.Friday);
-        WriteEnumInfo("Registered enum with generic", RegisteredEnumWithGeneric.Bar);
-        WriteEnumInfo("Registered enum with typeof", RegisteredEnumWithTypeof.FizzBuzz);
-        WriteEnumInfo("Unregistered enum", UnregisteredEnum.Bar);
+        LogManager.Flush();
+        EnumCache.Clear();
+
+        WriteEnumInfo("""Enum by default: DayOfWeek""", DayOfWeek.Friday);
+        AddExpectation("""Enum by default: DayOfWeek: 5""");
+        AddExpectation("""Enum by default: DayOfWeek (structured) ~~ { "DayOfWeek": "5" }""");
+
+        WriteEnumInfo("""Enum by default: UnregisteredEnum""", UnregisteredEnum.Bar);
+        AddExpectation("""Enum by default: UnregisteredEnum: 1""");
+        AddExpectation("""Enum by default: UnregisteredEnum (structured) ~~ { "UnregisteredEnum": "1" }""");
 
         _log.Info("-----");
+
+        LogManager.Flush();
+        EnumCache.Clear();
+        LogManager.RegisterEnum<RegisteredEnumWithGeneric>();
+        LogManager.RegisterEnum(typeof(RegisteredEnumWithTypeof));
+
+        WriteEnumInfo("""Enum registered: DayOfWeek""", DayOfWeek.Friday);
+        AddExpectation("""Enum registered: DayOfWeek: 5""");
+        AddExpectation("""Enum registered: DayOfWeek (structured) ~~ { "DayOfWeek": "5" }""");
+
+        WriteEnumInfo("""Enum registered: RegisteredEnumWithGeneric""", RegisteredEnumWithGeneric.Bar);
+        AddExpectation("""Enum registered: RegisteredEnumWithGeneric: Bar""");
+        AddExpectation("""Enum registered: RegisteredEnumWithGeneric (structured) ~~ { "RegisteredEnumWithGeneric": "Bar" }""");
+
+        WriteEnumInfo("""Enum registered: RegisteredEnumWithTypeof""", RegisteredEnumWithTypeof.FizzBuzz);
+        AddExpectation("""Enum registered: RegisteredEnumWithTypeof: FizzBuzz""");
+        AddExpectation("""Enum registered: RegisteredEnumWithTypeof (structured) ~~ { "RegisteredEnumWithTypeof": "FizzBuzz" }""");
+
+        WriteEnumInfo("""Enum registered: UnregisteredEnum""", UnregisteredEnum.Bar);
+        AddExpectation("""Enum registered: UnregisteredEnum: 1""");
+        AddExpectation("""Enum registered: UnregisteredEnum (structured) ~~ { "UnregisteredEnum": "1" }""");
+
+        _log.Info("-----");
+
+        LogManager.Flush();
+        EnumCache.Clear();
+        LogManager.RegisterAllEnumsFrom(typeof(Program).Assembly);
+
+        WriteEnumInfo("""Enum registered from assembly: DayOfWeek""", DayOfWeek.Friday);
+        AddExpectation("""Enum registered from assembly: DayOfWeek: 5""");
+        AddExpectation("""Enum registered from assembly: DayOfWeek (structured) ~~ { "DayOfWeek": "5" }""");
+
+        WriteEnumInfo("""Enum registered from assembly: RegisteredEnumWithGeneric""", RegisteredEnumWithGeneric.Bar);
+        AddExpectation("""Enum registered from assembly: RegisteredEnumWithGeneric: Bar""");
+        AddExpectation("""Enum registered from assembly: RegisteredEnumWithGeneric (structured) ~~ { "RegisteredEnumWithGeneric": "Bar" }""");
+
+        WriteEnumInfo("""Enum registered from assembly: RegisteredEnumWithTypeof""", RegisteredEnumWithTypeof.FizzBuzz);
+        AddExpectation("""Enum registered from assembly: RegisteredEnumWithTypeof: FizzBuzz""");
+        AddExpectation("""Enum registered from assembly: RegisteredEnumWithTypeof (structured) ~~ { "RegisteredEnumWithTypeof": "FizzBuzz" }""");
+
+        WriteEnumInfo("""Enum registered from assembly: UnregisteredEnum""", UnregisteredEnum.Bar);
+        AddExpectation("""Enum registered from assembly: UnregisteredEnum: Bar""");
+        AddExpectation("""Enum registered from assembly: UnregisteredEnum (structured) ~~ { "UnregisteredEnum": "Bar" }""");
+
+        _log.Info("-----");
+
+        LogManager.Flush();
+        EnumCache.Clear();
+        LogManager.Configuration!.AutoRegisterEnums = true;
+        LogManager.Configuration.ApplyChanges();
+        logManager.WaitUntilNewConfigurationIsApplied();
+
+        WriteEnumInfo("""Enum auto-registered: DayOfWeek""", DayOfWeek.Friday);
+        AddExpectation("""Enum auto-registered: DayOfWeek: Friday""");
+        AddExpectation("""Enum auto-registered: DayOfWeek (structured) ~~ { "DayOfWeek": "Friday" }""");
+
+        WriteEnumInfo("""Enum auto-registered: RegisteredEnumWithGeneric""", RegisteredEnumWithGeneric.Bar);
+        AddExpectation("""Enum auto-registered: RegisteredEnumWithGeneric: Bar""");
+        AddExpectation("""Enum auto-registered: RegisteredEnumWithGeneric (structured) ~~ { "RegisteredEnumWithGeneric": "Bar" }""");
+
+        WriteEnumInfo("""Enum auto-registered: RegisteredEnumWithTypeof""", RegisteredEnumWithTypeof.FizzBuzz);
+        AddExpectation("""Enum auto-registered: RegisteredEnumWithTypeof: FizzBuzz""");
+        AddExpectation("""Enum auto-registered: RegisteredEnumWithTypeof (structured) ~~ { "RegisteredEnumWithTypeof": "FizzBuzz" }""");
+
+        WriteEnumInfo("""Enum auto-registered: UnregisteredEnum""", UnregisteredEnum.Bar);
+        AddExpectation("""Enum auto-registered: UnregisteredEnum: Bar""");
+        AddExpectation("""Enum auto-registered: UnregisteredEnum (structured) ~~ { "UnregisteredEnum": "Bar" }""");
+
+        _log.Info("-----");
+
+        LogManager.RegisterUnmanaged<RegisteredUnmanagedType>();
 
         _log.Warn()
             .Append("Registered unmanaged type: ")
@@ -144,6 +203,9 @@ internal static class Program
             .AppendUnmanaged(new UnregisteredUnmanagedType { Value = 42 })
             .Log();
 
+        AddExpectation("Registered unmanaged type: foo 42 bar");
+        AddExpectation("Unregistered unmanaged type: Unmanaged(0x2a00000000000000)");
+
         _log.Info("-----");
 
         UseSpanOverloadWithEncoding(Encoding.Default);
@@ -154,12 +216,20 @@ internal static class Program
         UseSpanOverloadWithEncoding(Encoding.ASCII);
         UseSpanOverloadWithEncoding(Encoding.Latin1);
 
+        AddExpectation("Uses Span overload with Encoding.Default: True");
+        AddExpectation("Uses Span overload with Encoding.UTF8: True");
+        AddExpectation("Uses Span overload with Encoding.ASCII: True");
+        AddExpectation("Uses Span overload with Encoding.Latin1: True");
+
         _log.Info("-----");
 
         UseSpanOverloadWithEncoding(new UTF8Encoding());
         UseSpanOverloadWithEncoding(new UnicodeEncoding());
         UseSpanOverloadWithEncoding(new UTF32Encoding());
         UseSpanOverloadWithEncoding(new ASCIIEncoding());
+
+        AddExpectation("Uses Span overload with new UTF8Encoding(): True");
+        AddExpectation("Uses Span overload with new ASCIIEncoding(): True");
 
         _log.Info("-----");
 
@@ -177,7 +247,8 @@ internal static class Program
             _log.Warn($"{label}: {value}");
 
             _log.Warn()
-                .Append("  Structured value")
+                .Append(label)
+                .Append(" (structured)")
                 .AppendKeyValue(typeof(TEnum).Name, value)
                 .Log();
         }
@@ -187,6 +258,9 @@ internal static class Program
 
         static void UseSpanOverloadWithTextWriter(TextWriter textWriter, [CallerArgumentExpression(nameof(textWriter))] string? arg = null)
             => _log.Warn($"Uses Span overload with {arg}: {TextWriterAppender.UseSpanGetBytesOverload(textWriter)}");
+
+        void AddExpectation(string expectation)
+            => expectations.Add(expectation);
     }
 
     private enum RegisteredEnumWithGeneric

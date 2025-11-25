@@ -39,6 +39,12 @@ internal static class EnumCache
     public static void Ignore(Type enumType)
         => _enums[TypeUtil.GetTypeHandleSlow(enumType)] = NullEnumStrings.Instance;
 
+    public static void Clear()
+    {
+        _enums.Clear();
+        _isEnumSigned.Clear();
+    }
+
     public static bool IsRegistered(Type enumType)
         => _enums.ContainsKey(TypeUtil.GetTypeHandleSlow(enumType));
 

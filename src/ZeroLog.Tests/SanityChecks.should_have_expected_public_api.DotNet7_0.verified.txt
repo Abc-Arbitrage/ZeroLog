@@ -810,8 +810,7 @@ namespace ZeroLog
         public static ZeroLog.Log GetLogger(string name) { }
         public static ZeroLog.Log GetLogger<T>() { }
         public static System.IDisposable Initialize(ZeroLog.Configuration.ZeroLogConfiguration configuration) { }
-        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("This code uses reflection which is not compatible with AOT compilation.")]
-        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This code uses reflection which is not compatible with trimming.")]
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AssemblyLoadTrimming", "IL2072", Justification="Native values can be printed instead of strings.")]
         public static void RegisterAllEnumsFrom(System.Reflection.Assembly assembly) { }
         public static void RegisterEnum([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicFields)] System.Type enumType) { }
         public static void RegisterEnum<T>()

@@ -142,15 +142,11 @@ partial class LogManager : IDisposable
     /// </summary>
     /// <param name="assembly">The assembly.</param>
     /// <exception cref="ArgumentNullException"><paramref name="assembly"/> was null.</exception>
-    [RequiresDynamicCode("This code uses reflection which is not compatible with AOT compilation.")]
-    [RequiresUnreferencedCode("This code uses reflection which is not compatible with trimming.")]
+    [UnconditionalSuppressMessage("AssemblyLoadTrimming", "IL2072", Justification = "Native values can be printed instead of strings.")]
     public static void RegisterAllEnumsFrom(Assembly assembly)
     {
         if (assembly == null)
             throw new ArgumentNullException(nameof(assembly));
-
-        if (!RuntimeFeature.IsDynamicCodeSupported)
-            return;
 
         foreach (var type in TypeUtil.GetLoadableTypes(assembly).Where(t => t.IsEnum))
             RegisterEnum(type);
