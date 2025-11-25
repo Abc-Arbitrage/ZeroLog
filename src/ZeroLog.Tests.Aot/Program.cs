@@ -45,14 +45,17 @@ internal static class Program
         CheckExpectation(!RuntimeFeature.IsDynamicCodeSupported, "RuntimeFeature.IsDynamicCodeSupported is false");
         CheckExpectation(string.IsNullOrEmpty(GetAssemblyLocation()), "typeof(Program).Assembly.Location is empty");
 
+        CheckSubstring("System enum: Friday");
+        CheckSubstring("""Structured value ~~ { "DayOfWeek": "Friday" }""");
+
         CheckSubstring("Registered enum with generic: Bar");
         CheckSubstring("""Structured value ~~ { "RegisteredEnumWithGeneric": "Bar" }""");
 
         CheckSubstring("Registered enum with typeof: FizzBuzz");
         CheckSubstring("""Structured value ~~ { "RegisteredEnumWithTypeof": "FizzBuzz" }""");
 
-        CheckSubstring("Unregistered enum: 1");
-        CheckSubstring("""Structured value ~~ { "UnregisteredEnum": "1" }""");
+        CheckSubstring("Unregistered enum: Bar");
+        CheckSubstring("""Structured value ~~ { "UnregisteredEnum": "Bar" }""");
 
         CheckSubstring("Registered unmanaged type: foo 42 bar");
         CheckSubstring("Unregistered unmanaged type: Unmanaged(0x2a00000000000000)");
@@ -90,7 +93,7 @@ internal static class Program
     {
         using var logs = LogManager.Initialize(new ZeroLogConfiguration
         {
-            AutoRegisterEnums = true, // Won't work in AOT
+            AutoRegisterEnums = true,
             RootLogger =
             {
                 Level = LogLevel.Debug,

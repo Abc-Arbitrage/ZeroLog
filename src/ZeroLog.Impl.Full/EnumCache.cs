@@ -33,6 +33,12 @@ internal static class EnumCache
         where TEnum : struct, Enum
         => _enums.TryAdd(TypeUtil.GetTypeHandleSlow(typeof(TEnum)), EnumStrings.Create<TEnum>());
 
+    public static void Remove(Type enumType)
+        => _enums.TryRemove(TypeUtil.GetTypeHandleSlow(enumType), out _);
+
+    public static void Ignore(Type enumType)
+        => _enums[TypeUtil.GetTypeHandleSlow(enumType)] = NullEnumStrings.Instance;
+
     public static bool IsRegistered(Type enumType)
         => _enums.ContainsKey(TypeUtil.GetTypeHandleSlow(enumType));
 
