@@ -124,8 +124,7 @@ partial class LogManager : IDisposable
     /// Member names will be used when formatting the message (instead of numeric values).
     /// </summary>
     /// <param name="enumType">The enum type.</param>
-    [RequiresDynamicCode("This code uses reflection which is not compatible with AOT compilation. Use the generic version if possible.")]
-    public static void RegisterEnum(Type enumType)
+    public static void RegisterEnum([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] Type enumType)
         => EnumCache.Register(enumType);
 
     /// <summary>

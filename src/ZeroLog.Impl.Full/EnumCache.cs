@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using InlineIL;
 using ZeroLog.Support;
@@ -15,8 +16,7 @@ internal static class EnumCache
     private static readonly ConcurrentDictionary<IntPtr, EnumStrings> _enums = new();
     private static readonly ConcurrentDictionary<IntPtr, bool> _isEnumSigned = new();
 
-    [RequiresDynamicCode("Uses reflection to get enum values.")]
-    public static void Register(Type enumType)
+    public static void Register([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] Type enumType)
     {
         ArgumentNullException.ThrowIfNull(enumType);
 
@@ -24,9 +24,6 @@ internal static class EnumCache
             throw new ArgumentException($"Not an enum type: {enumType}");
 
         if (enumType.ContainsGenericParameters)
-            return;
-
-        if (!RuntimeFeature.IsDynamicCodeSupported)
             return;
 
         _enums.TryAdd(TypeUtil.GetTypeHandleSlow(enumType), EnumStrings.Create(enumType));
@@ -130,6 +127,24 @@ internal static class EnumCache
         };
     }
 
+    private static ulong ToUInt64Unbox(object? value)
+    {
+        // Only used when registering enums.
+
+        return value switch
+        {
+            sbyte i  => ToUInt64(i),
+            byte i   => ToUInt64(i),
+            short i  => ToUInt64(i),
+            ushort i => ToUInt64(i),
+            int i    => ToUInt64(i),
+            uint i   => ToUInt64(i),
+            long i   => ToUInt64(i),
+            ulong i  => ToUInt64(i),
+            _        => throw new InvalidOperationException($"Invalid enum: {value?.GetType()}")
+        };
+    }
+
     public static ulong? ToUInt64Nullable<T>(T value) // T = Nullable<SomeEnum>
     {
         return TypeUtilSlow<T>.UnderlyingTypeCode switch
@@ -187,14 +202,13 @@ internal static class EnumCache
 
     private abstract class EnumStrings
     {
-        [RequiresDynamicCode("This code uses Enum.GetValues which is not compatible with AOT compilation. Use Create<TEnum> if possible.")]
-        public static EnumStrings Create(Type enumType)
-        {
-            if (!RuntimeFeature.IsDynamicCodeSupported)
-                return NullEnumStrings.Instance;
-
-            return Create(Enum.GetValues(enumType).Cast<Enum>().Select(i => new EnumItem(i)));
-        }
+        [UnconditionalSuppressMessage("ReflectionAnalysis", "IL3050", Justification = "Check done manually")]
+        public static EnumStrings Create([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] Type enumType)
+            => Create(
+                RuntimeFeature.IsDynamicCodeSupported
+                    ? Enum.GetValues(enumType).Cast<Enum>().Select(i => new EnumItem(i))
+                    : enumType.GetFields(BindingFlags.Public | BindingFlags.Static).Select(i => new EnumItem(i))
+            );
 
         public static EnumStrings Create<TEnum>()
             where TEnum : struct, Enum
@@ -203,6 +217,9 @@ internal static class EnumCache
         private static EnumStrings Create(IEnumerable<EnumItem> enumItems)
         {
             var itemList = enumItems.ToList();
+
+            if (itemList.Count == 0)
+                return NullEnumStrings.Instance;
 
             return ArrayEnumStrings.CanHandle(itemList)
                 ? new ArrayEnumStrings(itemList)
@@ -265,9 +282,21 @@ internal static class EnumCache
             => null;
     }
 
-    private readonly struct EnumItem(Enum item)
+    private readonly struct EnumItem
     {
-        public ulong Value { get; } = ToUInt64Slow(item);
-        public string Name { get; } = item.ToString();
+        public string Name { get; }
+        public ulong Value { get; }
+
+        public EnumItem(Enum item)
+        {
+            Name = item.ToString();
+            Value = ToUInt64Slow(item);
+        }
+
+        public EnumItem(FieldInfo field)
+        {
+            Name = field.Name;
+            Value = ToUInt64Unbox(field.GetRawConstantValue());
+        }
     }
 }

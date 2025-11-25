@@ -45,8 +45,11 @@ internal static class Program
         CheckExpectation(!RuntimeFeature.IsDynamicCodeSupported, "RuntimeFeature.IsDynamicCodeSupported is false");
         CheckExpectation(string.IsNullOrEmpty(GetAssemblyLocation()), "typeof(Program).Assembly.Location is empty");
 
-        CheckSubstring("Registered enum: Bar");
-        CheckSubstring("""Structured value ~~ { "RegisteredEnum": "Bar" }""");
+        CheckSubstring("Registered enum with generic: Bar");
+        CheckSubstring("""Structured value ~~ { "RegisteredEnumWithGeneric": "Bar" }""");
+
+        CheckSubstring("Registered enum with typeof: FizzBuzz");
+        CheckSubstring("""Structured value ~~ { "RegisteredEnumWithTypeof": "FizzBuzz" }""");
 
         CheckSubstring("Unregistered enum: 1");
         CheckSubstring("""Structured value ~~ { "UnregisteredEnum": "1" }""");
@@ -99,7 +102,8 @@ internal static class Program
             }
         });
 
-        LogManager.RegisterEnum<RegisteredEnum>();
+        LogManager.RegisterEnum<RegisteredEnumWithGeneric>();
+        LogManager.RegisterEnum(typeof(RegisteredEnumWithTypeof));
         LogManager.RegisterUnmanaged<RegisteredUnmanagedType>();
 
         _log.Info("Hello, world!");
@@ -121,7 +125,8 @@ internal static class Program
         _log.Info("-----");
 
         WriteEnumInfo("System enum", DayOfWeek.Friday);
-        WriteEnumInfo("Registered enum", RegisteredEnum.Bar);
+        WriteEnumInfo("Registered enum with generic", RegisteredEnumWithGeneric.Bar);
+        WriteEnumInfo("Registered enum with typeof", RegisteredEnumWithTypeof.FizzBuzz);
         WriteEnumInfo("Unregistered enum", UnregisteredEnum.Bar);
 
         _log.Info("-----");
@@ -181,11 +186,18 @@ internal static class Program
             => _log.Warn($"Uses Span overload with {arg}: {TextWriterAppender.UseSpanGetBytesOverload(textWriter)}");
     }
 
-    private enum RegisteredEnum
+    private enum RegisteredEnumWithGeneric
     {
         Foo,
         Bar,
         Baz
+    }
+
+    private enum RegisteredEnumWithTypeof
+    {
+        Fizz,
+        Buzz,
+        FizzBuzz
     }
 
     private enum UnregisteredEnum

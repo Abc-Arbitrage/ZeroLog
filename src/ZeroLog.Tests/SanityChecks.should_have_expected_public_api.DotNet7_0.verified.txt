@@ -813,9 +813,7 @@ namespace ZeroLog
         [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("This code uses reflection which is not compatible with AOT compilation.")]
         [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This code uses reflection which is not compatible with trimming.")]
         public static void RegisterAllEnumsFrom(System.Reflection.Assembly assembly) { }
-        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("This code uses reflection which is not compatible with AOT compilation. Use the g" +
-            "eneric version if possible.")]
-        public static void RegisterEnum(System.Type enumType) { }
+        public static void RegisterEnum([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicFields)] System.Type enumType) { }
         public static void RegisterEnum<T>()
             where T :  struct, System.Enum { }
         [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("This code uses reflection which is not compatible with AOT compilation. Use the g" +
