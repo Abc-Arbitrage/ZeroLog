@@ -74,8 +74,19 @@ public class StreamAppenderTests
     [Test]
     public void should_detect_override_of_span_GetBytes()
     {
-        StreamAppender.OverridesSpanGetBytes(typeof(EncodingWithoutSpanGetBytes)).ShouldBeFalse();
-        StreamAppender.OverridesSpanGetBytes(typeof(EncodingWithSpanGetBytes)).ShouldBeTrue();
+        StreamAppender.UseSpanGetBytesOverload(new EncodingWithoutSpanGetBytes()).ShouldBeFalse();
+        StreamAppender.UseSpanGetBytesOverload(new EncodingWithSpanGetBytes()).ShouldBeTrue();
+
+        StreamAppender.UseSpanGetBytesOverload(Encoding.UTF8).ShouldBeTrue();
+        StreamAppender.UseSpanGetBytesOverload(new UTF8Encoding()).ShouldBeTrue();
+        StreamAppender.UseSpanGetBytesOverload(typeof(UTF8Encoding)).ShouldBeTrue();
+
+        StreamAppender.UseSpanGetBytesOverload(Encoding.ASCII).ShouldBeTrue();
+        StreamAppender.UseSpanGetBytesOverload(new ASCIIEncoding()).ShouldBeTrue();
+        StreamAppender.UseSpanGetBytesOverload(typeof(ASCIIEncoding)).ShouldBeTrue();
+
+        StreamAppender.UseSpanGetBytesOverload(Encoding.Latin1).ShouldBeTrue();
+        StreamAppender.UseSpanGetBytesOverload(Encoding.Latin1.GetType()).ShouldBeTrue();
     }
 
     [Test]
@@ -115,9 +126,7 @@ public class StreamAppenderTests
         var loggedMessage = new LoggedMessage(128, ZeroLogConfiguration.Default);
         loggedMessage.SetMessage(new LogMessage("Hello"));
 
-        GcTester.ShouldNotAllocate(
-            () => appender.WriteMessage(loggedMessage)
-        );
+        GcTester.ShouldNotAllocate(() => appender.WriteMessage(loggedMessage));
     }
 
     private sealed class MemoryAppender : StreamAppender

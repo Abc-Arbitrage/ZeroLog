@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
 using System.Text;
@@ -97,12 +98,25 @@ public abstract class StreamAppender : Appender
         // GetBytes(char[] chars, int charIndex, int charCount, byte[] bytes, int byteIndex) in the end.
         // If an encoding overrides the Span version of GetBytes, we assume it avoids this allocation
         // and it skips safety checks as those are guaranteed by the Span struct. In that case, we can call this overload directly.
-        _useSpanGetBytes = OverridesSpanGetBytes(_encoding.GetType());
+        _useSpanGetBytes = UseSpanGetBytesOverload(_encoding);
 
         if (_byteBuffer.Length < maxBytes)
             _byteBuffer = GC.AllocateUninitializedArray<byte>(maxBytes);
     }
 
-    internal static bool OverridesSpanGetBytes(Type encodingType)
-        => encodingType.GetMethod(nameof(System.Text.Encoding.GetBytes), BindingFlags.Public | BindingFlags.Instance, [typeof(ReadOnlySpan<char>), typeof(Span<byte>)])?.DeclaringType == encodingType;
+    internal static bool UseSpanGetBytesOverload(Encoding encoding)
+    {
+        // These are known to be good.
+        if (encoding is UTF8Encoding or ASCIIEncoding || ReferenceEquals(encoding, Encoding.Latin1))
+            return true;
+
+        return UseSpanGetBytesOverload(encoding.GetType());
+    }
+
+    [UnconditionalSuppressMessage("AssemblyLoadTrimming", "IL2070", Justification = "Returning false is OK, it just skips an optimization.")]
+    internal static bool UseSpanGetBytesOverload(Type encodingType)
+    {
+        var declaringType = encodingType.GetMethod(nameof(System.Text.Encoding.GetBytes), BindingFlags.Public | BindingFlags.Instance, [typeof(ReadOnlySpan<char>), typeof(Span<byte>)])?.DeclaringType;
+        return declaringType is not null && declaringType != typeof(Encoding);
+    }
 }

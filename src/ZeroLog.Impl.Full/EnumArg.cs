@@ -54,6 +54,8 @@ internal readonly struct EnumArg(IntPtr typeHandle, ulong value)
            ?? GetStringSlow(enumRegistered, config);
 
     [MethodImpl(MethodImplOptions.NoInlining)]
+    [UnconditionalSuppressMessage("AssemblyLoadTrimming", "IL3050", Justification = "Native values can be printed instead of strings.")]
+    [UnconditionalSuppressMessage("AssemblyLoadTrimming", "IL2072", Justification = "Native values can be printed instead of strings.")]
     private string? GetStringSlow(bool enumRegistered, ZeroLogConfiguration config)
     {
         if (enumRegistered || !config.AutoRegisterEnums)
@@ -62,7 +64,16 @@ internal readonly struct EnumArg(IntPtr typeHandle, ulong value)
         if (Type is not { } type)
             return null;
 
-        LogManager.RegisterEnum(type);
+        try
+        {
+            EnumCache.Register(type);
+        }
+        catch
+        {
+            EnumCache.Ignore(type);
+            return null;
+        }
+
         return EnumCache.GetString(_typeHandle, _value, out _);
     }
 

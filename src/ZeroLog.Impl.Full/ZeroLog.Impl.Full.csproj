@@ -4,6 +4,7 @@
     <RootNamespace>ZeroLog</RootNamespace>
     <Nullable>enable</Nullable>
     <DisableFody>true</DisableFody>
+    <IsAotCompatible>true</IsAotCompatible>
   </PropertyGroup>
 
   <ItemGroup>

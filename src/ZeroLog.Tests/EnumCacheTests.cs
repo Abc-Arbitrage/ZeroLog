@@ -256,6 +256,18 @@ public class EnumCacheTests
         GetString(GenericType<int>.AnotherOne<string>.EnumInGenericType2.Foo).ShouldEqual("Foo");
     }
 
+    [Test]
+    public void should_ignore_enum()
+    {
+        EnumCache.Register(typeof(EnumToIgnore));
+        EnumCache.GetString(typeof(EnumToIgnore).TypeHandle.Value, (ulong)EnumToIgnore.Bar, out _)
+                 .ShouldEqual(nameof(EnumToIgnore.Bar));
+
+        EnumCache.Ignore(typeof(EnumToIgnore));
+        EnumCache.GetString(typeof(EnumToIgnore).TypeHandle.Value, (ulong)EnumToIgnore.Bar, out _)
+                 .ShouldBeNull();
+    }
+
     private static string GetString<T>(T value)
         where T : struct
     {
@@ -400,6 +412,12 @@ public class EnumCacheTests
     {
         Min = ulong.MinValue,
         Max = ulong.MaxValue
+    }
+
+    private enum EnumToIgnore
+    {
+        Foo,
+        Bar
     }
 
     [SuppressMessage("ReSharper", "ClassNeverInstantiated.Local")]
