@@ -175,6 +175,7 @@ namespace ZeroLog.Formatting
         public System.Exception? Exception { get; }
         public ZeroLog.Formatting.KeyValueList KeyValues { get; }
         public ZeroLog.LogLevel Level { get; }
+        public string? LoggerCompactName { get; }
         public string? LoggerName { get; }
         public System.ReadOnlySpan<char> Message { get; }
         public System.Threading.Thread? Thread { get; }
@@ -981,6 +982,7 @@ namespace ZeroLog
         public override string ToString() { }
         public ZeroLog.LogMessage WithException(System.Exception? exception) { }
         public static ZeroLog.LogMessage CreateTestMessage(ZeroLog.LogLevel level, int bufferSize, int stringCapacity) { }
+        public static ZeroLog.LogMessage CreateTestMessage(ZeroLog.Log? log, ZeroLog.LogLevel level, int bufferSize, int stringCapacity) { }
         [System.Runtime.CompilerServices.InterpolatedStringHandler]
         public readonly ref struct AppendInterpolatedStringHandler
         {

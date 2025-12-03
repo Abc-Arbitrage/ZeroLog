@@ -334,7 +334,7 @@ internal class PrefixWriter
 
                 case PatternPartType.LoggerCompact:
                 {
-                    if (!builder.TryAppendPartial(message.Logger?.CompactName))
+                    if (!builder.TryAppendPartial(message.LoggerCompactName))
                         goto endOfLoop;
 
                     break;

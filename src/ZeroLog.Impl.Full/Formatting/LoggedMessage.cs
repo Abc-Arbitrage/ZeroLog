@@ -33,6 +33,11 @@ public sealed class LoggedMessage
     /// </summary>
     public string? LoggerName => _message.Logger?.Name;
 
+    /// <summary>
+    /// The name of the logger which logged this message, with its namespace shortened to the initials.
+    /// </summary>
+    public string? LoggerCompactName => _message.Logger?.CompactName;
+
     internal Log? Logger => _message.Logger;
 
     /// <summary>
@@ -141,7 +146,7 @@ public sealed class LoggedMessage
     /// <param name="message">The message to convert.</param>
     /// <param name="config">The configuration to use. Uses <see cref="ZeroLogConfiguration.Default"/> by default.</param>
     /// <returns>A standalone log message.</returns>
-    /// <seealso cref="LogMessage.CreateTestMessage"/>
+    /// <seealso cref="LogMessage.CreateTestMessage(ZeroLog.LogLevel,int,int)"/>
     public static LoggedMessage CreateTestMessage(LogMessage message, ZeroLogConfiguration? config = null)
     {
         ArgumentNullException.ThrowIfNull(message);

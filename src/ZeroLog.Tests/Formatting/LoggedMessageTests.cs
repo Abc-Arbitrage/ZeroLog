@@ -13,6 +13,7 @@ public class LoggedMessageTests
     private const int _bufferLength = 1024;
     private const int _stringCapacity = 16;
 
+    private static readonly Log _log = new("Foo.Bar.Baz");
     private LogMessage _logMessage;
 
     static LoggedMessageTests()
@@ -23,7 +24,7 @@ public class LoggedMessageTests
     [SetUp]
     public void SetUp()
     {
-        _logMessage = LogMessage.CreateTestMessage(LogLevel.Info, _bufferLength, _stringCapacity);
+        _logMessage = LogMessage.CreateTestMessage(_log, LogLevel.Info, _bufferLength, _stringCapacity);
     }
 
     [Test]
@@ -51,6 +52,7 @@ public class LoggedMessageTests
         clone.Thread.ShouldEqual(original.Thread);
         clone.Exception.ShouldEqual(original.Exception);
         clone.LoggerName.ShouldEqual(original.LoggerName);
+        clone.LoggerCompactName.ShouldEqual(original.LoggerCompactName);
         clone.Message.ToString().ShouldEqual(original.Message.ToString());
 
         clone.KeyValues.ShouldNotBeTheSameAs(original.KeyValues);
@@ -81,6 +83,7 @@ public class LoggedMessageTests
         clone.Thread.ShouldEqual(original.Thread);
         clone.Exception.ShouldEqual(original.Exception);
         clone.LoggerName.ShouldEqual(original.LoggerName);
+        clone.LoggerCompactName.ShouldEqual(original.LoggerCompactName);
         clone.Message.ToString().ShouldEqual(original.Message.ToString());
 
         clone.KeyValues.ShouldNotBeTheSameAs(original.KeyValues);
@@ -111,6 +114,7 @@ public class LoggedMessageTests
             clone.Thread,
             clone.Exception,
             clone.LoggerName,
+            clone.LoggerCompactName,
             clone.Message.ToString(),
             CaptureKeyValueList(clone.KeyValues)
         );
@@ -124,6 +128,7 @@ public class LoggedMessageTests
             clone.Thread,
             clone.Exception,
             clone.LoggerName,
+            clone.LoggerCompactName,
             clone.Message.ToString(),
             CaptureKeyValueList(clone.KeyValues)
         );
@@ -137,6 +142,14 @@ public class LoggedMessageTests
                 sb.Append($"[{item.Key}]={item.Value}({item.ArgumentType}={item.ValueType?.Name})");
             return sb.ToString();
         }
+    }
+
+    [Test]
+    public void should_provide_expected_values()
+    {
+        var message = GetFormatted();
+        message.LoggerName.ShouldEqual("Foo.Bar.Baz");
+        message.LoggerCompactName.ShouldEqual("FB.Baz");
     }
 
     [Test]
