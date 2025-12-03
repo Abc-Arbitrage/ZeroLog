@@ -19,6 +19,7 @@
   ZeroLog.Formatting.KeyValueList+Enumerator,
   ZeroLog.Formatting.LoggedKeyValue,
   ZeroLog.Formatting.LoggedMessage,
+  ZeroLog.Formatting.PatternWriter,
   ZeroLog.Log,
   ZeroLog.Log+DebugInterpolatedStringHandler,
   ZeroLog.Log+ErrorInterpolatedStringHandler,

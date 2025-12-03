@@ -9,6 +9,7 @@ internal static class ZeroLogFacts
     {
         public const string Log = "ZeroLog.Log";
         public const string LogMessage = "ZeroLog.LogMessage";
+        public const string PatternWriter = "ZeroLog.Formatting.PatternWriter";
         public const string DefaultFormatter = "ZeroLog.Formatting.DefaultFormatter";
     }
 

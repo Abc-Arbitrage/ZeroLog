@@ -188,6 +188,14 @@ namespace ZeroLog.Formatting
         public override string ToString() { }
         public static ZeroLog.Formatting.LoggedMessage CreateTestMessage(ZeroLog.LogMessage message, ZeroLog.Configuration.ZeroLogConfiguration? config = null) { }
     }
+    public sealed class PatternWriter
+    {
+        public PatternWriter(string pattern) { }
+        public string Pattern { get; }
+        public void Write(ZeroLog.Formatting.LoggedMessage message, System.Span<char> destination, out int charsWritten) { }
+        public static string EscapePattern(string? value) { }
+        public static bool IsValidPattern(string? pattern) { }
+    }
 }
 namespace ZeroLog
 {

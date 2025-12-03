@@ -9,7 +9,7 @@ using ZeroLog.Tests.Support;
 namespace ZeroLog.Tests.Formatting;
 
 [TestFixture]
-public class PrefixWriterTests
+public class PatternWriterTests
 {
     [Test]
     [TestCase("", "")]
@@ -55,7 +55,7 @@ public class PrefixWriterTests
     [TestCase("%%{%}", "%{%}")]
     public void should_write_prefix(string pattern, string expectedResult)
     {
-        var prefixWriter = new PrefixWriter(pattern)
+        var patternWriter = new PatternWriter(pattern)
         {
             LocalTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Etc/GMT+10")
         };
@@ -64,10 +64,10 @@ public class PrefixWriterTests
         logMessage.Initialize(new Log("Foo.Bar.TestLog"), LogLevel.Info);
         logMessage.Timestamp = new DateTime(2020, 01, 02, 03, 04, 05, 06);
 
-        var result = GetResult(prefixWriter, logMessage);
+        var result = GetResult(patternWriter, logMessage);
         result.ShouldEqual(expectedResult);
 
-        PrefixWriter.IsValidPattern(pattern).ShouldBeTrue();
+        PatternWriter.IsValidPattern(pattern).ShouldBeTrue();
     }
 
     [Test]
@@ -89,8 +89,8 @@ public class PrefixWriterTests
     [TestCase("%{column:-3}")]
     public void should_throw_on_invalid_format(string pattern)
     {
-        Assert.Throws<FormatException>(() => _ = new PrefixWriter(pattern));
-        PrefixWriter.IsValidPattern(pattern).ShouldBeFalse();
+        Assert.Throws<FormatException>(() => _ = new PatternWriter(pattern));
+        PatternWriter.IsValidPattern(pattern).ShouldBeFalse();
     }
 
     [Test]
@@ -115,7 +115,7 @@ public class PrefixWriterTests
     [TestCase("%{level:pad}")]
     public void should_not_allocate(string pattern)
     {
-        var prefixWriter = new PrefixWriter(pattern);
+        var patternWriter = new PatternWriter(pattern);
 
         var logMessage = new LogMessage("Foo");
         logMessage.Initialize(new Log("Foo.Bar.TestLog"), LogLevel.Info);
@@ -125,9 +125,9 @@ public class PrefixWriterTests
         var formattedLogMessage = new LoggedMessage(256, ZeroLogConfiguration.Default);
         formattedLogMessage.SetMessage(logMessage);
 
-        GcTester.ShouldNotAllocate(() => { prefixWriter.WritePrefix(formattedLogMessage, buffer, out _); });
+        GcTester.ShouldNotAllocate(() => { patternWriter.Write(formattedLogMessage, buffer, out _); });
 
-        PrefixWriter.IsValidPattern(pattern).ShouldBeTrue();
+        PatternWriter.IsValidPattern(pattern).ShouldBeTrue();
     }
 
     [Test]
@@ -139,12 +139,12 @@ public class PrefixWriterTests
         {
             Thread.CurrentThread.Name = "Hello";
 
-            var prefixWriter = new PrefixWriter($"{format} world!");
+            var patternWriter = new PatternWriter($"{format} world!");
 
             var logMessage = new LogMessage("Foo");
             logMessage.Initialize(null, LogLevel.Info);
 
-            var result = GetResult(prefixWriter, logMessage);
+            var result = GetResult(patternWriter, logMessage);
             result.ShouldEqual("Hello world!");
         });
     }
@@ -156,12 +156,12 @@ public class PrefixWriterTests
     {
         RunOnCustomThread(() =>
         {
-            var prefixWriter = new PrefixWriter(format);
+            var patternWriter = new PatternWriter(format);
 
             var logMessage = new LogMessage("Foo");
             logMessage.Initialize(null, LogLevel.Info);
 
-            var result = GetResult(prefixWriter, logMessage);
+            var result = GetResult(patternWriter, logMessage);
             result.ShouldEqual(Thread.CurrentThread.ManagedThreadId.ToString(CultureInfo.InvariantCulture));
         });
     }
@@ -173,11 +173,11 @@ public class PrefixWriterTests
     {
         RunOnCustomThread(() =>
         {
-            var prefixWriter = new PrefixWriter(format);
+            var patternWriter = new PatternWriter(format);
 
             var logMessage = new LogMessage("Foo");
 
-            var result = GetResult(prefixWriter, logMessage);
+            var result = GetResult(patternWriter, logMessage);
             result.ShouldEqual("0");
         });
     }
@@ -187,11 +187,11 @@ public class PrefixWriterTests
     {
         RunOnCustomThread(() =>
         {
-            var prefixWriter = new PrefixWriter("foo%{threadName}bar");
+            var patternWriter = new PatternWriter("foo%{threadName}bar");
 
             var logMessage = new LogMessage("Foo");
 
-            var result = GetResult(prefixWriter, logMessage);
+            var result = GetResult(patternWriter, logMessage);
             result.ShouldEqual("foobar");
         });
     }
@@ -199,10 +199,10 @@ public class PrefixWriterTests
     [Test]
     public void should_write_newline()
     {
-        var prefixWriter = new PrefixWriter("[%{newline}]");
+        var patternWriter = new PatternWriter("[%{newline}]");
         var logMessage = new LogMessage("Foo");
 
-        var result = GetResult(prefixWriter, logMessage);
+        var result = GetResult(patternWriter, logMessage);
         result.ShouldEqual($"[{Environment.NewLine}]");
     }
 
@@ -213,14 +213,14 @@ public class PrefixWriterTests
     [TestCase("%foo", "%%foo")]
     [TestCase("%foo %%bar", "%%foo %%%%bar")]
     public void should_escape_pattern(string pattern, string expectedResult)
-        => PrefixWriter.EscapePattern(pattern).ShouldEqual(expectedResult);
+        => PatternWriter.EscapePattern(pattern).ShouldEqual(expectedResult);
 
-    private static string GetResult(PrefixWriter prefixWriter, LogMessage logMessage)
+    private static string GetResult(PatternWriter patternWriter, LogMessage logMessage)
     {
         var buffer = new char[256];
         var formattedLogMessage = new LoggedMessage(256, ZeroLogConfiguration.Default);
         formattedLogMessage.SetMessage(logMessage);
-        prefixWriter.WritePrefix(formattedLogMessage, buffer, out var charsWritten);
+        patternWriter.Write(formattedLogMessage, buffer, out var charsWritten);
         return buffer.AsSpan(0, charsWritten).ToString();
     }
 

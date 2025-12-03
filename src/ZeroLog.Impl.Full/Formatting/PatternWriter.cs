@@ -8,7 +8,37 @@ using System.Text.RegularExpressions;
 
 namespace ZeroLog.Formatting;
 
-internal class PrefixWriter
+/// <summary>
+/// Writes log message data based on the provided pattern.
+/// </summary>
+/// <remarks>
+/// <para>
+/// The pattern is a string containing placeholders:
+/// <list type="table">
+/// <item><term><c>%date</c></term><description>The message UTC date (recommended, default format: <c>yyyy-MM-dd</c>).</description></item>
+/// <item><term><c>%localDate</c></term><description>The message local date (default format: <c>yyyy-MM-dd</c>).</description></item>
+/// <item><term><c>%time</c></term><description>The message time of day in UTC (default format: <c>hh\:mm\:ss\.fffffff</c>).</description></item>
+/// <item><term><c>%localTime</c></term><description>The message time of day converted to the local time zone (default format: <c>hh\:mm\:ss\.fffffff</c>).</description></item>
+/// <item><term><c>%thread</c></term><description>The thread name (or ID) which logged the message.</description></item>
+/// <item><term><c>%threadId</c></term><description>The thread ID which logged the message.</description></item>
+/// <item><term><c>%threadName</c></term><description>The thread name which logged the message, or empty if the thread was unnamed.</description></item>
+/// <item><term><c>%level</c></term><description>The log level in uppercase (specify the <c>pad</c> format to make each level 5 characters wide).</description></item>
+/// <item><term><c>%logger</c></term><description>The logger name.</description></item>
+/// <item><term><c>%loggerCompact</c></term><description>The logger name, with the namespace shortened to its initials.</description></item>
+/// <item><term><c>%newline</c></term><description>Equivalent to <c>Environment.NewLine</c>.</description></item>
+/// <item><term><c>%column</c></term><description>Inserts padding spaces until the column index specified in the format string is reached.</description></item>
+/// <item><term><c>%%</c></term><description>Inserts a single '%' character (escaping).</description></item>
+/// </list>
+/// </para>
+/// <para>
+/// Placeholders can be surrounded with braces and specify an optional format string:
+/// <c>%{date:yyyy-MM-dd HH:mm:ss}</c> for instance.
+/// </para>
+/// <para>
+/// Format strings can also be used to set a minimum field length: <c>%{logger:20}</c> will always be at least 20 characters wide.
+/// </para>
+/// </remarks>
+public sealed class PatternWriter
 {
     private static readonly Regex _patternRegex = new(
         """
@@ -28,17 +58,28 @@ internal class PrefixWriter
 
     private readonly PatternPart[] _parts;
 
+    /// <summary>
+    /// The pattern to be rendered.
+    /// </summary>
     public string Pattern { get; }
 
     internal TimeZoneInfo? LocalTimeZone { get; init; } // For unit tests
 
+    /// <summary>
+    /// Creates a pattern writer for the provided pattern.
+    /// </summary>
+    /// <param name="pattern">The pattern to use.</param>
     [SuppressMessage("ReSharper", "ConvertToPrimaryConstructor")]
-    public PrefixWriter(string pattern)
+    public PatternWriter(string pattern)
     {
         Pattern = pattern;
         _parts = OptimizeParts(ParsePattern(pattern)).ToArray();
     }
 
+    /// <summary>
+    /// Returns true if the provided pattern is valid.
+    /// </summary>
+    /// <param name="pattern">The pattern to validate.</param>
     public static bool IsValidPattern(string? pattern)
     {
         if (pattern is null)
@@ -46,7 +87,7 @@ internal class PrefixWriter
 
         try
         {
-            _ = new PrefixWriter(pattern);
+            _ = new PatternWriter(pattern);
             return true;
         }
         catch (FormatException)
@@ -55,6 +96,13 @@ internal class PrefixWriter
         }
     }
 
+    /// <summary>
+    /// Escapes the provided value so it can be used in a pattern without triggering placeholders.
+    /// </summary>
+    /// <remarks>
+    /// This replaces <c>%</c> with <c>%%</c>.
+    /// </remarks>
+    /// <param name="value">The value to escape.</param>
     public static string EscapePattern(string? value)
         => value?.Replace("%", "%%") ?? string.Empty;
 
@@ -209,8 +257,14 @@ internal class PrefixWriter
 
 #if NET
 
+    /// <summary>
+    /// Writes the log message data to the provided destination.
+    /// </summary>
+    /// <param name="message">The message to use.</param>
+    /// <param name="destination">The destination span to render to.</param>
+    /// <param name="charsWritten">Returns the number of chars written to the <paramref name="destination"/>.</param>
     [SuppressMessage("ReSharper", "ReplaceSliceWithRangeIndexer")]
-    public void WritePrefix(LoggedMessage message, Span<char> destination, out int charsWritten)
+    public void Write(LoggedMessage message, Span<char> destination, out int charsWritten)
     {
         var builder = new CharBufferBuilder(destination);
 
