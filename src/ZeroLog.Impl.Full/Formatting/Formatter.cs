@@ -102,6 +102,20 @@ public abstract class Formatter
     }
 
     /// <summary>
+    /// Pads the output with spaces until the specified column is reached.
+    /// </summary>
+    /// <param name="column">The column number.</param>
+    protected internal void PadToColumn(int column)
+    {
+        if (_position >= column)
+            return;
+
+        var length = Math.Min(column, _buffer.Length) - _position;
+        _buffer.AsSpan(_position, length).Fill(' ');
+        _position += length;
+    }
+
+    /// <summary>
     /// Returns a span of the current output.
     /// </summary>
     protected internal Span<char> GetOutput()

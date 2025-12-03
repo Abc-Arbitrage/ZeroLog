@@ -81,6 +81,30 @@ public class FormatterTests
         _formatter.GetOutput().SequenceEqual(value[..^Environment.NewLine.Length] + Environment.NewLine).ShouldBeTrue();
     }
 
+    [Test]
+    public void should_pad()
+    {
+        _formatter.Write("a");
+        _formatter.PadToColumn(5);
+        _formatter.Write("b");
+
+        _formatter.GetOutput().ToString().ShouldEqual("a    b");
+    }
+
+    [Test]
+    public void should_not_overflow_on_padding()
+    {
+        _formatter.PadToColumn(TestFormatter.BufferLength + 42);
+        _formatter.GetOutput().ToString().ShouldEqual(new string(' ', TestFormatter.BufferLength));
+    }
+
+    [Test]
+    public void should_not_throw_on_invalid_padding()
+    {
+        _formatter.PadToColumn(-42);
+        _formatter.GetOutput().Length.ShouldEqual(0);
+    }
+
     private class TestFormatter : Formatter
     {
         public static int BufferLength { get; } = new TestFormatter().GetRemainingBuffer().Length;

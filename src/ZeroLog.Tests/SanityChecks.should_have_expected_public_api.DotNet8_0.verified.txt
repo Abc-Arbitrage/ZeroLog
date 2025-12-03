@@ -141,6 +141,7 @@ namespace ZeroLog.Formatting
         public System.ReadOnlySpan<char> FormatMessage(ZeroLog.Formatting.LoggedMessage message) { }
         protected System.Span<char> GetOutput() { }
         protected System.Span<char> GetRemainingBuffer() { }
+        protected void PadToColumn(int column) { }
         protected void Write(System.ReadOnlySpan<char> value) { }
         protected void Write(ZeroLog.Formatting.KeyValueList? keyValues) { }
         protected bool Write<T>(T value, System.ReadOnlySpan<char> format = default)
