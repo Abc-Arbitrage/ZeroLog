@@ -142,6 +142,9 @@ namespace ZeroLog.Formatting
         protected System.Span<char> GetOutput() { }
         protected System.Span<char> GetRemainingBuffer() { }
         protected void Write(System.ReadOnlySpan<char> value) { }
+        protected void Write(ZeroLog.Formatting.KeyValueList? keyValues) { }
+        protected bool Write<T>(T value, System.ReadOnlySpan<char> format = default)
+            where T : System.ISpanFormattable { }
         protected void WriteLine() { }
         protected void WriteLine(System.ReadOnlySpan<char> value) { }
         protected abstract void WriteMessage(ZeroLog.Formatting.LoggedMessage message);

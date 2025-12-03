@@ -22,7 +22,21 @@ public class FormatterTests
         _formatter.Write("Foo");
         _formatter.Write("Bar");
 
-        (_formatter.GetOutput() is "FooBar").ShouldBeTrue();
+        _formatter.GetOutput().ToString().ShouldEqual("FooBar");
+    }
+
+    [Test]
+    public void should_append_formattable()
+    {
+        _formatter.Write(42);
+        _formatter.GetOutput().ToString().ShouldEqual("42");
+    }
+
+    [Test]
+    public void should_append_formattable_with_format()
+    {
+        _formatter.Write(0.42, "P2");
+        _formatter.GetOutput().ToString().ShouldEqual("42.00 %");
     }
 
     [Test]

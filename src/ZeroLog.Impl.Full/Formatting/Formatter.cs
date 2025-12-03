@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 
 namespace ZeroLog.Formatting;
 
@@ -26,7 +27,7 @@ public abstract class Formatter
     /// Formats the given message to text.
     /// </summary>
     /// <remarks>
-    /// Call <see cref="Write"/> to append text to the output.
+    /// Call <see cref="Write(System.ReadOnlySpan{char})"/> to append text to the output.
     /// </remarks>
     /// <param name="message">The message to format.</param>
     protected abstract void WriteMessage(LoggedMessage message);
@@ -40,6 +41,34 @@ public abstract class Formatter
         var charCount = Math.Min(value.Length, _buffer.Length - _position);
         value.Slice(0, charCount).CopyTo(_buffer.AsSpan(_position));
         _position += charCount;
+    }
+
+    /// <summary>
+    /// Appends a <see cref="ISpanFormattable"/> to the output.
+    /// </summary>
+    /// <param name="value">The value to write.</param>
+    /// <param name="format">The format to use.</param>
+    protected internal bool Write<T>(T value, ReadOnlySpan<char> format = default)
+        where T : ISpanFormattable
+    {
+        if (!value.TryFormat(GetRemainingBuffer(), out var charsWritten, format, CultureInfo.InvariantCulture))
+            return false;
+
+        AdvanceBy(charsWritten);
+        return true;
+    }
+
+    /// <summary>
+    /// Appends a <see cref="KeyValueList"/> to the output as JSON.
+    /// </summary>
+    /// <param name="keyValues">The list to write.</param>
+    protected internal void Write(KeyValueList? keyValues)
+    {
+        if (keyValues is null)
+            return;
+
+        JsonWriter.WriteJsonToStringBuffer(keyValues, GetRemainingBuffer(), out var charsWritten);
+        AdvanceBy(charsWritten);
     }
 
     /// <summary>
@@ -89,7 +118,7 @@ public abstract class Formatter
     /// </summary>
     /// <param name="charCount">The character count to advance the position by.</param>
     protected void AdvanceBy(int charCount)
-        => _position += charCount;
+        => _position = Math.Min(_position + charCount, _buffer.Length);
 
     internal char[] GetBuffer(out int length)
     {

@@ -86,9 +86,7 @@ public sealed class DefaultFormatter : Formatter
         if (message.KeyValues.Count != 0)
         {
             Write(JsonSeparator);
-
-            JsonWriter.WriteJsonToStringBuffer(message.KeyValues, GetRemainingBuffer(), out var charsWritten);
-            AdvanceBy(charsWritten);
+            Write(message.KeyValues);
         }
 
         WriteLine();
