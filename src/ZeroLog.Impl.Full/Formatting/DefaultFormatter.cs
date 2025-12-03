@@ -43,12 +43,7 @@ public sealed class DefaultFormatter : Formatter
     /// <inheritdoc/>
     protected override void WriteMessage(LoggedMessage message)
     {
-        if (_prefixWriter != null)
-        {
-            _prefixWriter.Write(message, GetRemainingBuffer(), out var charsWritten);
-            AdvanceBy(charsWritten);
-        }
-
+        Write(message, _prefixWriter);
         Write(message.Message);
 
         if (message.KeyValues.Count != 0)

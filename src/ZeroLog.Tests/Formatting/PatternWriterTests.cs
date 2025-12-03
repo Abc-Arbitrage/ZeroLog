@@ -125,9 +125,48 @@ public class PatternWriterTests
         var formattedLogMessage = new LoggedMessage(256, ZeroLogConfiguration.Default);
         formattedLogMessage.SetMessage(logMessage);
 
-        GcTester.ShouldNotAllocate(() => { patternWriter.Write(formattedLogMessage, buffer, out _); });
+        GcTester.ShouldNotAllocate(() =>
+        {
+            patternWriter.Write(formattedLogMessage, buffer, out _);
+        });
 
         PatternWriter.IsValidPattern(pattern).ShouldBeTrue();
+    }
+
+    [Test]
+    [TestCase(LogLevel.Trace, "[] [           ]")]
+    [TestCase(LogLevel.Debug, "[DEbug] [DEbug      ]")]
+    [TestCase(LogLevel.Info, "[InFo] [InFo       ]")]
+    [TestCase(LogLevel.Warn, "[WARN] [WARN       ]")]
+    [TestCase(LogLevel.Error, "[ERROR OMG] [ERROR OMG  ]")]
+    [TestCase(LogLevel.Fatal, "[CRITICAL!!!] [CRITICAL!!!]")]
+    public void should_customize_levels(LogLevel level, string expectedResult)
+    {
+        var patternWriter = new PatternWriter("[%level] [%{level:pad}]");
+        patternWriter.SetLevelNames(null!, "DEbug", "InFo", "WARN", "ERROR OMG", "CRITICAL!!!");
+
+        var logMessage = new LogMessage("Foo");
+        logMessage.Initialize(new Log("Foo.Bar.TestLog"), level);
+        logMessage.Timestamp = new DateTime(2020, 01, 02, 03, 04, 05, 06);
+
+        var result = GetResult(patternWriter, logMessage);
+        result.ShouldEqual(expectedResult);
+    }
+
+    [Test]
+    [TestCase(-1)]
+    [TestCase(42)]
+    public void should_handle_invalid_level_values(int level)
+    {
+        var patternWriter = new PatternWriter("[%level] [%{level:pad}]");
+        patternWriter.SetLevelNames("T", "DEbug", "InFo", "WARN", "ERROR OMG", "CRITICAL!!!");
+
+        var logMessage = new LogMessage("Foo");
+        logMessage.Initialize(new Log("Foo.Bar.TestLog"), (LogLevel)level);
+        logMessage.Timestamp = new DateTime(2020, 01, 02, 03, 04, 05, 06);
+
+        var result = GetResult(patternWriter, logMessage);
+        result.ShouldEqual("[] []");
     }
 
     [Test]

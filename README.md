@@ -139,7 +139,7 @@ The prefix pattern is a string with the following placeholders:
 | `%thread`        | The thread name (or ID) which logged the message                 |                                                            |
 | `%threadId`      | The thread ID which logged the message                           |                                                            |
 | `%threadName`    | The thread name which logged the message, or an empty string     |                                                            |
-| `%level`         | The log level in uppercase                                       | `pad` is equivalent to `5` (the longest level length)      |
+| `%level`         | The log level (default: a short uppercase label)                 | `pad` makes eack level the same length                     |
 | `%logger`        | The logger name                                                  |                                                            | 
 | `%loggerCompact` | The logger name, with the namespace shortened to its initials    |                                                            | 
 | `%newline`       | Equivalent to `Environment.NewLine`                              |                                                            | 

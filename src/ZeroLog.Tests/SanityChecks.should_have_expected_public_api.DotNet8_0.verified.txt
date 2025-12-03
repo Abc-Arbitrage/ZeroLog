@@ -144,6 +144,7 @@ namespace ZeroLog.Formatting
         protected void PadToColumn(int column) { }
         protected void Write(System.ReadOnlySpan<char> value) { }
         protected void Write(ZeroLog.Formatting.KeyValueList? keyValues) { }
+        protected void Write(ZeroLog.Formatting.LoggedMessage? message, ZeroLog.Formatting.PatternWriter? patternWriter) { }
         protected bool Write<T>(T value, System.ReadOnlySpan<char> format = default)
             where T : System.ISpanFormattable { }
         protected void WriteLine() { }
@@ -192,6 +193,7 @@ namespace ZeroLog.Formatting
     {
         public PatternWriter(string pattern) { }
         public string Pattern { get; }
+        public void SetLevelNames(string trace, string debug, string info, string warn, string error, string fatal) { }
         public void Write(ZeroLog.Formatting.LoggedMessage message, System.Span<char> destination, out int charsWritten) { }
         public static string EscapePattern(string? value) { }
         public static bool IsValidPattern(string? pattern) { }

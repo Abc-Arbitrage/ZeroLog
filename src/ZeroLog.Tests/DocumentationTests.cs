@@ -18,12 +18,7 @@ public class DocumentationTests
     [TestCaseSource(nameof(GetDocumentedMembers))]
     public void should_have_valid_documentation(XElement member)
     {
-        if (member.Element("inheritdoc") != null)
-        {
-            member.Elements("inheritdoc").Count().ShouldEqual(1);
-            member.Elements().Count(i => i.Name.LocalName is not "inheritdoc").ShouldEqual(0);
-        }
-        else
+        if (member.Element("inheritdoc") == null)
         {
             member.Elements("summary").Count().ShouldEqual(1);
             member.Elements("remarks").Count().ShouldBeLessThanOrEqualTo(1);

@@ -72,6 +72,20 @@ public abstract class Formatter
     }
 
     /// <summary>
+    /// Appends a logged message using a pattern writer.
+    /// </summary>
+    /// <param name="message">The message to write.</param>
+    /// <param name="patternWriter">The pattern writer to use.</param>
+    protected internal void Write(LoggedMessage? message, PatternWriter? patternWriter)
+    {
+        if (patternWriter is null || message is null)
+            return;
+
+        patternWriter.Write(message, GetRemainingBuffer(), out var charsWritten);
+        AdvanceBy(charsWritten);
+    }
+
+    /// <summary>
     /// Appends text followed by a newline to the output.
     /// </summary>
     /// <param name="value">The value to write.</param>

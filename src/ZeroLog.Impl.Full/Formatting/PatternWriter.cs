@@ -22,7 +22,7 @@ namespace ZeroLog.Formatting;
 /// <item><term><c>%thread</c></term><description>The thread name (or ID) which logged the message.</description></item>
 /// <item><term><c>%threadId</c></term><description>The thread ID which logged the message.</description></item>
 /// <item><term><c>%threadName</c></term><description>The thread name which logged the message, or empty if the thread was unnamed.</description></item>
-/// <item><term><c>%level</c></term><description>The log level in uppercase (specify the <c>pad</c> format to make each level 5 characters wide).</description></item>
+/// <item><term><c>%level</c></term><description>The log level (a short uppercase label by default, specify the <c>pad</c> format to make every label the same width).</description></item>
 /// <item><term><c>%logger</c></term><description>The logger name.</description></item>
 /// <item><term><c>%loggerCompact</c></term><description>The logger name, with the namespace shortened to its initials.</description></item>
 /// <item><term><c>%newline</c></term><description>Equivalent to <c>Environment.NewLine</c>.</description></item>
@@ -58,6 +58,9 @@ public sealed class PatternWriter
 
     private readonly PatternPart[] _parts;
 
+    private string[] _levels = [];
+    private string[] _levelsWithPadding = [];
+
     /// <summary>
     /// The pattern to be rendered.
     /// </summary>
@@ -74,6 +77,8 @@ public sealed class PatternWriter
     {
         Pattern = pattern;
         _parts = OptimizeParts(ParsePattern(pattern)).ToArray();
+
+        SetLevelNames("TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL");
     }
 
     /// <summary>
@@ -105,6 +110,20 @@ public sealed class PatternWriter
     /// <param name="value">The value to escape.</param>
     public static string EscapePattern(string? value)
         => value?.Replace("%", "%%") ?? string.Empty;
+
+    /// <summary>
+    /// Sets the labels to use for each log level.
+    /// </summary>
+    [SuppressMessage("ReSharper", "NullCoalescingConditionIsAlwaysNotNullAccordingToAPIContract")]
+    public void SetLevelNames(string trace, string debug, string info, string warn, string error, string fatal)
+    {
+        _levels = [trace, debug, info, warn, error, fatal];
+        for (var i = 0; i < _levels.Length; ++i)
+            _levels[i] ??= string.Empty;
+
+        var maxLength = _levels.Max(i => i.Length);
+        _levelsWithPadding = _levels.Select(i => i.PadRight(maxLength)).ToArray();
+    }
 
     private static IEnumerable<PatternPart> ParsePattern(string pattern)
     {
@@ -190,7 +209,7 @@ public sealed class PatternWriter
             case PatternPartType.Level:
             {
                 if (part.Format?.ToLowerInvariant() is "pad" or "padded")
-                    return new PatternPart(PatternPartType.Level, part.Format, 5);
+                    return new PatternPart(PatternPartType.LevelPadded);
 
                 goto default;
             }
@@ -361,18 +380,27 @@ public sealed class PatternWriter
 
                 case PatternPartType.Level:
                 {
-                    var levelString = message.Level switch
-                    {
-                        LogLevel.Trace => "TRACE",
-                        LogLevel.Debug => "DEBUG",
-                        LogLevel.Info  => "INFO",
-                        LogLevel.Warn  => "WARN",
-                        LogLevel.Error => "ERROR",
-                        LogLevel.Fatal => "FATAL",
-                        _              => "???"
-                    };
+                    var levels = _levels;
+                    var intLevel = (int)message.Level;
 
-                    if (!builder.TryAppendWhole(levelString))
+                    if (intLevel < 0 || intLevel >= levels.Length)
+                        break;
+
+                    if (!builder.TryAppendWhole(levels[intLevel]))
+                        goto endOfLoop;
+
+                    break;
+                }
+
+                case PatternPartType.LevelPadded:
+                {
+                    var levels = _levelsWithPadding;
+                    var intLevel = (int)message.Level;
+
+                    if (intLevel < 0 || intLevel >= levels.Length)
+                        break;
+
+                    if (!builder.TryAppendWhole(levels[intLevel]))
                         goto endOfLoop;
 
                     break;
@@ -428,6 +456,7 @@ public sealed class PatternWriter
         ThreadId,
         ThreadName,
         Level,
+        LevelPadded,
         Logger,
         LoggerCompact,
         NewLine,
