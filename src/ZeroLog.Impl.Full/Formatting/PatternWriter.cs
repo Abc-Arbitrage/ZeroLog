@@ -25,6 +25,7 @@ namespace ZeroLog.Formatting;
 /// <item><term><c>%level</c></term><description>The log level (a short uppercase label by default, specify the <c>pad</c> format to make every label the same width).</description></item>
 /// <item><term><c>%logger</c></term><description>The logger name.</description></item>
 /// <item><term><c>%loggerCompact</c></term><description>The logger name, with the namespace shortened to its initials.</description></item>
+/// <item><term><c>%message</c></term><description>The log message.</description></item>
 /// <item><term><c>%newline</c></term><description>Equivalent to <c>Environment.NewLine</c>.</description></item>
 /// <item><term><c>%column</c></term><description>Inserts padding spaces until the column index specified in the format string is reached.</description></item>
 /// <item><term><c>%%</c></term><description>Inserts a single '%' character (escaping).</description></item>
@@ -84,6 +85,9 @@ public sealed class PatternWriter
     /// <summary>
     /// Returns true if the provided pattern is valid.
     /// </summary>
+    /// <remarks>
+    /// This method allocates.
+    /// </remarks>
     /// <param name="pattern">The pattern to validate.</param>
     public static bool IsValidPattern(string? pattern)
     {
@@ -106,6 +110,7 @@ public sealed class PatternWriter
     /// </summary>
     /// <remarks>
     /// This replaces <c>%</c> with <c>%%</c>.
+    /// This method allocates.
     /// </remarks>
     /// <param name="value">The value to escape.</param>
     public static string EscapePattern(string? value)
@@ -114,12 +119,21 @@ public sealed class PatternWriter
     /// <summary>
     /// Sets the labels to use for each log level.
     /// </summary>
+    /// <remarks>
+    /// This method allocates.
+    /// </remarks>
     [SuppressMessage("ReSharper", "NullCoalescingConditionIsAlwaysNotNullAccordingToAPIContract")]
-    public void SetLevelNames(string trace, string debug, string info, string warn, string error, string fatal)
+    public void SetLevelNames(string? trace, string? debug, string? info, string? warn, string? error, string? fatal)
     {
-        _levels = [trace, debug, info, warn, error, fatal];
-        for (var i = 0; i < _levels.Length; ++i)
-            _levels[i] ??= string.Empty;
+        _levels =
+        [
+            trace ?? _levels[0],
+            debug ?? _levels[1],
+            info ?? _levels[2],
+            warn ?? _levels[3],
+            error ?? _levels[4],
+            fatal ?? _levels[5]
+        ];
 
         var maxLength = _levels.Max(i => i.Length);
         _levelsWithPadding = _levels.Select(i => i.PadRight(maxLength)).ToArray();
@@ -156,6 +170,7 @@ public sealed class PatternWriter
                 "level"         => new PatternPart(PatternPartType.Level, format),
                 "logger"        => new PatternPart(PatternPartType.Logger, format),
                 "loggercompact" => new PatternPart(PatternPartType.LoggerCompact, format),
+                "message"       => new PatternPart(PatternPartType.Message, format),
                 "newline"       => new PatternPart(PatternPartType.NewLine, format),
                 "column"        => new PatternPart(PatternPartType.Column, format),
                 "%"             => new PatternPart("%"),
@@ -422,6 +437,14 @@ public sealed class PatternWriter
                     break;
                 }
 
+                case PatternPartType.Message:
+                {
+                    if (!builder.TryAppendPartial(message.Message))
+                        goto endOfLoop;
+
+                    break;
+                }
+
                 case PatternPartType.Column:
                 {
                     if (part.FormatInt is { } column)
@@ -459,6 +482,7 @@ public sealed class PatternWriter
         LevelPadded,
         Logger,
         LoggerCompact,
+        Message,
         NewLine,
         Column
     }

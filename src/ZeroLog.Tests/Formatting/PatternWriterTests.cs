@@ -22,6 +22,7 @@ public class PatternWriterTests
     [TestCase("%level", "INFO")]
     [TestCase("%logger", "Foo.Bar.TestLog")]
     [TestCase("%loggerCompact", "FB.TestLog")]
+    [TestCase("%message", "Foo")]
     [TestCase("foo %level bar %logger baz", "foo INFO bar Foo.Bar.TestLog baz")]
     [TestCase("%level %level", "INFO INFO")]
     [TestCase("%LEVEL", "INFO")]
@@ -43,6 +44,7 @@ public class PatternWriterTests
     [TestCase("%{logger:3}", "Foo.Bar.TestLog")]
     [TestCase("%{logger:18}", "Foo.Bar.TestLog   ")]
     [TestCase("%{loggerCompact:12}", "FB.TestLog  ")]
+    [TestCase("%{message:5}", "Foo  ")]
     [TestCase("abc%{column:10}def%{column:15}ghi", "abc       def  ghi")]
     [TestCase("%%level", "%level")]
     [TestCase("%%%level", "%INFO")]
@@ -53,7 +55,7 @@ public class PatternWriterTests
     [TestCase("%{%}", "%{%}")]
     [TestCase("%{%:%}", "%{%:%}")]
     [TestCase("%%{%}", "%{%}")]
-    public void should_write_prefix(string pattern, string expectedResult)
+    public void should_write_pattern(string pattern, string expectedResult)
     {
         var patternWriter = new PatternWriter(pattern)
         {
@@ -134,7 +136,7 @@ public class PatternWriterTests
     }
 
     [Test]
-    [TestCase(LogLevel.Trace, "[] [           ]")]
+    [TestCase(LogLevel.Trace, "[TRACE] [TRACE      ]")]
     [TestCase(LogLevel.Debug, "[DEbug] [DEbug      ]")]
     [TestCase(LogLevel.Info, "[InFo] [InFo       ]")]
     [TestCase(LogLevel.Warn, "[WARN] [WARN       ]")]
@@ -143,7 +145,7 @@ public class PatternWriterTests
     public void should_customize_levels(LogLevel level, string expectedResult)
     {
         var patternWriter = new PatternWriter("[%level] [%{level:pad}]");
-        patternWriter.SetLevelNames(null!, "DEbug", "InFo", "WARN", "ERROR OMG", "CRITICAL!!!");
+        patternWriter.SetLevelNames(null, "DEbug", "InFo", "WARN", "ERROR OMG", "CRITICAL!!!");
 
         var logMessage = new LogMessage("Foo");
         logMessage.Initialize(new Log("Foo.Bar.TestLog"), level);

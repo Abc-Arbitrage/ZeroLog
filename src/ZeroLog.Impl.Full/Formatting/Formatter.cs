@@ -146,7 +146,7 @@ public abstract class Formatter
     /// </summary>
     /// <param name="charCount">The character count to advance the position by.</param>
     protected void AdvanceBy(int charCount)
-        => _position = Math.Min(_position + charCount, _buffer.Length);
+        => _position = Math.Clamp(_position + charCount, 0, _buffer.Length);
 
     internal char[] GetBuffer(out int length)
     {
