@@ -26,6 +26,8 @@ namespace ZeroLog.Formatting;
 /// <item><term><c>%logger</c></term><description>The logger name.</description></item>
 /// <item><term><c>%loggerCompact</c></term><description>The logger name, with the namespace shortened to its initials.</description></item>
 /// <item><term><c>%message</c></term><description>The log message.</description></item>
+/// <item><term><c>%exceptionMessage</c></term><description>The exception message, if any.</description></item>
+/// <item><term><c>%exceptionType</c></term><description>The exception type name, if any.</description></item>
 /// <item><term><c>%newline</c></term><description>Equivalent to <c>Environment.NewLine</c>.</description></item>
 /// <item><term><c>%column</c></term><description>Inserts padding spaces until the column index specified in the format string is reached.</description></item>
 /// <item><term><c>%%</c></term><description>Inserts a single '%' character (escaping).</description></item>
@@ -150,21 +152,23 @@ public sealed class PatternWriter
 
             var part = placeholderType.ToLowerInvariant() switch
             {
-                "date"          => new PatternPart(PatternPartType.Date, format),
-                "localdate"     => new PatternPart(PatternPartType.LocalDate, format),
-                "time"          => new PatternPart(PatternPartType.Time, format),
-                "localtime"     => new PatternPart(PatternPartType.LocalTime, format),
-                "thread"        => new PatternPart(PatternPartType.Thread, format),
-                "threadid"      => new PatternPart(PatternPartType.ThreadId, format),
-                "threadname"    => new PatternPart(PatternPartType.ThreadName, format),
-                "level"         => new PatternPart(PatternPartType.Level, format),
-                "logger"        => new PatternPart(PatternPartType.Logger, format),
-                "loggercompact" => new PatternPart(PatternPartType.LoggerCompact, format),
-                "message"       => new PatternPart(PatternPartType.Message, format),
-                "newline"       => new PatternPart(PatternPartType.NewLine, format),
-                "column"        => new PatternPart(PatternPartType.Column, format),
-                "%"             => new PatternPart("%"),
-                _               => throw new FormatException($"Invalid placeholder type: %{placeholderType}")
+                "date"             => new PatternPart(PatternPartType.Date, format),
+                "localdate"        => new PatternPart(PatternPartType.LocalDate, format),
+                "time"             => new PatternPart(PatternPartType.Time, format),
+                "localtime"        => new PatternPart(PatternPartType.LocalTime, format),
+                "thread"           => new PatternPart(PatternPartType.Thread, format),
+                "threadid"         => new PatternPart(PatternPartType.ThreadId, format),
+                "threadname"       => new PatternPart(PatternPartType.ThreadName, format),
+                "level"            => new PatternPart(PatternPartType.Level, format),
+                "logger"           => new PatternPart(PatternPartType.Logger, format),
+                "loggercompact"    => new PatternPart(PatternPartType.LoggerCompact, format),
+                "message"          => new PatternPart(PatternPartType.Message, format),
+                "exceptionmessage" => new PatternPart(PatternPartType.ExceptionMessage, format),
+                "exceptiontype"    => new PatternPart(PatternPartType.ExceptionType, format),
+                "newline"          => new PatternPart(PatternPartType.NewLine, format),
+                "column"           => new PatternPart(PatternPartType.Column, format),
+                "%"                => new PatternPart("%"),
+                _                  => throw new FormatException($"Invalid placeholder type: %{placeholderType}")
             };
 
             // ReSharper restore StringLiteralTypo
@@ -422,6 +426,28 @@ public sealed class PatternWriter
                     break;
                 }
 
+                case PatternPartType.ExceptionMessage:
+                {
+                    if (message.Exception?.Message is { } exceptionMessage)
+                    {
+                        if (!builder.TryAppendPartial(exceptionMessage))
+                            goto endOfLoop;
+                    }
+
+                    break;
+                }
+
+                case PatternPartType.ExceptionType:
+                {
+                    if (message.Exception is { } exception)
+                    {
+                        if (!builder.TryAppendPartial(exception.GetType().Name))
+                            goto endOfLoop;
+                    }
+
+                    break;
+                }
+
                 case PatternPartType.Column:
                 {
                     if (part.FormatInt is { } column)
@@ -460,6 +486,8 @@ public sealed class PatternWriter
         Logger,
         LoggerCompact,
         Message,
+        ExceptionMessage,
+        ExceptionType,
         NewLine,
         Column
     }

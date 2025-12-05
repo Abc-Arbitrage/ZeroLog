@@ -23,6 +23,8 @@ public class PatternWriterTests
     [TestCase("%logger", "Foo.Bar.TestLog")]
     [TestCase("%loggerCompact", "FB.TestLog")]
     [TestCase("%message", "Foo")]
+    [TestCase("%exceptionMessage", "Exception message")]
+    [TestCase("%exceptionType", "InvalidOperationException")]
     [TestCase("foo %level bar %logger baz", "foo INFO bar Foo.Bar.TestLog baz")]
     [TestCase("%level %level", "INFO INFO")]
     [TestCase("%LEVEL", "INFO")]
@@ -65,6 +67,7 @@ public class PatternWriterTests
         var logMessage = new LogMessage("Foo");
         logMessage.Initialize(new Log("Foo.Bar.TestLog"), LogLevel.Info);
         logMessage.Timestamp = new DateTime(2020, 01, 02, 03, 04, 05, 06);
+        logMessage.Exception = new InvalidOperationException("Exception message");
 
         var result = GetResult(patternWriter, logMessage);
         result.ShouldEqual(expectedResult);

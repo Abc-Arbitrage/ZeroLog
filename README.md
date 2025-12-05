@@ -128,25 +128,28 @@ Several appenders are provided by default, such as `ConsoleAppener` or `DateAndS
 
 The output format of the built-in appenders may be customized through the `Formatter` property, which controls how the message metadata is formatted. A `DefaultFormatter` is provided, which prefixes the logged message with a customizable pattern, and suffixes it with the structured data as JSON.
 
-The prefix pattern is a string with the following placeholders:
+The pattern is a string with the following placeholders:
 
-| Placeholder      | Effect                                                           | Format                                                     | 
-|------------------|------------------------------------------------------------------|------------------------------------------------------------|
-| `%date`          | The message date in UTC (recommended, also contains time of day) | A `DateTime` format string, default: `yyyy-MM-dd`          |
-| `%localDate`     | The message date converted to the local time zone                | A `DateTime` format string, default: `yyyy-MM-dd`          |
-| `%time`          | The message time of day (in UTC)                                 | A `TimeSpan` format string, default: `hh\:mm\:ss\.fffffff` |
-| `%localTime`     | The message time of day (converted to the local time zone)       | A `TimeSpan` format string, default: `hh\:mm\:ss\.fffffff` |
-| `%thread`        | The thread name (or ID) which logged the message                 |                                                            |
-| `%threadId`      | The thread ID which logged the message                           |                                                            |
-| `%threadName`    | The thread name which logged the message, or an empty string     |                                                            |
-| `%level`         | The log level (default: a short uppercase label)                 | `pad` makes eack level the same length                     |
-| `%logger`        | The logger name                                                  |                                                            | 
-| `%loggerCompact` | The logger name, with the namespace shortened to its initials    |                                                            | 
-| `%newline`       | Equivalent to `Environment.NewLine`                              |                                                            | 
-| `%column`        | Inserts padding spaces until a given column index                | The column index to reach                                  | 
-| `%%`             | Inserts a single `%` character (escaping)                        |                                                            | 
+| Placeholder         | Effect                                                           | Format                                                     | 
+|---------------------|------------------------------------------------------------------|------------------------------------------------------------|
+| `%date`             | The message date in UTC (recommended, also contains time of day) | A `DateTime` format string, default: `yyyy-MM-dd`          |
+| `%localDate`        | The message date converted to the local time zone                | A `DateTime` format string, default: `yyyy-MM-dd`          |
+| `%time`             | The message time of day (in UTC)                                 | A `TimeSpan` format string, default: `hh\:mm\:ss\.fffffff` |
+| `%localTime`        | The message time of day (converted to the local time zone)       | A `TimeSpan` format string, default: `hh\:mm\:ss\.fffffff` |
+| `%thread`           | The thread name (or ID) which logged the message                 |                                                            |
+| `%threadId`         | The thread ID which logged the message                           |                                                            |
+| `%threadName`       | The thread name which logged the message, or an empty string     |                                                            |
+| `%level`            | The log level (default: a short uppercase label)                 | `pad` makes eack level the same length                     |
+| `%logger`           | The logger name                                                  |                                                            | 
+| `%loggerCompact`    | The logger name, with the namespace shortened to its initials    |                                                            | 
+| `%message`          | The logged message                                               |                                                            | 
+| `%exceptionMessage` | The exception message, if any                                    |                                                            | 
+| `%exceptionType`    | The exception type, if any                                       |                                                            | 
+| `%newline`          | Equivalent to `Environment.NewLine`                              |                                                            | 
+| `%column`           | Inserts padding spaces until a given column index                | The column index to reach                                  | 
+| `%%`                | Inserts a single `%` character (escaping)                        |                                                            | 
 
-Prefixes can be written in the form `%{prefix}` or `%{prefix:format}` to define a format string. String placeholders accept an integer format string which defines their minimum length. For instance, `%{logger:20}` will always be at least 20 characters wide.
+Patterns can be written in the form `%{field}` or `%{field:format}` to define a format string. String placeholders accept an integer format string which defines their minimum length. For instance, `%{logger:20}` will always be at least 20 characters wide.
 
 ### Loggers
 
