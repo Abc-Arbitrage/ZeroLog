@@ -179,11 +179,15 @@ public class PatternWriterTests
     }
 
     [Test]
-    [TestCase(-1)]
-    [TestCase(0)]
-    [TestCase(1)]
-    [TestCase(42)]
-    public void should_handle_invalid_level_values_on_default_instance(int level)
+    [TestCase(-1, "[] []")]
+    [TestCase(0, "[TRACE] [TRACE]")]
+    [TestCase(1, "[DEBUG] [DEBUG]")]
+    [TestCase(2, "[INFO] [INFO ]")]
+    [TestCase(3, "[WARN] [WARN ]")]
+    [TestCase(4, "[ERROR] [ERROR]")]
+    [TestCase(5, "[FATAL] [FATAL]")]
+    [TestCase(6, "[] []")]
+    public void should_handle_invalid_level_values_on_default_instance(int level, string expected)
     {
         var patternWriter = new PatternWriter("[%level] [%{level:pad}]")
         {
@@ -195,7 +199,7 @@ public class PatternWriterTests
         logMessage.Timestamp = new DateTime(2020, 01, 02, 03, 04, 05, 06);
 
         var result = GetResult(patternWriter, logMessage);
-        result.ShouldEqual("[] []");
+        result.ShouldEqual(expected);
     }
 
     [Test]

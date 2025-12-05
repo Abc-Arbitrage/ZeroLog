@@ -200,7 +200,13 @@ namespace ZeroLog.Formatting
         public readonly struct LogLevelNames
         {
             public LogLevelNames(string trace, string debug, string info, string warn, string error, string fatal) { }
+            public string Debug { get; }
+            public string Error { get; }
+            public string Fatal { get; }
+            public string Info { get; }
             public string this[ZeroLog.LogLevel level] { get; }
+            public string Trace { get; }
+            public string Warn { get; }
         }
     }
 }

@@ -43,6 +43,8 @@ namespace ZeroLog.Formatting;
 /// </remarks>
 public sealed class PatternWriter
 {
+    private static readonly LogLevelNames _defaultLogLevelNames = new("TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL");
+
     private static readonly Regex _patternRegex = new(
         """
         %(?:
@@ -77,8 +79,8 @@ public sealed class PatternWriter
         get => _levelNames;
         init
         {
-            _levelNames = value;
-            _levelNamesWithPadding = value.ToPadded();
+            _levelNames = !value.IsEmpty ? value : _defaultLogLevelNames;
+            _levelNamesWithPadding = _levelNames.ToPadded();
         }
     }
 
@@ -94,7 +96,7 @@ public sealed class PatternWriter
         Pattern = pattern;
         _parts = OptimizeParts(ParsePattern(pattern)).ToArray();
 
-        LogLevels = new LogLevelNames("TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL");
+        LogLevels = _defaultLogLevelNames;
     }
 
     /// <summary>
@@ -526,6 +528,26 @@ public sealed class PatternWriter
     {
         private readonly string[]? _names;
 
+        internal bool IsEmpty => _names is null;
+
+        /// <summary>The name of the Trace level.</summary>
+        public string Trace => this[LogLevel.Trace];
+
+        /// <summary>The name of the Debug level.</summary>
+        public string Debug => this[LogLevel.Debug];
+
+        /// <summary>The name of the Info level.</summary>
+        public string Info => this[LogLevel.Info];
+
+        /// <summary>The name of the Warn level.</summary>
+        public string Warn => this[LogLevel.Warn];
+
+        /// <summary>The name of the Error level.</summary>
+        public string Error => this[LogLevel.Error];
+
+        /// <summary>The name of the Fatal level.</summary>
+        public string Fatal => this[LogLevel.Fatal];
+
         /// <summary>
         /// Creates a new instance of <see cref="LogLevelNames"/>.
         /// </summary>
@@ -552,12 +574,12 @@ public sealed class PatternWriter
             var maxLength = _names.Max(static i => i.Length);
 
             return new LogLevelNames(
-                _names[0].PadRight(maxLength),
-                _names[1].PadRight(maxLength),
-                _names[2].PadRight(maxLength),
-                _names[3].PadRight(maxLength),
-                _names[4].PadRight(maxLength),
-                _names[5].PadRight(maxLength)
+                Trace.PadRight(maxLength),
+                Debug.PadRight(maxLength),
+                Info.PadRight(maxLength),
+                Warn.PadRight(maxLength),
+                Error.PadRight(maxLength),
+                Fatal.PadRight(maxLength)
             );
         }
     }
