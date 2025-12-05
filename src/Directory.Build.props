@@ -1,5 +1,9 @@
 <Project>
   <PropertyGroup>
+    <Version>2.5.0</Version>
+  </PropertyGroup>
+
+  <PropertyGroup>
     <LangVersion>14.0</LangVersion>
     <AnalysisLevel>10.0</AnalysisLevel>
     <WarningLevel>4</WarningLevel>
@@ -17,7 +21,6 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>2.4.0</Version>
     <Description>A high-performance, zero-allocation logging library.</Description>
     <Authors>Reda Bouallou;Mendel Monteiro-Beckerman;Romain Verdier;Lucas Trzesniewski;Serge Farny</Authors>
     <PackageProjectUrl>https://github.com/Abc-Arbitrage/ZeroLog</PackageProjectUrl>
