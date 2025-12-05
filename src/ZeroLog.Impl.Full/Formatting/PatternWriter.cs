@@ -59,13 +59,26 @@ public sealed class PatternWriter
 
     private readonly PatternPart[] _parts;
 
-    private string[] _levels = [];
-    private string[] _levelsWithPadding = [];
+    private readonly LogLevelNames _levelNames;
+    private readonly LogLevelNames _levelNamesWithPadding;
 
     /// <summary>
     /// The pattern to be rendered.
     /// </summary>
     public string Pattern { get; }
+
+    /// <summary>
+    /// The log level names to use for the <c>%level</c> placeholder.
+    /// </summary>
+    public LogLevelNames LogLevels
+    {
+        get => _levelNames;
+        init
+        {
+            _levelNames = value;
+            _levelNamesWithPadding = value.ToPadded();
+        }
+    }
 
     internal TimeZoneInfo? LocalTimeZone { get; init; } // For unit tests
 
@@ -79,7 +92,7 @@ public sealed class PatternWriter
         Pattern = pattern;
         _parts = OptimizeParts(ParsePattern(pattern)).ToArray();
 
-        SetLevelNames("TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL");
+        LogLevels = new LogLevelNames("TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL");
     }
 
     /// <summary>
@@ -115,29 +128,6 @@ public sealed class PatternWriter
     /// <param name="value">The value to escape.</param>
     public static string EscapePattern(string? value)
         => value?.Replace("%", "%%") ?? string.Empty;
-
-    /// <summary>
-    /// Sets the labels to use for each log level.
-    /// </summary>
-    /// <remarks>
-    /// This method allocates.
-    /// </remarks>
-    [SuppressMessage("ReSharper", "NullCoalescingConditionIsAlwaysNotNullAccordingToAPIContract")]
-    public void SetLevelNames(string? trace, string? debug, string? info, string? warn, string? error, string? fatal)
-    {
-        _levels =
-        [
-            trace ?? _levels[0],
-            debug ?? _levels[1],
-            info ?? _levels[2],
-            warn ?? _levels[3],
-            error ?? _levels[4],
-            fatal ?? _levels[5]
-        ];
-
-        var maxLength = _levels.Max(i => i.Length);
-        _levelsWithPadding = _levels.Select(i => i.PadRight(maxLength)).ToArray();
-    }
 
     private static IEnumerable<PatternPart> ParsePattern(string pattern)
     {
@@ -290,7 +280,6 @@ public sealed class PatternWriter
     }
 
 #if NET
-
     /// <summary>
     /// Writes the log message data to the provided destination.
     /// </summary>
@@ -395,13 +384,7 @@ public sealed class PatternWriter
 
                 case PatternPartType.Level:
                 {
-                    var levels = _levels;
-                    var intLevel = (int)message.Level;
-
-                    if (intLevel < 0 || intLevel >= levels.Length)
-                        break;
-
-                    if (!builder.TryAppendWhole(levels[intLevel]))
+                    if (!builder.TryAppendWhole(_levelNames[message.Level]))
                         goto endOfLoop;
 
                     break;
@@ -409,13 +392,7 @@ public sealed class PatternWriter
 
                 case PatternPartType.LevelPadded:
                 {
-                    var levels = _levelsWithPadding;
-                    var intLevel = (int)message.Level;
-
-                    if (intLevel < 0 || intLevel >= levels.Length)
-                        break;
-
-                    if (!builder.TryAppendWhole(levels[intLevel]))
+                    if (!builder.TryAppendWhole(_levelNamesWithPadding[message.Level]))
                         goto endOfLoop;
 
                     break;
@@ -511,6 +488,49 @@ public sealed class PatternWriter
         {
             Type = PatternPartType.String;
             Format = value;
+        }
+    }
+
+    /// <summary>
+    /// The log level names to use for the <c>%level</c> placeholder.
+    /// </summary>
+    public readonly struct LogLevelNames
+    {
+        private readonly string[]? _names;
+
+        /// <summary>
+        /// Creates a new instance of <see cref="LogLevelNames"/>.
+        /// </summary>
+        [SuppressMessage("ReSharper", "NullCoalescingConditionIsAlwaysNotNullAccordingToAPIContract")]
+        public LogLevelNames(string trace, string debug, string info, string warn, string error, string fatal)
+        {
+            _names = [trace, debug, info, warn, error, fatal];
+
+            for (var i = 0; i < _names.Length; ++i)
+                _names[i] ??= _names[i] ?? string.Empty;
+        }
+
+        /// <summary>
+        /// Returns the name to use for the given log level.
+        /// </summary>
+        public string this[LogLevel level]
+            => (uint)level < _names?.Length ? _names[(int)level] : string.Empty;
+
+        internal LogLevelNames ToPadded()
+        {
+            if (_names is null)
+                return this;
+
+            var maxLength = _names.Max(static i => i.Length);
+
+            return new LogLevelNames(
+                _names[0].PadRight(maxLength),
+                _names[1].PadRight(maxLength),
+                _names[2].PadRight(maxLength),
+                _names[3].PadRight(maxLength),
+                _names[4].PadRight(maxLength),
+                _names[5].PadRight(maxLength)
+            );
         }
     }
 }

@@ -3,7 +3,12 @@
 internal static class ZeroLogFacts
 {
     public static bool IsLogLevelName(string? value)
-        => value is "Trace" or "Debug" or "Info" or "Warn" or "Error" or "Fatal";
+        => value is nameof(LogLevel.Trace)
+            or nameof(LogLevel.Debug)
+            or nameof(LogLevel.Info)
+            or nameof(LogLevel.Warn)
+            or nameof(LogLevel.Error)
+            or nameof(LogLevel.Fatal);
 
     public static class TypeNames
     {

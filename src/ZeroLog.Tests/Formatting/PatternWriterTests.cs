@@ -136,7 +136,7 @@ public class PatternWriterTests
     }
 
     [Test]
-    [TestCase(LogLevel.Trace, "[TRACE] [TRACE      ]")]
+    [TestCase(LogLevel.Trace, "[] [           ]")]
     [TestCase(LogLevel.Debug, "[DEbug] [DEbug      ]")]
     [TestCase(LogLevel.Info, "[InFo] [InFo       ]")]
     [TestCase(LogLevel.Warn, "[WARN] [WARN       ]")]
@@ -144,8 +144,10 @@ public class PatternWriterTests
     [TestCase(LogLevel.Fatal, "[CRITICAL!!!] [CRITICAL!!!]")]
     public void should_customize_levels(LogLevel level, string expectedResult)
     {
-        var patternWriter = new PatternWriter("[%level] [%{level:pad}]");
-        patternWriter.SetLevelNames(null, "DEbug", "InFo", "WARN", "ERROR OMG", "CRITICAL!!!");
+        var patternWriter = new PatternWriter("[%level] [%{level:pad}]")
+        {
+            LogLevels = new(null!, "DEbug", "InFo", "WARN", "ERROR OMG", "CRITICAL!!!")
+        };
 
         var logMessage = new LogMessage("Foo");
         logMessage.Initialize(new Log("Foo.Bar.TestLog"), level);
@@ -160,8 +162,30 @@ public class PatternWriterTests
     [TestCase(42)]
     public void should_handle_invalid_level_values(int level)
     {
-        var patternWriter = new PatternWriter("[%level] [%{level:pad}]");
-        patternWriter.SetLevelNames("T", "DEbug", "InFo", "WARN", "ERROR OMG", "CRITICAL!!!");
+        var patternWriter = new PatternWriter("[%level] [%{level:pad}]")
+        {
+            LogLevels = new(null!, "DEbug", "InFo", "WARN", "ERROR OMG", "CRITICAL!!!")
+        };
+
+        var logMessage = new LogMessage("Foo");
+        logMessage.Initialize(new Log("Foo.Bar.TestLog"), (LogLevel)level);
+        logMessage.Timestamp = new DateTime(2020, 01, 02, 03, 04, 05, 06);
+
+        var result = GetResult(patternWriter, logMessage);
+        result.ShouldEqual("[] []");
+    }
+
+    [Test]
+    [TestCase(-1)]
+    [TestCase(0)]
+    [TestCase(1)]
+    [TestCase(42)]
+    public void should_handle_invalid_level_values_on_default_instance(int level)
+    {
+        var patternWriter = new PatternWriter("[%level] [%{level:pad}]")
+        {
+            LogLevels = default
+        };
 
         var logMessage = new LogMessage("Foo");
         logMessage.Initialize(new Log("Foo.Bar.TestLog"), (LogLevel)level);

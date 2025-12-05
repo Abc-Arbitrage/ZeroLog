@@ -192,11 +192,16 @@ namespace ZeroLog.Formatting
     public sealed class PatternWriter
     {
         public PatternWriter(string pattern) { }
+        public ZeroLog.Formatting.PatternWriter.LogLevelNames LogLevels { get; init; }
         public string Pattern { get; }
-        public void SetLevelNames(string? trace, string? debug, string? info, string? warn, string? error, string? fatal) { }
         public void Write(ZeroLog.Formatting.LoggedMessage message, System.Span<char> destination, out int charsWritten) { }
         public static string EscapePattern(string? value) { }
         public static bool IsValidPattern(string? pattern) { }
+        public readonly struct LogLevelNames
+        {
+            public LogLevelNames(string trace, string debug, string info, string warn, string error, string fatal) { }
+            public string this[ZeroLog.LogLevel level] { get; }
+        }
     }
 }
 namespace ZeroLog

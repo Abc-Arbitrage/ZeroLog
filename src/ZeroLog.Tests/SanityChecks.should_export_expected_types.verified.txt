@@ -20,6 +20,7 @@
   ZeroLog.Formatting.LoggedKeyValue,
   ZeroLog.Formatting.LoggedMessage,
   ZeroLog.Formatting.PatternWriter,
+  ZeroLog.Formatting.PatternWriter+LogLevelNames,
   ZeroLog.Log,
   ZeroLog.Log+DebugInterpolatedStringHandler,
   ZeroLog.Log+ErrorInterpolatedStringHandler,
