@@ -1,6 +1,6 @@
 # ZeroLog                    <a href="#"><img src="icon.png" align="right" alt="Logo" /></a>
 
-[![Build](https://github.com/Abc-Arbitrage/ZeroLog/workflows/Build/badge.svg)](https://github.com/Abc-Arbitrage/ZeroLog/actions?query=workflow%3ABuild)
+[![Build](https://github.com/Abc-Arbitrage/ZeroLog/actions/workflows/build.yml/badge.svg?branch=master&event=push)](https://github.com/Abc-Arbitrage/ZeroLog/actions/workflows/build.yml)
 [![NuGet](https://img.shields.io/nuget/v/ZeroLog.svg?label=NuGet&logo=NuGet)](http://www.nuget.org/packages/ZeroLog/)
 
 **ZeroLog is a high-performance, zero-allocation .NET logging library**.
