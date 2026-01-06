@@ -22,6 +22,7 @@ internal static class ZeroLogFacts
     {
         public const string Append = "Append";
         public const string AppendEnum = "AppendEnum";
+        public const string WithException = "WithException";
         public const string Log = "Log";
     }
 

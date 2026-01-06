@@ -1,0 +1,101 @@
+using System.Collections.Immutable;
+using System.Composition;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CodeActions;
+using Microsoft.CodeAnalysis.CodeFixes;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Operations;
+using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+
+namespace ZeroLog.Analyzers;
+
+[ExportCodeFixProvider(LanguageNames.CSharp), Shared]
+public class UseAppendCodeFixProvider : CodeFixProvider
+{
+    public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
+        DiagnosticIds.UseAppend
+    );
+
+    public sealed override FixAllProvider GetFixAllProvider()
+        => WellKnownFixAllProviders.BatchFixer;
+
+    public override async Task RegisterCodeFixesAsync(CodeFixContext context)
+    {
+        var root = await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
+        if (root is null)
+            return;
+
+        var nodeToFix = root.FindNode(context.Span);
+
+        const string title = "Use Append syntax";
+        context.RegisterCodeFix(CodeAction.Create(title, async ct => await FixNode(context.Document, nodeToFix, root, ct).ConfigureAwait(false) ?? context.Document, title), context.Diagnostics);
+    }
+
+    private static async Task<Document?> FixNode(Document document,
+                                                 SyntaxNode identifierNodeToFix,
+                                                 SyntaxNode rootNode,
+                                                 CancellationToken cancellationToken)
+    {
+        if (identifierNodeToFix is not IdentifierNameSyntax { Parent: MemberAccessExpressionSyntax { Parent: InvocationExpressionSyntax invocationToFix } })
+            return null;
+
+        if (await document.GetSemanticModelAsync(cancellationToken).ConfigureAwait(false) is not { } semanticModel)
+            return null;
+
+        if (semanticModel.GetOperation(invocationToFix, cancellationToken) is not IInvocationOperation invocationOperation)
+            return null;
+
+        if (invocationOperation.Arguments.Length is not (1 or 2))
+            return null;
+
+        if (invocationOperation.Arguments.FirstOrDefault(i => i.Parameter?.Ordinal == 0) is not { } messageArgOp)
+            return null;
+
+        var exceptionArgOp = invocationOperation.Arguments.FirstOrDefault(i => i.Parameter?.Ordinal == 1);
+
+        // Source: log.Info(message[, exception]);
+        // Target: log.Info().Append(message)[.WithException(exception)].Log();
+
+        // log.Info(...) -> log.Info()
+        var chainExpression = InvocationExpression(invocationToFix.Expression);
+
+        // Add .Append(message)
+        chainExpression = AddInvocation(chainExpression, ZeroLogFacts.MethodNames.Append, messageArgOp.Value.Syntax);
+
+        // Add .WithException(exception)
+        if (exceptionArgOp is not null)
+            chainExpression = AddInvocation(chainExpression, ZeroLogFacts.MethodNames.WithException, exceptionArgOp.Value.Syntax);
+
+        // Add .Log()
+        chainExpression = AddInvocation(chainExpression, ZeroLogFacts.MethodNames.Log);
+
+        return document.WithSyntaxRoot(
+            rootNode.ReplaceNode(
+                invocationToFix,
+                chainExpression
+            )
+        );
+    }
+
+    private static InvocationExpressionSyntax AddInvocation(ExpressionSyntax baseExpression, string methodName, params SyntaxNode[] arguments)
+    {
+        var memberAccess = MemberAccessExpression(
+            SyntaxKind.SimpleMemberAccessExpression,
+            baseExpression,
+            IdentifierName(methodName)
+        );
+
+        return InvocationExpression(memberAccess)
+            .WithArgumentList(
+                ArgumentList(
+                    SeparatedList(
+                        arguments.Select(node => Argument((ExpressionSyntax)node.NormalizeWhitespace())).ToArray()
+                    )
+                )
+            );
+    }
+}
