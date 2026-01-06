@@ -149,5 +149,37 @@ public class UseAppendCodeFixProviderTests
         return test.RunAsync();
     }
 
+    [Test]
+    public Task should_fix_multi_line()
+    {
+        var test = new Test
+        {
+            TestCode = """
+                class C
+                {
+                    void M(ZeroLog.Log log, System.Exception ex)
+                    {
+                        log.[|Fatal|]("Foo", ex);
+                    }
+                }
+                """,
+            FixedCode = """
+                class C
+                {
+                    void M(ZeroLog.Log log, System.Exception ex)
+                    {
+                        log.Fatal()
+                .Append("Foo")
+                .WithException(ex)
+                .Log();
+                    }
+                }
+                """,
+            CodeActionIndex = 1
+        };
+
+        return test.RunAsync();
+    }
+
     private class Test : ZeroLogCodeFixTest<UseAppendAnalyzer, UseAppendCodeFixProvider>;
 }

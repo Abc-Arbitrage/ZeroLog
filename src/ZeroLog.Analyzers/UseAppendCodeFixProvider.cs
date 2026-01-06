@@ -8,6 +8,7 @@ using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Formatting;
 using Microsoft.CodeAnalysis.Operations;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
@@ -31,13 +32,30 @@ public class UseAppendCodeFixProvider : CodeFixProvider
 
         var nodeToFix = root.FindNode(context.Span);
 
-        const string title = "Use Append syntax";
-        context.RegisterCodeFix(CodeAction.Create(title, async ct => await FixNode(context.Document, nodeToFix, root, ct).ConfigureAwait(false) ?? context.Document, title), context.Diagnostics);
+        const string titleSingleLine = "Use Append syntax (single line)";
+        const string titleMultiLine = "Use Append syntax (multi line)";
+
+        context.RegisterCodeFix(
+            CodeAction.Create(
+                titleSingleLine,
+                async ct => await FixNode(context.Document, nodeToFix, root, multiLine: false, ct).ConfigureAwait(false) ?? context.Document,
+                titleSingleLine),
+            context.Diagnostics
+        );
+
+        context.RegisterCodeFix(
+            CodeAction.Create(
+                titleMultiLine,
+                async ct => await FixNode(context.Document, nodeToFix, root, multiLine: true, ct).ConfigureAwait(false) ?? context.Document,
+                titleMultiLine),
+            context.Diagnostics
+        );
     }
 
     private static async Task<Document?> FixNode(Document document,
                                                  SyntaxNode identifierNodeToFix,
                                                  SyntaxNode rootNode,
+                                                 bool multiLine,
                                                  CancellationToken cancellationToken)
     {
         if (identifierNodeToFix is not IdentifierNameSyntax { Parent: MemberAccessExpressionSyntax { Parent: InvocationExpressionSyntax invocationToFix } })
@@ -64,30 +82,36 @@ public class UseAppendCodeFixProvider : CodeFixProvider
         var chainExpression = InvocationExpression(invocationToFix.Expression);
 
         // Add .Append(message)
-        chainExpression = AddInvocation(chainExpression, ZeroLogFacts.MethodNames.Append, messageArgOp.Value.Syntax);
+        chainExpression = AddInvocation(chainExpression, ZeroLogFacts.MethodNames.Append, multiLine, messageArgOp.Value.Syntax);
 
         // Add .WithException(exception)
         if (exceptionArgOp is not null)
-            chainExpression = AddInvocation(chainExpression, ZeroLogFacts.MethodNames.WithException, exceptionArgOp.Value.Syntax);
+            chainExpression = AddInvocation(chainExpression, ZeroLogFacts.MethodNames.WithException, multiLine, exceptionArgOp.Value.Syntax);
 
         // Add .Log()
-        chainExpression = AddInvocation(chainExpression, ZeroLogFacts.MethodNames.Log);
+        chainExpression = AddInvocation(chainExpression, ZeroLogFacts.MethodNames.Log, multiLine);
 
         return document.WithSyntaxRoot(
             rootNode.ReplaceNode(
                 invocationToFix,
-                chainExpression
+                chainExpression.WithAdditionalAnnotations(Formatter.Annotation)
             )
         );
     }
 
-    private static InvocationExpressionSyntax AddInvocation(ExpressionSyntax baseExpression, string methodName, params SyntaxNode[] arguments)
+    private static InvocationExpressionSyntax AddInvocation(ExpressionSyntax baseExpression,
+                                                            string methodName,
+                                                            bool multiLine,
+                                                            params SyntaxNode[] arguments)
     {
         var memberAccess = MemberAccessExpression(
             SyntaxKind.SimpleMemberAccessExpression,
             baseExpression,
             IdentifierName(methodName)
         );
+
+        if (multiLine)
+            memberAccess = memberAccess.WithOperatorToken(memberAccess.OperatorToken.WithLeadingTrivia(CarriageReturnLineFeed));
 
         return InvocationExpression(memberAccess)
             .WithArgumentList(
