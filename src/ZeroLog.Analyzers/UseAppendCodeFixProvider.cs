@@ -88,7 +88,7 @@ public class UseAppendCodeFixProvider : CodeFixProvider
         // Target: log.Info().Append(message)[.WithException(exception)].Log();
 
         // log.Info(...) -> log.Info()
-        var chainExpression = InvocationExpression(invocationToFix.Expression);
+        var chainExpression = invocationToFix.WithArgumentList(ArgumentList());
 
         // Add .Append(message)
         chainExpression = AddInvocation(chainExpression, ZeroLogFacts.MethodNames.Append, invocationOptions, messageArgOp.Value.Syntax);

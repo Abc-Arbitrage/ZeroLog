@@ -32,7 +32,7 @@ public class UseStringInterpolationCodeFixProvider : CodeFixProvider
 
         var nodeToFix = root.FindNode(context.Span);
 
-        const string title = "Use string interpolation";
+        const string title = "Use string interpolation syntax";
         context.RegisterCodeFix(CodeAction.Create(title, ct => FixNode(context.Document, nodeToFix, root, ct), title), context.Diagnostics);
     }
 
@@ -48,7 +48,13 @@ public class UseStringInterpolationCodeFixProvider : CodeFixProvider
         if (semanticModel is null)
             return document;
 
-        var parts = TryConvertToStringInterpolationParts(logBuilderInvocation, semanticModel, cancellationToken, out var logMethodInvocation);
+        var parts = TryConvertToStringInterpolationParts(
+            logBuilderInvocation, semanticModel,
+            out var logMethodInvocation,
+            out var withExceptionInvocation,
+            cancellationToken
+        );
+
         if (parts is null || logMethodInvocation is null)
             return document;
 
@@ -71,9 +77,14 @@ public class UseStringInterpolationCodeFixProvider : CodeFixProvider
             )
         };
 
+        var arguments = SeparatedList([Argument(resultExpression)]);
+
+        if (withExceptionInvocation is not null)
+            arguments = arguments.Add(Argument(withExceptionInvocation));
+
         rootNode = rootNode.ReplaceNode(
             logMethodInvocation,
-            logBuilderInvocation.WithArgumentList(ArgumentList(SeparatedList([Argument(resultExpression)])))
+            logBuilderInvocation.WithArgumentList(ArgumentList(arguments))
                                 .WithTrailingTrivia(logMethodInvocation.GetTrailingTrivia())
         );
 
@@ -82,11 +93,13 @@ public class UseStringInterpolationCodeFixProvider : CodeFixProvider
 
     private static List<InterpolatedStringContentSyntax>? TryConvertToStringInterpolationParts(InvocationExpressionSyntax logBuilderInvocation,
                                                                                                SemanticModel semanticModel,
-                                                                                               CancellationToken cancellationToken,
-                                                                                               out InvocationExpressionSyntax? logMethodInvocation)
+                                                                                               out InvocationExpressionSyntax? logMethodInvocation,
+                                                                                               out ExpressionSyntax? withExceptionInvocation,
+                                                                                               CancellationToken cancellationToken)
     {
         var parts = new List<InterpolatedStringContentSyntax>();
         logMethodInvocation = null;
+        withExceptionInvocation = null;
 
         var currentNode = logBuilderInvocation.Parent;
 
@@ -99,6 +112,13 @@ public class UseStringInterpolationCodeFixProvider : CodeFixProvider
             {
                 logMethodInvocation = invocation;
                 return parts;
+            }
+
+            if (memberAccess.Name.Identifier.Text is ZeroLogFacts.MethodNames.WithException)
+            {
+                withExceptionInvocation ??= invocation.ArgumentList.Arguments[0].Expression.WithoutTrivia();
+                currentNode = invocation.Parent;
+                continue;
             }
 
             if (memberAccess.Name.Identifier.Text is not (ZeroLogFacts.MethodNames.Append or ZeroLogFacts.MethodNames.AppendEnum))

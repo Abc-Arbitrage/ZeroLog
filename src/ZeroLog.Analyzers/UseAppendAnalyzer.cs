@@ -14,7 +14,7 @@ public class UseAppendAnalyzer : DiagnosticAnalyzer
 {
     public static readonly DiagnosticDescriptor UseAppendDiagnostic = new(
         DiagnosticIds.UseAppend,
-        "Use Append",
+        "Use Append syntax",
         "Use Append syntax to add structured data",
         DiagnosticIds.Category,
         DiagnosticSeverity.Info,
@@ -44,7 +44,7 @@ public class UseAppendAnalyzer : DiagnosticAnalyzer
             return;
 
         var immediateLogMethods = logType.GetMembers()
-                                         .Where(i => i.Kind == SymbolKind.Method)
+                                         .Where(i => i.Kind == SymbolKind.Method && ZeroLogFacts.IsLogLevelName(i.Name))
                                          .OfType<IMethodSymbol>()
                                          .Where(i => i is
                                          {
@@ -52,7 +52,6 @@ public class UseAppendAnalyzer : DiagnosticAnalyzer
                                              IsStatic: false,
                                              DeclaredAccessibility: Accessibility.Public
                                          })
-                                         .Where(i => ZeroLogFacts.IsLogLevelName(i.Name))
                                          .Where(i => i.Parameters is [_] || i.Parameters is [_, { Type: { } secondParameterType }] && SymbolEqualityComparer.Default.Equals(secondParameterType, exceptionType))
                                          .ToImmutableHashSet<IMethodSymbol>(SymbolEqualityComparer.Default);
 
