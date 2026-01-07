@@ -79,6 +79,10 @@ public class UseAppendCodeFixProvider : CodeFixProvider
             ? new string(' ', initialMemberAccess.SyntaxTree.GetLineSpan(initialMemberAccess.OperatorToken.Span, cancellationToken).StartLinePosition.Character)
             : null;
 
+        var eol = multiLine
+            ? (await document.GetOptionsAsync(cancellationToken).ConfigureAwait(false)).GetOption(FormattingOptions.NewLine)
+            : null;
+
         // Source: log.Info(message[, exception]);
         // Target: log.Info().Append(message)[.WithException(exception)].Log();
 
@@ -86,14 +90,14 @@ public class UseAppendCodeFixProvider : CodeFixProvider
         var chainExpression = InvocationExpression(invocationToFix.Expression);
 
         // Add .Append(message)
-        chainExpression = AddInvocation(chainExpression, ZeroLogFacts.MethodNames.Append, indent, messageArgOp.Value.Syntax);
+        chainExpression = AddInvocation(chainExpression, ZeroLogFacts.MethodNames.Append, indent, eol, messageArgOp.Value.Syntax);
 
         // Add .WithException(exception)
         if (exceptionArgOp is not null)
-            chainExpression = AddInvocation(chainExpression, ZeroLogFacts.MethodNames.WithException, indent, exceptionArgOp.Value.Syntax);
+            chainExpression = AddInvocation(chainExpression, ZeroLogFacts.MethodNames.WithException, indent, eol, exceptionArgOp.Value.Syntax);
 
         // Add .Log()
-        chainExpression = AddInvocation(chainExpression, ZeroLogFacts.MethodNames.Log, indent);
+        chainExpression = AddInvocation(chainExpression, ZeroLogFacts.MethodNames.Log, indent, eol);
 
         return document.WithSyntaxRoot(
             rootNode.ReplaceNode(
@@ -106,12 +110,13 @@ public class UseAppendCodeFixProvider : CodeFixProvider
     private static InvocationExpressionSyntax AddInvocation(ExpressionSyntax baseExpression,
                                                             string methodName,
                                                             string? indent,
+                                                            string? eol,
                                                             params SyntaxNode[] arguments)
     {
         if (indent is not null)
         {
             var lastToken = baseExpression.GetLastToken();
-            baseExpression = baseExpression.ReplaceToken(lastToken, lastToken.WithTrailingTrivia(CarriageReturnLineFeed));
+            baseExpression = baseExpression.ReplaceToken(lastToken, lastToken.WithTrailingTrivia(EndOfLine(eol ?? string.Empty)));
         }
 
         var memberAccess = MemberAccessExpression(
