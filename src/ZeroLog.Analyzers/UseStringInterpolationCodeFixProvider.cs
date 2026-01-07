@@ -49,7 +49,8 @@ public class UseStringInterpolationCodeFixProvider : CodeFixProvider
             return document;
 
         var parts = TryConvertToStringInterpolationParts(
-            logBuilderInvocation, semanticModel,
+            logBuilderInvocation,
+            semanticModel,
             out var logMethodInvocation,
             out var withExceptionInvocation,
             cancellationToken
@@ -108,108 +109,125 @@ public class UseStringInterpolationCodeFixProvider : CodeFixProvider
             if (currentNode is not MemberAccessExpressionSyntax { Parent: InvocationExpressionSyntax invocation } memberAccess)
                 return null;
 
-            if (memberAccess.Name.Identifier.Text == ZeroLogFacts.MethodNames.Log)
+            switch (memberAccess.Name.Identifier.Text)
             {
-                logMethodInvocation = invocation;
-                return parts;
-            }
-
-            if (memberAccess.Name.Identifier.Text is ZeroLogFacts.MethodNames.WithException)
-            {
-                withExceptionInvocation ??= invocation.ArgumentList.Arguments[0].Expression.WithoutTrivia();
-                currentNode = invocation.Parent;
-                continue;
-            }
-
-            if (memberAccess.Name.Identifier.Text is not (ZeroLogFacts.MethodNames.Append or ZeroLogFacts.MethodNames.AppendEnum))
-                return null;
-
-            if (semanticModel.GetOperation(invocation, cancellationToken) is not IInvocationOperation invocationOperation)
-                return null;
-
-            var valueOperation = invocationOperation.Arguments.FirstOrDefault(i => i.Parameter?.Ordinal == 0)?.Value;
-            if (valueOperation is null)
-                return null;
-
-            var valueSyntaxNode = valueOperation.Syntax.WithoutTrivia();
-
-            switch (valueOperation.Syntax.Kind())
-            {
-                case SyntaxKind.StringLiteralExpression:
-                case SyntaxKind.CharacterLiteralExpression:
+                case ZeroLogFacts.MethodNames.Log:
                 {
-                    var literal = (LiteralExpressionSyntax)valueSyntaxNode;
+                    logMethodInvocation = invocation;
+                    return parts;
+                }
 
-                    // Verbatim strings have different escaping rules, treat them as separate expressions
-                    if (literal.Token.IsVerbatimStringLiteral())
-                        goto default;
+                case ZeroLogFacts.MethodNames.Append:
+                case ZeroLogFacts.MethodNames.AppendEnum:
+                {
+                    if (TryConvertAppendCallToPart(invocation, semanticModel, cancellationToken) is not { } part)
+                        return null;
 
-                    parts.Add(
-                        InterpolatedStringText(
-                            Token(
-                                SyntaxTriviaList.Empty,
-                                SyntaxKind.InterpolatedStringTextToken,
-                                EscapeBraces(GetNonVerbatimStringTokenInnerText(literal.Token.Text)),
-                                EscapeBraces(literal.Token.ValueText),
-                                SyntaxTriviaList.Empty
-                            )
-                        )
-                    );
+                    parts.Add(part);
+                    break;
+                }
 
+                case ZeroLogFacts.MethodNames.WithException:
+                {
+                    if (withExceptionInvocation is not null)
+                        return null;
+
+                    withExceptionInvocation = invocation.ArgumentList.Arguments[0].Expression.WithoutTrivia();
                     break;
                 }
 
                 default:
                 {
-                    var expression = (ExpressionSyntax)valueSyntaxNode;
-
-                    // Wrap the expression in parentheses if it contains a non-parenthesized conditional expression, in order for the colon token to be parsed correctly
-                    if (expression.DescendantNodesAndSelf(n => n.Kind() is not (SyntaxKind.ParenthesizedExpression or SyntaxKind.InvocationExpression))
-                                  .Any(n => n.IsKind(SyntaxKind.ConditionalExpression)))
-                    {
-                        expression = ParenthesizedExpression(expression);
-                    }
-
-                    var interpolation = Interpolation(expression);
-
-                    if (invocationOperation.Arguments.Length > 1)
-                    {
-                        var formatValueSyntax = invocationOperation.Arguments.FirstOrDefault(i => i.Parameter?.Name is ZeroLogFacts.ParameterNames.FormatString)?.Value.Syntax;
-
-                        if (formatValueSyntax != null && formatValueSyntax.IsKind(SyntaxKind.StringLiteralExpression))
-                        {
-                            var formatExpression = (LiteralExpressionSyntax)formatValueSyntax.WithoutTrivia();
-                            var formatLiteralText = formatExpression.Token.Text;
-
-                            if (formatExpression.Token.IsVerbatimStringLiteral())
-                            {
-                                // Try to convert a verbatim string into a standard string
-                                formatLiteralText = SymbolDisplay.FormatLiteral(formatExpression.Token.ValueText, true);
-                                if (formatLiteralText.StartsWith("@"))
-                                    return null; // The format string contains a newline
-                            }
-
-                            interpolation = interpolation.WithFormatClause(
-                                InterpolationFormatClause(
-                                    Token(SyntaxKind.ColonToken),
-                                    Token(
-                                        SyntaxTriviaList.Empty,
-                                        SyntaxKind.InterpolatedStringTextToken,
-                                        GetNonVerbatimStringTokenInnerText(formatLiteralText),
-                                        formatExpression.Token.ValueText,
-                                        SyntaxTriviaList.Empty
-                                    )
-                                )
-                            );
-                        }
-                    }
-
-                    parts.Add(interpolation);
-                    break;
+                    return null;
                 }
             }
 
             currentNode = invocation.Parent;
+        }
+    }
+
+    private static InterpolatedStringContentSyntax? TryConvertAppendCallToPart(InvocationExpressionSyntax invocationExpression,
+                                                                               SemanticModel semanticModel,
+                                                                               CancellationToken cancellationToken)
+    {
+        if (semanticModel.GetOperation(invocationExpression, cancellationToken) is not IInvocationOperation invocationOperation)
+            return null;
+
+        var valueOperation = invocationOperation.Arguments.FirstOrDefault(i => i.Parameter?.Ordinal == 0)?.Value;
+        if (valueOperation is null)
+            return null;
+
+        var valueSyntaxNode = valueOperation.Syntax.WithoutTrivia();
+
+        switch (valueOperation.Syntax.Kind())
+        {
+            case SyntaxKind.StringLiteralExpression:
+            case SyntaxKind.CharacterLiteralExpression:
+            {
+                var literal = (LiteralExpressionSyntax)valueSyntaxNode;
+
+                // Verbatim strings have different escaping rules, treat them as separate expressions
+                if (literal.Token.IsVerbatimStringLiteral())
+                    goto default;
+
+                return InterpolatedStringText(
+                    Token(
+                        SyntaxTriviaList.Empty,
+                        SyntaxKind.InterpolatedStringTextToken,
+                        EscapeBraces(GetNonVerbatimStringTokenInnerText(literal.Token.Text)),
+                        EscapeBraces(literal.Token.ValueText),
+                        SyntaxTriviaList.Empty
+                    )
+                );
+            }
+
+            default:
+            {
+                var expression = (ExpressionSyntax)valueSyntaxNode;
+
+                // Wrap the expression in parentheses if it contains a non-parenthesized conditional expression, in order for the colon token to be parsed correctly
+                if (expression.DescendantNodesAndSelf(n => n.Kind() is not (SyntaxKind.ParenthesizedExpression or SyntaxKind.InvocationExpression))
+                              .Any(n => n.IsKind(SyntaxKind.ConditionalExpression)))
+                {
+                    expression = ParenthesizedExpression(expression);
+                }
+
+                var interpolation = Interpolation(expression);
+
+                if (invocationOperation.Arguments.Length > 1)
+                {
+                    var formatValueSyntax = invocationOperation.Arguments.FirstOrDefault(i => i.Parameter?.Name is ZeroLogFacts.ParameterNames.FormatString)?.Value.Syntax;
+
+                    if (formatValueSyntax != null && formatValueSyntax.IsKind(SyntaxKind.StringLiteralExpression))
+                    {
+                        var formatExpression = (LiteralExpressionSyntax)formatValueSyntax.WithoutTrivia();
+                        var formatLiteralText = formatExpression.Token.Text;
+
+                        if (formatExpression.Token.IsVerbatimStringLiteral())
+                        {
+                            // Try to convert a verbatim string into a standard string
+                            formatLiteralText = SymbolDisplay.FormatLiteral(formatExpression.Token.ValueText, true);
+                            if (formatLiteralText.StartsWith("@"))
+                                return null; // The format string contains a newline
+                        }
+
+                        interpolation = interpolation.WithFormatClause(
+                            InterpolationFormatClause(
+                                Token(SyntaxKind.ColonToken),
+                                Token(
+                                    SyntaxTriviaList.Empty,
+                                    SyntaxKind.InterpolatedStringTextToken,
+                                    GetNonVerbatimStringTokenInnerText(formatLiteralText),
+                                    formatExpression.Token.ValueText,
+                                    SyntaxTriviaList.Empty
+                                )
+                            )
+                        );
+                    }
+                }
+
+                return interpolation;
+            }
         }
     }
 
