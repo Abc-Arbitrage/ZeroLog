@@ -39,7 +39,8 @@ public class UseAppendCodeFixProvider : CodeFixProvider
             CodeAction.Create(
                 titleSingleLine,
                 async ct => await FixNode(context.Document, nodeToFix, root, multiLine: false, ct).ConfigureAwait(false) ?? context.Document,
-                titleSingleLine),
+                titleSingleLine
+            ),
             context.Diagnostics
         );
 
@@ -47,7 +48,8 @@ public class UseAppendCodeFixProvider : CodeFixProvider
             CodeAction.Create(
                 titleMultiLine,
                 async ct => await FixNode(context.Document, nodeToFix, root, multiLine: true, ct).ConfigureAwait(false) ?? context.Document,
-                titleMultiLine),
+                titleMultiLine
+            ),
             context.Diagnostics
         );
     }
@@ -75,13 +77,12 @@ public class UseAppendCodeFixProvider : CodeFixProvider
 
         var exceptionArgOp = invocationOperation.Arguments.FirstOrDefault(i => i.Parameter?.Ordinal == 1);
 
-        var indent = multiLine
-            ? new string(' ', initialMemberAccess.SyntaxTree.GetLineSpan(initialMemberAccess.OperatorToken.Span, cancellationToken).StartLinePosition.Character)
-            : null;
-
-        var eol = multiLine
-            ? (await document.GetOptionsAsync(cancellationToken).ConfigureAwait(false)).GetOption(FormattingOptions.NewLine)
-            : null;
+        var invocationOptions = multiLine
+            ? new InvocationOptions(
+                new string(' ', initialMemberAccess.SyntaxTree.GetLineSpan(initialMemberAccess.OperatorToken.Span, cancellationToken).StartLinePosition.Character),
+                (await document.GetOptionsAsync(cancellationToken).ConfigureAwait(false)).GetOption(FormattingOptions.NewLine)
+            )
+            : new InvocationOptions(null, null);
 
         // Source: log.Info(message[, exception]);
         // Target: log.Info().Append(message)[.WithException(exception)].Log();
@@ -90,14 +91,14 @@ public class UseAppendCodeFixProvider : CodeFixProvider
         var chainExpression = InvocationExpression(invocationToFix.Expression);
 
         // Add .Append(message)
-        chainExpression = AddInvocation(chainExpression, ZeroLogFacts.MethodNames.Append, indent, eol, messageArgOp.Value.Syntax);
+        chainExpression = AddInvocation(chainExpression, ZeroLogFacts.MethodNames.Append, invocationOptions, messageArgOp.Value.Syntax);
 
         // Add .WithException(exception)
         if (exceptionArgOp is not null)
-            chainExpression = AddInvocation(chainExpression, ZeroLogFacts.MethodNames.WithException, indent, eol, exceptionArgOp.Value.Syntax);
+            chainExpression = AddInvocation(chainExpression, ZeroLogFacts.MethodNames.WithException, invocationOptions, exceptionArgOp.Value.Syntax);
 
         // Add .Log()
-        chainExpression = AddInvocation(chainExpression, ZeroLogFacts.MethodNames.Log, indent, eol);
+        chainExpression = AddInvocation(chainExpression, ZeroLogFacts.MethodNames.Log, invocationOptions);
 
         return document.WithSyntaxRoot(
             rootNode.ReplaceNode(
@@ -107,28 +108,21 @@ public class UseAppendCodeFixProvider : CodeFixProvider
         );
     }
 
-    private static InvocationExpressionSyntax AddInvocation(ExpressionSyntax baseExpression,
+    private static InvocationExpressionSyntax AddInvocation(ExpressionSyntax previousExpression,
                                                             string methodName,
-                                                            string? indent,
-                                                            string? eol,
+                                                            InvocationOptions options,
                                                             params SyntaxNode[] arguments)
     {
-        if (indent is not null)
-        {
-            var lastToken = baseExpression.GetLastToken();
-            baseExpression = baseExpression.ReplaceToken(lastToken, lastToken.WithTrailingTrivia(EndOfLine(eol ?? string.Empty)));
-        }
-
         var memberAccess = MemberAccessExpression(
             SyntaxKind.SimpleMemberAccessExpression,
-            baseExpression,
+            previousExpression,
             IdentifierName(methodName)
         );
 
-        if (indent is not null)
+        if (options.MultiLine)
         {
             memberAccess = memberAccess.WithOperatorToken(
-                memberAccess.OperatorToken.WithLeadingTrivia(Whitespace(indent))
+                memberAccess.OperatorToken.WithLeadingTrivia(options.EndOfLine, options.Indent)
             );
         }
 
@@ -140,5 +134,12 @@ public class UseAppendCodeFixProvider : CodeFixProvider
                     )
                 )
             );
+    }
+
+    private class InvocationOptions(string? indent, string? eol)
+    {
+        public bool MultiLine { get; } = indent is not null;
+        public SyntaxTrivia Indent { get; } = Whitespace(indent ?? string.Empty);
+        public SyntaxTrivia EndOfLine { get; } = EndOfLine(eol ?? string.Empty);
     }
 }
