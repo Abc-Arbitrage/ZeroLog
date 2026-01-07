@@ -58,7 +58,7 @@ public class UseAppendCodeFixProvider : CodeFixProvider
                                                  bool multiLine,
                                                  CancellationToken cancellationToken)
     {
-        if (identifierNodeToFix is not IdentifierNameSyntax { Parent: MemberAccessExpressionSyntax { Parent: InvocationExpressionSyntax invocationToFix } })
+        if (identifierNodeToFix is not IdentifierNameSyntax { Parent: MemberAccessExpressionSyntax { Parent: InvocationExpressionSyntax invocationToFix } initialMemberAccess })
             return null;
 
         if (await document.GetSemanticModelAsync(cancellationToken).ConfigureAwait(false) is not { } semanticModel)
@@ -75,6 +75,10 @@ public class UseAppendCodeFixProvider : CodeFixProvider
 
         var exceptionArgOp = invocationOperation.Arguments.FirstOrDefault(i => i.Parameter?.Ordinal == 1);
 
+        var indent = multiLine
+            ? new string(' ', initialMemberAccess.SyntaxTree.GetLineSpan(initialMemberAccess.OperatorToken.Span, cancellationToken).StartLinePosition.Character)
+            : null;
+
         // Source: log.Info(message[, exception]);
         // Target: log.Info().Append(message)[.WithException(exception)].Log();
 
@@ -82,33 +86,29 @@ public class UseAppendCodeFixProvider : CodeFixProvider
         var chainExpression = InvocationExpression(invocationToFix.Expression);
 
         // Add .Append(message)
-        chainExpression = AddInvocation(chainExpression, ZeroLogFacts.MethodNames.Append, multiLine, messageArgOp.Value.Syntax);
+        chainExpression = AddInvocation(chainExpression, ZeroLogFacts.MethodNames.Append, indent, messageArgOp.Value.Syntax);
 
         // Add .WithException(exception)
         if (exceptionArgOp is not null)
-            chainExpression = AddInvocation(chainExpression, ZeroLogFacts.MethodNames.WithException, multiLine, exceptionArgOp.Value.Syntax);
+            chainExpression = AddInvocation(chainExpression, ZeroLogFacts.MethodNames.WithException, indent, exceptionArgOp.Value.Syntax);
 
         // Add .Log()
-        chainExpression = AddInvocation(chainExpression, ZeroLogFacts.MethodNames.Log, multiLine);
-
-        var resultNode = multiLine
-            ? Formatter.Format(chainExpression, document.Project.Solution.Workspace, cancellationToken: cancellationToken)
-            : chainExpression;
+        chainExpression = AddInvocation(chainExpression, ZeroLogFacts.MethodNames.Log, indent);
 
         return document.WithSyntaxRoot(
             rootNode.ReplaceNode(
                 invocationToFix,
-                resultNode
+                chainExpression
             )
         );
     }
 
     private static InvocationExpressionSyntax AddInvocation(ExpressionSyntax baseExpression,
                                                             string methodName,
-                                                            bool multiLine,
+                                                            string? indent,
                                                             params SyntaxNode[] arguments)
     {
-        if (multiLine)
+        if (indent is not null)
         {
             var lastToken = baseExpression.GetLastToken();
             baseExpression = baseExpression.ReplaceToken(lastToken, lastToken.WithTrailingTrivia(CarriageReturnLineFeed));
@@ -120,11 +120,11 @@ public class UseAppendCodeFixProvider : CodeFixProvider
             IdentifierName(methodName)
         );
 
-        if (multiLine)
+        if (indent is not null)
         {
             memberAccess = memberAccess.WithOperatorToken(
-                memberAccess.OperatorToken.WithLeadingTrivia(Whitespace("    "))
-            ).WithAdditionalAnnotations(Formatter.Annotation);
+                memberAccess.OperatorToken.WithLeadingTrivia(Whitespace(indent))
+            );
         }
 
         return InvocationExpression(memberAccess)
