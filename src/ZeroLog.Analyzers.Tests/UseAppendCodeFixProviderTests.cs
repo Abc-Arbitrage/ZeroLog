@@ -128,10 +128,12 @@ public class UseAppendCodeFixProviderTests
                 {
                     void M(ZeroLog.Log log, System.Exception ex)
                     {
+
                         log.[|Trace|](
                             "Foo",
                             ex
                         );
+
                     }
                 }
                 """,
@@ -140,7 +142,9 @@ public class UseAppendCodeFixProviderTests
                 {
                     void M(ZeroLog.Log log, System.Exception ex)
                     {
+
                         log.Trace().Append("Foo").WithException(ex).Log();
+
                     }
                 }
                 """
@@ -169,9 +173,9 @@ public class UseAppendCodeFixProviderTests
                     void M(ZeroLog.Log log, System.Exception ex)
                     {
                         log.Fatal()
-                .Append("Foo")
-                .WithException(ex)
-                .Log();
+                            .Append("Foo")
+                            .WithException(ex)
+                            .Log();
                     }
                 }
                 """,

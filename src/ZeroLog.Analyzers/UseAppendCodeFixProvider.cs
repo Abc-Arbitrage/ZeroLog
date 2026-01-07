@@ -91,10 +91,14 @@ public class UseAppendCodeFixProvider : CodeFixProvider
         // Add .Log()
         chainExpression = AddInvocation(chainExpression, ZeroLogFacts.MethodNames.Log, multiLine);
 
+        var resultNode = multiLine
+            ? Formatter.Format(chainExpression, document.Project.Solution.Workspace, cancellationToken: cancellationToken)
+            : chainExpression;
+
         return document.WithSyntaxRoot(
             rootNode.ReplaceNode(
                 invocationToFix,
-                chainExpression.WithAdditionalAnnotations(Formatter.Annotation)
+                resultNode
             )
         );
     }
@@ -104,6 +108,12 @@ public class UseAppendCodeFixProvider : CodeFixProvider
                                                             bool multiLine,
                                                             params SyntaxNode[] arguments)
     {
+        if (multiLine)
+        {
+            var lastToken = baseExpression.GetLastToken();
+            baseExpression = baseExpression.ReplaceToken(lastToken, lastToken.WithTrailingTrivia(CarriageReturnLineFeed));
+        }
+
         var memberAccess = MemberAccessExpression(
             SyntaxKind.SimpleMemberAccessExpression,
             baseExpression,
@@ -111,7 +121,11 @@ public class UseAppendCodeFixProvider : CodeFixProvider
         );
 
         if (multiLine)
-            memberAccess = memberAccess.WithOperatorToken(memberAccess.OperatorToken.WithLeadingTrivia(CarriageReturnLineFeed));
+        {
+            memberAccess = memberAccess.WithOperatorToken(
+                memberAccess.OperatorToken.WithLeadingTrivia(Whitespace("    "))
+            ).WithAdditionalAnnotations(Formatter.Annotation);
+        }
 
         return InvocationExpression(memberAccess)
             .WithArgumentList(
