@@ -15,10 +15,10 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 namespace ZeroLog.Analyzers;
 
 [ExportCodeFixProvider(LanguageNames.CSharp), Shared]
-public class UseStringInterpolationCodeFixProvider : CodeFixProvider
+public class UseSimpleSyntaxCodeFixProvider : CodeFixProvider
 {
     public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
-        DiagnosticIds.UseStringInterpolation
+        DiagnosticIds.UseSimpleSyntax
     );
 
     public sealed override FixAllProvider GetFixAllProvider()
@@ -26,27 +26,38 @@ public class UseStringInterpolationCodeFixProvider : CodeFixProvider
 
     public override async Task RegisterCodeFixesAsync(CodeFixContext context)
     {
-        var root = await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
+        var document = context.Document;
+        var root = await document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
         if (root is null)
             return;
 
-        var nodeToFix = root.FindNode(context.Span);
+        var nameNode = root.FindNode(context.Span);
+        if (!nameNode.IsKind(SyntaxKind.IdentifierName))
+            return;
 
-        const string title = "Use string interpolation syntax";
-        context.RegisterCodeFix(CodeAction.Create(title, ct => FixNode(context.Document, nodeToFix, root, ct), title), context.Diagnostics);
+        const string title = "Use simple syntax";
+
+        context.RegisterCodeFix(
+            CodeAction.Create(
+                title,
+                async cancellationToken => await Apply(document, nameNode, root, cancellationToken).ConfigureAwait(false) ?? document,
+                title
+            ),
+            context.Diagnostics
+        );
     }
 
-    private static async Task<Document> FixNode(Document document,
-                                                SyntaxNode logBuilderIdentifierNode,
-                                                SyntaxNode rootNode,
-                                                CancellationToken cancellationToken)
+    private static async Task<Document?> Apply(Document document,
+                                               SyntaxNode initialIdentifierNode,
+                                               SyntaxNode rootNode,
+                                               CancellationToken cancellationToken)
     {
-        if (logBuilderIdentifierNode is not IdentifierNameSyntax { Parent: MemberAccessExpressionSyntax { Parent: InvocationExpressionSyntax logBuilderInvocation } })
-            return document;
+        if (initialIdentifierNode is not IdentifierNameSyntax { Parent: MemberAccessExpressionSyntax { Parent: InvocationExpressionSyntax logBuilderInvocation } })
+            return null;
 
         var semanticModel = await document.GetSemanticModelAsync(cancellationToken).ConfigureAwait(false);
         if (semanticModel is null)
-            return document;
+            return null;
 
         var parts = TryConvertToStringInterpolationParts(
             logBuilderInvocation,
@@ -57,7 +68,7 @@ public class UseStringInterpolationCodeFixProvider : CodeFixProvider
         );
 
         if (parts is null || logMethodInvocation is null)
-            return document;
+            return null;
 
         parts = ConcatInterpolationStringTexts(FlattenNestedInterpolations(parts)).ToList();
 
@@ -83,13 +94,13 @@ public class UseStringInterpolationCodeFixProvider : CodeFixProvider
         if (withExceptionInvocation is not null)
             arguments = arguments.Add(Argument(withExceptionInvocation));
 
-        rootNode = rootNode.ReplaceNode(
-            logMethodInvocation,
-            logBuilderInvocation.WithArgumentList(ArgumentList(arguments))
-                                .WithTrailingTrivia(logMethodInvocation.GetTrailingTrivia())
+        return document.WithSyntaxRoot(
+            rootNode.ReplaceNode(
+                logMethodInvocation,
+                logBuilderInvocation.WithArgumentList(ArgumentList(arguments))
+                                    .WithTrailingTrivia(logMethodInvocation.GetTrailingTrivia())
+            )
         );
-
-        return document.WithSyntaxRoot(rootNode);
     }
 
     private static List<InterpolatedStringContentSyntax>? TryConvertToStringInterpolationParts(InvocationExpressionSyntax logBuilderInvocation,

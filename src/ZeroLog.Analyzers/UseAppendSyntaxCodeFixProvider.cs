@@ -15,10 +15,10 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 namespace ZeroLog.Analyzers;
 
 [ExportCodeFixProvider(LanguageNames.CSharp), Shared]
-public class UseAppendCodeFixProvider : CodeFixProvider
+public class UseAppendSyntaxCodeFixProvider : CodeFixProvider
 {
     public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
-        DiagnosticIds.UseAppend
+        DiagnosticIds.UseAppendSyntax
     );
 
     public sealed override FixAllProvider GetFixAllProvider()
@@ -26,19 +26,22 @@ public class UseAppendCodeFixProvider : CodeFixProvider
 
     public override async Task RegisterCodeFixesAsync(CodeFixContext context)
     {
-        var root = await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
+        var document = context.Document;
+        var root = await document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
         if (root is null)
             return;
 
-        var nodeToFix = root.FindNode(context.Span);
+        var nameNode = root.FindNode(context.Span);
+        if (!nameNode.IsKind(SyntaxKind.IdentifierName))
+            return;
 
-        const string titleSingleLine = "Use Append syntax (single line)";
-        const string titleMultiLine = "Use Append syntax (multi line)";
+        const string titleSingleLine = "Use Append syntax (single-line)";
+        const string titleMultiLine = "Use Append syntax (multi-line)";
 
         context.RegisterCodeFix(
             CodeAction.Create(
                 titleSingleLine,
-                async ct => await FixNode(context.Document, nodeToFix, root, multiLine: false, ct).ConfigureAwait(false) ?? context.Document,
+                async cancellationToken => await Apply(document, nameNode, root, multiLine: false, cancellationToken).ConfigureAwait(false) ?? document,
                 titleSingleLine
             ),
             context.Diagnostics
@@ -47,26 +50,26 @@ public class UseAppendCodeFixProvider : CodeFixProvider
         context.RegisterCodeFix(
             CodeAction.Create(
                 titleMultiLine,
-                async ct => await FixNode(context.Document, nodeToFix, root, multiLine: true, ct).ConfigureAwait(false) ?? context.Document,
+                async cancellationToken => await Apply(document, nameNode, root, multiLine: true, cancellationToken).ConfigureAwait(false) ?? document,
                 titleMultiLine
             ),
             context.Diagnostics
         );
     }
 
-    private static async Task<Document?> FixNode(Document document,
-                                                 SyntaxNode identifierNodeToFix,
-                                                 SyntaxNode rootNode,
-                                                 bool multiLine,
-                                                 CancellationToken cancellationToken)
+    private static async Task<Document?> Apply(Document document,
+                                               SyntaxNode initialIdentifierNode,
+                                               SyntaxNode rootNode,
+                                               bool multiLine,
+                                               CancellationToken cancellationToken)
     {
-        if (identifierNodeToFix is not IdentifierNameSyntax { Parent: MemberAccessExpressionSyntax { Parent: InvocationExpressionSyntax invocationToFix } initialMemberAccess })
+        if (initialIdentifierNode is not IdentifierNameSyntax { Parent: MemberAccessExpressionSyntax { Parent: InvocationExpressionSyntax initialInvocation } initialMemberAccess })
             return null;
 
         if (await document.GetSemanticModelAsync(cancellationToken).ConfigureAwait(false) is not { } semanticModel)
             return null;
 
-        if (semanticModel.GetOperation(invocationToFix, cancellationToken) is not IInvocationOperation invocationOperation)
+        if (semanticModel.GetOperation(initialInvocation, cancellationToken) is not IInvocationOperation invocationOperation)
             return null;
 
         if (invocationOperation.Arguments.Length is not (1 or 2))
@@ -88,7 +91,7 @@ public class UseAppendCodeFixProvider : CodeFixProvider
         // Target: log.Info().Append(message)[.WithException(exception)].Log();
 
         // log.Info(...) -> log.Info()
-        var chainExpression = invocationToFix.WithArgumentList(ArgumentList());
+        var chainExpression = initialInvocation.WithArgumentList(ArgumentList());
 
         // Add .Append(message)
         chainExpression = AddInvocation(chainExpression, ZeroLogFacts.MethodNames.Append, invocationOptions, messageArgOp.Value.Syntax);
@@ -102,8 +105,8 @@ public class UseAppendCodeFixProvider : CodeFixProvider
 
         return document.WithSyntaxRoot(
             rootNode.ReplaceNode(
-                invocationToFix,
-                chainExpression
+                initialInvocation,
+                chainExpression.WithTrailingTrivia(initialInvocation.GetTrailingTrivia())
             )
         );
     }

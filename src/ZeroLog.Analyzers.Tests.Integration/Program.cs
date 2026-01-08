@@ -2,7 +2,7 @@
 using ZeroLog.Appenders;
 using ZeroLog.Configuration;
 
-namespace ZeroLog.Analyzers.IntegrationTest;
+namespace ZeroLog.Analyzers.Tests.Integration;
 
 public static class Program
 {

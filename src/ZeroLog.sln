@@ -36,7 +36,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeroLog.Tests.Allocation", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeroLog.Tests.Aot", "ZeroLog.Tests.Aot\ZeroLog.Tests.Aot.csproj", "{1913F929-BD68-41E8-8763-E83BA5A0E415}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeroLog.Analyzers.IntegrationTest", "ZeroLog.Analyzers.IntegrationTest\ZeroLog.Analyzers.IntegrationTest.csproj", "{7332F0F8-A49F-4DEC-BEB5-B515E15B4AF8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeroLog.Analyzers.Tests.Integration", "ZeroLog.Analyzers.Tests.Integration\ZeroLog.Analyzers.Tests.Integration.csproj", "{7332F0F8-A49F-4DEC-BEB5-B515E15B4AF8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

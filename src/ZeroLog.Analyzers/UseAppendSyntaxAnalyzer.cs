@@ -10,10 +10,10 @@ using Microsoft.CodeAnalysis.Operations;
 namespace ZeroLog.Analyzers;
 
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public class UseAppendAnalyzer : DiagnosticAnalyzer
+public class UseAppendSyntaxAnalyzer : DiagnosticAnalyzer
 {
-    public static readonly DiagnosticDescriptor UseAppendDiagnostic = new(
-        DiagnosticIds.UseAppend,
+    public static readonly DiagnosticDescriptor UseAppendSyntaxDiagnostic = new(
+        DiagnosticIds.UseAppendSyntax,
         "Use Append syntax",
         "Use Append syntax to add structured data",
         DiagnosticIds.Category,
@@ -22,7 +22,7 @@ public class UseAppendAnalyzer : DiagnosticAnalyzer
     );
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-        UseAppendDiagnostic
+        UseAppendSyntaxDiagnostic
     );
 
     public override void Initialize(AnalysisContext context)
@@ -33,9 +33,9 @@ public class UseAppendAnalyzer : DiagnosticAnalyzer
         context.RegisterCompilationStartAction(AnalyzeCompilationStart);
     }
 
-    private static void AnalyzeCompilationStart(CompilationStartAnalysisContext compilationStartContext)
+    private static void AnalyzeCompilationStart(CompilationStartAnalysisContext context)
     {
-        var compilation = (CSharpCompilation)compilationStartContext.Compilation;
+        var compilation = (CSharpCompilation)context.Compilation;
 
         var logType = compilation.GetTypeByMetadataName(ZeroLogFacts.TypeNames.Log);
         var exceptionType = compilation.GetTypeByMetadataName(typeof(Exception).FullName!);
@@ -58,7 +58,7 @@ public class UseAppendAnalyzer : DiagnosticAnalyzer
         if (immediateLogMethods.Count == 0)
             return;
 
-        compilationStartContext.RegisterOperationAction(
+        context.RegisterOperationAction(
             ctx => AnalyzeOperation(ctx, immediateLogMethods),
             OperationKind.Invocation
         );
@@ -75,6 +75,6 @@ public class UseAppendAnalyzer : DiagnosticAnalyzer
             return;
 
         if (invocation.Syntax is InvocationExpressionSyntax { Expression: MemberAccessExpressionSyntax expressionSyntax })
-            context.ReportDiagnostic(Diagnostic.Create(UseAppendDiagnostic, expressionSyntax.Name.GetLocation()));
+            context.ReportDiagnostic(Diagnostic.Create(UseAppendSyntaxDiagnostic, expressionSyntax.Name.GetLocation()));
     }
 }

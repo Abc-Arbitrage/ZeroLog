@@ -9,11 +9,11 @@ using Microsoft.CodeAnalysis.Operations;
 namespace ZeroLog.Analyzers;
 
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public class UseStringInterpolationAnalyzer : DiagnosticAnalyzer
+public class UseSimpleSyntaxAnalyzer : DiagnosticAnalyzer
 {
-    public static readonly DiagnosticDescriptor UseStringInterpolationDiagnostic = new(
-        DiagnosticIds.UseStringInterpolation,
-        "Use string interpolation syntax",
+    public static readonly DiagnosticDescriptor UseSimpleSyntaxDiagnostic = new(
+        DiagnosticIds.UseSimpleSyntax,
+        "Use simple syntax",
         "String interpolation syntax can be used for this log message",
         DiagnosticIds.Category,
         DiagnosticSeverity.Info,
@@ -21,7 +21,7 @@ public class UseStringInterpolationAnalyzer : DiagnosticAnalyzer
     );
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-        UseStringInterpolationDiagnostic
+        UseSimpleSyntaxDiagnostic
     );
 
     public override void Initialize(AnalysisContext context)
@@ -32,9 +32,9 @@ public class UseStringInterpolationAnalyzer : DiagnosticAnalyzer
         context.RegisterCompilationStartAction(AnalyzeCompilationStart);
     }
 
-    private static void AnalyzeCompilationStart(CompilationStartAnalysisContext compilationStartContext)
+    private static void AnalyzeCompilationStart(CompilationStartAnalysisContext context)
     {
-        var compilation = (CSharpCompilation)compilationStartContext.Compilation;
+        var compilation = (CSharpCompilation)context.Compilation;
 
         if (compilation.LanguageVersion < LanguageVersion.CSharp10)
             return;
@@ -61,7 +61,7 @@ public class UseStringInterpolationAnalyzer : DiagnosticAnalyzer
 
         var analysis = new Analysis(logType, logMessageType, logMethod);
 
-        compilationStartContext.RegisterOperationAction(
+        context.RegisterOperationAction(
             analysis.AnalyzeOperation,
             OperationKind.Invocation
         );
@@ -69,9 +69,9 @@ public class UseStringInterpolationAnalyzer : DiagnosticAnalyzer
 
     private class Analysis(INamedTypeSymbol logTypeSymbol, INamedTypeSymbol logMessageTypeSymbol, IMethodSymbol logMethodSymbol)
     {
-        public void AnalyzeOperation(OperationAnalysisContext operationContext)
+        public void AnalyzeOperation(OperationAnalysisContext context)
         {
-            var invocation = (IInvocationOperation)operationContext.Operation;
+            var invocation = (IInvocationOperation)context.Operation;
 
             if (invocation.TargetMethod.Name != ZeroLogFacts.MethodNames.Log)
                 return;
@@ -82,7 +82,7 @@ public class UseStringInterpolationAnalyzer : DiagnosticAnalyzer
             var rootMethodInvocation = FindSimplifiableLogBuilderInvocationOperation(invocation.Instance);
 
             if (rootMethodInvocation?.Syntax is InvocationExpressionSyntax { Expression: MemberAccessExpressionSyntax expressionSyntax })
-                operationContext.ReportDiagnostic(Diagnostic.Create(UseStringInterpolationDiagnostic, expressionSyntax.Name.GetLocation()));
+                context.ReportDiagnostic(Diagnostic.Create(UseSimpleSyntaxDiagnostic, expressionSyntax.Name.GetLocation()));
         }
 
         private IInvocationOperation? FindSimplifiableLogBuilderInvocationOperation(IOperation? operation)

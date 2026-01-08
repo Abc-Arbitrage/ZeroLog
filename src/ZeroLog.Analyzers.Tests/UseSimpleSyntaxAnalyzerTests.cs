@@ -1,11 +1,10 @@
 ﻿using System.Threading.Tasks;
-using Microsoft.CodeAnalysis.Testing;
 using NUnit.Framework;
 
 namespace ZeroLog.Analyzers.Tests;
 
 [TestFixture]
-public class UseStringInterpolationAnalyzerTests
+public class UseSimpleSyntaxAnalyzerTests
 {
     [Test]
     public Task should_report_direct_log_opportunity()
@@ -153,5 +152,5 @@ public class UseStringInterpolationAnalyzerTests
         return test.RunAsync();
     }
 
-    private class Test : ZeroLogAnalyzerTest<UseStringInterpolationAnalyzer>;
+    private class Test : ZeroLogAnalyzerTest<UseSimpleSyntaxAnalyzer>;
 }

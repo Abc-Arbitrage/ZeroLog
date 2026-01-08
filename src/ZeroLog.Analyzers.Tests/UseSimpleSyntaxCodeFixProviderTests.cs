@@ -4,7 +4,7 @@ using NUnit.Framework;
 namespace ZeroLog.Analyzers.Tests;
 
 [TestFixture]
-public class UseStringInterpolationCodeFixProviderTests
+public class UseSimpleSyntaxCodeFixProviderTests
 {
     [Test]
     public Task should_fix()
@@ -402,5 +402,5 @@ public class UseStringInterpolationCodeFixProviderTests
         return test.RunAsync();
     }
 
-    private class Test : ZeroLogCodeFixTest<UseStringInterpolationAnalyzer, UseStringInterpolationCodeFixProvider>;
+    private class Test : ZeroLogCodeFixTest<UseSimpleSyntaxAnalyzer, UseSimpleSyntaxCodeFixProvider>;
 }

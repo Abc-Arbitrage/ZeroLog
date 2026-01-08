@@ -4,7 +4,7 @@ using NUnit.Framework;
 namespace ZeroLog.Analyzers.Tests;
 
 [TestFixture]
-public class UseAppendCodeFixProviderTests
+public class UseAppendSyntaxCodeFixProviderTests
 {
     [Test]
     public Task should_fix_message_only()
@@ -119,7 +119,7 @@ public class UseAppendCodeFixProviderTests
     }
 
     [Test]
-    public Task should_handle_whitespace()
+    public Task should_keep_external_trivia()
     {
         var test = new Test
         {
@@ -129,10 +129,10 @@ public class UseAppendCodeFixProviderTests
                     void M(ZeroLog.Log log, System.Exception ex)
                     {
 
-                        log.[|Trace|](
+                        /* start trivia */ log.[|Trace|](
                             "Foo",
                             ex
-                        );
+                        ) /* end trivia */ ;
 
                     }
                 }
@@ -143,7 +143,7 @@ public class UseAppendCodeFixProviderTests
                     void M(ZeroLog.Log log, System.Exception ex)
                     {
 
-                        log.Trace().Append("Foo").WithException(ex).Log();
+                        /* start trivia */ log.Trace().Append("Foo").WithException(ex).Log() /* end trivia */ ;
 
                     }
                 }
@@ -161,21 +161,21 @@ public class UseAppendCodeFixProviderTests
             TestCode = """
                 class C
                 {
-                    void M(ZeroLog.Log log, System.Exception ex)
+                    void M(ZeroLog.Log logger, System.Exception ex)
                     {
-                        log.[|Fatal|]("Foo", ex);
+                        logger.[|Fatal|]("Foo", ex);
                     }
                 }
                 """,
             FixedCode = """
                 class C
                 {
-                    void M(ZeroLog.Log log, System.Exception ex)
+                    void M(ZeroLog.Log logger, System.Exception ex)
                     {
-                        log.Fatal()
-                           .Append("Foo")
-                           .WithException(ex)
-                           .Log();
+                        logger.Fatal()
+                              .Append("Foo")
+                              .WithException(ex)
+                              .Log();
                     }
                 }
                 """,
@@ -185,5 +185,5 @@ public class UseAppendCodeFixProviderTests
         return test.RunAsync();
     }
 
-    private class Test : ZeroLogCodeFixTest<UseAppendAnalyzer, UseAppendCodeFixProvider>;
+    private class Test : ZeroLogCodeFixTest<UseAppendSyntaxAnalyzer, UseAppendSyntaxCodeFixProvider>;
 }
