@@ -12,9 +12,9 @@ namespace ZeroLog.Analyzers.Tests;
 internal static class ZeroLogAnalyzerTest
 {
     private static readonly ReferenceAssemblies _netReferenceAssemblies = new(
-        "net9.0",
-        new PackageIdentity("Microsoft.NETCore.App.Ref", "9.0.0"),
-        Path.Combine("ref", "net9.0")
+        "net10.0",
+        new PackageIdentity("Microsoft.NETCore.App.Ref", "10.0.0"),
+        Path.Combine("ref", "net10.0")
     );
 
     public static void ConfigureTest(AnalyzerTest<DefaultVerifier> test)
