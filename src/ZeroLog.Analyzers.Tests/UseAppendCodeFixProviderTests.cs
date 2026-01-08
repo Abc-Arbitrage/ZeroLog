@@ -119,7 +119,7 @@ public class UseAppendCodeFixProviderTests
     }
 
     [Test]
-    public Task should_normalize_whitespace()
+    public Task should_handle_whitespace()
     {
         var test = new Test
         {

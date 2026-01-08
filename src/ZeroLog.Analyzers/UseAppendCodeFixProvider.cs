@@ -130,7 +130,7 @@ public class UseAppendCodeFixProvider : CodeFixProvider
             .WithArgumentList(
                 ArgumentList(
                     SeparatedList(
-                        arguments.Select(node => Argument((ExpressionSyntax)node.NormalizeWhitespace())).ToArray()
+                        arguments.Select(node => Argument((ExpressionSyntax)node.WithoutTrivia())).ToArray()
                     )
                 )
             );
