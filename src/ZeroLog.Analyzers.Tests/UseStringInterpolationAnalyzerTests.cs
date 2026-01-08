@@ -16,13 +16,9 @@ public class UseStringInterpolationAnalyzerTests
                 class C
                 {
                     void M(ZeroLog.Log log)
-                        => log.{|#0:Info|}().Append("Foo").Log();
+                        => log.[|Info|]().Append("Foo").Log();
                 }
-                """,
-            ExpectedDiagnostics =
-            {
-                new DiagnosticResult(UseStringInterpolationAnalyzer.UseStringInterpolationDiagnostic).WithLocation(0)
-            }
+                """
         };
 
         return test.RunAsync();
@@ -37,13 +33,9 @@ public class UseStringInterpolationAnalyzerTests
                 class C
                 {
                     void M(ZeroLog.Log log)
-                        => log.{|#0:Info|}().Append(42).AppendEnum(System.DayOfWeek.Friday).Append(true).Log();
+                        => log.[|Info|]().Append(42).AppendEnum(System.DayOfWeek.Friday).Append(true).Log();
                 }
-                """,
-            ExpectedDiagnostics =
-            {
-                new DiagnosticResult(UseStringInterpolationAnalyzer.UseStringInterpolationDiagnostic).WithLocation(0)
-            }
+                """
         };
 
         return test.RunAsync();
@@ -75,17 +67,12 @@ public class UseStringInterpolationAnalyzerTests
                 class C
                 {
                     void M1(ZeroLog.Log log)
-                        => log.{|#0:Info|}().Append(42, "X").Log();
+                        => log.[|Info|]().Append(42, "X").Log();
 
                     void M2(ZeroLog.Log log)
-                        => log.{|#1:Info|}().Append(format: "X", value: 40 + 2).Log();
+                        => log.[|Info|]().Append(format: "X", value: 40 + 2).Log();
                 }
-                """,
-            ExpectedDiagnostics =
-            {
-                new DiagnosticResult(UseStringInterpolationAnalyzer.UseStringInterpolationDiagnostic).WithLocation(0),
-                new DiagnosticResult(UseStringInterpolationAnalyzer.UseStringInterpolationDiagnostic).WithLocation(1)
-            }
+                """
         };
 
         return test.RunAsync();
@@ -125,6 +112,40 @@ public class UseStringInterpolationAnalyzerTests
 
                     void M(ZeroLog.Log log)
                         => log.Info().Append($@"").Log();
+                }
+                """
+        };
+
+        return test.RunAsync();
+    }
+
+    [Test]
+    public Task should_report_direct_log_opportunity_with_exception()
+    {
+        var test = new Test
+        {
+            TestCode = """
+                class C
+                {
+                    void M(ZeroLog.Log log, System.Exception ex)
+                        => log.[|Info|]().Append("Foo").WithException(ex).Log();
+                }
+                """
+        };
+
+        return test.RunAsync();
+    }
+
+    [Test]
+    public Task should_not_report_direct_log_opportunity_with_multiple_exceptions()
+    {
+        var test = new Test
+        {
+            TestCode = """
+                class C
+                {
+                    void M(ZeroLog.Log log, System.Exception ex)
+                        => log.Info().Append("Foo").WithException(ex).WithException(ex).Log();
                 }
                 """
         };

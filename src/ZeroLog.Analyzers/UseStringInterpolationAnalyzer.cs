@@ -13,7 +13,7 @@ public class UseStringInterpolationAnalyzer : DiagnosticAnalyzer
 {
     public static readonly DiagnosticDescriptor UseStringInterpolationDiagnostic = new(
         DiagnosticIds.UseStringInterpolation,
-        "Use string interpolation",
+        "Use string interpolation syntax",
         "String interpolation syntax can be used for this log message",
         DiagnosticIds.Category,
         DiagnosticSeverity.Info,
@@ -48,7 +48,13 @@ public class UseStringInterpolationAnalyzer : DiagnosticAnalyzer
         var logMethod = logMessageType.GetMembers(ZeroLogFacts.MethodNames.Log)
                                       .Where(i => i.Kind == SymbolKind.Method)
                                       .OfType<IMethodSymbol>()
-                                      .FirstOrDefault(i => i.Parameters.IsEmpty && i.ReturnsVoid && !i.IsStatic);
+                                      .FirstOrDefault(i => i is
+                                      {
+                                          ReturnsVoid: true,
+                                          IsStatic: false,
+                                          DeclaredAccessibility: Accessibility.Public,
+                                          Parameters.IsEmpty: true
+                                      });
 
         if (logMethod is null)
             return;
@@ -67,6 +73,9 @@ public class UseStringInterpolationAnalyzer : DiagnosticAnalyzer
         {
             var invocation = (IInvocationOperation)operationContext.Operation;
 
+            if (invocation.TargetMethod.Name != ZeroLogFacts.MethodNames.Log)
+                return;
+
             if (!SymbolEqualityComparer.Default.Equals(invocation.TargetMethod, logMethodSymbol))
                 return;
 
@@ -78,6 +87,8 @@ public class UseStringInterpolationAnalyzer : DiagnosticAnalyzer
 
         private IInvocationOperation? FindSimplifiableLogBuilderInvocationOperation(IOperation? operation)
         {
+            var hasWithExceptionCall = false;
+
             while (true)
             {
                 if (operation?.Kind != OperationKind.Invocation)
@@ -87,26 +98,50 @@ public class UseStringInterpolationAnalyzer : DiagnosticAnalyzer
 
                 if (SymbolEqualityComparer.Default.Equals(invocationOperation.TargetMethod.ContainingType, logMessageTypeSymbol))
                 {
-                    if (invocationOperation.TargetMethod.Name is not (ZeroLogFacts.MethodNames.Append or ZeroLogFacts.MethodNames.AppendEnum))
-                        return null;
-
-                    var valueArgument = invocationOperation.Arguments.FirstOrDefault(i => i.Parameter?.Ordinal == 0);
-                    if (valueArgument is null)
-                        return null;
-
-                    // Don't suggest a simplification if there is a verbatim string interpolation
-                    if (valueArgument.Value is { Kind: OperationKind.InterpolatedString, Syntax: InterpolatedStringExpressionSyntax interpolatedStringSyntax }
-                        && interpolatedStringSyntax.StringStartToken.IsKind(SyntaxKind.InterpolatedVerbatimStringStartToken))
+                    switch (invocationOperation.TargetMethod.Name)
                     {
-                        return null;
-                    }
+                        case ZeroLogFacts.MethodNames.Append:
+                        case ZeroLogFacts.MethodNames.AppendEnum:
+                        {
+                            var valueArgument = invocationOperation.Arguments.FirstOrDefault(i => i.Parameter?.Ordinal == 0);
+                            if (valueArgument is null)
+                                return null;
 
-                    if (invocationOperation.Arguments.Length > 1)
-                    {
-                        // The format string needs to be a literal
-                        var formatArgument = invocationOperation.Arguments.FirstOrDefault(i => i.Parameter?.Name is ZeroLogFacts.ParameterNames.FormatString);
-                        if (formatArgument != null && formatArgument.Value.Kind != OperationKind.Literal)
+                            // Don't suggest a simplification if there is a verbatim string interpolation
+                            if (valueArgument.Value is { Kind: OperationKind.InterpolatedString, Syntax: InterpolatedStringExpressionSyntax interpolatedStringSyntax }
+                                && interpolatedStringSyntax.StringStartToken.IsKind(SyntaxKind.InterpolatedVerbatimStringStartToken))
+                            {
+                                return null;
+                            }
+
+                            if (invocationOperation.Arguments.Length > 1)
+                            {
+                                // The format string needs to be a literal
+                                var formatArgument = invocationOperation.Arguments.FirstOrDefault(i => i.Parameter?.Name is ZeroLogFacts.ParameterNames.FormatString);
+                                if (formatArgument != null && formatArgument.Value.Kind != OperationKind.Literal)
+                                    return null;
+                            }
+
+                            break;
+                        }
+
+                        case ZeroLogFacts.MethodNames.WithException:
+                        {
+                            // Don't allow multiple WithException calls
+                            if (hasWithExceptionCall)
+                                return null;
+
+                            if (invocationOperation.Arguments.Length != 1)
+                                return null;
+
+                            hasWithExceptionCall = true;
+                            break;
+                        }
+
+                        default:
+                        {
                             return null;
+                        }
                     }
 
                     operation = invocationOperation.Instance;
