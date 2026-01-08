@@ -68,6 +68,9 @@ public class UseAppendAnalyzer : DiagnosticAnalyzer
     {
         var invocation = (IInvocationOperation)context.Operation;
 
+        if (!ZeroLogFacts.IsLogLevelName(invocation.TargetMethod.Name))
+            return;
+
         if (!immediateLogMethods.Contains(invocation.TargetMethod))
             return;
 

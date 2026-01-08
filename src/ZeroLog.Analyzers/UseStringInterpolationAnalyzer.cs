@@ -73,6 +73,9 @@ public class UseStringInterpolationAnalyzer : DiagnosticAnalyzer
         {
             var invocation = (IInvocationOperation)operationContext.Operation;
 
+            if (invocation.TargetMethod.Name != ZeroLogFacts.MethodNames.Log)
+                return;
+
             if (!SymbolEqualityComparer.Default.Equals(invocation.TargetMethod, logMethodSymbol))
                 return;
 
