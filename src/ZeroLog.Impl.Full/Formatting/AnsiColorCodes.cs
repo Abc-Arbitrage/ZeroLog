@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 
 namespace ZeroLog.Formatting;
 
+[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
 internal static partial class AnsiColorCodes
 {
     public const string Reset = "\e[0m";
@@ -47,18 +49,20 @@ internal static partial class AnsiColorCodes
 
     public static bool UseByDefault { get; } = !Console.IsOutputRedirected && string.IsNullOrEmpty(Environment.GetEnvironmentVariable("NO_COLOR"));
 
+    // lang=regex
+    private const string _asciiColorsRegexPattern = """\e\[[0-9;]*m""";
+    private const RegexOptions _asciiColorsRegexOptions = RegexOptions.CultureInvariant | RegexOptions.Singleline;
+
 #if NET7_0_OR_GREATER
-    [GeneratedRegex("""\e\[.*?m""", RegexOptions.CultureInvariant | RegexOptions.Singleline)]
+    [GeneratedRegex(_asciiColorsRegexPattern, _asciiColorsRegexOptions)]
     private static partial Regex AnsiColorsRegex();
+#else
+    private static readonly Regex _ansiColorsRegex = new(_asciiColorsRegexPattern, RegexOptions.Compiled | _asciiColorsRegexOptions);
+    private static Regex AnsiColorsRegex() => _ansiColorsRegex;
+#endif
 
     public static string RemoveAnsiCodes(string? input)
         => AnsiColorsRegex().Replace(input ?? string.Empty, string.Empty);
-#else
-    private static readonly Regex _ansiColorsRegex = new("""\e\[.*?m""", RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.Singleline);
-
-    public static string RemoveAnsiCodes(string? input)
-        => _ansiColorsRegex.Replace(input ?? string.Empty, string.Empty);
-#endif
 
     public static string GetForegroundColorCode(ConsoleColor color)
     {

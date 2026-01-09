@@ -191,11 +191,21 @@ namespace ZeroLog.Formatting
     public sealed class PatternWriter
     {
         public PatternWriter(string pattern) { }
+        public ZeroLog.Formatting.PatternWriter.LogLevelColorCodes LogLevelColors { get; init; }
         public ZeroLog.Formatting.PatternWriter.LogLevelNames LogLevels { get; init; }
         public string Pattern { get; }
+        public ZeroLog.Formatting.PatternWriter WithoutAnsiColorCodes() { }
         public void Write(ZeroLog.Formatting.LoggedMessage message, System.Span<char> destination, out int charsWritten) { }
         public static string EscapePattern(string? value) { }
         public static bool IsValidPattern(string? pattern) { }
+        public readonly struct LogLevelColorCodes
+        {
+            public LogLevelColorCodes(System.ConsoleColor trace, System.ConsoleColor debug, System.ConsoleColor info, System.ConsoleColor warn, System.ConsoleColor error, System.ConsoleColor fatal) { }
+            public LogLevelColorCodes(string trace, string debug, string info, string warn, string error, string fatal) { }
+            public LogLevelColorCodes(System.ConsoleColor traceForeground, System.ConsoleColor traceBackground, System.ConsoleColor debugForeground, System.ConsoleColor debugBackground, System.ConsoleColor infoForeground, System.ConsoleColor infoBackground, System.ConsoleColor warnForeground, System.ConsoleColor warnBackground, System.ConsoleColor errorForeground, System.ConsoleColor errorBackground, System.ConsoleColor fatalForeground, System.ConsoleColor fatalBackground) { }
+            public string this[ZeroLog.LogLevel level] { get; }
+            public ZeroLog.Formatting.PatternWriter.LogLevelColorCodes WithoutAnsiColorCodes() { }
+        }
         public readonly struct LogLevelNames
         {
             public LogLevelNames(string trace, string debug, string info, string warn, string error, string fatal) { }
@@ -206,6 +216,7 @@ namespace ZeroLog.Formatting
             public string this[ZeroLog.LogLevel level] { get; }
             public string Trace { get; }
             public string Warn { get; }
+            public ZeroLog.Formatting.PatternWriter.LogLevelNames WithoutAnsiColorCodes() { }
         }
     }
 }

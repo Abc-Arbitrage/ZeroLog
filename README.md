@@ -140,6 +140,7 @@ The pattern is a string with the following placeholders:
 | `%threadId`         | The thread ID which logged the message                           |                                                            |
 | `%threadName`       | The thread name which logged the message, or an empty string     |                                                            |
 | `%level`            | The log level (default: a short uppercase label)                 | `pad` makes eack level the same length                     |
+| `%levelColor`       | The ANSI color code associated to the log lavel                  |                                                            |
 | `%logger`           | The logger name                                                  |                                                            | 
 | `%loggerCompact`    | The logger name, with the namespace shortened to its initials    |                                                            | 
 | `%message`          | The logged message                                               |                                                            | 
@@ -147,6 +148,7 @@ The pattern is a string with the following placeholders:
 | `%exceptionType`    | The exception type, if any                                       |                                                            | 
 | `%newline`          | Equivalent to `Environment.NewLine`                              |                                                            | 
 | `%column`           | Inserts padding spaces until a given column index                | The column index to reach                                  | 
+| `%resetColor`       | The reset ANSI color code                                        | `\e[0m`                                                    | 
 | `%%`                | Inserts a single `%` character (escaping)                        |                                                            | 
 
 Patterns can be written in the form `%{field}` or `%{field:format}` to define a format string. String placeholders accept an integer format string which defines their minimum length. For instance, `%{logger:20}` will always be at least 20 characters wide.

@@ -130,10 +130,7 @@ public class PatternWriterTests
         var formattedLogMessage = new LoggedMessage(256, ZeroLogConfiguration.Default);
         formattedLogMessage.SetMessage(logMessage);
 
-        GcTester.ShouldNotAllocate(() =>
-        {
-            patternWriter.Write(formattedLogMessage, buffer, out _);
-        });
+        GcTester.ShouldNotAllocate(() => patternWriter.Write(formattedLogMessage, buffer, out _));
 
         PatternWriter.IsValidPattern(pattern).ShouldBeTrue();
     }
@@ -286,6 +283,31 @@ public class PatternWriterTests
     [TestCase("%foo %%bar", "%%foo %%%%bar")]
     public void should_escape_pattern(string pattern, string expectedResult)
         => PatternWriter.EscapePattern(pattern).ShouldEqual(expectedResult);
+
+    [Test]
+    [TestCase("", "", "")]
+    [TestCase("foo", "foo", "foo")]
+    [TestCase("foo%{resetColor}bar", "foobar", "foobar")]
+    [TestCase("foo%{levelColor}bar", "foobar", "foobar")]
+    [TestCase("foo%{resetColor}bar%{levelColor}%{resetColor}baz", "foobarbaz", "foobarbaz")]
+    [TestCase("foo%{level}bar", "foo%{level}bar", "fooINFObar")]
+    public void should_remove_ansi_codes(string pattern, string expectedPattern, string expectedResult)
+    {
+        var initialPatternWriter = new PatternWriter(pattern);
+        initialPatternWriter.Pattern.ShouldEqual(pattern);
+        initialPatternWriter.LogLevelColors[LogLevel.Info].ShouldContain("\e");
+
+        var patternWriter = initialPatternWriter.WithoutAnsiColorCodes();
+        patternWriter.Pattern.ShouldEqual(expectedPattern);
+        patternWriter.LogLevels[LogLevel.Info].ShouldEqual("INFO");
+        patternWriter.LogLevelColors[LogLevel.Info].ShouldBeEmpty();
+
+        var logMessage = new LogMessage("Foo");
+        logMessage.Initialize(new Log("Foo.Bar.TestLog"), LogLevel.Info);
+
+        var result = GetResult(patternWriter, logMessage);
+        result.ShouldEqual(expectedResult);
+    }
 
     private static string GetResult(PatternWriter patternWriter, LogMessage logMessage)
     {
