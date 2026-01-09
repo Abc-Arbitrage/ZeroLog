@@ -25,7 +25,7 @@ public class ConsoleAppender : StreamAppender
     {
         Stream = Console.OpenStandardOutput();
         Encoding = Console.OutputEncoding;
-        ColorOutput = !Console.IsOutputRedirected && string.IsNullOrEmpty(Environment.GetEnvironmentVariable("NO_COLOR"));
+        ColorOutput = AnsiColorCodes.UseByDefault;
     }
 
     /// <inheritdoc/>

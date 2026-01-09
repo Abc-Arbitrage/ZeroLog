@@ -23,6 +23,7 @@ namespace ZeroLog.Formatting;
 /// <item><term><c>%threadId</c></term><description>The thread ID which logged the message.</description></item>
 /// <item><term><c>%threadName</c></term><description>The thread name which logged the message, or empty if the thread was unnamed.</description></item>
 /// <item><term><c>%level</c></term><description>The log level (a short uppercase label by default, specify the <c>pad</c> format to make every label the same width).</description></item>
+/// <item><term><c>%levelColor</c></term><description>The log level ANSI color code.</description></item>
 /// <item><term><c>%logger</c></term><description>The logger name.</description></item>
 /// <item><term><c>%loggerCompact</c></term><description>The logger name, with the namespace shortened to its initials.</description></item>
 /// <item><term><c>%message</c></term><description>The log message.</description></item>
@@ -30,6 +31,7 @@ namespace ZeroLog.Formatting;
 /// <item><term><c>%exceptionType</c></term><description>The exception type name, if any.</description></item>
 /// <item><term><c>%newline</c></term><description>Equivalent to <c>Environment.NewLine</c>.</description></item>
 /// <item><term><c>%column</c></term><description>Inserts padding spaces until the column index specified in the format string is reached.</description></item>
+/// <item><term><c>%reset</c></term><description>Inserts a reset ANSI code.</description></item>
 /// <item><term><c>%%</c></term><description>Inserts a single '%' character (escaping).</description></item>
 /// </list>
 /// </para>
@@ -44,6 +46,7 @@ namespace ZeroLog.Formatting;
 public sealed class PatternWriter
 {
     private static readonly LogLevelNames _defaultLogLevelNames = new("TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL");
+    private static readonly LogLevelColorCodes _defaultLogLevelColorCodes = new(ConsoleColor.Gray, ConsoleColor.DarkGray, ConsoleColor.White, ConsoleColor.Yellow, ConsoleColor.Red, ConsoleColor.Magenta);
 
     private static readonly Regex _patternRegex = new(
         """
@@ -65,6 +68,7 @@ public sealed class PatternWriter
 
     private readonly LogLevelNames _levelNames;
     private readonly LogLevelNames _levelNamesWithPadding;
+    private readonly LogLevelColorCodes _levelColors;
 
     /// <summary>
     /// The pattern to be rendered.
@@ -82,6 +86,15 @@ public sealed class PatternWriter
             _levelNames = !value.IsEmpty ? value : _defaultLogLevelNames;
             _levelNamesWithPadding = _levelNames.ToPadded();
         }
+    }
+
+    /// <summary>
+    /// The log level color codes to use for the <c>%levelColor</c> placeholder.
+    /// </summary>
+    public LogLevelColorCodes LogLevelColors
+    {
+        get => _levelColors;
+        init => _levelColors = !value.IsEmpty ? value : _defaultLogLevelColorCodes;
     }
 
     internal TimeZoneInfo? LocalTimeZone { get; init; } // For unit tests
@@ -162,6 +175,7 @@ public sealed class PatternWriter
                 "threadid"         => new PatternPart(PatternPartType.ThreadId, format),
                 "threadname"       => new PatternPart(PatternPartType.ThreadName, format),
                 "level"            => new PatternPart(PatternPartType.Level, format),
+                "levelColor"       => new PatternPart(PatternPartType.LevelColor, format),
                 "logger"           => new PatternPart(PatternPartType.Logger, format),
                 "loggercompact"    => new PatternPart(PatternPartType.LoggerCompact, format),
                 "message"          => new PatternPart(PatternPartType.Message, format),
@@ -169,6 +183,7 @@ public sealed class PatternWriter
                 "exceptiontype"    => new PatternPart(PatternPartType.ExceptionType, format),
                 "newline"          => new PatternPart(PatternPartType.NewLine, format),
                 "column"           => new PatternPart(PatternPartType.Column, format),
+                "reset"            => new PatternPart(AnsiColorCodes.Reset),
                 "%"                => new PatternPart("%"),
                 _                  => throw new FormatException($"Invalid placeholder type: %{placeholderType}")
             };
@@ -396,6 +411,14 @@ public sealed class PatternWriter
                     break;
                 }
 
+                case PatternPartType.LevelColor:
+                {
+                    if (!builder.TryAppendWhole(_levelColors[message.Level]))
+                        goto endOfLoop;
+
+                    break;
+                }
+
                 case PatternPartType.LevelPadded:
                 {
                     if (!builder.TryAppendWhole(_levelNamesWithPadding[message.Level]))
@@ -484,6 +507,7 @@ public sealed class PatternWriter
         ThreadId,
         ThreadName,
         Level,
+        LevelColor,
         LevelPadded,
         Logger,
         LoggerCompact,
@@ -582,5 +606,36 @@ public sealed class PatternWriter
                 Fatal.PadRight(maxLength)
             );
         }
+    }
+
+    /// <summary>
+    /// The log level ANSI color code to use for the <c>%levelColor</c> placeholder.
+    /// </summary>
+    public readonly struct LogLevelColorCodes
+    {
+        private readonly LogLevelNames _values;
+
+        internal bool IsEmpty => _values.IsEmpty;
+
+        /// <summary>
+        /// Creates a new instance of <see cref="LogLevelColors"/>.
+        /// </summary>
+        public LogLevelColorCodes(ConsoleColor trace, ConsoleColor debug, ConsoleColor info, ConsoleColor warn, ConsoleColor error, ConsoleColor fatal)
+        {
+            _values = new(
+                AnsiColorCodes.GetForegroundColorCode(trace),
+                AnsiColorCodes.GetForegroundColorCode(debug),
+                AnsiColorCodes.GetForegroundColorCode(info),
+                AnsiColorCodes.GetForegroundColorCode(warn),
+                AnsiColorCodes.GetForegroundColorCode(error),
+                AnsiColorCodes.GetForegroundColorCode(fatal)
+            );
+        }
+
+        /// <summary>
+        /// Returns the code to use for the given log level.
+        /// </summary>
+        public string this[LogLevel level]
+            => _values[level];
     }
 }
