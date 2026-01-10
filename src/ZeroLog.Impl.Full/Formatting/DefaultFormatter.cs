@@ -19,7 +19,7 @@ namespace ZeroLog.Formatting;
 public sealed class DefaultFormatter : Formatter
 {
     internal static readonly PatternWriter DefaultColoredPrefixWriter = new(
-        $"%resetColor{C.ForegroundBrightBlack}%time%resetColor - %levelColor{C.Bold}%level%resetColor - {C.ForegroundCyan}%logger%resetColor || {C.ForegroundBrightWhite}{C.Bold}%message%resetColor"
+        $"%resetColor{C.DefaultTimestamp}%time%resetColor - %levelColor%{{level:pad}}%resetColor - {C.DefaultLogger}%logger%resetColor || {C.DefaultMessage}%message%resetColor"
     );
 
     internal static readonly PatternWriter DefaultPrefixWriter = DefaultColoredPrefixWriter.WithoutAnsiColorCodes();

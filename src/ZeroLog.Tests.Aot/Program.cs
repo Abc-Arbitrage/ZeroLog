@@ -82,7 +82,7 @@ internal static class Program
             AutoRegisterEnums = false,
             RootLogger =
             {
-                Level = LogLevel.Debug,
+                Level = LogLevel.Trace,
                 Appenders =
                 {
                     new ConsoleAppender(),
@@ -92,6 +92,17 @@ internal static class Program
         });
 
         _log.Info("Hello, world!");
+        _log.Info("-----");
+
+        _log.Trace().Append("Default trace message").AppendKeyValue("Foo", "Bar").Log();
+        _log.Debug().Append("Default debug message").AppendKeyValue("Foo", "Bar").Log();
+        _log.Info().Append("Default info message").AppendKeyValue("Foo", "Bar").Log();
+        _log.Warn().Append("Default warn message").AppendKeyValue("Foo", "Bar").Log();
+        _log.Error().Append("Default error message").AppendKeyValue("Foo", "Bar").Log();
+        _log.Fatal().Append("Default fatal message").AppendKeyValue("Foo", "Bar").Log();
+
+        _log.Error("Default exception", new InvalidOperationException("Something went wrong"));
+
         _log.Info("-----");
 
         _log.Info()

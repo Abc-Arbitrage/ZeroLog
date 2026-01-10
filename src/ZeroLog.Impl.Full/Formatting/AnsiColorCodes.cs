@@ -8,7 +8,6 @@ namespace ZeroLog.Formatting;
 internal static partial class AnsiColorCodes
 {
     public const string Reset = "\e[0m";
-    public const string Bold = "\e[1m";
 
     // https://en.wikipedia.org/wiki/ANSI_escape_code#Colors
 
@@ -47,6 +46,17 @@ internal static partial class AnsiColorCodes
     public const string BackgroundBrightMagenta = "\e[105m";
     public const string BackgroundBrightCyan = "\e[106m";
     public const string BackgroundBrightWhite = "\e[107m";
+
+    public const string DefaultTrace = "\e[90m";
+    public const string DefaultDebug = "\e[37m";
+    public const string DefaultInfo = "\e[1;97m";
+    public const string DefaultWarn = "\e[1;93m";
+    public const string DefaultError = "\e[1;91m";
+    public const string DefaultFatal = "\e[1;95m";
+
+    public const string DefaultTimestamp = ForegroundBrightBlack;
+    public const string DefaultLogger = ForegroundCyan;
+    public const string DefaultMessage = "\e[1;97m";
 
     public static bool UseByDefault { get; } = !Console.IsOutputRedirected && string.IsNullOrEmpty(Environment.GetEnvironmentVariable("NO_COLOR"));
 
