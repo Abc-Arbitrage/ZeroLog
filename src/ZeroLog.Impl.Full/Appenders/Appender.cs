@@ -65,8 +65,7 @@ public abstract class Appender : IDisposable
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Failed to initialize appender of type {GetType().FullName}:");
-            Console.Error.WriteLine(ex);
+            LogManager.ReportInternalError("Failed to initialize appender", ex);
         }
     }
 

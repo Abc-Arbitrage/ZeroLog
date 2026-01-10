@@ -33,7 +33,7 @@ public class DefaultFormatterTests
 
         _logMessage.Append("Foo").Append(42);
 
-        GetFormattedFull().ShouldEqual($"03:04:05.0060000 - INFO - TestLog || Foo42{Environment.NewLine}");
+        GetFormattedFull().ShouldEqual($"03:04:05.0060000 - INFO  - TestLog || Foo42{Environment.NewLine}");
     }
 
     [Test]

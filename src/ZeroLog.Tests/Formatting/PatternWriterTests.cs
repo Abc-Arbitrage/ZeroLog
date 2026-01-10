@@ -43,7 +43,7 @@ public class PatternWriterTests
     [TestCase("%{level:pad}", "INFO ")]
     [TestCase("%{level:5}", "INFO ")]
     [TestCase("%{level:6}", "INFO  ")]
-    [TestCase("%levelColor%level", "\e[97mINFO")]
+    [TestCase("%levelColor%level", AnsiColorCodes.DefaultInfo + "INFO")]
     [TestCase("%{logger:3}", "Foo.Bar.TestLog")]
     [TestCase("%{logger:18}", "Foo.Bar.TestLog   ")]
     [TestCase("%{loggerCompact:12}", "FB.TestLog  ")]

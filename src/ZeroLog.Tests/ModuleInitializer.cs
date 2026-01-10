@@ -11,6 +11,8 @@ public static class ModuleInitializer
     [ModuleInitializer]
     public static void Initialize()
     {
+        LogManager.IgnoreInternalErrors = true;
+
         DiffRunner.Disabled = true;
         VerifyDiffPlex.Initialize();
     }

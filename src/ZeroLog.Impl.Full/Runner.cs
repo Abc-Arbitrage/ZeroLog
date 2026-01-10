@@ -257,16 +257,7 @@ internal sealed class AsyncRunner : Runner
         }
         catch (Exception ex)
         {
-            try
-            {
-                Console.Error.WriteLine($"Error in ZeroLog thread initializer ({nameof(ZeroLogConfiguration.LoggingThreadInitializer)}):");
-                Console.Error.WriteLine(ex);
-            }
-            catch
-            {
-                // Don't kill the process (ex.ToString() could throw for instance).
-                // Initializer failure is not fatal, continue running the thread.
-            }
+            LogManager.ReportInternalError($"Error in ZeroLog thread initializer ({nameof(ZeroLogConfiguration.LoggingThreadInitializer)}):", ex);
         }
 
         try
@@ -278,9 +269,7 @@ internal sealed class AsyncRunner : Runner
         {
             try
             {
-                Console.Error.WriteLine($"Fatal error in ZeroLog. {nameof(WriteThread)}:");
-                Console.Error.WriteLine(ex);
-
+                LogManager.ReportInternalError($"Fatal error in ZeroLog. {nameof(WriteThread)}:", ex);
                 Dispose();
             }
             catch
