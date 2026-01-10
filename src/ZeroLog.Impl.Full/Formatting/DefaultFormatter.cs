@@ -1,4 +1,5 @@
 using ZeroLog.Appenders;
+using C = ZeroLog.Formatting.AnsiColorCodes;
 
 namespace ZeroLog.Formatting;
 
@@ -17,18 +18,27 @@ namespace ZeroLog.Formatting;
 /// </remarks>
 public sealed class DefaultFormatter : Formatter
 {
-    private static readonly PatternWriter _defaultPrefixWriter = new("%time - %level - %logger || ");
+    internal static readonly PatternWriter DefaultColoredPrefixWriter = new(
+        $"%resetColor{C.ForegroundBrightBlack}%time%resetColor - %levelColor{C.Bold}%level%resetColor - {C.ForegroundCyan}%logger%resetColor || {C.ForegroundBrightWhite}{C.Bold}%message%resetColor"
+    );
 
-    private readonly PatternWriter? _prefixWriter = _defaultPrefixWriter;
+    internal static readonly PatternWriter DefaultPrefixWriter = DefaultColoredPrefixWriter.WithoutAnsiColorCodes();
 
     /// <summary>
-    /// The message prefix pattern. This is logged before the message text.
+    /// The writer used for the start of the message.
+    /// </summary>
+    /// <seealso cref="PrefixPattern"/>
+    public PatternWriter PrefixPatternWriter { get; init; } = DefaultPrefixWriter;
+
+    /// <summary>
+    /// The message prefix pattern. Use <see cref="PrefixPatternWriter"/> for more customization.
     /// </summary>
     /// <inheritdoc cref="PatternWriter" path="/remarks" />
+    /// <seealso cref="PrefixPatternWriter"/>
     public string PrefixPattern
     {
-        get => _prefixWriter?.Pattern ?? string.Empty;
-        init => _prefixWriter = !string.IsNullOrEmpty(value) ? new PatternWriter(value) : null;
+        get => PrefixPatternWriter.Pattern;
+        init => PrefixPatternWriter = new PatternWriter(value);
     }
 
     /// <summary>
@@ -43,8 +53,10 @@ public sealed class DefaultFormatter : Formatter
     /// <inheritdoc/>
     protected override void WriteMessage(LoggedMessage message)
     {
-        Write(message, _prefixWriter);
-        Write(message.Message);
+        Write(message, PrefixPatternWriter);
+
+        if (!PrefixPatternWriter.HasMessage) // For backwards compatibility
+            Write(message.Message);
 
         if (message.KeyValues.Count != 0)
         {
@@ -56,8 +68,26 @@ public sealed class DefaultFormatter : Formatter
 
         if (message.Exception != null)
         {
+            if (PrefixPatternWriter.HasAnsiCodes)
+                Write(C.ForegroundBrightRed);
+
             // This allocates, but there's no better way to get the details.
             WriteLine(message.Exception.ToString());
+
+            if (PrefixPatternWriter.HasAnsiCodes)
+                Write(C.Reset);
         }
+    }
+
+    internal DefaultFormatter WithoutAnsiColorCodes()
+    {
+        if (!PrefixPatternWriter.HasAnsiCodes && !AnsiColorCodes.HasAnsiCode(JsonSeparator))
+            return this;
+
+        return new DefaultFormatter
+        {
+            PrefixPatternWriter = PrefixPatternWriter.WithoutAnsiColorCodes(),
+            JsonSeparator = AnsiColorCodes.RemoveAnsiCodes(JsonSeparator)
+        };
     }
 }

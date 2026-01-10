@@ -165,6 +165,12 @@ internal abstract class Runner : ILogMessageProvider, IDisposable
         }
     }
 
+    protected void InitializeAppenders()
+    {
+        foreach (var appender in _appenders)
+            appender.InternalInitialize();
+    }
+
     protected void FlushAppenders()
     {
         foreach (var appender in _appenders)
@@ -185,6 +191,7 @@ internal abstract class Runner : ILogMessageProvider, IDisposable
         {
             appenders.UnionWith(_appenders);
             _appenders = appenders.ToArray();
+            InitializeAppenders();
         }
 
         _loggedMessage.UpdateConfiguration(newConfig);
@@ -264,6 +271,7 @@ internal sealed class AsyncRunner : Runner
 
         try
         {
+            InitializeAppenders();
             WriteToAppenders();
         }
         catch (Exception ex)
@@ -369,6 +377,16 @@ internal sealed class AsyncRunner : Runner
 internal sealed class SyncRunner(ZeroLogConfiguration config) : Runner(config)
 {
     private readonly Lock _lock = new();
+
+    public override void Start()
+    {
+        base.Start();
+
+        lock (_lock)
+        {
+            InitializeAppenders();
+        }
+    }
 
     public override void Submit(LogMessage message)
     {

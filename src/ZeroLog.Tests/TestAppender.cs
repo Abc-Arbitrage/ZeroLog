@@ -12,6 +12,7 @@ public class TestAppender(bool captureLoggedMessages) : Appender
     private int _messageCountTarget;
 
     public List<string> LoggedMessages { get; } = new();
+    public int InitializationCount { get; private set; }
     public int FlushCount { get; private set; }
     public bool IsDisposed { get; private set; }
 
@@ -23,6 +24,11 @@ public class TestAppender(bool captureLoggedMessages) : Appender
         _messageCount = 0;
         _messageCountTarget = expectedMessageCount;
         return _signal;
+    }
+
+    public override void Initialize()
+    {
+        ++InitializationCount;
     }
 
     public override void WriteMessage(LoggedMessage message)

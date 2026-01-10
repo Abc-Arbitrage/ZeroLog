@@ -16,7 +16,6 @@ public abstract class StreamAppender : Appender
 
     private Encoding _encoding = Encoding.UTF8;
     private bool _useSpanGetBytes;
-    private Formatter? _formatter;
 
     /// <summary>
     /// The stream to write to.
@@ -41,8 +40,8 @@ public abstract class StreamAppender : Appender
     /// </summary>
     public Formatter Formatter
     {
-        get => _formatter ??= new DefaultFormatter();
-        init => _formatter = value;
+        get => field ??= new DefaultFormatter();
+        set;
     }
 
     /// <summary>

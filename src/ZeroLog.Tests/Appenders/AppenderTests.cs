@@ -168,13 +168,41 @@ public class AppenderTests
         _appender.FlushCount.ShouldEqual(2);
     }
 
+    [Test]
+    public void should_initialize_once()
+    {
+        _appender.InitializationCount.ShouldEqual(0);
+        _appender.InternalInitialize();
+        _appender.InitializationCount.ShouldEqual(1);
+        _appender.InternalInitialize();
+        _appender.InitializationCount.ShouldEqual(1);
+    }
+
+    [Test]
+    public void should_not_throw_if_appender_initialization_throws()
+    {
+        _appender.FailOnInitialize = true;
+
+        Assert.DoesNotThrow(() => _appender.InternalInitialize());
+    }
+
     private class FailingAppender : Appender
     {
+        public bool FailOnInitialize { get; set; }
         public bool FailOnAppend { get; set; }
         public bool FailOnFlush { get; set; }
 
+        public int InitializationCount { get; private set; }
         public int AppendCount { get; private set; }
         public int FlushCount { get; private set; }
+
+        public override void Initialize()
+        {
+            ++InitializationCount;
+
+            if (FailOnInitialize)
+                throw new InvalidOperationException();
+        }
 
         public override void WriteMessage(LoggedMessage message)
         {

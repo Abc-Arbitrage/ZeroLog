@@ -8,6 +8,7 @@ namespace ZeroLog.Formatting;
 internal static partial class AnsiColorCodes
 {
     public const string Reset = "\e[0m";
+    public const string Bold = "\e[1m";
 
     // https://en.wikipedia.org/wiki/ANSI_escape_code#Colors
 
@@ -61,8 +62,28 @@ internal static partial class AnsiColorCodes
     private static Regex AnsiColorsRegex() => _ansiColorsRegex;
 #endif
 
+    public static bool HasAnsiCode(string value)
+        => value.Contains("\e");
+
     public static string RemoveAnsiCodes(string? input)
         => AnsiColorsRegex().Replace(input ?? string.Empty, string.Empty);
+
+    public static int LengthWithoutAnsiCodes(string? input)
+    {
+        if (string.IsNullOrEmpty(input))
+            return 0;
+
+#if NET7_0_OR_GREATER
+        var length = input.Length;
+
+        foreach (var match in AnsiColorsRegex().EnumerateMatches(input))
+            length -= match.Length;
+
+        return length;
+#else
+        return RemoveAnsiCodes(input).Length;
+#endif
+    }
 
     public static string GetForegroundColorCode(ConsoleColor color)
     {

@@ -43,6 +43,7 @@ public class PatternWriterTests
     [TestCase("%{level:pad}", "INFO ")]
     [TestCase("%{level:5}", "INFO ")]
     [TestCase("%{level:6}", "INFO  ")]
+    [TestCase("%levelColor%level", "\e[97mINFO")]
     [TestCase("%{logger:3}", "Foo.Bar.TestLog")]
     [TestCase("%{logger:18}", "Foo.Bar.TestLog   ")]
     [TestCase("%{loggerCompact:12}", "FB.TestLog  ")]
@@ -57,6 +58,7 @@ public class PatternWriterTests
     [TestCase("%{%}", "%{%}")]
     [TestCase("%{%:%}", "%{%:%}")]
     [TestCase("%%{%}", "%{%}")]
+    [TestCase("foo%{resetColor}bar", "foo\e[0mbar")]
     public void should_write_pattern(string pattern, string expectedResult)
     {
         var patternWriter = new PatternWriter(pattern)
@@ -92,6 +94,7 @@ public class PatternWriterTests
     [TestCase("%{column}")]
     [TestCase("%{column:foo}")]
     [TestCase("%{column:-3}")]
+    [TestCase("%{resetColor:5}")]
     public void should_throw_on_invalid_format(string pattern)
     {
         Assert.Throws<FormatException>(() => _ = new PatternWriter(pattern));
@@ -110,9 +113,11 @@ public class PatternWriterTests
     [TestCase("%threadId")]
     [TestCase("%threadName")]
     [TestCase("%level")]
+    [TestCase("%levelColor")]
     [TestCase("%logger")]
     [TestCase("%loggerCompact")]
     [TestCase("%newline")]
+    [TestCase("%resetColor")]
     [TestCase("abc%{column:10}def")]
     [TestCase("foo %level bar %logger baz")]
     [TestCase("%{date:dd MM yyyy HH mm ss}")]
@@ -197,6 +202,34 @@ public class PatternWriterTests
 
         var result = GetResult(patternWriter, logMessage);
         result.ShouldEqual(expected);
+    }
+
+    [Test]
+    [TestCase(LogLevel.Trace, "[\e[30m]")]
+    [TestCase(LogLevel.Debug, "[\e[91m]")]
+    [TestCase(LogLevel.Info, "[\e[92m]")]
+    [TestCase(LogLevel.Warn, "[\e[93m]")]
+    [TestCase(LogLevel.Error, "[\e[94m]")]
+    [TestCase(LogLevel.Fatal, "[\e[95m]")]
+    public void should_customize_level_colors(LogLevel level, string expectedResult)
+    {
+        var patternWriter = new PatternWriter("[%levelColor]")
+        {
+            LogLevelColors = new(
+                ConsoleColor.Black,
+                ConsoleColor.Red,
+                ConsoleColor.Green,
+                ConsoleColor.Yellow,
+                ConsoleColor.Blue,
+                ConsoleColor.Magenta
+            )
+        };
+
+        var logMessage = new LogMessage("Foo");
+        logMessage.Initialize(new Log("Foo.Bar.TestLog"), level);
+
+        var result = GetResult(patternWriter, logMessage);
+        result.ShouldEqual(expectedResult);
     }
 
     [Test]
@@ -298,9 +331,11 @@ public class PatternWriterTests
         initialPatternWriter.LogLevelColors[LogLevel.Info].ShouldContain("\e");
 
         var patternWriter = initialPatternWriter.WithoutAnsiColorCodes();
+        patternWriter.HasAnsiCodes.ShouldBeFalse();
         patternWriter.Pattern.ShouldEqual(expectedPattern);
         patternWriter.LogLevels[LogLevel.Info].ShouldEqual("INFO");
-        patternWriter.LogLevelColors[LogLevel.Info].ShouldBeEmpty();
+        patternWriter.LogLevelColors[LogLevel.Info].ShouldEqual("");
+        AnsiColorCodes.HasAnsiCode(patternWriter.Pattern).ShouldBeFalse();
 
         var logMessage = new LogMessage("Foo");
         logMessage.Initialize(new Log("Foo.Bar.TestLog"), LogLevel.Info);

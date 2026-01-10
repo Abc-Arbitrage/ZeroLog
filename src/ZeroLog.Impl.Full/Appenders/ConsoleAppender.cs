@@ -8,8 +8,6 @@ namespace ZeroLog.Appenders;
 /// </summary>
 public class ConsoleAppender : StreamAppender
 {
-    private LogLevel _lastLoggedLevel = LogLevel.None;
-
     /// <summary>
     /// Defines whether messages should be colored.
     /// </summary>
@@ -26,68 +24,19 @@ public class ConsoleAppender : StreamAppender
         Stream = Console.OpenStandardOutput();
         Encoding = Console.OutputEncoding;
         ColorOutput = AnsiColorCodes.UseByDefault;
-    }
 
-    /// <inheritdoc/>
-    public override void WriteMessage(LoggedMessage message)
-    {
-        if (ColorOutput)
-            UpdateConsoleColor(message);
-
-        base.WriteMessage(message);
-    }
-
-    /// <inheritdoc/>
-    public override void Flush()
-    {
-        base.Flush();
-
-        if (ColorOutput)
-            Console.ResetColor();
-
-        _lastLoggedLevel = LogLevel.None;
-    }
-
-    private void UpdateConsoleColor(LoggedMessage message)
-    {
-        if (message.Level == _lastLoggedLevel)
-            return;
-
-        if (_lastLoggedLevel != LogLevel.None)
-            base.Flush();
-
-        _lastLoggedLevel = message.Level;
-
-        switch (message.Level)
+        Formatter = new DefaultFormatter
         {
-            case LogLevel.Fatal:
-                Console.ForegroundColor = ConsoleColor.Black;
-                Console.BackgroundColor = ConsoleColor.White;
-                break;
+            PrefixPatternWriter = DefaultFormatter.DefaultColoredPrefixWriter
+        };
+    }
 
-            case LogLevel.Error:
-                Console.BackgroundColor = ConsoleColor.Black;
-                Console.ForegroundColor = ConsoleColor.Red;
-                break;
+    /// <inheritdoc/>
+    public override void Initialize()
+    {
+        base.Initialize();
 
-            case LogLevel.Warn:
-                Console.BackgroundColor = ConsoleColor.Black;
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                break;
-
-            case LogLevel.Info:
-                Console.BackgroundColor = ConsoleColor.Black;
-                Console.ForegroundColor = ConsoleColor.White;
-                break;
-
-            case LogLevel.Debug:
-            case LogLevel.Trace:
-                Console.BackgroundColor = ConsoleColor.Black;
-                Console.ForegroundColor = ConsoleColor.Gray;
-                break;
-
-            default:
-                goto case LogLevel.Info;
-        }
+        if (!ColorOutput && Formatter is DefaultFormatter defaultFormatter)
+            Formatter = defaultFormatter.WithoutAnsiColorCodes();
     }
 }

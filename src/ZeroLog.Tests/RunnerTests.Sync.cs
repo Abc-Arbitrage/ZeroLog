@@ -44,6 +44,18 @@ public class SyncRunnerTests
     }
 
     [Test]
+    public void should_initialize_appenders_immediately()
+    {
+        _testAppender.InitializationCount.ShouldEqual(1);
+
+        _log.Info("Foo");
+        _log.Info("Bar");
+        _log.Info("Baz");
+
+        _testAppender.InitializationCount.ShouldEqual(1);
+    }
+
+    [Test]
     public void should_flush_appenders_immediately()
     {
         _log.Info("Foo");

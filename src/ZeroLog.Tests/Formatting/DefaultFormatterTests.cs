@@ -356,9 +356,65 @@ public class DefaultFormatterTests
     }
 
     [Test]
+    public void should_write_exception()
+    {
+        _logMessage.WithException(new Exception("Oops!"));
+
+        GetFormattedSimple().ShouldContain("Oops!");
+    }
+
+    [Test]
     public void should_escape_prefix()
     {
         DefaultFormatter.EscapePlaceholders("foo%bar").ShouldEqual("foo%%bar");
+    }
+
+    [Test]
+    public void should_not_have_ansi_codes_by_default()
+    {
+        var formatter = new DefaultFormatter();
+
+        formatter.PrefixPatternWriter.HasAnsiCodes.ShouldBeFalse();
+        formatter.PrefixPattern.Contains('\u001b').ShouldBeFalse();
+        formatter.WithoutAnsiColorCodes().ShouldBeTheSameAs(formatter);
+    }
+
+    [Test]
+    public void should_remove_color_codes()
+    {
+        var formatter = new DefaultFormatter
+        {
+            PrefixPatternWriter = new PatternWriter("%{resetColor}foo\e[0m|bar%levelColor baz\e[0m"),
+            JsonSeparator = "\e[0m | \e[0m"
+        }.WithoutAnsiColorCodes();
+
+        formatter.PrefixPatternWriter.HasAnsiCodes.ShouldBeFalse();
+        formatter.PrefixPattern.ShouldEqual("foo|bar baz");
+        formatter.JsonSeparator.ShouldEqual(" | ");
+    }
+
+    [Test]
+    public void should_not_write_message_if_already_present_in_pattern()
+    {
+        var formatter = new DefaultFormatter
+        {
+            PrefixPattern = "[%message]"
+        };
+
+        var message = formatter.FormatMessage(LoggedMessage.CreateTestMessage(new LogMessage("Hello"))).ToString();
+        message.ShouldEqual($"[Hello]{Environment.NewLine}");
+    }
+
+    [Test]
+    public void should_write_message_if_not_present_in_pattern()
+    {
+        var formatter = new DefaultFormatter
+        {
+            PrefixPattern = "[] "
+        };
+
+        var message = formatter.FormatMessage(LoggedMessage.CreateTestMessage(new LogMessage("Hello"))).ToString();
+        message.ShouldEqual($"[] Hello{Environment.NewLine}");
     }
 
     private string GetFormattedFull()

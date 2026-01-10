@@ -6,14 +6,14 @@
         public ZeroLog.LogLevel Level { get; init; }
         public virtual void Dispose() { }
         public virtual void Flush() { }
+        public virtual void Initialize() { }
         public abstract void WriteMessage(ZeroLog.Formatting.LoggedMessage message);
     }
     public class ConsoleAppender : ZeroLog.Appenders.StreamAppender
     {
         public ConsoleAppender() { }
         public bool ColorOutput { get; init; }
-        public override void Flush() { }
-        public override void WriteMessage(ZeroLog.Formatting.LoggedMessage message) { }
+        public override void Initialize() { }
     }
     public class DateAndSizeRollingFileAppender : ZeroLog.Appenders.StreamAppender
     {
@@ -37,7 +37,7 @@
     {
         protected StreamAppender() { }
         protected System.Text.Encoding Encoding { get; set; }
-        public ZeroLog.Formatting.Formatter Formatter { get; init; }
+        public ZeroLog.Formatting.Formatter Formatter { get; set; }
         protected System.IO.Stream? Stream { get; set; }
         public override void Dispose() { }
         public override void Flush() { }
@@ -131,6 +131,7 @@ namespace ZeroLog.Formatting
         public DefaultFormatter() { }
         public string JsonSeparator { get; init; }
         public string PrefixPattern { get; init; }
+        public ZeroLog.Formatting.PatternWriter PrefixPatternWriter { get; init; }
         protected override void WriteMessage(ZeroLog.Formatting.LoggedMessage message) { }
         public static string EscapePlaceholders(string? value) { }
     }
@@ -191,7 +192,7 @@ namespace ZeroLog.Formatting
     }
     public sealed class PatternWriter
     {
-        public PatternWriter(string pattern) { }
+        public PatternWriter(string? pattern) { }
         public ZeroLog.Formatting.PatternWriter.LogLevelColorCodes LogLevelColors { get; init; }
         public ZeroLog.Formatting.PatternWriter.LogLevelNames LogLevels { get; init; }
         public string Pattern { get; }
@@ -205,7 +206,6 @@ namespace ZeroLog.Formatting
             public LogLevelColorCodes(string trace, string debug, string info, string warn, string error, string fatal) { }
             public LogLevelColorCodes(System.ConsoleColor traceForeground, System.ConsoleColor traceBackground, System.ConsoleColor debugForeground, System.ConsoleColor debugBackground, System.ConsoleColor infoForeground, System.ConsoleColor infoBackground, System.ConsoleColor warnForeground, System.ConsoleColor warnBackground, System.ConsoleColor errorForeground, System.ConsoleColor errorBackground, System.ConsoleColor fatalForeground, System.ConsoleColor fatalBackground) { }
             public string this[ZeroLog.LogLevel level] { get; }
-            public ZeroLog.Formatting.PatternWriter.LogLevelColorCodes WithoutAnsiColorCodes() { }
         }
         public readonly struct LogLevelNames
         {
@@ -217,7 +217,6 @@ namespace ZeroLog.Formatting
             public string this[ZeroLog.LogLevel level] { get; }
             public string Trace { get; }
             public string Warn { get; }
-            public ZeroLog.Formatting.PatternWriter.LogLevelNames WithoutAnsiColorCodes() { }
         }
     }
 }

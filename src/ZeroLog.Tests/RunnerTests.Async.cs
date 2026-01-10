@@ -53,6 +53,22 @@ public class AsyncRunnerTests
     }
 
     [Test]
+    public void should_initialize_appenders()
+    {
+        Start();
+
+        var signal = _testAppender.SetMessageCountTarget(3);
+
+        _log.Info("Foo");
+        _log.Info("Bar");
+        _log.Info("Baz");
+
+        signal.Wait(TimeSpan.FromSeconds(1));
+
+        _testAppender.InitializationCount.ShouldEqual(1);
+    }
+
+    [Test]
     public void should_flush_appenders_when_not_logging_messages()
     {
         Start();
