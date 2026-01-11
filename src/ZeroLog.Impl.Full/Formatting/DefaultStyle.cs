@@ -14,7 +14,7 @@ public sealed class DefaultStyle
     /// </summary>
     public Formatter Formatter { get; }
 
-    private DefaultStyle(string pattern)
+    private DefaultStyle([PatternWriter.Pattern] string pattern)
         : this(new DefaultFormatter(pattern))
     {
     }

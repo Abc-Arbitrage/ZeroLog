@@ -28,6 +28,7 @@ public sealed class DefaultFormatter : Formatter
     /// </summary>
     /// <inheritdoc cref="PatternWriter" path="/remarks" />
     /// <seealso cref="MessagePatternWriter"/>
+    [PatternWriter.Pattern]
     public string PrefixPattern
     {
         get => MessagePatternWriter.Pattern;
@@ -50,7 +51,7 @@ public sealed class DefaultFormatter : Formatter
     /// <summary>
     /// Initializes a new instance of the default formatter with a custom pattern.
     /// </summary>
-    public DefaultFormatter(string pattern)
+    public DefaultFormatter([PatternWriter.Pattern] string pattern)
         : this(new PatternWriter(pattern))
     {
     }

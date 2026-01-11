@@ -128,7 +128,7 @@ public sealed partial class PatternWriter
     /// </summary>
     /// <param name="pattern">The pattern to use.</param>
     [SuppressMessage("ReSharper", "ConvertToPrimaryConstructor")]
-    public PatternWriter(string? pattern)
+    public PatternWriter([Pattern] string? pattern)
     {
         Pattern = pattern ?? string.Empty;
         _parts = OptimizeParts(ParsePattern(Pattern)).ToArray();
@@ -786,4 +786,10 @@ public sealed partial class PatternWriter
         internal LogLevelColorCodes WithoutAnsiColorCodes()
             => new(Values.WithoutAnsiColorCodes());
     }
+
+    /// <summary>
+    /// Marks a parameter as a pattern string for compile-time validation.
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Property)]
+    public sealed class PatternAttribute : Attribute;
 }

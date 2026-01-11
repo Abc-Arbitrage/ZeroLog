@@ -7,8 +7,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ZeroLog\ZeroLog.csproj" />
+    <ProjectReference Include="..\ZeroLog.Analyzers\ZeroLog.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" PrivateAssets="all" />
   </ItemGroup>
-  
+
   <ItemGroup>
     <PackageReference Include="Spectre.Console" Version="0.54.0" />
   </ItemGroup>

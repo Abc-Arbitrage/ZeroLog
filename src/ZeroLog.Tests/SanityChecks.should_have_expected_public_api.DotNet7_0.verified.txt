@@ -221,6 +221,11 @@ namespace ZeroLog.Formatting
             public string Trace { get; }
             public string Warn { get; }
         }
+        [System.AttributeUsage(System.AttributeTargets.Property | System.AttributeTargets.Parameter)]
+        public sealed class PatternAttribute : System.Attribute
+        {
+            public PatternAttribute() { }
+        }
     }
 }
 namespace ZeroLog

@@ -25,6 +25,7 @@
   ZeroLog.Formatting.PatternWriter,
   ZeroLog.Formatting.PatternWriter+LogLevelColorCodes,
   ZeroLog.Formatting.PatternWriter+LogLevelNames,
+  ZeroLog.Formatting.PatternWriter+PatternAttribute,
   ZeroLog.Log,
   ZeroLog.Log+DebugInterpolatedStringHandler,
   ZeroLog.Log+ErrorInterpolatedStringHandler,

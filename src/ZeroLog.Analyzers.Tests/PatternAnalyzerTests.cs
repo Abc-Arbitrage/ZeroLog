@@ -1,5 +1,4 @@
 using System.Threading.Tasks;
-using Microsoft.CodeAnalysis.Testing;
 using NUnit.Framework;
 
 namespace ZeroLog.Analyzers.Tests;
@@ -18,13 +17,9 @@ public class PatternAnalyzerTests
                 class C
                 {
                     DefaultFormatter M()
-                        => new DefaultFormatter { PrefixPattern = {|#0:"%{level:-20}"|} };
+                        => new DefaultFormatter { PrefixPattern = [|"%{level:-20}"|] };
                 }
-                """,
-            ExpectedDiagnostics =
-            {
-                new DiagnosticResult(PatternAnalyzer.InvalidPatternDiagnostic).WithLocation(0).WithArguments("%{level:-20}")
-            }
+                """
         };
 
         return test.RunAsync();
@@ -82,14 +77,10 @@ public class PatternAnalyzerTests
                 {
                     void M()
                     {
-                        _ = new PatternWriter({|#0:"%{level:-20}"|});
+                        _ = new PatternWriter([|"%{level:-20}"|]);
                     }
                 }
-                """,
-            ExpectedDiagnostics =
-            {
-                new DiagnosticResult(PatternAnalyzer.InvalidPatternDiagnostic).WithLocation(0).WithArguments("%{level:-20}")
-            }
+                """
         };
 
         return test.RunAsync();
