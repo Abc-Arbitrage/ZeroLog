@@ -47,16 +47,13 @@ public sealed partial class PatternWriter
 {
     // NOTE: This class is immutable after initialization.
 
-    private static readonly LogLevelNames _defaultLogLevelNames = new("TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL");
-
-    private static readonly LogLevelColorCodes _defaultLogLevelColorCodes = new(
-        AnsiColorCodes.DefaultTrace,
-        AnsiColorCodes.DefaultDebug,
-        AnsiColorCodes.DefaultInfo,
-        AnsiColorCodes.DefaultWarn,
-        AnsiColorCodes.DefaultError,
-        AnsiColorCodes.DefaultFatal
-    );
+#if NET
+    private static readonly LogLevelNames _defaultLogLevelNames = DefaultStyle.Defaults.LogLevelNames;
+    private static readonly LogLevelColorCodes _defaultLogLevelColorCodes = DefaultStyle.Defaults.LogLevelColorCodes;
+#else
+    private static readonly LogLevelNames _defaultLogLevelNames = default;
+    private static readonly LogLevelColorCodes _defaultLogLevelColorCodes = default;
+#endif
 
     // lang=regex
     private const string _placeholderRegexPattern =

@@ -12,6 +12,7 @@
     public class ConsoleAppender : ZeroLog.Appenders.StreamAppender
     {
         public ConsoleAppender() { }
+        public ConsoleAppender(ZeroLog.Formatting.DefaultStyle defaultStyle) { }
         public bool ColorOutput { get; init; }
         public override void Initialize() { }
     }
@@ -128,11 +129,28 @@ namespace ZeroLog.Formatting
     public sealed class DefaultFormatter : ZeroLog.Formatting.Formatter
     {
         public DefaultFormatter() { }
+        public DefaultFormatter(ZeroLog.Formatting.PatternWriter writer) { }
+        public DefaultFormatter(string pattern) { }
         public string JsonSeparator { get; init; }
+        public ZeroLog.Formatting.PatternWriter MessagePatternWriter { get; init; }
         public string PrefixPattern { get; init; }
-        public ZeroLog.Formatting.PatternWriter PrefixPatternWriter { get; init; }
+        public override string ToString() { }
         protected override void WriteMessage(ZeroLog.Formatting.LoggedMessage message) { }
         public static string EscapePlaceholders(string? value) { }
+    }
+    public sealed class DefaultStyle
+    {
+        public ZeroLog.Formatting.Formatter Formatter { get; }
+        public override string ToString() { }
+        public static class Colored
+        {
+            public static ZeroLog.Formatting.DefaultStyle Highlighted { get; }
+            public static ZeroLog.Formatting.DefaultStyle WholeLine { get; }
+        }
+        public static class NoColor
+        {
+            public static ZeroLog.Formatting.DefaultStyle Simple { get; }
+        }
     }
     public abstract class Formatter
     {

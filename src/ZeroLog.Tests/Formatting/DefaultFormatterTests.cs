@@ -374,7 +374,7 @@ public class DefaultFormatterTests
     {
         var formatter = new DefaultFormatter();
 
-        formatter.PrefixPatternWriter.HasAnsiCodes.ShouldBeFalse();
+        formatter.MessagePatternWriter.HasAnsiCodes.ShouldBeFalse();
         formatter.PrefixPattern.Contains('\u001b').ShouldBeFalse();
         formatter.WithoutAnsiColorCodes().ShouldBeTheSameAs(formatter);
     }
@@ -384,11 +384,11 @@ public class DefaultFormatterTests
     {
         var formatter = new DefaultFormatter
         {
-            PrefixPatternWriter = new PatternWriter("%{resetColor}foo\e[0m|bar%levelColor baz\e[0m"),
+            MessagePatternWriter = new PatternWriter("%{resetColor}foo\e[0m|bar%levelColor baz\e[0m"),
             JsonSeparator = "\e[0m | \e[0m"
         }.WithoutAnsiColorCodes();
 
-        formatter.PrefixPatternWriter.HasAnsiCodes.ShouldBeFalse();
+        formatter.MessagePatternWriter.HasAnsiCodes.ShouldBeFalse();
         formatter.PrefixPattern.ShouldEqual("foo|bar baz");
         formatter.JsonSeparator.ShouldEqual(" | ");
     }
