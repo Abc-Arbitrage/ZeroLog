@@ -25,6 +25,7 @@ public class AnsiColorCodesTests
     [TestCase("", 0)]
     [TestCase("foo", 3)]
     [TestCase("foo\e[31mbar\e[0mbaz", 9)]
-    public void should_calculate_length_without_ansi_codes(string value, int expectedResult)
-        => AnsiColorCodes.LengthWithoutAnsiCodes(value).ShouldEqual(expectedResult);
+    [TestCase("1\e[0m👩🏽‍🚒3👨🏼‍👩🏽‍👧‍👦🏻5👩‍👧‍👦7", 7)]
+    public void should_calculate_visible_text_length(string value, int expectedResult)
+        => AnsiColorCodes.GetVisibleTextLength(value).ShouldEqual(expectedResult);
 }

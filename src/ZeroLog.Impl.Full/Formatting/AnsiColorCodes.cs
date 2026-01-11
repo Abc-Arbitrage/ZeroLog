@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Text.RegularExpressions;
 
 namespace ZeroLog.Formatting;
@@ -68,21 +69,12 @@ internal static partial class AnsiColorCodes
     public static string RemoveAnsiCodes(string? input)
         => AnsiColorsRegex().Replace(input ?? string.Empty, string.Empty);
 
-    public static int LengthWithoutAnsiCodes(string? input)
+    public static int GetVisibleTextLength(string? input)
     {
         if (string.IsNullOrEmpty(input))
             return 0;
 
-#if NET7_0_OR_GREATER
-        var length = input.Length;
-
-        foreach (var match in AnsiColorsRegex().EnumerateMatches(input))
-            length -= match.Length;
-
-        return length;
-#else
-        return RemoveAnsiCodes(input).Length;
-#endif
+        return new StringInfo(RemoveAnsiCodes(input)).LengthInTextElements;
     }
 
     public static string GetForegroundColorCode(ConsoleColor color)

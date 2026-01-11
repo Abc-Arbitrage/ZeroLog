@@ -91,10 +91,10 @@ public sealed class DefaultFormatter : Formatter
 
             // This allocates, but there's no better way to get the details.
             Write(message.Exception.ToString());
-
-            if (MessagePatternWriter.HasAnsiCodes)
-                Write(C.Reset);
         }
+
+        if (MessagePatternWriter.HasAnsiCodes)
+            Write(C.Reset);
 
         WriteLine();
     }

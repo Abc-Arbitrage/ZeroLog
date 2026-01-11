@@ -624,7 +624,7 @@ public sealed partial class PatternWriter
         {
             Type = PatternPartType.String;
             Format = value;
-            FormatInt = AnsiColorCodes.LengthWithoutAnsiCodes(value);
+            FormatInt = AnsiColorCodes.GetVisibleTextLength(value);
         }
     }
 
@@ -668,7 +668,7 @@ public sealed partial class PatternWriter
             for (var i = 0; i < _names.Length; ++i)
             {
                 _names[i] ??= _names[i] ?? string.Empty;
-                _visibleLengths[i] = AnsiColorCodes.LengthWithoutAnsiCodes(_names[i]);
+                _visibleLengths[i] = AnsiColorCodes.GetVisibleTextLength(_names[i]);
             }
         }
 
@@ -686,7 +686,7 @@ public sealed partial class PatternWriter
             if (_names is null)
                 return this;
 
-            var maxVisibleLength = _names.Max(AnsiColorCodes.LengthWithoutAnsiCodes);
+            var maxVisibleLength = _names.Max(AnsiColorCodes.GetVisibleTextLength);
 
             return new LogLevelNames(
                 Pad(Trace),
@@ -699,7 +699,7 @@ public sealed partial class PatternWriter
 
             string Pad(string value)
             {
-                var visibleLength = AnsiColorCodes.LengthWithoutAnsiCodes(value);
+                var visibleLength = AnsiColorCodes.GetVisibleTextLength(value);
                 var padLength = maxVisibleLength - visibleLength;
                 return value.PadRight(value.Length + padLength);
             }
