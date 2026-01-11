@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 using PublicApiGenerator;
 using VerifyNUnit;
+using ZeroLog.Formatting;
 
 namespace ZeroLog.Tests;
 
@@ -55,7 +56,11 @@ public class SanityChecks
             typeof(LogManager).Assembly
                               .GeneratePublicApi(new ApiGeneratorOptions
                               {
-                                  IncludeAssemblyAttributes = false
+                                  IncludeAssemblyAttributes = false,
+                                  ExcludeTypes =
+                                  [
+                                      typeof(DefaultStyle)
+                                  ]
                               })
         ).UniqueForTargetFrameworkAndVersion();
     }

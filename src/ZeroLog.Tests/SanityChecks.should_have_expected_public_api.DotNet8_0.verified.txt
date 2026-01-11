@@ -139,20 +139,6 @@ namespace ZeroLog.Formatting
         protected override void WriteMessage(ZeroLog.Formatting.LoggedMessage message) { }
         public static string EscapePlaceholders(string? value) { }
     }
-    public sealed class DefaultStyle
-    {
-        public ZeroLog.Formatting.Formatter Formatter { get; }
-        public override string ToString() { }
-        public static class Colored
-        {
-            public static ZeroLog.Formatting.DefaultStyle Highlighted { get; }
-            public static ZeroLog.Formatting.DefaultStyle WholeLine { get; }
-        }
-        public static class NoColor
-        {
-            public static ZeroLog.Formatting.DefaultStyle Simple { get; }
-        }
-    }
     public abstract class Formatter
     {
         protected Formatter() { }

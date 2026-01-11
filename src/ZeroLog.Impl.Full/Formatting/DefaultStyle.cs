@@ -1,8 +1,7 @@
-using System;
-
 namespace ZeroLog.Formatting;
 
 using C = AnsiColorCodes;
+using D = DefaultStyle.Defaults;
 
 /// <summary>
 /// A default output style shipped with ZeroLog.
@@ -42,7 +41,6 @@ public sealed class DefaultStyle
         /// <summary>
         /// A simple default style: timestamp, level, logger name, and message.
         /// </summary>
-        /// <seealso cref="Colored.WholeLine"/>
         public static DefaultStyle Simple => field ??= new("%time - %{level:pad} - %logger || %message");
     }
 
@@ -53,16 +51,29 @@ public sealed class DefaultStyle
     public static class Colored
     {
         /// <summary>
-        /// A simple style which colors a whole line based on the log level.
+        /// A simple style which colors the full line based on the log level.
         /// </summary>
-        public static DefaultStyle WholeLine => field ??= new("%resetColor%levelColor%time - %{level:pad} - %logger || %message");
+        public static DefaultStyle FullLine => field ??= new("%resetColor%levelColor%time - %{level:pad} - %logger || %message");
 
         /// <summary>
         /// A style which highlights the level, logger, and message.
         /// </summary>
         public static DefaultStyle Highlighted => field ??= new(
             new PatternWriter(
-                $"%resetColor{Defaults.Timestamp}%time%resetColor - %{{level:pad}}%resetColor - {Defaults.Logger}%logger%resetColor || {Defaults.Message}%message%resetColor"
+                $$"""
+                %resetColor%{time:hh\:mm\:ss}{{D.DarkTimestamp}}%{time:\.fff}%resetColor - %{level:pad}%resetColor - {{D.Logger}}%logger%resetColor || {{D.HighlightedMessage}}%message%resetColor
+                """
+            ) { LogLevels = Defaults.HighlightedLogLevelNames }
+        );
+
+        /// <summary>
+        /// Similar to <see cref="Highlighted"/>, but also highlights the message text.
+        /// </summary>
+        public static DefaultStyle HighlightedWithMessage => field ??= new(
+            new PatternWriter(
+                $$"""
+                %resetColor%{time:hh\:mm\:ss}{{D.DarkTimestamp}}%{time:\.fff}%resetColor - %{level:pad}%resetColor - {{D.Logger}}%logger%resetColor || %levelColor{{C.Bold}}%message%resetColor
+                """
             ) { LogLevels = Defaults.HighlightedLogLevelNames }
         );
     }
@@ -83,9 +94,9 @@ public sealed class DefaultStyle
         public const string ColorError = C.ForegroundBrightRed;
         public const string ColorFatal = C.ForegroundBrightMagenta;
 
-        public const string Timestamp = C.ForegroundBrightBlack;
+        public const string DarkTimestamp = C.ForegroundBrightBlack;
         public const string Logger = C.ForegroundCyan;
-        public const string Message = "\e[1;97m";
+        public const string HighlightedMessage = "\e[1;97m";
 
         public static readonly PatternWriter.LogLevelNames LogLevelNames = new(NameTrace, NameDebug, NameInfo, NameWarn, NameError, NameFatal);
         public static readonly PatternWriter.LogLevelColorCodes LogLevelColorCodes = new(ColorTrace, ColorDebug, ColorInfo, ColorWarn, ColorError, ColorFatal);
