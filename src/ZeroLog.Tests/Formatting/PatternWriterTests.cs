@@ -49,6 +49,8 @@ public class PatternWriterTests
     [TestCase("%{loggerCompact:12}", "FB.TestLog  ")]
     [TestCase("%{message:5}", "Foo  ")]
     [TestCase("abc%{column:10}def%{column:15}ghi", "abc       def  ghi")]
+    [TestCase("a%{resetColor}b%{levelColor}c%{column:10}d\e[0;1me%{levelColor}f%{column:15}ghi", $"a\e[0mb{AnsiColorCodes.DefaultInfo}c       d\e[0;1me{AnsiColorCodes.DefaultInfo}f  ghi")]
+    [TestCase("a%{message:5}b%{levelColor}c%{column:10}d\e[0;1me%{message:5}f%{column:20}ghi", $"aFoo  b{AnsiColorCodes.DefaultInfo}c  d\e[0;1meFoo  f  ghi")]
     [TestCase("%%level", "%level")]
     [TestCase("%%%level", "%INFO")]
     [TestCase("%%{level}", "%{level}")]

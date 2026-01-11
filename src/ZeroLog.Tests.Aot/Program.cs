@@ -94,17 +94,6 @@ internal static class Program
         _log.Info("Hello, world!");
         _log.Info("-----");
 
-        _log.Trace().Append("Default trace message").AppendKeyValue("Foo", "Bar").Log();
-        _log.Debug().Append("Default debug message").AppendKeyValue("Foo", "Bar").Log();
-        _log.Info().Append("Default info message").AppendKeyValue("Foo", "Bar").Log();
-        _log.Warn().Append("Default warn message").AppendKeyValue("Foo", "Bar").Log();
-        _log.Error().Append("Default error message").AppendKeyValue("Foo", "Bar").Log();
-        _log.Fatal().Append("Default fatal message").AppendKeyValue("Foo", "Bar").Log();
-
-        _log.Error("Default exception", new InvalidOperationException("Something went wrong"));
-
-        _log.Info("-----");
-
         _log.Info()
             .Append(nameof(RuntimeInformation))
             .AppendKeyValue(nameof(RuntimeInformation.FrameworkDescription), RuntimeInformation.FrameworkDescription)
@@ -117,6 +106,17 @@ internal static class Program
             .AppendKeyValue(nameof(RuntimeFeature.IsDynamicCodeSupported), RuntimeFeature.IsDynamicCodeSupported)
             .AppendKeyValue(nameof(RuntimeFeature.IsDynamicCodeCompiled), RuntimeFeature.IsDynamicCodeCompiled)
             .Log();
+
+        _log.Info("-----");
+
+        _log.Trace().Append("Default trace message").AppendKeyValue("Foo", "Bar").Log();
+        _log.Debug().Append("Default debug message").AppendKeyValue("Foo", "Bar").Log();
+        _log.Info().Append("Default info message").AppendKeyValue("Foo", "Bar").Log();
+        _log.Warn().Append("Default warn message").AppendKeyValue("Foo", "Bar").Log();
+        _log.Error().Append("Default error message").AppendKeyValue("Foo", "Bar").Log();
+        _log.Fatal().Append("Default fatal message").AppendKeyValue("Foo", "Bar").Log();
+
+        _log.Error("Default exception", GetExceptionWithStackTrace());
 
         _log.Info("-----");
 
@@ -272,6 +272,18 @@ internal static class Program
 
         void AddExpectation(string expectation)
             => expectations.Add(expectation);
+
+        static Exception GetExceptionWithStackTrace()
+        {
+            try
+            {
+                throw new InvalidOperationException("Simulated exception");
+            }
+            catch (Exception ex)
+            {
+                return ex;
+            }
+        }
     }
 
     private enum RegisteredEnumWithGeneric

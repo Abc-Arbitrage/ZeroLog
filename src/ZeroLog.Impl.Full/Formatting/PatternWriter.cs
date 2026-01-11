@@ -346,7 +346,13 @@ public sealed partial class PatternWriter
     {
         var builder = new CharBufferBuilder(destination);
 
-        foreach (var part in _parts)
+        // This is used for the %column placeholder. The value will be inaccurate in the following cases:
+        // - %level contains ANSI codes
+        // - %levelColor contains visible output
+        // - Any other placeholder preceding %column outputs ANSI codes, though it is unlikely
+        var visibleLength = 0;
+
+        foreach (ref readonly var part in _parts.AsSpan())
         {
             var partStartOffset = builder.Length;
 
@@ -357,7 +363,8 @@ public sealed partial class PatternWriter
                     if (!builder.TryAppendPartial(part.Format))
                         goto endOfLoop;
 
-                    break;
+                    visibleLength += part.FormatInt.GetValueOrDefault();
+                    continue;
                 }
 
                 case PatternPartType.Date:
@@ -450,7 +457,7 @@ public sealed partial class PatternWriter
                     if (!builder.TryAppendWhole(_levelColors[message.Level]))
                         goto endOfLoop;
 
-                    break;
+                    continue;
                 }
 
                 case PatternPartType.LevelPadded:
@@ -509,9 +516,11 @@ public sealed partial class PatternWriter
 
                 case PatternPartType.Column:
                 {
-                    // TODO: Ignore ANSI codes
-                    if (part.FormatInt is { } column)
-                        builder.TryAppendPartial(' ', column - builder.Length);
+                    if (part.FormatInt is { } column && column - visibleLength is > 0 and var spacesCount)
+                    {
+                        builder.TryAppendPartial(' ', spacesCount);
+                        visibleLength += spacesCount;
+                    }
 
                     continue;
                 }
@@ -519,6 +528,8 @@ public sealed partial class PatternWriter
 
             if (part.FormatInt is { } fieldLength)
                 builder.TryAppendPartial(' ', fieldLength - builder.Length + partStartOffset);
+
+            visibleLength += builder.Length - partStartOffset;
         }
 
         endOfLoop:
@@ -604,6 +615,7 @@ public sealed partial class PatternWriter
         {
             Type = PatternPartType.String;
             Format = value;
+            FormatInt = AnsiColorCodes.LengthWithoutAnsiCodes(value);
         }
     }
 
