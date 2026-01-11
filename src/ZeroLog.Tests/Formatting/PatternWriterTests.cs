@@ -51,6 +51,7 @@ public class PatternWriterTests
     [TestCase("abc%{column:10}def%{column:15}ghi", "abc       def  ghi")]
     [TestCase("a%{resetColor}b%{levelColor}c%{column:10}d\e[0;1me%{levelColor}f%{column:15}ghi", $"a\e[0mb{AnsiColorCodes.DefaultInfo}c       d\e[0;1me{AnsiColorCodes.DefaultInfo}f  ghi")]
     [TestCase("a%{message:5}b%{levelColor}c%{column:10}d\e[0;1me%{message:5}f%{column:20}ghi", $"aFoo  b{AnsiColorCodes.DefaultInfo}c  d\e[0;1meFoo  f  ghi")]
+    [TestCase("abc%{level:7}foo%{column:15}def%{level:2}ghi%{column:25}bar%{column:30}baz", "abcINFO   foo  defINFOghibar  baz")]
     [TestCase("%%level", "%level")]
     [TestCase("%%%level", "%INFO")]
     [TestCase("%%{level}", "%{level}")]
@@ -344,6 +345,27 @@ public class PatternWriterTests
 
         var result = GetResult(patternWriter, logMessage);
         result.ShouldEqual(expectedResult);
+    }
+
+    [Test]
+    public void should_measure_ansi_codes_length_correctly()
+    {
+        const string pattern = "%{resetColor}foo %{levelColor}bar %{level}baz%{level:6}|%{column:30}%{resetColor}Foo %{levelColor}Bar %{level:pad}Baz%{column:55}%message";
+        const string expectedFull = "\e[0mfoo \e[0;1m|\e[94m|bar \e[0mINFO\e[0;0;0mbaz\e[0mINFO\e[0;0;0m  |      \e[0mFoo \e[0;1m|\e[94m|Bar \e[0mINFO\e[0;0;0m      Baz  Message";
+        const string expectedVisible = "foo ||bar INFObazINFO  |      Foo ||Bar INFO      Baz  Message";
+
+        var patternWriter = new PatternWriter(pattern)
+        {
+            LogLevels = new PatternWriter.LogLevelNames("", "", "\e[0mINFO\e[0;0;0m", "pad10chars", "", ""),
+            LogLevelColors = new PatternWriter.LogLevelColorCodes("", "", "\e[0;1m|\e[94m|", "", "", "")
+        };
+
+        var logMessage = new LogMessage("Message");
+        logMessage.Initialize(new Log("Foo.Bar.TestLog"), LogLevel.Info);
+
+        var result = GetResult(patternWriter, logMessage);
+        result.ShouldEqual(expectedFull);
+        AnsiColorCodes.RemoveAnsiCodes(result).ShouldEqual(expectedVisible);
     }
 
     private static string GetResult(PatternWriter patternWriter, LogMessage logMessage)

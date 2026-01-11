@@ -60,14 +60,15 @@ internal ref struct CharBufferBuilder(Span<char> buffer)
         return false;
     }
 
-    public void TryAppendPartial(char value, int count)
+    public int TryAppendPartial(char value, int count)
     {
-        if (count > 0)
-        {
-            count = Math.Min(count, _buffer.Length - _pos);
-            _buffer.Slice(_pos, count).Fill(value);
-            _pos += count;
-        }
+        if (count <= 0)
+            return 0;
+
+        count = Math.Min(count, _buffer.Length - _pos);
+        _buffer.Slice(_pos, count).Fill(value);
+        _pos += count;
+        return count;
     }
 
     public bool TryAppend(int value, string? format = null)
