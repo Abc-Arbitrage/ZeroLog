@@ -22,7 +22,8 @@ namespace ZeroLog.Formatting;
 /// <item><term><c>%thread</c></term><description>The thread name (or ID) which logged the message.</description></item>
 /// <item><term><c>%threadId</c></term><description>The thread ID which logged the message.</description></item>
 /// <item><term><c>%threadName</c></term><description>The thread name which logged the message, or empty if the thread was unnamed.</description></item>
-/// <item><term><c>%level</c></term><description>The log level (a short uppercase label by default, specify the <c>pad</c> format to make every label the same width).</description></item>
+/// <item><term><c>%level</c></term><description>The log level from <see cref="LogLevels"/> (a short uppercase label by default, specify the <c>pad</c> format to make every label the same width).</description></item>
+/// <item><term><c>%levelColor</c></term><description>The log level ANSI color code from <see cref="LogLevelColors"/>.</description></item>
 /// <item><term><c>%logger</c></term><description>The logger name.</description></item>
 /// <item><term><c>%loggerCompact</c></term><description>The logger name, with the namespace shortened to its initials.</description></item>
 /// <item><term><c>%message</c></term><description>The log message.</description></item>
@@ -30,6 +31,7 @@ namespace ZeroLog.Formatting;
 /// <item><term><c>%exceptionType</c></term><description>The exception type name, if any.</description></item>
 /// <item><term><c>%newline</c></term><description>Equivalent to <c>Environment.NewLine</c>.</description></item>
 /// <item><term><c>%column</c></term><description>Inserts padding spaces until the column index specified in the format string is reached.</description></item>
+/// <item><term><c>%resetColor</c></term><description>The reset ANSI code.</description></item>
 /// <item><term><c>%%</c></term><description>Inserts a single '%' character (escaping).</description></item>
 /// </list>
 /// </para>
@@ -41,11 +43,20 @@ namespace ZeroLog.Formatting;
 /// Format strings can also be used to set a minimum field length: <c>%{logger:20}</c> will always be at least 20 characters wide.
 /// </para>
 /// </remarks>
-public sealed class PatternWriter
+public sealed partial class PatternWriter
 {
-    private static readonly LogLevelNames _defaultLogLevelNames = new("TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL");
+    // NOTE: This class is immutable after initialization.
 
-    private static readonly Regex _patternRegex = new(
+#if NET
+    private static readonly LogLevelNames _defaultLogLevelNames = DefaultStyle.Defaults.LogLevelNames;
+    private static readonly LogLevelColorCodes _defaultLogLevelColorCodes = DefaultStyle.Defaults.LogLevelColorCodes;
+#else
+    private static readonly LogLevelNames _defaultLogLevelNames = default;
+    private static readonly LogLevelColorCodes _defaultLogLevelColorCodes = default;
+#endif
+
+    // lang=regex
+    private const string _placeholderRegexPattern =
         """
         %(?:
             (?<type>\w+|%)
@@ -57,14 +68,23 @@ public sealed class PatternWriter
                 )?
             \}
         )
-        """,
-        RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace
-    );
+        """;
+
+    private const RegexOptions _placeholderRegexOptions = RegexOptions.CultureInvariant | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace;
+
+#if NET7_0_OR_GREATER
+    [GeneratedRegex(_placeholderRegexPattern, _placeholderRegexOptions)]
+    private static partial Regex PlaceholderRegex();
+#else
+    private static readonly Regex _placeholderRegex = new(_placeholderRegexPattern, RegexOptions.Compiled | _placeholderRegexOptions);
+    private static Regex PlaceholderRegex() => _placeholderRegex;
+#endif
 
     private readonly PatternPart[] _parts;
 
     private readonly LogLevelNames _levelNames;
     private readonly LogLevelNames _levelNamesWithPadding;
+    private readonly LogLevelColorCodes _levelColors;
 
     /// <summary>
     /// The pattern to be rendered.
@@ -81,8 +101,25 @@ public sealed class PatternWriter
         {
             _levelNames = !value.IsEmpty ? value : _defaultLogLevelNames;
             _levelNamesWithPadding = _levelNames.ToPadded();
+            HasAnsiCodes = EvaluateHasAnsiCodes();
         }
     }
+
+    /// <summary>
+    /// The log level color codes to use for the <c>%levelColor</c> placeholder.
+    /// </summary>
+    public LogLevelColorCodes LogLevelColors
+    {
+        get => _levelColors;
+        init
+        {
+            _levelColors = value;
+            HasAnsiCodes = EvaluateHasAnsiCodes();
+        }
+    }
+
+    internal bool HasMessage { get; }
+    internal bool HasAnsiCodes { get; private init; }
 
     internal TimeZoneInfo? LocalTimeZone { get; init; } // For unit tests
 
@@ -91,12 +128,15 @@ public sealed class PatternWriter
     /// </summary>
     /// <param name="pattern">The pattern to use.</param>
     [SuppressMessage("ReSharper", "ConvertToPrimaryConstructor")]
-    public PatternWriter(string pattern)
+    public PatternWriter([Pattern] string? pattern)
     {
-        Pattern = pattern;
-        _parts = OptimizeParts(ParsePattern(pattern)).ToArray();
+        Pattern = pattern ?? string.Empty;
+        _parts = OptimizeParts(ParsePattern(Pattern)).ToArray();
 
         LogLevels = _defaultLogLevelNames;
+        LogLevelColors = _defaultLogLevelColorCodes;
+
+        HasMessage = _parts.Any(p => p.Type == PatternPartType.Message);
     }
 
     /// <summary>
@@ -136,8 +176,7 @@ public sealed class PatternWriter
     private static IEnumerable<PatternPart> ParsePattern(string pattern)
     {
         var position = 0;
-
-        var matches = _patternRegex.Matches(pattern);
+        var matches = PlaceholderRegex().Matches(pattern);
 
         foreach (Match? match in matches)
         {
@@ -162,12 +201,14 @@ public sealed class PatternWriter
                 "threadid"         => new PatternPart(PatternPartType.ThreadId, format),
                 "threadname"       => new PatternPart(PatternPartType.ThreadName, format),
                 "level"            => new PatternPart(PatternPartType.Level, format),
+                "levelcolor"       => new PatternPart(PatternPartType.LevelColor, format),
                 "logger"           => new PatternPart(PatternPartType.Logger, format),
                 "loggercompact"    => new PatternPart(PatternPartType.LoggerCompact, format),
                 "message"          => new PatternPart(PatternPartType.Message, format),
                 "exceptionmessage" => new PatternPart(PatternPartType.ExceptionMessage, format),
                 "exceptiontype"    => new PatternPart(PatternPartType.ExceptionType, format),
                 "newline"          => new PatternPart(PatternPartType.NewLine, format),
+                "resetcolor"       => new PatternPart(PatternPartType.ResetColor, format),
                 "column"           => new PatternPart(PatternPartType.Column, format),
                 "%"                => new PatternPart("%"),
                 _                  => throw new FormatException($"Invalid placeholder type: %{placeholderType}")
@@ -226,6 +267,7 @@ public sealed class PatternWriter
             }
 
             case PatternPartType.NewLine:
+            case PatternPartType.ResetColor:
             {
                 if (part.Format is not null)
                     throw new FormatException($"The %{placeholderType} placeholder does not support format strings.");
@@ -269,6 +311,10 @@ public sealed class PatternWriter
                     sb.Append(Environment.NewLine);
                     break;
 
+                case PatternPartType.ResetColor:
+                    sb.Append(AnsiColorCodes.Reset);
+                    break;
+
                 default:
                     if (sb.Length != 0)
                     {
@@ -296,10 +342,12 @@ public sealed class PatternWriter
     public void Write(LoggedMessage message, Span<char> destination, out int charsWritten)
     {
         var builder = new CharBufferBuilder(destination);
+        var visibleLength = 0; // Used for the %column placeholder
 
-        foreach (var part in _parts)
+        foreach (ref readonly var part in _parts.AsSpan())
         {
             var partStartOffset = builder.Length;
+            var partVisibleStartOffset = visibleLength;
 
             switch (part.Type)
             {
@@ -308,7 +356,8 @@ public sealed class PatternWriter
                     if (!builder.TryAppendPartial(part.Format))
                         goto endOfLoop;
 
-                    break;
+                    visibleLength += part.FormatInt.GetValueOrDefault();
+                    continue;
                 }
 
                 case PatternPartType.Date:
@@ -390,7 +439,15 @@ public sealed class PatternWriter
 
                 case PatternPartType.Level:
                 {
-                    if (!builder.TryAppendWhole(_levelNames[message.Level]))
+                    if (!TryWriteLevel(message.Level, _levelNames, ref builder, ref visibleLength))
+                        goto endOfLoop;
+
+                    break;
+                }
+
+                case PatternPartType.LevelColor:
+                {
+                    if (!TryWriteLevel(message.Level, _levelColors.Values, ref builder, ref visibleLength))
                         goto endOfLoop;
 
                     break;
@@ -398,7 +455,7 @@ public sealed class PatternWriter
 
                 case PatternPartType.LevelPadded:
                 {
-                    if (!builder.TryAppendWhole(_levelNamesWithPadding[message.Level]))
+                    if (!TryWriteLevel(message.Level, _levelNamesWithPadding, ref builder, ref visibleLength))
                         goto endOfLoop;
 
                     break;
@@ -452,26 +509,73 @@ public sealed class PatternWriter
 
                 case PatternPartType.Column:
                 {
-                    if (part.FormatInt is { } column)
-                        builder.TryAppendPartial(' ', column - builder.Length);
+                    if (part.FormatInt is { } column && column > visibleLength)
+                        visibleLength += builder.TryAppendPartial(' ', column - visibleLength);
 
                     continue;
                 }
             }
 
-            if (part.FormatInt is { } fieldLength)
-                builder.TryAppendPartial(' ', fieldLength - builder.Length + partStartOffset);
+            // Most of the part types don't output ANSI codes, so we add the full output length to the visible length by default.
+            // Parts which can contain ANSI codes adjust the visible length accordingly, so adding this value gives the correct result.
+            visibleLength += builder.Length - partStartOffset;
+            var visiblePartLength = visibleLength - partVisibleStartOffset;
+
+            if (part.FormatInt is { } fieldLength && fieldLength > visiblePartLength)
+                visibleLength += builder.TryAppendPartial(' ', fieldLength - visiblePartLength);
         }
 
         endOfLoop:
 
         charsWritten = builder.Length;
+        return;
+
+        static bool TryWriteLevel(LogLevel level,
+                                  in LogLevelNames values,
+                                  ref CharBufferBuilder builder,
+                                  ref int visibleLength)
+        {
+            var value = values[level];
+
+            if (!builder.TryAppendWhole(value))
+                return false;
+
+            // This adds an offset which will be adjusted later.
+            visibleLength += values.GetVisibleLength(level) - value.Length;
+            return true;
+        }
     }
 
     private DateTime ToLocalDate(DateTime value)
         => LocalTimeZone is not null ? TimeZoneInfo.ConvertTimeFromUtc(value, LocalTimeZone) : value.ToLocalTime();
 
 #endif
+
+    private bool EvaluateHasAnsiCodes()
+        => AnsiColorCodes.HasAnsiCode(Pattern)
+           || _parts.Any(p => p.Type == PatternPartType.ResetColor)
+           || _parts.Any(p => p.Type == PatternPartType.LevelColor) && LogLevelColors.Values.HasAnsiColorCodes()
+           || _parts.Any(p => p.Type is PatternPartType.Level or PatternPartType.LevelPadded) && LogLevels.HasAnsiColorCodes();
+
+    /// <summary>
+    /// Returns this writer with any ANSI color codes removed.
+    /// </summary>
+    public PatternWriter WithoutAnsiColorCodes()
+    {
+        var pattern = PlaceholderRegex().Replace(
+            AnsiColorCodes.RemoveAnsiCodes(Pattern),
+            match => match.Groups["type"].Value.ToLowerInvariant() is "resetcolor" or "levelcolor"
+                ? string.Empty
+                : match.Value
+        );
+
+        return new PatternWriter(pattern)
+        {
+            LogLevels = LogLevels.WithoutAnsiColorCodes(),
+            LogLevelColors = LogLevelColors.WithoutAnsiColorCodes(),
+            LocalTimeZone = LocalTimeZone
+        };
+    }
 
     private enum PatternPartType
     {
@@ -484,6 +588,7 @@ public sealed class PatternWriter
         ThreadId,
         ThreadName,
         Level,
+        LevelColor,
         LevelPadded,
         Logger,
         LoggerCompact,
@@ -491,6 +596,7 @@ public sealed class PatternWriter
         ExceptionMessage,
         ExceptionType,
         NewLine,
+        ResetColor,
         Column
     }
 
@@ -518,6 +624,7 @@ public sealed class PatternWriter
         {
             Type = PatternPartType.String;
             Format = value;
+            FormatInt = AnsiColorCodes.GetVisibleTextLength(value);
         }
     }
 
@@ -527,6 +634,7 @@ public sealed class PatternWriter
     public readonly struct LogLevelNames
     {
         private readonly string[]? _names;
+        private readonly int[]? _visibleLengths;
 
         internal bool IsEmpty => _names is null;
 
@@ -555,9 +663,13 @@ public sealed class PatternWriter
         public LogLevelNames(string trace, string debug, string info, string warn, string error, string fatal)
         {
             _names = [trace, debug, info, warn, error, fatal];
+            _visibleLengths = new int[_names.Length];
 
             for (var i = 0; i < _names.Length; ++i)
+            {
                 _names[i] ??= _names[i] ?? string.Empty;
+                _visibleLengths[i] = AnsiColorCodes.GetVisibleTextLength(_names[i]);
+            }
         }
 
         /// <summary>
@@ -566,21 +678,118 @@ public sealed class PatternWriter
         public string this[LogLevel level]
             => (uint)level < _names?.Length ? _names[(int)level] : string.Empty;
 
+        internal int GetVisibleLength(LogLevel level)
+            => (uint)level < _visibleLengths?.Length ? _visibleLengths[(int)level] : 0;
+
         internal LogLevelNames ToPadded()
         {
             if (_names is null)
                 return this;
 
-            var maxLength = _names.Max(static i => i.Length);
+            var maxVisibleLength = _names.Max(AnsiColorCodes.GetVisibleTextLength);
 
             return new LogLevelNames(
-                Trace.PadRight(maxLength),
-                Debug.PadRight(maxLength),
-                Info.PadRight(maxLength),
-                Warn.PadRight(maxLength),
-                Error.PadRight(maxLength),
-                Fatal.PadRight(maxLength)
+                Pad(Trace),
+                Pad(Debug),
+                Pad(Info),
+                Pad(Warn),
+                Pad(Error),
+                Pad(Fatal)
+            );
+
+            string Pad(string value)
+            {
+                var visibleLength = AnsiColorCodes.GetVisibleTextLength(value);
+                var padLength = maxVisibleLength - visibleLength;
+                return value.PadRight(value.Length + padLength);
+            }
+        }
+
+        internal bool HasAnsiColorCodes()
+            => _names is not null && _names.Any(static i => AnsiColorCodes.HasAnsiCode(i));
+
+        internal LogLevelNames WithoutAnsiColorCodes()
+        {
+            if (_names is null)
+                return this;
+
+            return new LogLevelNames(
+                AnsiColorCodes.RemoveAnsiCodes(Trace),
+                AnsiColorCodes.RemoveAnsiCodes(Debug),
+                AnsiColorCodes.RemoveAnsiCodes(Info),
+                AnsiColorCodes.RemoveAnsiCodes(Warn),
+                AnsiColorCodes.RemoveAnsiCodes(Error),
+                AnsiColorCodes.RemoveAnsiCodes(Fatal)
             );
         }
     }
+
+    /// <summary>
+    /// The log level ANSI color code to use for the <c>%levelColor</c> placeholder.
+    /// </summary>
+    public readonly struct LogLevelColorCodes
+    {
+        internal readonly LogLevelNames Values;
+
+        /// <summary>
+        /// Creates a new instance of <see cref="LogLevelColors"/> with foreground colors from <see cref="ConsoleColor"/>.
+        /// </summary>
+        public LogLevelColorCodes(ConsoleColor trace, ConsoleColor debug, ConsoleColor info, ConsoleColor warn, ConsoleColor error, ConsoleColor fatal)
+            : this(
+                AnsiColorCodes.GetForegroundColorCode(trace),
+                AnsiColorCodes.GetForegroundColorCode(debug),
+                AnsiColorCodes.GetForegroundColorCode(info),
+                AnsiColorCodes.GetForegroundColorCode(warn),
+                AnsiColorCodes.GetForegroundColorCode(error),
+                AnsiColorCodes.GetForegroundColorCode(fatal)
+            )
+        {
+        }
+
+        /// <summary>
+        /// Creates a new instance of <see cref="LogLevelColors"/> with foreground and background colors from <see cref="ConsoleColor"/>.
+        /// </summary>
+        public LogLevelColorCodes(ConsoleColor traceForeground, ConsoleColor traceBackground,
+                                  ConsoleColor debugForeground, ConsoleColor debugBackground,
+                                  ConsoleColor infoForeground, ConsoleColor infoBackground,
+                                  ConsoleColor warnForeground, ConsoleColor warnBackground,
+                                  ConsoleColor errorForeground, ConsoleColor errorBackground,
+                                  ConsoleColor fatalForeground, ConsoleColor fatalBackground)
+            : this(
+                AnsiColorCodes.GetForegroundColorCode(traceForeground) + AnsiColorCodes.GetBackgroundColorCode(traceBackground),
+                AnsiColorCodes.GetForegroundColorCode(debugForeground) + AnsiColorCodes.GetBackgroundColorCode(debugBackground),
+                AnsiColorCodes.GetForegroundColorCode(infoForeground) + AnsiColorCodes.GetBackgroundColorCode(infoBackground),
+                AnsiColorCodes.GetForegroundColorCode(warnForeground) + AnsiColorCodes.GetBackgroundColorCode(warnBackground),
+                AnsiColorCodes.GetForegroundColorCode(errorForeground) + AnsiColorCodes.GetBackgroundColorCode(errorBackground),
+                AnsiColorCodes.GetForegroundColorCode(fatalForeground) + AnsiColorCodes.GetBackgroundColorCode(fatalBackground)
+            )
+        {
+        }
+
+        /// <summary>
+        /// Creates a new instance of <see cref="LogLevelColors"/> with custom ANSI codes.
+        /// </summary>
+        public LogLevelColorCodes(string trace, string debug, string info, string warn, string error, string fatal)
+            : this(new LogLevelNames(trace, debug, info, warn, error, fatal))
+        {
+        }
+
+        private LogLevelColorCodes(LogLevelNames values)
+            => Values = values;
+
+        /// <summary>
+        /// Returns the code to use for the given log level.
+        /// </summary>
+        public string this[LogLevel level]
+            => Values[level];
+
+        internal LogLevelColorCodes WithoutAnsiColorCodes()
+            => new(Values.WithoutAnsiColorCodes());
+    }
+
+    /// <summary>
+    /// Marks a parameter as a pattern string for compile-time validation.
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Property)]
+    public sealed class PatternAttribute : Attribute;
 }

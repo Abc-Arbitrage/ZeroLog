@@ -3,6 +3,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Operations;
+using ZeroLog.Analyzers.Support;
 using ZeroLog.Formatting;
 
 namespace ZeroLog.Analyzers;
@@ -31,40 +32,72 @@ public class PatternAnalyzer : DiagnosticAnalyzer
         context.RegisterCompilationStartAction(AnalyzeCompilationStart);
     }
 
-    private static void AnalyzeCompilationStart(CompilationStartAnalysisContext compilationStartContext)
+    private static void AnalyzeCompilationStart(CompilationStartAnalysisContext context)
     {
-        var compilation = (CSharpCompilation)compilationStartContext.Compilation;
+        var compilation = (CSharpCompilation)context.Compilation;
 
-        if (compilation.GetTypeByMetadataName(ZeroLogFacts.TypeNames.PatternWriter)?.InstanceConstructors is [{ } patternWriterConstructor])
+        var patternAttributeType = compilation.GetTypeByMetadataName(typeof(PatternWriter.PatternAttribute).FullName!);
+        if (patternAttributeType is null)
+            return;
+
+        context.RegisterOperationAction(
+            i => Analyze(ref i, patternAttributeType),
+            OperationKind.Argument, OperationKind.SimpleAssignment
+        );
+    }
+
+    private static void Analyze(ref OperationAnalysisContext context, INamedTypeSymbol patternAttributeType)
+    {
+        ILiteralOperation? literalOperation = null;
+
+        switch (context.Operation.Kind)
         {
-            compilationStartContext.RegisterOperationAction(
-                operationContext =>
-                {
-                    if (operationContext.Operation is IObjectCreationOperation { Constructor: { } constructor, Arguments: [{ Value.ConstantValue: { HasValue: true, Value: var pattern } } argument] }
-                        && SymbolEqualityComparer.Default.Equals(constructor, patternWriterConstructor)
-                        && !PatternWriter.IsValidPattern(pattern as string))
+            case OperationKind.Argument:
+            {
+                if (context.Operation is IArgumentOperation
                     {
-                        operationContext.ReportDiagnostic(Diagnostic.Create(InvalidPatternDiagnostic, argument.Syntax.GetLocation(), pattern ?? "null"));
+                        Value.Kind: OperationKind.Literal,
+                        Value: ILiteralOperation literal,
+                        Parameter: { Type.SpecialType: SpecialType.System_String } parameter
                     }
-                },
-                OperationKind.ObjectCreation
-            );
+                    && parameter.HasAttribute(patternAttributeType))
+                {
+                    literalOperation = literal;
+                }
+
+                break;
+            }
+
+            case OperationKind.SimpleAssignment:
+            {
+                if (context.Operation is ISimpleAssignmentOperation
+                    {
+                        Value.Kind: OperationKind.Literal,
+                        Value: ILiteralOperation literal,
+                        Target.Kind: OperationKind.PropertyReference,
+                        Target: IPropertyReferenceOperation
+                        {
+                            Property: { Type.SpecialType: SpecialType.System_String } property
+                        }
+                    }
+                    && property.HasAttribute(patternAttributeType))
+                {
+                    literalOperation = literal;
+                }
+
+                break;
+            }
+
+            default:
+            {
+                return;
+            }
         }
 
-        if (compilation.GetTypeByMetadataName(ZeroLogFacts.TypeNames.DefaultFormatter)?.GetMembers(ZeroLogFacts.PropertyNames.PrefixPattern) is [IPropertySymbol prefixPatternProperty])
+        if (literalOperation is { ConstantValue: { HasValue: true, Value: string pattern } }
+            && !PatternWriter.IsValidPattern(pattern))
         {
-            compilationStartContext.RegisterOperationAction(
-                operationContext =>
-                {
-                    if (operationContext.Operation is IAssignmentOperation { Value.ConstantValue: { HasValue: true, Value: var pattern }, Target: IPropertyReferenceOperation { Property: var assignedProperty } } assignmentOperation
-                        && SymbolEqualityComparer.Default.Equals(assignedProperty, prefixPatternProperty)
-                        && !PatternWriter.IsValidPattern(pattern as string))
-                    {
-                        operationContext.ReportDiagnostic(Diagnostic.Create(InvalidPatternDiagnostic, assignmentOperation.Value.Syntax.GetLocation(), pattern ?? "null"));
-                    }
-                },
-                OperationKind.SimpleAssignment
-            );
+            context.ReportDiagnostic(Diagnostic.Create(InvalidPatternDiagnostic, literalOperation.Syntax.GetLocation(), pattern));
         }
     }
 }

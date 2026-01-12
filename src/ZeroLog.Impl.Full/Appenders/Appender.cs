@@ -14,12 +14,23 @@ namespace ZeroLog.Appenders;
 public abstract class Appender : IDisposable
 {
     private readonly Stopwatch _quarantineStopwatch = new();
+    private bool _initialized;
     private bool _needsFlush;
 
     /// <summary>
     /// The minimum log level of messages this appender should handle.
     /// </summary>
     public LogLevel Level { get; init; }
+
+    /// <summary>
+    /// Initializes the appender before writing the first message.
+    /// </summary>
+    /// <remarks>
+    /// Appenders will be initialized a single time by ZeroLog, even if used multiple times.
+    /// </remarks>
+    public virtual void Initialize()
+    {
+    }
 
     /// <summary>
     /// Handles a logged message.
@@ -40,6 +51,22 @@ public abstract class Appender : IDisposable
     /// <inheritdoc cref="IDisposable.Dispose"/>
     public virtual void Dispose()
     {
+    }
+
+    internal void InternalInitialize()
+    {
+        try
+        {
+            if (_initialized)
+                return;
+
+            _initialized = true;
+            Initialize();
+        }
+        catch (Exception ex)
+        {
+            LogManager.ReportInternalError("Failed to initialize appender", ex);
+        }
     }
 
     internal void InternalWriteMessage(LoggedMessage message, ZeroLogConfiguration config)

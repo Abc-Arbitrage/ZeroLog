@@ -40,10 +40,25 @@ public class DocumentationTests
 
         var xmlFilePath = Path.ChangeExtension(typeof(LogManager).Assembly.Location, ".xml");
         var members = XDocument.Load(xmlFilePath).Root!.Element("members")!.Elements("member");
-        var membersDict = members.ToDictionary(i => i.Attribute("name")!.Value, i => i);
+        var membersDict = members.Select(i => (key: i.Attribute("name")!.Value, elem: i))
+                                 .Where(i => FilterKey(i.key))
+                                 .ToDictionary(i => i.key, i => i.elem);
+
+        membersDict.Remove("P:System.Text.RegularExpressions.Generated.Utilities.WordCharBitmap");
 
         _members ??= membersDict;
         return _members;
+
+        static bool FilterKey(string key)
+        {
+            if (key.EndsWith("Regex"))
+                return false;
+
+            if (key.StartsWith("P:System"))
+                return false;
+
+            return true;
+        }
     }
 
     private static IEnumerable<ITestCaseData> GetDocumentedMembers()

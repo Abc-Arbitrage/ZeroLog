@@ -17,24 +17,54 @@ namespace ZeroLog.Formatting;
 /// </remarks>
 public sealed class DefaultFormatter : Formatter
 {
-    private static readonly PatternWriter _defaultPrefixWriter = new("%time - %level - %logger || ");
-
-    private readonly PatternWriter? _prefixWriter = _defaultPrefixWriter;
+    /// <summary>
+    /// The writer used for the start of the message.
+    /// </summary>
+    /// <seealso cref="PrefixPattern"/>
+    public PatternWriter MessagePatternWriter { get; init; }
 
     /// <summary>
-    /// The message prefix pattern. This is logged before the message text.
+    /// The message prefix pattern. Use <see cref="MessagePatternWriter"/> for more customization.
     /// </summary>
     /// <inheritdoc cref="PatternWriter" path="/remarks" />
+    /// <seealso cref="MessagePatternWriter"/>
+    [PatternWriter.Pattern]
     public string PrefixPattern
     {
-        get => _prefixWriter?.Pattern ?? string.Empty;
-        init => _prefixWriter = !string.IsNullOrEmpty(value) ? new PatternWriter(value) : null;
+        get => MessagePatternWriter.Pattern;
+        init => MessagePatternWriter = new PatternWriter(value);
     }
 
     /// <summary>
     /// The separator to write before the JSON metadata.
     /// </summary>
     public string JsonSeparator { get; init; } = " ~~ ";
+
+    /// <summary>
+    /// Initializes a new instance of the default formatter, with the default pattern.
+    /// </summary>
+    public DefaultFormatter()
+        : this(((DefaultFormatter)DefaultStyle.NoColor.Default.Formatter).MessagePatternWriter)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the default formatter with a custom pattern.
+    /// </summary>
+    /// <inheritdoc cref="PatternWriter" path="/remarks" />
+    /// <seealso cref="MessagePatternWriter"/>
+    public DefaultFormatter([PatternWriter.Pattern] string pattern)
+        : this(new PatternWriter(pattern))
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the default formatter with a custom pattern writer.
+    /// </summary>
+    public DefaultFormatter(PatternWriter writer)
+    {
+        MessagePatternWriter = writer;
+    }
 
     /// <inheritdoc cref="PatternWriter.EscapePattern"/>
     public static string EscapePlaceholders(string? value)
@@ -43,8 +73,10 @@ public sealed class DefaultFormatter : Formatter
     /// <inheritdoc/>
     protected override void WriteMessage(LoggedMessage message)
     {
-        Write(message, _prefixWriter);
-        Write(message.Message);
+        Write(message, MessagePatternWriter);
+
+        if (!MessagePatternWriter.HasMessage) // For backwards compatibility
+            Write(message.Message);
 
         if (message.KeyValues.Count != 0)
         {
@@ -52,12 +84,39 @@ public sealed class DefaultFormatter : Formatter
             Write(message.KeyValues);
         }
 
-        WriteLine();
-
         if (message.Exception != null)
         {
+            WriteLine();
+
+            if (MessagePatternWriter.HasAnsiCodes)
+                Write(AnsiColorCodes.ForegroundBrightRed);
+
             // This allocates, but there's no better way to get the details.
-            WriteLine(message.Exception.ToString());
+            Write(message.Exception.ToString());
         }
+
+        if (MessagePatternWriter.HasAnsiCodes)
+            Write(AnsiColorCodes.Reset);
+
+        WriteLine();
     }
+
+    /// <summary>
+    /// Returns this formatter with any ANSI color codes removed.
+    /// </summary>
+    public DefaultFormatter WithoutAnsiColorCodes()
+    {
+        if (!MessagePatternWriter.HasAnsiCodes && !AnsiColorCodes.HasAnsiCode(JsonSeparator))
+            return this;
+
+        return new DefaultFormatter
+        {
+            MessagePatternWriter = MessagePatternWriter.WithoutAnsiColorCodes(),
+            JsonSeparator = AnsiColorCodes.RemoveAnsiCodes(JsonSeparator)
+        };
+    }
+
+    /// <inheritdoc/>
+    public override string ToString()
+        => PrefixPattern;
 }

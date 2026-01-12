@@ -29,6 +29,8 @@ partial class LogManager : IDisposable
     /// </remarks>
     public static ZeroLogConfiguration? Configuration => _staticLogManager?._userConfig;
 
+    internal static bool IgnoreInternalErrors { get; set; }
+
     private LogManager(ZeroLogConfiguration config)
     {
         _userConfig = config;
@@ -226,4 +228,22 @@ partial class LogManager : IDisposable
 
     internal void WaitUntilNewConfigurationIsApplied() // For unit tests
         => _runner?.WaitUntilNewConfigurationIsApplied();
+
+    internal static void ReportInternalError(string message, Exception? exception)
+    {
+        if (IgnoreInternalErrors)
+            return;
+
+        try
+        {
+            Console.Error.WriteLine(message);
+
+            if (exception is not null)
+                Console.Error.WriteLine(exception);
+        }
+        catch
+        {
+            // Do not cause any side effects (e.g. ex.ToString() could throw).
+        }
+    }
 }
