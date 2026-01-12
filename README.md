@@ -126,7 +126,7 @@ Several appenders are provided by default, such as `ConsoleAppener` or `DateAndS
 
 #### Formatters
 
-The output format of the built-in appenders may be customized through the `Formatter` property, which controls how the message metadata is formatted. A `DefaultFormatter` is provided, which prefixes the logged message with a customizable pattern, and suffixes it with the structured data as JSON.
+The output format of the built-in appenders may be customized through the `Formatter` property, which controls how the message metadata is formatted. A `DefaultFormatter` is provided, which uses a customizable pattern to control how the message should be displayed, and suffixes it with the structured data as JSON.
 
 The pattern is a string with the following placeholders:
 
@@ -152,6 +152,8 @@ The pattern is a string with the following placeholders:
 | `%%`                | Inserts a single `%` character (escaping)                        |                                                            | 
 
 Patterns can be written in the form `%{field}` or `%{field:format}` to define a format string. String placeholders accept an integer format string which defines their minimum length. For instance, `%{logger:20}` will always be at least 20 characters wide.
+
+A few default patterns are provided. You can run the `ZeroLog.Examples` project to preview them, or write your own. You can also write your own `Formatter`, as shown in the same project.
 
 ### Loggers
 

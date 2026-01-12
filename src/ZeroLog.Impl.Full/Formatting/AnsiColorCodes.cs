@@ -53,14 +53,14 @@ internal static partial class AnsiColorCodes
     public static bool UseByDefault { get; } = !Console.IsOutputRedirected && string.IsNullOrEmpty(Environment.GetEnvironmentVariable("NO_COLOR"));
 
     // lang=regex
-    private const string _asciiColorsRegexPattern = """\e\[[0-9;]*m""";
-    private const RegexOptions _asciiColorsRegexOptions = RegexOptions.CultureInvariant | RegexOptions.Singleline;
+    private const string _ansiColorsRegexPattern = """\e\[[0-9;]*m""";
+    private const RegexOptions _ansiColorsRegexOptions = RegexOptions.CultureInvariant | RegexOptions.Singleline;
 
 #if NET7_0_OR_GREATER
-    [GeneratedRegex(_asciiColorsRegexPattern, _asciiColorsRegexOptions)]
+    [GeneratedRegex(_ansiColorsRegexPattern, _ansiColorsRegexOptions)]
     private static partial Regex AnsiColorsRegex();
 #else
-    private static readonly Regex _ansiColorsRegex = new(_asciiColorsRegexPattern, RegexOptions.Compiled | _asciiColorsRegexOptions);
+    private static readonly Regex _ansiColorsRegex = new(_ansiColorsRegexPattern, RegexOptions.Compiled | _ansiColorsRegexOptions);
     private static Regex AnsiColorsRegex() => _ansiColorsRegex;
 #endif
 
