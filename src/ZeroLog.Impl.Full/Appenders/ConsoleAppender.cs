@@ -25,16 +25,16 @@ public class ConsoleAppender : StreamAppender
         Encoding = Console.OutputEncoding;
         ColorOutput = AnsiColorCodes.UseByDefault;
 
-        Formatter = DefaultStyle.Colored.Highlighted.Formatter;
+        Formatter = DefaultStyle.Colored.Default.Formatter;
     }
 
     /// <summary>
     /// Initializes a new instance of the console appender from one of the default styles.
     /// </summary>
-    public ConsoleAppender(DefaultStyle defaultStyle)
+    public ConsoleAppender(DefaultStyle style)
         : this()
     {
-        Formatter = defaultStyle.Formatter;
+        Formatter = style.Formatter;
     }
 
     /// <inheritdoc/>

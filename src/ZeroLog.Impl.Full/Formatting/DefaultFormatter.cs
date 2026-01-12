@@ -44,13 +44,15 @@ public sealed class DefaultFormatter : Formatter
     /// Initializes a new instance of the default formatter, with the default pattern.
     /// </summary>
     public DefaultFormatter()
-        : this(((DefaultFormatter)DefaultStyle.NoColor.Simple.Formatter).MessagePatternWriter)
+        : this(((DefaultFormatter)DefaultStyle.NoColor.Default.Formatter).MessagePatternWriter)
     {
     }
 
     /// <summary>
     /// Initializes a new instance of the default formatter with a custom pattern.
     /// </summary>
+    /// <inheritdoc cref="PatternWriter" path="/remarks" />
+    /// <seealso cref="MessagePatternWriter"/>
     public DefaultFormatter([PatternWriter.Pattern] string pattern)
         : this(new PatternWriter(pattern))
     {
@@ -99,7 +101,10 @@ public sealed class DefaultFormatter : Formatter
         WriteLine();
     }
 
-    internal DefaultFormatter WithoutAnsiColorCodes()
+    /// <summary>
+    /// Returns this formatter with any ANSI color codes removed.
+    /// </summary>
+    public DefaultFormatter WithoutAnsiColorCodes()
     {
         if (!MessagePatternWriter.HasAnsiCodes && !AnsiColorCodes.HasAnsiCode(JsonSeparator))
             return this;

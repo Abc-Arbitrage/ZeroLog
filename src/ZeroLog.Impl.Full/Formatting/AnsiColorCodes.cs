@@ -10,6 +10,7 @@ internal static partial class AnsiColorCodes
 {
     public const string Reset = "\e[0m";
     public const string Bold = "\e[1m";
+    public const string DefaultForeground = "\e[39m";
 
     // https://en.wikipedia.org/wiki/ANSI_escape_code#Colors
 

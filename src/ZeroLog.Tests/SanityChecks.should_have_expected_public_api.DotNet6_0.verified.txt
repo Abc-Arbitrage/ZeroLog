@@ -12,7 +12,7 @@
     public class ConsoleAppender : ZeroLog.Appenders.StreamAppender
     {
         public ConsoleAppender() { }
-        public ConsoleAppender(ZeroLog.Formatting.DefaultStyle defaultStyle) { }
+        public ConsoleAppender(ZeroLog.Formatting.DefaultStyle style) { }
         public bool ColorOutput { get; init; }
         public override void Initialize() { }
     }
@@ -135,6 +135,7 @@ namespace ZeroLog.Formatting
         public ZeroLog.Formatting.PatternWriter MessagePatternWriter { get; init; }
         public string PrefixPattern { get; init; }
         public override string ToString() { }
+        public ZeroLog.Formatting.DefaultFormatter WithoutAnsiColorCodes() { }
         protected override void WriteMessage(ZeroLog.Formatting.LoggedMessage message) { }
         public static string EscapePlaceholders(string? value) { }
     }

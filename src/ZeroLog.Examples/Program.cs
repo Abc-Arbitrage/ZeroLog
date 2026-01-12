@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using ZeroLog.Appenders;
 using ZeroLog.Configuration;
 using ZeroLog.Formatting;
@@ -8,11 +9,15 @@ namespace ZeroLog.Examples;
 internal static class Program
 {
     private static readonly Log _log = LogManager.GetLogger(typeof(Program));
+    private static readonly Log _logOther = LogManager.GetLogger(typeof(Program).FullName + ".SomeOtherLog");
+
     private static readonly ConsoleAppender _appender = new() { ColorOutput = true };
 
     public static void Main()
     {
         Console.OutputEncoding = System.Text.Encoding.UTF8;
+        Thread.CurrentThread.Name = "Main thread";
+
         using var session = InitializeLogManager();
         Utils.WriteHeader();
 
@@ -66,10 +71,20 @@ internal static class Program
             MessagePatternWriter = new PatternWriter("%resetColor%level %{localDate:HH:mm}\e[90m%{localDate::ss.ffff} %levelColor\e[1m%message%{column:50}\e[0;90m from %loggerCompact")
             {
                 LogLevels = new PatternWriter.LogLevelNames(
-                    "🔎", "🐛", "ℹ️", "⚠️", "❌", "💀"
+                    "🔎",
+                    "🐛",
+                    "ℹ️",
+                    "⚠️",
+                    "❌",
+                    "💀"
                 ),
                 LogLevelColors = new PatternWriter.LogLevelColorCodes(
-                    ConsoleColor.Gray, ConsoleColor.DarkGray, ConsoleColor.Blue, ConsoleColor.DarkYellow, ConsoleColor.DarkRed, ConsoleColor.Magenta
+                    ConsoleColor.Gray,
+                    ConsoleColor.DarkGray,
+                    ConsoleColor.Blue,
+                    ConsoleColor.DarkYellow,
+                    ConsoleColor.DarkRed,
+                    ConsoleColor.Magenta
                 )
             },
             JsonSeparator = " with data: "
@@ -91,7 +106,7 @@ internal static class Program
         _log.Trace().Append("Example trace message").AppendKeyValue("Foo", "Bar").Log();
         _log.Debug().Append("Example debug message").AppendKeyValue("Foo", "Bar").AppendKeyValue("Hello", "World").Log();
         _log.Info().Append("Example information message").AppendKeyValue("Foo", "Bar").Log();
-        _log.Warn().Append("Example warning message").AppendKeyValue("Foo", "Bar").Log();
+        _logOther.Warn().Append("Example warning message").AppendKeyValue("Foo", "Bar").Log();
         _log.Error().Append("Example error message").AppendKeyValue("Foo", "Bar").Log();
         _log.Fatal().Append("Example fatal message").AppendKeyValue("Foo", "Bar").Log();
 
@@ -104,7 +119,12 @@ internal static class Program
     private sealed class CustomFormatter : Formatter
     {
         private static readonly PatternWriter.LogLevelNames _levelIcons = new(
-            "🔎", "🐛", "ℹ️", "⚠️", "❌", "💀"
+            "🔎",
+            "🐛",
+            "ℹ️",
+            "⚠️",
+            "❌",
+            "💀"
         );
 
         protected override void WriteMessage(LoggedMessage message)
