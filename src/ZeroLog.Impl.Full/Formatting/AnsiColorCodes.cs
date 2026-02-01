@@ -129,4 +129,115 @@ internal static partial class AnsiColorCodes
             _ => ""
         };
     }
+
+    internal static bool TryParseSgrCode(string? input, out int value)
+    {
+        if (string.IsNullOrWhiteSpace(input))
+        {
+            value = 0;
+            return false;
+        }
+
+        input = NormalizeInput(input);
+
+        if (byte.TryParse(input, out var byteValue))
+        {
+            value = byteValue;
+            return true;
+        }
+
+        if (Enum.TryParse<SgrCode>(input, true, out var sgrCode))
+        {
+            value = (int)sgrCode;
+            return true;
+        }
+
+        var colorTypeOffset = GetColorTypeOffset(input, out var colorInputWithoutPrefix);
+        if (Enum.TryParse<ColorOffset>(colorInputWithoutPrefix, true, out var colorOffset))
+        {
+            value = (int)colorTypeOffset + (int)colorOffset;
+            return true;
+        }
+
+        value = 0;
+        return false;
+
+        static string NormalizeInput(string? input)
+            => input?.Replace(" ", "").ToLowerInvariant() ?? string.Empty;
+
+        static ColorTypeOffset GetColorTypeOffset(string input, out string inputWithoutPrefix)
+        {
+            var background = !Prefix("foreground") && !Prefix("fg") && (Prefix("background") || Prefix("bg"));
+            var bright = !Prefix("dark") && Prefix("bright");
+
+            inputWithoutPrefix = input;
+
+            return (background, bright) switch
+            {
+                (false, false) => ColorTypeOffset.Foreground,
+                (false, true)  => ColorTypeOffset.ForegroundBright,
+                (true, false)  => ColorTypeOffset.Background,
+                (true, true)   => ColorTypeOffset.BackgroundBright,
+            };
+
+            bool Prefix(string prefix)
+            {
+                if (!input.StartsWith(prefix))
+                    return false;
+
+                input = input.Substring(prefix.Length);
+                return true;
+            }
+        }
+    }
+
+    [SuppressMessage("ReSharper", "UnusedMember.Local")]
+    private enum SgrCode
+    {
+        Reset = 0,
+        Normal = 0,
+        Bold = 1,
+        Faint = 2,
+        Dim = 2,
+        Italic = 3,
+        Underline = 4,
+        Blink = 5,
+        Invert = 7,
+        Reversed = 7,
+        Conceal = 8,
+        Hide = 8,
+        CrossedOut = 9,
+        Strike = 9,
+        DoublyUnderlined = 21,
+        NormalIntensity = 22,
+        NotItalic = 23,
+        NotUnderlined = 24,
+        NotBlinking = 25,
+        NotReversed = 27,
+        Reveal = 28,
+        NotCrossedOut = 29,
+        DefaultForeground = 39,
+        DefaultBackground = 49,
+    }
+
+    private enum ColorTypeOffset
+    {
+        Foreground = 30,
+        Background = 40,
+        ForegroundBright = 90,
+        BackgroundBright = 100,
+    }
+
+    [SuppressMessage("ReSharper", "UnusedMember.Local")]
+    private enum ColorOffset
+    {
+        Black = 0,
+        Red = 1,
+        Green = 2,
+        Yellow = 3,
+        Blue = 4,
+        Magenta = 5,
+        Cyan = 6,
+        White = 7
+    }
 }
