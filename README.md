@@ -140,7 +140,7 @@ The pattern is a string with the following placeholders:
 | `%threadId`         | The thread ID which logged the message                           |                                                            |
 | `%threadName`       | The thread name which logged the message, or an empty string     |                                                            |
 | `%level`            | The log level (default: a short uppercase label)                 | `pad` makes eack level the same length                     |
-| `%levelColor`       | The ANSI color code associated to the log lavel                  |                                                            |
+| `%levelColor`       | The ANSI color code associated to the log level                  |                                                            |
 | `%logger`           | The logger name                                                  |                                                            | 
 | `%loggerCompact`    | The logger name, with the namespace shortened to its initials    |                                                            | 
 | `%message`          | The logged message                                               |                                                            | 
