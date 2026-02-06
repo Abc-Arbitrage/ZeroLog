@@ -1,6 +1,5 @@
 namespace ZeroLog.Formatting;
 
-using C = AnsiColorCodes;
 using D = DefaultStyle.Defaults;
 
 /// <summary>
@@ -112,37 +111,39 @@ public sealed class DefaultStyle
         public const string NameError = "ERROR";
         public const string NameFatal = "FATAL";
 
-        private static readonly C.Code _codeTrace = (C.ColorType.ForegroundBright, C.Color.Black);
-        private static readonly C.Code _codeDebug = C.Attribute.DefaultForeground;
-        private static readonly C.Code _codeInfo = (C.ColorType.ForegroundBright, C.Color.White);
-        private static readonly C.Code _codeWarn = (C.ColorType.ForegroundBright, C.Color.Yellow);
-        private static readonly C.Code _codeError = (C.ColorType.ForegroundBright, C.Color.Red);
-        private static readonly C.Code _codeFatal = (C.ColorType.ForegroundBright, C.Color.Magenta);
+        public const string ColorTrace = "%{sgr:gray}";
+        public const string ColorDebug = "%{sgr:default foreground}";
+        public const string ColorInfo = "%{sgr:bright white}";
+        public const string ColorWarn = "%{sgr:bright yellow}";
+        public const string ColorError = "%{sgr:bright red}";
+        public const string ColorFatal = "%{sgr:bright magenta}";
 
-        public static readonly string DarkTimestamp = C.SGR(C.ColorType.ForegroundBright, C.Color.Black);
-        public static readonly string Logger = C.SGR(C.ColorType.ForegroundBright, C.Color.Blue);
-        public static readonly string HighlightedMessage = C.SGR(C.Attribute.Bold, (C.ColorType.ForegroundBright, C.Color.White));
-        public static readonly string Exception = C.SGR(C.ColorType.ForegroundBright, C.Color.Red);
+        public const string DarkTimestamp = "%{sgr:gray}";
+        public const string Logger = "%{sgr:bright blue}";
+        public const string HighlightedMessage = "%{sgr:bold, bright white}";
 
         public static readonly PatternWriter.LogLevelNames LogLevelNames = new(NameTrace, NameDebug, NameInfo, NameWarn, NameError, NameFatal);
-        public static readonly PatternWriter.LogLevelColorCodes LogLevelColorCodes = new(C.SGR(_codeTrace), C.SGR(_codeDebug), C.SGR(_codeInfo), C.SGR(_codeWarn), C.SGR(_codeError), C.SGR(_codeFatal));
+        public static readonly PatternWriter.LogLevelColorCodes LogLevelColorCodes = new(ColorTrace, ColorDebug, ColorInfo, ColorWarn, ColorError, ColorFatal);
 
         public static readonly PatternWriter.LogLevelNames BoldLogLevelNames = new(
-            $"{C.SGR(_codeTrace)}{NameTrace}",
-            $"{C.SGR(C.Attribute.Bold, _codeDebug)}{NameDebug}",
-            $"{C.SGR(C.Attribute.Bold, _codeInfo)}{NameInfo}",
-            $"{C.SGR(C.Attribute.Bold, _codeWarn)}{NameWarn}",
-            $"{C.SGR(C.Attribute.Bold, _codeError)}{NameError}",
-            $"{C.SGR(C.Attribute.Bold, _codeFatal)}{NameFatal}"
+            $"{ColorTrace}{NameTrace}",
+            $"{Bold(ColorDebug)}{NameDebug}",
+            $"{Bold(ColorInfo)}{NameInfo}",
+            $"{Bold(ColorWarn)}{NameWarn}",
+            $"{Bold(ColorError)}{NameError}",
+            $"{Bold(ColorFatal)}{NameFatal}"
         );
 
         public static readonly PatternWriter.LogLevelColorCodes BoldLogLevelColorCodes = new(
-            $"{C.SGR(_codeTrace)}",
-            $"{C.SGR(_codeDebug)}",
-            $"{C.SGR(C.Attribute.Bold, _codeInfo)}",
-            $"{C.SGR(C.Attribute.Bold, _codeWarn)}",
-            $"{C.SGR(C.Attribute.Bold, _codeError)}",
-            $"{C.SGR(C.Attribute.Bold, _codeFatal)}"
+            $"{ColorTrace}",
+            $"{ColorDebug}",
+            $"{Bold(ColorInfo)}",
+            $"{Bold(ColorWarn)}",
+            $"{Bold(ColorError)}",
+            $"{Bold(ColorFatal)}"
         );
+
+        private static string Bold(string placeholder)
+            => placeholder.Replace("%{sgr:", "%{sgr:bold,");
     }
 }

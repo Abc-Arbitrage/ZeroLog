@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
@@ -6,6 +7,7 @@ using System.Text.RegularExpressions;
 
 namespace ZeroLog.Formatting;
 
+[SuppressMessage("ReSharper", "InconsistentNaming")]
 [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
 internal static partial class AnsiColorCodes
 {
@@ -41,15 +43,12 @@ internal static partial class AnsiColorCodes
         return new StringInfo(RemoveAnsiCodes(input)).LengthInTextElements;
     }
 
-    [SuppressMessage("ReSharper", "InconsistentNaming")]
-    public static string SGR(params Code[] codes)
+    public static string SGR(params IEnumerable<Code> codes)
         => $"\e[{string.Join(";", codes.Select(i => i.Value))}m";
 
-    [SuppressMessage("ReSharper", "InconsistentNaming")]
     public static string SGR(ColorType colorType, Color color)
         => SGR((colorType, color));
 
-    [SuppressMessage("ReSharper", "InconsistentNaming")]
     public static string SGR(ConsoleColor foreground, ConsoleColor? background = null)
     {
         return background is null
@@ -69,7 +68,7 @@ internal static partial class AnsiColorCodes
                 ConsoleColor.DarkCyan    => Get(Color.Cyan, false),
                 ConsoleColor.DarkGray    => Get(Color.White, false),
 
-                ConsoleColor.Gray    => Get(Color.Gray, true),
+                ConsoleColor.Gray    => Get(Color.Black, true),
                 ConsoleColor.Red     => Get(Color.Red, true),
                 ConsoleColor.Green   => Get(Color.Green, true),
                 ConsoleColor.Yellow  => Get(Color.Yellow, true),
@@ -85,34 +84,68 @@ internal static partial class AnsiColorCodes
         }
     }
 
-    internal static bool TryParseSgrCode(string? input, out Code value)
+    public static bool TryParseSGR(string? input, out string result)
     {
         if (input is null or "")
+            goto invalid;
+
+        var codes = new List<Code>();
+
+        foreach (var part in input.Split([',', ';'], StringSplitOptions.RemoveEmptyEntries))
         {
-            value = default;
-            return false;
+            if (!TryParseSGRCode(part, out var code))
+                goto invalid;
+
+            codes.Add(code);
         }
 
-        var parts = input.Trim().ToLowerInvariant().Split([" "], StringSplitOptions.RemoveEmptyEntries);
+        if (codes.Count == 0)
+            goto invalid;
 
-        if (parts is [var singlePart])
+        result = SGR(codes);
+        return true;
+
+        invalid:
+        result = string.Empty;
+        return false;
+    }
+
+    internal static bool TryParseSGRCode(string? input, out Code result)
+    {
+        if (input is null or "")
+            goto invalid;
+
+        var parts = input.Trim().ToLowerInvariant().Split([" "], StringSplitOptions.RemoveEmptyEntries).ToList();
+
+        switch (parts)
         {
-            if (byte.TryParse(singlePart, out var byteValue))
-            {
-                value = new Code(byteValue);
+            case ["default"]:
+                result = Attribute.Reset;
                 return true;
-            }
 
-            if (Enum.TryParse<Attribute>(singlePart, true, out var attribute))
-            {
-                value = attribute;
+            case [var singlePart] when byte.TryParse(singlePart, out var byteValue):
+                result = new Code(byteValue);
                 return true;
-            }
+
+            case [var singlePart] when Enum.TryParse<Attribute>(singlePart, true, out var attribute):
+                result = attribute;
+                return true;
+
+            case [..] when Enum.TryParse<Attribute>(string.Join("", parts), true, out var attribute):
+                result = attribute;
+                return true;
+
+            // "bright black" sounds so stupid, give it a better alias
+            case [..] when parts.IndexOf("gray") is >= 0 and var index:
+                parts.RemoveAt(index);
+                parts.AddRange(["bright", "black"]);
+                break;
         }
 
         bool? bright = null;
         bool? foreground = null;
         Color? color = null;
+        var defaultKeyword = false;
 
         foreach (var part in parts)
         {
@@ -148,6 +181,13 @@ internal static partial class AnsiColorCodes
                     foreground = false;
                     break;
 
+                case "default":
+                    if (defaultKeyword)
+                        goto invalid;
+
+                    defaultKeyword = true;
+                    break;
+
                 default:
                     if (color is not null)
                         goto invalid;
@@ -160,15 +200,24 @@ internal static partial class AnsiColorCodes
             }
         }
 
+        if (defaultKeyword)
+        {
+            if (foreground is null || color is not null || bright is not null)
+                goto invalid;
+
+            result = foreground.GetValueOrDefault() ? Attribute.DefaultForeground : Attribute.DefaultBackground;
+            return true;
+        }
+
         if (color is null)
             goto invalid;
 
         var colorType = GetColorType(foreground ?? true, bright ?? false);
-        value = Combine(colorType, color.GetValueOrDefault());
+        result = Combine(colorType, color.GetValueOrDefault());
         return true;
 
         invalid:
-        value = default;
+        result = default;
         return false;
     }
 
@@ -231,10 +280,7 @@ internal static partial class AnsiColorCodes
         Blue = 4,
         Magenta = 5,
         Cyan = 6,
-        White = 7,
-
-        // Alias
-        Gray = Black
+        White = 7
     }
 
     public readonly struct Code(byte value)

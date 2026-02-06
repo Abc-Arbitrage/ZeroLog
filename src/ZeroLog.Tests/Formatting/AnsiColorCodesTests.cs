@@ -32,6 +32,8 @@ public class AnsiColorCodesTests
     [Test]
     [TestCase("reset", 0)]
     [TestCase(" reset ", 0)]
+    [TestCase("normal", 0)]
+    [TestCase("default", 0)]
     [TestCase("bold", 1)]
     [TestCase("red", 31)]
     [TestCase("blue", 34)]
@@ -50,9 +52,15 @@ public class AnsiColorCodesTests
     [TestCase("bg blue", 44)]
     [TestCase("bg dark blue", 44)]
     [TestCase("bg bright blue", 104)]
+    [TestCase("default foreground", 39)]
+    [TestCase("default bg", 49)]
+    [TestCase("bold", 1)]
+    [TestCase("not italic", 23)]
+    [TestCase("gray", 90)]
+    [TestCase("gray bg", 100)]
     public void should_parse_sgr_codes(string input, byte expectedResult)
     {
-        AnsiColorCodes.TryParseSgrCode(input, out var result).ShouldBeTrue();
+        AnsiColorCodes.TryParseSGRCode(input, out var result).ShouldBeTrue();
         result.Value.ShouldEqual(expectedResult);
     }
 
@@ -72,6 +80,11 @@ public class AnsiColorCodesTests
     [TestCase("background foreground")]
     [TestCase("red blue")]
     [TestCase("reversed blue")]
+    [TestCase("default blue foreground")]
+    [TestCase("default blue")]
+    [TestCase("default bright")]
+    [TestCase("default default")]
+    [TestCase("gray gray")]
     public void should_not_parse_sgr_codes(string input)
-        => AnsiColorCodes.TryParseSgrCode(input, out _).ShouldBeFalse();
+        => AnsiColorCodes.TryParseSGRCode(input, out _).ShouldBeFalse();
 }

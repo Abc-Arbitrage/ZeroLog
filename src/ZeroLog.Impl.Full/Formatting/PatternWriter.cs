@@ -31,6 +31,7 @@ namespace ZeroLog.Formatting;
 /// <item><term><c>%exceptionType</c></term><description>The exception type name, if any.</description></item>
 /// <item><term><c>%newline</c></term><description>Equivalent to <c>Environment.NewLine</c>.</description></item>
 /// <item><term><c>%column</c></term><description>Inserts padding spaces until the column index specified in the format string is reached.</description></item>
+/// <item><term><c>%sgr</c></term><description>An SGR ANSI code.</description></item>
 /// <item><term><c>%resetColor</c></term><description>The reset ANSI code.</description></item>
 /// <item><term><c>%%</c></term><description>Inserts a single '%' character (escaping).</description></item>
 /// </list>
@@ -46,14 +47,6 @@ namespace ZeroLog.Formatting;
 public sealed partial class PatternWriter
 {
     // NOTE: This class is immutable after initialization.
-
-#if NET
-    private static readonly LogLevelNames _defaultLogLevelNames = DefaultStyle.Defaults.LogLevelNames;
-    private static readonly LogLevelColorCodes _defaultLogLevelColorCodes = DefaultStyle.Defaults.LogLevelColorCodes;
-#else
-    private static readonly LogLevelNames _defaultLogLevelNames = default;
-    private static readonly LogLevelColorCodes _defaultLogLevelColorCodes = default;
-#endif
 
     // lang=regex
     private const string _placeholderRegexPattern =
@@ -78,6 +71,14 @@ public sealed partial class PatternWriter
 #else
     private static readonly Regex _placeholderRegex = new(_placeholderRegexPattern, RegexOptions.Compiled | _placeholderRegexOptions);
     private static Regex PlaceholderRegex() => _placeholderRegex;
+#endif
+
+#if NET
+    private static readonly LogLevelNames _defaultLogLevelNames = DefaultStyle.Defaults.LogLevelNames;
+    private static readonly LogLevelColorCodes _defaultLogLevelColorCodes = DefaultStyle.Defaults.LogLevelColorCodes;
+#else
+    private static readonly LogLevelNames _defaultLogLevelNames = default;
+    private static readonly LogLevelColorCodes _defaultLogLevelColorCodes = default;
 #endif
 
     private readonly PatternPart[] _parts;
@@ -210,6 +211,7 @@ public sealed partial class PatternWriter
                 "newline"          => new PatternPart(PatternPartType.NewLine, format),
                 "resetcolor"       => new PatternPart(PatternPartType.ResetColor, format),
                 "column"           => new PatternPart(PatternPartType.Column, format),
+                "sgr"              => new PatternPart(PatternPartType.SgrCode, format),
                 "%"                => new PatternPart("%"),
                 _                  => throw new FormatException($"Invalid placeholder type: %{placeholderType}")
             };
@@ -224,6 +226,9 @@ public sealed partial class PatternWriter
         if (position < pattern.Length)
             yield return new PatternPart(pattern.Substring(position, pattern.Length - position));
     }
+
+    private static string ConvertConstantPlaceholders(string? pattern)
+        => string.Join("", ParsePattern(pattern ?? string.Empty).Where(i => i.Type == PatternPartType.String).Select(i => i.Format));
 
     private static PatternPart ValidatePart(PatternPart part, string placeholderType)
     {
@@ -267,20 +272,31 @@ public sealed partial class PatternWriter
             }
 
             case PatternPartType.NewLine:
+            {
+                RequireFormat(false);
+                return new PatternPart(Environment.NewLine);
+            }
+
             case PatternPartType.ResetColor:
             {
-                if (part.Format is not null)
-                    throw new FormatException($"The %{placeholderType} placeholder does not support format strings.");
-
-                break;
+                RequireFormat(false);
+                return new PatternPart(AnsiColorCodes.Reset);
             }
 
             case PatternPartType.Column:
             {
-                if (part.Format is null)
-                    throw new FormatException($"The %{placeholderType} placeholder requires a format string.");
-
+                RequireFormat(true);
                 goto default;
+            }
+
+            case PatternPartType.SgrCode:
+            {
+                RequireFormat(true);
+
+                if (!AnsiColorCodes.TryParseSGR(part.Format, out var sgrCode))
+                    throw new FormatException($"Could not parse SGR field format: {part.Format}");
+
+                return new PatternPart(sgrCode);
             }
 
             default:
@@ -293,6 +309,18 @@ public sealed partial class PatternWriter
         }
 
         return part;
+
+        void RequireFormat(bool shouldHaveFormat)
+        {
+            switch (shouldHaveFormat)
+            {
+                case true when part.Format is null:
+                    throw new FormatException($"The %{placeholderType} placeholder requires a format string.");
+
+                case false when part.Format is not null:
+                    throw new FormatException($"The %{placeholderType} placeholder does not support format strings.");
+            }
+        }
     }
 
     private static IEnumerable<PatternPart> OptimizeParts(IEnumerable<PatternPart> parts)
@@ -305,14 +333,6 @@ public sealed partial class PatternWriter
             {
                 case PatternPartType.String:
                     sb.Append(part.Format);
-                    break;
-
-                case PatternPartType.NewLine:
-                    sb.Append(Environment.NewLine);
-                    break;
-
-                case PatternPartType.ResetColor:
-                    sb.Append(AnsiColorCodes.Reset);
                     break;
 
                 default:
@@ -553,7 +573,7 @@ public sealed partial class PatternWriter
 
     private bool EvaluateHasAnsiCodes()
         => AnsiColorCodes.HasAnsiCode(Pattern)
-           || _parts.Any(p => p.Type == PatternPartType.ResetColor)
+           || _parts.Any(p => p.Type is PatternPartType.SgrCode or PatternPartType.ResetColor)
            || _parts.Any(p => p.Type == PatternPartType.LevelColor) && LogLevelColors.Values.HasAnsiColorCodes()
            || _parts.Any(p => p.Type is PatternPartType.Level or PatternPartType.LevelPadded) && LogLevels.HasAnsiColorCodes();
 
@@ -564,7 +584,7 @@ public sealed partial class PatternWriter
     {
         var pattern = PlaceholderRegex().Replace(
             AnsiColorCodes.RemoveAnsiCodes(Pattern),
-            match => match.Groups["type"].Value.ToLowerInvariant() is "resetcolor" or "levelcolor"
+            match => match.Groups["type"].Value.ToLowerInvariant() is "resetcolor" or "levelcolor" or "sgr"
                 ? string.Empty
                 : match.Value
         );
@@ -597,6 +617,7 @@ public sealed partial class PatternWriter
         ExceptionType,
         NewLine,
         ResetColor,
+        SgrCode,
         Column
     }
 
@@ -659,7 +680,6 @@ public sealed partial class PatternWriter
         /// <summary>
         /// Creates a new instance of <see cref="LogLevelNames"/>.
         /// </summary>
-        [SuppressMessage("ReSharper", "NullCoalescingConditionIsAlwaysNotNullAccordingToAPIContract")]
         public LogLevelNames(string trace, string debug, string info, string warn, string error, string fatal)
         {
             _names = [trace, debug, info, warn, error, fatal];
@@ -667,7 +687,7 @@ public sealed partial class PatternWriter
 
             for (var i = 0; i < _names.Length; ++i)
             {
-                _names[i] ??= _names[i] ?? string.Empty;
+                _names[i] = ConvertConstantPlaceholders(_names[i]);
                 _visibleLengths[i] = AnsiColorCodes.GetVisibleTextLength(_names[i]);
             }
         }
