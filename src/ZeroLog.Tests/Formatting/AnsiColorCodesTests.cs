@@ -31,11 +31,13 @@ public class AnsiColorCodesTests
 
     [Test]
     [TestCase("reset", 0)]
+    [TestCase(" reset ", 0)]
     [TestCase("bold", 1)]
     [TestCase("red", 31)]
     [TestCase("blue", 34)]
     [TestCase("dark blue", 34)]
     [TestCase("bright blue", 94)]
+    [TestCase(" bright blue ", 94)]
     [TestCase("foreground blue", 34)]
     [TestCase("foreground dark blue", 34)]
     [TestCase("foreground bright blue", 94)]

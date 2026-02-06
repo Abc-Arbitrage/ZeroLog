@@ -138,57 +138,90 @@ internal static partial class AnsiColorCodes
             return false;
         }
 
-        input = NormalizeInput(input);
+        var parts = input?.Trim().ToLowerInvariant().Split([" "], StringSplitOptions.RemoveEmptyEntries) ?? [];
 
-        if (byte.TryParse(input, out var byteValue))
+        if (parts is [var singlePart])
         {
-            value = byteValue;
-            return true;
-        }
-
-        if (Enum.TryParse<SgrCode>(input, true, out var sgrCode))
-        {
-            value = (int)sgrCode;
-            return true;
-        }
-
-        var colorTypeOffset = GetColorTypeOffset(input, out var colorInputWithoutPrefix);
-        if (Enum.TryParse<ColorOffset>(colorInputWithoutPrefix, true, out var colorOffset))
-        {
-            value = (int)colorTypeOffset + (int)colorOffset;
-            return true;
-        }
-
-        value = 0;
-        return false;
-
-        static string NormalizeInput(string? input)
-            => input?.Replace(" ", "").ToLowerInvariant() ?? string.Empty;
-
-        static ColorTypeOffset GetColorTypeOffset(string input, out string inputWithoutPrefix)
-        {
-            var background = !Prefix("foreground") && !Prefix("fg") && (Prefix("background") || Prefix("bg"));
-            var bright = !Prefix("dark") && Prefix("bright");
-
-            inputWithoutPrefix = input;
-
-            return (background, bright) switch
+            if (byte.TryParse(singlePart, out var byteValue))
             {
-                (false, false) => ColorTypeOffset.Foreground,
-                (false, true)  => ColorTypeOffset.ForegroundBright,
-                (true, false)  => ColorTypeOffset.Background,
-                (true, true)   => ColorTypeOffset.BackgroundBright,
-            };
+                value = byteValue;
+                return true;
+            }
 
-            bool Prefix(string prefix)
+            if (Enum.TryParse<SgrCode>(singlePart, true, out var sgrCode))
             {
-                if (!input.StartsWith(prefix))
-                    return false;
-
-                input = input.Substring(prefix.Length);
+                value = (int)sgrCode;
                 return true;
             }
         }
+
+        bool? bright = null;
+        bool? background = null;
+        ColorOffset? colorOffset = null;
+
+        foreach (var part in parts)
+        {
+            switch (part)
+            {
+                case "dark":
+                    if (bright is not null)
+                        goto invalid;
+
+                    bright = false;
+                    break;
+
+                case "bright":
+                    if (bright is not null)
+                        goto invalid;
+
+                    bright = true;
+                    break;
+
+                case "fg":
+                case "foreground":
+                    if (background is not null)
+                        goto invalid;
+
+                    background = false;
+                    break;
+
+                case "bg":
+                case "background":
+                    if (background is not null)
+                        goto invalid;
+
+                    background = true;
+                    break;
+
+                default:
+                    if (colorOffset is not null)
+                        goto invalid;
+
+                    if (!Enum.TryParse<ColorOffset>(part, true, out var parsedColorOffset))
+                        goto invalid;
+
+                    colorOffset = parsedColorOffset;
+                    break;
+            }
+        }
+
+        if (colorOffset is null)
+            goto invalid;
+
+        var colorTypeOffset = (background ?? false, bright ?? false) switch
+        {
+            (false, false) => ColorTypeOffset.Foreground,
+            (false, true)  => ColorTypeOffset.ForegroundBright,
+            (true, false)  => ColorTypeOffset.Background,
+            (true, true)   => ColorTypeOffset.BackgroundBright,
+        };
+
+        value = (int)colorTypeOffset + (int)colorOffset.GetValueOrDefault();
+        return true;
+
+        invalid:
+        value = 0;
+        return false;
     }
 
     [SuppressMessage("ReSharper", "UnusedMember.Local")]
