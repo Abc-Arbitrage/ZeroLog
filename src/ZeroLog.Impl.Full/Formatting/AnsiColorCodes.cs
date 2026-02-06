@@ -78,67 +78,49 @@ internal static partial class AnsiColorCodes
         return new StringInfo(RemoveAnsiCodes(input)).LengthInTextElements;
     }
 
-    public static string GetForegroundColorCode(ConsoleColor color)
+    public static string ConsoleColorToAnsiCode(ConsoleColor foreground)
+        => CreateSgrSequence(ConsoleColorToAttribute(foreground, true));
+
+    public static string ConsoleColorToAnsiCode(ConsoleColor foreground, ConsoleColor background)
+        => CreateSgrSequence(ConsoleColorToAttribute(foreground, true), ConsoleColorToAttribute(background, false));
+
+    private static byte ConsoleColorToAttribute(ConsoleColor consoleColor, bool foreground)
     {
-        return color switch
+        return consoleColor switch
         {
-            ConsoleColor.Black       => ForegroundBlack,
-            ConsoleColor.DarkRed     => ForegroundRed,
-            ConsoleColor.DarkGreen   => ForegroundGreen,
-            ConsoleColor.DarkYellow  => ForegroundYellow,
-            ConsoleColor.DarkBlue    => ForegroundBlue,
-            ConsoleColor.DarkMagenta => ForegroundMagenta,
-            ConsoleColor.DarkCyan    => ForegroundCyan,
-            ConsoleColor.DarkGray    => ForegroundWhite,
+            ConsoleColor.Black       => Get(ColorOffset.Black, false),
+            ConsoleColor.DarkRed     => Get(ColorOffset.Red, false),
+            ConsoleColor.DarkGreen   => Get(ColorOffset.Green, false),
+            ConsoleColor.DarkYellow  => Get(ColorOffset.Yellow, false),
+            ConsoleColor.DarkBlue    => Get(ColorOffset.Blue, false),
+            ConsoleColor.DarkMagenta => Get(ColorOffset.Magenta, false),
+            ConsoleColor.DarkCyan    => Get(ColorOffset.Cyan, false),
+            ConsoleColor.DarkGray    => Get(ColorOffset.White, false),
 
-            ConsoleColor.Gray    => ForegroundBrightBlack,
-            ConsoleColor.Red     => ForegroundBrightRed,
-            ConsoleColor.Green   => ForegroundBrightGreen,
-            ConsoleColor.Yellow  => ForegroundBrightYellow,
-            ConsoleColor.Blue    => ForegroundBrightBlue,
-            ConsoleColor.Magenta => ForegroundBrightMagenta,
-            ConsoleColor.Cyan    => ForegroundBrightCyan,
-            ConsoleColor.White   => ForegroundBrightWhite,
+            ConsoleColor.Gray    => Get(ColorOffset.Black, true),
+            ConsoleColor.Red     => Get(ColorOffset.Red, true),
+            ConsoleColor.Green   => Get(ColorOffset.Green, true),
+            ConsoleColor.Yellow  => Get(ColorOffset.Yellow, true),
+            ConsoleColor.Blue    => Get(ColorOffset.Blue, true),
+            ConsoleColor.Magenta => Get(ColorOffset.Magenta, true),
+            ConsoleColor.Cyan    => Get(ColorOffset.Cyan, true),
+            ConsoleColor.White   => Get(ColorOffset.White, true),
 
-            _ => ""
+            _ => 0
         };
-    }
 
-    public static string GetBackgroundColorCode(ConsoleColor color)
-    {
-        return color switch
-        {
-            ConsoleColor.Black       => BackgroundBlack,
-            ConsoleColor.DarkRed     => BackgroundRed,
-            ConsoleColor.DarkGreen   => BackgroundGreen,
-            ConsoleColor.DarkYellow  => BackgroundYellow,
-            ConsoleColor.DarkBlue    => BackgroundBlue,
-            ConsoleColor.DarkMagenta => BackgroundMagenta,
-            ConsoleColor.DarkCyan    => BackgroundCyan,
-            ConsoleColor.DarkGray    => BackgroundWhite,
-
-            ConsoleColor.Gray    => BackgroundBrightBlack,
-            ConsoleColor.Red     => BackgroundBrightRed,
-            ConsoleColor.Green   => BackgroundBrightGreen,
-            ConsoleColor.Yellow  => BackgroundBrightYellow,
-            ConsoleColor.Blue    => BackgroundBrightBlue,
-            ConsoleColor.Magenta => BackgroundBrightMagenta,
-            ConsoleColor.Cyan    => BackgroundBrightCyan,
-            ConsoleColor.White   => BackgroundBrightWhite,
-
-            _ => ""
-        };
+        byte Get(ColorOffset color, bool bright) => GetColorAttribute(GetColorTypeOffset(foreground, bright), color);
     }
 
     internal static bool TryParseSgrCode(string? input, out int value)
     {
-        if (string.IsNullOrWhiteSpace(input))
+        if (input is null or "")
         {
             value = 0;
             return false;
         }
 
-        var parts = input?.Trim().ToLowerInvariant().Split([" "], StringSplitOptions.RemoveEmptyEntries) ?? [];
+        var parts = input.Trim().ToLowerInvariant().Split([" "], StringSplitOptions.RemoveEmptyEntries);
 
         if (parts is [var singlePart])
         {
@@ -156,7 +138,7 @@ internal static partial class AnsiColorCodes
         }
 
         bool? bright = null;
-        bool? background = null;
+        bool? foreground = null;
         ColorOffset? colorOffset = null;
 
         foreach (var part in parts)
@@ -179,18 +161,18 @@ internal static partial class AnsiColorCodes
 
                 case "fg":
                 case "foreground":
-                    if (background is not null)
+                    if (foreground is not null)
                         goto invalid;
 
-                    background = false;
+                    foreground = true;
                     break;
 
                 case "bg":
                 case "background":
-                    if (background is not null)
+                    if (foreground is not null)
                         goto invalid;
 
-                    background = true;
+                    foreground = false;
                     break;
 
                 default:
@@ -208,15 +190,8 @@ internal static partial class AnsiColorCodes
         if (colorOffset is null)
             goto invalid;
 
-        var colorTypeOffset = (background ?? false, bright ?? false) switch
-        {
-            (false, false) => ColorTypeOffset.Foreground,
-            (false, true)  => ColorTypeOffset.ForegroundBright,
-            (true, false)  => ColorTypeOffset.Background,
-            (true, true)   => ColorTypeOffset.BackgroundBright,
-        };
-
-        value = (int)colorTypeOffset + (int)colorOffset.GetValueOrDefault();
+        var colorTypeOffset = GetColorTypeOffset(foreground ?? true, bright ?? false);
+        value = GetColorAttribute(colorTypeOffset, colorOffset.GetValueOrDefault());
         return true;
 
         invalid:
@@ -224,8 +199,23 @@ internal static partial class AnsiColorCodes
         return false;
     }
 
+    private static ColorTypeOffset GetColorTypeOffset(bool foreground, bool bright)
+        => (foreground, bright) switch
+        {
+            (true, false)  => ColorTypeOffset.Foreground,
+            (true, true)   => ColorTypeOffset.ForegroundBright,
+            (false, false) => ColorTypeOffset.Background,
+            (false, true)  => ColorTypeOffset.BackgroundBright
+        };
+
+    private static byte GetColorAttribute(ColorTypeOffset colorType, ColorOffset color)
+        => (byte)((byte)colorType + (byte)color);
+
+    private static string CreateSgrSequence(params byte[] attributes)
+        => $"\e[{string.Join(";", attributes)}m";
+
     [SuppressMessage("ReSharper", "UnusedMember.Local")]
-    private enum SgrCode
+    private enum SgrCode : byte
     {
         Reset = 0,
         Normal = 0,
@@ -253,16 +243,20 @@ internal static partial class AnsiColorCodes
         DefaultBackground = 49,
     }
 
-    private enum ColorTypeOffset
+    private enum ColorTypeOffset : byte
     {
+        OffsetFromForegroundToBackground = 10,
+        OffsetFromDarkToBright = 60,
+
         Foreground = 30,
-        Background = 40,
-        ForegroundBright = 90,
-        BackgroundBright = 100,
+        ForegroundBright = Foreground + OffsetFromDarkToBright,
+
+        Background = Foreground + OffsetFromForegroundToBackground,
+        BackgroundBright = ForegroundBright + OffsetFromForegroundToBackground
     }
 
     [SuppressMessage("ReSharper", "UnusedMember.Local")]
-    private enum ColorOffset
+    private enum ColorOffset : byte
     {
         Black = 0,
         Red = 1,
@@ -271,6 +265,9 @@ internal static partial class AnsiColorCodes
         Blue = 4,
         Magenta = 5,
         Cyan = 6,
-        White = 7
+        White = 7,
+
+        // Alias
+        Gray = Black
     }
 }

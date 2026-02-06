@@ -736,12 +736,12 @@ public sealed partial class PatternWriter
         /// </summary>
         public LogLevelColorCodes(ConsoleColor trace, ConsoleColor debug, ConsoleColor info, ConsoleColor warn, ConsoleColor error, ConsoleColor fatal)
             : this(
-                AnsiColorCodes.GetForegroundColorCode(trace),
-                AnsiColorCodes.GetForegroundColorCode(debug),
-                AnsiColorCodes.GetForegroundColorCode(info),
-                AnsiColorCodes.GetForegroundColorCode(warn),
-                AnsiColorCodes.GetForegroundColorCode(error),
-                AnsiColorCodes.GetForegroundColorCode(fatal)
+                AnsiColorCodes.ConsoleColorToAnsiCode(trace),
+                AnsiColorCodes.ConsoleColorToAnsiCode(debug),
+                AnsiColorCodes.ConsoleColorToAnsiCode(info),
+                AnsiColorCodes.ConsoleColorToAnsiCode(warn),
+                AnsiColorCodes.ConsoleColorToAnsiCode(error),
+                AnsiColorCodes.ConsoleColorToAnsiCode(fatal)
             )
         {
         }
@@ -749,19 +749,25 @@ public sealed partial class PatternWriter
         /// <summary>
         /// Creates a new instance of <see cref="LogLevelColors"/> with foreground and background colors from <see cref="ConsoleColor"/>.
         /// </summary>
-        public LogLevelColorCodes(ConsoleColor traceForeground, ConsoleColor traceBackground,
-                                  ConsoleColor debugForeground, ConsoleColor debugBackground,
-                                  ConsoleColor infoForeground, ConsoleColor infoBackground,
-                                  ConsoleColor warnForeground, ConsoleColor warnBackground,
-                                  ConsoleColor errorForeground, ConsoleColor errorBackground,
-                                  ConsoleColor fatalForeground, ConsoleColor fatalBackground)
+        public LogLevelColorCodes(ConsoleColor traceForeground,
+                                  ConsoleColor traceBackground,
+                                  ConsoleColor debugForeground,
+                                  ConsoleColor debugBackground,
+                                  ConsoleColor infoForeground,
+                                  ConsoleColor infoBackground,
+                                  ConsoleColor warnForeground,
+                                  ConsoleColor warnBackground,
+                                  ConsoleColor errorForeground,
+                                  ConsoleColor errorBackground,
+                                  ConsoleColor fatalForeground,
+                                  ConsoleColor fatalBackground)
             : this(
-                AnsiColorCodes.GetForegroundColorCode(traceForeground) + AnsiColorCodes.GetBackgroundColorCode(traceBackground),
-                AnsiColorCodes.GetForegroundColorCode(debugForeground) + AnsiColorCodes.GetBackgroundColorCode(debugBackground),
-                AnsiColorCodes.GetForegroundColorCode(infoForeground) + AnsiColorCodes.GetBackgroundColorCode(infoBackground),
-                AnsiColorCodes.GetForegroundColorCode(warnForeground) + AnsiColorCodes.GetBackgroundColorCode(warnBackground),
-                AnsiColorCodes.GetForegroundColorCode(errorForeground) + AnsiColorCodes.GetBackgroundColorCode(errorBackground),
-                AnsiColorCodes.GetForegroundColorCode(fatalForeground) + AnsiColorCodes.GetBackgroundColorCode(fatalBackground)
+                AnsiColorCodes.ConsoleColorToAnsiCode(traceForeground, traceBackground),
+                AnsiColorCodes.ConsoleColorToAnsiCode(debugForeground, debugBackground),
+                AnsiColorCodes.ConsoleColorToAnsiCode(infoForeground, infoBackground),
+                AnsiColorCodes.ConsoleColorToAnsiCode(warnForeground, warnBackground),
+                AnsiColorCodes.ConsoleColorToAnsiCode(errorForeground, errorBackground),
+                AnsiColorCodes.ConsoleColorToAnsiCode(fatalForeground, fatalBackground)
             )
         {
         }
