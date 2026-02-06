@@ -736,12 +736,12 @@ public sealed partial class PatternWriter
         /// </summary>
         public LogLevelColorCodes(ConsoleColor trace, ConsoleColor debug, ConsoleColor info, ConsoleColor warn, ConsoleColor error, ConsoleColor fatal)
             : this(
-                AnsiColorCodes.ConsoleColorToAnsiCode(trace),
-                AnsiColorCodes.ConsoleColorToAnsiCode(debug),
-                AnsiColorCodes.ConsoleColorToAnsiCode(info),
-                AnsiColorCodes.ConsoleColorToAnsiCode(warn),
-                AnsiColorCodes.ConsoleColorToAnsiCode(error),
-                AnsiColorCodes.ConsoleColorToAnsiCode(fatal)
+                AnsiColorCodes.SGR(trace),
+                AnsiColorCodes.SGR(debug),
+                AnsiColorCodes.SGR(info),
+                AnsiColorCodes.SGR(warn),
+                AnsiColorCodes.SGR(error),
+                AnsiColorCodes.SGR(fatal)
             )
         {
         }
@@ -762,12 +762,12 @@ public sealed partial class PatternWriter
                                   ConsoleColor fatalForeground,
                                   ConsoleColor fatalBackground)
             : this(
-                AnsiColorCodes.ConsoleColorToAnsiCode(traceForeground, traceBackground),
-                AnsiColorCodes.ConsoleColorToAnsiCode(debugForeground, debugBackground),
-                AnsiColorCodes.ConsoleColorToAnsiCode(infoForeground, infoBackground),
-                AnsiColorCodes.ConsoleColorToAnsiCode(warnForeground, warnBackground),
-                AnsiColorCodes.ConsoleColorToAnsiCode(errorForeground, errorBackground),
-                AnsiColorCodes.ConsoleColorToAnsiCode(fatalForeground, fatalBackground)
+                AnsiColorCodes.SGR(traceForeground, traceBackground),
+                AnsiColorCodes.SGR(debugForeground, debugBackground),
+                AnsiColorCodes.SGR(infoForeground, infoBackground),
+                AnsiColorCodes.SGR(warnForeground, warnBackground),
+                AnsiColorCodes.SGR(errorForeground, errorBackground),
+                AnsiColorCodes.SGR(fatalForeground, fatalBackground)
             )
         {
         }

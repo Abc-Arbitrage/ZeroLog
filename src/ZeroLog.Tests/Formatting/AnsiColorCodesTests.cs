@@ -50,10 +50,10 @@ public class AnsiColorCodesTests
     [TestCase("bg blue", 44)]
     [TestCase("bg dark blue", 44)]
     [TestCase("bg bright blue", 104)]
-    public void should_parse_sgr_codes(string input, int expectedResult)
+    public void should_parse_sgr_codes(string input, byte expectedResult)
     {
         AnsiColorCodes.TryParseSgrCode(input, out var result).ShouldBeTrue();
-        result.ShouldEqual(expectedResult);
+        result.Value.ShouldEqual(expectedResult);
     }
 
     [Test]

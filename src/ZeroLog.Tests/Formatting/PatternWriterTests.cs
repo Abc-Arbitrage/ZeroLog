@@ -11,6 +11,8 @@ namespace ZeroLog.Tests.Formatting;
 [TestFixture]
 public class PatternWriterTests
 {
+    private const string _colorInfo = "\e[97m";
+
     [Test]
     [TestCase("", "")]
     [TestCase("foo", "foo")]
@@ -43,14 +45,14 @@ public class PatternWriterTests
     [TestCase("%{level:pad}", "INFO ")]
     [TestCase("%{level:5}", "INFO ")]
     [TestCase("%{level:6}", "INFO  ")]
-    [TestCase("%levelColor%level", DefaultStyle.Defaults.ColorInfo + "INFO")]
+    [TestCase("%levelColor%level", _colorInfo + "INFO")]
     [TestCase("%{logger:3}", "Foo.Bar.TestLog")]
     [TestCase("%{logger:18}", "Foo.Bar.TestLog   ")]
     [TestCase("%{loggerCompact:12}", "FB.TestLog  ")]
     [TestCase("%{message:5}", "Foo  ")]
     [TestCase("abc%{column:10}def%{column:15}ghi", "abc       def  ghi")]
-    [TestCase("a%{resetColor}b%{levelColor}c%{column:10}d\e[0;1me%{levelColor}f%{column:15}ghi", $"a\e[0mb{DefaultStyle.Defaults.ColorInfo}c       d\e[0;1me{DefaultStyle.Defaults.ColorInfo}f  ghi")]
-    [TestCase("a%{message:5}b%{levelColor}c%{column:10}d\e[0;1me%{message:5}f%{column:20}ghi", $"aFoo  b{DefaultStyle.Defaults.ColorInfo}c  d\e[0;1meFoo  f  ghi")]
+    [TestCase("a%{resetColor}b%{levelColor}c%{column:10}d\e[0;1me%{levelColor}f%{column:15}ghi", $"a\e[0mb{_colorInfo}c       d\e[0;1me{_colorInfo}f  ghi")]
+    [TestCase("a%{message:5}b%{levelColor}c%{column:10}d\e[0;1me%{message:5}f%{column:20}ghi", $"aFoo  b{_colorInfo}c  d\e[0;1meFoo  f  ghi")]
     [TestCase("abc%{level:7}foo%{column:15}def%{level:2}ghi%{column:25}bar%{column:30}baz", "abcINFO   foo  defINFOghibar  baz")]
     [TestCase("%%level", "%level")]
     [TestCase("%%%level", "%INFO")]

@@ -89,7 +89,7 @@ public sealed class DefaultFormatter : Formatter
             WriteLine();
 
             if (MessagePatternWriter.HasAnsiCodes)
-                Write(AnsiColorCodes.ForegroundBrightRed);
+                Write(DefaultStyle.Defaults.Exception);
 
             // This allocates, but there's no better way to get the details.
             Write(message.Exception.ToString());
