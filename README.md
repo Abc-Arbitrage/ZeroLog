@@ -148,6 +148,7 @@ The pattern is a string with the following placeholders:
 | `%exceptionType`    | The exception type, if any                                       |                                                            | 
 | `%newline`          | Equivalent to `Environment.NewLine`                              |                                                            | 
 | `%column`           | Inserts padding spaces until a given column index                | The column index to reach                                  | 
+| `%color`            | An ANSI SGR color code                                           | See in the `PatternWriter` tooltip for more information    | 
 | `%resetColor`       | The reset ANSI color code                                        | `\e[0m`                                                    | 
 | `%%`                | Inserts a single `%` character (escaping)                        |                                                            | 
 

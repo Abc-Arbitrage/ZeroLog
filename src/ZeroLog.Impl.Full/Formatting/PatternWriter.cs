@@ -31,7 +31,7 @@ namespace ZeroLog.Formatting;
 /// <item><term><c>%exceptionType</c></term><description>The exception type name, if any.</description></item>
 /// <item><term><c>%newline</c></term><description>Equivalent to <c>Environment.NewLine</c>.</description></item>
 /// <item><term><c>%column</c></term><description>Inserts padding spaces until the column index specified in the format string is reached.</description></item>
-/// <item><term><c>%color</c></term><description>An ANSI color code (SGR).</description></item>
+/// <item><term><c>%color</c></term><description>An ANSI SGR color code, see below.</description></item>
 /// <item><term><c>%resetColor</c></term><description>The reset ANSI code.</description></item>
 /// <item><term><c>%%</c></term><description>Inserts a single '%' character (escaping).</description></item>
 /// </list>
@@ -41,9 +41,19 @@ namespace ZeroLog.Formatting;
 /// <c>%{date:yyyy-MM-dd HH:mm:ss}</c> for instance.
 /// </para>
 /// <para>
+/// The <c>%{color:...}</c> placeholder can be used to set the color of the <i>following</i> text in a terminal by emitting
+/// <see href="https://en.wikipedia.org/wiki/ANSI_escape_code#Select_Graphic_Rendition_parameters">SGR ANSI codes</see> which are
+/// defined in the placeholder's format string and separated by <c>,</c> or <c>;</c>. Each attribute will persist until the next
+/// <c>%{resetColor}</c> or another <c>%{color:...}</c> which overwrites it.<br/>
+/// These codes can control the foreground and background colors, as well as text attributes when displayed in a terminal.<br/>
+/// Examples: <c>reset</c>, <c>bold</c>, <c>red</c>, <c>bright blue</c>, <c>blue background</c>, <c>default foreground</c>, <c>91</c>.<br/>
+/// A full example would be: <c>%{color:reset, bold, bright white foreground, dark blue background}</c>.
+/// </para>
+/// <para>
 /// Format strings can also be used to set a minimum field length: <c>%{logger:20}</c> will always be at least 20 characters wide.
 /// </para>
 /// </remarks>
+/// <seealso href="https://en.wikipedia.org/wiki/ANSI_escape_code#Select_Graphic_Rendition_parameters"/>
 public sealed partial class PatternWriter
 {
     // NOTE: This class is immutable after initialization.
