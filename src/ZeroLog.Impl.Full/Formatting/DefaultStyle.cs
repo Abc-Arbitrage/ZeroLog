@@ -111,16 +111,16 @@ public sealed class DefaultStyle
         public const string NameError = "ERROR";
         public const string NameFatal = "FATAL";
 
-        public const string ColorTrace = "%{sgr:gray}";
-        public const string ColorDebug = "%{sgr:default foreground}";
-        public const string ColorInfo = "%{sgr:bright white}";
-        public const string ColorWarn = "%{sgr:bright yellow}";
-        public const string ColorError = "%{sgr:bright red}";
-        public const string ColorFatal = "%{sgr:bright magenta}";
+        public const string ColorTrace = "%{color:gray}";
+        public const string ColorDebug = "%{color:default foreground}";
+        public const string ColorInfo = "%{color:bright white}";
+        public const string ColorWarn = "%{color:bright yellow}";
+        public const string ColorError = "%{color:bright red}";
+        public const string ColorFatal = "%{color:bright magenta}";
 
-        public const string DarkTimestamp = "%{sgr:gray}";
-        public const string Logger = "%{sgr:bright blue}";
-        public const string HighlightedMessage = "%{sgr:bold, bright white}";
+        public const string DarkTimestamp = "%{color:gray}";
+        public const string Logger = "%{color:bright blue}";
+        public const string HighlightedMessage = "%{color:bold, bright white}";
 
         public static readonly PatternWriter.LogLevelNames LogLevelNames = new(NameTrace, NameDebug, NameInfo, NameWarn, NameError, NameFatal);
         public static readonly PatternWriter.LogLevelColorCodes LogLevelColorCodes = new(ColorTrace, ColorDebug, ColorInfo, ColorWarn, ColorError, ColorFatal);
@@ -144,6 +144,6 @@ public sealed class DefaultStyle
         );
 
         private static string Bold(string placeholder)
-            => placeholder.Replace("%{sgr:", "%{sgr:bold,");
+            => placeholder.Contains("bold") ? placeholder : placeholder.Replace("%{color:", "%{color:bold, ");
     }
 }

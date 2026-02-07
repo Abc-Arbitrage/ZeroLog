@@ -31,7 +31,7 @@ namespace ZeroLog.Formatting;
 /// <item><term><c>%exceptionType</c></term><description>The exception type name, if any.</description></item>
 /// <item><term><c>%newline</c></term><description>Equivalent to <c>Environment.NewLine</c>.</description></item>
 /// <item><term><c>%column</c></term><description>Inserts padding spaces until the column index specified in the format string is reached.</description></item>
-/// <item><term><c>%sgr</c></term><description>An SGR ANSI code.</description></item>
+/// <item><term><c>%color</c></term><description>An ANSI color code (SGR).</description></item>
 /// <item><term><c>%resetColor</c></term><description>The reset ANSI code.</description></item>
 /// <item><term><c>%%</c></term><description>Inserts a single '%' character (escaping).</description></item>
 /// </list>
@@ -211,7 +211,7 @@ public sealed partial class PatternWriter
                 "newline"          => new PatternPart(PatternPartType.NewLine, format),
                 "resetcolor"       => new PatternPart(PatternPartType.ResetColor, format),
                 "column"           => new PatternPart(PatternPartType.Column, format),
-                "sgr"              => new PatternPart(PatternPartType.SgrCode, format),
+                "color"            => new PatternPart(PatternPartType.Color, format),
                 "%"                => new PatternPart("%"),
                 _                  => throw new FormatException($"Invalid placeholder type: %{placeholderType}")
             };
@@ -289,14 +289,14 @@ public sealed partial class PatternWriter
                 goto default;
             }
 
-            case PatternPartType.SgrCode:
+            case PatternPartType.Color:
             {
                 RequireFormat(true);
 
-                if (!AnsiColorCodes.TryParseSGR(part.Format, out var sgrCode))
-                    throw new FormatException($"Could not parse SGR field format: {part.Format}");
+                if (!AnsiColorCodes.TryParseSGR(part.Format, out var code))
+                    throw new FormatException($"Could not parse color field format: {part.Format}");
 
-                return new PatternPart(sgrCode);
+                return new PatternPart(code);
             }
 
             default:
@@ -573,7 +573,7 @@ public sealed partial class PatternWriter
 
     private bool EvaluateHasAnsiCodes()
         => AnsiColorCodes.HasAnsiCode(Pattern)
-           || _parts.Any(p => p.Type is PatternPartType.SgrCode or PatternPartType.ResetColor)
+           || _parts.Any(p => p.Type is PatternPartType.Color or PatternPartType.ResetColor)
            || _parts.Any(p => p.Type == PatternPartType.LevelColor) && LogLevelColors.Values.HasAnsiColorCodes()
            || _parts.Any(p => p.Type is PatternPartType.Level or PatternPartType.LevelPadded) && LogLevels.HasAnsiColorCodes();
 
@@ -584,7 +584,7 @@ public sealed partial class PatternWriter
     {
         var pattern = PlaceholderRegex().Replace(
             AnsiColorCodes.RemoveAnsiCodes(Pattern),
-            match => match.Groups["type"].Value.ToLowerInvariant() is "resetcolor" or "levelcolor" or "sgr"
+            match => match.Groups["type"].Value.ToLowerInvariant() is "resetcolor" or "levelcolor" or "color"
                 ? string.Empty
                 : match.Value
         );
@@ -617,7 +617,7 @@ public sealed partial class PatternWriter
         ExceptionType,
         NewLine,
         ResetColor,
-        SgrCode,
+        Color,
         Column
     }
 
