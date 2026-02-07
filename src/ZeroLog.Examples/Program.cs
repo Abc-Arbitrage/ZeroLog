@@ -68,7 +68,7 @@ internal static class Program
         _appender.Formatter = new DefaultFormatter
         {
             // See: https://en.wikipedia.org/wiki/ANSI_escape_code#Colors
-            MessagePatternWriter = new PatternWriter("%resetColor%level %{localDate:HH:mm}\e[90m%{localDate::ss.ffff} %levelColor\e[1m%message%{column:50}\e[0;90m from %loggerCompact")
+            MessagePatternWriter = new PatternWriter("%{resetColor}%{level} %{localDate:HH:mm}%{color:gray}%{localDate::ss.ffff} %{levelColor}%{color:bold}%{message}%{column:50}%{color:reset, gray} from %loggerCompact")
             {
                 LogLevels = new PatternWriter.LogLevelNames(
                     "🔎",
@@ -103,6 +103,9 @@ internal static class Program
 
     private static void LogExampleMessages()
     {
+        if (_appender.Formatter is DefaultFormatter defaultFormatter)
+            Utils.ShowPattern(defaultFormatter.PrefixPattern);
+
         _log.Trace().Append("Example trace message").AppendKeyValue("Foo", "Bar").Log();
         _log.Debug().Append("Example debug message").AppendKeyValue("Foo", "Bar").AppendKeyValue("Hello", "World").Log();
         _log.Info().Append("Example information message").AppendKeyValue("Foo", "Bar").Log();

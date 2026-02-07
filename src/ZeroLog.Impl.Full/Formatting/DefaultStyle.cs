@@ -1,3 +1,5 @@
+using System;
+
 namespace ZeroLog.Formatting;
 
 using D = DefaultStyle.Defaults;
@@ -61,7 +63,7 @@ public sealed class DefaultStyle
         /// <summary>
         /// A simple style similar to <see cref="NoColor.SimpleWithThread"/> which colors the full line based on the log level.
         /// </summary>
-        public static DefaultStyle FullLine => field ??= new("%resetColor%levelColor%time - %{level:pad} - %logger (%thread) || %message");
+        public static DefaultStyle FullLine => field ??= new("%{resetColor}%{levelColor}%{time} - %{level:pad} - %logger (%thread) || %{message}%{resetColor}");
 
         /// <summary>
         /// A style which highlights the level, logger, and message.
@@ -69,7 +71,7 @@ public sealed class DefaultStyle
         public static DefaultStyle BlueAndWhite => field ??= new(
             new PatternWriter(
                 $$"""
-                %resetColor%{time:hh\:mm\:ss}{{D.DarkTimestamp}}%{time:\.fff}%resetColor  %{level:pad}%resetColor  {{D.Logger}}%logger%resetColor (%thread) || {{D.HighlightedMessage}}%message%resetColor
+                %{resetColor}%{time:hh\:mm\:ss}{{D.DarkTimestamp}}%{time:\.fff}%{resetColor}  %{level:pad}  {{D.Logger}}%{logger}%{resetColor} (%thread) || {{D.HighlightedMessage}}%{message}%{resetColor}
                 """
             ) { LogLevels = Defaults.BoldLogLevelNames }
         );
@@ -80,7 +82,7 @@ public sealed class DefaultStyle
         public static DefaultStyle ColoredMessage => field ??= new(
             new PatternWriter(
                 $$"""
-                %resetColor%{time:hh\:mm\:ss}{{D.DarkTimestamp}}%{time:\.fff}%resetColor  %{level:pad}%resetColor  {{D.Logger}}%logger%resetColor (%thread) || %levelColor%message%resetColor
+                %{resetColor}%{time:hh\:mm\:ss}{{D.DarkTimestamp}}%{time:\.fff}%{resetColor}  %{level:pad}  {{D.Logger}}%{logger}%{resetColor} (%thread) || %{levelColor}%{message}%{resetColor}
                 """
             )
             {
@@ -95,7 +97,7 @@ public sealed class DefaultStyle
         public static DefaultStyle ShortLoggerWithPadding => field ??= new(
             new PatternWriter(
                     $$"""
-                    %resetColor%{time:hh\:mm\:ss}{{D.DarkTimestamp}}%{time:\.fff}%resetColor  %{level:pad}%resetColor  {{D.Logger}}%loggerCompact%resetColor %{column:60}|| %levelColor%message%resetColor
+                    %{resetColor}%{time:hh\:mm\:ss}{{D.DarkTimestamp}}%{time:\.fff}%{resetColor}  %{level:pad}  {{D.Logger}}%{loggerCompact}%{resetColor} %{column:60}|| %{levelColor}%{message}%{resetColor}
                     """
                 )
                 { LogLevels = Defaults.BoldLogLevelNames }
@@ -119,7 +121,7 @@ public sealed class DefaultStyle
         public const string ColorFatal = "%{color:bright magenta}";
 
         public const string DarkTimestamp = "%{color:gray}";
-        public const string Logger = "%{color:bright blue}";
+        public const string Logger = "%{color:reset, bright blue}";
         public const string HighlightedMessage = "%{color:bold, bright white}";
 
         public static readonly PatternWriter.LogLevelNames LogLevelNames = new(NameTrace, NameDebug, NameInfo, NameWarn, NameError, NameFatal);
@@ -135,15 +137,17 @@ public sealed class DefaultStyle
         );
 
         public static readonly PatternWriter.LogLevelColorCodes BoldLogLevelColorCodes = new(
-            $"{ColorTrace}",
-            $"{ColorDebug}",
-            $"{Bold(ColorInfo)}",
-            $"{Bold(ColorWarn)}",
-            $"{Bold(ColorError)}",
-            $"{Bold(ColorFatal)}"
+            ColorTrace,
+            ColorDebug,
+            Bold(ColorInfo),
+            Bold(ColorWarn),
+            Bold(ColorError),
+            Bold(ColorFatal)
         );
 
         private static string Bold(string placeholder)
-            => placeholder.Contains("bold") ? placeholder : placeholder.Replace("%{color:", "%{color:bold, ");
+            => placeholder.Contains("bold", StringComparison.OrdinalIgnoreCase)
+                ? placeholder
+                : placeholder.Replace("%{color:", "%{color:bold, ", StringComparison.OrdinalIgnoreCase);
     }
 }
