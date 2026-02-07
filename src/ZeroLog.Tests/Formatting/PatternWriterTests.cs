@@ -64,6 +64,9 @@ public class PatternWriterTests
     [TestCase("%{%:%}", "%{%:%}")]
     [TestCase("%%{%}", "%{%}")]
     [TestCase("foo%{resetColor}bar", "foo\e[0mbar")]
+    [TestCase("foo%{color:reset}bar", "foo\e[0mbar")]
+    [TestCase("foo%{color:41,42,43}bar", "foo\e[41;42;43mbar")]
+    [TestCase("foo%{color:reset, bold, blue}bar", "foo\e[0;1;34mbar")]
     public void should_write_pattern(string pattern, string expectedResult)
     {
         var patternWriter = new PatternWriter(pattern)
@@ -100,11 +103,35 @@ public class PatternWriterTests
     [TestCase("%{column:foo}")]
     [TestCase("%{column:-3}")]
     [TestCase("%{resetColor:5}")]
+    [TestCase("%{color}")]
+    [TestCase("%{color:foo}")]
     public void should_throw_on_invalid_format(string pattern)
     {
         Assert.Throws<FormatException>(() => _ = new PatternWriter(pattern));
         PatternWriter.IsValidPattern(pattern).ShouldBeFalse();
     }
+
+    [Test]
+    [TestCase("", "")]
+    [TestCase("foo", "foo")]
+    [TestCase("%%", "%")]
+    [TestCase("foo%{color:reset, bold, blue}bar", "foo\e[0;1;34mbar")]
+    [TestCase("foo%{resetColor}bar%{resetColor}baz", "foo\e[0mbar\e[0mbaz")]
+    [TestCase("foo%{newLine}bar", "foo\nbar")]
+    [TestCase("foo%{level}bar%{color:bold}baz", "foobar\e[1mbaz")]
+    public void should_convert_constant_placeholders_to_literals(string pattern, string expectedResult)
+        => PatternWriter.ConvertConstantPlaceholders(pattern).ReplaceLineEndings("\n").ShouldEqual(expectedResult);
+
+    [Test]
+    [TestCase("", 0)]
+    [TestCase("foo", 1)]
+    [TestCase("foo%{color:blue}bar%{resetColor}baz%{newLine}%%", 1)]
+    [TestCase("%{color:blue}%{resetColor}%{newLine}%%", 1)]
+    [TestCase("foo%{level}bar", 3)]
+    [TestCase("foo%{level}%{color:blue}bar", 3)]
+    [TestCase("foo%{color:red}%{level}%{color:blue}bar", 3)]
+    public void should_concatenate_literal_parts(string pattern, int expectedPartCount)
+        => new PatternWriter(pattern).PartCount.ShouldEqual(expectedPartCount);
 
     [Test]
     [TestCase("")]
@@ -123,6 +150,7 @@ public class PatternWriterTests
     [TestCase("%loggerCompact")]
     [TestCase("%newline")]
     [TestCase("%resetColor")]
+    [TestCase("%{color:reset, bold, blue, red background}")]
     [TestCase("abc%{column:10}def")]
     [TestCase("foo %level bar %logger baz")]
     [TestCase("%{date:dd MM yyyy HH mm ss}")]
@@ -149,14 +177,21 @@ public class PatternWriterTests
     [TestCase(LogLevel.Trace, "[] [           ]")]
     [TestCase(LogLevel.Debug, "[DEbug] [DEbug      ]")]
     [TestCase(LogLevel.Info, "[InFo] [InFo       ]")]
-    [TestCase(LogLevel.Warn, "[WARN] [WARN       ]")]
+    [TestCase(LogLevel.Warn, "[\e[33mWARN\e[0m] [\e[33mWARN\e[0m       ]")]
     [TestCase(LogLevel.Error, "[ERROR OMG] [ERROR OMG  ]")]
     [TestCase(LogLevel.Fatal, "[CRITICAL!!!] [CRITICAL!!!]")]
     public void should_customize_levels(LogLevel level, string expectedResult)
     {
         var patternWriter = new PatternWriter("[%level] [%{level:pad}]")
         {
-            LogLevels = new(null!, "DEbug", "InFo", "WARN", "ERROR OMG", "CRITICAL!!!")
+            LogLevels = new(
+                null!,
+                "DEbug",
+                "InFo",
+                "%{color:yellow}WARN%{resetColor}",
+                "ERROR OMG",
+                "CRITICAL!!!"
+            )
         };
 
         var logMessage = new LogMessage("Foo");
@@ -227,6 +262,34 @@ public class PatternWriterTests
                 ConsoleColor.Yellow,
                 ConsoleColor.Blue,
                 ConsoleColor.Magenta
+            )
+        };
+
+        var logMessage = new LogMessage("Foo");
+        logMessage.Initialize(new Log("Foo.Bar.TestLog"), level);
+
+        var result = GetResult(patternWriter, logMessage);
+        result.ShouldEqual(expectedResult);
+    }
+
+    [Test]
+    [TestCase(LogLevel.Trace, "[]")]
+    [TestCase(LogLevel.Debug, "[foo]")]
+    [TestCase(LogLevel.Info, "['\e[32m']")]
+    [TestCase(LogLevel.Warn, "[\e[1;33mWARN\e[0m]")]
+    [TestCase(LogLevel.Error, "[ERROR%]")]
+    [TestCase(LogLevel.Fatal, "[nope]")]
+    public void should_customize_level_colors_with_placeholders(LogLevel level, string expectedResult)
+    {
+        var patternWriter = new PatternWriter("[%levelColor]")
+        {
+            LogLevelColors = new(
+                null!,
+                "foo",
+                "'%{color:green}'",
+                "%{color:bold, yellow}WARN%{resetColor}",
+                "ERROR%%",
+                "%{levelColor}nope"
             )
         };
 
@@ -326,6 +389,7 @@ public class PatternWriterTests
     [TestCase("", "", "")]
     [TestCase("foo", "foo", "foo")]
     [TestCase("foo%{resetColor}bar", "foobar", "foobar")]
+    [TestCase("foo%{color:blue}bar", "foobar", "foobar")]
     [TestCase("foo%{levelColor}bar", "foobar", "foobar")]
     [TestCase("foo%{resetColor}bar%{levelColor}%{resetColor}baz", "foobarbaz", "foobarbaz")]
     [TestCase("foo%{level}bar", "foo%{level}bar", "fooINFObar")]
@@ -352,8 +416,8 @@ public class PatternWriterTests
     [Test]
     public void should_measure_ansi_codes_length_correctly()
     {
-        const string pattern = "%{resetColor}foo %{levelColor}bar %{level}baz%{level:6}|%{column:30}%{resetColor}Foo %{levelColor}Bar %{level:pad}Baz%{column:55}%message";
-        const string expectedFull = "\e[0mfoo \e[0;1m|\e[94m|bar \e[0mINFO\e[0;0;0mbaz\e[0mINFO\e[0;0;0m  |      \e[0mFoo \e[0;1m|\e[94m|Bar \e[0mINFO\e[0;0;0m      Baz  Message";
+        const string pattern = "%{resetColor}foo%{color:bold} %{levelColor}bar %{level}baz%{level:6}|%{column:30}%{resetColor}Foo %{levelColor}Bar %{level:pad}Baz%{column:55}%message";
+        const string expectedFull = "\e[0mfoo\e[1m \e[0;1m|\e[94m|bar \e[0mINFO\e[0;0;0mbaz\e[0mINFO\e[0;0;0m  |      \e[0mFoo \e[0;1m|\e[94m|Bar \e[0mINFO\e[0;0;0m      Baz  Message";
         const string expectedVisible = "foo ||bar INFObazINFO  |      Foo ||Bar INFO      Baz  Message";
 
         var patternWriter = new PatternWriter(pattern)

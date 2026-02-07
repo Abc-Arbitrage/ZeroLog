@@ -58,6 +58,7 @@ public class AnsiColorCodesTests
     [TestCase("not italic", 23)]
     [TestCase("gray", 90)]
     [TestCase("gray bg", 100)]
+    [TestCase("42", 42)]
     public void should_parse_sgr_codes(string input, byte expectedResult)
     {
         AnsiColorCodes.TryParseSGRCode(input, out var result).ShouldBeTrue();
@@ -85,6 +86,7 @@ public class AnsiColorCodesTests
     [TestCase("default bright")]
     [TestCase("default default")]
     [TestCase("gray gray")]
+    [TestCase("42 42")]
     public void should_not_parse_sgr_codes(string input)
         => AnsiColorCodes.TryParseSGRCode(input, out _).ShouldBeFalse();
 }

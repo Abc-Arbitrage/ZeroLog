@@ -122,7 +122,9 @@ public sealed partial class PatternWriter
     internal bool HasMessage { get; }
     internal bool HasAnsiCodes { get; private init; }
 
-    internal TimeZoneInfo? LocalTimeZone { get; init; } // For unit tests
+    // For unit tests
+    internal int PartCount => _parts.Length;
+    internal TimeZoneInfo? LocalTimeZone { get; init; }
 
     /// <summary>
     /// Creates a pattern writer for the provided pattern.
@@ -227,7 +229,7 @@ public sealed partial class PatternWriter
             yield return new PatternPart(pattern.Substring(position, pattern.Length - position));
     }
 
-    private static string ConvertConstantPlaceholders(string? pattern)
+    internal static string ConvertConstantPlaceholders(string? pattern)
         => string.Join("", ParsePattern(pattern ?? string.Empty).Where(i => i.Type == PatternPartType.String).Select(i => i.Format));
 
     private static PatternPart ValidatePart(PatternPart part, string placeholderType)
@@ -584,7 +586,7 @@ public sealed partial class PatternWriter
     {
         var pattern = PlaceholderRegex().Replace(
             AnsiColorCodes.RemoveAnsiCodes(Pattern),
-            match => match.Groups["type"].Value.ToLowerInvariant() is "resetcolor" or "levelcolor" or "color"
+            match => match.Groups["type"].Value.ToLowerInvariant() is "color" or "resetcolor" or "levelcolor"
                 ? string.Empty
                 : match.Value
         );
@@ -616,8 +618,8 @@ public sealed partial class PatternWriter
         ExceptionMessage,
         ExceptionType,
         NewLine,
-        ResetColor,
         Color,
+        ResetColor,
         Column
     }
 
