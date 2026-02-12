@@ -93,10 +93,8 @@ internal static partial class AnsiColorCodes
 
         foreach (var part in input.Split([',', ';'], StringSplitOptions.RemoveEmptyEntries))
         {
-            if (!TryParseSGRCode(part, out var code))
+            if (!TryParseSGRCode(part, codes))
                 goto invalid;
-
-            codes.Add(code);
         }
 
         if (codes.Count == 0)
@@ -110,29 +108,29 @@ internal static partial class AnsiColorCodes
         return false;
     }
 
-    internal static bool TryParseSGRCode(string? input, out Code result)
+    private static bool TryParseSGRCode(string? input, List<Code> codes)
     {
         if (input is null or "")
-            goto invalid;
+            return false;
 
         var parts = input.Trim().ToLowerInvariant().Split([" "], StringSplitOptions.RemoveEmptyEntries).ToList();
 
         switch (parts)
         {
             case ["default"]:
-                result = Attribute.Reset;
+                codes.Add(Attribute.Reset);
                 return true;
 
             case [var singlePart] when byte.TryParse(singlePart, out var byteValue):
-                result = new Code(byteValue);
+                codes.Add(new Code(byteValue));
                 return true;
 
             case [var singlePart] when Enum.TryParse<Attribute>(singlePart, true, out var attribute):
-                result = attribute;
+                codes.Add(attribute);
                 return true;
 
             case [..] when Enum.TryParse<Attribute>(string.Join("", parts), true, out var attribute):
-                result = attribute;
+                codes.Add(attribute);
                 return true;
 
             // "bright black" sounds so stupid, give it a better alias
@@ -145,6 +143,7 @@ internal static partial class AnsiColorCodes
         bool? bright = null;
         bool? foreground = null;
         Color? color = null;
+        (byte r, byte g, byte b)? colorRgb = null;
         var defaultKeyword = false;
 
         foreach (var part in parts)
@@ -153,14 +152,14 @@ internal static partial class AnsiColorCodes
             {
                 case "dark":
                     if (bright is not null)
-                        goto invalid;
+                        return false;
 
                     bright = false;
                     break;
 
                 case "bright":
                     if (bright is not null)
-                        goto invalid;
+                        return false;
 
                     bright = true;
                     break;
@@ -168,7 +167,7 @@ internal static partial class AnsiColorCodes
                 case "fg":
                 case "foreground":
                     if (foreground is not null)
-                        goto invalid;
+                        return false;
 
                     foreground = true;
                     break;
@@ -176,24 +175,37 @@ internal static partial class AnsiColorCodes
                 case "bg":
                 case "background":
                     if (foreground is not null)
-                        goto invalid;
+                        return false;
 
                     foreground = false;
                     break;
 
                 case "default":
                     if (defaultKeyword)
-                        goto invalid;
+                        return false;
 
                     defaultKeyword = true;
                     break;
 
                 default:
-                    if (color is not null)
-                        goto invalid;
+                    if (color is not null || colorRgb is not null)
+                        return false;
+
+                    if (part.Length == 7 && part.StartsWith("#", StringComparison.Ordinal))
+                    {
+                        if (byte.TryParse(part.Substring(1, 2), NumberStyles.AllowHexSpecifier, null, out var r)
+                            && byte.TryParse(part.Substring(3, 2), NumberStyles.AllowHexSpecifier, null, out var g)
+                            && byte.TryParse(part.Substring(5, 2), NumberStyles.AllowHexSpecifier, null, out var b))
+                        {
+                            colorRgb = (r, g, b);
+                            continue;
+                        }
+
+                        return false;
+                    }
 
                     if (!Enum.TryParse<Color>(part, true, out var parsedColor))
-                        goto invalid;
+                        return false;
 
                     color = parsedColor;
                     break;
@@ -202,22 +214,36 @@ internal static partial class AnsiColorCodes
 
         if (defaultKeyword)
         {
-            if (foreground is null || color is not null || bright is not null)
-                goto invalid;
+            if (foreground is null || color is not null || colorRgb is not null || bright is not null)
+                return false;
 
-            result = foreground.GetValueOrDefault() ? Attribute.DefaultForeground : Attribute.DefaultBackground;
+            codes.Add(foreground.GetValueOrDefault() ? Attribute.DefaultForeground : Attribute.DefaultBackground);
             return true;
         }
 
-        if (color is null)
-            goto invalid;
+        if (color is not null)
+        {
+            if (colorRgb is not null)
+                return false;
 
-        var colorType = GetColorType(foreground ?? true, bright ?? false);
-        result = Combine(colorType, color.GetValueOrDefault());
-        return true;
+            var colorType = GetColorType(foreground ?? true, bright ?? false);
+            codes.Add(Combine(colorType, color.GetValueOrDefault()));
+            return true;
+        }
 
-        invalid:
-        result = default;
+        if (colorRgb is { } rgb)
+        {
+            if (bright is not null)
+                return false;
+
+            codes.Add(foreground ?? true ? new Code(38) : new Code(48));
+            codes.Add(new Code(2));
+            codes.Add(new Code(rgb.r));
+            codes.Add(new Code(rgb.g));
+            codes.Add(new Code(rgb.b));
+            return true;
+        }
+
         return false;
     }
 

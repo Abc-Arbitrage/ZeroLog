@@ -68,7 +68,7 @@ internal static class Program
         _appender.Formatter = new DefaultFormatter
         {
             // See: https://en.wikipedia.org/wiki/ANSI_escape_code#Colors
-            MessagePatternWriter = new PatternWriter("%{resetColor}%{level} %{localDate:HH:mm}%{color:gray}%{localDate::ss.ffff} %{levelColor}%{color:bold}%{message}%{column:50}%{color:reset, gray} from %loggerCompact")
+            MessagePatternWriter = new PatternWriter("%{resetColor}%{level} %{color:#FFA0A0}%{localDate:HH:mm}%{color:gray}%{localDate::ss.ffff} %{levelColor}%{color:bold}%{message}%{column:50}%{color:reset, gray} from %loggerCompact")
             {
                 LogLevels = new PatternWriter.LogLevelNames(
                     "🔎",
