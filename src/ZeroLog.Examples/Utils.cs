@@ -10,6 +10,8 @@ namespace ZeroLog.Examples;
 
 internal static class Utils
 {
+    private static readonly Style _headerStyle = new(Color.LightSkyBlue1);
+
     public static void WriteHeader()
     {
         AnsiConsole.WriteLine();
@@ -60,8 +62,9 @@ internal static class Utils
     {
         NewLine();
 
-        AnsiConsole.Write(new Panel(title)
+        AnsiConsole.Write(new Panel(new Text(title, _headerStyle))
         {
+            BorderStyle = _headerStyle,
             Border = BoxBorder.Double,
             Padding = new Padding(4, 1)
         });
@@ -71,11 +74,18 @@ internal static class Utils
     {
         NewLine();
 
-        AnsiConsole.Write(new Panel(title)
+        AnsiConsole.Write(new Panel(new Text(title, _headerStyle))
         {
+            BorderStyle = _headerStyle,
             Border = BoxBorder.Rounded,
             Padding = new Padding(2, 0)
         });
+    }
+
+    public static void ShowPattern(string pattern)
+    {
+        AnsiConsole.MarkupLineInterpolated($"   [bold LightSkyBlue1]Pattern:[/] {pattern}");
+        AnsiConsole.WriteLine();
     }
 
     public static void NewLine()

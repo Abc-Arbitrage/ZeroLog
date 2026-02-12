@@ -31,6 +31,7 @@ namespace ZeroLog.Formatting;
 /// <item><term><c>%exceptionType</c></term><description>The exception type name, if any.</description></item>
 /// <item><term><c>%newline</c></term><description>Equivalent to <c>Environment.NewLine</c>.</description></item>
 /// <item><term><c>%column</c></term><description>Inserts padding spaces until the column index specified in the format string is reached.</description></item>
+/// <item><term><c>%color</c></term><description>An ANSI SGR color code, see below.</description></item>
 /// <item><term><c>%resetColor</c></term><description>The reset ANSI code.</description></item>
 /// <item><term><c>%%</c></term><description>Inserts a single '%' character (escaping).</description></item>
 /// </list>
@@ -40,20 +41,32 @@ namespace ZeroLog.Formatting;
 /// <c>%{date:yyyy-MM-dd HH:mm:ss}</c> for instance.
 /// </para>
 /// <para>
+/// The <c>%{color:...}</c> placeholder can be used to set the color of the <i>following</i> text in a terminal by emitting
+/// <see href="https://en.wikipedia.org/wiki/ANSI_escape_code#Select_Graphic_Rendition_parameters">SGR ANSI codes</see>.
+/// The format string of this placeholder can contain multiple comma- or semicolon-separated values which specify the attributes of the emitted ANSI code.
+/// Color definitions are defined in a single value.
+/// <br/>
+/// <br/>Supported values include:<br/>
+/// <list type="table">
+/// <listheader><term>Type</term><description>Examples</description></listheader>
+/// <item><term>Attribute</term><description><c>reset</c>, <c>bold</c>, <c>italic</c></description></item>
+/// <item><term>Standard color</term><description><c>red</c>, <c>blue</c>, <c>green</c></description></item>
+/// <item><term>Color target</term><description><c>foreground</c> (default), <c>background</c>, <c>fg</c>, <c>bg</c></description></item>
+/// <item><term>Color intensity</term><description><c>dark</c> (default), <c>light</c> followed by a standard color</description></item>
+/// <item><term>Custom color</term><description><c>#FFA0A0</c></description></item>
+/// <item><term>Default color</term><description><c>default foreground</c></description></item>
+/// <item><term>Custom code</term><description><c>94</c> (bright blue foreground)</description></item>
+/// </list>
+/// <br/>A full example would be: <c>%{color:reset, bold, bright white foreground, #2A3B4C background}</c>.
+/// </para>
+/// <para>
 /// Format strings can also be used to set a minimum field length: <c>%{logger:20}</c> will always be at least 20 characters wide.
 /// </para>
 /// </remarks>
+/// <seealso href="https://en.wikipedia.org/wiki/ANSI_escape_code#Select_Graphic_Rendition_parameters"/>
 public sealed partial class PatternWriter
 {
     // NOTE: This class is immutable after initialization.
-
-#if NET
-    private static readonly LogLevelNames _defaultLogLevelNames = DefaultStyle.Defaults.LogLevelNames;
-    private static readonly LogLevelColorCodes _defaultLogLevelColorCodes = DefaultStyle.Defaults.LogLevelColorCodes;
-#else
-    private static readonly LogLevelNames _defaultLogLevelNames = default;
-    private static readonly LogLevelColorCodes _defaultLogLevelColorCodes = default;
-#endif
 
     // lang=regex
     private const string _placeholderRegexPattern =
@@ -78,6 +91,14 @@ public sealed partial class PatternWriter
 #else
     private static readonly Regex _placeholderRegex = new(_placeholderRegexPattern, RegexOptions.Compiled | _placeholderRegexOptions);
     private static Regex PlaceholderRegex() => _placeholderRegex;
+#endif
+
+#if NET
+    private static readonly LogLevelNames _defaultLogLevelNames = DefaultStyle.Defaults.LogLevelNames;
+    private static readonly LogLevelColorCodes _defaultLogLevelColorCodes = DefaultStyle.Defaults.LogLevelColorCodes;
+#else
+    private static readonly LogLevelNames _defaultLogLevelNames = default;
+    private static readonly LogLevelColorCodes _defaultLogLevelColorCodes = default;
 #endif
 
     private readonly PatternPart[] _parts;
@@ -121,7 +142,9 @@ public sealed partial class PatternWriter
     internal bool HasMessage { get; }
     internal bool HasAnsiCodes { get; private init; }
 
-    internal TimeZoneInfo? LocalTimeZone { get; init; } // For unit tests
+    // For unit tests
+    internal int PartCount => _parts.Length;
+    internal TimeZoneInfo? LocalTimeZone { get; init; }
 
     /// <summary>
     /// Creates a pattern writer for the provided pattern.
@@ -210,6 +233,7 @@ public sealed partial class PatternWriter
                 "newline"          => new PatternPart(PatternPartType.NewLine, format),
                 "resetcolor"       => new PatternPart(PatternPartType.ResetColor, format),
                 "column"           => new PatternPart(PatternPartType.Column, format),
+                "color"            => new PatternPart(PatternPartType.Color, format),
                 "%"                => new PatternPart("%"),
                 _                  => throw new FormatException($"Invalid placeholder type: %{placeholderType}")
             };
@@ -224,6 +248,9 @@ public sealed partial class PatternWriter
         if (position < pattern.Length)
             yield return new PatternPart(pattern.Substring(position, pattern.Length - position));
     }
+
+    internal static string ConvertConstantPlaceholders(string? pattern)
+        => string.Join("", ParsePattern(pattern ?? string.Empty).Where(i => i.Type == PatternPartType.String).Select(i => i.Format));
 
     private static PatternPart ValidatePart(PatternPart part, string placeholderType)
     {
@@ -267,20 +294,31 @@ public sealed partial class PatternWriter
             }
 
             case PatternPartType.NewLine:
+            {
+                RequireFormat(false);
+                return new PatternPart(Environment.NewLine);
+            }
+
             case PatternPartType.ResetColor:
             {
-                if (part.Format is not null)
-                    throw new FormatException($"The %{placeholderType} placeholder does not support format strings.");
-
-                break;
+                RequireFormat(false);
+                return new PatternPart(AnsiColorCodes.Reset);
             }
 
             case PatternPartType.Column:
             {
-                if (part.Format is null)
-                    throw new FormatException($"The %{placeholderType} placeholder requires a format string.");
-
+                RequireFormat(true);
                 goto default;
+            }
+
+            case PatternPartType.Color:
+            {
+                RequireFormat(true);
+
+                if (!AnsiColorCodes.TryParseSGR(part.Format, out var code))
+                    throw new FormatException($"Invalid color format string: {part.Format}");
+
+                return new PatternPart(code);
             }
 
             default:
@@ -293,6 +331,18 @@ public sealed partial class PatternWriter
         }
 
         return part;
+
+        void RequireFormat(bool shouldHaveFormat)
+        {
+            switch (shouldHaveFormat)
+            {
+                case true when part.Format is null:
+                    throw new FormatException($"The %{placeholderType} placeholder requires a format string.");
+
+                case false when part.Format is not null:
+                    throw new FormatException($"The %{placeholderType} placeholder does not support format strings.");
+            }
+        }
     }
 
     private static IEnumerable<PatternPart> OptimizeParts(IEnumerable<PatternPart> parts)
@@ -305,14 +355,6 @@ public sealed partial class PatternWriter
             {
                 case PatternPartType.String:
                     sb.Append(part.Format);
-                    break;
-
-                case PatternPartType.NewLine:
-                    sb.Append(Environment.NewLine);
-                    break;
-
-                case PatternPartType.ResetColor:
-                    sb.Append(AnsiColorCodes.Reset);
                     break;
 
                 default:
@@ -553,7 +595,7 @@ public sealed partial class PatternWriter
 
     private bool EvaluateHasAnsiCodes()
         => AnsiColorCodes.HasAnsiCode(Pattern)
-           || _parts.Any(p => p.Type == PatternPartType.ResetColor)
+           || _parts.Any(p => p.Type is PatternPartType.Color or PatternPartType.ResetColor)
            || _parts.Any(p => p.Type == PatternPartType.LevelColor) && LogLevelColors.Values.HasAnsiColorCodes()
            || _parts.Any(p => p.Type is PatternPartType.Level or PatternPartType.LevelPadded) && LogLevels.HasAnsiColorCodes();
 
@@ -564,7 +606,7 @@ public sealed partial class PatternWriter
     {
         var pattern = PlaceholderRegex().Replace(
             AnsiColorCodes.RemoveAnsiCodes(Pattern),
-            match => match.Groups["type"].Value.ToLowerInvariant() is "resetcolor" or "levelcolor"
+            match => match.Groups["type"].Value.ToLowerInvariant() is "color" or "resetcolor" or "levelcolor"
                 ? string.Empty
                 : match.Value
         );
@@ -596,6 +638,7 @@ public sealed partial class PatternWriter
         ExceptionMessage,
         ExceptionType,
         NewLine,
+        Color,
         ResetColor,
         Column
     }
@@ -659,7 +702,6 @@ public sealed partial class PatternWriter
         /// <summary>
         /// Creates a new instance of <see cref="LogLevelNames"/>.
         /// </summary>
-        [SuppressMessage("ReSharper", "NullCoalescingConditionIsAlwaysNotNullAccordingToAPIContract")]
         public LogLevelNames(string trace, string debug, string info, string warn, string error, string fatal)
         {
             _names = [trace, debug, info, warn, error, fatal];
@@ -667,7 +709,7 @@ public sealed partial class PatternWriter
 
             for (var i = 0; i < _names.Length; ++i)
             {
-                _names[i] ??= _names[i] ?? string.Empty;
+                _names[i] = ConvertConstantPlaceholders(_names[i]);
                 _visibleLengths[i] = AnsiColorCodes.GetVisibleTextLength(_names[i]);
             }
         }
@@ -736,12 +778,12 @@ public sealed partial class PatternWriter
         /// </summary>
         public LogLevelColorCodes(ConsoleColor trace, ConsoleColor debug, ConsoleColor info, ConsoleColor warn, ConsoleColor error, ConsoleColor fatal)
             : this(
-                AnsiColorCodes.GetForegroundColorCode(trace),
-                AnsiColorCodes.GetForegroundColorCode(debug),
-                AnsiColorCodes.GetForegroundColorCode(info),
-                AnsiColorCodes.GetForegroundColorCode(warn),
-                AnsiColorCodes.GetForegroundColorCode(error),
-                AnsiColorCodes.GetForegroundColorCode(fatal)
+                AnsiColorCodes.SGR(trace),
+                AnsiColorCodes.SGR(debug),
+                AnsiColorCodes.SGR(info),
+                AnsiColorCodes.SGR(warn),
+                AnsiColorCodes.SGR(error),
+                AnsiColorCodes.SGR(fatal)
             )
         {
         }
@@ -749,19 +791,25 @@ public sealed partial class PatternWriter
         /// <summary>
         /// Creates a new instance of <see cref="LogLevelColors"/> with foreground and background colors from <see cref="ConsoleColor"/>.
         /// </summary>
-        public LogLevelColorCodes(ConsoleColor traceForeground, ConsoleColor traceBackground,
-                                  ConsoleColor debugForeground, ConsoleColor debugBackground,
-                                  ConsoleColor infoForeground, ConsoleColor infoBackground,
-                                  ConsoleColor warnForeground, ConsoleColor warnBackground,
-                                  ConsoleColor errorForeground, ConsoleColor errorBackground,
-                                  ConsoleColor fatalForeground, ConsoleColor fatalBackground)
+        public LogLevelColorCodes(ConsoleColor traceForeground,
+                                  ConsoleColor traceBackground,
+                                  ConsoleColor debugForeground,
+                                  ConsoleColor debugBackground,
+                                  ConsoleColor infoForeground,
+                                  ConsoleColor infoBackground,
+                                  ConsoleColor warnForeground,
+                                  ConsoleColor warnBackground,
+                                  ConsoleColor errorForeground,
+                                  ConsoleColor errorBackground,
+                                  ConsoleColor fatalForeground,
+                                  ConsoleColor fatalBackground)
             : this(
-                AnsiColorCodes.GetForegroundColorCode(traceForeground) + AnsiColorCodes.GetBackgroundColorCode(traceBackground),
-                AnsiColorCodes.GetForegroundColorCode(debugForeground) + AnsiColorCodes.GetBackgroundColorCode(debugBackground),
-                AnsiColorCodes.GetForegroundColorCode(infoForeground) + AnsiColorCodes.GetBackgroundColorCode(infoBackground),
-                AnsiColorCodes.GetForegroundColorCode(warnForeground) + AnsiColorCodes.GetBackgroundColorCode(warnBackground),
-                AnsiColorCodes.GetForegroundColorCode(errorForeground) + AnsiColorCodes.GetBackgroundColorCode(errorBackground),
-                AnsiColorCodes.GetForegroundColorCode(fatalForeground) + AnsiColorCodes.GetBackgroundColorCode(fatalBackground)
+                AnsiColorCodes.SGR(traceForeground, traceBackground),
+                AnsiColorCodes.SGR(debugForeground, debugBackground),
+                AnsiColorCodes.SGR(infoForeground, infoBackground),
+                AnsiColorCodes.SGR(warnForeground, warnBackground),
+                AnsiColorCodes.SGR(errorForeground, errorBackground),
+                AnsiColorCodes.SGR(fatalForeground, fatalBackground)
             )
         {
         }

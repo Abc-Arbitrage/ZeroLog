@@ -1,4 +1,5 @@
 using ZeroLog.Appenders;
+using static ZeroLog.Formatting.AnsiColorCodes;
 
 namespace ZeroLog.Formatting;
 
@@ -17,6 +18,8 @@ namespace ZeroLog.Formatting;
 /// </remarks>
 public sealed class DefaultFormatter : Formatter
 {
+    private static readonly string _exceptionCode = SGR(ColorType.ForegroundBright, Color.Red);
+
     /// <summary>
     /// The writer used for the start of the message.
     /// </summary>
@@ -89,14 +92,14 @@ public sealed class DefaultFormatter : Formatter
             WriteLine();
 
             if (MessagePatternWriter.HasAnsiCodes)
-                Write(AnsiColorCodes.ForegroundBrightRed);
+                Write(_exceptionCode);
 
             // This allocates, but there's no better way to get the details.
             Write(message.Exception.ToString());
         }
 
         if (MessagePatternWriter.HasAnsiCodes)
-            Write(AnsiColorCodes.Reset);
+            Write(Reset);
 
         WriteLine();
     }
@@ -106,13 +109,13 @@ public sealed class DefaultFormatter : Formatter
     /// </summary>
     public DefaultFormatter WithoutAnsiColorCodes()
     {
-        if (!MessagePatternWriter.HasAnsiCodes && !AnsiColorCodes.HasAnsiCode(JsonSeparator))
+        if (!MessagePatternWriter.HasAnsiCodes && !HasAnsiCode(JsonSeparator))
             return this;
 
         return new DefaultFormatter
         {
             MessagePatternWriter = MessagePatternWriter.WithoutAnsiColorCodes(),
-            JsonSeparator = AnsiColorCodes.RemoveAnsiCodes(JsonSeparator)
+            JsonSeparator = RemoveAnsiCodes(JsonSeparator)
         };
     }
 

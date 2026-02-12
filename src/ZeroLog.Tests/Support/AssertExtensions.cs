@@ -67,10 +67,14 @@ internal static class AssertExtensions
     public static void ShouldBeEquivalentTo<T>(this IEnumerable<T>? actual, IEnumerable<T> expected)
         => Assert.That(actual, Is.EquivalentTo(expected));
 
+    public static void ShouldStartWith(this string? actual, string expected)
+        => Assert.That(actual, Does.StartWith(expected));
+
     public static void ShouldEndWith(this string? actual, string expected)
         => Assert.That(actual, Does.EndWith(expected));
 
-    public static void ShouldBeLessThanOrEqualTo<T>(this T? actual, T expected) where T : notnull
+    public static void ShouldBeLessThanOrEqualTo<T>(this T? actual, T expected)
+        where T : notnull
         => Assert.That(actual, Is.LessThanOrEqualTo(expected));
 
     public static T ShouldHaveSingleItem<T>(this IEnumerable<T>? actual)
