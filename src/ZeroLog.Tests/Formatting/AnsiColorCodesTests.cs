@@ -68,7 +68,7 @@ public class AnsiColorCodesTests
     [TestCase("reset, bold, #102030 foreground, #405060 background", "0;1;38;2;16;32;48;48;2;64;80;96")]
     public void should_parse_sgr_codes(string input, string expectedResult)
     {
-        AnsiColorCodes.TryParseSGR(input, out var result).ShouldBeTrue();
+        AnsiColorCodes.TryParse(input, out var result).ShouldBeTrue();
         result.ShouldStartWith("\e[");
         result.ShouldEndWith("m");
         result.Substring(2, result.Length - 3).ShouldEqual(expectedResult);
@@ -113,5 +113,5 @@ public class AnsiColorCodesTests
     [TestCase("#FFA0A00")]
     [TestCase("#00G000")]
     public void should_not_parse_sgr_codes(string input)
-        => AnsiColorCodes.TryParseSGR(input, out _).ShouldBeFalse();
+        => AnsiColorCodes.TryParse(input, out _).ShouldBeFalse();
 }

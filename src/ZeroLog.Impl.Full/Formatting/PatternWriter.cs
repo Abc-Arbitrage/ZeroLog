@@ -315,7 +315,7 @@ public sealed partial class PatternWriter
             {
                 RequireFormat(true);
 
-                if (!AnsiColorCodes.TryParseSGR(part.Format, out var code))
+                if (!AnsiColorCodes.TryParse(part.Format, out var code))
                     throw new FormatException($"Invalid color format string: {part.Format}");
 
                 return new PatternPart(code);

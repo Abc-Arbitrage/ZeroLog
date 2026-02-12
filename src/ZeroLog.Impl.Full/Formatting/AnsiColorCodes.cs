@@ -84,7 +84,7 @@ internal static partial class AnsiColorCodes
         }
     }
 
-    public static bool TryParseSGR(string? input, out string result)
+    public static bool TryParse(string? input, out string result)
     {
         if (input is null or "")
             goto invalid;
@@ -93,7 +93,7 @@ internal static partial class AnsiColorCodes
 
         foreach (var part in input.Split([',', ';'], StringSplitOptions.RemoveEmptyEntries))
         {
-            if (!TryParseSGRCode(part, codes))
+            if (!TryParseCode(part, codes))
                 goto invalid;
         }
 
@@ -108,7 +108,7 @@ internal static partial class AnsiColorCodes
         return false;
     }
 
-    private static bool TryParseSGRCode(string? input, List<Code> codes)
+    private static bool TryParseCode(string? input, List<Code> codes)
     {
         if (input is null or "")
             return false;
