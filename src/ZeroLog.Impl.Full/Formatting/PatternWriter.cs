@@ -44,7 +44,7 @@ namespace ZeroLog.Formatting;
 /// The <c>%{color:...}</c> placeholder can be used to set the color of the <i>following</i> text in a terminal by emitting
 /// <see href="https://en.wikipedia.org/wiki/ANSI_escape_code#Select_Graphic_Rendition_parameters">SGR ANSI codes</see>.
 /// The format string of this placeholder can contain multiple comma- or semicolon-separated values which specify the attributes of the emitted ANSI code.
-/// Color definitions are defined in a single value.
+/// Color definitions are set as a single value.
 /// <br/>
 /// <br/>Supported values include:<br/>
 /// <list type="table">
@@ -52,12 +52,12 @@ namespace ZeroLog.Formatting;
 /// <item><term>Attribute</term><description><c>reset</c>, <c>bold</c>, <c>italic</c></description></item>
 /// <item><term>Standard color</term><description><c>red</c>, <c>blue</c>, <c>green</c></description></item>
 /// <item><term>Color target</term><description><c>foreground</c> (default), <c>background</c>, <c>fg</c>, <c>bg</c></description></item>
-/// <item><term>Color intensity</term><description><c>dark</c> (default), <c>light</c> followed by a standard color</description></item>
+/// <item><term>Color intensity</term><description><c>dark</c> (default), <c>bright</c> followed by a standard color</description></item>
 /// <item><term>Custom color</term><description><c>#FFA0A0</c></description></item>
 /// <item><term>Default color</term><description><c>default foreground</c></description></item>
 /// <item><term>Custom code</term><description><c>94</c> (bright blue foreground)</description></item>
 /// </list>
-/// <br/>A full example would be: <c>%{color:reset, bold, bright white foreground, #2A3B4C background}</c>.
+/// <br/>A full example would be: <c>%{color: reset, bold, bright white foreground, #2A3B4C background}</c>.
 /// </para>
 /// <para>
 /// Format strings can also be used to set a minimum field length: <c>%{logger:20}</c> will always be at least 20 characters wide.

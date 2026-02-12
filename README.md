@@ -148,11 +148,29 @@ The pattern is a string with the following placeholders:
 | `%exceptionType`    | The exception type, if any                                       |                                                            | 
 | `%newline`          | Equivalent to `Environment.NewLine`                              |                                                            | 
 | `%column`           | Inserts padding spaces until a given column index                | The column index to reach                                  | 
-| `%color`            | An ANSI SGR color code                                           | See in the `PatternWriter` tooltip for more information    | 
-| `%resetColor`       | The reset ANSI color code                                        | `\e[0m`                                                    | 
+| `%color`            | An ANSI SGR color code                                           | See below for more information                             | 
+| `%resetColor`       | The reset ANSI color code                                        | Equivalent to `\e[0m`                                      | 
 | `%%`                | Inserts a single `%` character (escaping)                        |                                                            | 
 
 Patterns can be written in the form `%{field}` or `%{field:format}` to define a format string. String placeholders accept an integer format string which defines their minimum length. For instance, `%{logger:20}` will always be at least 20 characters wide.
+
+The `%{color:...}` placeholder can be used to set the color of the *following* text in a terminal by emitting [SGR ANSI codes](https://en.wikipedia.org/wiki/ANSI_escape_code#Select_Graphic_Rendition_parameters).
+The format string of this placeholder can contain multiple comma- or semicolon-separated values which specify the attributes of the emitted ANSI code. Color definitions are set as a single value.
+
+Supported values include:
+
+| Type            | Examples                                                     |
+|-----------------|--------------------------------------------------------------|
+| Attribute       | `reset`, `bold`, `italic`, `doubly underlined`, `not italic` |
+| Standard color  | `red`, `blue`, `green`                                       |
+| Color target    | `foreground` (default), `background`, `fg`, `bg`             |
+| Color intensity | `dark` (default), `bright` followed by a standard color      |
+| Custom color    | `#FFA0A0`                                                    |
+| Default color   | `default foreground`                                         |
+| Custom code     | `94` (bright blue foreground)                                |
+
+A full example would be: `%{color: reset, bold, bright white foreground, #2A3B4C background}`.
+
 
 A few default patterns are provided. You can run the `ZeroLog.Examples` project to preview them, or write your own. You can also write your own `Formatter`, as shown in the same project.
 
