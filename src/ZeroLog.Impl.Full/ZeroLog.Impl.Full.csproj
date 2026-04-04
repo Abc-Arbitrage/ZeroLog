@@ -4,7 +4,8 @@
     <RootNamespace>ZeroLog</RootNamespace>
     <Nullable>enable</Nullable>
     <DisableFody>true</DisableFody>
-    <IsAotCompatible>true</IsAotCompatible>
+    <IsAotCompatible Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))">true</IsAotCompatible>
+    <VerifyReferenceAotCompatibility>true</VerifyReferenceAotCompatibility>
   </PropertyGroup>
 
   <ItemGroup>
@@ -12,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="InlineIL.Fody" Version="1.10.1" PrivateAssets="all" />
+    <PackageReference Include="InlineIL.Fody" Version="1.10.2" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
