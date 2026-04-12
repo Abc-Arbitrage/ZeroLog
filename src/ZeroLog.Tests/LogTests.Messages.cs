@@ -1,4 +1,3 @@
-
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -6454,5 +6453,4 @@ partial class LogTests
     {
         GcTester.ShouldNotAllocate(() => _log.Fatal($"foo {new LogMessage.AppendOperation<int>(40, static (msg, i) => msg.Append(i + 2))} bar"));
     }
-
 }

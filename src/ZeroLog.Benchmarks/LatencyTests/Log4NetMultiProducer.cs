@@ -35,5 +35,4 @@ public class Log4NetMultiProducer
 
         return SimpleLatencyBenchmark.RunBench(producingThreadCount, produce, signal);
     }
-
 }

@@ -5,18 +5,17 @@ trim_trailing_whitespace = true
 insert_final_newline = true
 end_of_line = crlf
 
-[*.{cs,csx,xaml,cake}]
+[*.{cs,csx,c,cpp,h,cake,tt}]
 indent_size = 4
 indent_style = space
 
-[*.{config,nuspec,resx}]
+[*.{config,nuspec,resx,xml,xaml}]
 indent_size = 2
 indent_style = space
 
 [*.{csproj,vcxproj,props,targets,slnx}]
 indent_size = 2
 indent_style = space
-insert_final_newline = false
 
 [*.sln]
 indent_style = tab
@@ -31,7 +30,7 @@ end_of_line = lf
 ij_powershell_block_brace_style = end_of_line
 
 # Verify
-[*.{received,verified}.txt]
+[*.{received,verified}.{txt,cs}]
 charset = utf-8-bom
 end_of_line = lf
 indent_size = unset
@@ -40,5 +39,85 @@ insert_final_newline = false
 tab_width = unset
 trim_trailing_whitespace = false
 
+### dotnet settings
 [*.cs]
-resharper_indent_raw_literal_string = indent
+
+# "this" qualification
+dotnet_style_qualification_for_event = false:warning
+dotnet_style_qualification_for_field = false:warning
+dotnet_style_qualification_for_method = false:warning
+dotnet_style_qualification_for_property = false:warning
+
+# Use language keywords vs BCL type names
+dotnet_style_predefined_type_for_locals_parameters_members = true:suggestion
+dotnet_style_predefined_type_for_member_access = true:suggestion
+
+# Modifiers
+dotnet_style_require_accessibility_modifiers = for_non_interface_members:suggestion
+dotnet_style_readonly_field = true:suggestion
+
+### Naming rules
+
+# Rules
+dotnet_naming_rule.non_public_fields_should_be_underscore_camel_case.symbols = non_public_fields
+dotnet_naming_rule.non_public_fields_should_be_underscore_camel_case.style = underscore_camel_case
+dotnet_naming_rule.non_public_fields_should_be_underscore_camel_case.severity = warning
+
+# Symbols
+dotnet_naming_symbols.non_public_fields.applicable_accessibilities = private, protected, private_protected
+dotnet_naming_symbols.non_public_fields.applicable_kinds = field
+
+# Styles
+dotnet_naming_style.underscore_camel_case.capitalization = camel_case
+dotnet_naming_style.underscore_camel_case.required_prefix = _
+
+### csharp settings
+[*.cs]
+csharp_indent_labels = no_change
+csharp_prefer_braces = false
+
+### ReSharper settings (these need to be in a [*] section)
+
+[*]
+resharper_align_linq_query = true
+resharper_align_multiline_argument = true
+resharper_align_multiline_calls_chain = true
+resharper_align_multiline_extends_list = true
+resharper_align_multiline_parameter = true
+resharper_align_multiple_declaration = true
+resharper_align_multline_type_parameter_constrains = true
+resharper_align_multline_type_parameter_list = true
+resharper_align_tuple_components = true
+resharper_int_align_switch_expressions = true
+resharper_indent_raw_literal_string = do_not_change
+
+resharper_csharp_keep_blank_lines_in_code = 1
+resharper_csharp_keep_blank_lines_in_declarations = 1
+resharper_keep_existing_attribute_arrangement = true
+resharper_keep_existing_embedded_arrangement = false
+
+resharper_place_accessorholder_attribute_on_same_line = false
+resharper_place_constructor_initializer_on_same_line = false
+resharper_place_expr_method_on_single_line = false
+resharper_place_field_attribute_on_same_line = false
+resharper_place_simple_embedded_statement_on_same_line = false
+resharper_csharp_place_type_constraints_on_same_line = false
+resharper_csharp_wrap_parameters_style = chop_if_long
+resharper_csharp_wrap_arguments_style = wrap_if_long
+resharper_csharp_wrap_after_invocation_lpar = false
+resharper_csharp_wrap_before_invocation_rpar = false
+resharper_csharp_place_single_method_argument_lambda_on_same_line = false
+resharper_csharp_wrap_before_arrow_with_expressions = true
+
+resharper_new_line_before_while = false
+resharper_csharp_stick_comment = false
+
+resharper_wrap_before_arrow_with_expressions = true
+resharper_csharp_wrap_before_binary_opsign = true
+resharper_csharp_wrap_multiple_type_parameter_constraints_style = chop_always
+
+resharper_wrap_tags_and_pi = false
+resharper_xmldoc_indent_text = do_not_touch
+resharper_xmldoc_indent_child_elements = do_not_touch
+resharper_xmldoc_space_before_self_closing = false
+resharper_space_before_self_closing = true

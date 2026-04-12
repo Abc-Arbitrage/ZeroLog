@@ -22,7 +22,6 @@ public class NLogAsyncMultiProducer
 
         var logger = NLog.LogManager.GetLogger(nameof(asyncTarget));
 
-
         var signal = appender.SetMessageCountTarget(warmingMessageCount + totalMessageCount);
 
         var produce = new Func<HistogramBase>(() =>
@@ -49,5 +48,4 @@ public class NLogAsyncMultiProducer
 
         return result;
     }
-
 }

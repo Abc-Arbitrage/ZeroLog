@@ -16,7 +16,7 @@ public class ZeroLogMultiProducer
             RootLogger =
             {
                 LogMessagePoolExhaustionStrategy = LogMessagePoolExhaustionStrategy.WaitUntilAvailable,
-                Appenders = {appender}
+                Appenders = { appender }
             },
             LogMessagePoolSize = queueSize,
         });

@@ -59,7 +59,6 @@ public class IntegrationTests
     [Test]
     public void should_test_append()
     {
-
         Console.WriteLine("Starting test");
         var sw = Stopwatch.StartNew();
 
@@ -89,6 +88,7 @@ public class IntegrationTests
                 streamWriter.WriteLine(timeTaken);
             }
         }
+
         Console.WriteLine("Printed total time taken csv");
     }
 
