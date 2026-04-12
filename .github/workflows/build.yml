@@ -26,16 +26,16 @@ jobs:
           dotnet-version: ${{ env.BUILD_DOTNET_VERSION }}
 
       - name: Restore
-        run: dotnet restore src/ZeroLog.sln
+        run: dotnet restore src/ZeroLog.slnx
 
       - name: Build
-        run: dotnet build --configuration Release --no-restore src/ZeroLog.sln
+        run: dotnet build --configuration Release --no-restore src/ZeroLog.slnx
 
       - name: Pack
-        run: dotnet pack --configuration Release --no-build src/ZeroLog.sln
+        run: dotnet pack --configuration Release --no-build src/ZeroLog.slnx
 
       - name: Test
-        run: dotnet test --configuration Release --no-build src/ZeroLog.sln
+        run: dotnet test --configuration Release --no-build src/ZeroLog.slnx
 
       - name: Test Allocations
         run: ./src/ZeroLog.Tests.Allocation/run.ps1 --configuration Release --no-build
@@ -63,10 +63,10 @@ jobs:
           dotnet-version: ${{ env.BUILD_DOTNET_VERSION }}
 
       - name: Restore
-        run: dotnet restore src/ZeroLog.sln
+        run: dotnet restore src/ZeroLog.slnx
 
       - name: Build
-        run: dotnet build --configuration Release --no-restore src/ZeroLog.sln
+        run: dotnet build --configuration Release --no-restore src/ZeroLog.slnx
 
       - name: Test ZeroLog
         run: dotnet test --configuration Release --no-build src/ZeroLog.Tests/ZeroLog.Tests.csproj

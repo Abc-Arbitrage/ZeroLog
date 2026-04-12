@@ -1,0 +1,24 @@
+<Solution>
+  <Folder Name="/Build/">
+    <File Path="../.editorconfig" />
+    <File Path="../.gitattributes" />
+    <File Path="../.github/workflows/build.yml" />
+    <File Path="../.gitignore" />
+    <File Path="../README.md" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Build.targets" />
+    <File Path="NuGetReadme.md" />
+  </Folder>
+  <Project Path="ZeroLog.Analyzers.Tests.Integration/ZeroLog.Analyzers.Tests.Integration.csproj" />
+  <Project Path="ZeroLog.Analyzers.Tests/ZeroLog.Analyzers.Tests.csproj" />
+  <Project Path="ZeroLog.Analyzers/ZeroLog.Analyzers.csproj" />
+  <Project Path="ZeroLog.Benchmarks/ZeroLog.Benchmarks.csproj" />
+  <Project Path="ZeroLog.Examples/ZeroLog.Examples.csproj" />
+  <Project Path="ZeroLog.Impl.Base/ZeroLog.Impl.Base.csproj" />
+  <Project Path="ZeroLog.Impl.Full/ZeroLog.Impl.Full.csproj" />
+  <Project Path="ZeroLog.Tests.Allocation/ZeroLog.Tests.Allocation.csproj" />
+  <Project Path="ZeroLog.Tests.Aot/ZeroLog.Tests.Aot.csproj" />
+  <Project Path="ZeroLog.Tests.NetStandard/ZeroLog.Tests.NetStandard.csproj" />
+  <Project Path="ZeroLog.Tests/ZeroLog.Tests.csproj" />
+  <Project Path="ZeroLog/ZeroLog.csproj" />
+</Solution>

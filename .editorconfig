@@ -13,7 +13,7 @@ indent_style = space
 indent_size = 2
 indent_style = space
 
-[*.{csproj,vcxproj,props,targets}]
+[*.{csproj,vcxproj,props,targets,slnx}]
 indent_size = 2
 indent_style = space
 insert_final_newline = false
