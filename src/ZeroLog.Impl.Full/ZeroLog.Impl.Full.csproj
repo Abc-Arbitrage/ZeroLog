@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="../ZeroLog.Impl.Base/**/*.cs" Exclude="../ZeroLog.Impl.Base/obj/**/*;../ZeroLog.Impl.Base/bin/**/*" />
+    <Compile Include="../ZeroLog.Impl.Base/**/*.cs" Exclude="../ZeroLog.Impl.Base/obj/**/*;../ZeroLog.Impl.Base/bin/**/*;../ZeroLog.Impl.Base/Properties/**/*" />
   </ItemGroup>
 
 </Project>
