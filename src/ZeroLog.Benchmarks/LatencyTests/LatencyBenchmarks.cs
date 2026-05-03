@@ -15,7 +15,7 @@ namespace Benchmarks;
 
 [MemoryDiagnoser]
 [AllStatisticsColumn]
-[SimpleJob(iterationCount: 64, invocationCount: 128)]
+[SimpleJob(iterationCount: 32, invocationCount: 128)]
 public partial class LatencyBenchmarks
 {
     private const int _operationCount = 8 * 1024;
@@ -39,28 +39,23 @@ public partial class LatencyBenchmarks
     [ParamsAllValues]
     public bool Enabled { get; [UsedImplicitly] set; }
 
-    [GlobalSetup]
-    public void Setup()
-    {
-        SetupZeroLog();
-        SetupZLogger();
-        SetupSerilog();
-    }
-
-    [GlobalCleanup]
-    public void Cleanup()
-    {
-        TearDownZeroLog();
-        TearDownZLogger();
-        TearDownSerilog();
-    }
-
     //
     // ZeroLog
     //
 
-    private void SetupZeroLog()
+    [GlobalSetup(Target = nameof(ZeroLog_Default))]
+    public void SetupZeroLog_Default()
+        => SetupZeroLog(LogMessagePoolExhaustionStrategy.Default);
+
+    [GlobalSetup(Target = nameof(ZeroLog_WaitUntilAvailable))]
+    public void SetupZeroLog_WaitUntilAvailable()
+        => SetupZeroLog(LogMessagePoolExhaustionStrategy.WaitUntilAvailable);
+
+    private void SetupZeroLog(LogMessagePoolExhaustionStrategy strategy)
     {
+        if (LogManager.Configuration is not null)
+            throw new InvalidOperationException();
+
         _zeroLogTestAppender = new TestAppender(false);
 
         LogManager.Initialize(new ZeroLogConfiguration
@@ -68,29 +63,38 @@ public partial class LatencyBenchmarks
             LogMessagePoolSize = _operationCount,
             RootLogger =
             {
-                Level = Enabled ? global::ZeroLog.LogLevel.Info : global::ZeroLog.LogLevel.Warn,
-                LogMessagePoolExhaustionStrategy = LogMessagePoolExhaustionStrategy.WaitUntilAvailable,
+                Level = Enabled ? ZeroLog.LogLevel.Info : ZeroLog.LogLevel.Warn,
+                LogMessagePoolExhaustionStrategy = strategy,
                 Appenders = { _zeroLogTestAppender }
             }
         });
 
-        _zeroLogLogger = LogManager.GetLogger(nameof(ZeroLog));
+        _zeroLogLogger = LogManager.GetLogger("ZeroLog");
 
         if (_zeroLogLogger.IsInfoEnabled != Enabled)
             throw new InvalidOperationException();
     }
 
-    private void TearDownZeroLog()
+    [GlobalCleanup(Targets = [nameof(ZeroLog_Default), nameof(ZeroLog_WaitUntilAvailable)])]
+    public void CleanupZeroLog()
         => LogManager.Shutdown();
 
+    [Benchmark(OperationsPerInvoke = _operationCount)]
+    public void ZeroLog_Default()
+    {
+        // This strategy is unfair to the other ones, as it allows skipping messages, but it is the default one, so bench it anyway.
+        for (var i = 0; i < _operationCount; ++i)
+            _zeroLogLogger.Info($"Hi {_text}! It's {_date:HH:mm:ss}, and the message is #{_number}");
+    }
+
     [Benchmark(Baseline = true, OperationsPerInvoke = _operationCount)]
-    public void ZeroLog()
+    public void ZeroLog_WaitUntilAvailable()
     {
         for (var i = 0; i < _operationCount; ++i)
             _zeroLogLogger.Info($"Hi {_text}! It's {_date:HH:mm:ss}, and the message is #{_number}");
     }
 
-    [IterationCleanup(Target = nameof(ZeroLog))]
+    [IterationCleanup(Targets = [nameof(ZeroLog_Default), nameof(ZeroLog_WaitUntilAvailable)])]
     public void CleanupZeroLogIteration()
         => LogManager.Flush();
 
@@ -98,7 +102,8 @@ public partial class LatencyBenchmarks
     // ZLogger
     //
 
-    private void SetupZLogger()
+    [GlobalSetup(Targets = [nameof(ZLogger_Standard), nameof(ZLogger_Generated)])]
+    public void SetupZLogger()
     {
         _zLoggerFactory = LoggerFactory.Create(logging =>
         {
@@ -106,37 +111,39 @@ public partial class LatencyBenchmarks
             logging.SetMinimumLevel(Enabled ? Microsoft.Extensions.Logging.LogLevel.Information : Microsoft.Extensions.Logging.LogLevel.Warning);
         });
 
-        _zLoggerLogger = _zLoggerFactory.CreateLogger(nameof(ZLogger));
+        _zLoggerLogger = _zLoggerFactory.CreateLogger(nameof(ZLogger_Standard));
 
         if (_zLoggerLogger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Information) != Enabled)
             throw new InvalidOperationException();
     }
 
-    private void TearDownZLogger()
+    [GlobalCleanup(Targets = [nameof(ZLogger_Standard), nameof(ZLogger_Generated)])]
+    public void CleanupZLogger()
         => _zLoggerFactory.Dispose();
 
     [Benchmark(OperationsPerInvoke = _operationCount)]
-    public void ZLogger()
+    public void ZLogger_Standard()
     {
         for (var i = 0; i < _operationCount; ++i)
             _zLoggerLogger.ZLogInformation($"Hi {_text}! It's {_date:HH:mm:ss}, and the message is #{_number}");
     }
 
     [Benchmark(OperationsPerInvoke = _operationCount)]
-    public void ZLoggerGenerated()
+    public void ZLogger_Generated()
     {
         for (var i = 0; i < _operationCount; ++i)
-            ZLoggerGenerated(_zLoggerLogger, _text, _date, _number);
+            ZLogger_Generated(_zLoggerLogger, _text, _date, _number);
     }
 
     [ZLoggerMessage(Microsoft.Extensions.Logging.LogLevel.Information, "Hi {name}! It's {hour:HH:mm:ss}, and the message is #{number}")]
-    private static partial void ZLoggerGenerated(ILogger logger, string name, DateTime hour, int number);
+    private static partial void ZLogger_Generated(ILogger logger, string name, DateTime hour, int number);
 
     //
     // Serilog
     //
 
-    private void SetupSerilog()
+    [GlobalSetup(Target = nameof(Serilog))]
+    public void SetupSerilog()
     {
         _serilogTestSink = new SerilogTestSink(false);
 
@@ -149,13 +156,14 @@ public partial class LatencyBenchmarks
             throw new InvalidOperationException();
     }
 
-    private void TearDownSerilog()
+    [GlobalCleanup(Target = nameof(Serilog))]
+    public void CleanupSerilog()
         => _serilogLogger.Dispose();
 
     [Benchmark(OperationsPerInvoke = _operationCount)]
     public void Serilog()
     {
         for (var i = 0; i < _operationCount; ++i)
-            _serilogLogger.Information("Hi {name}! It's {hour:HH:mm:ss}, and the message is #{number}", _text, _date, _number);
+            _serilogLogger.Information("Hi {Name}! It's {Hour:HH:mm:ss}, and the message is #{Number}", _text, _date, _number);
     }
 }
