@@ -11,7 +11,7 @@ public unsafe class BufferSegmentProviderTests
     private BufferSegmentProvider _bufferSegmentProvider;
 
     private const int _segmentCount = 4;
-    private const int _segmentSize = 8;
+    private const int _segmentSize = BufferSegmentProvider.MinSegmentSize;
 
     [SetUp]
     public void SetUp()
@@ -77,5 +77,21 @@ public unsafe class BufferSegmentProviderTests
     {
         var provider = new BufferSegmentProvider(4 * 1024, 1024 * 1024);
         provider.BufferSize.ShouldEqual(1024 * 1024 * 1024);
+    }
+
+    [Test]
+    public void should_have_min_segment_size()
+    {
+        _bufferSegmentProvider = new BufferSegmentProvider(1, 1);
+
+        var segmentA = _bufferSegmentProvider.GetSegment();
+        segmentA.Length.ShouldEqual(BufferSegmentProvider.MinSegmentSize);
+        segmentA.UnderlyingBuffer.Length.ShouldEqual(BufferSegmentProvider.MinSegmentSize);
+
+        var segmentB = _bufferSegmentProvider.GetSegment();
+        segmentB.Length.ShouldEqual(BufferSegmentProvider.MinSegmentSize);
+        segmentB.UnderlyingBuffer.Length.ShouldEqual(BufferSegmentProvider.MinSegmentSize);
+
+        segmentB.UnderlyingBuffer.ShouldNotBeTheSameAs(segmentA.UnderlyingBuffer);
     }
 }

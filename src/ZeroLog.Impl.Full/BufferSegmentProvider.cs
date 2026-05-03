@@ -6,6 +6,8 @@ namespace ZeroLog;
 
 internal unsafe class BufferSegmentProvider
 {
+    internal const int MinSegmentSize = 8;
+
     private readonly Lock _lock = new();
     private readonly int _segmentCount;
     private readonly int _segmentSize;
@@ -29,8 +31,8 @@ internal unsafe class BufferSegmentProvider
         while ((long)segmentSize * segmentCount > maxBufferSize)
             segmentCount >>= 1;
 
-        _segmentCount = segmentCount;
-        _segmentSize = segmentSize;
+        _segmentCount = Math.Max(1, segmentCount);
+        _segmentSize = Math.Max(MinSegmentSize, segmentSize);
     }
 
     public BufferSegment GetSegment()
