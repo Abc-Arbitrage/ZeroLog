@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace ZeroLog;
@@ -36,22 +37,24 @@ internal unsafe class BufferSegmentProvider
     {
         lock (_lock)
         {
-            if (_currentSegment >= _segmentCount || _currentBuffer is null)
+            var buffer = _currentBuffer;
+
+            if (_currentSegment >= _segmentCount || buffer is null)
             {
-                _currentBuffer = GC.AllocateUninitializedArray<byte>(BufferSize, pinned: true);
+                _currentBuffer = buffer = GC.AllocateUninitializedArray<byte>(BufferSize, pinned: true);
                 _currentSegment = 0;
             }
 
             var offset = _segmentSize * _currentSegment++;
-            var data = (byte*)Marshal.UnsafeAddrOfPinnedArrayElement(_currentBuffer, offset);
-            return new BufferSegment(data, _segmentSize, _currentBuffer);
+            var data = (byte*)Unsafe.AsPointer(ref MemoryMarshal.GetArrayDataReference(buffer)) + offset;
+            return new BufferSegment(data, _segmentSize, buffer);
         }
     }
 
     public static BufferSegment CreateStandaloneSegment(int bufferSize)
     {
         var buffer = GC.AllocateUninitializedArray<byte>(bufferSize, pinned: true);
-        var data = (byte*)Marshal.UnsafeAddrOfPinnedArrayElement(buffer, 0);
+        var data = (byte*)Unsafe.AsPointer(ref MemoryMarshal.GetArrayDataReference(buffer));
         return new BufferSegment(data, bufferSize, buffer);
     }
 }
