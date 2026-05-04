@@ -111,58 +111,56 @@ public readonly unsafe ref struct LoggedKeyValue
             return false;
         }
 
-        fixed (byte* rawDataPointer = _rawData)
+        ref var rawDataRef = ref MemoryMarshal.GetReference(_rawData);
+        var valueType = (ArgumentType)rawDataRef; // There is no FormatFlag in this context
+        ref var dataRef = ref Unsafe.Add(ref rawDataRef, sizeof(ArgumentType));
+
+        switch (valueType)
         {
-            var valueType = *(ArgumentType*)rawDataPointer; // There is no FormatFlag in this context
-            var dataPointer = rawDataPointer + sizeof(ArgumentType);
-
-            switch (valueType)
+            case ArgumentType.Char when typeof(T) == typeof(char):
+            case ArgumentType.Boolean when typeof(T) == typeof(bool):
+            case ArgumentType.Byte when typeof(T) == typeof(byte):
+            case ArgumentType.SByte when typeof(T) == typeof(sbyte):
+            case ArgumentType.Int16 when typeof(T) == typeof(short):
+            case ArgumentType.UInt16 when typeof(T) == typeof(ushort):
+            case ArgumentType.Int32 when typeof(T) == typeof(int):
+            case ArgumentType.UInt32 when typeof(T) == typeof(uint):
+            case ArgumentType.Int64 when typeof(T) == typeof(long):
+            case ArgumentType.UInt64 when typeof(T) == typeof(ulong):
+            case ArgumentType.IntPtr when typeof(T) == typeof(nint):
+            case ArgumentType.UIntPtr when typeof(T) == typeof(nuint):
+            case ArgumentType.Single when typeof(T) == typeof(float):
+            case ArgumentType.Double when typeof(T) == typeof(double):
+            case ArgumentType.Decimal when typeof(T) == typeof(decimal):
+            case ArgumentType.Guid when typeof(T) == typeof(Guid):
+            case ArgumentType.DateTime when typeof(T) == typeof(DateTime):
+            case ArgumentType.TimeSpan when typeof(T) == typeof(TimeSpan):
+            case ArgumentType.DateOnly when typeof(T) == typeof(DateOnly):
+            case ArgumentType.TimeOnly when typeof(T) == typeof(TimeOnly):
+            case ArgumentType.DateTimeOffset when typeof(T) == typeof(DateTimeOffset):
             {
-                case ArgumentType.Char when typeof(T) == typeof(char):
-                case ArgumentType.Boolean when typeof(T) == typeof(bool):
-                case ArgumentType.Byte when typeof(T) == typeof(byte):
-                case ArgumentType.SByte when typeof(T) == typeof(sbyte):
-                case ArgumentType.Int16 when typeof(T) == typeof(short):
-                case ArgumentType.UInt16 when typeof(T) == typeof(ushort):
-                case ArgumentType.Int32 when typeof(T) == typeof(int):
-                case ArgumentType.UInt32 when typeof(T) == typeof(uint):
-                case ArgumentType.Int64 when typeof(T) == typeof(long):
-                case ArgumentType.UInt64 when typeof(T) == typeof(ulong):
-                case ArgumentType.IntPtr when typeof(T) == typeof(nint):
-                case ArgumentType.UIntPtr when typeof(T) == typeof(nuint):
-                case ArgumentType.Single when typeof(T) == typeof(float):
-                case ArgumentType.Double when typeof(T) == typeof(double):
-                case ArgumentType.Decimal when typeof(T) == typeof(decimal):
-                case ArgumentType.Guid when typeof(T) == typeof(Guid):
-                case ArgumentType.DateTime when typeof(T) == typeof(DateTime):
-                case ArgumentType.TimeSpan when typeof(T) == typeof(TimeSpan):
-                case ArgumentType.DateOnly when typeof(T) == typeof(DateOnly):
-                case ArgumentType.TimeOnly when typeof(T) == typeof(TimeOnly):
-                case ArgumentType.DateTimeOffset when typeof(T) == typeof(DateTimeOffset):
-                {
-                    result = Unsafe.Read<T>(dataPointer);
-                    return true;
-                }
-
-                case ArgumentType.Enum:
-                {
-                    var argPtr = (EnumArg*)dataPointer;
-                    return argPtr->TryGetValue<T>(out result);
-                }
-
-                case ArgumentType.Unmanaged:
-                {
-                    var argPtr = (UnmanagedArgHeader*)dataPointer;
-                    if (typeof(T) != argPtr->Type)
-                        break;
-
-                    result = Unsafe.Read<T>(argPtr + sizeof(UnmanagedArgHeader));
-                    return true;
-                }
+                result = Unsafe.As<byte, T>(ref dataRef);
+                return true;
             }
 
-            result = default;
-            return false;
+            case ArgumentType.Enum:
+            {
+                return Unsafe.As<byte, EnumArg>(ref dataRef).TryGetValue<T>(out result);
+            }
+
+            case ArgumentType.Unmanaged:
+            {
+                ref var header = ref Unsafe.As<byte, UnmanagedArgHeader>(ref dataRef);
+                if (typeof(T) != header.Type)
+                    break;
+
+                ref var valueRef = ref Unsafe.Add(ref dataRef, sizeof(UnmanagedArgHeader));
+                result = Unsafe.As<byte, T>(ref valueRef);
+                return true;
+            }
         }
+
+        result = default;
+        return false;
     }
 }
