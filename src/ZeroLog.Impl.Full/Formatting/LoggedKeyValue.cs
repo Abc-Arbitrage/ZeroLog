@@ -145,7 +145,7 @@ public readonly unsafe ref struct LoggedKeyValue
 
             case ArgumentType.Enum:
             {
-                return Unsafe.As<byte, EnumArg>(ref dataRef).TryGetValue<T>(out result);
+                return Unsafe.As<byte, EnumArg>(ref dataRef).TryGetValue(out result);
             }
 
             case ArgumentType.Unmanaged:
