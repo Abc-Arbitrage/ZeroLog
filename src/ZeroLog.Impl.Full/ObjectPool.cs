@@ -8,7 +8,7 @@ using ZeroLog.Support;
 
 namespace ZeroLog;
 
-internal class ObjectPool<T> : IDisposable
+internal sealed class ObjectPool<T> : IDisposable
     where T : class
 {
     private readonly ConcurrentQueue<T> _queue;

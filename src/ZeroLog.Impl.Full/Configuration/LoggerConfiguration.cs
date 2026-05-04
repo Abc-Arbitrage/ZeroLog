@@ -178,7 +178,7 @@ public interface ILoggerConfigurationCollection : ICollection<LoggerConfiguratio
     void Add(string name, LogLevel level);
 }
 
-internal class LoggerConfigurationCollection : List<LoggerConfiguration>, ILoggerConfigurationCollection
+internal sealed class LoggerConfigurationCollection : List<LoggerConfiguration>, ILoggerConfigurationCollection
 {
     public LoggerConfigurationCollection()
     {

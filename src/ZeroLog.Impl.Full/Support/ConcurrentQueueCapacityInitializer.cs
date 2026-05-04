@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace ZeroLog.Support;
 
-internal class ConcurrentQueueCapacityInitializer<T>(int size) : ICollection<T>
+internal sealed class ConcurrentQueueCapacityInitializer<T>(int size) : ICollection<T>
 {
     // Fake collection used to initialize the capacity of a ConcurrentQueue:
     // - Has a Count property set to the desired initial capacity
