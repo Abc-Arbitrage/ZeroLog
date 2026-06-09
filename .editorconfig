@@ -108,6 +108,7 @@ resharper_csharp_wrap_after_invocation_lpar = false
 resharper_csharp_wrap_before_invocation_rpar = false
 resharper_csharp_place_single_method_argument_lambda_on_same_line = false
 resharper_csharp_wrap_before_arrow_with_expressions = true
+resharper_csharp_empty_block_style = do_not_change
 
 resharper_new_line_before_while = false
 resharper_csharp_stick_comment = false

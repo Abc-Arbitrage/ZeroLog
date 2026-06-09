@@ -62,12 +62,10 @@ public sealed partial class LogMessage
     internal static readonly LogMessage Empty = new();
 
     private LogMessage()
-    {
-    }
+    { }
 
     public partial void Log()
-    {
-    }
+    { }
 
     public override partial string ToString()
         => string.Empty;

@@ -17,13 +17,11 @@ public sealed class DefaultStyle
 
     private DefaultStyle([PatternWriter.Pattern] string pattern)
         : this(new DefaultFormatter(pattern))
-    {
-    }
+    { }
 
     private DefaultStyle(PatternWriter patternWriter)
         : this(new DefaultFormatter(patternWriter))
-    {
-    }
+    { }
 
     private DefaultStyle(DefaultFormatter formatter)
     {

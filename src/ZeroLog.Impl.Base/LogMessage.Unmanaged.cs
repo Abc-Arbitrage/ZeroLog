@@ -70,13 +70,11 @@ partial class LogMessage
 
     private partial void InternalAppendUnmanaged<T>(ref T value, string? format)
         where T : unmanaged
-    {
-    }
+    { }
 
     private partial void InternalAppendUnmanaged<T>(ref T? value, string? format)
         where T : unmanaged
-    {
-    }
+    { }
 
 #endif
 }

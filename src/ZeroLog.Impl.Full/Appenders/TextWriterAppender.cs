@@ -37,8 +37,7 @@ public class TextWriterAppender : Appender
     /// Initializes a new instance of the appender.
     /// </summary>
     public TextWriterAppender()
-    {
-    }
+    { }
 
     /// <summary>
     /// Initializes a new instance of the appender.

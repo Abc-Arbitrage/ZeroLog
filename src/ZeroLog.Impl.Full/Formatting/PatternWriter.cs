@@ -785,8 +785,7 @@ public sealed partial class PatternWriter
                 AnsiColorCodes.SGR(error),
                 AnsiColorCodes.SGR(fatal)
             )
-        {
-        }
+        { }
 
         /// <summary>
         /// Creates a new instance of <see cref="LogLevelColors"/> with foreground and background colors from <see cref="ConsoleColor"/>.
@@ -811,16 +810,14 @@ public sealed partial class PatternWriter
                 AnsiColorCodes.SGR(errorForeground, errorBackground),
                 AnsiColorCodes.SGR(fatalForeground, fatalBackground)
             )
-        {
-        }
+        { }
 
         /// <summary>
         /// Creates a new instance of <see cref="LogLevelColors"/> with custom ANSI codes.
         /// </summary>
         public LogLevelColorCodes(string trace, string debug, string info, string warn, string error, string fatal)
             : this(new LogLevelNames(trace, debug, info, warn, error, fatal))
-        {
-        }
+        { }
 
         private LogLevelColorCodes(LogLevelNames values)
             => Values = values;

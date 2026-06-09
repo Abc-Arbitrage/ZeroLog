@@ -74,15 +74,13 @@ public class DateAndSizeRollingFileAppender : StreamAppender
     /// Called after a file is opened. You may use this to write a header.
     /// </summary>
     protected virtual void FileOpened()
-    {
-    }
+    { }
 
     /// <summary>
     /// Called before a file is closed. You may use this to write a footer.
     /// </summary>
     protected virtual void FileClosing()
-    {
-    }
+    { }
 
     /// <summary>
     /// Returns the file name without the directory for the given parameters.

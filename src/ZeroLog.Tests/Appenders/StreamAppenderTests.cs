@@ -182,9 +182,7 @@ public class StreamAppenderTests
             => Default.GetMaxCharCount(byteCount);
     }
 
-    private class EncodingWithoutSpanGetBytes : EncodingBase
-    {
-    }
+    private class EncodingWithoutSpanGetBytes : EncodingBase;
 
     private class EncodingWithSpanGetBytes : EncodingBase
     {

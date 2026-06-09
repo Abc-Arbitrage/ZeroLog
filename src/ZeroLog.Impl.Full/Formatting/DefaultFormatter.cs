@@ -48,8 +48,7 @@ public sealed class DefaultFormatter : Formatter
     /// </summary>
     public DefaultFormatter()
         : this(((DefaultFormatter)DefaultStyle.NoColor.Default.Formatter).MessagePatternWriter)
-    {
-    }
+    { }
 
     /// <summary>
     /// Initializes a new instance of the default formatter with a custom pattern.
@@ -58,8 +57,7 @@ public sealed class DefaultFormatter : Formatter
     /// <seealso cref="MessagePatternWriter"/>
     public DefaultFormatter([PatternWriter.Pattern] string pattern)
         : this(new PatternWriter(pattern))
-    {
-    }
+    { }
 
     /// <summary>
     /// Initializes a new instance of the default formatter with a custom pattern writer.

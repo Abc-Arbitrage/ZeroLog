@@ -15,6 +15,5 @@ internal class BenchmarkLogMessageProvider : ILogMessageProvider
         => _logMessage;
 
     public void Submit(LogMessage message)
-    {
-    }
+    { }
 }

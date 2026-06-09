@@ -110,7 +110,6 @@ public class FormatterTests
         public static int BufferLength { get; } = new TestFormatter().GetRemainingBuffer().Length;
 
         protected override void WriteMessage(LoggedMessage message)
-        {
-        }
+        { }
     }
 }

@@ -12,6 +12,5 @@ public sealed class NoopAppender : Appender
     /// </summary>
     /// <param name="message">The message to ignore.</param>
     public override void WriteMessage(LoggedMessage message)
-    {
-    }
+    { }
 }

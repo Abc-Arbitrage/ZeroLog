@@ -136,8 +136,7 @@ internal abstract class Runner : ILogMessageProvider, IDisposable
     public abstract void Flush();
 
     internal virtual void WaitUntilNewConfigurationIsApplied() // For unit tests
-    {
-    }
+    { }
 
     protected virtual bool ShouldWaitUntilAvailable()
         => IsRunning;

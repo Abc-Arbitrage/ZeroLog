@@ -92,36 +92,29 @@ partial class LogMessage
 #if NETSTANDARD
 
     private partial void InternalAppendKeyValue(string key, string? value)
-    {
-    }
+    { }
 
     private partial void InternalAppendKeyValue<T>(string key, T value, ArgumentType argType)
         where T : unmanaged
-    {
-    }
+    { }
 
     private partial void InternalAppendKeyValue<T>(string key, T? value, ArgumentType argType)
         where T : unmanaged
-    {
-    }
+    { }
 
     private partial void InternalAppendKeyValue<T>(string key, T value)
         where T : struct, Enum
-    {
-    }
+    { }
 
     private partial void InternalAppendKeyValue<T>(string key, T? value)
         where T : struct, Enum
-    {
-    }
+    { }
 
     private partial void InternalAppendKeyValue(string key, ReadOnlySpan<char> value)
-    {
-    }
+    { }
 
     private partial void InternalAppendKeyValue(string key, ReadOnlySpan<byte> value)
-    {
-    }
+    { }
 
 #endif
 }

@@ -95,46 +95,37 @@ partial class LogMessage
 #if NETSTANDARD
 
     internal partial void InternalAppendString(string? value)
-    {
-    }
+    { }
 
     internal partial void InternalAppendValueType<T>(T value, ArgumentType argType)
         where T : unmanaged
-    {
-    }
+    { }
 
     internal partial void InternalAppendValueType<T>(T? value, ArgumentType argType)
         where T : unmanaged
-    {
-    }
+    { }
 
     internal partial void InternalAppendValueType<T>(T value, string format, ArgumentType argType)
         where T : unmanaged
-    {
-    }
+    { }
 
     internal partial void InternalAppendValueType<T>(T? value, string format, ArgumentType argType)
         where T : unmanaged
-    {
-    }
+    { }
 
     internal partial void InternalAppendEnum<T>(T value)
         where T : struct, Enum
-    {
-    }
+    { }
 
     internal partial void InternalAppendEnum<T>(T? value)
         where T : struct, Enum
-    {
-    }
+    { }
 
     internal partial void InternalAppendStringSpan(ReadOnlySpan<char> value)
-    {
-    }
+    { }
 
     internal partial void InternalAppendUtf8StringSpan(ReadOnlySpan<byte> value)
-    {
-    }
+    { }
 
 #endif
 }

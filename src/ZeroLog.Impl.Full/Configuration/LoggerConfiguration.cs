@@ -76,8 +76,7 @@ public sealed class LoggerConfiguration : ILoggerConfiguration
     /// <param name="type">The type which uses the logger.</param>
     public LoggerConfiguration(Type type)
         : this(type.FullName ?? throw new InvalidOperationException("Invalid type name"))
-    {
-    }
+    { }
 
     /// <summary>
     /// Creates a configuration for a type.
@@ -130,8 +129,7 @@ public sealed class RootLoggerConfiguration : ILoggerConfiguration
     public ICollection<AppenderConfiguration> Appenders { get; private set; } = new List<AppenderConfiguration>();
 
     internal RootLoggerConfiguration()
-    {
-    }
+    { }
 
     LogLevel? ILoggerConfiguration.Level => Level;
     LogMessagePoolExhaustionStrategy? ILoggerConfiguration.LogMessagePoolExhaustionStrategy => LogMessagePoolExhaustionStrategy;
@@ -181,13 +179,11 @@ public interface ILoggerConfigurationCollection : ICollection<LoggerConfiguratio
 internal sealed class LoggerConfigurationCollection : List<LoggerConfiguration>, ILoggerConfigurationCollection
 {
     public LoggerConfigurationCollection()
-    {
-    }
+    { }
 
     public LoggerConfigurationCollection(IEnumerable<LoggerConfiguration> items)
         : base(items)
-    {
-    }
+    { }
 
     public void Add(string name, LogLevel level)
         => Add(new LoggerConfiguration(name, level));

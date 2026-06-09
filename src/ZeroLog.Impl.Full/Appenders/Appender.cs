@@ -29,8 +29,7 @@ public abstract class Appender : IDisposable
     /// Appenders will be initialized a single time by ZeroLog, even if used multiple times.
     /// </remarks>
     public virtual void Initialize()
-    {
-    }
+    { }
 
     /// <summary>
     /// Handles a logged message.
@@ -45,13 +44,11 @@ public abstract class Appender : IDisposable
     /// This is called each time the message queue is empty after a message has been handled.
     /// </remarks>
     public virtual void Flush()
-    {
-    }
+    { }
 
     /// <inheritdoc cref="IDisposable.Dispose"/>
     public virtual void Dispose()
-    {
-    }
+    { }
 
     internal void InternalInitialize()
     {
