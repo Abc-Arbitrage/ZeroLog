@@ -35,7 +35,7 @@ jobs:
         run: dotnet pack --configuration Release --no-build src/ZeroLog.slnx
 
       - name: Test
-        run: dotnet test --configuration Release --no-build src/ZeroLog.slnx
+        run: dotnet test --configuration Release --no-build --solution src/ZeroLog.slnx
 
       - name: Test Allocations
         run: ./src/ZeroLog.Tests.Allocation/run.ps1 --configuration Release --no-build
@@ -69,10 +69,10 @@ jobs:
         run: dotnet build --configuration Release --no-restore src/ZeroLog.slnx
 
       - name: Test ZeroLog
-        run: dotnet test --configuration Release --no-build src/ZeroLog.Tests/ZeroLog.Tests.csproj
+        run: dotnet test --configuration Release --no-build --project src/ZeroLog.Tests/ZeroLog.Tests.csproj
 
       - name: Test Analyzers
-        run: dotnet test --configuration Release --no-build src/ZeroLog.Analyzers.Tests/ZeroLog.Analyzers.Tests.csproj
+        run: dotnet test --configuration Release --no-build --project src/ZeroLog.Analyzers.Tests/ZeroLog.Analyzers.Tests.csproj
 
       - name: Test Allocations
         run: ./src/ZeroLog.Tests.Allocation/run.ps1 --configuration Release --no-build
