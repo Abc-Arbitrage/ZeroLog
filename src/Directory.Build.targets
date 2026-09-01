@@ -1,1 +1,7 @@
-<Project />
+<Project>
+  <ItemGroup>
+    <!-- Workaround: https://youtrack.jetbrains.com/issue/RIDER-131530 -->
+    <PackageReference Include="Microsoft.NET.Test.Sdk" VersionOverride="18.9.0" Condition="'$(EnableNUnitRunner)' == 'true'" />
+  </ItemGroup>
+
+</Project>
