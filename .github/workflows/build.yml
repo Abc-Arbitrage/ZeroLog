@@ -4,13 +4,8 @@ on: [ push, pull_request ]
 env:
   DOTNET_NOLOGO: 1
   NUGET_CERT_REVOCATION_MODE: offline
-
-  BUILD_DOTNET_VERSION: |
-    6.0.x
-    7.0.x
-    8.0.x
-    9.0.x
-    10.0.x
+  DOTNET_SYSTEM_CONSOLE_ALLOW_ANSI_COLOR_REDIRECTION: 1
+  TERM: xterm
 
 jobs:
   windows:
@@ -18,12 +13,12 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v5
+        uses: actions/setup-dotnet@v6
         with:
-          dotnet-version: ${{ env.BUILD_DOTNET_VERSION }}
+          global-json-file: global.json
 
       - name: Restore
         run: dotnet restore src/ZeroLog.slnx
@@ -55,12 +50,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v5
+        uses: actions/setup-dotnet@v6
         with:
-          dotnet-version: ${{ env.BUILD_DOTNET_VERSION }}
+          global-json-file: global.json
 
       - name: Restore
         run: dotnet restore src/ZeroLog.slnx
