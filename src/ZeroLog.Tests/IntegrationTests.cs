@@ -11,7 +11,7 @@ using ZeroLog.Configuration;
 namespace ZeroLog.Tests;
 
 [TestFixture]
-[Explicit("Manual")]
+[Explicit("Manual")] // MTP complains about explicit tests, so their attributes are commented out.
 public class IntegrationTests
 {
     private PerformanceAppender _performanceAppender;
@@ -46,7 +46,7 @@ public class IntegrationTests
         LogManager.Shutdown();
     }
 
-    [Test]
+    // [Test]
     public void should_test_console()
     {
         LogManager.GetLogger(typeof(IntegrationTests)).Info().Append("Hello").Log();
@@ -56,7 +56,7 @@ public class IntegrationTests
         LogManager.GetLogger(typeof(IntegrationTests)).Debug().Append("Hello").Log();
     }
 
-    [Test]
+    // [Test]
     public void should_test_append()
     {
         Console.WriteLine("Starting test");
@@ -97,7 +97,7 @@ public class IntegrationTests
         return unchecked(ticks * 1000000 / (double)(Stopwatch.Frequency));
     }
 
-    [Test]
+    // [Test]
     public void should_not_allocate()
     {
         const int count = 1000000;
