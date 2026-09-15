@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="InlineIL.Fody" Version="1.10.2" PrivateAssets="all" />
+    <PackageReference Include="InlineIL.Fody" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>

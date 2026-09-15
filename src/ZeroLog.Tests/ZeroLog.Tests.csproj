@@ -12,14 +12,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="NUnit" Version="4.6.1" />
-    <PackageReference Include="NUnit3TestAdapter" Version="6.3.0" />
-    <PackageReference Include="MarkdownSnippets.MsBuild" Version="28.4.2" PrivateAssets="all" />
-    <PackageReference Include="Verify.NUnit" Version="32.0.0" />
-    <PackageReference Include="Verify.DiffPlex" Version="3.3.1" />
-    <PackageReference Include="PublicApiGenerator" Version="11.5.4" />
-    <PackageReference Include="ObjectLayoutInspector" Version="0.2.0" />
-    <PackageReference Include="JetBrains.Annotations" Version="2026.2.0" PrivateAssets="all" />
+    <PackageReference Include="NUnit" />
+    <PackageReference Include="NUnit3TestAdapter" />
+    <PackageReference Include="MarkdownSnippets.MsBuild" PrivateAssets="all" />
+    <PackageReference Include="Verify.NUnit" />
+    <PackageReference Include="Verify.DiffPlex" />
+    <PackageReference Include="PublicApiGenerator" />
+    <PackageReference Include="ObjectLayoutInspector" />
+    <PackageReference Include="JetBrains.Annotations" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
