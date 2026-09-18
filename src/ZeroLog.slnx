@@ -4,9 +4,11 @@
     <File Path="../.gitattributes" />
     <File Path="../.github/workflows/build.yml" />
     <File Path="../.gitignore" />
+    <File Path="../global.json" />
     <File Path="../README.md" />
     <File Path="Directory.Build.props" />
     <File Path="Directory.Build.targets" />
+    <File Path="Directory.Packages.props" />
     <File Path="NuGetReadme.md" />
   </Folder>
   <Project Path="ZeroLog.Analyzers.Tests.Integration/ZeroLog.Analyzers.Tests.Integration.csproj" />

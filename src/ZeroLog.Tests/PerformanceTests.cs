@@ -7,7 +7,7 @@ using ZeroLog.Configuration;
 namespace ZeroLog.Tests;
 
 [TestFixture]
-[Ignore("Manual")]
+[Explicit("Manual")] // MTP complains about explicit tests, so their attributes are commented out.
 public class PerformanceTests
 {
     private TestAppender _testAppender;
@@ -35,13 +35,13 @@ public class PerformanceTests
         LogManager.Shutdown();
     }
 
-    [Test]
+    // [Test]
     public void should_test_console()
     {
         LogManager.GetLogger(typeof(PerformanceTests)).Info().Append("Hello ").Append(42).Append(" this is a relatively long message ").Append(12345.4332m).Log();
     }
 
-    [Test]
+    // [Test]
     public void should_run_test()
     {
         const int threadMessageCount = 1000 * 1000;

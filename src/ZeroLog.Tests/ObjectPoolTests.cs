@@ -72,7 +72,7 @@ public class ObjectPoolTests
         pool.Count.ShouldEqual(3);
     }
 
-    [Test, Explicit]
+    // [Test, Explicit] // MTP complains about explicit tests
     public void show_layout()
     {
         TypeLayout.PrintLayout<ObjectPool<Item>>(false);

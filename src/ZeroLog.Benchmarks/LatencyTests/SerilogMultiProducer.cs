@@ -1,8 +1,6 @@
 ﻿using System;
 using HdrHistogram;
 using ZeroLog.Benchmarks.Tools;
-using ZeroLog.Configuration;
-using ZeroLog.Tests;
 
 namespace ZeroLog.Benchmarks.LatencyTests;
 
