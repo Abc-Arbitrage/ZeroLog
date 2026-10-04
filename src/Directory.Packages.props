@@ -7,12 +7,12 @@
     <PackageVersion Include="Fody" Version="6.9.3" />
     <PackageVersion Include="InlineIL.Fody" Version="1.10.2" />
     <PackageVersion Include="JetBrains.Annotations" Version="2026.2.0" />
-    <PackageVersion Include="MarkdownSnippets.MsBuild" Version="28.4.2" />
+    <PackageVersion Include="MarkdownSnippets.MsBuild" Version="28.5.0" />
     <PackageVersion Include="Microsoft.CodeAnalysis" Version="5.6.0" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Analyzer.Testing" Version="1.1.4" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.CodeFix.Testing" Version="1.1.4" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="5.6.0" />
-    <PackageVersion Include="NUnit" Version="4.6.1" />
+    <PackageVersion Include="NUnit" Version="5.0.0" />
     <PackageVersion Include="NUnit3TestAdapter" Version="6.3.0" />
     <PackageVersion Include="ObjectLayoutInspector" Version="0.2.0" />
     <PackageVersion Include="PublicApiGenerator" Version="11.5.4" />

@@ -17,8 +17,8 @@
     <PackageReference Include="HdrHistogram" VersionOverride="2.5.0" />
     <PackageReference Include="Fody" PrivateAssets="all" />
     <PackageReference Include="InlineIL.Fody" PrivateAssets="all" />
-    <PackageReference Include="log4net" VersionOverride="3.4.0" />
-    <PackageReference Include="NLog" VersionOverride="6.2.0" />
+    <PackageReference Include="log4net" VersionOverride="3.5.0" />
+    <PackageReference Include="NLog" VersionOverride="6.2.1" />
     <PackageReference Include="Serilog" VersionOverride="4.4.0" />
     <PackageReference Include="ZLogger" VersionOverride="2.5.10" />
     <PackageReference Include="JetBrains.Annotations" PrivateAssets="all" />
