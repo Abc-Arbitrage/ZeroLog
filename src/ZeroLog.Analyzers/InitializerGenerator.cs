@@ -20,27 +20,32 @@ public class InitializerGenerator : IIncrementalGenerator
                                  .CreateSyntaxProvider(SyntaxPredicate, SyntaxTransform)
                                  .WhereNotNull()
                                  .Collect()
-                                 .Combine(context.CompilationProvider.Select(SupportsGeneratedInitialization))
+                                 .Combine(context.CompilationProvider.Select(SupportsGeneratedInitializer))
                                  .Select(static (pair, _) => pair.Right ? pair.Left : ImmutableArray<string>.Empty)
                                  .Select(static (names, _) => LoggerNames.Normalize(names))
                                  .WithComparer(LoggerNames.Comparer);
 
+        var hasModuleInitializerAttribute = context.CompilationProvider
+                                                   .Select(static (i, _) => i.GetTypeByMetadataName("System.Runtime.CompilerServices.ModuleInitializerAttribute") is not null);
+
         context.RegisterImplementationSourceOutput(
-            loggerNames,
-            static (context, loggerNames) =>
+            loggerNames.Combine(hasModuleInitializerAttribute),
+            static (context, pair) =>
             {
+                var (loggerNames, hasModuleInitializerAttribute) = pair;
+
                 if (loggerNames.Length == 0)
                     return;
 
                 context.AddSource(
-                    "Initialization.g.cs",
-                    new Generator().Generate(loggerNames)
+                    "Initializer.g.cs",
+                    new Generator().Generate(loggerNames, hasModuleInitializerAttribute)
                 );
             }
         );
     }
 
-    private static bool SupportsGeneratedInitialization(Compilation compilation, CancellationToken cancellationToken)
+    private static bool SupportsGeneratedInitializer(Compilation compilation, CancellationToken cancellationToken)
     {
         // C# 11 is required for file-scoped types
         return compilation is CSharpCompilation { LanguageVersion: >= (LanguageVersion)1100 }
@@ -166,15 +171,16 @@ public class InitializerGenerator : IIncrementalGenerator
 
         private readonly CodeWriter _writer = new();
 
-        public string Generate(ImmutableArray<string> loggerNames)
+        public string Generate(ImmutableArray<string> loggerNames, bool hasModuleInitializerAttribute)
         {
             _writer.Clear();
 
             AppendHeader();
-            AppendAttributes();
 
-            using (_writer.WriteBlock($"namespace {ZeroLogFacts.Namespace}"))
-            using (_writer.WriteBlock("file static class ZeroLogGenerated"))
+            if (!hasModuleInitializerAttribute)
+                AppendModuleInitializerAttribute();
+
+            using (_writer.WriteBlock("file static class ZeroLogInitializer"))
             {
                 GenerateModuleInitializer();
                 GenerateOnInitialized(loggerNames);
@@ -197,11 +203,8 @@ public class InitializerGenerator : IIncrementalGenerator
             );
         }
 
-        private void AppendAttributes()
+        private void AppendModuleInitializerAttribute()
         {
-            _writer.AppendUnindentedLine("#if !NET5_0_OR_GREATER")
-                   .AppendLine();
-
             using (_writer.WriteBlock("namespace System.Runtime.CompilerServices"))
             {
                 _writer.AppendLine(
@@ -212,9 +215,7 @@ public class InitializerGenerator : IIncrementalGenerator
                 );
             }
 
-            _writer.AppendLine()
-                   .AppendUnindentedLine("#endif")
-                   .AppendLine();
+            _writer.AppendLine();
         }
 
         private void GenerateModuleInitializer()
