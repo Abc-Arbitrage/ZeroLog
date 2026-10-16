@@ -4,11 +4,8 @@ namespace ZeroLog.Analyzers.Support;
 
 internal static class RoslynExtensions
 {
-    extension<T>(IncrementalValuesProvider<T?> provider)
-    {
-        public IncrementalValuesProvider<T> WhereNotNull()
-            => provider.Where(static value => value is not null)!;
-    }
+    public static IncrementalValuesProvider<T> WhereNotNull<T>(this IncrementalValuesProvider<T?> source)
+        => source.Where(static value => value is not null)!;
 
     extension(ISymbol symbol)
     {

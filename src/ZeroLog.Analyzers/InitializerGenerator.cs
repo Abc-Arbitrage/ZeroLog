@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
@@ -15,23 +16,17 @@ public class InitializerGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        var isEnabled = context.CompilationProvider
-                               .Select(CompilationPredicate);
-
-        var invocations = context.SyntaxProvider
+        var loggerNames = context.SyntaxProvider
                                  .CreateSyntaxProvider(SyntaxPredicate, SyntaxTransform)
-                                 .WhereNotNull();
-
-        var pipeline = invocations.Combine(isEnabled)
-                                  .SelectMany(static (pair, _) =>
-                                  {
-                                      var (invocations, isEnabled) = pair;
-                                      return isEnabled ? ImmutableArray.Create(invocations) : ImmutableArray<string>.Empty;
-                                  })
-                                  .Collect();
+                                 .WhereNotNull()
+                                 .Collect()
+                                 .Combine(context.CompilationProvider.Select(SupportsGeneratedInitialization))
+                                 .Select(static (pair, _) => pair.Right ? pair.Left : ImmutableArray<string>.Empty)
+                                 .Select(static (names, _) => LoggerNames.Normalize(names))
+                                 .WithComparer(LoggerNames.Comparer);
 
         context.RegisterImplementationSourceOutput(
-            pipeline,
+            loggerNames,
             static (context, loggerNames) =>
             {
                 if (loggerNames.Length == 0)
@@ -45,7 +40,7 @@ public class InitializerGenerator : IIncrementalGenerator
         );
     }
 
-    private static bool CompilationPredicate(Compilation compilation, CancellationToken cancellationToken)
+    private static bool SupportsGeneratedInitialization(Compilation compilation, CancellationToken cancellationToken)
     {
         // C# 11 is required for file-scoped types
         return compilation is CSharpCompilation { LanguageVersion: >= (LanguageVersion)1100 }
@@ -142,7 +137,30 @@ public class InitializerGenerator : IIncrementalGenerator
         return null;
     }
 
-    private class Generator
+    private sealed class LoggerNames : IEqualityComparer<ImmutableArray<string>>
+    {
+        public static readonly LoggerNames Comparer = new();
+
+        public static ImmutableArray<string> Normalize(ImmutableArray<string> names)
+            => names.Distinct(StringComparer.Ordinal)
+                    .OrderBy(static i => i, StringComparer.Ordinal)
+                    .ToImmutableArray();
+
+        public bool Equals(ImmutableArray<string> x, ImmutableArray<string> y)
+            => x.SequenceEqual(y, StringComparer.Ordinal);
+
+        public int GetHashCode(ImmutableArray<string> names)
+        {
+            var hash = 0;
+
+            foreach (var name in names)
+                hash = unchecked(hash * 397 + StringComparer.Ordinal.GetHashCode(name));
+
+            return hash;
+        }
+    }
+
+    private sealed class Generator
     {
         private const string _onInitializedMethodName = "OnInitialized";
 
@@ -226,7 +244,7 @@ public class InitializerGenerator : IIncrementalGenerator
             {
                 using (_writer.WriteBlock("try"))
                 {
-                    foreach (var loggerName in loggerNames.Distinct().OrderBy(i => i, StringComparer.Ordinal))
+                    foreach (var loggerName in loggerNames)
                         _writer.AppendLine($"Prepare({SymbolDisplay.FormatLiteral(loggerName, true)});");
                 }
 
