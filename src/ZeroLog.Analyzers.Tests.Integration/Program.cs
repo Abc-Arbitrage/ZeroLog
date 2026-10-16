@@ -74,6 +74,9 @@ public static class Program
         _ = LogManager.GetLogger(typeof(DateTime));
         _ = LogManager.GetLogger<TimeSpan>();
         _ = LogManager.GetLogger(@"Logger""From""String");
+
+        _ = LogManager.GetLogger(typeof(NestedType));
+        _ = LogManager.GetLogger(typeof(NestedType.DeeperNestedType));
     }
 
     private static IDisposable InitLogger()
@@ -82,5 +85,10 @@ public static class Program
         {
             RootLogger = { Appenders = { new ConsoleAppender { ColorOutput = false } } }
         });
+    }
+
+    private class NestedType
+    {
+        public class DeeperNestedType;
     }
 }

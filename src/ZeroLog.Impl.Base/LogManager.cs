@@ -47,4 +47,7 @@ public sealed partial class LogManager
         => _loggers.GetOrAdd(name, static n => new Log(n));
 
 #endif
+
+    internal static bool IsLoggerRegistered(string name)
+        => _loggers.ContainsKey(name);
 }

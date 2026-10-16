@@ -568,6 +568,10 @@
         public static ZeroLog.Log GetLogger(System.Type type) { }
         public static ZeroLog.Log GetLogger(string name) { }
         public static ZeroLog.Log GetLogger<T>() { }
+        public static class InternalApi
+        {
+            public static event System.Action? Initialized;
+        }
     }
     public sealed class LogMessage
     {

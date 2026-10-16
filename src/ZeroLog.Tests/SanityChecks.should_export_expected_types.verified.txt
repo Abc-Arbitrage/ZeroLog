@@ -35,6 +35,7 @@
   ZeroLog.Log+WarnInterpolatedStringHandler,
   ZeroLog.LogLevel,
   ZeroLog.LogManager,
+  ZeroLog.LogManager+InternalApi,
   ZeroLog.LogMessage,
   ZeroLog.LogMessage+AppendInterpolatedStringHandler,
   ZeroLog.LogMessage+AppendOperation`1,

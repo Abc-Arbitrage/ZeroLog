@@ -7,6 +7,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using ZeroLog.Appenders;
 using ZeroLog.Configuration;
+using ZeroLog.Tests.Aot.NetStandard;
 
 namespace ZeroLog.Tests.Aot;
 
@@ -45,11 +46,16 @@ internal static class Program
 
         var success = true;
 
-        CheckExpectation(!RuntimeFeature.IsDynamicCodeSupported, "RuntimeFeature.IsDynamicCodeSupported is false");
-        CheckExpectation(string.IsNullOrEmpty(GetAssemblyLocation()), "typeof(Program).Assembly.Location is empty");
+        CheckExpectation(!RuntimeFeature.IsDynamicCodeSupported);
+        CheckExpectation(string.IsNullOrEmpty(GetAssemblyLocation()));
 
         foreach (var expectation in expectations)
             CheckSubstring(expectation);
+
+        // Source generator
+        CheckExpectation(LogManager.IsLoggerRegistered("PreinitializedLogger"));
+        _ = LogManager.GetLogger("PreinitializedLogger");
+        CheckExpectation(NetStandardClass.HasPreInitializedLoggers());
 
         CheckSubstring("Goodbye!");
 
@@ -62,7 +68,7 @@ internal static class Program
         void CheckSubstring(string expected)
             => CheckExpectation(stringOutput.Contains(expected), expected);
 
-        void CheckExpectation(bool result, string label)
+        void CheckExpectation(bool result, [CallerArgumentExpression(nameof(result))] string? label = null)
         {
             Console.WriteLine($"  - {(result ? $"{_green}PASSED" : $"{_red}FAILED")}{_reset}: {label}");
 

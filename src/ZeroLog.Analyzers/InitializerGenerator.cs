@@ -47,10 +47,22 @@ public class InitializerGenerator : IIncrementalGenerator
 
     private static bool CompilationPredicate(Compilation compilation, CancellationToken cancellationToken)
     {
-        return compilation is CSharpCompilation { LanguageVersion: >= (LanguageVersion)1100 } // C# 11 is required for file-scoped types
+        // C# 11 is required for file-scoped types
+        return compilation is CSharpCompilation { LanguageVersion: >= (LanguageVersion)1100 }
                && compilation.GetTypeByMetadataName(ZeroLogFacts.TypeNames.LogManager) is { } logManagerType
                && logManagerType.GetTypeMembers(ZeroLogFacts.ShortTypeNames.InternalApi) is [{ } internalApiType]
-               && internalApiType.GetMembers(ZeroLogFacts.EventNames.Initialized) is [IEventSymbol];
+               && internalApiType.GetMembers(ZeroLogFacts.EventNames.Initialized) is
+               [
+                   IEventSymbol
+                   {
+                       Type: INamedTypeSymbol
+                       {
+                           Name: nameof(Action),
+                           IsGenericType: false,
+                           ContainingNamespace: { Name: "System", ContainingNamespace.IsGlobalNamespace: true }
+                       }
+                   }
+               ];
     }
 
     private static bool SyntaxPredicate(SyntaxNode node, CancellationToken cancellationToken)
@@ -130,8 +142,6 @@ public class InitializerGenerator : IIncrementalGenerator
         return null;
     }
 
-    //     private readonly record struct CompilationModel(bool IsEnabled, bool HasModuleInitializer, bool HasFileScopedTypes);
-
     private class Generator
     {
         private const string _onInitializedMethodName = "OnInitialized";
@@ -141,10 +151,12 @@ public class InitializerGenerator : IIncrementalGenerator
         public string Generate(ImmutableArray<string> loggerNames)
         {
             _writer.Clear();
+
             AppendHeader();
+            AppendAttributes();
 
             using (_writer.WriteBlock($"namespace {ZeroLogFacts.Namespace}"))
-            using (_writer.WriteBlock("file static class ZeroLogInitializer"))
+            using (_writer.WriteBlock("file static class ZeroLogGenerated"))
             {
                 GenerateModuleInitializer();
                 GenerateOnInitialized(loggerNames);
@@ -167,18 +179,45 @@ public class InitializerGenerator : IIncrementalGenerator
             );
         }
 
-        private void GenerateModuleInitializer()
+        private void AppendAttributes()
         {
-            _writer.AppendUnindentedLine("#if NET5_0_OR_GREATER");
-            _writer.AppendLine("[global::System.Runtime.CompilerServices.ModuleInitializer]");
-            _writer.AppendUnindentedLine("#endif");
+            _writer.AppendUnindentedLine("#if !NET5_0_OR_GREATER")
+                   .AppendLine();
 
-            using (_writer.WriteBlock("public static void ModuleInitializer()"))
+            using (_writer.WriteBlock("namespace System.Runtime.CompilerServices"))
             {
-                _writer.AppendLine($"global::{ZeroLogFacts.TypeNames.LogManager}.{ZeroLogFacts.ShortTypeNames.InternalApi}.{ZeroLogFacts.EventNames.Initialized} += {_onInitializedMethodName};");
+                _writer.AppendLine(
+                    """
+                    [global::System.AttributeUsage(global::System.AttributeTargets.Method)]
+                    file sealed class ModuleInitializerAttribute : global::System.Attribute;
+                    """
+                );
             }
 
-            _writer.AppendLine();
+            _writer.AppendLine()
+                   .AppendUnindentedLine("#endif")
+                   .AppendLine();
+        }
+
+        private void GenerateModuleInitializer()
+        {
+            _writer.AppendLine(
+                $$"""
+                [global::System.Runtime.CompilerServices.ModuleInitializer]
+                public static void ModuleInitializer()
+                {
+                    try
+                    {
+                        global::{{ZeroLogFacts.TypeNames.LogManager}}.{{ZeroLogFacts.ShortTypeNames.InternalApi}}.{{ZeroLogFacts.EventNames.Initialized}} += {{_onInitializedMethodName}};
+                    }
+                    catch
+                    {
+                        // Ignore exceptions during module initialization, this is only an optimization.
+                    }
+                }
+
+                """
+            );
         }
 
         private void GenerateOnInitialized(ImmutableArray<string> loggerNames)
@@ -188,13 +227,23 @@ public class InitializerGenerator : IIncrementalGenerator
                 using (_writer.WriteBlock("try"))
                 {
                     foreach (var loggerName in loggerNames.Distinct().OrderBy(i => i, StringComparer.Ordinal))
-                        _writer.AppendLine($"global::{ZeroLogFacts.TypeNames.LogManager}.{ZeroLogFacts.MethodNames.GetLogger}({SymbolDisplay.FormatLiteral(loggerName, true)});");
+                        _writer.AppendLine($"Prepare({SymbolDisplay.FormatLiteral(loggerName, true)});");
                 }
 
                 using (_writer.WriteBlock("catch"))
                 {
                     _writer.AppendLine("// Ignore exceptions during initialization, this is only an optimization.");
                 }
+
+                _writer.AppendLine(
+                    $"""
+
+                    return;
+
+                    static void Prepare(string loggerName)
+                        => _ = global::{ZeroLogFacts.TypeNames.LogManager}.{ZeroLogFacts.MethodNames.GetLogger}(loggerName);
+                    """
+                );
             }
         }
     }
