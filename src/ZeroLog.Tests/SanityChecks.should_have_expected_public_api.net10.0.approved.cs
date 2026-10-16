@@ -1,4 +1,236 @@
-﻿namespace ZeroLog
+namespace ZeroLog.Appenders
+{
+    public abstract class Appender : System.IDisposable
+    {
+        protected Appender() { }
+        public ZeroLog.LogLevel Level { get; init; }
+        public virtual void Dispose() { }
+        public virtual void Flush() { }
+        public virtual void Initialize() { }
+        public abstract void WriteMessage(ZeroLog.Formatting.LoggedMessage message);
+    }
+    public class ConsoleAppender : ZeroLog.Appenders.StreamAppender
+    {
+        public ConsoleAppender() { }
+        public ConsoleAppender(ZeroLog.Formatting.DefaultStyle style) { }
+        public bool ColorOutput { get; init; }
+        public override void Initialize() { }
+    }
+    public class DateAndSizeRollingFileAppender : ZeroLog.Appenders.StreamAppender
+    {
+        public DateAndSizeRollingFileAppender(string directory) { }
+        public string Directory { get; }
+        public string FileExtension { get; init; }
+        public string FileNamePrefix { get; init; }
+        public long MaxFileSizeInBytes { get; init; }
+        public override void Dispose() { }
+        protected virtual void FileClosing() { }
+        protected virtual void FileOpened() { }
+        protected virtual string GetFileName(System.DateOnly date, int number) { }
+        public override void WriteMessage(ZeroLog.Formatting.LoggedMessage message) { }
+    }
+    public sealed class NoopAppender : ZeroLog.Appenders.Appender
+    {
+        public NoopAppender() { }
+        public override void WriteMessage(ZeroLog.Formatting.LoggedMessage message) { }
+    }
+    public abstract class StreamAppender : ZeroLog.Appenders.Appender
+    {
+        protected StreamAppender() { }
+        protected System.Text.Encoding Encoding { get; set; }
+        public ZeroLog.Formatting.Formatter Formatter { get; set; }
+        protected System.IO.Stream? Stream { get; set; }
+        public override void Dispose() { }
+        public override void Flush() { }
+        public override void WriteMessage(ZeroLog.Formatting.LoggedMessage message) { }
+    }
+    public class TextWriterAppender : ZeroLog.Appenders.Appender
+    {
+        public TextWriterAppender() { }
+        public TextWriterAppender(System.IO.TextWriter? textWriter) { }
+        public ZeroLog.Formatting.Formatter Formatter { get; init; }
+        public System.IO.TextWriter? TextWriter { get; set; }
+        public override void Dispose() { }
+        public override void Flush() { }
+        public override void WriteMessage(ZeroLog.Formatting.LoggedMessage message) { }
+    }
+}
+namespace ZeroLog.Configuration
+{
+    public sealed class AppenderConfiguration
+    {
+        public AppenderConfiguration(ZeroLog.Appenders.Appender appender) { }
+        public ZeroLog.Appenders.Appender Appender { get; }
+        public ZeroLog.LogLevel Level { get; set; }
+        public static ZeroLog.Configuration.AppenderConfiguration op_Implicit(ZeroLog.Appenders.Appender appender) { }
+    }
+    public enum AppendingStrategy
+    {
+        Asynchronous = 0,
+        Synchronous = 1,
+    }
+    public interface ILoggerConfigurationCollection : System.Collections.Generic.ICollection<ZeroLog.Configuration.LoggerConfiguration>, System.Collections.Generic.IEnumerable<ZeroLog.Configuration.LoggerConfiguration>, System.Collections.IEnumerable
+    {
+        void Add(string name, ZeroLog.LogLevel level);
+    }
+    public enum LogMessagePoolExhaustionStrategy
+    {
+        DropLogMessageAndNotifyAppenders = 0,
+        DropLogMessage = 1,
+        WaitUntilAvailable = 2,
+        Allocate = 3,
+        Default = 0,
+    }
+    public sealed class LoggerConfiguration
+    {
+        public LoggerConfiguration(System.Type type) { }
+        public LoggerConfiguration(string name) { }
+        public LoggerConfiguration(System.Type type, ZeroLog.LogLevel level) { }
+        public LoggerConfiguration(string name, ZeroLog.LogLevel level) { }
+        public System.Collections.Generic.ICollection<ZeroLog.Configuration.AppenderConfiguration> Appenders { get; }
+        public bool IncludeParentAppenders { get; set; }
+        public ZeroLog.LogLevel? Level { get; set; }
+        public ZeroLog.Configuration.LogMessagePoolExhaustionStrategy? LogMessagePoolExhaustionStrategy { get; set; }
+        public string Name { get; }
+    }
+    public sealed class RootLoggerConfiguration
+    {
+        public System.Collections.Generic.ICollection<ZeroLog.Configuration.AppenderConfiguration> Appenders { get; }
+        public ZeroLog.LogLevel Level { get; set; }
+        public ZeroLog.Configuration.LogMessagePoolExhaustionStrategy LogMessagePoolExhaustionStrategy { get; set; }
+    }
+    public sealed class ThreadConfiguration
+    {
+        public System.Threading.Thread Thread { get; }
+    }
+    public sealed class ZeroLogConfiguration
+    {
+        public ZeroLogConfiguration() { }
+        public System.TimeSpan AppenderQuarantineDelay { get; set; }
+        public ZeroLog.Configuration.AppendingStrategy AppendingStrategy { get; init; }
+        public bool AutoRegisterEnums { get; set; }
+        public int LogMessageBufferSize { get; init; }
+        public int LogMessagePoolSize { get; init; }
+        public int LogMessageStringCapacity { get; init; }
+        public ZeroLog.Configuration.ILoggerConfigurationCollection Loggers { get; }
+        public System.Action<ZeroLog.Configuration.ThreadConfiguration>? LoggingThreadInitializer { get; init; }
+        public string NullDisplayString { get; set; }
+        public ZeroLog.Configuration.RootLoggerConfiguration RootLogger { get; }
+        public System.TimeProvider? TimeProvider { get; init; }
+        public string TruncatedMessageSuffix { get; set; }
+        [System.Obsolete("ZeroLog will always use a background thread in asynchronous mode.")]
+        public bool UseBackgroundThread { get; init; }
+        public void ApplyChanges() { }
+        public void SetLogLevel(string? loggerName, ZeroLog.LogLevel? logLevel) { }
+        public static ZeroLog.Configuration.ZeroLogConfiguration CreateTestConfiguration() { }
+    }
+}
+namespace ZeroLog.Formatting
+{
+    public sealed class DefaultFormatter : ZeroLog.Formatting.Formatter
+    {
+        public DefaultFormatter() { }
+        public DefaultFormatter(ZeroLog.Formatting.PatternWriter writer) { }
+        public DefaultFormatter(string pattern) { }
+        public string JsonSeparator { get; init; }
+        public ZeroLog.Formatting.PatternWriter MessagePatternWriter { get; init; }
+        public string PrefixPattern { get; init; }
+        public override string ToString() { }
+        public ZeroLog.Formatting.DefaultFormatter WithoutAnsiColorCodes() { }
+        protected override void WriteMessage(ZeroLog.Formatting.LoggedMessage message) { }
+        public static string EscapePlaceholders(string? value) { }
+    }
+    public abstract class Formatter
+    {
+        protected Formatter() { }
+        protected void AdvanceBy(int charCount) { }
+        public System.ReadOnlySpan<char> FormatMessage(ZeroLog.Formatting.LoggedMessage message) { }
+        protected System.Span<char> GetOutput() { }
+        protected System.Span<char> GetRemainingBuffer() { }
+        protected void PadToColumn(int column) { }
+        protected void Write(System.ReadOnlySpan<char> value) { }
+        protected void Write(ZeroLog.Formatting.KeyValueList? keyValues) { }
+        protected void Write(ZeroLog.Formatting.LoggedMessage? message, ZeroLog.Formatting.PatternWriter? patternWriter) { }
+        protected bool Write<T>(T value, System.ReadOnlySpan<char> format = default)
+            where T : System.ISpanFormattable { }
+        protected void WriteLine() { }
+        protected void WriteLine(System.ReadOnlySpan<char> value) { }
+        protected abstract void WriteMessage(ZeroLog.Formatting.LoggedMessage message);
+    }
+    public sealed class KeyValueList
+    {
+        public int Count { get; }
+        public ZeroLog.Formatting.LoggedKeyValue this[int index] { get; }
+        public ZeroLog.Formatting.KeyValueList.Enumerator GetEnumerator() { }
+        public ref struct Enumerator
+        {
+            public ZeroLog.Formatting.LoggedKeyValue Current { get; }
+            public bool MoveNext() { }
+        }
+    }
+    public readonly ref struct LoggedKeyValue
+    {
+        public bool IsBoolean { get; }
+        public bool IsNull { get; }
+        public bool IsNumeric { get; }
+        public string Key { get; }
+        public System.ReadOnlySpan<char> Value { get; }
+        public System.Type? ValueType { get; }
+        public void Deconstruct(out string key, out System.ReadOnlySpan<char> value) { }
+        public override string ToString() { }
+        public bool TryGetValue<T>(out T result)
+            where T :  unmanaged { }
+    }
+    public sealed class LoggedMessage
+    {
+        public System.Exception? Exception { get; }
+        public ZeroLog.Formatting.KeyValueList KeyValues { get; }
+        public ZeroLog.LogLevel Level { get; }
+        public string? LoggerCompactName { get; }
+        public string? LoggerName { get; }
+        public System.ReadOnlySpan<char> Message { get; }
+        public System.Threading.Thread? Thread { get; }
+        public System.DateTime Timestamp { get; }
+        public ZeroLog.Formatting.LoggedMessage Clone() { }
+        public override string ToString() { }
+        public static ZeroLog.Formatting.LoggedMessage CreateTestMessage(ZeroLog.LogMessage message, ZeroLog.Configuration.ZeroLogConfiguration? config = null) { }
+    }
+    public sealed class PatternWriter
+    {
+        public PatternWriter(string? pattern) { }
+        public ZeroLog.Formatting.PatternWriter.LogLevelColorCodes LogLevelColors { get; init; }
+        public ZeroLog.Formatting.PatternWriter.LogLevelNames LogLevels { get; init; }
+        public string Pattern { get; }
+        public ZeroLog.Formatting.PatternWriter WithoutAnsiColorCodes() { }
+        public void Write(ZeroLog.Formatting.LoggedMessage message, System.Span<char> destination, out int charsWritten) { }
+        public static string EscapePattern(string? value) { }
+        public static bool IsValidPattern(string? pattern) { }
+        public readonly struct LogLevelColorCodes
+        {
+            public LogLevelColorCodes(System.ConsoleColor trace, System.ConsoleColor debug, System.ConsoleColor info, System.ConsoleColor warn, System.ConsoleColor error, System.ConsoleColor fatal) { }
+            public LogLevelColorCodes(string trace, string debug, string info, string warn, string error, string fatal) { }
+            public LogLevelColorCodes(System.ConsoleColor traceForeground, System.ConsoleColor traceBackground, System.ConsoleColor debugForeground, System.ConsoleColor debugBackground, System.ConsoleColor infoForeground, System.ConsoleColor infoBackground, System.ConsoleColor warnForeground, System.ConsoleColor warnBackground, System.ConsoleColor errorForeground, System.ConsoleColor errorBackground, System.ConsoleColor fatalForeground, System.ConsoleColor fatalBackground) { }
+            public string this[ZeroLog.LogLevel level] { get; }
+        }
+        public readonly struct LogLevelNames
+        {
+            public LogLevelNames(string trace, string debug, string info, string warn, string error, string fatal) { }
+            public string Debug { get; }
+            public string Error { get; }
+            public string Fatal { get; }
+            public string Info { get; }
+            public string this[ZeroLog.LogLevel level] { get; }
+            public string Trace { get; }
+            public string Warn { get; }
+        }
+        [System.AttributeUsage(System.AttributeTargets.Property | System.AttributeTargets.Parameter)]
+        public sealed class PatternAttribute : System.Attribute
+        {
+            public PatternAttribute() { }
+        }
+    }
+}
+namespace ZeroLog
 {
     public sealed class Log
     {
@@ -9,41 +241,44 @@
         public bool IsTraceEnabled { get; }
         public bool IsWarnEnabled { get; }
         public ZeroLog.LogMessage Debug() { }
-        public void Debug(ZeroLog.Log.DebugInterpolatedStringHandler message) { }
+        public void Debug([System.Runtime.CompilerServices.InterpolatedStringHandlerArgument("")] ZeroLog.Log.DebugInterpolatedStringHandler message) { }
         public void Debug(string? message) { }
-        public void Debug(ZeroLog.Log.DebugInterpolatedStringHandler message, System.Exception? ex) { }
+        public void Debug([System.Runtime.CompilerServices.InterpolatedStringHandlerArgument("")] ZeroLog.Log.DebugInterpolatedStringHandler message, System.Exception? ex) { }
         public void Debug(string? message, System.Exception? ex) { }
         public ZeroLog.LogMessage Error() { }
-        public void Error(ZeroLog.Log.ErrorInterpolatedStringHandler message) { }
+        public void Error([System.Runtime.CompilerServices.InterpolatedStringHandlerArgument("")] ZeroLog.Log.ErrorInterpolatedStringHandler message) { }
         public void Error(string? message) { }
-        public void Error(ZeroLog.Log.ErrorInterpolatedStringHandler message, System.Exception? ex) { }
+        public void Error([System.Runtime.CompilerServices.InterpolatedStringHandlerArgument("")] ZeroLog.Log.ErrorInterpolatedStringHandler message, System.Exception? ex) { }
         public void Error(string? message, System.Exception? ex) { }
         public ZeroLog.LogMessage Fatal() { }
-        public void Fatal(ZeroLog.Log.FatalInterpolatedStringHandler message) { }
+        public void Fatal([System.Runtime.CompilerServices.InterpolatedStringHandlerArgument("")] ZeroLog.Log.FatalInterpolatedStringHandler message) { }
         public void Fatal(string? message) { }
-        public void Fatal(ZeroLog.Log.FatalInterpolatedStringHandler message, System.Exception? ex) { }
+        public void Fatal([System.Runtime.CompilerServices.InterpolatedStringHandlerArgument("")] ZeroLog.Log.FatalInterpolatedStringHandler message, System.Exception? ex) { }
         public void Fatal(string? message, System.Exception? ex) { }
         public ZeroLog.LogMessage ForLevel(ZeroLog.LogLevel level) { }
         public ZeroLog.LogMessage Info() { }
-        public void Info(ZeroLog.Log.InfoInterpolatedStringHandler message) { }
+        public void Info([System.Runtime.CompilerServices.InterpolatedStringHandlerArgument("")] ZeroLog.Log.InfoInterpolatedStringHandler message) { }
         public void Info(string? message) { }
-        public void Info(ZeroLog.Log.InfoInterpolatedStringHandler message, System.Exception? ex) { }
+        public void Info([System.Runtime.CompilerServices.InterpolatedStringHandlerArgument("")] ZeroLog.Log.InfoInterpolatedStringHandler message, System.Exception? ex) { }
         public void Info(string? message, System.Exception? ex) { }
         public bool IsEnabled(ZeroLog.LogLevel level) { }
         public override string ToString() { }
         public ZeroLog.LogMessage Trace() { }
-        public void Trace(ZeroLog.Log.TraceInterpolatedStringHandler message) { }
+        public void Trace([System.Runtime.CompilerServices.InterpolatedStringHandlerArgument("")] ZeroLog.Log.TraceInterpolatedStringHandler message) { }
         public void Trace(string? message) { }
-        public void Trace(ZeroLog.Log.TraceInterpolatedStringHandler message, System.Exception? ex) { }
+        public void Trace([System.Runtime.CompilerServices.InterpolatedStringHandlerArgument("")] ZeroLog.Log.TraceInterpolatedStringHandler message, System.Exception? ex) { }
         public void Trace(string? message, System.Exception? ex) { }
         public ZeroLog.LogMessage Warn() { }
-        public void Warn(ZeroLog.Log.WarnInterpolatedStringHandler message) { }
+        public void Warn([System.Runtime.CompilerServices.InterpolatedStringHandlerArgument("")] ZeroLog.Log.WarnInterpolatedStringHandler message) { }
         public void Warn(string? message) { }
-        public void Warn(ZeroLog.Log.WarnInterpolatedStringHandler message, System.Exception? ex) { }
+        public void Warn([System.Runtime.CompilerServices.InterpolatedStringHandlerArgument("")] ZeroLog.Log.WarnInterpolatedStringHandler message, System.Exception? ex) { }
         public void Warn(string? message, System.Exception? ex) { }
+        [System.Runtime.CompilerServices.InterpolatedStringHandler]
         public readonly ref struct DebugInterpolatedStringHandler
         {
             public DebugInterpolatedStringHandler(int literalLength, int formattedCount, ZeroLog.Log log, out bool isEnabled) { }
+            public void AppendFormatted(System.DateOnly value) { }
+            public void AppendFormatted(System.DateOnly? value) { }
             public void AppendFormatted(System.DateTime value) { }
             public void AppendFormatted(System.DateTime? value) { }
             public void AppendFormatted(System.DateTimeOffset value) { }
@@ -54,6 +289,8 @@
             public void AppendFormatted(System.IntPtr? value) { }
             public void AppendFormatted(System.ReadOnlySpan<byte> value) { }
             public void AppendFormatted(System.ReadOnlySpan<char> value) { }
+            public void AppendFormatted(System.TimeOnly value) { }
+            public void AppendFormatted(System.TimeOnly? value) { }
             public void AppendFormatted(System.TimeSpan value) { }
             public void AppendFormatted(System.TimeSpan? value) { }
             public void AppendFormatted(nuint value) { }
@@ -85,6 +322,8 @@
             public void AppendFormatted(ulong? value) { }
             public void AppendFormatted(ushort value) { }
             public void AppendFormatted(ushort? value) { }
+            public void AppendFormatted(System.DateOnly value, string format) { }
+            public void AppendFormatted(System.DateOnly? value, string format) { }
             public void AppendFormatted(System.DateTime value, string format) { }
             public void AppendFormatted(System.DateTime? value, string format) { }
             public void AppendFormatted(System.DateTimeOffset value, string format) { }
@@ -93,6 +332,8 @@
             public void AppendFormatted(System.Guid? value, string format) { }
             public void AppendFormatted(nint value, string format) { }
             public void AppendFormatted(System.IntPtr? value, string format) { }
+            public void AppendFormatted(System.TimeOnly value, string format) { }
+            public void AppendFormatted(System.TimeOnly? value, string format) { }
             public void AppendFormatted(System.TimeSpan value, string format) { }
             public void AppendFormatted(System.TimeSpan? value, string format) { }
             public void AppendFormatted(nuint value, string format) { }
@@ -126,9 +367,12 @@
             public void AppendFormatted<T>(ZeroLog.LogMessage.AppendOperation<T> operation) { }
             public void AppendLiteral(string value) { }
         }
+        [System.Runtime.CompilerServices.InterpolatedStringHandler]
         public readonly ref struct ErrorInterpolatedStringHandler
         {
             public ErrorInterpolatedStringHandler(int literalLength, int formattedCount, ZeroLog.Log log, out bool isEnabled) { }
+            public void AppendFormatted(System.DateOnly value) { }
+            public void AppendFormatted(System.DateOnly? value) { }
             public void AppendFormatted(System.DateTime value) { }
             public void AppendFormatted(System.DateTime? value) { }
             public void AppendFormatted(System.DateTimeOffset value) { }
@@ -139,6 +383,8 @@
             public void AppendFormatted(System.IntPtr? value) { }
             public void AppendFormatted(System.ReadOnlySpan<byte> value) { }
             public void AppendFormatted(System.ReadOnlySpan<char> value) { }
+            public void AppendFormatted(System.TimeOnly value) { }
+            public void AppendFormatted(System.TimeOnly? value) { }
             public void AppendFormatted(System.TimeSpan value) { }
             public void AppendFormatted(System.TimeSpan? value) { }
             public void AppendFormatted(nuint value) { }
@@ -170,6 +416,8 @@
             public void AppendFormatted(ulong? value) { }
             public void AppendFormatted(ushort value) { }
             public void AppendFormatted(ushort? value) { }
+            public void AppendFormatted(System.DateOnly value, string format) { }
+            public void AppendFormatted(System.DateOnly? value, string format) { }
             public void AppendFormatted(System.DateTime value, string format) { }
             public void AppendFormatted(System.DateTime? value, string format) { }
             public void AppendFormatted(System.DateTimeOffset value, string format) { }
@@ -178,6 +426,8 @@
             public void AppendFormatted(System.Guid? value, string format) { }
             public void AppendFormatted(nint value, string format) { }
             public void AppendFormatted(System.IntPtr? value, string format) { }
+            public void AppendFormatted(System.TimeOnly value, string format) { }
+            public void AppendFormatted(System.TimeOnly? value, string format) { }
             public void AppendFormatted(System.TimeSpan value, string format) { }
             public void AppendFormatted(System.TimeSpan? value, string format) { }
             public void AppendFormatted(nuint value, string format) { }
@@ -211,9 +461,12 @@
             public void AppendFormatted<T>(ZeroLog.LogMessage.AppendOperation<T> operation) { }
             public void AppendLiteral(string value) { }
         }
+        [System.Runtime.CompilerServices.InterpolatedStringHandler]
         public readonly ref struct FatalInterpolatedStringHandler
         {
             public FatalInterpolatedStringHandler(int literalLength, int formattedCount, ZeroLog.Log log, out bool isEnabled) { }
+            public void AppendFormatted(System.DateOnly value) { }
+            public void AppendFormatted(System.DateOnly? value) { }
             public void AppendFormatted(System.DateTime value) { }
             public void AppendFormatted(System.DateTime? value) { }
             public void AppendFormatted(System.DateTimeOffset value) { }
@@ -224,6 +477,8 @@
             public void AppendFormatted(System.IntPtr? value) { }
             public void AppendFormatted(System.ReadOnlySpan<byte> value) { }
             public void AppendFormatted(System.ReadOnlySpan<char> value) { }
+            public void AppendFormatted(System.TimeOnly value) { }
+            public void AppendFormatted(System.TimeOnly? value) { }
             public void AppendFormatted(System.TimeSpan value) { }
             public void AppendFormatted(System.TimeSpan? value) { }
             public void AppendFormatted(nuint value) { }
@@ -255,6 +510,8 @@
             public void AppendFormatted(ulong? value) { }
             public void AppendFormatted(ushort value) { }
             public void AppendFormatted(ushort? value) { }
+            public void AppendFormatted(System.DateOnly value, string format) { }
+            public void AppendFormatted(System.DateOnly? value, string format) { }
             public void AppendFormatted(System.DateTime value, string format) { }
             public void AppendFormatted(System.DateTime? value, string format) { }
             public void AppendFormatted(System.DateTimeOffset value, string format) { }
@@ -263,6 +520,8 @@
             public void AppendFormatted(System.Guid? value, string format) { }
             public void AppendFormatted(nint value, string format) { }
             public void AppendFormatted(System.IntPtr? value, string format) { }
+            public void AppendFormatted(System.TimeOnly value, string format) { }
+            public void AppendFormatted(System.TimeOnly? value, string format) { }
             public void AppendFormatted(System.TimeSpan value, string format) { }
             public void AppendFormatted(System.TimeSpan? value, string format) { }
             public void AppendFormatted(nuint value, string format) { }
@@ -296,9 +555,12 @@
             public void AppendFormatted<T>(ZeroLog.LogMessage.AppendOperation<T> operation) { }
             public void AppendLiteral(string value) { }
         }
+        [System.Runtime.CompilerServices.InterpolatedStringHandler]
         public readonly ref struct InfoInterpolatedStringHandler
         {
             public InfoInterpolatedStringHandler(int literalLength, int formattedCount, ZeroLog.Log log, out bool isEnabled) { }
+            public void AppendFormatted(System.DateOnly value) { }
+            public void AppendFormatted(System.DateOnly? value) { }
             public void AppendFormatted(System.DateTime value) { }
             public void AppendFormatted(System.DateTime? value) { }
             public void AppendFormatted(System.DateTimeOffset value) { }
@@ -309,6 +571,8 @@
             public void AppendFormatted(System.IntPtr? value) { }
             public void AppendFormatted(System.ReadOnlySpan<byte> value) { }
             public void AppendFormatted(System.ReadOnlySpan<char> value) { }
+            public void AppendFormatted(System.TimeOnly value) { }
+            public void AppendFormatted(System.TimeOnly? value) { }
             public void AppendFormatted(System.TimeSpan value) { }
             public void AppendFormatted(System.TimeSpan? value) { }
             public void AppendFormatted(nuint value) { }
@@ -340,6 +604,8 @@
             public void AppendFormatted(ulong? value) { }
             public void AppendFormatted(ushort value) { }
             public void AppendFormatted(ushort? value) { }
+            public void AppendFormatted(System.DateOnly value, string format) { }
+            public void AppendFormatted(System.DateOnly? value, string format) { }
             public void AppendFormatted(System.DateTime value, string format) { }
             public void AppendFormatted(System.DateTime? value, string format) { }
             public void AppendFormatted(System.DateTimeOffset value, string format) { }
@@ -348,6 +614,8 @@
             public void AppendFormatted(System.Guid? value, string format) { }
             public void AppendFormatted(nint value, string format) { }
             public void AppendFormatted(System.IntPtr? value, string format) { }
+            public void AppendFormatted(System.TimeOnly value, string format) { }
+            public void AppendFormatted(System.TimeOnly? value, string format) { }
             public void AppendFormatted(System.TimeSpan value, string format) { }
             public void AppendFormatted(System.TimeSpan? value, string format) { }
             public void AppendFormatted(nuint value, string format) { }
@@ -381,9 +649,12 @@
             public void AppendFormatted<T>(ZeroLog.LogMessage.AppendOperation<T> operation) { }
             public void AppendLiteral(string value) { }
         }
+        [System.Runtime.CompilerServices.InterpolatedStringHandler]
         public readonly ref struct TraceInterpolatedStringHandler
         {
             public TraceInterpolatedStringHandler(int literalLength, int formattedCount, ZeroLog.Log log, out bool isEnabled) { }
+            public void AppendFormatted(System.DateOnly value) { }
+            public void AppendFormatted(System.DateOnly? value) { }
             public void AppendFormatted(System.DateTime value) { }
             public void AppendFormatted(System.DateTime? value) { }
             public void AppendFormatted(System.DateTimeOffset value) { }
@@ -394,6 +665,8 @@
             public void AppendFormatted(System.IntPtr? value) { }
             public void AppendFormatted(System.ReadOnlySpan<byte> value) { }
             public void AppendFormatted(System.ReadOnlySpan<char> value) { }
+            public void AppendFormatted(System.TimeOnly value) { }
+            public void AppendFormatted(System.TimeOnly? value) { }
             public void AppendFormatted(System.TimeSpan value) { }
             public void AppendFormatted(System.TimeSpan? value) { }
             public void AppendFormatted(nuint value) { }
@@ -425,6 +698,8 @@
             public void AppendFormatted(ulong? value) { }
             public void AppendFormatted(ushort value) { }
             public void AppendFormatted(ushort? value) { }
+            public void AppendFormatted(System.DateOnly value, string format) { }
+            public void AppendFormatted(System.DateOnly? value, string format) { }
             public void AppendFormatted(System.DateTime value, string format) { }
             public void AppendFormatted(System.DateTime? value, string format) { }
             public void AppendFormatted(System.DateTimeOffset value, string format) { }
@@ -433,6 +708,8 @@
             public void AppendFormatted(System.Guid? value, string format) { }
             public void AppendFormatted(nint value, string format) { }
             public void AppendFormatted(System.IntPtr? value, string format) { }
+            public void AppendFormatted(System.TimeOnly value, string format) { }
+            public void AppendFormatted(System.TimeOnly? value, string format) { }
             public void AppendFormatted(System.TimeSpan value, string format) { }
             public void AppendFormatted(System.TimeSpan? value, string format) { }
             public void AppendFormatted(nuint value, string format) { }
@@ -466,9 +743,12 @@
             public void AppendFormatted<T>(ZeroLog.LogMessage.AppendOperation<T> operation) { }
             public void AppendLiteral(string value) { }
         }
+        [System.Runtime.CompilerServices.InterpolatedStringHandler]
         public readonly ref struct WarnInterpolatedStringHandler
         {
             public WarnInterpolatedStringHandler(int literalLength, int formattedCount, ZeroLog.Log log, out bool isEnabled) { }
+            public void AppendFormatted(System.DateOnly value) { }
+            public void AppendFormatted(System.DateOnly? value) { }
             public void AppendFormatted(System.DateTime value) { }
             public void AppendFormatted(System.DateTime? value) { }
             public void AppendFormatted(System.DateTimeOffset value) { }
@@ -479,6 +759,8 @@
             public void AppendFormatted(System.IntPtr? value) { }
             public void AppendFormatted(System.ReadOnlySpan<byte> value) { }
             public void AppendFormatted(System.ReadOnlySpan<char> value) { }
+            public void AppendFormatted(System.TimeOnly value) { }
+            public void AppendFormatted(System.TimeOnly? value) { }
             public void AppendFormatted(System.TimeSpan value) { }
             public void AppendFormatted(System.TimeSpan? value) { }
             public void AppendFormatted(nuint value) { }
@@ -510,6 +792,8 @@
             public void AppendFormatted(ulong? value) { }
             public void AppendFormatted(ushort value) { }
             public void AppendFormatted(ushort? value) { }
+            public void AppendFormatted(System.DateOnly value, string format) { }
+            public void AppendFormatted(System.DateOnly? value, string format) { }
             public void AppendFormatted(System.DateTime value, string format) { }
             public void AppendFormatted(System.DateTime? value, string format) { }
             public void AppendFormatted(System.DateTimeOffset value, string format) { }
@@ -518,6 +802,8 @@
             public void AppendFormatted(System.Guid? value, string format) { }
             public void AppendFormatted(nint value, string format) { }
             public void AppendFormatted(System.IntPtr? value, string format) { }
+            public void AppendFormatted(System.TimeOnly value, string format) { }
+            public void AppendFormatted(System.TimeOnly? value, string format) { }
             public void AppendFormatted(System.TimeSpan value, string format) { }
             public void AppendFormatted(System.TimeSpan? value, string format) { }
             public void AppendFormatted(nuint value, string format) { }
@@ -562,12 +848,29 @@
         Fatal = 5,
         None = 6,
     }
-    public sealed class LogManager
+    public sealed class LogManager : System.IDisposable
     {
-        public LogManager() { }
+        public static ZeroLog.Configuration.ZeroLogConfiguration? Configuration { get; }
+        public void Dispose() { }
+        public static void Flush() { }
         public static ZeroLog.Log GetLogger(System.Type type) { }
         public static ZeroLog.Log GetLogger(string name) { }
         public static ZeroLog.Log GetLogger<T>() { }
+        public static System.IDisposable Initialize(ZeroLog.Configuration.ZeroLogConfiguration configuration) { }
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AssemblyLoadTrimming", "IL2072", Justification="Native values can be printed instead of strings.")]
+        public static void RegisterAllEnumsFrom(System.Reflection.Assembly assembly) { }
+        public static void RegisterEnum([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicFields)] System.Type enumType) { }
+        public static void RegisterEnum<T>()
+            where T :  struct, System.Enum { }
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("This code uses reflection which is not compatible with AOT compilation. Use the g" +
+            "eneric version if possible.")]
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This code uses reflection which is not compatible with trimming.")]
+        public static void RegisterUnmanaged(System.Type type) { }
+        public static void RegisterUnmanaged<T>()
+            where T :  unmanaged, System.ISpanFormattable { }
+        public static void RegisterUnmanaged<T>(ZeroLog.UnmanagedFormatterDelegate<T> formatter)
+            where T :  unmanaged { }
+        public static void Shutdown() { }
         public static class InternalApi
         {
             public static event System.Action? Initialized;
@@ -579,6 +882,8 @@
         public ZeroLog.LogLevel Level { get; }
         public System.Threading.Thread? Thread { get; }
         public System.DateTime Timestamp { get; }
+        public ZeroLog.LogMessage Append(System.DateOnly value) { }
+        public ZeroLog.LogMessage Append(System.DateOnly? value) { }
         public ZeroLog.LogMessage Append(System.DateTime value) { }
         public ZeroLog.LogMessage Append(System.DateTime? value) { }
         public ZeroLog.LogMessage Append(System.DateTimeOffset value) { }
@@ -589,11 +894,13 @@
         public ZeroLog.LogMessage Append(System.IntPtr? value) { }
         public ZeroLog.LogMessage Append(System.ReadOnlySpan<byte> value) { }
         public ZeroLog.LogMessage Append(System.ReadOnlySpan<char> value) { }
+        public ZeroLog.LogMessage Append(System.TimeOnly value) { }
+        public ZeroLog.LogMessage Append(System.TimeOnly? value) { }
         public ZeroLog.LogMessage Append(System.TimeSpan value) { }
         public ZeroLog.LogMessage Append(System.TimeSpan? value) { }
         public ZeroLog.LogMessage Append(nuint value) { }
         public ZeroLog.LogMessage Append(System.UIntPtr? value) { }
-        public ZeroLog.LogMessage Append(ZeroLog.LogMessage.AppendInterpolatedStringHandler value) { }
+        public ZeroLog.LogMessage Append([System.Runtime.CompilerServices.InterpolatedStringHandlerArgument("")] ZeroLog.LogMessage.AppendInterpolatedStringHandler value) { }
         public ZeroLog.LogMessage Append(bool value) { }
         public ZeroLog.LogMessage Append(bool? value) { }
         public ZeroLog.LogMessage Append(byte value) { }
@@ -621,6 +928,8 @@
         public ZeroLog.LogMessage Append(ulong? value) { }
         public ZeroLog.LogMessage Append(ushort value) { }
         public ZeroLog.LogMessage Append(ushort? value) { }
+        public ZeroLog.LogMessage Append(System.DateOnly value, string format) { }
+        public ZeroLog.LogMessage Append(System.DateOnly? value, string format) { }
         public ZeroLog.LogMessage Append(System.DateTime value, string format) { }
         public ZeroLog.LogMessage Append(System.DateTime? value, string format) { }
         public ZeroLog.LogMessage Append(System.DateTimeOffset value, string format) { }
@@ -629,6 +938,8 @@
         public ZeroLog.LogMessage Append(System.Guid? value, string format) { }
         public ZeroLog.LogMessage Append(nint value, string format) { }
         public ZeroLog.LogMessage Append(System.IntPtr? value, string format) { }
+        public ZeroLog.LogMessage Append(System.TimeOnly value, string format) { }
+        public ZeroLog.LogMessage Append(System.TimeOnly? value, string format) { }
         public ZeroLog.LogMessage Append(System.TimeSpan value, string format) { }
         public ZeroLog.LogMessage Append(System.TimeSpan? value, string format) { }
         public ZeroLog.LogMessage Append(nuint value, string format) { }
@@ -659,6 +970,8 @@
             where T :  struct, System.Enum { }
         public ZeroLog.LogMessage AppendEnum<T>(T? value)
             where T :  struct, System.Enum { }
+        public ZeroLog.LogMessage AppendKeyValue(string key, System.DateOnly value) { }
+        public ZeroLog.LogMessage AppendKeyValue(string key, System.DateOnly? value) { }
         public ZeroLog.LogMessage AppendKeyValue(string key, System.DateTime value) { }
         public ZeroLog.LogMessage AppendKeyValue(string key, System.DateTime? value) { }
         public ZeroLog.LogMessage AppendKeyValue(string key, System.DateTimeOffset value) { }
@@ -669,6 +982,8 @@
         public ZeroLog.LogMessage AppendKeyValue(string key, System.IntPtr? value) { }
         public ZeroLog.LogMessage AppendKeyValue(string key, System.ReadOnlySpan<byte> value) { }
         public ZeroLog.LogMessage AppendKeyValue(string key, System.ReadOnlySpan<char> value) { }
+        public ZeroLog.LogMessage AppendKeyValue(string key, System.TimeOnly value) { }
+        public ZeroLog.LogMessage AppendKeyValue(string key, System.TimeOnly? value) { }
         public ZeroLog.LogMessage AppendKeyValue(string key, System.TimeSpan value) { }
         public ZeroLog.LogMessage AppendKeyValue(string key, System.TimeSpan? value) { }
         public ZeroLog.LogMessage AppendKeyValue(string key, nuint value) { }
@@ -715,9 +1030,14 @@
         public void Log() { }
         public override string ToString() { }
         public ZeroLog.LogMessage WithException(System.Exception? exception) { }
+        public static ZeroLog.LogMessage CreateTestMessage(ZeroLog.LogLevel level, int bufferSize, int stringCapacity) { }
+        public static ZeroLog.LogMessage CreateTestMessage(ZeroLog.Log? log, ZeroLog.LogLevel level, int bufferSize, int stringCapacity) { }
+        [System.Runtime.CompilerServices.InterpolatedStringHandler]
         public readonly ref struct AppendInterpolatedStringHandler
         {
             public AppendInterpolatedStringHandler(int literalLength, int formattedCount, ZeroLog.LogMessage message) { }
+            public void AppendFormatted(System.DateOnly value) { }
+            public void AppendFormatted(System.DateOnly? value) { }
             public void AppendFormatted(System.DateTime value) { }
             public void AppendFormatted(System.DateTime? value) { }
             public void AppendFormatted(System.DateTimeOffset value) { }
@@ -728,6 +1048,8 @@
             public void AppendFormatted(System.IntPtr? value) { }
             public void AppendFormatted(System.ReadOnlySpan<byte> value) { }
             public void AppendFormatted(System.ReadOnlySpan<char> value) { }
+            public void AppendFormatted(System.TimeOnly value) { }
+            public void AppendFormatted(System.TimeOnly? value) { }
             public void AppendFormatted(System.TimeSpan value) { }
             public void AppendFormatted(System.TimeSpan? value) { }
             public void AppendFormatted(nuint value) { }
@@ -759,6 +1081,8 @@
             public void AppendFormatted(ulong? value) { }
             public void AppendFormatted(ushort value) { }
             public void AppendFormatted(ushort? value) { }
+            public void AppendFormatted(System.DateOnly value, string format) { }
+            public void AppendFormatted(System.DateOnly? value, string format) { }
             public void AppendFormatted(System.DateTime value, string format) { }
             public void AppendFormatted(System.DateTime? value, string format) { }
             public void AppendFormatted(System.DateTimeOffset value, string format) { }
@@ -767,6 +1091,8 @@
             public void AppendFormatted(System.Guid? value, string format) { }
             public void AppendFormatted(nint value, string format) { }
             public void AppendFormatted(System.IntPtr? value, string format) { }
+            public void AppendFormatted(System.TimeOnly value, string format) { }
+            public void AppendFormatted(System.TimeOnly? value, string format) { }
             public void AppendFormatted(System.TimeSpan value, string format) { }
             public void AppendFormatted(System.TimeSpan? value, string format) { }
             public void AppendFormatted(nuint value, string format) { }
@@ -808,4 +1134,5 @@
             public override string ToString() { }
         }
     }
+    public delegate bool UnmanagedFormatterDelegate<T>(ref T value, System.Span<char> destination, out int charsWritten, System.ReadOnlySpan<char> format);
 }

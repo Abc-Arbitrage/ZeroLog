@@ -210,7 +210,8 @@ public class InitializerGenerator : IIncrementalGenerator
                 _writer.AppendLine(
                     """
                     [global::System.AttributeUsage(global::System.AttributeTargets.Method)]
-                    file sealed class ModuleInitializerAttribute : global::System.Attribute;
+                    file sealed class ModuleInitializerAttribute : global::System.Attribute
+                    { }
                     """
                 );
             }

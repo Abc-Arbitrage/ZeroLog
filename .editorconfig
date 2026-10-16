@@ -29,10 +29,8 @@ end_of_line = lf
 [*.ps1]
 ij_powershell_block_brace_style = end_of_line
 
-# Verify
-[*.{received,verified}.{txt,cs}]
-charset = utf-8-bom
-end_of_line = lf
+# Shouldly
+[*.{received,approved}.{txt,cs}]
 indent_size = unset
 indent_style = unset
 insert_final_newline = false

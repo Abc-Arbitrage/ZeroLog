@@ -3,7 +3,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using PublicApiGenerator;
-using VerifyNUnit;
+using Shouldly;
+using ZeroLog.Tests.Support;
 
 namespace ZeroLog.Tests.NetStandard;
 
@@ -11,42 +12,59 @@ namespace ZeroLog.Tests.NetStandard;
 public class SanityChecks
 {
     [Test]
-    public Task should_export_expected_namespaces()
+    public void should_export_expected_namespaces()
     {
-        return Verifier.Verify(
-            typeof(LogManager).Assembly
-                              .ExportedTypes
-                              .Select(i => i.Namespace)
-                              .OrderBy(i => i)
-                              .Distinct()
-        );
+        typeof(LogManager).Assembly
+                          .ExportedTypes
+                          .Select(i => i.Namespace)
+                          .Distinct()
+                          .ShouldBeEquivalentTo([
+                              "ZeroLog"
+                          ]);
     }
 
     [Test]
-    public Task should_export_expected_types()
+    public void should_export_expected_types()
     {
-        return Verifier.Verify(
-            typeof(LogManager).Assembly
-                              .ExportedTypes
-                              .Select(i => i.FullName)
-                              .OrderBy(i => i)
-                              .Distinct()
-        );
+        var expected = new[]
+        {
+            "ZeroLog.Log",
+            "ZeroLog.Log+DebugInterpolatedStringHandler",
+            "ZeroLog.Log+ErrorInterpolatedStringHandler",
+            "ZeroLog.Log+FatalInterpolatedStringHandler",
+            "ZeroLog.Log+InfoInterpolatedStringHandler",
+            "ZeroLog.Log+TraceInterpolatedStringHandler",
+            "ZeroLog.Log+WarnInterpolatedStringHandler",
+            "ZeroLog.LogLevel",
+            "ZeroLog.LogManager",
+            "ZeroLog.LogManager+InternalApi",
+            "ZeroLog.LogMessage",
+            "ZeroLog.LogMessage+AppendInterpolatedStringHandler",
+            "ZeroLog.LogMessage+AppendOperation`1"
+        };
+
+        typeof(LogManager).Assembly
+                          .ExportedTypes
+                          .Select(i => i.FullName)
+                          .Distinct()
+                          .ShouldBeEquivalentTo(expected);
     }
 
     [Test]
-    public Task should_have_expected_public_api()
+    public void should_have_expected_public_api()
     {
-        return Verifier.Verify(
-            typeof(LogManager).Assembly
-                              .GeneratePublicApi(new ApiGeneratorOptions
-                              {
-                                  IncludeAssemblyAttributes = false,
-                                  ExcludeAttributes =
-                                  [
-                                      typeof(ObsoleteAttribute).FullName
-                                  ]
-                              })
-        );
+        typeof(LogManager).Assembly
+                          .GeneratePublicApi(new ApiGeneratorOptions
+                          {
+                              IncludeAssemblyAttributes = false,
+                              ExcludeAttributes =
+                              [
+                                  typeof(ObsoleteAttribute).FullName
+                              ]
+                          })
+                          .ShouldMatchApproved(
+                              cfg => cfg.WithFileExtension(".cs")
+                                        .LocateTestMethodUsingAttribute<TestAttribute>()
+                          );
     }
 }

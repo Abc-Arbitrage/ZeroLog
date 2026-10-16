@@ -10,6 +10,10 @@
     <File Path="Directory.Build.targets" />
     <File Path="Directory.Packages.props" />
     <File Path="NuGetReadme.md" />
+    <File Path="Tests.targets" />
+  </Folder>
+  <Folder Name="/Tools/">
+    <File Path="Tools/ApproveAll.ps1" />
   </Folder>
   <Project Path="ZeroLog.Analyzers.Tests.Integration/ZeroLog.Analyzers.Tests.Integration.csproj" />
   <Project Path="ZeroLog.Analyzers.Tests/ZeroLog.Analyzers.Tests.csproj" />

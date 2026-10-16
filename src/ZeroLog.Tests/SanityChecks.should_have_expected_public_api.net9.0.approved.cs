@@ -1,4 +1,4 @@
-﻿namespace ZeroLog.Appenders
+namespace ZeroLog.Appenders
 {
     public abstract class Appender : System.IDisposable
     {

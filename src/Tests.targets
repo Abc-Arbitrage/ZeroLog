@@ -1,0 +1,16 @@
+<Project>
+
+  <!-- Shouldly -->
+  <PropertyGroup>
+    <Optimize>false</Optimize>
+  </PropertyGroup>
+  <ItemGroup>
+    <ShouldlySnapshot Include="**\*.received.*" />
+    <ShouldlySnapshot Include="**\*.approved.*" />
+    <ShouldlySnapshot Update="@(ShouldlySnapshot)" DependentUpon="$([System.Text.RegularExpressions.Regex]::Match('%(Filename)', '^[^.]+')).cs" />
+    <Compile Remove="@(ShouldlySnapshot)" />
+    <None Include="@(ShouldlySnapshot)" />
+    <ShouldlySnapshot Remove="@(ShouldlySnapshot)" />
+  </ItemGroup>
+
+</Project>
