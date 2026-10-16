@@ -227,12 +227,18 @@ public class InitializerGenerator : IIncrementalGenerator
                 {
                     try
                     {
-                        global::{{ZeroLogFacts.TypeNames.LogManager}}.{{ZeroLogFacts.ShortTypeNames.InternalApi}}.{{ZeroLogFacts.EventNames.Initialized}} += {{_onInitializedMethodName}};
+                        AttachEventHandler();
                     }
                     catch
                     {
                         // Ignore exceptions during module initialization, this is only an optimization.
                     }
+
+                    return;
+
+                    [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+                    static void AttachEventHandler()
+                        => global::{{ZeroLogFacts.TypeNames.LogManager}}.{{ZeroLogFacts.ShortTypeNames.InternalApi}}.{{ZeroLogFacts.EventNames.Initialized}} += {{_onInitializedMethodName}};
                 }
 
                 """
