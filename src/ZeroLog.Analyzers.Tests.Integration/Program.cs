@@ -37,6 +37,7 @@ public static class Program
                .Log();
 
         Trivia();
+        PreInitialization();
     }
 
     private static void Trivia()
@@ -66,6 +67,13 @@ public static class Program
         /* 16 */        .Log( /* 17 */ ) /* 18 */; /* 19 */                                 // 20
 
         // @formatter:on
+    }
+
+    private static void PreInitialization()
+    {
+        _ = LogManager.GetLogger(typeof(DateTime));
+        _ = LogManager.GetLogger<TimeSpan>();
+        _ = LogManager.GetLogger(@"Logger""From""String");
     }
 
     private static IDisposable InitLogger()
