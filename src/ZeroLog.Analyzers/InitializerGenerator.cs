@@ -159,7 +159,7 @@ public class InitializerGenerator : IIncrementalGenerator
             var hash = 0;
 
             foreach (var name in names)
-                hash = unchecked(hash * 397 + StringComparer.Ordinal.GetHashCode(name));
+                hash = unchecked((hash * 397) ^ StringComparer.Ordinal.GetHashCode(name));
 
             return hash;
         }

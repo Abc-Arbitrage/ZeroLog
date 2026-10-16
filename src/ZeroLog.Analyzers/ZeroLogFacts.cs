@@ -2,6 +2,8 @@
 
 internal static class ZeroLogFacts
 {
+    public const string Namespace = "ZeroLog";
+
     public static bool IsLogLevelName(string? value)
         => value is nameof(LogLevel.Trace)
             or nameof(LogLevel.Debug)
@@ -9,8 +11,6 @@ internal static class ZeroLogFacts
             or nameof(LogLevel.Warn)
             or nameof(LogLevel.Error)
             or nameof(LogLevel.Fatal);
-
-    public const string Namespace = "ZeroLog";
 
     public static class ShortTypeNames
     {

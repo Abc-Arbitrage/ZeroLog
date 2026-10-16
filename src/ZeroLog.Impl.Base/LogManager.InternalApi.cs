@@ -3,10 +3,10 @@ using System.ComponentModel;
 
 namespace ZeroLog;
 
-partial class LogManager
-{
 #pragma warning disable CS1591
 
+partial class LogManager
+{
     /// <summary>
     /// This class is for internal use only and should not be used directly by users.
     /// It may cause breaking changes or be removed in future versions without notice.
