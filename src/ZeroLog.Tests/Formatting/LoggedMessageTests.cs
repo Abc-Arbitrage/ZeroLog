@@ -1,9 +1,9 @@
 using System;
 using System.Text;
 using NUnit.Framework;
+using Shouldly;
 using ZeroLog.Configuration;
 using ZeroLog.Formatting;
-using ZeroLog.Tests.Support;
 
 namespace ZeroLog.Tests.Formatting;
 
@@ -31,7 +31,7 @@ public class LoggedMessageTests
     public void should_format_message()
     {
         _logMessage.Append("Foo").Append("Bar");
-        GetFormatted().ToString().ShouldEqual("FooBar");
+        GetFormatted().ToString().ShouldBe("FooBar");
     }
 
     [Test]
@@ -46,22 +46,22 @@ public class LoggedMessageTests
         var original = GetFormatted();
         var clone = original.Clone();
 
-        clone.ShouldNotBeTheSameAs(original);
-        clone.Level.ShouldEqual(original.Level);
-        clone.Timestamp.ShouldEqual(original.Timestamp);
-        clone.Thread.ShouldEqual(original.Thread);
-        clone.Exception.ShouldEqual(original.Exception);
-        clone.LoggerName.ShouldEqual(original.LoggerName);
-        clone.LoggerCompactName.ShouldEqual(original.LoggerCompactName);
-        clone.Message.ToString().ShouldEqual(original.Message.ToString());
+        clone.ShouldNotBeSameAs(original);
+        clone.Level.ShouldBe(original.Level);
+        clone.Timestamp.ShouldBe(original.Timestamp);
+        clone.Thread.ShouldBe(original.Thread);
+        clone.Exception.ShouldBe(original.Exception);
+        clone.LoggerName.ShouldBe(original.LoggerName);
+        clone.LoggerCompactName.ShouldBe(original.LoggerCompactName);
+        clone.Message.ToString().ShouldBe(original.Message.ToString());
 
-        clone.KeyValues.ShouldNotBeTheSameAs(original.KeyValues);
-        clone.KeyValues.Count.ShouldEqual(original.KeyValues.Count);
+        clone.KeyValues.ShouldNotBeSameAs(original.KeyValues);
+        clone.KeyValues.Count.ShouldBe(original.KeyValues.Count);
 
         for (var i = 0; i < original.KeyValues.Count; ++i)
         {
-            clone.KeyValues[i].Key.ShouldEqual(original.KeyValues[i].Key);
-            clone.KeyValues[i].Value.ToString().ShouldEqual(original.KeyValues[i].Value.ToString());
+            clone.KeyValues[i].Key.ShouldBe(original.KeyValues[i].Key);
+            clone.KeyValues[i].Value.ToString().ShouldBe(original.KeyValues[i].Value.ToString());
         }
     }
 
@@ -77,22 +77,22 @@ public class LoggedMessageTests
         var original = GetFormatted();
         var clone = original.Clone().Clone();
 
-        clone.ShouldNotBeTheSameAs(original);
-        clone.Level.ShouldEqual(original.Level);
-        clone.Timestamp.ShouldEqual(original.Timestamp);
-        clone.Thread.ShouldEqual(original.Thread);
-        clone.Exception.ShouldEqual(original.Exception);
-        clone.LoggerName.ShouldEqual(original.LoggerName);
-        clone.LoggerCompactName.ShouldEqual(original.LoggerCompactName);
-        clone.Message.ToString().ShouldEqual(original.Message.ToString());
+        clone.ShouldNotBeSameAs(original);
+        clone.Level.ShouldBe(original.Level);
+        clone.Timestamp.ShouldBe(original.Timestamp);
+        clone.Thread.ShouldBe(original.Thread);
+        clone.Exception.ShouldBe(original.Exception);
+        clone.LoggerName.ShouldBe(original.LoggerName);
+        clone.LoggerCompactName.ShouldBe(original.LoggerCompactName);
+        clone.Message.ToString().ShouldBe(original.Message.ToString());
 
-        clone.KeyValues.ShouldNotBeTheSameAs(original.KeyValues);
-        clone.KeyValues.Count.ShouldEqual(original.KeyValues.Count);
+        clone.KeyValues.ShouldNotBeSameAs(original.KeyValues);
+        clone.KeyValues.Count.ShouldBe(original.KeyValues.Count);
 
         for (var i = 0; i < original.KeyValues.Count; ++i)
         {
-            clone.KeyValues[i].Key.ShouldEqual(original.KeyValues[i].Key);
-            clone.KeyValues[i].Value.ToString().ShouldEqual(original.KeyValues[i].Value.ToString());
+            clone.KeyValues[i].Key.ShouldBe(original.KeyValues[i].Key);
+            clone.KeyValues[i].Value.ToString().ShouldBe(original.KeyValues[i].Value.ToString());
         }
     }
 
@@ -133,7 +133,7 @@ public class LoggedMessageTests
             CaptureKeyValueList(clone.KeyValues)
         );
 
-        dataAfterReset.ShouldEqual(dataBeforeReset);
+        dataAfterReset.ShouldBe(dataBeforeReset);
 
         static string CaptureKeyValueList(KeyValueList list)
         {
@@ -148,8 +148,8 @@ public class LoggedMessageTests
     public void should_provide_expected_values()
     {
         var message = GetFormatted();
-        message.LoggerName.ShouldEqual("Foo.Bar.Baz");
-        message.LoggerCompactName.ShouldEqual("FB.Baz");
+        message.LoggerName.ShouldBe("Foo.Bar.Baz");
+        message.LoggerCompactName.ShouldBe("FB.Baz");
     }
 
     [Test]
@@ -158,9 +158,9 @@ public class LoggedMessageTests
         _logMessage.AppendKeyValue("Foo", (byte)42);
 
         var result = GetFirstValue();
-        result.ValueType.ShouldEqual(typeof(byte));
+        result.ValueType.ShouldBe(typeof(byte));
         result.TryGetValue<byte>(out var value).ShouldBeTrue();
-        value.ShouldEqual((byte)42);
+        value.ShouldBe((byte)42);
     }
 
     [Test]
@@ -169,9 +169,9 @@ public class LoggedMessageTests
         _logMessage.AppendKeyValue("Foo", (sbyte)-42);
 
         var result = GetFirstValue();
-        result.ValueType.ShouldEqual(typeof(sbyte));
+        result.ValueType.ShouldBe(typeof(sbyte));
         result.TryGetValue<sbyte>(out var value).ShouldBeTrue();
-        value.ShouldEqual((sbyte)-42);
+        value.ShouldBe((sbyte)-42);
     }
 
     [Test]
@@ -180,9 +180,9 @@ public class LoggedMessageTests
         _logMessage.AppendKeyValue("Foo", (short)-42);
 
         var result = GetFirstValue();
-        result.ValueType.ShouldEqual(typeof(short));
+        result.ValueType.ShouldBe(typeof(short));
         result.TryGetValue<short>(out var value).ShouldBeTrue();
-        value.ShouldEqual((short)-42);
+        value.ShouldBe((short)-42);
     }
 
     [Test]
@@ -191,9 +191,9 @@ public class LoggedMessageTests
         _logMessage.AppendKeyValue("Foo", (ushort)42);
 
         var result = GetFirstValue();
-        result.ValueType.ShouldEqual(typeof(ushort));
+        result.ValueType.ShouldBe(typeof(ushort));
         result.TryGetValue<ushort>(out var value).ShouldBeTrue();
-        value.ShouldEqual((ushort)42u);
+        value.ShouldBe((ushort)42u);
     }
 
     [Test]
@@ -202,9 +202,9 @@ public class LoggedMessageTests
         _logMessage.AppendKeyValue("Foo", -42);
 
         var result = GetFirstValue();
-        result.ValueType.ShouldEqual(typeof(int));
+        result.ValueType.ShouldBe(typeof(int));
         result.TryGetValue<int>(out var value).ShouldBeTrue();
-        value.ShouldEqual(-42);
+        value.ShouldBe(-42);
 
         result.TryGetValue<uint>(out _).ShouldBeFalse();
     }
@@ -215,9 +215,9 @@ public class LoggedMessageTests
         _logMessage.AppendKeyValue("Foo", 42u);
 
         var result = GetFirstValue();
-        result.ValueType.ShouldEqual(typeof(uint));
+        result.ValueType.ShouldBe(typeof(uint));
         result.TryGetValue<uint>(out var value).ShouldBeTrue();
-        value.ShouldEqual(42u);
+        value.ShouldBe(42u);
 
         result.TryGetValue<int>(out _).ShouldBeFalse();
     }
@@ -228,9 +228,9 @@ public class LoggedMessageTests
         _logMessage.AppendKeyValue("Foo", -42L);
 
         var result = GetFirstValue();
-        result.ValueType.ShouldEqual(typeof(long));
+        result.ValueType.ShouldBe(typeof(long));
         result.TryGetValue<long>(out var value).ShouldBeTrue();
-        value.ShouldEqual(-42L);
+        value.ShouldBe(-42L);
     }
 
     [Test]
@@ -239,9 +239,9 @@ public class LoggedMessageTests
         _logMessage.AppendKeyValue("Foo", 42ul);
 
         var result = GetFirstValue();
-        result.ValueType.ShouldEqual(typeof(ulong));
+        result.ValueType.ShouldBe(typeof(ulong));
         result.TryGetValue<ulong>(out var value).ShouldBeTrue();
-        value.ShouldEqual(42ul);
+        value.ShouldBe(42ul);
     }
 
     [Test]
@@ -251,9 +251,9 @@ public class LoggedMessageTests
         _logMessage.AppendKeyValue("Foo", guid);
 
         var result = GetFirstValue();
-        result.ValueType.ShouldEqual(typeof(Guid));
+        result.ValueType.ShouldBe(typeof(Guid));
         result.TryGetValue<Guid>(out var value).ShouldBeTrue();
-        value.ShouldEqual(guid);
+        value.ShouldBe(guid);
     }
 
     [Test]
@@ -262,30 +262,30 @@ public class LoggedMessageTests
         _logMessage.AppendKeyValue("Foo", DayOfWeek.Friday);
 
         var result = GetFirstValue();
-        result.ValueType.ShouldEqual(typeof(DayOfWeek));
+        result.ValueType.ShouldBe(typeof(DayOfWeek));
         result.TryGetValue<DayOfWeek>(out var value).ShouldBeTrue();
-        value.ShouldEqual(DayOfWeek.Friday);
+        value.ShouldBe(DayOfWeek.Friday);
     }
 
     [Test]
     public void should_return_string_type_for_string()
     {
         _logMessage.AppendKeyValue("Foo", "Bar");
-        GetFirstValue().ValueType.ShouldEqual(typeof(string));
+        GetFirstValue().ValueType.ShouldBe(typeof(string));
     }
 
     [Test]
     public void should_return_string_type_for_span_of_byte()
     {
         _logMessage.AppendKeyValue("Foo", [(byte)'A']);
-        GetFirstValue().ValueType.ShouldEqual(typeof(string));
+        GetFirstValue().ValueType.ShouldBe(typeof(string));
     }
 
     [Test]
     public void should_return_string_type_for_span_of_char()
     {
         _logMessage.AppendKeyValue("Foo", "Bar".AsSpan());
-        GetFirstValue().ValueType.ShouldEqual(typeof(string));
+        GetFirstValue().ValueType.ShouldBe(typeof(string));
     }
 
     private LoggedMessage GetFormatted()

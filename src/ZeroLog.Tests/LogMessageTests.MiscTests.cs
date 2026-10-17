@@ -1,6 +1,6 @@
 using System;
 using NUnit.Framework;
-using ZeroLog.Tests.Support;
+using Shouldly;
 
 namespace ZeroLog.Tests;
 
@@ -15,7 +15,7 @@ partial class LogMessageTests
 
         [Test]
         public void should_write_constant_message()
-            => new LogMessage("foobar").ToString().ShouldEqual("foobar");
+            => new LogMessage("foobar").ToString().ShouldBe("foobar");
 
         [Test]
         public void should_truncate_value_types_after_string_capacity_is_exceeded()
@@ -27,7 +27,7 @@ partial class LogMessageTests
                        .Append("bar")
                        .Append(20)
                        .ToString()
-                       .ShouldEqual("foo10 [TRUNCATED]");
+                       .ShouldBe("foo10 [TRUNCATED]");
         }
 
         [Test]
@@ -36,7 +36,7 @@ partial class LogMessageTests
             var ex = new InvalidOperationException();
             _logMessage.WithException(ex);
 
-            _logMessage.Exception.ShouldBeTheSameAs(ex);
+            _logMessage.Exception.ShouldBeSameAs(ex);
         }
 
         [Test]
@@ -44,7 +44,7 @@ partial class LogMessageTests
         {
             _logMessage.Append($"foo {new LogMessage.AppendOperation<int>(40, static (msg, i) => msg.Append(i + 2))} bar")
                        .ToString()
-                       .ShouldEqual("foo 42 bar");
+                       .ShouldBe("foo 42 bar");
         }
     }
 }

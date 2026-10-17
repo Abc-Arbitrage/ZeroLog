@@ -30,6 +30,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using NUnit.Framework;
+using Shouldly;
 using ZeroLog.Configuration;
 using ZeroLog.Tests.Support;
 
@@ -64,8 +65,8 @@ partial class LogTests
         _log.<#= logLevel #>().Append("Foo").Log();
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(LogLevel.<#= logLevel #>);
-        message.ToString().ShouldEqual("Foo");
+        message.Level.ShouldBe(LogLevel.<#= logLevel #>);
+        message.ToString().ShouldBe("Foo");
         message.Exception.ShouldBeNull();
     }
 
@@ -75,8 +76,8 @@ partial class LogTests
         _log.<#= logLevel #>("foo");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(LogLevel.<#= logLevel #>);
-        message.ToString().ShouldEqual("foo");
+        message.Level.ShouldBe(LogLevel.<#= logLevel #>);
+        message.ToString().ShouldBe("foo");
         message.Exception.ShouldBeNull();
     }
 
@@ -87,8 +88,8 @@ partial class LogTests
         _log.<#= logLevel #>("Foo", exception);
 
         var message = _provider.GetSubmittedMessage();
-        message.ToString().ShouldEqual("Foo");
-        message.Exception.ShouldBeTheSameAs(exception);
+        message.ToString().ShouldBe("Foo");
+        message.Exception.ShouldBeSameAs(exception);
     }
 
     [Test]
@@ -97,8 +98,8 @@ partial class LogTests
         _log.<#= logLevel #>($"foo {NoInline("bar")} baz {NoInline("foobar")}");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(LogLevel.<#= logLevel #>);
-        message.ToString().ShouldEqual("foo bar baz foobar");
+        message.Level.ShouldBe(LogLevel.<#= logLevel #>);
+        message.ToString().ShouldBe("foo bar baz foobar");
         message.Exception.ShouldBeNull();
     }
 
@@ -108,8 +109,8 @@ partial class LogTests
         _log.<#= logLevel #>($"foo {"bar".AsSpan()} baz {"foobar".AsSpan()}");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(LogLevel.<#= logLevel #>);
-        message.ToString().ShouldEqual("foo bar baz foobar");
+        message.Level.ShouldBe(LogLevel.<#= logLevel #>);
+        message.ToString().ShouldBe("foo bar baz foobar");
         message.Exception.ShouldBeNull();
     }
 
@@ -120,8 +121,8 @@ partial class LogTests
         _log.<#= logLevel #>($"foo {"bar"u8} baz {"foobar"u8}");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(LogLevel.<#= logLevel #>);
-        message.ToString().ShouldEqual("foo bar baz foobar");
+        message.Level.ShouldBe(LogLevel.<#= logLevel #>);
+        message.ToString().ShouldBe("foo bar baz foobar");
         message.Exception.ShouldBeNull();
     }
 
@@ -132,8 +133,8 @@ partial class LogTests
         _log.<#= logLevel #>($"Foo {42}", exception);
 
         var message = _provider.GetSubmittedMessage();
-        message.ToString().ShouldEqual("Foo 42");
-        message.Exception.ShouldBeTheSameAs(exception);
+        message.ToString().ShouldBe("Foo 42");
+        message.Exception.ShouldBeSameAs(exception);
     }
 
     [Test]
@@ -158,8 +159,8 @@ partial class LogTests
         _log.<#= logLevel #>($"foo {TestValues.<#= type.argType #>} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(LogLevel.<#= logLevel #>);
-        message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.<#= type.argType #>} bar"));
+        message.Level.ShouldBe(LogLevel.<#= logLevel #>);
+        message.ToString().ShouldBe(FormattableString.Invariant($"foo {TestValues.<#= type.argType #>} bar"));
     }
 
     [Test]
@@ -168,8 +169,8 @@ partial class LogTests
         _log.<#= logLevel #>($"foo {(<#= type.name #>?)TestValues.<#= type.argType #>} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(LogLevel.<#= logLevel #>);
-        message.ToString().ShouldEqual(FormattableString.Invariant($"foo {TestValues.<#= type.argType #>} bar"));
+        message.Level.ShouldBe(LogLevel.<#= logLevel #>);
+        message.ToString().ShouldBe(FormattableString.Invariant($"foo {TestValues.<#= type.argType #>} bar"));
     }
 
 <#
@@ -182,8 +183,8 @@ partial class LogTests
         _log.<#= logLevel #>($"foo {TestValues.<#= type.argType #>:<#= testFormats[type.argType] #>} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(LogLevel.<#= logLevel #>);
-        message.ToString().ShouldEqual($"foo {TestValues.<#= type.argType #>.ToString("<#= testFormats[type.argType] #>", CultureInfo.InvariantCulture)} bar");
+        message.Level.ShouldBe(LogLevel.<#= logLevel #>);
+        message.ToString().ShouldBe($"foo {TestValues.<#= type.argType #>.ToString("<#= testFormats[type.argType] #>", CultureInfo.InvariantCulture)} bar");
     }
 
     [Test]
@@ -192,8 +193,8 @@ partial class LogTests
         _log.<#= logLevel #>($"foo {(<#= type.name #>?)TestValues.<#= type.argType #>:<#= testFormats[type.argType] #>} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(LogLevel.<#= logLevel #>);
-        message.ToString().ShouldEqual($"foo {TestValues.<#= type.argType #>.ToString("<#= testFormats[type.argType] #>", CultureInfo.InvariantCulture)} bar");
+        message.Level.ShouldBe(LogLevel.<#= logLevel #>);
+        message.ToString().ShouldBe($"foo {TestValues.<#= type.argType #>.ToString("<#= testFormats[type.argType] #>", CultureInfo.InvariantCulture)} bar");
     }
 
 <#
@@ -214,8 +215,8 @@ partial class LogTests
         _log.<#= logLevel #>($"foo {DayOfWeek.Friday} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(LogLevel.<#= logLevel #>);
-        message.ToString().ShouldEqual("foo Friday bar");
+        message.Level.ShouldBe(LogLevel.<#= logLevel #>);
+        message.ToString().ShouldBe("foo Friday bar");
     }
 
     [Test]
@@ -224,8 +225,8 @@ partial class LogTests
         _log.<#= logLevel #>($"foo {(DayOfWeek?)DayOfWeek.Friday} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(LogLevel.<#= logLevel #>);
-        message.ToString().ShouldEqual("foo Friday bar");
+        message.Level.ShouldBe(LogLevel.<#= logLevel #>);
+        message.ToString().ShouldBe("foo Friday bar");
     }
 
     [Test]
@@ -240,8 +241,8 @@ partial class LogTests
         _log.<#= logLevel #>($"foo {new LogMessage.AppendOperation<int>(40, static (msg, i) => msg.Append(i + 2))} bar");
 
         var message = _provider.GetSubmittedMessage();
-        message.Level.ShouldEqual(LogLevel.<#= logLevel #>);
-        message.ToString().ShouldEqual("foo 42 bar");
+        message.Level.ShouldBe(LogLevel.<#= logLevel #>);
+        message.ToString().ShouldBe("foo 42 bar");
     }
 
     [Test]

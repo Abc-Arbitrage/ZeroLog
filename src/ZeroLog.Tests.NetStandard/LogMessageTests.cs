@@ -1,5 +1,5 @@
 using NUnit.Framework;
-using ZeroLog.Tests.Support;
+using Shouldly;
 
 namespace ZeroLog.Tests.NetStandard;
 
@@ -12,6 +12,6 @@ public class LogMessageTests
         LogMessage.Empty
                   .Append(42)
                   .ToString()
-                  .ShouldEqual(string.Empty);
+                  .ShouldBe(string.Empty);
     }
 }

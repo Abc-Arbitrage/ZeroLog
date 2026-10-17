@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using NUnit.Framework;
+using Shouldly;
 using ZeroLog.Support;
-using ZeroLog.Tests.Support;
 
 namespace ZeroLog.Tests;
 
@@ -11,128 +11,128 @@ public class EnumCacheTests
     [Test]
     public void should_get_enum_strings_byte()
     {
-        GetString(EnumByte.Foo).ShouldEqual("Foo");
-        GetString(EnumByte.Bar).ShouldEqual("Bar");
-        GetString(EnumByte.Baz).ShouldEqual("Baz");
+        GetString(EnumByte.Foo).ShouldBe("Foo");
+        GetString(EnumByte.Bar).ShouldBe("Bar");
+        GetString(EnumByte.Baz).ShouldBe("Baz");
     }
 
     [Test]
     public void should_get_enum_strings_sbyte()
     {
-        GetString(EnumSByte.Foo).ShouldEqual("Foo");
-        GetString(EnumSByte.Bar).ShouldEqual("Bar");
-        GetString(EnumSByte.Baz).ShouldEqual("Baz");
+        GetString(EnumSByte.Foo).ShouldBe("Foo");
+        GetString(EnumSByte.Bar).ShouldBe("Bar");
+        GetString(EnumSByte.Baz).ShouldBe("Baz");
     }
 
     [Test]
     public void should_get_enum_strings_int16()
     {
-        GetString(EnumInt16.Foo).ShouldEqual("Foo");
-        GetString(EnumInt16.Bar).ShouldEqual("Bar");
-        GetString(EnumInt16.Baz).ShouldEqual("Baz");
+        GetString(EnumInt16.Foo).ShouldBe("Foo");
+        GetString(EnumInt16.Bar).ShouldBe("Bar");
+        GetString(EnumInt16.Baz).ShouldBe("Baz");
     }
 
     [Test]
     public void should_get_enum_strings_uint16()
     {
-        GetString(EnumUInt16.Foo).ShouldEqual("Foo");
-        GetString(EnumUInt16.Bar).ShouldEqual("Bar");
-        GetString(EnumUInt16.Baz).ShouldEqual("Baz");
+        GetString(EnumUInt16.Foo).ShouldBe("Foo");
+        GetString(EnumUInt16.Bar).ShouldBe("Bar");
+        GetString(EnumUInt16.Baz).ShouldBe("Baz");
     }
 
     [Test]
     public void should_get_enum_strings_int32()
     {
-        GetString(EnumInt32.Foo).ShouldEqual("Foo");
-        GetString(EnumInt32.Bar).ShouldEqual("Bar");
-        GetString(EnumInt32.Baz).ShouldEqual("Baz");
+        GetString(EnumInt32.Foo).ShouldBe("Foo");
+        GetString(EnumInt32.Bar).ShouldBe("Bar");
+        GetString(EnumInt32.Baz).ShouldBe("Baz");
     }
 
     [Test]
     public void should_get_enum_strings_uint32()
     {
-        GetString(EnumUInt32.Foo).ShouldEqual("Foo");
-        GetString(EnumUInt32.Bar).ShouldEqual("Bar");
-        GetString(EnumUInt32.Baz).ShouldEqual("Baz");
+        GetString(EnumUInt32.Foo).ShouldBe("Foo");
+        GetString(EnumUInt32.Bar).ShouldBe("Bar");
+        GetString(EnumUInt32.Baz).ShouldBe("Baz");
     }
 
     [Test]
     public void should_get_enum_strings_int64()
     {
-        GetString(EnumInt64.Foo).ShouldEqual("Foo");
-        GetString(EnumInt64.Bar).ShouldEqual("Bar");
-        GetString(EnumInt64.Baz).ShouldEqual("Baz");
+        GetString(EnumInt64.Foo).ShouldBe("Foo");
+        GetString(EnumInt64.Bar).ShouldBe("Bar");
+        GetString(EnumInt64.Baz).ShouldBe("Baz");
     }
 
     [Test]
     public void should_get_enum_strings_uint64()
     {
-        GetString(EnumUInt64.Foo).ShouldEqual("Foo");
-        GetString(EnumUInt64.Bar).ShouldEqual("Bar");
-        GetString(EnumUInt64.Baz).ShouldEqual("Baz");
+        GetString(EnumUInt64.Foo).ShouldBe("Foo");
+        GetString(EnumUInt64.Bar).ShouldBe("Bar");
+        GetString(EnumUInt64.Baz).ShouldBe("Baz");
     }
 
     [Test]
     public void should_round_trip_value_byte()
     {
         var value = EnumCache.ToUInt64(EnumByte.Baz);
-        EnumCache.FromUInt64<EnumByte>(value).ShouldEqual(EnumByte.Baz);
+        EnumCache.FromUInt64<EnumByte>(value).ShouldBe(EnumByte.Baz);
     }
 
     [Test]
     public void should_round_trip_value_sbyte()
     {
         var value = EnumCache.ToUInt64(EnumSByte.Baz);
-        EnumCache.FromUInt64<EnumSByte>(value).ShouldEqual(EnumSByte.Baz);
+        EnumCache.FromUInt64<EnumSByte>(value).ShouldBe(EnumSByte.Baz);
     }
 
     [Test]
     public void should_round_trip_value_int16()
     {
         var value = EnumCache.ToUInt64(EnumInt16.Baz);
-        EnumCache.FromUInt64<EnumInt16>(value).ShouldEqual(EnumInt16.Baz);
+        EnumCache.FromUInt64<EnumInt16>(value).ShouldBe(EnumInt16.Baz);
     }
 
     [Test]
     public void should_round_trip_value_uint16()
     {
         var value = EnumCache.ToUInt64(EnumUInt16.Baz);
-        EnumCache.FromUInt64<EnumUInt16>(value).ShouldEqual(EnumUInt16.Baz);
+        EnumCache.FromUInt64<EnumUInt16>(value).ShouldBe(EnumUInt16.Baz);
     }
 
     [Test]
     public void should_round_trip_value_int32()
     {
         var value = EnumCache.ToUInt64(EnumInt32.Baz);
-        EnumCache.FromUInt64<EnumInt32>(value).ShouldEqual(EnumInt32.Baz);
+        EnumCache.FromUInt64<EnumInt32>(value).ShouldBe(EnumInt32.Baz);
     }
 
     [Test]
     public void should_round_trip_value_uint32()
     {
         var value = EnumCache.ToUInt64(EnumUInt32.Baz);
-        EnumCache.FromUInt64<EnumUInt32>(value).ShouldEqual(EnumUInt32.Baz);
+        EnumCache.FromUInt64<EnumUInt32>(value).ShouldBe(EnumUInt32.Baz);
     }
 
     [Test]
     public void should_round_trip_value_int64()
     {
         var value = EnumCache.ToUInt64(EnumInt64.Baz);
-        EnumCache.FromUInt64<EnumInt64>(value).ShouldEqual(EnumInt64.Baz);
+        EnumCache.FromUInt64<EnumInt64>(value).ShouldBe(EnumInt64.Baz);
     }
 
     [Test]
     public void should_round_trip_value_uint64()
     {
         var value = EnumCache.ToUInt64(EnumUInt64.Baz);
-        EnumCache.FromUInt64<EnumUInt64>(value).ShouldEqual(EnumUInt64.Baz);
+        EnumCache.FromUInt64<EnumUInt64>(value).ShouldBe(EnumUInt64.Baz);
     }
 
     [Test]
     public void should_round_trip_negative_value()
     {
         var value = EnumCache.ToUInt64(EnumWithNegativeValues.Foo);
-        EnumCache.FromUInt64<EnumWithNegativeValues>(value).ShouldEqual(EnumWithNegativeValues.Foo);
+        EnumCache.FromUInt64<EnumWithNegativeValues>(value).ShouldBe(EnumWithNegativeValues.Foo);
     }
 
     [Test]
@@ -148,23 +148,23 @@ public class EnumCacheTests
     [Test]
     public void should_get_enum_strings_on_enums_with_negative_values()
     {
-        GetString(EnumWithNegativeValues.Foo).ShouldEqual("Foo");
-        GetString(EnumWithNegativeValues.Bar).ShouldEqual("Bar");
-        GetString(EnumWithNegativeValues.Baz).ShouldEqual("Baz");
+        GetString(EnumWithNegativeValues.Foo).ShouldBe("Foo");
+        GetString(EnumWithNegativeValues.Bar).ShouldBe("Bar");
+        GetString(EnumWithNegativeValues.Baz).ShouldBe("Baz");
     }
 
     [Test]
     public void should_get_enum_strings_on_enums_with_large_values()
     {
-        GetString(EnumWithLargeValues.Foo).ShouldEqual("Foo");
-        GetString(EnumWithLargeValues.Bar).ShouldEqual("Bar");
-        GetString(EnumWithLargeValues.Baz).ShouldEqual("Baz");
+        GetString(EnumWithLargeValues.Foo).ShouldBe("Foo");
+        GetString(EnumWithLargeValues.Bar).ShouldBe("Bar");
+        GetString(EnumWithLargeValues.Baz).ShouldBe("Baz");
     }
 
     [Test]
     public void should_get_enum_strings_on_enums_with_value_larger_than_item_count()
     {
-        GetString(EnumWithValueLargerThanItemCount.Foo).ShouldEqual("Foo");
+        GetString(EnumWithValueLargerThanItemCount.Foo).ShouldBe("Foo");
     }
 
     [Test]
@@ -252,8 +252,8 @@ public class EnumCacheTests
     [Test]
     public void should_handle_nested_enums_in_constructed_generic_types()
     {
-        GetString(GenericType<int>.EnumInGenericType.Foo).ShouldEqual("Foo");
-        GetString(GenericType<int>.AnotherOne<string>.EnumInGenericType2.Foo).ShouldEqual("Foo");
+        GetString(GenericType<int>.EnumInGenericType.Foo).ShouldBe("Foo");
+        GetString(GenericType<int>.AnotherOne<string>.EnumInGenericType2.Foo).ShouldBe("Foo");
     }
 
     [Test]
@@ -261,7 +261,7 @@ public class EnumCacheTests
     {
         EnumCache.Register(typeof(EnumToIgnore));
         EnumCache.GetString(typeof(EnumToIgnore).TypeHandle.Value, (ulong)EnumToIgnore.Bar, out _)
-                 .ShouldEqual(nameof(EnumToIgnore.Bar));
+                 .ShouldBe(nameof(EnumToIgnore.Bar));
 
         EnumCache.Ignore(typeof(EnumToIgnore));
         EnumCache.GetString(typeof(EnumToIgnore).TypeHandle.Value, (ulong)EnumToIgnore.Bar, out _)
@@ -284,9 +284,9 @@ public class EnumCacheTests
     private static void CheckNullableValue<T>(T value)
         where T : struct
     {
-        EnumCache.ToUInt64Slow((Enum)(object)value).ShouldEqual(EnumCache.ToUInt64(value));
-        EnumCache.ToUInt64Nullable((T?)value).ShouldEqual(EnumCache.ToUInt64(value));
-        GetString(value).ShouldEqual(value.ToString());
+        EnumCache.ToUInt64Slow((Enum)(object)value).ShouldBe(EnumCache.ToUInt64(value));
+        EnumCache.ToUInt64Nullable((T?)value).ShouldBe(EnumCache.ToUInt64(value));
+        GetString(value).ShouldBe(value.ToString());
     }
 
     private enum EnumByte : byte

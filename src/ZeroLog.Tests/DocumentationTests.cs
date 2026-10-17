@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using NUnit.Framework;
 using NUnit.Framework.Interfaces;
-using ZeroLog.Tests.Support;
+using Shouldly;
 
 namespace ZeroLog.Tests;
 
@@ -20,7 +20,7 @@ public class DocumentationTests
     {
         if (member.Element("inheritdoc") == null)
         {
-            member.Elements("summary").Count().ShouldEqual(1);
+            member.Elements("summary").Count().ShouldBe(1);
             member.Elements("remarks").Count().ShouldBeLessThanOrEqualTo(1);
         }
 

@@ -6,8 +6,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using Shouldly;
 using ZeroLog.Configuration;
-using ZeroLog.Tests.Support;
 
 namespace ZeroLog.Tests;
 
@@ -71,7 +71,7 @@ public partial class LogManagerTests(AppendingStrategy appendingStrategy)
         log.Info("test");
         LogManager.Shutdown();
 
-        _testAppender.LoggedMessages.ShouldHaveSingleItem().ShouldEqual("test");
+        _testAppender.LoggedMessages.ShouldHaveSingleItem().ShouldBe("test");
     }
 
     [Test]
@@ -81,13 +81,13 @@ public partial class LogManagerTests(AppendingStrategy appendingStrategy)
         log.Info("test");
         LogManager.Flush();
 
-        _testAppender.LoggedMessages.ShouldHaveSingleItem().ShouldEqual("test");
+        _testAppender.LoggedMessages.ShouldHaveSingleItem().ShouldBe("test");
     }
 
     [Test]
     public void should_prevent_initializing_already_initialized_log_manager()
     {
-        Assert.Throws<InvalidOperationException>(() => LogManager.Initialize(new ZeroLogConfiguration()));
+        Should.Throw<InvalidOperationException>(() => LogManager.Initialize(new ZeroLogConfiguration()));
     }
 
     [Test]
@@ -103,7 +103,7 @@ public partial class LogManagerTests(AppendingStrategy appendingStrategy)
 
         var unavailableEvent = log.Debug();
 
-        actualLogMessages.Count.ShouldEqual(actualLogMessages.Count);
+        actualLogMessages.Count.ShouldBe(actualLogMessages.Count);
         unavailableEvent.ConstantMessage.ShouldNotBeNull();
 
         var signal = _testAppender.SetMessageCountTarget(actualLogMessages.Count);
@@ -268,7 +268,7 @@ public partial class LogManagerTests(AppendingStrategy appendingStrategy)
         signal.Wait(TimeSpan.FromSeconds(1));
 
         var logMessage = _testAppender.LoggedMessages.ShouldHaveSingleItem();
-        logMessage.ShouldEqual("An error occurred during formatting: Simulated failure - Unformatted message: Unmanaged(0x2a000000)");
+        logMessage.ShouldBe("An error occurred during formatting: Simulated failure - Unformatted message: Unmanaged(0x2a000000)");
     }
 
     [Test]
@@ -283,7 +283,7 @@ public partial class LogManagerTests(AppendingStrategy appendingStrategy)
 
         signal.Wait(TimeSpan.FromSeconds(1));
         var message = _testAppender.LoggedMessages.ShouldHaveSingleItem();
-        message.ShouldEqual(new string('.', LogManager.OutputBufferSize - ZeroLogConfiguration.Default.TruncatedMessageSuffix.Length) + ZeroLogConfiguration.Default.TruncatedMessageSuffix);
+        message.ShouldBe(new string('.', LogManager.OutputBufferSize - ZeroLogConfiguration.Default.TruncatedMessageSuffix.Length) + ZeroLogConfiguration.Default.TruncatedMessageSuffix);
     }
 
     public struct FailingUnmanagedStruct : ISpanFormattable

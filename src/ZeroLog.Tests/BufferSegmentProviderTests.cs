@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using NUnit.Framework;
-using ZeroLog.Tests.Support;
+using Shouldly;
 
 namespace ZeroLog.Tests;
 
@@ -24,8 +24,8 @@ public unsafe class BufferSegmentProviderTests
     {
         var bufferSegment = _bufferSegmentProvider.GetSegment();
 
-        bufferSegment.Length.ShouldEqual(_segmentSize);
-        new IntPtr(bufferSegment.Data).ShouldNotEqual(IntPtr.Zero);
+        bufferSegment.Length.ShouldBe(_segmentSize);
+        new IntPtr(bufferSegment.Data).ShouldNotBe(IntPtr.Zero);
         bufferSegment.UnderlyingBuffer.ShouldNotBeNull();
     }
 
@@ -42,8 +42,8 @@ public unsafe class BufferSegmentProviderTests
         for (var i = 1; i < segments.Count; i++)
         {
             var bufferSegment = segments[i];
-            ((nuint)bufferSegment.Data).ShouldEqual(lastAddress + _segmentSize);
-            bufferSegment.Length.ShouldEqual(_segmentSize);
+            ((nuint)bufferSegment.Data).ShouldBe(lastAddress + _segmentSize);
+            bufferSegment.Length.ShouldBe(_segmentSize);
             lastAddress = (nuint)bufferSegment.Data;
         }
     }
@@ -56,27 +56,27 @@ public unsafe class BufferSegmentProviderTests
         for (var i = 0; i < 2 * _segmentCount; i++)
             segments.Add(_bufferSegmentProvider.GetSegment());
 
-        segments[_segmentCount - 1].UnderlyingBuffer.ShouldBeTheSameAs(segments[0].UnderlyingBuffer);
-        segments[_segmentCount].UnderlyingBuffer.ShouldNotBeTheSameAs(segments[_segmentCount - 1].UnderlyingBuffer);
-        segments[_segmentCount + 1].UnderlyingBuffer.ShouldBeTheSameAs(segments[_segmentCount].UnderlyingBuffer);
+        segments[_segmentCount - 1].UnderlyingBuffer.ShouldBeSameAs(segments[0].UnderlyingBuffer);
+        segments[_segmentCount].UnderlyingBuffer.ShouldNotBeSameAs(segments[_segmentCount - 1].UnderlyingBuffer);
+        segments[_segmentCount + 1].UnderlyingBuffer.ShouldBeSameAs(segments[_segmentCount].UnderlyingBuffer);
 
-        ((nuint)segments[_segmentCount + 1].Data).ShouldEqual((nuint)segments[_segmentCount].Data + _segmentSize);
+        ((nuint)segments[_segmentCount + 1].Data).ShouldBe((nuint)segments[_segmentCount].Data + _segmentSize);
     }
 
     [Test]
     public void should_validate_arguments()
     {
-        Assert.Throws<ArgumentOutOfRangeException>(() => _ = new BufferSegmentProvider(0, 1));
-        Assert.Throws<ArgumentOutOfRangeException>(() => _ = new BufferSegmentProvider(-1, 1));
-        Assert.Throws<ArgumentOutOfRangeException>(() => _ = new BufferSegmentProvider(1, 0));
-        Assert.Throws<ArgumentOutOfRangeException>(() => _ = new BufferSegmentProvider(1, -1));
+        Should.Throw<ArgumentOutOfRangeException>(() => _ = new BufferSegmentProvider(0, 1));
+        Should.Throw<ArgumentOutOfRangeException>(() => _ = new BufferSegmentProvider(-1, 1));
+        Should.Throw<ArgumentOutOfRangeException>(() => _ = new BufferSegmentProvider(1, 0));
+        Should.Throw<ArgumentOutOfRangeException>(() => _ = new BufferSegmentProvider(1, -1));
     }
 
     [Test]
     public void should_limit_buffer_size()
     {
         var provider = new BufferSegmentProvider(4 * 1024, 1024 * 1024);
-        provider.BufferSize.ShouldEqual(1024 * 1024 * 1024);
+        provider.BufferSize.ShouldBe(1024 * 1024 * 1024);
     }
 
     [Test]
@@ -85,13 +85,13 @@ public unsafe class BufferSegmentProviderTests
         _bufferSegmentProvider = new BufferSegmentProvider(1, 1);
 
         var segmentA = _bufferSegmentProvider.GetSegment();
-        segmentA.Length.ShouldEqual(BufferSegmentProvider.MinSegmentSize);
-        segmentA.UnderlyingBuffer.Length.ShouldEqual(BufferSegmentProvider.MinSegmentSize);
+        segmentA.Length.ShouldBe(BufferSegmentProvider.MinSegmentSize);
+        segmentA.UnderlyingBuffer.Length.ShouldBe(BufferSegmentProvider.MinSegmentSize);
 
         var segmentB = _bufferSegmentProvider.GetSegment();
-        segmentB.Length.ShouldEqual(BufferSegmentProvider.MinSegmentSize);
-        segmentB.UnderlyingBuffer.Length.ShouldEqual(BufferSegmentProvider.MinSegmentSize);
+        segmentB.Length.ShouldBe(BufferSegmentProvider.MinSegmentSize);
+        segmentB.UnderlyingBuffer.Length.ShouldBe(BufferSegmentProvider.MinSegmentSize);
 
-        segmentB.UnderlyingBuffer.ShouldNotBeTheSameAs(segmentA.UnderlyingBuffer);
+        segmentB.UnderlyingBuffer.ShouldNotBeSameAs(segmentA.UnderlyingBuffer);
     }
 }

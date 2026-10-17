@@ -4,8 +4,8 @@ using System.Linq;
 using System.Reflection;
 using NUnit.Framework;
 using NUnit.Framework.Interfaces;
+using Shouldly;
 using ZeroLog.Formatting;
-using ZeroLog.Tests.Support;
 
 namespace ZeroLog.Tests.Formatting;
 
@@ -16,8 +16,8 @@ public class DefaultStyleTests
     [TestCaseSource(nameof(GetDefaultStyles))]
     public void should_be_valid(PropertyInfo property)
     {
-        var style = property.GetValue(null).ShouldBe<DefaultStyle>();
-        var formatter = style.Formatter.ShouldBe<DefaultFormatter>();
+        var style = property.GetValue(null).ShouldBeOfType<DefaultStyle>();
+        var formatter = style.Formatter.ShouldBeOfType<DefaultFormatter>();
         PatternWriter.IsValidPattern(formatter.MessagePatternWriter.Pattern).ShouldBeTrue();
     }
 

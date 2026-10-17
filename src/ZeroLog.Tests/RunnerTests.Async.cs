@@ -2,8 +2,8 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using Shouldly;
 using ZeroLog.Configuration;
-using ZeroLog.Tests.Support;
 
 namespace ZeroLog.Tests;
 
@@ -65,7 +65,7 @@ public class AsyncRunnerTests
 
         signal.Wait(TimeSpan.FromSeconds(1));
 
-        _testAppender.InitializationCount.ShouldEqual(1);
+        _testAppender.InitializationCount.ShouldBe(1);
     }
 
     [Test]
@@ -106,7 +106,7 @@ public class AsyncRunnerTests
         _testAppender.WaitOnWriteEvent.Set();
 
         flushTask.Wait(TimeSpan.FromSeconds(1)).ShouldBeTrue();
-        _testAppender.FlushCount.ShouldEqual(1);
+        _testAppender.FlushCount.ShouldBe(1);
     }
 
     [Test]
@@ -124,7 +124,7 @@ public class AsyncRunnerTests
         _log.Info(null);
 
         Wait.Until(() => _testAppender.LoggedMessages.Count == 1, TimeSpan.FromSeconds(30));
-        _testAppender.LoggedMessages.ShouldHaveSingleItem().ShouldEqual("Foo");
+        _testAppender.LoggedMessages.ShouldHaveSingleItem().ShouldBe("Foo");
     }
 
     [Test]
@@ -139,8 +139,8 @@ public class AsyncRunnerTests
             _runner.AcquireLogMessage(LogMessagePoolExhaustionStrategy.DropLogMessageAndNotifyAppenders).ConstantMessage.ShouldBeNull();
 
         _runner.AcquireLogMessage(LogMessagePoolExhaustionStrategy.DropLogMessageAndNotifyAppenders).ConstantMessage.ShouldNotBeNull().ShouldContain("Log message pool is exhausted");
-        _runner.AcquireLogMessage(LogMessagePoolExhaustionStrategy.DropLogMessageAndNotifyAppenders).ShouldBeTheSameAs(LogMessage.Empty);
-        _runner.AcquireLogMessage(LogMessagePoolExhaustionStrategy.DropLogMessageAndNotifyAppenders).ShouldBeTheSameAs(LogMessage.Empty);
+        _runner.AcquireLogMessage(LogMessagePoolExhaustionStrategy.DropLogMessageAndNotifyAppenders).ShouldBeSameAs(LogMessage.Empty);
+        _runner.AcquireLogMessage(LogMessagePoolExhaustionStrategy.DropLogMessageAndNotifyAppenders).ShouldBeSameAs(LogMessage.Empty);
 
         _runner.Submit(firstMessage);
         _runner.Flush();
@@ -148,8 +148,8 @@ public class AsyncRunnerTests
 
         _runner.AcquireLogMessage(LogMessagePoolExhaustionStrategy.DropLogMessageAndNotifyAppenders).ConstantMessage.ShouldBeNull();
         _runner.AcquireLogMessage(LogMessagePoolExhaustionStrategy.DropLogMessageAndNotifyAppenders).ConstantMessage.ShouldNotBeNull().ShouldContain("Log message pool is exhausted");
-        _runner.AcquireLogMessage(LogMessagePoolExhaustionStrategy.DropLogMessageAndNotifyAppenders).ShouldBeTheSameAs(LogMessage.Empty);
-        _runner.AcquireLogMessage(LogMessagePoolExhaustionStrategy.DropLogMessageAndNotifyAppenders).ShouldBeTheSameAs(LogMessage.Empty);
+        _runner.AcquireLogMessage(LogMessagePoolExhaustionStrategy.DropLogMessageAndNotifyAppenders).ShouldBeSameAs(LogMessage.Empty);
+        _runner.AcquireLogMessage(LogMessagePoolExhaustionStrategy.DropLogMessageAndNotifyAppenders).ShouldBeSameAs(LogMessage.Empty);
     }
 
     [Test]
@@ -166,8 +166,8 @@ public class AsyncRunnerTests
         _log.Info("Foo");
         Wait.Until(() => _testAppender.FlushCount >= 1, TimeSpan.FromSeconds(30));
 
-        _runner.Thread.Name.ShouldEqual("TestLoggingThread");
-        _runner.Thread.Priority.ShouldEqual(ThreadPriority.BelowNormal);
+        _runner.Thread.Name.ShouldBe("TestLoggingThread");
+        _runner.Thread.Priority.ShouldBe(ThreadPriority.BelowNormal);
     }
 
     [Test]
@@ -192,6 +192,6 @@ public class AsyncRunnerTests
         _runner.Flush();
 
         // Make sure we drop messages logged from the thread initializer which we cannot handle
-        _testAppender.LoggedMessages.Count.ShouldEqual(_config.LogMessagePoolSize);
+        _testAppender.LoggedMessages.Count.ShouldBe(_config.LogMessagePoolSize);
     }
 }

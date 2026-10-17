@@ -1,6 +1,6 @@
 using NUnit.Framework;
+using Shouldly;
 using ZeroLog.Configuration;
-using ZeroLog.Tests.Support;
 
 namespace ZeroLog.Tests;
 
@@ -46,13 +46,13 @@ public class SyncRunnerTests
     [Test]
     public void should_initialize_appenders_immediately()
     {
-        _testAppender.InitializationCount.ShouldEqual(1);
+        _testAppender.InitializationCount.ShouldBe(1);
 
         _log.Info("Foo");
         _log.Info("Bar");
         _log.Info("Baz");
 
-        _testAppender.InitializationCount.ShouldEqual(1);
+        _testAppender.InitializationCount.ShouldBe(1);
     }
 
     [Test]
@@ -62,10 +62,10 @@ public class SyncRunnerTests
         _log.Info("Bar");
         _log.Info("Baz");
 
-        _testAppender.FlushCount.ShouldEqual(3);
+        _testAppender.FlushCount.ShouldBe(3);
 
         _log.Info("Foo");
-        _testAppender.FlushCount.ShouldEqual(4);
+        _testAppender.FlushCount.ShouldBe(4);
     }
 
     [Test]
@@ -77,6 +77,6 @@ public class SyncRunnerTests
         });
 
         _log.Info(null);
-        _testAppender.LoggedMessages.ShouldHaveSingleItem().ShouldEqual("Foo");
+        _testAppender.LoggedMessages.ShouldHaveSingleItem().ShouldBe("Foo");
     }
 }

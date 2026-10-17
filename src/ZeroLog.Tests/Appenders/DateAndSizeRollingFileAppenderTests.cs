@@ -4,9 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using NUnit.Framework;
+using Shouldly;
 using ZeroLog.Appenders;
 using ZeroLog.Formatting;
-using ZeroLog.Tests.Support;
 
 namespace ZeroLog.Tests.Appenders;
 
@@ -49,12 +49,12 @@ public class DateAndSizeRollingFileAppenderTests
         _appender.WriteMessage(formattedMessage);
         _appender.Flush();
 
-        using var reader = new StreamReader(File.Open(_appender.Stream.ShouldBe<FileStream>().Name.ShouldNotBeNull(), FileMode.Open, FileAccess.Read, FileShare.ReadWrite), _appender.Encoding);
+        using var reader = new StreamReader(File.Open(_appender.Stream.ShouldBeOfType<FileStream>().Name.ShouldNotBeNull(), FileMode.Open, FileAccess.Read, FileShare.ReadWrite), _appender.Encoding);
         var text = reader.ReadToEnd();
 
         var thread = Thread.CurrentThread.Name ?? Thread.CurrentThread.ManagedThreadId.ToString();
         var expectedLine = $"{logMessage.Timestamp.Date:yyyy-MM-dd} - {logMessage.Timestamp.TimeOfDay:hh\\:mm\\:ss\\.fffffff} - {thread} - INFO - TestLog || {logMessage}";
-        text.ShouldEqual(expectedLine + Environment.NewLine + expectedLine + Environment.NewLine);
+        text.ShouldBe(expectedLine + Environment.NewLine + expectedLine + Environment.NewLine);
     }
 
     [Test]
@@ -72,19 +72,19 @@ public class DateAndSizeRollingFileAppenderTests
         var formattedMessage = LoggedMessage.CreateTestMessage(logMessage);
 
         _appender.WriteMessage(formattedMessage);
-        Path.GetFileName(_appender.Stream.ShouldBe<FileStream>().Name).ShouldEqual("0");
+        Path.GetFileName(_appender.Stream.ShouldBeOfType<FileStream>().Name).ShouldBe("0");
 
         _appender.WriteMessage(formattedMessage);
-        Path.GetFileName(_appender.Stream.ShouldBe<FileStream>().Name).ShouldEqual("0");
+        Path.GetFileName(_appender.Stream.ShouldBeOfType<FileStream>().Name).ShouldBe("0");
 
         _appender.WriteMessage(formattedMessage);
-        Path.GetFileName(_appender.Stream.ShouldBe<FileStream>().Name).ShouldEqual("1");
+        Path.GetFileName(_appender.Stream.ShouldBeOfType<FileStream>().Name).ShouldBe("1");
 
         _appender.WriteMessage(formattedMessage);
-        Path.GetFileName(_appender.Stream.ShouldBe<FileStream>().Name).ShouldEqual("1");
+        Path.GetFileName(_appender.Stream.ShouldBeOfType<FileStream>().Name).ShouldBe("1");
 
         _appender.WriteMessage(formattedMessage);
-        Path.GetFileName(_appender.Stream.ShouldBe<FileStream>().Name).ShouldEqual("2");
+        Path.GetFileName(_appender.Stream.ShouldBeOfType<FileStream>().Name).ShouldBe("2");
     }
 
     [Test]
@@ -98,20 +98,20 @@ public class DateAndSizeRollingFileAppenderTests
         var formattedMessage = LoggedMessage.CreateTestMessage(logMessage);
 
         _appender.WriteMessage(formattedMessage);
-        Path.GetFileName(_appender.Stream.ShouldBe<FileStream>().Name).ShouldEqual(logMessage.Timestamp.ToString("yyyyMMdd"));
+        Path.GetFileName(_appender.Stream.ShouldBeOfType<FileStream>().Name).ShouldBe(logMessage.Timestamp.ToString("yyyyMMdd", CultureInfo.InvariantCulture));
 
         logMessage.Timestamp = logMessage.Timestamp.AddDays(1);
 
         _appender.WriteMessage(formattedMessage);
-        Path.GetFileName(_appender.Stream.ShouldBe<FileStream>().Name).ShouldEqual(logMessage.Timestamp.ToString("yyyyMMdd"));
+        Path.GetFileName(_appender.Stream.ShouldBeOfType<FileStream>().Name).ShouldBe(logMessage.Timestamp.ToString("yyyyMMdd", CultureInfo.InvariantCulture));
 
         _appender.WriteMessage(formattedMessage);
-        Path.GetFileName(_appender.Stream.ShouldBe<FileStream>().Name).ShouldEqual(logMessage.Timestamp.ToString("yyyyMMdd"));
+        Path.GetFileName(_appender.Stream.ShouldBeOfType<FileStream>().Name).ShouldBe(logMessage.Timestamp.ToString("yyyyMMdd", CultureInfo.InvariantCulture));
 
         logMessage.Timestamp = logMessage.Timestamp.AddDays(1);
 
         _appender.WriteMessage(formattedMessage);
-        Path.GetFileName(_appender.Stream.ShouldBe<FileStream>().Name).ShouldEqual(logMessage.Timestamp.ToString("yyyyMMdd"));
+        Path.GetFileName(_appender.Stream.ShouldBeOfType<FileStream>().Name).ShouldBe(logMessage.Timestamp.ToString("yyyyMMdd", CultureInfo.InvariantCulture));
     }
 
     [Test]
@@ -135,9 +135,9 @@ public class DateAndSizeRollingFileAppenderTests
         _appender.WriteMessage(formattedMessage);
         _appender.Dispose();
 
-        File.ReadAllLines(Path.Combine(_appender.Directory, "0")).ShouldEqual(["File 0"]);
-        File.ReadAllLines(Path.Combine(_appender.Directory, "1")).ShouldEqual(["File 1"]);
-        File.ReadAllLines(Path.Combine(_appender.Directory, "2")).ShouldEqual(["File 2", logMessage.ToString()]);
+        File.ReadAllLines(Path.Combine(_appender.Directory, "0")).ShouldBe(["File 0"]);
+        File.ReadAllLines(Path.Combine(_appender.Directory, "1")).ShouldBe(["File 1"]);
+        File.ReadAllLines(Path.Combine(_appender.Directory, "2")).ShouldBe(["File 2", logMessage.ToString()]);
     }
 
     [Test]
@@ -164,10 +164,10 @@ public class DateAndSizeRollingFileAppenderTests
             _appender.Dispose();
         }
 
-        File.ReadAllLines(Path.Combine(_appender.Directory, "0")).ShouldEqual(["File 0"]);
-        File.ReadAllLines(Path.Combine(_appender.Directory, "1")).ShouldEqual(["File 1"]);
-        File.ReadAllLines(Path.Combine(_appender.Directory, "2")).ShouldEqual(["File 2"]);
-        File.ReadAllLines(Path.Combine(_appender.Directory, "3")).ShouldEqual([logMessage.ToString()]);
+        File.ReadAllLines(Path.Combine(_appender.Directory, "0")).ShouldBe(["File 0"]);
+        File.ReadAllLines(Path.Combine(_appender.Directory, "1")).ShouldBe(["File 1"]);
+        File.ReadAllLines(Path.Combine(_appender.Directory, "2")).ShouldBe(["File 2"]);
+        File.ReadAllLines(Path.Combine(_appender.Directory, "3")).ShouldBe([logMessage.ToString()]);
     }
 
     [Test]
@@ -198,7 +198,7 @@ public class DateAndSizeRollingFileAppenderTests
 
         _appender.Dispose();
 
-        File.ReadAllLines(Path.Combine(_appender.Directory, ConstantFileNameAppender.FileName)).ShouldEqual(["First line", "Test message", "Test message", "Test message", "Test message"]);
+        File.ReadAllLines(Path.Combine(_appender.Directory, ConstantFileNameAppender.FileName)).ShouldBe(["First line", "Test message", "Test message", "Test message", "Test message"]);
     }
 
     [Test]
@@ -220,7 +220,7 @@ public class DateAndSizeRollingFileAppenderTests
 
         Directory.GetFiles(_appender.Directory)
                  .Select(Path.GetFileName)
-                 .ShouldEqual(["Foo.20220215.000.bar"]);
+                 .ShouldBe(["Foo.20220215.000.bar"]);
     }
 
     private class FileNumberPatternAppender(string directory) : DateAndSizeRollingFileAppender(directory)
@@ -232,7 +232,7 @@ public class DateAndSizeRollingFileAppenderTests
     private class DatePatternAppender(string directory) : DateAndSizeRollingFileAppender(directory)
     {
         protected override string GetFileName(DateOnly date, int number)
-            => date.ToString("yyyyMMdd");
+            => date.ToString("yyyyMMdd", CultureInfo.InvariantCulture);
     }
 
     private class ConstantFileNameAppender(string directory) : DateAndSizeRollingFileAppender(directory)

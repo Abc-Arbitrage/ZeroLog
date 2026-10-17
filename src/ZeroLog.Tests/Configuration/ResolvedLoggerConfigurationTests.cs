@@ -1,5 +1,6 @@
 using System;
 using NUnit.Framework;
+using Shouldly;
 using ZeroLog.Appenders;
 using ZeroLog.Configuration;
 using ZeroLog.Tests.Support;
@@ -13,8 +14,8 @@ public class ResolvedLoggerConfigurationTests
     public void should_have_empty_config()
     {
         var emptyConfig = ResolvedLoggerConfiguration.Empty;
-        emptyConfig.Level.ShouldEqual(LogLevel.None);
-        emptyConfig.LogMessagePoolExhaustionStrategy.ShouldEqual(LogMessagePoolExhaustionStrategy.DropLogMessage);
+        emptyConfig.Level.ShouldBe(LogLevel.None);
+        emptyConfig.LogMessagePoolExhaustionStrategy.ShouldBe(LogMessagePoolExhaustionStrategy.DropLogMessage);
         emptyConfig.GetAppenders(LogLevel.Trace).ShouldBeEmpty();
         emptyConfig.GetAppenders(LogLevel.Debug).ShouldBeEmpty();
         emptyConfig.GetAppenders(LogLevel.Info).ShouldBeEmpty();
@@ -23,7 +24,7 @@ public class ResolvedLoggerConfigurationTests
         emptyConfig.GetAppenders(LogLevel.Fatal).ShouldBeEmpty();
 
 #if NET8_0_OR_GREATER
-        emptyConfig.TimeProvider.ShouldBeTheSameAs(TimeProvider.System);
+        emptyConfig.TimeProvider.ShouldBeSameAs(TimeProvider.System);
 #endif
     }
 
@@ -74,54 +75,54 @@ public class ResolvedLoggerConfigurationTests
         };
 
         var rootConfig = config.ResolveLoggerConfiguration("SomethingElse");
-        rootConfig.Level.ShouldEqual(LogLevel.Debug);
-        rootConfig.LogMessagePoolExhaustionStrategy.ShouldEqual(LogMessagePoolExhaustionStrategy.Default);
+        rootConfig.Level.ShouldBe(LogLevel.Debug);
+        rootConfig.LogMessagePoolExhaustionStrategy.ShouldBe(LogMessagePoolExhaustionStrategy.Default);
         rootConfig.GetAppenders(LogLevel.Trace).ShouldBeEmpty();
-        rootConfig.GetAppenders(LogLevel.Debug).ShouldBeEquivalentTo([appenderA]);
-        rootConfig.GetAppenders(LogLevel.Info).ShouldBeEquivalentTo([appenderA]);
-        rootConfig.GetAppenders(LogLevel.Warn).ShouldBeEquivalentTo([appenderA]);
-        rootConfig.GetAppenders(LogLevel.Error).ShouldBeEquivalentTo([appenderA]);
-        rootConfig.GetAppenders(LogLevel.Fatal).ShouldBeEquivalentTo([appenderA]);
+        rootConfig.GetAppenders(LogLevel.Debug).ShouldBe([appenderA], ignoreOrder: true);
+        rootConfig.GetAppenders(LogLevel.Info).ShouldBe([appenderA], ignoreOrder: true);
+        rootConfig.GetAppenders(LogLevel.Warn).ShouldBe([appenderA], ignoreOrder: true);
+        rootConfig.GetAppenders(LogLevel.Error).ShouldBe([appenderA], ignoreOrder: true);
+        rootConfig.GetAppenders(LogLevel.Fatal).ShouldBe([appenderA], ignoreOrder: true);
 
         var fooConfig = config.ResolveLoggerConfiguration("Foo");
-        fooConfig.Level.ShouldEqual(LogLevel.Error);
-        fooConfig.LogMessagePoolExhaustionStrategy.ShouldEqual(LogMessagePoolExhaustionStrategy.WaitUntilAvailable);
+        fooConfig.Level.ShouldBe(LogLevel.Error);
+        fooConfig.LogMessagePoolExhaustionStrategy.ShouldBe(LogMessagePoolExhaustionStrategy.WaitUntilAvailable);
         fooConfig.GetAppenders(LogLevel.Trace).ShouldBeEmpty();
         fooConfig.GetAppenders(LogLevel.Debug).ShouldBeEmpty();
         fooConfig.GetAppenders(LogLevel.Info).ShouldBeEmpty();
         fooConfig.GetAppenders(LogLevel.Warn).ShouldBeEmpty();
-        fooConfig.GetAppenders(LogLevel.Error).ShouldBeEquivalentTo([appenderA, appenderB]);
-        fooConfig.GetAppenders(LogLevel.Fatal).ShouldBeEquivalentTo([appenderA, appenderB]);
+        fooConfig.GetAppenders(LogLevel.Error).ShouldBe([appenderA, appenderB], ignoreOrder: true);
+        fooConfig.GetAppenders(LogLevel.Fatal).ShouldBe([appenderA, appenderB], ignoreOrder: true);
 
         var fooBarConfig = config.ResolveLoggerConfiguration("Foo.Bar");
-        fooBarConfig.Level.ShouldEqual(LogLevel.Info);
-        fooBarConfig.LogMessagePoolExhaustionStrategy.ShouldEqual(LogMessagePoolExhaustionStrategy.WaitUntilAvailable);
+        fooBarConfig.Level.ShouldBe(LogLevel.Info);
+        fooBarConfig.LogMessagePoolExhaustionStrategy.ShouldBe(LogMessagePoolExhaustionStrategy.WaitUntilAvailable);
         fooBarConfig.GetAppenders(LogLevel.Trace).ShouldBeEmpty();
         fooBarConfig.GetAppenders(LogLevel.Debug).ShouldBeEmpty();
-        fooBarConfig.GetAppenders(LogLevel.Info).ShouldBeEquivalentTo([appenderA, appenderB]);
-        fooBarConfig.GetAppenders(LogLevel.Warn).ShouldBeEquivalentTo([appenderA, appenderB, appenderC]);
-        fooBarConfig.GetAppenders(LogLevel.Error).ShouldBeEquivalentTo([appenderA, appenderB, appenderC]);
-        fooBarConfig.GetAppenders(LogLevel.Fatal).ShouldBeEquivalentTo([appenderA, appenderB, appenderC]);
+        fooBarConfig.GetAppenders(LogLevel.Info).ShouldBe([appenderA, appenderB], ignoreOrder: true);
+        fooBarConfig.GetAppenders(LogLevel.Warn).ShouldBe([appenderA, appenderB, appenderC], ignoreOrder: true);
+        fooBarConfig.GetAppenders(LogLevel.Error).ShouldBe([appenderA, appenderB, appenderC], ignoreOrder: true);
+        fooBarConfig.GetAppenders(LogLevel.Fatal).ShouldBe([appenderA, appenderB, appenderC], ignoreOrder: true);
 
         var fooBarClearConfig = config.ResolveLoggerConfiguration("Foo.Bar.Clear");
-        fooBarClearConfig.Level.ShouldEqual(LogLevel.Info);
-        fooBarClearConfig.LogMessagePoolExhaustionStrategy.ShouldEqual(LogMessagePoolExhaustionStrategy.WaitUntilAvailable);
+        fooBarClearConfig.Level.ShouldBe(LogLevel.Info);
+        fooBarClearConfig.LogMessagePoolExhaustionStrategy.ShouldBe(LogMessagePoolExhaustionStrategy.WaitUntilAvailable);
         fooBarClearConfig.GetAppenders(LogLevel.Trace).ShouldBeEmpty();
         fooBarClearConfig.GetAppenders(LogLevel.Debug).ShouldBeEmpty();
-        fooBarClearConfig.GetAppenders(LogLevel.Info).ShouldBeEquivalentTo([appenderD]);
-        fooBarClearConfig.GetAppenders(LogLevel.Warn).ShouldBeEquivalentTo([appenderD]);
-        fooBarClearConfig.GetAppenders(LogLevel.Error).ShouldBeEquivalentTo([appenderD]);
-        fooBarClearConfig.GetAppenders(LogLevel.Fatal).ShouldBeEquivalentTo([appenderD]);
+        fooBarClearConfig.GetAppenders(LogLevel.Info).ShouldBe([appenderD], ignoreOrder: true);
+        fooBarClearConfig.GetAppenders(LogLevel.Warn).ShouldBe([appenderD], ignoreOrder: true);
+        fooBarClearConfig.GetAppenders(LogLevel.Error).ShouldBe([appenderD], ignoreOrder: true);
+        fooBarClearConfig.GetAppenders(LogLevel.Fatal).ShouldBe([appenderD], ignoreOrder: true);
 
         var bazConfig = config.ResolveLoggerConfiguration("Baz");
-        bazConfig.Level.ShouldEqual(LogLevel.Debug);
-        bazConfig.LogMessagePoolExhaustionStrategy.ShouldEqual(LogMessagePoolExhaustionStrategy.Default);
+        bazConfig.Level.ShouldBe(LogLevel.Debug);
+        bazConfig.LogMessagePoolExhaustionStrategy.ShouldBe(LogMessagePoolExhaustionStrategy.Default);
         bazConfig.GetAppenders(LogLevel.Trace).ShouldBeEmpty();
-        bazConfig.GetAppenders(LogLevel.Debug).ShouldBeEquivalentTo([appenderA]);
-        bazConfig.GetAppenders(LogLevel.Info).ShouldBeEquivalentTo([appenderA]);
-        bazConfig.GetAppenders(LogLevel.Warn).ShouldBeEquivalentTo([appenderA]);
-        bazConfig.GetAppenders(LogLevel.Error).ShouldBeEquivalentTo([appenderA, appenderC]);
-        bazConfig.GetAppenders(LogLevel.Fatal).ShouldBeEquivalentTo([appenderA, appenderC]);
+        bazConfig.GetAppenders(LogLevel.Debug).ShouldBe([appenderA], ignoreOrder: true);
+        bazConfig.GetAppenders(LogLevel.Info).ShouldBe([appenderA], ignoreOrder: true);
+        bazConfig.GetAppenders(LogLevel.Warn).ShouldBe([appenderA], ignoreOrder: true);
+        bazConfig.GetAppenders(LogLevel.Error).ShouldBe([appenderA, appenderC], ignoreOrder: true);
+        bazConfig.GetAppenders(LogLevel.Fatal).ShouldBe([appenderA, appenderC], ignoreOrder: true);
     }
 
     [Test]
@@ -139,13 +140,13 @@ public class ResolvedLoggerConfigurationTests
         };
 
         var logConfig = config.ResolveLoggerConfiguration("Foo");
-        logConfig.Level.ShouldEqual(LogLevel.Info);
+        logConfig.Level.ShouldBe(LogLevel.Info);
         logConfig.GetAppenders(LogLevel.Trace).ShouldBeEmpty();
         logConfig.GetAppenders(LogLevel.Debug).ShouldBeEmpty();
-        logConfig.GetAppenders(LogLevel.Info).ShouldBeEquivalentTo([appender]);
-        logConfig.GetAppenders(LogLevel.Warn).ShouldBeEquivalentTo([appender]);
-        logConfig.GetAppenders(LogLevel.Error).ShouldBeEquivalentTo([appender]);
-        logConfig.GetAppenders(LogLevel.Fatal).ShouldBeEquivalentTo([appender]);
+        logConfig.GetAppenders(LogLevel.Info).ShouldBe([appender], ignoreOrder: true);
+        logConfig.GetAppenders(LogLevel.Warn).ShouldBe([appender], ignoreOrder: true);
+        logConfig.GetAppenders(LogLevel.Error).ShouldBe([appender], ignoreOrder: true);
+        logConfig.GetAppenders(LogLevel.Fatal).ShouldBe([appender], ignoreOrder: true);
     }
 
     [Test]
@@ -169,13 +170,13 @@ public class ResolvedLoggerConfigurationTests
         };
 
         var logConfig = config.ResolveLoggerConfiguration("Foo");
-        logConfig.Level.ShouldEqual(LogLevel.Warn);
+        logConfig.Level.ShouldBe(LogLevel.Warn);
         logConfig.GetAppenders(LogLevel.Trace).ShouldBeEmpty();
         logConfig.GetAppenders(LogLevel.Debug).ShouldBeEmpty();
         logConfig.GetAppenders(LogLevel.Info).ShouldBeEmpty();
-        logConfig.GetAppenders(LogLevel.Warn).ShouldBeEquivalentTo([appender]);
-        logConfig.GetAppenders(LogLevel.Error).ShouldBeEquivalentTo([appender]);
-        logConfig.GetAppenders(LogLevel.Fatal).ShouldBeEquivalentTo([appender]);
+        logConfig.GetAppenders(LogLevel.Warn).ShouldBe([appender], ignoreOrder: true);
+        logConfig.GetAppenders(LogLevel.Error).ShouldBe([appender], ignoreOrder: true);
+        logConfig.GetAppenders(LogLevel.Fatal).ShouldBe([appender], ignoreOrder: true);
     }
 
     [Test]
@@ -199,13 +200,13 @@ public class ResolvedLoggerConfigurationTests
         };
 
         var logConfig = config.ResolveLoggerConfiguration("Foo");
-        logConfig.Level.ShouldEqual(LogLevel.Warn);
+        logConfig.Level.ShouldBe(LogLevel.Warn);
         logConfig.GetAppenders(LogLevel.Trace).ShouldBeEmpty();
         logConfig.GetAppenders(LogLevel.Debug).ShouldBeEmpty();
         logConfig.GetAppenders(LogLevel.Info).ShouldBeEmpty();
-        logConfig.GetAppenders(LogLevel.Warn).ShouldBeEquivalentTo([appender]);
-        logConfig.GetAppenders(LogLevel.Error).ShouldBeEquivalentTo([appender]);
-        logConfig.GetAppenders(LogLevel.Fatal).ShouldBeEquivalentTo([appender]);
+        logConfig.GetAppenders(LogLevel.Warn).ShouldBe([appender], ignoreOrder: true);
+        logConfig.GetAppenders(LogLevel.Error).ShouldBe([appender], ignoreOrder: true);
+        logConfig.GetAppenders(LogLevel.Fatal).ShouldBe([appender], ignoreOrder: true);
     }
 
     [Test]
@@ -232,22 +233,22 @@ public class ResolvedLoggerConfigurationTests
         };
 
         var fooConfig = config.ResolveLoggerConfiguration("Foo");
-        fooConfig.Level.ShouldEqual(LogLevel.Error);
+        fooConfig.Level.ShouldBe(LogLevel.Error);
         fooConfig.GetAppenders(LogLevel.Trace).ShouldBeEmpty();
         fooConfig.GetAppenders(LogLevel.Debug).ShouldBeEmpty();
         fooConfig.GetAppenders(LogLevel.Info).ShouldBeEmpty();
         fooConfig.GetAppenders(LogLevel.Warn).ShouldBeEmpty();
-        fooConfig.GetAppenders(LogLevel.Error).ShouldBeEquivalentTo([appenderA]);
-        fooConfig.GetAppenders(LogLevel.Fatal).ShouldBeEquivalentTo([appenderA]);
+        fooConfig.GetAppenders(LogLevel.Error).ShouldBe([appenderA], ignoreOrder: true);
+        fooConfig.GetAppenders(LogLevel.Fatal).ShouldBe([appenderA], ignoreOrder: true);
 
         var fooBarConfig = config.ResolveLoggerConfiguration("Foo.Bar");
-        fooBarConfig.Level.ShouldEqual(LogLevel.Info);
+        fooBarConfig.Level.ShouldBe(LogLevel.Info);
         fooBarConfig.GetAppenders(LogLevel.Trace).ShouldBeEmpty();
         fooBarConfig.GetAppenders(LogLevel.Debug).ShouldBeEmpty();
-        fooBarConfig.GetAppenders(LogLevel.Info).ShouldBeEquivalentTo([appenderA, appenderB]);
-        fooBarConfig.GetAppenders(LogLevel.Warn).ShouldBeEquivalentTo([appenderA, appenderB]);
-        fooBarConfig.GetAppenders(LogLevel.Error).ShouldBeEquivalentTo([appenderA, appenderB]);
-        fooBarConfig.GetAppenders(LogLevel.Fatal).ShouldBeEquivalentTo([appenderA, appenderB]);
+        fooBarConfig.GetAppenders(LogLevel.Info).ShouldBe([appenderA, appenderB], ignoreOrder: true);
+        fooBarConfig.GetAppenders(LogLevel.Warn).ShouldBe([appenderA, appenderB], ignoreOrder: true);
+        fooBarConfig.GetAppenders(LogLevel.Error).ShouldBe([appenderA, appenderB], ignoreOrder: true);
+        fooBarConfig.GetAppenders(LogLevel.Fatal).ShouldBe([appenderA, appenderB], ignoreOrder: true);
     }
 
 #if NET8_0_OR_GREATER
@@ -262,7 +263,7 @@ public class ResolvedLoggerConfigurationTests
         };
 
         var logConfig = config.ResolveLoggerConfiguration("Foo");
-        logConfig.TimeProvider.ShouldBeTheSameAs(timeProvider);
+        logConfig.TimeProvider.ShouldBeSameAs(timeProvider);
     }
 #endif
 }

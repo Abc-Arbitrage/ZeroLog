@@ -1,6 +1,6 @@
 using System;
 using NUnit.Framework;
-using ZeroLog.Tests.Support;
+using Shouldly;
 
 namespace ZeroLog.Tests.NetStandard;
 
@@ -33,8 +33,8 @@ public class LogTests
             .Append(42)
             .Log();
 
-        _log.Fatal().ShouldBeTheSameAs(LogMessage.Empty);
-        _log.ForLevel(LogLevel.Fatal).ShouldBeTheSameAs(LogMessage.Empty);
+        _log.Fatal().ShouldBeSameAs(LogMessage.Empty);
+        _log.ForLevel(LogLevel.Fatal).ShouldBeSameAs(LogMessage.Empty);
     }
 
     [Test]
@@ -55,7 +55,7 @@ public class LogTests
             .Append(42)
             .Log();
 
-        _log.Trace().ShouldBeTheSameAs(LogMessage.Empty);
-        _log.ForLevel(LogLevel.Trace).ShouldBeTheSameAs(LogMessage.Empty);
+        _log.Trace().ShouldBeSameAs(LogMessage.Empty);
+        _log.ForLevel(LogLevel.Trace).ShouldBeSameAs(LogMessage.Empty);
     }
 }

@@ -1,10 +1,8 @@
 using System;
 using System.Linq;
-using System.Threading.Tasks;
 using NUnit.Framework;
 using PublicApiGenerator;
 using Shouldly;
-using ZeroLog.Tests.Support;
 
 namespace ZeroLog.Tests.NetStandard;
 
@@ -18,7 +16,7 @@ public class SanityChecks
                           .ExportedTypes
                           .Select(i => i.Namespace)
                           .Distinct()
-                          .ShouldBeEquivalentTo([
+                          .ShouldBe([
                               "ZeroLog"
                           ]);
     }
@@ -47,7 +45,7 @@ public class SanityChecks
                           .ExportedTypes
                           .Select(i => i.FullName)
                           .Distinct()
-                          .ShouldBeEquivalentTo(expected);
+                          .ShouldBe(expected, ignoreOrder: true);
     }
 
     [Test]

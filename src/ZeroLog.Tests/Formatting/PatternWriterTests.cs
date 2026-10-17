@@ -2,6 +2,7 @@ using System;
 using System.Globalization;
 using System.Threading;
 using NUnit.Framework;
+using Shouldly;
 using ZeroLog.Configuration;
 using ZeroLog.Formatting;
 using ZeroLog.Tests.Support;
@@ -80,7 +81,7 @@ public class PatternWriterTests
         logMessage.Exception = new InvalidOperationException("Exception message");
 
         var result = GetResult(patternWriter, logMessage);
-        result.ShouldEqual(expectedResult);
+        result.ShouldBe(expectedResult);
 
         PatternWriter.IsValidPattern(pattern).ShouldBeTrue();
     }
@@ -107,7 +108,7 @@ public class PatternWriterTests
     [TestCase("%{color:foo}")]
     public void should_throw_on_invalid_format(string pattern)
     {
-        Assert.Throws<FormatException>(() => _ = new PatternWriter(pattern));
+        Should.Throw<FormatException>(() => _ = new PatternWriter(pattern));
         PatternWriter.IsValidPattern(pattern).ShouldBeFalse();
     }
 
@@ -120,7 +121,7 @@ public class PatternWriterTests
     [TestCase("foo%{newLine}bar", "foo\nbar")]
     [TestCase("foo%{level}bar%{color:bold}baz", "foobar\e[1mbaz")]
     public void should_convert_constant_placeholders_to_literals(string pattern, string expectedResult)
-        => PatternWriter.ConvertConstantPlaceholders(pattern).ReplaceLineEndings("\n").ShouldEqual(expectedResult);
+        => PatternWriter.ConvertConstantPlaceholders(pattern).ReplaceLineEndings("\n").ShouldBe(expectedResult);
 
     [Test]
     [TestCase("", 0)]
@@ -131,7 +132,7 @@ public class PatternWriterTests
     [TestCase("foo%{level}%{color:blue}bar", 3)]
     [TestCase("foo%{color:red}%{level}%{color:blue}bar", 3)]
     public void should_concatenate_literal_parts(string pattern, int expectedPartCount)
-        => new PatternWriter(pattern).PartCount.ShouldEqual(expectedPartCount);
+        => new PatternWriter(pattern).PartCount.ShouldBe(expectedPartCount);
 
     [Test]
     [TestCase("")]
@@ -199,7 +200,7 @@ public class PatternWriterTests
         logMessage.Timestamp = new DateTime(2020, 01, 02, 03, 04, 05, 06);
 
         var result = GetResult(patternWriter, logMessage);
-        result.ShouldEqual(expectedResult);
+        result.ShouldBe(expectedResult);
     }
 
     [Test]
@@ -217,7 +218,7 @@ public class PatternWriterTests
         logMessage.Timestamp = new DateTime(2020, 01, 02, 03, 04, 05, 06);
 
         var result = GetResult(patternWriter, logMessage);
-        result.ShouldEqual("[] []");
+        result.ShouldBe("[] []");
     }
 
     [Test]
@@ -241,7 +242,7 @@ public class PatternWriterTests
         logMessage.Timestamp = new DateTime(2020, 01, 02, 03, 04, 05, 06);
 
         var result = GetResult(patternWriter, logMessage);
-        result.ShouldEqual(expected);
+        result.ShouldBe(expected);
     }
 
     [Test]
@@ -269,7 +270,7 @@ public class PatternWriterTests
         logMessage.Initialize(new Log("Foo.Bar.TestLog"), level);
 
         var result = GetResult(patternWriter, logMessage);
-        result.ShouldEqual(expectedResult);
+        result.ShouldBe(expectedResult);
     }
 
     [Test]
@@ -297,7 +298,7 @@ public class PatternWriterTests
         logMessage.Initialize(new Log("Foo.Bar.TestLog"), level);
 
         var result = GetResult(patternWriter, logMessage);
-        result.ShouldEqual(expectedResult);
+        result.ShouldBe(expectedResult);
     }
 
     [Test]
@@ -315,7 +316,7 @@ public class PatternWriterTests
             logMessage.Initialize(null, LogLevel.Info);
 
             var result = GetResult(patternWriter, logMessage);
-            result.ShouldEqual("Hello world!");
+            result.ShouldBe("Hello world!");
         });
     }
 
@@ -332,7 +333,7 @@ public class PatternWriterTests
             logMessage.Initialize(null, LogLevel.Info);
 
             var result = GetResult(patternWriter, logMessage);
-            result.ShouldEqual(Thread.CurrentThread.ManagedThreadId.ToString(CultureInfo.InvariantCulture));
+            result.ShouldBe(Thread.CurrentThread.ManagedThreadId.ToString(CultureInfo.InvariantCulture));
         });
     }
 
@@ -348,7 +349,7 @@ public class PatternWriterTests
             var logMessage = new LogMessage("Foo");
 
             var result = GetResult(patternWriter, logMessage);
-            result.ShouldEqual("0");
+            result.ShouldBe("0");
         });
     }
 
@@ -362,7 +363,7 @@ public class PatternWriterTests
             var logMessage = new LogMessage("Foo");
 
             var result = GetResult(patternWriter, logMessage);
-            result.ShouldEqual("foobar");
+            result.ShouldBe("foobar");
         });
     }
 
@@ -373,7 +374,7 @@ public class PatternWriterTests
         var logMessage = new LogMessage("Foo");
 
         var result = GetResult(patternWriter, logMessage);
-        result.ShouldEqual($"[{Environment.NewLine}]");
+        result.ShouldBe($"[{Environment.NewLine}]");
     }
 
     [Test]
@@ -383,7 +384,7 @@ public class PatternWriterTests
     [TestCase("%foo", "%%foo")]
     [TestCase("%foo %%bar", "%%foo %%%%bar")]
     public void should_escape_pattern(string pattern, string expectedResult)
-        => PatternWriter.EscapePattern(pattern).ShouldEqual(expectedResult);
+        => PatternWriter.EscapePattern(pattern).ShouldBe(expectedResult);
 
     [Test]
     [TestCase("", "", "")]
@@ -396,21 +397,21 @@ public class PatternWriterTests
     public void should_remove_ansi_codes(string pattern, string expectedPattern, string expectedResult)
     {
         var initialPatternWriter = new PatternWriter(pattern);
-        initialPatternWriter.Pattern.ShouldEqual(pattern);
+        initialPatternWriter.Pattern.ShouldBe(pattern);
         initialPatternWriter.LogLevelColors[LogLevel.Info].ShouldContain("\e");
 
         var patternWriter = initialPatternWriter.WithoutAnsiColorCodes();
         patternWriter.HasAnsiCodes.ShouldBeFalse();
-        patternWriter.Pattern.ShouldEqual(expectedPattern);
-        patternWriter.LogLevels[LogLevel.Info].ShouldEqual("INFO");
-        patternWriter.LogLevelColors[LogLevel.Info].ShouldEqual("");
+        patternWriter.Pattern.ShouldBe(expectedPattern);
+        patternWriter.LogLevels[LogLevel.Info].ShouldBe("INFO");
+        patternWriter.LogLevelColors[LogLevel.Info].ShouldBe("");
         AnsiColorCodes.HasAnsiCode(patternWriter.Pattern).ShouldBeFalse();
 
         var logMessage = new LogMessage("Foo");
         logMessage.Initialize(new Log("Foo.Bar.TestLog"), LogLevel.Info);
 
         var result = GetResult(patternWriter, logMessage);
-        result.ShouldEqual(expectedResult);
+        result.ShouldBe(expectedResult);
     }
 
     [Test]
@@ -430,8 +431,8 @@ public class PatternWriterTests
         logMessage.Initialize(new Log("Foo.Bar.TestLog"), LogLevel.Info);
 
         var result = GetResult(patternWriter, logMessage);
-        result.ShouldEqual(expectedFull);
-        AnsiColorCodes.RemoveAnsiCodes(result).ShouldEqual(expectedVisible);
+        result.ShouldBe(expectedFull);
+        AnsiColorCodes.RemoveAnsiCodes(result).ShouldBe(expectedVisible);
     }
 
     private static string GetResult(PatternWriter patternWriter, LogMessage logMessage)

@@ -1,8 +1,8 @@
 using System;
 using System.Linq;
 using NUnit.Framework;
+using Shouldly;
 using ZeroLog.Configuration;
-using ZeroLog.Tests.Support;
 
 namespace ZeroLog.Tests;
 
@@ -11,7 +11,7 @@ public partial class LogManagerTests
     [Test]
     public void should_return_configuration()
     {
-        LogManager.Configuration.ShouldBeTheSameAs(_config);
+        LogManager.Configuration.ShouldBeSameAs(_config);
 
         LogManager.Shutdown();
         LogManager.Configuration.ShouldBeNull();
@@ -39,8 +39,8 @@ public partial class LogManagerTests
         rootSignal.Wait(TimeSpan.FromSeconds(1));
         barSignal.Wait(TimeSpan.FromSeconds(1));
 
-        _testAppender.LoggedMessages.ShouldHaveSingleItem().ShouldEqual("Bar");
-        barAppender.LoggedMessages.ShouldHaveSingleItem().ShouldEqual("Bar");
+        _testAppender.LoggedMessages.ShouldHaveSingleItem().ShouldBe("Bar");
+        barAppender.LoggedMessages.ShouldHaveSingleItem().ShouldBe("Bar");
     }
 
     [Test]

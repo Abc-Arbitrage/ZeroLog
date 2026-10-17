@@ -1,5 +1,6 @@
 using System;
 using NUnit.Framework;
+using Shouldly;
 
 namespace ZeroLog.Tests.Support;
 
@@ -20,6 +21,6 @@ internal static class GcTester
         var bytesAfter = GC.GetAllocatedBytesForCurrentThread();
         var allocatedBytes = bytesAfter - bytesBefore;
 
-        Assert.That(allocatedBytes, Is.Zero, $"{allocatedBytes} bytes allocated");
+        allocatedBytes.ShouldBe(0);
     }
 }

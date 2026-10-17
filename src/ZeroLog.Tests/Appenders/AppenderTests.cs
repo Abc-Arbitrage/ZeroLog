@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using Shouldly;
 using ZeroLog.Appenders;
 using ZeroLog.Configuration;
 using ZeroLog.Formatting;
-using ZeroLog.Tests.Support;
 
 namespace ZeroLog.Tests.Appenders;
 
@@ -32,10 +32,10 @@ public class AppenderTests
         _appender.FailOnAppend = false;
 
         _appender.InternalWriteMessage(_message, ZeroLogConfiguration.Default);
-        _appender.AppendCount.ShouldEqual(1);
+        _appender.AppendCount.ShouldBe(1);
 
         _appender.InternalWriteMessage(_message, ZeroLogConfiguration.Default);
-        _appender.AppendCount.ShouldEqual(2);
+        _appender.AppendCount.ShouldBe(2);
     }
 
     [Test]
@@ -54,11 +54,11 @@ public class AppenderTests
 
         var testLoggedMessage = LoggedMessage.CreateTestMessage(testMessage, ZeroLogConfiguration.Default);
 
-        testLoggedMessage.Message.ToString().ShouldEqual(realLoggedMessage.Message.ToString());
+        testLoggedMessage.Message.ToString().ShouldBe(realLoggedMessage.Message.ToString());
         var (realKey, realValue) = realLoggedMessage.KeyValues[0];
         var (testKey, testValue) = testLoggedMessage.KeyValues[0];
 
-        testKey.ShouldEqual(realKey);
+        testKey.ShouldBe(realKey);
         testValue.SequenceEqual(realValue).ShouldBeTrue();
     }
 
@@ -67,7 +67,7 @@ public class AppenderTests
     {
         _appender.FailOnAppend = true;
 
-        Assert.DoesNotThrow(() => _appender.InternalWriteMessage(_message, ZeroLogConfiguration.Default));
+        Should.NotThrow(() => _appender.InternalWriteMessage(_message, ZeroLogConfiguration.Default));
     }
 
     [Test]
@@ -78,7 +78,7 @@ public class AppenderTests
         _appender.InternalWriteMessage(_message, ZeroLogConfiguration.Default);
         _appender.InternalWriteMessage(_message, ZeroLogConfiguration.Default);
 
-        _appender.AppendCount.ShouldEqual(1);
+        _appender.AppendCount.ShouldBe(1);
     }
 
     [Test]
@@ -88,34 +88,34 @@ public class AppenderTests
         var config = new ZeroLogConfiguration { AppenderQuarantineDelay = TimeSpan.FromSeconds(1) };
 
         _appender.InternalWriteMessage(_message, config);
-        _appender.AppendCount.ShouldEqual(1);
+        _appender.AppendCount.ShouldBe(1);
 
         _appender.InternalWriteMessage(_message, config);
-        _appender.AppendCount.ShouldEqual(1);
+        _appender.AppendCount.ShouldBe(1);
 
         await Task.Delay(TimeSpan.FromSeconds(2));
 
         _appender.InternalWriteMessage(_message, config);
-        _appender.AppendCount.ShouldEqual(2);
+        _appender.AppendCount.ShouldBe(2);
 
         _appender.InternalWriteMessage(_message, config);
-        _appender.AppendCount.ShouldEqual(2);
+        _appender.AppendCount.ShouldBe(2);
     }
 
     [Test]
     public void should_not_flush_unnecessarily()
     {
         _appender.InternalFlush();
-        _appender.FlushCount.ShouldEqual(0);
+        _appender.FlushCount.ShouldBe(0);
 
         _appender.InternalWriteMessage(_message, ZeroLogConfiguration.Default);
-        _appender.FlushCount.ShouldEqual(0);
+        _appender.FlushCount.ShouldBe(0);
 
         _appender.InternalFlush();
-        _appender.FlushCount.ShouldEqual(1);
+        _appender.FlushCount.ShouldBe(1);
 
         _appender.InternalFlush();
-        _appender.FlushCount.ShouldEqual(1);
+        _appender.FlushCount.ShouldBe(1);
     }
 
     [Test]
@@ -124,7 +124,7 @@ public class AppenderTests
         _appender.FailOnFlush = true;
         _appender.InternalWriteMessage(_message, ZeroLogConfiguration.Default);
 
-        Assert.DoesNotThrow(() => _appender.InternalFlush());
+        Should.NotThrow(() => _appender.InternalFlush());
     }
 
     [Test]
@@ -138,8 +138,8 @@ public class AppenderTests
         _appender.InternalWriteMessage(_message, ZeroLogConfiguration.Default);
         _appender.InternalFlush();
 
-        _appender.AppendCount.ShouldEqual(1);
-        _appender.FlushCount.ShouldEqual(1);
+        _appender.AppendCount.ShouldBe(1);
+        _appender.FlushCount.ShouldBe(1);
     }
 
     [Test]
@@ -152,30 +152,30 @@ public class AppenderTests
         _appender.InternalFlush();
 
         _appender.InternalWriteMessage(_message, config);
-        _appender.AppendCount.ShouldEqual(1);
-        _appender.FlushCount.ShouldEqual(1);
+        _appender.AppendCount.ShouldBe(1);
+        _appender.FlushCount.ShouldBe(1);
 
         await Task.Delay(TimeSpan.FromSeconds(2));
 
         _appender.InternalWriteMessage(_message, config);
         _appender.InternalFlush();
-        _appender.AppendCount.ShouldEqual(2);
-        _appender.FlushCount.ShouldEqual(2);
+        _appender.AppendCount.ShouldBe(2);
+        _appender.FlushCount.ShouldBe(2);
 
         _appender.InternalWriteMessage(_message, config);
         _appender.InternalFlush();
-        _appender.AppendCount.ShouldEqual(2);
-        _appender.FlushCount.ShouldEqual(2);
+        _appender.AppendCount.ShouldBe(2);
+        _appender.FlushCount.ShouldBe(2);
     }
 
     [Test]
     public void should_initialize_once()
     {
-        _appender.InitializationCount.ShouldEqual(0);
+        _appender.InitializationCount.ShouldBe(0);
         _appender.InternalInitialize();
-        _appender.InitializationCount.ShouldEqual(1);
+        _appender.InitializationCount.ShouldBe(1);
         _appender.InternalInitialize();
-        _appender.InitializationCount.ShouldEqual(1);
+        _appender.InitializationCount.ShouldBe(1);
     }
 
     [Test]
@@ -183,7 +183,7 @@ public class AppenderTests
     {
         _appender.FailOnInitialize = true;
 
-        Assert.DoesNotThrow(() => _appender.InternalInitialize());
+        Should.NotThrow(() => _appender.InternalInitialize());
     }
 
     private class FailingAppender : Appender

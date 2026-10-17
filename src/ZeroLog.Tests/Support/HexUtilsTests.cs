@@ -1,5 +1,6 @@
 ﻿using System;
 using NUnit.Framework;
+using Shouldly;
 using ZeroLog.Formatting;
 
 namespace ZeroLog.Tests.Support;
@@ -16,7 +17,7 @@ public unsafe class HexUtilsTests
         HexUtils.AppendValueAsHex(xPtr, sizeof(int), buffer);
         var s = buffer.ToString();
         var expected = BitConverter.IsLittleEndian ? "cdab3412" : "1234abcd";
-        Assert.That(s, Is.EqualTo(expected));
+        s.ShouldBe(expected);
     }
 
     [Test]
@@ -28,7 +29,7 @@ public unsafe class HexUtilsTests
         HexUtils.AppendValueAsHex(xPtr, sizeof(int), buffer);
         var s = buffer.ToString();
         var expected = BitConverter.IsLittleEndian ? "04030201" : "01020304";
-        Assert.That(s, Is.EqualTo(expected));
+        s.ShouldBe(expected);
     }
 
     [Test]
@@ -40,6 +41,6 @@ public unsafe class HexUtilsTests
         HexUtils.AppendValueAsHex(xPtr, sizeof(int), buffer);
         var s = buffer.ToString();
         var expected = BitConverter.IsLittleEndian ? "40302010" : "10203040";
-        Assert.That(s, Is.EqualTo(expected));
+        s.ShouldBe(expected);
     }
 }

@@ -3,6 +3,7 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using NUnit.Framework;
+using Shouldly;
 using ZeroLog.Appenders;
 using ZeroLog.Configuration;
 using ZeroLog.Formatting;
@@ -35,7 +36,7 @@ public class StreamAppenderTests
         var thread = Thread.CurrentThread.Name ?? Thread.CurrentThread.ManagedThreadId.ToString();
         var logLine = $"{logMessage.Timestamp.Date:yyyy-MM-dd} - {logMessage.Timestamp.TimeOfDay:hh\\:mm\\:ss\\.fffffff} - {thread} - INFO - TestLog || {message}{Environment.NewLine}";
 
-        appender.ToString().ShouldEqual(logLine + logLine);
+        appender.ToString().ShouldBe(logLine + logLine);
     }
 
     [Test]
@@ -51,7 +52,7 @@ public class StreamAppenderTests
 
         var logLine = $"{message}{Environment.NewLine}";
 
-        appender.ToString().ShouldEqual(logLine + logLine);
+        appender.ToString().ShouldBe(logLine + logLine);
     }
 
     [Test]
@@ -68,7 +69,7 @@ public class StreamAppenderTests
         appender.WriteMessage(formattedMessage);
         appender.Flush();
 
-        appender.ToString().ShouldEqual($"Test log message{Environment.NewLine}{logMessage.Exception}{Environment.NewLine}");
+        appender.ToString().ShouldBe($"Test log message{Environment.NewLine}{logMessage.Exception}{Environment.NewLine}");
     }
 
     [Test]
@@ -100,7 +101,7 @@ public class StreamAppenderTests
         appender.WriteMessage(loggedMessage);
 
         encoding.StandardGetBytesCalled.ShouldBeTrue();
-        appender.ToString().ShouldEqual($"Hello{Environment.NewLine}");
+        appender.ToString().ShouldBe($"Hello{Environment.NewLine}");
     }
 
     [Test]
@@ -115,7 +116,7 @@ public class StreamAppenderTests
 
         encoding.SpanGetBytesCalled.ShouldBeTrue();
         encoding.StandardGetBytesCalled.ShouldBeFalse();
-        appender.ToString().ShouldEqual($"Hello{Environment.NewLine}");
+        appender.ToString().ShouldBe($"Hello{Environment.NewLine}");
     }
 
     [Test]

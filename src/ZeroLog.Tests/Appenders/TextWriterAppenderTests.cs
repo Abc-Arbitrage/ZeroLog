@@ -3,6 +3,7 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using NUnit.Framework;
+using Shouldly;
 using ZeroLog.Appenders;
 using ZeroLog.Configuration;
 using ZeroLog.Formatting;
@@ -39,7 +40,7 @@ public class TextWriterAppenderTests
         var thread = Thread.CurrentThread.Name ?? Thread.CurrentThread.ManagedThreadId.ToString();
         var logLine = $"{logMessage.Timestamp.Date:yyyy-MM-dd} - {logMessage.Timestamp.TimeOfDay:hh\\:mm\\:ss\\.fffffff} - {thread} - INFO - TestLog || {message}{Environment.NewLine}";
 
-        appender.TextWriter.ToString().ShouldEqual(logLine + logLine);
+        appender.TextWriter.ToString().ShouldBe(logLine + logLine);
     }
 
     [Test]
@@ -90,7 +91,7 @@ public class TextWriterAppenderTests
         appender.WriteMessage(loggedMessage);
 
         writer.StandardWriteCalled.ShouldBeTrue();
-        writer.StringBuilder.ToString().ShouldEqual($"Hello{Environment.NewLine}");
+        writer.StringBuilder.ToString().ShouldBe($"Hello{Environment.NewLine}");
     }
 
     [Test]
@@ -107,7 +108,7 @@ public class TextWriterAppenderTests
 
         writer.SpanWriteCalled.ShouldBeTrue();
         writer.StandardWriteCalled.ShouldBeFalse();
-        writer.StringBuilder.ToString().ShouldEqual($"Hello{Environment.NewLine}");
+        writer.StringBuilder.ToString().ShouldBe($"Hello{Environment.NewLine}");
     }
 
     [Test]

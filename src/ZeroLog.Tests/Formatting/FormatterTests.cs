@@ -1,7 +1,7 @@
 using System;
 using NUnit.Framework;
+using Shouldly;
 using ZeroLog.Formatting;
-using ZeroLog.Tests.Support;
 
 namespace ZeroLog.Tests.Formatting;
 
@@ -22,21 +22,21 @@ public class FormatterTests
         _formatter.Write("Foo");
         _formatter.Write("Bar");
 
-        _formatter.GetOutput().ToString().ShouldEqual("FooBar");
+        _formatter.GetOutput().ToString().ShouldBe("FooBar");
     }
 
     [Test]
     public void should_append_formattable()
     {
         _formatter.Write(42);
-        _formatter.GetOutput().ToString().ShouldEqual("42");
+        _formatter.GetOutput().ToString().ShouldBe("42");
     }
 
     [Test]
     public void should_append_formattable_with_format()
     {
         _formatter.Write(0.42, "P2");
-        _formatter.GetOutput().ToString().ShouldEqual("42.00 %");
+        _formatter.GetOutput().ToString().ShouldBe("42.00 %");
     }
 
     [Test]
@@ -88,21 +88,21 @@ public class FormatterTests
         _formatter.PadToColumn(5);
         _formatter.Write("b");
 
-        _formatter.GetOutput().ToString().ShouldEqual("a    b");
+        _formatter.GetOutput().ToString().ShouldBe("a    b");
     }
 
     [Test]
     public void should_not_overflow_on_padding()
     {
         _formatter.PadToColumn(TestFormatter.BufferLength + 42);
-        _formatter.GetOutput().ToString().ShouldEqual(new string(' ', TestFormatter.BufferLength));
+        _formatter.GetOutput().ToString().ShouldBe(new string(' ', TestFormatter.BufferLength));
     }
 
     [Test]
     public void should_not_throw_on_invalid_padding()
     {
         _formatter.PadToColumn(-42);
-        _formatter.GetOutput().Length.ShouldEqual(0);
+        _formatter.GetOutput().Length.ShouldBe(0);
     }
 
     private class TestFormatter : Formatter

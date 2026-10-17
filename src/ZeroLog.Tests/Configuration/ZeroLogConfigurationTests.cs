@@ -1,6 +1,6 @@
 using NUnit.Framework;
+using Shouldly;
 using ZeroLog.Configuration;
-using ZeroLog.Tests.Support;
 
 namespace ZeroLog.Tests.Configuration;
 
@@ -16,12 +16,12 @@ public class ZeroLogConfigurationTests
         config.SetLogLevel("Foo", LogLevel.Info);
 
         var loggerConfig = config.Loggers.ShouldHaveSingleItem();
-        loggerConfig.Name.ShouldEqual("Foo");
-        loggerConfig.Level.ShouldEqual(LogLevel.Info);
+        loggerConfig.Name.ShouldBe("Foo");
+        loggerConfig.Level.ShouldBe(LogLevel.Info);
 
         config.SetLogLevel("Foo", LogLevel.Warn);
-        config.Loggers.ShouldHaveSingleItem().ShouldBeTheSameAs(loggerConfig);
-        loggerConfig.Level.ShouldEqual(LogLevel.Warn);
+        config.Loggers.ShouldHaveSingleItem().ShouldBeSameAs(loggerConfig);
+        loggerConfig.Level.ShouldBe(LogLevel.Warn);
 
         config.SetLogLevel("Foo", null);
         loggerConfig.Level.ShouldBeNull();
@@ -37,7 +37,7 @@ public class ZeroLogConfigurationTests
 
         config.SetLogLevel(name, LogLevel.Warn);
 
-        config.RootLogger.Level.ShouldEqual(LogLevel.Warn);
+        config.RootLogger.Level.ShouldBe(LogLevel.Warn);
         config.Loggers.ShouldBeEmpty();
     }
 
@@ -53,14 +53,14 @@ public class ZeroLogConfigurationTests
         };
 
         var logger = config.Loggers.ShouldHaveSingleItem();
-        logger.Name.ShouldEqual("Foo");
-        logger.Level.ShouldEqual(LogLevel.Warn);
+        logger.Name.ShouldBe("Foo");
+        logger.Level.ShouldBe(LogLevel.Warn);
     }
 
     [Test]
     public void should_create_test_config()
     {
         var config = ZeroLogConfiguration.CreateTestConfiguration();
-        config.AppendingStrategy.ShouldEqual(AppendingStrategy.Synchronous); // This is the most important property
+        config.AppendingStrategy.ShouldBe(AppendingStrategy.Synchronous); // This is the most important property
     }
 }

@@ -1,6 +1,6 @@
 using NUnit.Framework;
+using Shouldly;
 using ZeroLog.Formatting;
-using ZeroLog.Tests.Support;
 
 namespace ZeroLog.Tests.Formatting;
 
@@ -12,14 +12,14 @@ public class AnsiColorCodesTests
     [TestCase("foo", false)]
     [TestCase("\e[31mfoo", true)]
     public void should_detect_ansi_codes(string value, bool expectedResult)
-        => AnsiColorCodes.HasAnsiCode(value).ShouldEqual(expectedResult);
+        => AnsiColorCodes.HasAnsiCode(value).ShouldBe(expectedResult);
 
     [Test]
     [TestCase("", "")]
     [TestCase("foo", "foo")]
     [TestCase("foo\e[31mbar\e[0mbaz", "foobarbaz")]
     public void should_remove_ansi_codes(string value, string expectedResult)
-        => AnsiColorCodes.RemoveAnsiCodes(value).ShouldEqual(expectedResult);
+        => AnsiColorCodes.RemoveAnsiCodes(value).ShouldBe(expectedResult);
 
     [Test]
     [TestCase("", 0)]
@@ -27,7 +27,7 @@ public class AnsiColorCodesTests
     [TestCase("foo\e[31mbar\e[0mbaz", 9)]
     [TestCase("1\e[0m👩🏽‍🚒3👨🏼‍👩🏽‍👧‍👦🏻5👩‍👧‍👦7", 7)]
     public void should_calculate_visible_text_length(string value, int expectedResult)
-        => AnsiColorCodes.GetVisibleTextLength(value).ShouldEqual(expectedResult);
+        => AnsiColorCodes.GetVisibleTextLength(value).ShouldBe(expectedResult);
 
     [Test]
     [TestCase("reset", "0")]
@@ -71,7 +71,7 @@ public class AnsiColorCodesTests
         AnsiColorCodes.TryParse(input, out var result).ShouldBeTrue();
         result.ShouldStartWith("\e[");
         result.ShouldEndWith("m");
-        result.Substring(2, result.Length - 3).ShouldEqual(expectedResult);
+        result.Substring(2, result.Length - 3).ShouldBe(expectedResult);
     }
 
     [Test]

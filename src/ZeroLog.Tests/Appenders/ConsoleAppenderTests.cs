@@ -1,8 +1,8 @@
 using System.IO;
 using NUnit.Framework;
+using Shouldly;
 using ZeroLog.Appenders;
 using ZeroLog.Formatting;
-using ZeroLog.Tests.Support;
 
 namespace ZeroLog.Tests.Appenders;
 
@@ -25,6 +25,6 @@ public class ConsoleAppenderTests
         appender.Flush();
 
         var result = appender.Encoding.GetString(stream.ToArray());
-        AnsiColorCodes.HasAnsiCode(result).ShouldEqual(colors);
+        AnsiColorCodes.HasAnsiCode(result).ShouldBe(colors);
     }
 }

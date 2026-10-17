@@ -2,6 +2,7 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using NUnit.Framework;
+using Shouldly;
 using ZeroLog.Support;
 
 namespace ZeroLog.Tests.Support;
@@ -14,7 +15,7 @@ public class TypeUtilTests
         var typeHandle = TypeUtil<DayOfWeek>.TypeHandle;
         var type = TypeUtil.GetTypeFromHandle(typeHandle);
 
-        type.ShouldEqual(typeof(DayOfWeek));
+        type.ShouldBe(typeof(DayOfWeek));
     }
 
     [Test]
@@ -52,7 +53,7 @@ public class TypeUtilTests
         bool IsUnmanaged<T>()
         {
             var expectedResult = !RuntimeHelpers.IsReferenceOrContainsReferences<T>();
-            TypeUtil.GetIsUnmanagedSlow(typeof(T)).ShouldEqual(expectedResult);
+            TypeUtil.GetIsUnmanagedSlow(typeof(T)).ShouldBe(expectedResult);
             return expectedResult;
         }
     }

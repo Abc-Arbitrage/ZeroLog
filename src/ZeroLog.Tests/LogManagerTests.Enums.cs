@@ -1,6 +1,6 @@
 using System;
 using NUnit.Framework;
-using ZeroLog.Tests.Support;
+using Shouldly;
 
 namespace ZeroLog.Tests;
 

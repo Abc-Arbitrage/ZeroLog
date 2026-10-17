@@ -1,5 +1,5 @@
 ﻿using NUnit.Framework;
-using ZeroLog.Tests.Support;
+using Shouldly;
 
 namespace ZeroLog.Tests.NetStandard;
 
@@ -16,7 +16,7 @@ public class LogManagerTests
         fooLog.ShouldNotBeNull();
         barLog.ShouldNotBeNull();
 
-        barLog.ShouldNotBeTheSameAs(fooLog);
-        fooLog2.ShouldBeTheSameAs(fooLog);
+        barLog.ShouldNotBeSameAs(fooLog);
+        fooLog2.ShouldBeSameAs(fooLog);
     }
 }

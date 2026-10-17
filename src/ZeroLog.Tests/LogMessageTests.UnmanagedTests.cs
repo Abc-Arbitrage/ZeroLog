@@ -1,7 +1,7 @@
 using System;
 using NUnit.Framework;
+using Shouldly;
 using ZeroLog.Configuration;
-using ZeroLog.Tests.Support;
 
 namespace ZeroLog.Tests;
 
@@ -25,48 +25,48 @@ partial class LogMessageTests
         public void should_append_formattable_value()
         {
             var value = new Int64FormattableWrapper { Value = 42 };
-            _logMessage.AppendUnmanaged(value).ToString().ShouldEqual("42");
+            _logMessage.AppendUnmanaged(value).ToString().ShouldBe("42");
         }
 
         [Test]
         public void should_append_formattable_value_ref()
         {
             var value = new Int64FormattableWrapper { Value = 42 };
-            _logMessage.AppendUnmanaged(ref value).ToString().ShouldEqual("42");
+            _logMessage.AppendUnmanaged(ref value).ToString().ShouldBe("42");
         }
 
         [Test]
         public void should_append_formattable_value_nullable()
         {
             Int64FormattableWrapper? value = new Int64FormattableWrapper { Value = 42 };
-            _logMessage.AppendUnmanaged(value).ToString().ShouldEqual("42");
+            _logMessage.AppendUnmanaged(value).ToString().ShouldBe("42");
         }
 
         [Test]
         public void should_append_formattable_value_nullable_ref()
         {
             Int64FormattableWrapper? value = new Int64FormattableWrapper { Value = 42 };
-            _logMessage.AppendUnmanaged(ref value).ToString().ShouldEqual("42");
+            _logMessage.AppendUnmanaged(ref value).ToString().ShouldBe("42");
         }
 
         [Test]
         public void should_append_null_value()
         {
-            _logMessage.AppendUnmanaged((Int64FormattableWrapper?)null).ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            _logMessage.AppendUnmanaged((Int64FormattableWrapper?)null).ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
         }
 
         [Test]
         public void should_append_null_value_ref()
         {
             Int64FormattableWrapper? value = null;
-            _logMessage.AppendUnmanaged(ref value).ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            _logMessage.AppendUnmanaged(ref value).ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
         }
 
         [Test]
         public void should_forward_format()
         {
-            _logMessage.AppendUnmanaged(new ForwardFormatToOutputStruct()).ToString().ShouldEqual("");
-            _logMessage.AppendUnmanaged(new ForwardFormatToOutputStruct(), "foo").ToString().ShouldEqual("foo");
+            _logMessage.AppendUnmanaged(new ForwardFormatToOutputStruct()).ToString().ShouldBe("");
+            _logMessage.AppendUnmanaged(new ForwardFormatToOutputStruct(), "foo").ToString().ShouldBe("foo");
         }
 
         public struct Int64FormattableWrapper : ISpanFormattable

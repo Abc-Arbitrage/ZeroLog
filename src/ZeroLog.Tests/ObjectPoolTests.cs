@@ -1,6 +1,6 @@
 using NUnit.Framework;
 using ObjectLayoutInspector;
-using ZeroLog.Tests.Support;
+using Shouldly;
 
 namespace ZeroLog.Tests;
 
@@ -11,65 +11,65 @@ public class ObjectPoolTests
     public void should_provide_items()
     {
         var pool = new ObjectPool<Item>(3, () => new Item());
-        pool.Count.ShouldEqual(3);
+        pool.Count.ShouldBe(3);
 
         pool.TryAcquire(out var a).ShouldBeTrue();
-        pool.Count.ShouldEqual(2);
+        pool.Count.ShouldBe(2);
         a.ShouldNotBeNull();
 
         pool.TryAcquire(out var b).ShouldBeTrue();
-        pool.Count.ShouldEqual(1);
+        pool.Count.ShouldBe(1);
         b.ShouldNotBeNull();
 
         pool.TryAcquire(out var c).ShouldBeTrue();
-        pool.Count.ShouldEqual(0);
+        pool.Count.ShouldBe(0);
         c.ShouldNotBeNull();
 
         pool.TryAcquire(out var d).ShouldBeFalse();
-        pool.Count.ShouldEqual(0);
+        pool.Count.ShouldBe(0);
         d.ShouldBeNull();
 
-        a.ShouldNotBeTheSameAs(b);
-        b.ShouldNotBeTheSameAs(c);
-        c.ShouldNotBeTheSameAs(a);
+        a.ShouldNotBeSameAs(b);
+        b.ShouldNotBeSameAs(c);
+        c.ShouldNotBeSameAs(a);
     }
 
     [Test]
     public void should_return_items()
     {
         var pool = new ObjectPool<Item>(2, () => new Item());
-        pool.Count.ShouldEqual(2);
+        pool.Count.ShouldBe(2);
 
         pool.TryAcquire(out var a).ShouldBeTrue();
-        pool.Count.ShouldEqual(1);
+        pool.Count.ShouldBe(1);
         a.ShouldNotBeNull();
 
         pool.TryAcquire(out var b).ShouldBeTrue();
-        pool.Count.ShouldEqual(0);
+        pool.Count.ShouldBe(0);
         b.ShouldNotBeNull();
 
         pool.TryAcquire(out _).ShouldBeFalse();
-        pool.Count.ShouldEqual(0);
+        pool.Count.ShouldBe(0);
 
         pool.Release(a);
-        pool.Count.ShouldEqual(1);
+        pool.Count.ShouldBe(1);
 
         pool.TryAcquire(out var c).ShouldBeTrue();
-        pool.Count.ShouldEqual(0);
-        c.ShouldBeTheSameAs(a);
+        pool.Count.ShouldBe(0);
+        c.ShouldBeSameAs(a);
     }
 
     [Test]
     public void should_not_exceed_capacity()
     {
         var pool = new ObjectPool<Item>(2, () => new Item());
-        pool.Count.ShouldEqual(2);
+        pool.Count.ShouldBe(2);
 
         pool.Release(new Item());
-        pool.Count.ShouldEqual(3); // Allow one cached instance to exceed the capacity
+        pool.Count.ShouldBe(3); // Allow one cached instance to exceed the capacity
 
         pool.Release(new Item());
-        pool.Count.ShouldEqual(3);
+        pool.Count.ShouldBe(3);
     }
 
     // [Test, Explicit] // MTP complains about explicit tests

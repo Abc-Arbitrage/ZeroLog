@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using Shouldly;
 
 namespace ZeroLog.Tests.Support;
 
@@ -8,7 +9,7 @@ public class GcTesterTests
     [Test]
     public void should_detect_allocations()
     {
-        Assert.Throws<AssertionException>(() => GcTester.ShouldNotAllocate(() => _ = new object()));
+        Should.Throw<ShouldAssertException>(() => GcTester.ShouldNotAllocate(() => _ = new object()));
     }
 
     [Test]
@@ -25,7 +26,7 @@ public class GcTesterTests
 
         GcTester.ShouldNotAllocate(() => ++callCount, () => ++afterWarmupCount);
 
-        callCount.ShouldEqual(2);
-        afterWarmupCount.ShouldEqual(1);
+        callCount.ShouldBe(2);
+        afterWarmupCount.ShouldBe(1);
     }
 }

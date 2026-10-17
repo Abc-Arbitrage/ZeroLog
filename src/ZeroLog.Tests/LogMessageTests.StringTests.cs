@@ -2,8 +2,8 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using NUnit.Framework;
+using Shouldly;
 using ZeroLog.Configuration;
-using ZeroLog.Tests.Support;
 
 namespace ZeroLog.Tests;
 
@@ -22,7 +22,7 @@ unsafe partial class LogMessageTests
         {
             _logMessage.Append("foo");
 
-            _logMessage.ToString().ShouldEqual("foo");
+            _logMessage.ToString().ShouldBe("foo");
         }
 
         [Test]
@@ -30,7 +30,7 @@ unsafe partial class LogMessageTests
         {
             _logMessage.Append((string?)null);
 
-            _logMessage.ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            _logMessage.ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
         }
 
         [Test]
@@ -39,7 +39,7 @@ unsafe partial class LogMessageTests
             _logMessage.Append("foo")
                        .Append("bar");
 
-            _logMessage.ToString().ShouldEqual("foobar");
+            _logMessage.ToString().ShouldBe("foobar");
         }
 
         [Test]
@@ -47,7 +47,7 @@ unsafe partial class LogMessageTests
         {
             _logMessage.Append($"foo {NoInline("bar")} baz");
 
-            _logMessage.ToString().ShouldEqual("foo bar baz");
+            _logMessage.ToString().ShouldBe("foo bar baz");
         }
 
         [Test]
@@ -60,7 +60,7 @@ unsafe partial class LogMessageTests
                        .Append("5,")
                        .Append("6");
 
-            _logMessage.ToString().ShouldEqual("1,2,3,4, [TRUNCATED]");
+            _logMessage.ToString().ShouldBe("1,2,3,4, [TRUNCATED]");
         }
 
         [Test]
@@ -69,7 +69,7 @@ unsafe partial class LogMessageTests
             _logMessage.Append((string?)null);
 
             Span<char> outputBuffer = stackalloc char[2];
-            _logMessage.WriteTo(outputBuffer, ZeroLogConfiguration.Default, LogMessage.FormatType.Formatted, null).ShouldEqual(outputBuffer.Length);
+            _logMessage.WriteTo(outputBuffer, ZeroLogConfiguration.Default, LogMessage.FormatType.Formatted, null).ShouldBe(outputBuffer.Length);
             outputBuffer.SequenceEqual(ZeroLogConfiguration.Default.NullDisplayString.AsSpan(0, outputBuffer.Length));
         }
 
@@ -99,7 +99,7 @@ unsafe partial class LogMessageTests
             _logMessage.Append("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ");
 
             string.Create(16, _logMessage, (buffer, message) => message.WriteTo(buffer, ZeroLogConfiguration.Default, LogMessage.FormatType.Formatted, null))
-                  .ShouldEqual("0123 [TRUNCATED]");
+                  .ShouldBe("0123 [TRUNCATED]");
         }
 
         [Test]
@@ -109,7 +109,7 @@ unsafe partial class LogMessageTests
             _logMessage.Append("0123456789");
 
             string.Create(8, _logMessage, (buffer, message) => message.WriteTo(buffer, ZeroLogConfiguration.Default, LogMessage.FormatType.Formatted, null))
-                  .ShouldEqual(" [TRUNCA");
+                  .ShouldBe(" [TRUNCA");
         }
     }
 
@@ -119,9 +119,9 @@ unsafe partial class LogMessageTests
         [Test]
         public void should_append_string()
         {
-            _logMessage.Append("foo".AsSpan()).ShouldEqual(_logMessage);
+            _logMessage.Append("foo".AsSpan()).ShouldBe(_logMessage);
 
-            _logMessage.ToString().ShouldEqual("foo");
+            _logMessage.ToString().ShouldBe("foo");
         }
 
         [Test]
@@ -129,7 +129,7 @@ unsafe partial class LogMessageTests
         {
             _logMessage.Append(ReadOnlySpan<char>.Empty);
 
-            _logMessage.ToString().ShouldEqual(string.Empty);
+            _logMessage.ToString().ShouldBe(string.Empty);
         }
 
         [Test]
@@ -138,7 +138,7 @@ unsafe partial class LogMessageTests
             _logMessage.Append("foo".AsSpan());
             _logMessage.Append("bar".AsSpan());
 
-            _logMessage.ToString().ShouldEqual("foobar");
+            _logMessage.ToString().ShouldBe("foobar");
         }
 
         [Test]
@@ -146,7 +146,7 @@ unsafe partial class LogMessageTests
         {
             _logMessage.Append($"foo {"bar".AsSpan()} baz");
 
-            _logMessage.ToString().ShouldEqual("foo bar baz");
+            _logMessage.ToString().ShouldBe("foo bar baz");
         }
 
         [Test]
@@ -159,7 +159,7 @@ unsafe partial class LogMessageTests
 
             _logMessage.Append(value.AsSpan());
 
-            _logMessage.ToString().ShouldEqual(expected);
+            _logMessage.ToString().ShouldBe(expected);
         }
 
         [Test]
@@ -171,7 +171,7 @@ unsafe partial class LogMessageTests
 
             _logMessage.Append(value.AsSpan());
 
-            _logMessage.ToString().ShouldEqual(expected);
+            _logMessage.ToString().ShouldBe(expected);
         }
 
         [Test]
@@ -181,7 +181,7 @@ unsafe partial class LogMessageTests
 
             _logMessage.Append("0123456".AsSpan());
 
-            _logMessage.ToString().ShouldEqual(" [TRUNCATED]");
+            _logMessage.ToString().ShouldBe(" [TRUNCATED]");
         }
 
         [Test]
@@ -210,7 +210,7 @@ unsafe partial class LogMessageTests
             _logMessage.Append("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ".AsSpan());
 
             string.Create(16, _logMessage, (buffer, message) => message.WriteTo(buffer, ZeroLogConfiguration.Default, LogMessage.FormatType.Formatted, null))
-                  .ShouldEqual("0123 [TRUNCATED]");
+                  .ShouldBe("0123 [TRUNCATED]");
         }
 
         [Test]
@@ -220,7 +220,7 @@ unsafe partial class LogMessageTests
             _logMessage.Append("0123456789".AsSpan());
 
             string.Create(8, _logMessage, (buffer, message) => message.WriteTo(buffer, ZeroLogConfiguration.Default, LogMessage.FormatType.Formatted, null))
-                  .ShouldEqual(" [TRUNCA");
+                  .ShouldBe(" [TRUNCA");
         }
     }
 
@@ -230,9 +230,9 @@ unsafe partial class LogMessageTests
         [Test]
         public void should_append_string()
         {
-            _logMessage.Append("foo"u8).ShouldEqual(_logMessage);
+            _logMessage.Append("foo"u8).ShouldBe(_logMessage);
 
-            _logMessage.ToString().ShouldEqual("foo");
+            _logMessage.ToString().ShouldBe("foo");
         }
 
         [Test]
@@ -240,7 +240,7 @@ unsafe partial class LogMessageTests
         {
             _logMessage.Append(ReadOnlySpan<byte>.Empty);
 
-            _logMessage.ToString().ShouldEqual(string.Empty);
+            _logMessage.ToString().ShouldBe(string.Empty);
         }
 
         [Test]
@@ -249,7 +249,7 @@ unsafe partial class LogMessageTests
             _logMessage.Append("foo"u8);
             _logMessage.Append("bar"u8);
 
-            _logMessage.ToString().ShouldEqual("foobar");
+            _logMessage.ToString().ShouldBe("foobar");
         }
 
         [Test]
@@ -258,7 +258,7 @@ unsafe partial class LogMessageTests
         {
             _logMessage.Append($"foo {"bar"u8} baz");
 
-            _logMessage.ToString().ShouldEqual("foo bar baz");
+            _logMessage.ToString().ShouldBe("foo bar baz");
         }
 
         [Test]
@@ -271,7 +271,7 @@ unsafe partial class LogMessageTests
 
             _logMessage.Append(Encoding.UTF8.GetBytes(value));
 
-            _logMessage.ToString().ShouldEqual(expected);
+            _logMessage.ToString().ShouldBe(expected);
         }
 
         [Test]
@@ -281,7 +281,7 @@ unsafe partial class LogMessageTests
 
             _logMessage.Append("0123456"u8);
 
-            _logMessage.ToString().ShouldEqual(" [TRUNCATED]");
+            _logMessage.ToString().ShouldBe(" [TRUNCATED]");
         }
 
         [Test]
@@ -311,7 +311,7 @@ unsafe partial class LogMessageTests
             _logMessage.Append("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"u8);
 
             string.Create(16, _logMessage, (buffer, message) => message.WriteTo(buffer, ZeroLogConfiguration.Default, LogMessage.FormatType.Formatted, null))
-                  .ShouldEqual(" [TRUNCATED]\0\0\0\0");
+                  .ShouldBe(" [TRUNCATED]\0\0\0\0");
         }
 
         [Test]
@@ -321,14 +321,14 @@ unsafe partial class LogMessageTests
             _logMessage.Append("0123456789"u8);
 
             string.Create(8, _logMessage, (buffer, message) => message.WriteTo(buffer, ZeroLogConfiguration.Default, LogMessage.FormatType.Formatted, null))
-                  .ShouldEqual(" [TRUNCA");
+                  .ShouldBe(" [TRUNCA");
         }
 
         [Test]
         public void should_not_fail_on_invalid_utf8()
         {
             _logMessage.Append(new byte[] { (byte)'[', 0xFF, (byte)']' });
-            _logMessage.ToString().ShouldEqual("[\uFFFD]");
+            _logMessage.ToString().ShouldBe("[\uFFFD]");
         }
     }
 }

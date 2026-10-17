@@ -27,7 +27,7 @@ public class SanityChecks
                           .Select(i => i.Namespace)
                           .OrderBy(i => i)
                           .Distinct()
-                          .ShouldEqual(expected);
+                          .ShouldBe(expected);
     }
 
     [Test]
@@ -83,7 +83,7 @@ public class SanityChecks
                           .Select(i => i.FullName)
                           .OrderBy(i => i)
                           .Distinct()
-                          .ShouldEqual(expected);
+                          .ShouldBe(expected);
     }
 
     [Test]

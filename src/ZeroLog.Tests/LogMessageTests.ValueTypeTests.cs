@@ -1,8 +1,8 @@
 using System;
 using System.Globalization;
 using NUnit.Framework;
+using Shouldly;
 using ZeroLog.Configuration;
-using ZeroLog.Tests.Support;
 
 namespace ZeroLog.Tests;
 
@@ -26,12 +26,12 @@ unsafe partial class LogMessageTests
             {
                 // Truncate because the output buffer is too small
                 Span<char> smallBuffer = stackalloc char[2];
-                _logMessage.WriteTo(smallBuffer, ZeroLogConfiguration.Default, LogMessage.FormatType.Formatted, null).ShouldEqual(smallBuffer.Length);
+                _logMessage.WriteTo(smallBuffer, ZeroLogConfiguration.Default, LogMessage.FormatType.Formatted, null).ShouldBe(smallBuffer.Length);
                 smallBuffer.SequenceEqual(ZeroLogConfiguration.Default.TruncatedMessageSuffix.AsSpan(0, smallBuffer.Length)).ShouldBeTrue();
             }
 
             // Edge case: empty output buffer
-            _logMessage.WriteTo(Span<char>.Empty, ZeroLogConfiguration.Default, LogMessage.FormatType.Formatted, null).ShouldEqual(0);
+            _logMessage.WriteTo(Span<char>.Empty, ZeroLogConfiguration.Default, LogMessage.FormatType.Formatted, null).ShouldBe(0);
 
             // Truncate because the log message buffer is too small
             _logMessage = LogMessage.CreateTestMessage(LogLevel.Info, requiredBufferSize - 1, _stringCapacity);
@@ -39,7 +39,7 @@ unsafe partial class LogMessageTests
             action.Invoke();
 
             _logMessage.IsTruncated.ShouldBeTrue();
-            _logMessage.ToString().ShouldEqual(ZeroLogConfiguration.Default.TruncatedMessageSuffix);
+            _logMessage.ToString().ShouldBe(ZeroLogConfiguration.Default.TruncatedMessageSuffix);
 
             // Edge case: empty log message buffer
             _logMessage = LogMessage.CreateTestMessage(LogLevel.Info, 0, _stringCapacity);
@@ -66,27 +66,27 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_value([Values] bool value)
-            => _logMessage.Append(value).ToString().ShouldEqual(value.ToString());
+            => _logMessage.Append(value).ToString().ShouldBe(value.ToString());
 
         [Test]
         public void should_append_nullable_value()
-            => _logMessage.Append(AsNullable(_value)).ToString().ShouldEqual(_value.ToString());
+            => _logMessage.Append(AsNullable(_value)).ToString().ShouldBe(_value.ToString());
 
         [Test]
         public void should_append_null()
-            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append(GetNullValue()).ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_value_through_interpolation([Values] bool value)
-            => _logMessage.Append($"{value}").ToString().ShouldEqual(value.ToString());
+            => _logMessage.Append($"{value}").ToString().ShouldBe(value.ToString());
 
         [Test]
         public void should_append_nullable_value_through_interpolation([Values] bool value)
-            => _logMessage.Append($"{AsNullable(value)}").ToString().ShouldEqual(value.ToString());
+            => _logMessage.Append($"{AsNullable(value)}").ToString().ShouldBe(value.ToString());
 
         [Test]
         public void should_append_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_truncate_value()
@@ -108,51 +108,51 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_value()
-            => _logMessage.Append(_value).ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+            => _logMessage.Append(_value).ToString().ShouldBe(_value.ToString(CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_nullable_value()
-            => _logMessage.Append(AsNullable(_value)).ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+            => _logMessage.Append(AsNullable(_value)).ToString().ShouldBe(_value.ToString(CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_null()
-            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append(GetNullValue()).ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value()
-            => _logMessage.Append(_value, "X").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+            => _logMessage.Append(_value, "X").ToString().ShouldBe(_value.ToString("X", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_formatted_null()
-            => _logMessage.Append(GetNullValue(), "X").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append(GetNullValue(), "X").ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_nullable_formatted_value()
-            => _logMessage.Append(AsNullable(_value), "X").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+            => _logMessage.Append(AsNullable(_value), "X").ToString().ShouldBe(_value.ToString("X", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_value_through_interpolation()
-            => _logMessage.Append($"{_value}").ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{_value}").ToString().ShouldBe(_value.ToString(CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_nullable_value_through_interpolation()
-            => _logMessage.Append($"{AsNullable(_value)}").ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{AsNullable(_value)}").ToString().ShouldBe(_value.ToString(CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value_through_interpolation()
-            => _logMessage.Append($"{_value:X}").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{_value:X}").ToString().ShouldBe(_value.ToString("X", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_nullable_formatted_value_through_interpolation()
-            => _logMessage.Append($"{AsNullable(_value):X}").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{AsNullable(_value):X}").ToString().ShouldBe(_value.ToString("X", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_formatted_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue():X}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue():X}").ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_truncate_value()
@@ -186,51 +186,51 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_value()
-            => _logMessage.Append(_value).ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+            => _logMessage.Append(_value).ToString().ShouldBe(_value.ToString(CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_nullable_value()
-            => _logMessage.Append(AsNullable(_value)).ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+            => _logMessage.Append(AsNullable(_value)).ToString().ShouldBe(_value.ToString(CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_null()
-            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append(GetNullValue()).ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value()
-            => _logMessage.Append(_value, "X").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+            => _logMessage.Append(_value, "X").ToString().ShouldBe(_value.ToString("X", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_formatted_null()
-            => _logMessage.Append(GetNullValue(), "X").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append(GetNullValue(), "X").ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_nullable_formatted_value()
-            => _logMessage.Append(AsNullable(_value), "X").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+            => _logMessage.Append(AsNullable(_value), "X").ToString().ShouldBe(_value.ToString("X", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_value_through_interpolation()
-            => _logMessage.Append($"{_value}").ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{_value}").ToString().ShouldBe(_value.ToString(CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_nullable_value_through_interpolation()
-            => _logMessage.Append($"{AsNullable(_value)}").ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{AsNullable(_value)}").ToString().ShouldBe(_value.ToString(CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value_through_interpolation()
-            => _logMessage.Append($"{_value:X}").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{_value:X}").ToString().ShouldBe(_value.ToString("X", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_nullable_formatted_value_through_interpolation()
-            => _logMessage.Append($"{AsNullable(_value):X}").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{AsNullable(_value):X}").ToString().ShouldBe(_value.ToString("X", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_formatted_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue():X}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue():X}").ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_truncate_value()
@@ -264,27 +264,27 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_value()
-            => _logMessage.Append(_value).ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+            => _logMessage.Append(_value).ToString().ShouldBe(_value.ToString(CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_nullable_value()
-            => _logMessage.Append(AsNullable(_value)).ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+            => _logMessage.Append(AsNullable(_value)).ToString().ShouldBe(_value.ToString(CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_null()
-            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append(GetNullValue()).ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_value_through_interpolation()
-            => _logMessage.Append($"{_value}").ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{_value}").ToString().ShouldBe(_value.ToString(CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_nullable_value_through_interpolation()
-            => _logMessage.Append($"{AsNullable(_value)}").ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{AsNullable(_value)}").ToString().ShouldBe(_value.ToString(CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_truncate_value()
@@ -306,51 +306,51 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_value()
-            => _logMessage.Append(_value).ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+            => _logMessage.Append(_value).ToString().ShouldBe(_value.ToString(CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_nullable_value()
-            => _logMessage.Append(AsNullable(_value)).ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+            => _logMessage.Append(AsNullable(_value)).ToString().ShouldBe(_value.ToString(CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_null()
-            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append(GetNullValue()).ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value()
-            => _logMessage.Append(_value, "X").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+            => _logMessage.Append(_value, "X").ToString().ShouldBe(_value.ToString("X", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_formatted_null()
-            => _logMessage.Append(GetNullValue(), "X").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append(GetNullValue(), "X").ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_nullable_formatted_value()
-            => _logMessage.Append(AsNullable(_value), "X").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+            => _logMessage.Append(AsNullable(_value), "X").ToString().ShouldBe(_value.ToString("X", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_value_through_interpolation()
-            => _logMessage.Append($"{_value}").ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{_value}").ToString().ShouldBe(_value.ToString(CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_nullable_value_through_interpolation()
-            => _logMessage.Append($"{AsNullable(_value)}").ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{AsNullable(_value)}").ToString().ShouldBe(_value.ToString(CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value_through_interpolation()
-            => _logMessage.Append($"{_value:X}").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{_value:X}").ToString().ShouldBe(_value.ToString("X", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_nullable_formatted_value_through_interpolation()
-            => _logMessage.Append($"{AsNullable(_value):X}").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{AsNullable(_value):X}").ToString().ShouldBe(_value.ToString("X", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_formatted_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue():X}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue():X}").ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_truncate_value()
@@ -386,51 +386,51 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_value()
-            => _logMessage.Append(_value).ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+            => _logMessage.Append(_value).ToString().ShouldBe(_value.ToString(CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_nullable_value()
-            => _logMessage.Append(AsNullable(_value)).ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+            => _logMessage.Append(AsNullable(_value)).ToString().ShouldBe(_value.ToString(CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_null()
-            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append(GetNullValue()).ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value()
-            => _logMessage.Append(_value, "X").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+            => _logMessage.Append(_value, "X").ToString().ShouldBe(_value.ToString("X", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_formatted_null()
-            => _logMessage.Append(GetNullValue(), "X").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append(GetNullValue(), "X").ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_nullable_formatted_value()
-            => _logMessage.Append(AsNullable(_value), "X").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+            => _logMessage.Append(AsNullable(_value), "X").ToString().ShouldBe(_value.ToString("X", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_value_through_interpolation()
-            => _logMessage.Append($"{_value}").ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{_value}").ToString().ShouldBe(_value.ToString(CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_nullable_value_through_interpolation()
-            => _logMessage.Append($"{AsNullable(_value)}").ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{AsNullable(_value)}").ToString().ShouldBe(_value.ToString(CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value_through_interpolation()
-            => _logMessage.Append($"{_value:X}").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{_value:X}").ToString().ShouldBe(_value.ToString("X", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_nullable_formatted_value_through_interpolation()
-            => _logMessage.Append($"{AsNullable(_value):X}").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{AsNullable(_value):X}").ToString().ShouldBe(_value.ToString("X", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_formatted_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue():X}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue():X}").ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_truncate_value()
@@ -466,51 +466,51 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_value()
-            => _logMessage.Append(_value).ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+            => _logMessage.Append(_value).ToString().ShouldBe(_value.ToString(CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_nullable_value()
-            => _logMessage.Append(AsNullable(_value)).ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+            => _logMessage.Append(AsNullable(_value)).ToString().ShouldBe(_value.ToString(CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_null()
-            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append(GetNullValue()).ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value()
-            => _logMessage.Append(_value, "X").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+            => _logMessage.Append(_value, "X").ToString().ShouldBe(_value.ToString("X", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_formatted_null()
-            => _logMessage.Append(GetNullValue(), "X").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append(GetNullValue(), "X").ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_nullable_formatted_value()
-            => _logMessage.Append(AsNullable(_value), "X").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+            => _logMessage.Append(AsNullable(_value), "X").ToString().ShouldBe(_value.ToString("X", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_value_through_interpolation()
-            => _logMessage.Append($"{_value}").ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{_value}").ToString().ShouldBe(_value.ToString(CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_nullable_value_through_interpolation()
-            => _logMessage.Append($"{AsNullable(_value)}").ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{AsNullable(_value)}").ToString().ShouldBe(_value.ToString(CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value_through_interpolation()
-            => _logMessage.Append($"{_value:X}").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{_value:X}").ToString().ShouldBe(_value.ToString("X", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_nullable_formatted_value_through_interpolation()
-            => _logMessage.Append($"{AsNullable(_value):X}").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{AsNullable(_value):X}").ToString().ShouldBe(_value.ToString("X", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_formatted_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue():X}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue():X}").ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_truncate_value()
@@ -546,51 +546,51 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_value()
-            => _logMessage.Append(_value).ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+            => _logMessage.Append(_value).ToString().ShouldBe(_value.ToString(CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_nullable_value()
-            => _logMessage.Append(AsNullable(_value)).ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+            => _logMessage.Append(AsNullable(_value)).ToString().ShouldBe(_value.ToString(CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_null()
-            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append(GetNullValue()).ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value()
-            => _logMessage.Append(_value, "X").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+            => _logMessage.Append(_value, "X").ToString().ShouldBe(_value.ToString("X", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_formatted_null()
-            => _logMessage.Append(GetNullValue(), "X").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append(GetNullValue(), "X").ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_nullable_formatted_value()
-            => _logMessage.Append(AsNullable(_value), "X").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+            => _logMessage.Append(AsNullable(_value), "X").ToString().ShouldBe(_value.ToString("X", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_value_through_interpolation()
-            => _logMessage.Append($"{_value}").ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{_value}").ToString().ShouldBe(_value.ToString(CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_nullable_value_through_interpolation()
-            => _logMessage.Append($"{AsNullable(_value)}").ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{AsNullable(_value)}").ToString().ShouldBe(_value.ToString(CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value_through_interpolation()
-            => _logMessage.Append($"{_value:X}").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{_value:X}").ToString().ShouldBe(_value.ToString("X", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_nullable_formatted_value_through_interpolation()
-            => _logMessage.Append($"{AsNullable(_value):X}").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{AsNullable(_value):X}").ToString().ShouldBe(_value.ToString("X", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_formatted_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue():X}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue():X}").ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_truncate_value()
@@ -626,51 +626,51 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_value()
-            => _logMessage.Append(_value).ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+            => _logMessage.Append(_value).ToString().ShouldBe(_value.ToString(CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_nullable_value()
-            => _logMessage.Append(AsNullable(_value)).ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+            => _logMessage.Append(AsNullable(_value)).ToString().ShouldBe(_value.ToString(CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_null()
-            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append(GetNullValue()).ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value()
-            => _logMessage.Append(_value, "X").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+            => _logMessage.Append(_value, "X").ToString().ShouldBe(_value.ToString("X", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_formatted_null()
-            => _logMessage.Append(GetNullValue(), "X").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append(GetNullValue(), "X").ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_nullable_formatted_value()
-            => _logMessage.Append(AsNullable(_value), "X").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+            => _logMessage.Append(AsNullable(_value), "X").ToString().ShouldBe(_value.ToString("X", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_value_through_interpolation()
-            => _logMessage.Append($"{_value}").ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{_value}").ToString().ShouldBe(_value.ToString(CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_nullable_value_through_interpolation()
-            => _logMessage.Append($"{AsNullable(_value)}").ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{AsNullable(_value)}").ToString().ShouldBe(_value.ToString(CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value_through_interpolation()
-            => _logMessage.Append($"{_value:X}").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{_value:X}").ToString().ShouldBe(_value.ToString("X", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_nullable_formatted_value_through_interpolation()
-            => _logMessage.Append($"{AsNullable(_value):X}").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{AsNullable(_value):X}").ToString().ShouldBe(_value.ToString("X", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_formatted_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue():X}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue():X}").ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_truncate_value()
@@ -706,51 +706,51 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_value()
-            => _logMessage.Append(_value).ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+            => _logMessage.Append(_value).ToString().ShouldBe(_value.ToString(CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_nullable_value()
-            => _logMessage.Append(AsNullable(_value)).ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+            => _logMessage.Append(AsNullable(_value)).ToString().ShouldBe(_value.ToString(CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_null()
-            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append(GetNullValue()).ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value()
-            => _logMessage.Append(_value, "X").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+            => _logMessage.Append(_value, "X").ToString().ShouldBe(_value.ToString("X", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_formatted_null()
-            => _logMessage.Append(GetNullValue(), "X").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append(GetNullValue(), "X").ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_nullable_formatted_value()
-            => _logMessage.Append(AsNullable(_value), "X").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+            => _logMessage.Append(AsNullable(_value), "X").ToString().ShouldBe(_value.ToString("X", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_value_through_interpolation()
-            => _logMessage.Append($"{_value}").ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{_value}").ToString().ShouldBe(_value.ToString(CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_nullable_value_through_interpolation()
-            => _logMessage.Append($"{AsNullable(_value)}").ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{AsNullable(_value)}").ToString().ShouldBe(_value.ToString(CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value_through_interpolation()
-            => _logMessage.Append($"{_value:X}").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{_value:X}").ToString().ShouldBe(_value.ToString("X", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_nullable_formatted_value_through_interpolation()
-            => _logMessage.Append($"{AsNullable(_value):X}").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{AsNullable(_value):X}").ToString().ShouldBe(_value.ToString("X", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_formatted_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue():X}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue():X}").ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_truncate_value()
@@ -786,51 +786,51 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_value()
-            => _logMessage.Append(_value).ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+            => _logMessage.Append(_value).ToString().ShouldBe(_value.ToString(CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_nullable_value()
-            => _logMessage.Append(AsNullable(_value)).ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+            => _logMessage.Append(AsNullable(_value)).ToString().ShouldBe(_value.ToString(CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_null()
-            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append(GetNullValue()).ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value()
-            => _logMessage.Append(_value, "X").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+            => _logMessage.Append(_value, "X").ToString().ShouldBe(_value.ToString("X", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_formatted_null()
-            => _logMessage.Append(GetNullValue(), "X").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append(GetNullValue(), "X").ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_nullable_formatted_value()
-            => _logMessage.Append(AsNullable(_value), "X").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+            => _logMessage.Append(AsNullable(_value), "X").ToString().ShouldBe(_value.ToString("X", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_value_through_interpolation()
-            => _logMessage.Append($"{_value}").ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{_value}").ToString().ShouldBe(_value.ToString(CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_nullable_value_through_interpolation()
-            => _logMessage.Append($"{AsNullable(_value)}").ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{AsNullable(_value)}").ToString().ShouldBe(_value.ToString(CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value_through_interpolation()
-            => _logMessage.Append($"{_value:X}").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{_value:X}").ToString().ShouldBe(_value.ToString("X", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_nullable_formatted_value_through_interpolation()
-            => _logMessage.Append($"{AsNullable(_value):X}").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{AsNullable(_value):X}").ToString().ShouldBe(_value.ToString("X", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_formatted_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue():X}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue():X}").ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_truncate_value()
@@ -866,51 +866,51 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_value()
-            => _logMessage.Append(_value).ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+            => _logMessage.Append(_value).ToString().ShouldBe(_value.ToString(CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_nullable_value()
-            => _logMessage.Append(AsNullable(_value)).ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+            => _logMessage.Append(AsNullable(_value)).ToString().ShouldBe(_value.ToString(CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_null()
-            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append(GetNullValue()).ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value()
-            => _logMessage.Append(_value, "X").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+            => _logMessage.Append(_value, "X").ToString().ShouldBe(_value.ToString("X", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_formatted_null()
-            => _logMessage.Append(GetNullValue(), "X").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append(GetNullValue(), "X").ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_nullable_formatted_value()
-            => _logMessage.Append(AsNullable(_value), "X").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+            => _logMessage.Append(AsNullable(_value), "X").ToString().ShouldBe(_value.ToString("X", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_value_through_interpolation()
-            => _logMessage.Append($"{_value}").ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{_value}").ToString().ShouldBe(_value.ToString(CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_nullable_value_through_interpolation()
-            => _logMessage.Append($"{AsNullable(_value)}").ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{AsNullable(_value)}").ToString().ShouldBe(_value.ToString(CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value_through_interpolation()
-            => _logMessage.Append($"{_value:X}").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{_value:X}").ToString().ShouldBe(_value.ToString("X", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_nullable_formatted_value_through_interpolation()
-            => _logMessage.Append($"{AsNullable(_value):X}").ToString().ShouldEqual(_value.ToString("X", CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{AsNullable(_value):X}").ToString().ShouldBe(_value.ToString("X", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_formatted_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue():X}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue():X}").ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_truncate_value()
@@ -946,51 +946,51 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_value()
-            => _logMessage.Append(_value).ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+            => _logMessage.Append(_value).ToString().ShouldBe(_value.ToString(CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_nullable_value()
-            => _logMessage.Append(AsNullable(_value)).ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+            => _logMessage.Append(AsNullable(_value)).ToString().ShouldBe(_value.ToString(CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_null()
-            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append(GetNullValue()).ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value()
-            => _logMessage.Append(_value, "F2").ToString().ShouldEqual(_value.ToString("F2", CultureInfo.InvariantCulture));
+            => _logMessage.Append(_value, "F2").ToString().ShouldBe(_value.ToString("F2", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_formatted_null()
-            => _logMessage.Append(GetNullValue(), "F2").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append(GetNullValue(), "F2").ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_nullable_formatted_value()
-            => _logMessage.Append(AsNullable(_value), "F2").ToString().ShouldEqual(_value.ToString("F2", CultureInfo.InvariantCulture));
+            => _logMessage.Append(AsNullable(_value), "F2").ToString().ShouldBe(_value.ToString("F2", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_value_through_interpolation()
-            => _logMessage.Append($"{_value}").ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{_value}").ToString().ShouldBe(_value.ToString(CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_nullable_value_through_interpolation()
-            => _logMessage.Append($"{AsNullable(_value)}").ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{AsNullable(_value)}").ToString().ShouldBe(_value.ToString(CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value_through_interpolation()
-            => _logMessage.Append($"{_value:F2}").ToString().ShouldEqual(_value.ToString("F2", CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{_value:F2}").ToString().ShouldBe(_value.ToString("F2", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_nullable_formatted_value_through_interpolation()
-            => _logMessage.Append($"{AsNullable(_value):F2}").ToString().ShouldEqual(_value.ToString("F2", CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{AsNullable(_value):F2}").ToString().ShouldBe(_value.ToString("F2", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_formatted_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue():F2}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue():F2}").ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_truncate_value()
@@ -1026,51 +1026,51 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_value()
-            => _logMessage.Append(_value).ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+            => _logMessage.Append(_value).ToString().ShouldBe(_value.ToString(CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_nullable_value()
-            => _logMessage.Append(AsNullable(_value)).ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+            => _logMessage.Append(AsNullable(_value)).ToString().ShouldBe(_value.ToString(CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_null()
-            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append(GetNullValue()).ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value()
-            => _logMessage.Append(_value, "F2").ToString().ShouldEqual(_value.ToString("F2", CultureInfo.InvariantCulture));
+            => _logMessage.Append(_value, "F2").ToString().ShouldBe(_value.ToString("F2", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_formatted_null()
-            => _logMessage.Append(GetNullValue(), "F2").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append(GetNullValue(), "F2").ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_nullable_formatted_value()
-            => _logMessage.Append(AsNullable(_value), "F2").ToString().ShouldEqual(_value.ToString("F2", CultureInfo.InvariantCulture));
+            => _logMessage.Append(AsNullable(_value), "F2").ToString().ShouldBe(_value.ToString("F2", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_value_through_interpolation()
-            => _logMessage.Append($"{_value}").ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{_value}").ToString().ShouldBe(_value.ToString(CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_nullable_value_through_interpolation()
-            => _logMessage.Append($"{AsNullable(_value)}").ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{AsNullable(_value)}").ToString().ShouldBe(_value.ToString(CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value_through_interpolation()
-            => _logMessage.Append($"{_value:F2}").ToString().ShouldEqual(_value.ToString("F2", CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{_value:F2}").ToString().ShouldBe(_value.ToString("F2", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_nullable_formatted_value_through_interpolation()
-            => _logMessage.Append($"{AsNullable(_value):F2}").ToString().ShouldEqual(_value.ToString("F2", CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{AsNullable(_value):F2}").ToString().ShouldBe(_value.ToString("F2", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_formatted_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue():F2}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue():F2}").ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_truncate_value()
@@ -1106,51 +1106,51 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_value()
-            => _logMessage.Append(_value).ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+            => _logMessage.Append(_value).ToString().ShouldBe(_value.ToString(CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_nullable_value()
-            => _logMessage.Append(AsNullable(_value)).ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+            => _logMessage.Append(AsNullable(_value)).ToString().ShouldBe(_value.ToString(CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_null()
-            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append(GetNullValue()).ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value()
-            => _logMessage.Append(_value, "F2").ToString().ShouldEqual(_value.ToString("F2", CultureInfo.InvariantCulture));
+            => _logMessage.Append(_value, "F2").ToString().ShouldBe(_value.ToString("F2", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_formatted_null()
-            => _logMessage.Append(GetNullValue(), "F2").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append(GetNullValue(), "F2").ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_nullable_formatted_value()
-            => _logMessage.Append(AsNullable(_value), "F2").ToString().ShouldEqual(_value.ToString("F2", CultureInfo.InvariantCulture));
+            => _logMessage.Append(AsNullable(_value), "F2").ToString().ShouldBe(_value.ToString("F2", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_value_through_interpolation()
-            => _logMessage.Append($"{_value}").ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{_value}").ToString().ShouldBe(_value.ToString(CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_nullable_value_through_interpolation()
-            => _logMessage.Append($"{AsNullable(_value)}").ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{AsNullable(_value)}").ToString().ShouldBe(_value.ToString(CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value_through_interpolation()
-            => _logMessage.Append($"{_value:F2}").ToString().ShouldEqual(_value.ToString("F2", CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{_value:F2}").ToString().ShouldBe(_value.ToString("F2", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_nullable_formatted_value_through_interpolation()
-            => _logMessage.Append($"{AsNullable(_value):F2}").ToString().ShouldEqual(_value.ToString("F2", CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{AsNullable(_value):F2}").ToString().ShouldBe(_value.ToString("F2", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_formatted_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue():F2}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue():F2}").ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_truncate_value()
@@ -1186,54 +1186,54 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_value()
-            => _logMessage.Append(_value).ToString().ShouldEqual(_value.ToString(null, CultureInfo.InvariantCulture));
+            => _logMessage.Append(_value).ToString().ShouldBe(_value.ToString(null, CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_nullable_value()
-            => _logMessage.Append(AsNullable(_value)).ToString().ShouldEqual(_value.ToString(null, CultureInfo.InvariantCulture));
+            => _logMessage.Append(AsNullable(_value)).ToString().ShouldBe(_value.ToString(null, CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_null()
-            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append(GetNullValue()).ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         [TestCase("N")]
         [TestCase("D")]
         [TestCase("B")]
         public void should_append_formatted_value(string format)
-            => _logMessage.Append(_value, format).ToString().ShouldEqual(_value.ToString(format, CultureInfo.InvariantCulture));
+            => _logMessage.Append(_value, format).ToString().ShouldBe(_value.ToString(format, CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_formatted_null()
-            => _logMessage.Append(GetNullValue(), "D").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append(GetNullValue(), "D").ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_nullable_formatted_value()
-            => _logMessage.Append(_value, "D").ToString().ShouldEqual(_value.ToString("D", CultureInfo.InvariantCulture));
+            => _logMessage.Append(_value, "D").ToString().ShouldBe(_value.ToString("D", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_value_through_interpolation()
-            => _logMessage.Append($"{_value}").ToString().ShouldEqual(_value.ToString(null, CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{_value}").ToString().ShouldBe(_value.ToString(null, CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_nullable_value_through_interpolation()
-            => _logMessage.Append($"{AsNullable(_value)}").ToString().ShouldEqual(_value.ToString(null, CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{AsNullable(_value)}").ToString().ShouldBe(_value.ToString(null, CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value_through_interpolation()
-            => _logMessage.Append($"{_value:D}").ToString().ShouldEqual(_value.ToString("D", CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{_value:D}").ToString().ShouldBe(_value.ToString("D", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_nullable_formatted_value_through_interpolation()
-            => _logMessage.Append($"{AsNullable(_value):D}").ToString().ShouldEqual(_value.ToString("D", CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{AsNullable(_value):D}").ToString().ShouldBe(_value.ToString("D", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_formatted_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue():D}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue():D}").ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_truncate_value()
@@ -1270,54 +1270,54 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_value()
-            => _logMessage.Append(_value).ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+            => _logMessage.Append(_value).ToString().ShouldBe(_value.ToString(CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_nullable_value()
-            => _logMessage.Append(AsNullable(_value)).ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+            => _logMessage.Append(AsNullable(_value)).ToString().ShouldBe(_value.ToString(CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_null()
-            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append(GetNullValue()).ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         [TestCase("d")]
         [TestCase("D")]
         [TestCase("yyyy-MM-dd")]
         public void should_append_formatted_value(string format)
-            => _logMessage.Append(_value, format).ToString().ShouldEqual(_value.ToString(format, CultureInfo.InvariantCulture));
+            => _logMessage.Append(_value, format).ToString().ShouldBe(_value.ToString(format, CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_formatted_null()
-            => _logMessage.Append(GetNullValue(), "D").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append(GetNullValue(), "D").ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_nullable_formatted_value()
-            => _logMessage.Append(_value, "D").ToString().ShouldEqual(_value.ToString("D", CultureInfo.InvariantCulture));
+            => _logMessage.Append(_value, "D").ToString().ShouldBe(_value.ToString("D", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_value_through_interpolation()
-            => _logMessage.Append($"{_value}").ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{_value}").ToString().ShouldBe(_value.ToString(CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_nullable_value_through_interpolation()
-            => _logMessage.Append($"{AsNullable(_value)}").ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{AsNullable(_value)}").ToString().ShouldBe(_value.ToString(CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value_through_interpolation()
-            => _logMessage.Append($"{_value:yyyy}").ToString().ShouldEqual(_value.ToString("yyyy", CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{_value:yyyy}").ToString().ShouldBe(_value.ToString("yyyy", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_nullable_formatted_value_through_interpolation()
-            => _logMessage.Append($"{AsNullable(_value):yyyy}").ToString().ShouldEqual(_value.ToString("yyyy", CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{AsNullable(_value):yyyy}").ToString().ShouldBe(_value.ToString("yyyy", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_formatted_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue():yyyy}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue():yyyy}").ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_truncate_value()
@@ -1354,53 +1354,53 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_value()
-            => _logMessage.Append(_value).ToString().ShouldEqual(_value.ToString(null, CultureInfo.InvariantCulture));
+            => _logMessage.Append(_value).ToString().ShouldBe(_value.ToString(null, CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_nullable_value()
-            => _logMessage.Append(AsNullable(_value)).ToString().ShouldEqual(_value.ToString(null, CultureInfo.InvariantCulture));
+            => _logMessage.Append(AsNullable(_value)).ToString().ShouldBe(_value.ToString(null, CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_null()
-            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append(GetNullValue()).ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         [TestCase("c")]
         [TestCase("G")]
         public void should_append_formatted_value(string format)
-            => _logMessage.Append(_value, format).ToString().ShouldEqual(_value.ToString(format, CultureInfo.InvariantCulture));
+            => _logMessage.Append(_value, format).ToString().ShouldBe(_value.ToString(format, CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_formatted_null()
-            => _logMessage.Append(GetNullValue(), "G").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append(GetNullValue(), "G").ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_nullable_formatted_value()
-            => _logMessage.Append(_value, "c").ToString().ShouldEqual(_value.ToString("c", CultureInfo.InvariantCulture));
+            => _logMessage.Append(_value, "c").ToString().ShouldBe(_value.ToString("c", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_value_through_interpolation()
-            => _logMessage.Append($"{_value}").ToString().ShouldEqual(_value.ToString(null, CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{_value}").ToString().ShouldBe(_value.ToString(null, CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_nullable_value_through_interpolation()
-            => _logMessage.Append($"{AsNullable(_value)}").ToString().ShouldEqual(_value.ToString(null, CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{AsNullable(_value)}").ToString().ShouldBe(_value.ToString(null, CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value_through_interpolation()
-            => _logMessage.Append($"{_value:c}").ToString().ShouldEqual(_value.ToString("c", CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{_value:c}").ToString().ShouldBe(_value.ToString("c", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_nullable_formatted_value_through_interpolation()
-            => _logMessage.Append($"{AsNullable(_value):c}").ToString().ShouldEqual(_value.ToString("c", CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{AsNullable(_value):c}").ToString().ShouldBe(_value.ToString("c", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_formatted_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue():c}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue():c}").ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_truncate_value()
@@ -1436,54 +1436,54 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_value()
-            => _logMessage.Append(_value).ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+            => _logMessage.Append(_value).ToString().ShouldBe(_value.ToString(CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_nullable_value()
-            => _logMessage.Append(AsNullable(_value)).ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+            => _logMessage.Append(AsNullable(_value)).ToString().ShouldBe(_value.ToString(CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_null()
-            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append(GetNullValue()).ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         [TestCase("d")]
         [TestCase("D")]
         [TestCase("yyyy-MM-dd")]
         public void should_append_formatted_value(string format)
-            => _logMessage.Append(_value, format).ToString().ShouldEqual(_value.ToString(format, CultureInfo.InvariantCulture));
+            => _logMessage.Append(_value, format).ToString().ShouldBe(_value.ToString(format, CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_formatted_null()
-            => _logMessage.Append(GetNullValue(), "D").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append(GetNullValue(), "D").ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_nullable_formatted_value()
-            => _logMessage.Append(_value, "D").ToString().ShouldEqual(_value.ToString("D", CultureInfo.InvariantCulture));
+            => _logMessage.Append(_value, "D").ToString().ShouldBe(_value.ToString("D", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_value_through_interpolation()
-            => _logMessage.Append($"{_value}").ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{_value}").ToString().ShouldBe(_value.ToString(CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_nullable_value_through_interpolation()
-            => _logMessage.Append($"{AsNullable(_value)}").ToString().ShouldEqual(_value.ToString(CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{AsNullable(_value)}").ToString().ShouldBe(_value.ToString(CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value_through_interpolation()
-            => _logMessage.Append($"{_value:yyyy}").ToString().ShouldEqual(_value.ToString("yyyy", CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{_value:yyyy}").ToString().ShouldBe(_value.ToString("yyyy", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_nullable_formatted_value_through_interpolation()
-            => _logMessage.Append($"{AsNullable(_value):yyyy}").ToString().ShouldEqual(_value.ToString("yyyy", CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{AsNullable(_value):yyyy}").ToString().ShouldBe(_value.ToString("yyyy", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_formatted_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue():yyyy}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue():yyyy}").ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_truncate_value()
@@ -1520,53 +1520,53 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_value()
-            => _logMessage.Append(_value).ToString().ShouldEqual(_value.ToString(null, CultureInfo.InvariantCulture));
+            => _logMessage.Append(_value).ToString().ShouldBe(_value.ToString(null, CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_nullable_value()
-            => _logMessage.Append(AsNullable(_value)).ToString().ShouldEqual(_value.ToString(null, CultureInfo.InvariantCulture));
+            => _logMessage.Append(AsNullable(_value)).ToString().ShouldBe(_value.ToString(null, CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_null()
-            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append(GetNullValue()).ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         [TestCase("t")]
         [TestCase("T")]
         public void should_append_formatted_value(string format)
-            => _logMessage.Append(_value, format).ToString().ShouldEqual(_value.ToString(format, CultureInfo.InvariantCulture));
+            => _logMessage.Append(_value, format).ToString().ShouldBe(_value.ToString(format, CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_formatted_null()
-            => _logMessage.Append(GetNullValue(), "T").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append(GetNullValue(), "T").ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_nullable_formatted_value()
-            => _logMessage.Append(_value, "t").ToString().ShouldEqual(_value.ToString("t", CultureInfo.InvariantCulture));
+            => _logMessage.Append(_value, "t").ToString().ShouldBe(_value.ToString("t", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_value_through_interpolation()
-            => _logMessage.Append($"{_value}").ToString().ShouldEqual(_value.ToString(null, CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{_value}").ToString().ShouldBe(_value.ToString(null, CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_nullable_value_through_interpolation()
-            => _logMessage.Append($"{AsNullable(_value)}").ToString().ShouldEqual(_value.ToString(null, CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{AsNullable(_value)}").ToString().ShouldBe(_value.ToString(null, CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value_through_interpolation()
-            => _logMessage.Append($"{_value:t}").ToString().ShouldEqual(_value.ToString("t", CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{_value:t}").ToString().ShouldBe(_value.ToString("t", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_nullable_formatted_value_through_interpolation()
-            => _logMessage.Append($"{AsNullable(_value):t}").ToString().ShouldEqual(_value.ToString("t", CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{AsNullable(_value):t}").ToString().ShouldBe(_value.ToString("t", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_formatted_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue():c}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue():c}").ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_truncate_value()
@@ -1602,54 +1602,54 @@ unsafe partial class LogMessageTests
 
         [Test]
         public void should_append_value()
-            => _logMessage.Append(_value).ToString().ShouldEqual(_value.ToString(null, CultureInfo.InvariantCulture));
+            => _logMessage.Append(_value).ToString().ShouldBe(_value.ToString(null, CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_nullable_value()
-            => _logMessage.Append(AsNullable(_value)).ToString().ShouldEqual(_value.ToString(null, CultureInfo.InvariantCulture));
+            => _logMessage.Append(AsNullable(_value)).ToString().ShouldBe(_value.ToString(null, CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_null()
-            => _logMessage.Append(GetNullValue()).ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append(GetNullValue()).ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         [TestCase("d")]
         [TestCase("D")]
         [TestCase("yyyy-MM-dd")]
         public void should_append_formatted_value(string format)
-            => _logMessage.Append(_value, format).ToString().ShouldEqual(_value.ToString(format, CultureInfo.InvariantCulture));
+            => _logMessage.Append(_value, format).ToString().ShouldBe(_value.ToString(format, CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_formatted_null()
-            => _logMessage.Append(GetNullValue(), "o").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append(GetNullValue(), "o").ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_nullable_formatted_value()
-            => _logMessage.Append(_value, "o").ToString().ShouldEqual(_value.ToString("o", CultureInfo.InvariantCulture));
+            => _logMessage.Append(_value, "o").ToString().ShouldBe(_value.ToString("o", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_value_through_interpolation()
-            => _logMessage.Append($"{_value}").ToString().ShouldEqual(_value.ToString(null, CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{_value}").ToString().ShouldBe(_value.ToString(null, CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_nullable_value_through_interpolation()
-            => _logMessage.Append($"{AsNullable(_value)}").ToString().ShouldEqual(_value.ToString(null, CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{AsNullable(_value)}").ToString().ShouldBe(_value.ToString(null, CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue()}").ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_append_formatted_value_through_interpolation()
-            => _logMessage.Append($"{_value:o}").ToString().ShouldEqual(_value.ToString("o", CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{_value:o}").ToString().ShouldBe(_value.ToString("o", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_nullable_formatted_value_through_interpolation()
-            => _logMessage.Append($"{AsNullable(_value):o}").ToString().ShouldEqual(_value.ToString("o", CultureInfo.InvariantCulture));
+            => _logMessage.Append($"{AsNullable(_value):o}").ToString().ShouldBe(_value.ToString("o", CultureInfo.InvariantCulture));
 
         [Test]
         public void should_append_formatted_null_value_through_interpolation()
-            => _logMessage.Append($"{GetNullValue():o}").ToString().ShouldEqual(ZeroLogConfiguration.Default.NullDisplayString);
+            => _logMessage.Append($"{GetNullValue():o}").ToString().ShouldBe(ZeroLogConfiguration.Default.NullDisplayString);
 
         [Test]
         public void should_truncate_value()

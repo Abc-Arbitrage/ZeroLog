@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using NUnit.Framework;
+using Shouldly;
 using ZeroLog.Configuration;
 using ZeroLog.Tests.Support;
 
@@ -34,7 +35,7 @@ public partial class LogTests
         _log.IsFatalEnabled.ShouldBeFalse();
         _log.IsEnabled(LogLevel.Fatal).ShouldBeFalse();
 
-        _log.Fatal().ShouldBeTheSameAs(LogMessage.Empty);
+        _log.Fatal().ShouldBeSameAs(LogMessage.Empty);
     }
 
     [Test]
@@ -45,7 +46,7 @@ public partial class LogTests
         _log.DisableLogging();
 
         _log.IsFatalEnabled.ShouldBeFalse();
-        _log.Fatal().ShouldBeTheSameAs(LogMessage.Empty);
+        _log.Fatal().ShouldBeSameAs(LogMessage.Empty);
     }
 
     [TestCase(LogLevel.Trace, true, true, true, true, true, true)]
@@ -58,12 +59,12 @@ public partial class LogTests
     {
         _log.UpdateConfiguration(_provider, ResolvedLoggerConfiguration.SingleAppender(logLevel));
 
-        _log.IsTraceEnabled.ShouldEqual(isTrace);
-        _log.IsDebugEnabled.ShouldEqual(isDebug);
-        _log.IsInfoEnabled.ShouldEqual(isInfo);
-        _log.IsWarnEnabled.ShouldEqual(isWarn);
-        _log.IsErrorEnabled.ShouldEqual(isError);
-        _log.IsFatalEnabled.ShouldEqual(isFatal);
+        _log.IsTraceEnabled.ShouldBe(isTrace);
+        _log.IsDebugEnabled.ShouldBe(isDebug);
+        _log.IsInfoEnabled.ShouldBe(isInfo);
+        _log.IsWarnEnabled.ShouldBe(isWarn);
+        _log.IsErrorEnabled.ShouldBe(isError);
+        _log.IsFatalEnabled.ShouldBe(isFatal);
 
         _log.IsEnabled(logLevel).ShouldBeTrue();
         _log.IsEnabled(logLevel - 1).ShouldBeFalse();
@@ -96,8 +97,8 @@ public partial class LogTests
         var timeProvider = new TestTimeProvider { Timestamp = TestTimeProvider.ExampleTimestamp };
         _log.UpdateConfiguration(_provider, ResolvedLoggerConfiguration.SingleAppender(LogLevel.Trace, timeProvider: timeProvider));
 
-        _log.Config.TimeProvider.ShouldBeTheSameAs(timeProvider);
-        _log.Info().Timestamp.ShouldEqual(TestTimeProvider.ExampleTimestamp);
+        _log.Config.TimeProvider.ShouldBeSameAs(timeProvider);
+        _log.Info().Timestamp.ShouldBe(TestTimeProvider.ExampleTimestamp);
     }
 #endif
 
