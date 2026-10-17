@@ -1,19 +1,27 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>roslyn4.0</TargetFramework>
+    <TargetFrameworks>roslyn5.0;roslyn4.0</TargetFrameworks>
     <Nullable>enable</Nullable>
     <IsRoslynComponent>true</IsRoslynComponent>
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
     <NoWarn>$(NoWarn);RS2008</NoWarn>
   </PropertyGroup>
 
-  <PropertyGroup>
+  <PropertyGroup Condition="'$(TargetFramework)' != ''">
     <TargetFrameworkIdentifier>.NETStandard</TargetFrameworkIdentifier>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+
+    <RoslynVersion Condition="'$(TargetFramework)' == 'roslyn4.0'">4.0.1</RoslynVersion>
+    <RoslynVersion Condition="'$(TargetFramework)' == 'roslyn5.0'">5.0.0</RoslynVersion>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <DefineConstants>$(DefineConstants);ZEROLOG_ANALYZERS</DefineConstants>
+    <DefineConstants Condition="'$(TargetFramework)' == 'roslyn5.0'">$(DefineConstants);ROSLYN5_0_OR_GREATER</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" VersionOverride="[4.0.1]" PrivateAssets="all" Condition="'$(TargetFramework)' == 'roslyn4.0'" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" VersionOverride="[$(RoslynVersion)]" PrivateAssets="all" Condition="'$(RoslynVersion)' != ''" />
   </ItemGroup>
 
   <ItemGroup>

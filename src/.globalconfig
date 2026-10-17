@@ -1,0 +1,3 @@
+is_global = true
+
+roslyn_correctness.assembly_reference_validation = relaxed

@@ -15,7 +15,9 @@ internal static partial class AnsiColorCodes
 
     public const string Reset = "\e[0m";
 
+#if !ZEROLOG_ANALYZERS
     public static bool UseByDefault { get; } = !Console.IsOutputRedirected && string.IsNullOrEmpty(Environment.GetEnvironmentVariable("NO_COLOR"));
+#endif
 
     // lang=regex
     private const string _ansiColorsRegexPattern = """\e\[[0-9;]*m""";

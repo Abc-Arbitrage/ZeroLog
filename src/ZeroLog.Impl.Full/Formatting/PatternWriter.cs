@@ -296,7 +296,11 @@ public sealed partial class PatternWriter
             case PatternPartType.NewLine:
             {
                 RequireFormat(false);
+#if ZEROLOG_ANALYZERS
+                return new PatternPart("\n");
+#else
                 return new PatternPart(Environment.NewLine);
+#endif
             }
 
             case PatternPartType.ResetColor:

@@ -7,7 +7,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ZeroLog\ZeroLog.csproj" />
-    <ProjectReference Include="..\ZeroLog.Analyzers\ZeroLog.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" PrivateAssets="all" />
+    <ProjectReference Include="..\ZeroLog.Analyzers\ZeroLog.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" SetTargetFramework="TargetFramework=roslyn5.0" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>

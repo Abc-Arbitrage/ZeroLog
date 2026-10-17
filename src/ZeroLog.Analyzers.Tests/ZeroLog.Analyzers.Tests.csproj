@@ -1,9 +1,18 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFrameworks>roslyn5.0;roslyn4.0</TargetFrameworks>
     <OutputType>Exe</OutputType>
     <Nullable>enable</Nullable>
     <EnableNUnitRunner>true</EnableNUnitRunner>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)' != ''">
+    <TargetFrameworkIdentifier>.NETCoreApp</TargetFrameworkIdentifier>
+    <TargetFrameworkVersion>v10.0</TargetFrameworkVersion>
+
+    <RoslynVersion Condition="'$(TargetFramework)' == 'roslyn4.0'">4.14.0</RoslynVersion>
+    <RoslynVersion Condition="'$(TargetFramework)' == 'roslyn5.0'">5.9.0</RoslynVersion>
+    <RoslynTestingVersion>1.1.4</RoslynTestingVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -11,13 +20,14 @@
     <ProjectReference Include="..\ZeroLog\ZeroLog.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" NoWarn="NU1608" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Analyzer.Testing" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.CodeFix.Testing" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.SourceGenerators.Testing" />
+  <ItemGroup Condition="'$(RoslynVersion)' != ''">
+    <PackageReference Include="Microsoft.CodeAnalysis" VersionOverride="$(RoslynVersion)" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" VersionOverride="$(RoslynVersion)" NoWarn="NU1608" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Analyzer.Testing" VersionOverride="$(RoslynTestingVersion)" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.CodeFix.Testing" VersionOverride="$(RoslynTestingVersion)" />
+  </ItemGroup>
 
+  <ItemGroup>
     <PackageReference Include="NUnit" />
     <PackageReference Include="NUnit3TestAdapter" />
     <PackageReference Include="Shouldly" />
