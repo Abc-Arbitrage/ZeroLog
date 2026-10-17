@@ -4,11 +4,27 @@
     <OutputType>Exe</OutputType>
     <EnableNUnitRunner>true</EnableNUnitRunner>
     <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
-    <NoWarn>$(NoWarn);CS8002</NoWarn>
+    <NoWarn>$(NoWarn);CS8002;ZL0001</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <TargetFrameworks>$(TargetFrameworks);</TargetFrameworks>
+    <TargetFrameworks>$(TargetFrameworks)$(TargetFrameworks.Replace(';', '_gen;'))</TargetFrameworks>
+    <TargetFrameworks>$([MSBuild]::Unescape('$(TargetFrameworks.TrimEnd(';'))'))</TargetFrameworks>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)' != ''">
+    <BaseTFM>$(TargetFramework.Replace('_gen', ''))</BaseTFM>
+    <TargetFrameworkIdentifier>$([MSBuild]::GetTargetFrameworkIdentifier('$(BaseTFM)'))</TargetFrameworkIdentifier>
+    <TargetFrameworkVersion>v$([MSBuild]::GetTargetFrameworkVersion('$(BaseTFM)', 2))</TargetFrameworkVersion>
+
+    <ZeroLogSourceGenerators>false</ZeroLogSourceGenerators>
+    <ZeroLogSourceGenerators Condition="$(TargetFramework.EndsWith('_gen'))">true</ZeroLogSourceGenerators>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\ZeroLog\ZeroLog.csproj" />
+    <ProjectReference Include="..\ZeroLog.Analyzers\ZeroLog.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
@@ -24,6 +40,9 @@
 
   <ItemGroup>
     <AssemblyMetadata Include="TargetFramework" Value="$(TargetFramework)" />
+
+    <!-- Don't show duplicate files in the IDE -->
+    <Compile Remove="@(Compile)" Condition="'$(DesignTimeBuild)' == 'true' and $(TargetFramework.EndsWith('_gen'))" />
   </ItemGroup>
 
   <ItemGroup>

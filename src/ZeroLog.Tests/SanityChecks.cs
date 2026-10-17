@@ -118,4 +118,21 @@ public class SanityChecks
                                         .WithDiscriminator(typeof(SanityChecks).Assembly.GetMetadataValue("TargetFramework") ?? throw new InvalidOperationException("TargetFramework metadata not found"))
                           );
     }
+
+    [Test]
+    public void should_have_generators_enabled_with_tfm_alias()
+    {
+        const string loggerName = "Test if using _gen TFM";
+
+        var shouldBeAutoRegistered = typeof(SanityChecks).Assembly
+                                                         .GetMetadataValue("TargetFramework")
+                                                         .ShouldNotBeNull()
+                                                         .Contains("_gen");
+
+        LogManager.IsLoggerRegistered(loggerName)
+                  .ShouldBe(shouldBeAutoRegistered);
+
+        if (Guid.NewGuid() == Guid.Empty)
+            LogManager.GetLogger(loggerName);
+    }
 }
