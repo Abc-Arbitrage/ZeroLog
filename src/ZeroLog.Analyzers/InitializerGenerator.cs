@@ -49,7 +49,7 @@ public class InitializerGenerator : IIncrementalGenerator
     {
         // C# 11 is required for file-scoped types
         return compilation is CSharpCompilation { LanguageVersion: >= (LanguageVersion)1100 }
-               && compilation.GetTypeByMetadataName(ZeroLogFacts.TypeNames.LogManager) is { } logManagerType
+               && compilation.GetTypeByMetadataName(ZeroLogFacts.FullTypeNames.LogManager) is { } logManagerType
                && logManagerType.GetTypeMembers(ZeroLogFacts.ShortTypeNames.InternalApi) is [{ } internalApiType]
                && internalApiType.GetMembers(ZeroLogFacts.EventNames.Initialized) is
                [
@@ -239,7 +239,7 @@ public class InitializerGenerator : IIncrementalGenerator
 
                     [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
                     static void AttachEventHandler()
-                        => global::{{ZeroLogFacts.TypeNames.LogManager}}.{{ZeroLogFacts.ShortTypeNames.InternalApi}}.{{ZeroLogFacts.EventNames.Initialized}} += {{_onInitializedMethodName}};
+                        => global::{{ZeroLogFacts.FullTypeNames.LogManager}}.{{ZeroLogFacts.ShortTypeNames.InternalApi}}.{{ZeroLogFacts.EventNames.Initialized}} += {{_onInitializedMethodName}};
                 }
 
                 """
@@ -267,7 +267,7 @@ public class InitializerGenerator : IIncrementalGenerator
                     return;
 
                     static void Prepare(string loggerName)
-                        => _ = global::{ZeroLogFacts.TypeNames.LogManager}.{ZeroLogFacts.MethodNames.GetLogger}(loggerName);
+                        => _ = global::{ZeroLogFacts.FullTypeNames.LogManager}.{ZeroLogFacts.MethodNames.GetLogger}(loggerName);
                     """
                 );
             }

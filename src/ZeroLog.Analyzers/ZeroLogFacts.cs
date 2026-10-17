@@ -18,7 +18,7 @@ internal static class ZeroLogFacts
         public const string InternalApi = "InternalApi";
     }
 
-    public static class TypeNames
+    public static class FullTypeNames
     {
         public const string Log = "ZeroLog.Log";
         public const string LogManager = "ZeroLog.LogManager";
