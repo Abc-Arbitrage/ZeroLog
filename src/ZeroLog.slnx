@@ -10,6 +10,10 @@
     <File Path="Directory.Build.targets" />
     <File Path="Directory.Packages.props" />
     <File Path="NuGetReadme.md" />
+    <File Path="Tests.targets" />
+  </Folder>
+  <Folder Name="/Tools/">
+    <File Path="Tools/ApproveAll.ps1" />
   </Folder>
   <Project Path="ZeroLog.Analyzers.Tests.Integration/ZeroLog.Analyzers.Tests.Integration.csproj" />
   <Project Path="ZeroLog.Analyzers.Tests/ZeroLog.Analyzers.Tests.csproj" />
@@ -19,6 +23,7 @@
   <Project Path="ZeroLog.Impl.Base/ZeroLog.Impl.Base.csproj" />
   <Project Path="ZeroLog.Impl.Full/ZeroLog.Impl.Full.csproj" />
   <Project Path="ZeroLog.Tests.Allocation/ZeroLog.Tests.Allocation.csproj" />
+  <Project Path="ZeroLog.Tests.Aot.NetStandard/ZeroLog.Tests.Aot.NetStandard.csproj" />
   <Project Path="ZeroLog.Tests.Aot/ZeroLog.Tests.Aot.csproj" />
   <Project Path="ZeroLog.Tests.NetStandard/ZeroLog.Tests.NetStandard.csproj" />
   <Project Path="ZeroLog.Tests/ZeroLog.Tests.csproj" />

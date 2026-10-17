@@ -32,7 +32,7 @@ public class DiscardedLogMessageAnalyzer : DiagnosticAnalyzer
 
     private static void AnalyzeCompilationStart(CompilationStartAnalysisContext compilationStartContext)
     {
-        var logMessageType = compilationStartContext.Compilation.GetTypeByMetadataName(ZeroLogFacts.TypeNames.LogMessage);
+        var logMessageType = compilationStartContext.Compilation.GetTypeByMetadataName(ZeroLogFacts.FullTypeNames.LogMessage);
         if (logMessageType is null)
             return;
 

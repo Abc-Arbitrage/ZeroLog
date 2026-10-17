@@ -9,4 +9,7 @@
     <ProjectReference Include="..\ZeroLog\ZeroLog.csproj" />
     <ProjectReference Include="..\ZeroLog.Analyzers\ZeroLog.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" PrivateAssets="all" />
   </ItemGroup>
+
+  <Import Project="../ZeroLog/ZeroLog.targets" />
+
 </Project>

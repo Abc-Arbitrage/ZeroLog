@@ -38,8 +38,8 @@ public class LegacyStringInterpolationAnalyzer : DiagnosticAnalyzer
         if (compilation.LanguageVersion >= LanguageVersion.CSharp10)
             return;
 
-        var logType = compilation.GetTypeByMetadataName(ZeroLogFacts.TypeNames.Log);
-        var logMessageType = compilation.GetTypeByMetadataName(ZeroLogFacts.TypeNames.LogMessage);
+        var logType = compilation.GetTypeByMetadataName(ZeroLogFacts.FullTypeNames.Log);
+        var logMessageType = compilation.GetTypeByMetadataName(ZeroLogFacts.FullTypeNames.LogMessage);
 
         if (logType is null || logMessageType is null)
             return;

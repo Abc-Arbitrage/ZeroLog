@@ -12,14 +12,17 @@
   <ItemGroup>
     <PackageReference Include="NUnit" />
     <PackageReference Include="NUnit3TestAdapter" />
-    <PackageReference Include="Verify.NUnit" />
-    <PackageReference Include="Verify.DiffPlex" />
     <PackageReference Include="PublicApiGenerator" />
+    <PackageReference Include="Shouldly" />
+    <PackageReference Include="Shouldly.DiffEngine" />
     <PackageReference Include="JetBrains.Annotations" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
     <Compile Include="../ZeroLog.Tests/Support/AssertExtensions.cs" Link="Support/AssertExtensions.cs" />
   </ItemGroup>
+
+  <Import Project="../Tests.targets" />
+  <Import Project="../ZeroLog/ZeroLog.targets" />
 
 </Project>

@@ -1,16 +1,14 @@
 ﻿using DiffEngine;
 using NUnit.Framework;
-using VerifyTests;
 
 namespace ZeroLog.Tests.NetStandard;
 
 [SetUpFixture]
-public static class Initializer
+public static class Global
 {
     [OneTimeSetUp]
-    public static void Initialize()
+    public static void GlobalSetup()
     {
         DiffRunner.Disabled = true;
-        VerifyDiffPlex.Initialize();
     }
 }

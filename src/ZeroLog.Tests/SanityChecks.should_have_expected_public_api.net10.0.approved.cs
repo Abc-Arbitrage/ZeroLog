@@ -1,4 +1,4 @@
-﻿namespace ZeroLog.Appenders
+namespace ZeroLog.Appenders
 {
     public abstract class Appender : System.IDisposable
     {
@@ -871,6 +871,10 @@ namespace ZeroLog
         public static void RegisterUnmanaged<T>(ZeroLog.UnmanagedFormatterDelegate<T> formatter)
             where T :  unmanaged { }
         public static void Shutdown() { }
+        public static class InternalApi
+        {
+            public static event System.Action? Initialized;
+        }
     }
     public sealed class LogMessage
     {

@@ -37,6 +37,7 @@ public static class Program
                .Log();
 
         Trivia();
+        LoggerWarmup();
     }
 
     private static void Trivia()
@@ -68,11 +69,26 @@ public static class Program
         // @formatter:on
     }
 
+    private static void LoggerWarmup()
+    {
+        _ = LogManager.GetLogger(typeof(DateTime));
+        _ = LogManager.GetLogger<TimeSpan>();
+        _ = LogManager.GetLogger(@"Logger""From""String");
+
+        _ = LogManager.GetLogger(typeof(NestedType));
+        _ = LogManager.GetLogger(typeof(NestedType.DeeperNestedType));
+    }
+
     private static IDisposable InitLogger()
     {
         return LogManager.Initialize(new ZeroLogConfiguration
         {
             RootLogger = { Appenders = { new ConsoleAppender { ColorOutput = false } } }
         });
+    }
+
+    private class NestedType
+    {
+        public class DeeperNestedType;
     }
 }

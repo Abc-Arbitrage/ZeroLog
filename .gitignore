@@ -17,6 +17,5 @@ Thumbs.db
 
 BenchmarkDotNet.Artifacts/
 
-# Verify
+# Shouldly
 *.received.*
-*.received/

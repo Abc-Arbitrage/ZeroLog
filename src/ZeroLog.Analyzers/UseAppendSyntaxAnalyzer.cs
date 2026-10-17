@@ -37,7 +37,7 @@ public class UseAppendSyntaxAnalyzer : DiagnosticAnalyzer
     {
         var compilation = (CSharpCompilation)context.Compilation;
 
-        var logType = compilation.GetTypeByMetadataName(ZeroLogFacts.TypeNames.Log);
+        var logType = compilation.GetTypeByMetadataName(ZeroLogFacts.FullTypeNames.Log);
         var exceptionType = compilation.GetTypeByMetadataName(typeof(Exception).FullName!);
 
         if (logType is null || exceptionType is null)

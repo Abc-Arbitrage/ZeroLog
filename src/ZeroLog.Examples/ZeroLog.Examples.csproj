@@ -14,4 +14,6 @@
     <PackageReference Include="Spectre.Console" />
   </ItemGroup>
 
+  <Import Project="../ZeroLog/ZeroLog.targets" />
+
 </Project>

@@ -2,6 +2,8 @@
 
 internal static class ZeroLogFacts
 {
+    public const string Namespace = "ZeroLog";
+
     public static bool IsLogLevelName(string? value)
         => value is nameof(LogLevel.Trace)
             or nameof(LogLevel.Debug)
@@ -10,9 +12,16 @@ internal static class ZeroLogFacts
             or nameof(LogLevel.Error)
             or nameof(LogLevel.Fatal);
 
-    public static class TypeNames
+    public static class ShortTypeNames
+    {
+        public const string LogManager = "LogManager";
+        public const string InternalApi = "InternalApi";
+    }
+
+    public static class FullTypeNames
     {
         public const string Log = "ZeroLog.Log";
+        public const string LogManager = "ZeroLog.LogManager";
         public const string LogMessage = "ZeroLog.LogMessage";
         public const string PatternWriter = "ZeroLog.Formatting.PatternWriter";
         public const string DefaultFormatter = "ZeroLog.Formatting.DefaultFormatter";
@@ -23,6 +32,7 @@ internal static class ZeroLogFacts
         public const string Append = "Append";
         public const string AppendEnum = "AppendEnum";
         public const string WithException = "WithException";
+        public const string GetLogger = "GetLogger";
         public const string Log = "Log";
     }
 
@@ -34,5 +44,10 @@ internal static class ZeroLogFacts
     public static class PropertyNames
     {
         public const string PrefixPattern = "PrefixPattern";
+    }
+
+    public static class EventNames
+    {
+        public const string Initialized = "Initialized";
     }
 }

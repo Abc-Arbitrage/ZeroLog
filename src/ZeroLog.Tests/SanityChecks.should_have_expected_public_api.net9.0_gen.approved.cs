@@ -1,4 +1,4 @@
-﻿namespace ZeroLog.Appenders
+namespace ZeroLog.Appenders
 {
     public abstract class Appender : System.IDisposable
     {
@@ -116,6 +116,7 @@ namespace ZeroLog.Configuration
         public System.Action<ZeroLog.Configuration.ThreadConfiguration>? LoggingThreadInitializer { get; init; }
         public string NullDisplayString { get; set; }
         public ZeroLog.Configuration.RootLoggerConfiguration RootLogger { get; }
+        public System.TimeProvider? TimeProvider { get; init; }
         public string TruncatedMessageSuffix { get; set; }
         [System.Obsolete("ZeroLog will always use a background thread in asynchronous mode.")]
         public bool UseBackgroundThread { get; init; }
@@ -861,6 +862,8 @@ namespace ZeroLog
         public static void RegisterEnum([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicFields)] System.Type enumType) { }
         public static void RegisterEnum<T>()
             where T :  struct, System.Enum { }
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("This code uses reflection which is not compatible with AOT compilation. Use the g" +
+            "eneric version if possible.")]
         [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This code uses reflection which is not compatible with trimming.")]
         public static void RegisterUnmanaged(System.Type type) { }
         public static void RegisterUnmanaged<T>()
@@ -868,6 +871,10 @@ namespace ZeroLog
         public static void RegisterUnmanaged<T>(ZeroLog.UnmanagedFormatterDelegate<T> formatter)
             where T :  unmanaged { }
         public static void Shutdown() { }
+        public static class InternalApi
+        {
+            public static event System.Action? Initialized;
+        }
     }
     public sealed class LogMessage
     {

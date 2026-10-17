@@ -1,4 +1,4 @@
-﻿namespace ZeroLog.Appenders
+namespace ZeroLog.Appenders
 {
     public abstract class Appender : System.IDisposable
     {
@@ -116,6 +116,7 @@ namespace ZeroLog.Configuration
         public System.Action<ZeroLog.Configuration.ThreadConfiguration>? LoggingThreadInitializer { get; init; }
         public string NullDisplayString { get; set; }
         public ZeroLog.Configuration.RootLoggerConfiguration RootLogger { get; }
+        public System.TimeProvider? TimeProvider { get; init; }
         public string TruncatedMessageSuffix { get; set; }
         [System.Obsolete("ZeroLog will always use a background thread in asynchronous mode.")]
         public bool UseBackgroundThread { get; init; }
@@ -870,6 +871,10 @@ namespace ZeroLog
         public static void RegisterUnmanaged<T>(ZeroLog.UnmanagedFormatterDelegate<T> formatter)
             where T :  unmanaged { }
         public static void Shutdown() { }
+        public static class InternalApi
+        {
+            public static event System.Action? Initialized;
+        }
     }
     public sealed class LogMessage
     {

@@ -16,9 +16,15 @@
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" NoWarn="NU1608" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Analyzer.Testing" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.CodeFix.Testing" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.SourceGenerators.Testing" />
 
     <PackageReference Include="NUnit" />
     <PackageReference Include="NUnit3TestAdapter" />
+    <PackageReference Include="Shouldly" />
+    <PackageReference Include="Shouldly.DiffEngine" />
   </ItemGroup>
+
+  <Import Project="../Tests.targets" />
+  <Import Project="../ZeroLog/ZeroLog.targets" />
 
 </Project>
