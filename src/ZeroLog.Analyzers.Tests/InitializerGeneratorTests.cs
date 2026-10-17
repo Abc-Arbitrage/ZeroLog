@@ -6,6 +6,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Testing;
 using NUnit.Framework;
 using Shouldly;
+using ZeroLog.Analyzers.Tests.Support;
 
 namespace ZeroLog.Analyzers.Tests;
 
@@ -112,7 +113,11 @@ public class InitializerGeneratorTests
 
         var driver = CSharpGeneratorDriver.Create(
             [new InitializerGenerator().AsSourceGenerator()],
-            parseOptions: parseOptions
+            parseOptions: parseOptions,
+            optionsProvider: new AnalyzerConfigOptionsProviderMock
+            {
+                { "build_property.ZeroLogEnabledGenerators", "Initializer" }
+            }
         );
 
         var result = driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics)

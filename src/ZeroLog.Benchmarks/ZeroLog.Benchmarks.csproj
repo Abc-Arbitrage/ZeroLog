@@ -28,4 +28,6 @@
     <Compile Include="..\ZeroLog.Tests\TestAppender.cs" Link="Tools\TestAppender.cs" />
   </ItemGroup>
 
+  <Import Project="../ZeroLog/ZeroLog.targets" />
+
 </Project>

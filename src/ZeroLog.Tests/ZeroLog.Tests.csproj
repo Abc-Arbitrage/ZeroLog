@@ -42,5 +42,6 @@
   </ItemGroup>
 
   <Import Project="../Tests.targets" />
+  <Import Project="../ZeroLog/ZeroLog.targets" />
 
 </Project>

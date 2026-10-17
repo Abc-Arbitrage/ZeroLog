@@ -20,8 +20,10 @@ public class InitializerGenerator : IIncrementalGenerator
                                  .CreateSyntaxProvider(SyntaxPredicate, SyntaxTransform)
                                  .WhereNotNull()
                                  .Collect()
+                                 .Combine(context.IsGeneratorEnabled("Initializer"))
+                                 .EmptyIfFalse()
                                  .Combine(context.CompilationProvider.Select(SupportsGeneratedInitializer))
-                                 .Select(static (pair, _) => pair.Right ? pair.Left : ImmutableArray<string>.Empty)
+                                 .EmptyIfFalse()
                                  .Select(static (names, _) => LoggerNames.Normalize(names))
                                  .WithComparer(LoggerNames.Comparer);
 

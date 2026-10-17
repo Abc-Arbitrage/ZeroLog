@@ -1,5 +1,18 @@
 <Project>
 
+  <PropertyGroup>
+    <ZeroLogSourceGenerators Condition="'$(ZeroLogSourceGenerators)' == ''">true</ZeroLogSourceGenerators>
+    <ZeroLogGenerateInitializer Condition="'$(ZeroLogGenerateInitializer)' == '' and '$(ZeroLogSourceGenerators)' == 'true'">true</ZeroLogGenerateInitializer>
+
+    <ZeroLogEnabledGenerators />
+    <ZeroLogEnabledGenerators Condition="'$(ZeroLogGenerateInitializer)' == 'true'">$(ZeroLogEnabledGenerators)Initializer,</ZeroLogEnabledGenerators>
+    <ZeroLogEnabledGenerators Condition="'$(ZeroLogSourceGenerators)' != 'true'" />
+  </PropertyGroup>
+
+  <ItemGroup>
+    <CompilerVisibleProperty Include="ZeroLogEnabledGenerators" />
+  </ItemGroup>
+
   <Target Name="ZeroLogSanityChack"
           BeforeTargets="Build"
           Condition="'$(ZeroLogSkipSanityCheck)' != 'true' and '$(DesignTimeBuild)' != 'true'">

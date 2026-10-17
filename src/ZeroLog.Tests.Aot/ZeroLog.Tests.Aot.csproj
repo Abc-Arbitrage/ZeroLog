@@ -14,4 +14,6 @@
     <ProjectReference Include="..\ZeroLog.Tests.Aot.NetStandard\ZeroLog.Tests.Aot.NetStandard.csproj" />
   </ItemGroup>
 
+  <Import Project="../ZeroLog/ZeroLog.targets" />
+
 </Project>

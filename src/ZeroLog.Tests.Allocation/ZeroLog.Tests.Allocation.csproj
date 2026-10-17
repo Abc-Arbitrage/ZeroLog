@@ -10,4 +10,6 @@
     <ProjectReference Include="..\ZeroLog\ZeroLog.csproj" />
   </ItemGroup>
 
+  <Import Project="../ZeroLog/ZeroLog.targets" />
+
 </Project>
