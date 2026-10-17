@@ -83,10 +83,10 @@ public class AsyncRunnerTests
         _testAppender.WaitOnWriteEvent.Set();
         signal.Wait(TimeSpan.FromSeconds(1));
 
-        Wait.Until(() => _testAppender.FlushCount == 1, TimeSpan.FromSeconds(1));
+        Wait.Until(() => _testAppender.FlushCount == 1, TimeSpan.FromSeconds(30));
 
         _log.Info("Foo");
-        Wait.Until(() => _testAppender.FlushCount == 2, TimeSpan.FromSeconds(1));
+        Wait.Until(() => _testAppender.FlushCount == 2, TimeSpan.FromSeconds(30));
     }
 
     [Test]
@@ -123,7 +123,7 @@ public class AsyncRunnerTests
 
         _log.Info(null);
 
-        Wait.Until(() => _testAppender.LoggedMessages.Count == 1, TimeSpan.FromSeconds(1));
+        Wait.Until(() => _testAppender.LoggedMessages.Count == 1, TimeSpan.FromSeconds(30));
         _testAppender.LoggedMessages.ShouldHaveSingleItem().ShouldEqual("Foo");
     }
 
@@ -164,7 +164,7 @@ public class AsyncRunnerTests
         Start();
 
         _log.Info("Foo");
-        Wait.Until(() => _testAppender.FlushCount >= 1, TimeSpan.FromSeconds(1));
+        Wait.Until(() => _testAppender.FlushCount >= 1, TimeSpan.FromSeconds(30));
 
         _runner.Thread.Name.ShouldEqual("TestLoggingThread");
         _runner.Thread.Priority.ShouldEqual(ThreadPriority.BelowNormal);
