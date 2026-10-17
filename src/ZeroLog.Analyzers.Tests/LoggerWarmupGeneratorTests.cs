@@ -11,7 +11,7 @@ using ZeroLog.Analyzers.Tests.Support;
 namespace ZeroLog.Analyzers.Tests;
 
 [TestFixture]
-public class InitializerGeneratorTests
+public class LoggerWarmupGeneratorTests
 {
     [OneTimeSetUp]
     public async Task SetUp()
@@ -112,11 +112,11 @@ public class InitializerGeneratorTests
         compilation.GetDiagnostics().ShouldBeEmpty();
 
         var driver = CSharpGeneratorDriver.Create(
-            [new InitializerGenerator().AsSourceGenerator()],
+            [new LoggerWarmupGenerator().AsSourceGenerator()],
             parseOptions: parseOptions,
             optionsProvider: new AnalyzerConfigOptionsProviderMock
             {
-                { "build_property.ZeroLogEnabledGenerators", "Initializer" }
+                { "build_property.ZeroLogEnabledGenerators", "LoggerWarmup" }
             }
         );
 

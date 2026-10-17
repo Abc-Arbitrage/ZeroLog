@@ -7,9 +7,9 @@ namespace ZeroLog.Tests.Aot.NetStandard;
 
 public static class NetStandardClass
 {
-    private const string _loggerName = "Pre-initialized logger from a .NET Standard dependency";
+    private const string _loggerName = "Warmed up logger from a .NET Standard dependency";
 
-    public static bool HasPreInitializedLoggers()
+    public static bool HasWarmedUpLoggers()
     {
         var result = LogManager.IsLoggerRegistered(_loggerName);
         DoNothing();

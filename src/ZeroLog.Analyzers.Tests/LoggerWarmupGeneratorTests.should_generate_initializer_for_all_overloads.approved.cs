@@ -4,7 +4,7 @@
 
 #nullable enable
 
-file static class ZeroLogInitializer
+file static class LoggerWarmup
 {
     [global::System.Runtime.CompilerServices.ModuleInitializer]
     public static void ModuleInitializer()
@@ -29,11 +29,11 @@ file static class ZeroLogInitializer
     {
         try
         {
-            Prepare("Logger\"Test\"Name");
-            Prepare("System.DateTime");
-            Prepare("System.TimeSpan");
-            Prepare("Test.Namespace.Outer");
-            Prepare("Test.Namespace.Outer+Nested");
+            Warmup("Logger\"Test\"Name");
+            Warmup("System.DateTime");
+            Warmup("System.TimeSpan");
+            Warmup("Test.Namespace.Outer");
+            Warmup("Test.Namespace.Outer+Nested");
         }
         catch
         {
@@ -42,7 +42,7 @@ file static class ZeroLogInitializer
 
         return;
 
-        static void Prepare(string loggerName)
+        static void Warmup(string loggerName)
             => _ = global::ZeroLog.LogManager.GetLogger(loggerName);
     }
 }

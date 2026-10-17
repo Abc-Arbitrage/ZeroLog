@@ -53,9 +53,9 @@ internal static class Program
             CheckSubstring(expectation);
 
         // Source generator
-        CheckExpectation(LogManager.IsLoggerRegistered("PreinitializedLogger"));
-        _ = LogManager.GetLogger("PreinitializedLogger");
-        CheckExpectation(NetStandardClass.HasPreInitializedLoggers());
+        CheckExpectation(LogManager.IsLoggerRegistered("WarmedUpLogger"));
+        _ = LogManager.GetLogger("WarmedUpLogger");
+        CheckExpectation(NetStandardClass.HasWarmedUpLoggers());
 
         CheckSubstring("Goodbye!");
 

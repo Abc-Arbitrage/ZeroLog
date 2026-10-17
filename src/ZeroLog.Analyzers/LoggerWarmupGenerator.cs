@@ -12,7 +12,7 @@ using ZeroLog.Analyzers.Support;
 namespace ZeroLog.Analyzers;
 
 [Generator(LanguageNames.CSharp)]
-public class InitializerGenerator : IIncrementalGenerator
+public class LoggerWarmupGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
@@ -20,9 +20,9 @@ public class InitializerGenerator : IIncrementalGenerator
                                  .CreateSyntaxProvider(SyntaxPredicate, SyntaxTransform)
                                  .WhereNotNull()
                                  .Collect()
-                                 .Combine(context.IsGeneratorEnabled("Initializer"))
+                                 .Combine(context.IsGeneratorEnabled("LoggerWarmup"))
                                  .EmptyIfFalse()
-                                 .Combine(context.CompilationProvider.Select(SupportsGeneratedInitializer))
+                                 .Combine(context.CompilationProvider.Select(SupportsGeneratedWarmup))
                                  .EmptyIfFalse()
                                  .Select(static (names, _) => LoggerNames.Normalize(names))
                                  .WithComparer(LoggerNames.Comparer);
@@ -40,14 +40,14 @@ public class InitializerGenerator : IIncrementalGenerator
                     return;
 
                 context.AddSource(
-                    "Initializer.g.cs",
+                    "LoggerWarmup.g.cs",
                     new Generator().Generate(loggerNames, hasModuleInitializerAttribute)
                 );
             }
         );
     }
 
-    private static bool SupportsGeneratedInitializer(Compilation compilation, CancellationToken cancellationToken)
+    private static bool SupportsGeneratedWarmup(Compilation compilation, CancellationToken cancellationToken)
     {
         // C# 11 is required for file-scoped types
         return compilation is CSharpCompilation { LanguageVersion: >= (LanguageVersion)1100 }
@@ -182,7 +182,7 @@ public class InitializerGenerator : IIncrementalGenerator
             if (!hasModuleInitializerAttribute)
                 AppendModuleInitializerAttribute();
 
-            using (_writer.WriteBlock("file static class ZeroLogInitializer"))
+            using (_writer.WriteBlock("file static class LoggerWarmup"))
             {
                 GenerateModuleInitializer();
                 GenerateOnInitialized(loggerNames);
@@ -255,7 +255,7 @@ public class InitializerGenerator : IIncrementalGenerator
                 using (_writer.WriteBlock("try"))
                 {
                     foreach (var loggerName in loggerNames)
-                        _writer.AppendLine($"Prepare({SymbolDisplay.FormatLiteral(loggerName, true)});");
+                        _writer.AppendLine($"Warmup({SymbolDisplay.FormatLiteral(loggerName, true)});");
                 }
 
                 using (_writer.WriteBlock("catch"))
@@ -268,7 +268,7 @@ public class InitializerGenerator : IIncrementalGenerator
 
                     return;
 
-                    static void Prepare(string loggerName)
+                    static void Warmup(string loggerName)
                         => _ = global::{ZeroLogFacts.FullTypeNames.LogManager}.{ZeroLogFacts.MethodNames.GetLogger}(loggerName);
                     """
                 );

@@ -37,7 +37,7 @@ public static class Program
                .Log();
 
         Trivia();
-        PreInitialization();
+        LoggerWarmup();
     }
 
     private static void Trivia()
@@ -69,7 +69,7 @@ public static class Program
         // @formatter:on
     }
 
-    private static void PreInitialization()
+    private static void LoggerWarmup()
     {
         _ = LogManager.GetLogger(typeof(DateTime));
         _ = LogManager.GetLogger<TimeSpan>();

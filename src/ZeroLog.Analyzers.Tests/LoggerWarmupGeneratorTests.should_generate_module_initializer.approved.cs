@@ -4,7 +4,14 @@
 
 #nullable enable
 
-file static class ZeroLogInitializer
+namespace System.Runtime.CompilerServices
+{
+    [global::System.AttributeUsage(global::System.AttributeTargets.Method)]
+    file sealed class ModuleInitializerAttribute : global::System.Attribute
+    { }
+}
+
+file static class LoggerWarmup
 {
     [global::System.Runtime.CompilerServices.ModuleInitializer]
     public static void ModuleInitializer()
@@ -29,7 +36,7 @@ file static class ZeroLogInitializer
     {
         try
         {
-            Prepare("Constant");
+            Warmup("Foo");
         }
         catch
         {
@@ -38,7 +45,7 @@ file static class ZeroLogInitializer
 
         return;
 
-        static void Prepare(string loggerName)
+        static void Warmup(string loggerName)
             => _ = global::ZeroLog.LogManager.GetLogger(loggerName);
     }
 }

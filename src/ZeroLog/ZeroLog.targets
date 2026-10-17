@@ -2,10 +2,10 @@
 
   <PropertyGroup>
     <ZeroLogSourceGenerators Condition="'$(ZeroLogSourceGenerators)' == ''">true</ZeroLogSourceGenerators>
-    <ZeroLogGenerateInitializer Condition="'$(ZeroLogGenerateInitializer)' == '' and '$(ZeroLogSourceGenerators)' == 'true'">true</ZeroLogGenerateInitializer>
+    <ZeroLogGenerateLoggerWarmup Condition="'$(ZeroLogGenerateLoggerWarmup)' == '' and '$(ZeroLogSourceGenerators)' == 'true'">true</ZeroLogGenerateLoggerWarmup>
 
     <ZeroLogEnabledGenerators />
-    <ZeroLogEnabledGenerators Condition="'$(ZeroLogGenerateInitializer)' == 'true'">$(ZeroLogEnabledGenerators)Initializer,</ZeroLogEnabledGenerators>
+    <ZeroLogEnabledGenerators Condition="'$(ZeroLogGenerateLoggerWarmup)' == 'true'">$(ZeroLogEnabledGenerators)LoggerWarmup,</ZeroLogEnabledGenerators>
     <ZeroLogEnabledGenerators Condition="'$(ZeroLogSourceGenerators)' != 'true'" />
   </PropertyGroup>
 
