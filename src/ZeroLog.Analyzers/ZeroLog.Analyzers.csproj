@@ -4,6 +4,7 @@
     <Nullable>enable</Nullable>
     <IsRoslynComponent>true</IsRoslynComponent>
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+    <DefineConstants>$(DefineConstants);ZEROLOG_ANALYZERS</DefineConstants>
     <NoWarn>$(NoWarn);RS2008</NoWarn>
   </PropertyGroup>
 
@@ -19,11 +20,9 @@
 
     <RoslynVersion Condition="'$(TargetFramework)' == 'roslyn4.0'">4.0.1</RoslynVersion>
     <RoslynVersion Condition="'$(TargetFramework)' == 'roslyn5.0'">5.0.0</RoslynVersion>
-  </PropertyGroup>
 
-  <PropertyGroup>
-    <DefineConstants>$(DefineConstants);ZEROLOG_ANALYZERS</DefineConstants>
-    <DefineConstants Condition="'$(TargetFramework)' == 'roslyn5.0'">$(DefineConstants);ROSLYN5_0_OR_GREATER</DefineConstants>
+    <DefineConstants Condition="$([MSBuild]::VersionGreaterThanOrEquals('$(RoslynVersion)', '4.0'))">$(DefineConstants);ROSLYN4_0_OR_GREATER</DefineConstants>
+    <DefineConstants Condition="$([MSBuild]::VersionGreaterThanOrEquals('$(RoslynVersion)', '5.0'))">$(DefineConstants);ROSLYN5_0_OR_GREATER</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
