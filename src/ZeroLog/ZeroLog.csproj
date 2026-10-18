@@ -34,7 +34,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="ZeroLog.targets" Pack="true" PackagePath="build" />
+    <None Include="ZeroLog.targets" Pack="true" PackagePath="buildTransitive/ZeroLog.targets" />
+    <None Include="ZeroLog.Link.targets" Pack="true" PackagePath="build/ZeroLog.targets" />
+
     <None Include="../NuGetReadme.md" Pack="true" PackagePath="/README.md" Visible="false" />
     <None Include="../../icon.png" Pack="true" PackagePath="/" Visible="false" />
   </ItemGroup>

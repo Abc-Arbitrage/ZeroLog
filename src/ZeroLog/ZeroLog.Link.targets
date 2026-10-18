@@ -1,0 +1,3 @@
+<Project>
+  <Import Project="../buildTransitive/ZeroLog.targets" />
+</Project>
