@@ -1,6 +1,8 @@
 #if ROSLYN5_0_OR_GREATER
 
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -17,7 +19,8 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
     {
         var chains = context.SyntaxProvider
                             .CreateSyntaxProvider(SyntaxPredicate, SyntaxTransform)
-                            .Where(static i => i.LinkType is not AppendChain.LinkType.None)
+                            .Where(static i => i.Link.LinkType is not AppendChain.LinkType.None)
+                            .WithLambdaComparer(static (a, b) => a.Link.Equals(b.Link), static i => i.Link.GetHashCode())
                             .Collect()
                             .Combine(context.IsGeneratorEnabled("AppendChains"))
                             .EmptyIfFalse()
@@ -55,7 +58,7 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
             InvokedMethodName: ZeroLogFacts.MethodNames.Append // TODO: Enums and key/values
         };
 
-    private static AppendModel SyntaxTransform(GeneratorSyntaxContext context, CancellationToken cancellationToken)
+    private static ChainLinkModel SyntaxTransform(GeneratorSyntaxContext context, CancellationToken cancellationToken)
     {
         if (context.Node is InvocationExpressionSyntax invocationSyntax
             && context.SemanticModel.GetOperation(invocationSyntax, cancellationToken) is IInvocationOperation
@@ -71,23 +74,66 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
                     }
                 }
             } invocation
-            && IsChainable(invocation, out var linkType)
-            && context.SemanticModel.GetInterceptableLocation(invocationSyntax, cancellationToken) is { } interceptableLocation
+            && TryGetChainLink(invocation, context.SemanticModel, out var chainLink, cancellationToken)
            )
         {
-            return new AppendModel(
-                linkType,
-                interceptableLocation
-            );
+            return chainLink;
         }
 
         return default;
     }
 
-    private static bool IsChainable(IInvocationOperation invocation, out AppendChain.LinkType linkType)
+    private static bool TryGetChainLink(IInvocationOperation invocation,
+                                        SemanticModel semanticModel,
+                                        out ChainLinkModel chainLink,
+                                        CancellationToken cancellationToken)
     {
-        if (!IsChainable(invocation.TargetMethod, out linkType))
+        chainLink = default;
+
+        if (!TryGetLink(invocation, semanticModel, out var link, cancellationToken))
             return false;
+
+        var currentInvocation = invocation;
+        var chainPosition = 0;
+
+        var parentLink = default(LinkModel);
+
+        while (TryGetLink(currentInvocation, semanticModel, out var currentLink, cancellationToken))
+        {
+            parentLink = currentLink;
+            ++chainPosition;
+            currentInvocation = currentInvocation.Instance as IInvocationOperation;
+        }
+
+        chainLink = new ChainLinkModel(
+            link,
+            parentLink,
+            chainPosition - 1
+        );
+
+        return true;
+    }
+
+    private static bool TryGetLink([NotNullWhen(true)] IInvocationOperation? invocation,
+                                   SemanticModel semanticModel,
+                                   out LinkModel link,
+                                   CancellationToken cancellationToken)
+    {
+        link = default;
+
+        if (invocation is null)
+            return false;
+
+        if (!IsChainable(invocation.TargetMethod, out var linkType))
+            return false;
+
+        if (semanticModel.GetInterceptableLocation((InvocationExpressionSyntax)invocation.Syntax, cancellationToken) is not { } linkLocation)
+            return false;
+
+        link = new LinkModel(
+            linkType,
+            linkLocation
+        );
 
         return true;
     }
@@ -96,14 +142,23 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
     {
         linkType = default;
 
-        if (method.Name != ZeroLogFacts.MethodNames.Append)
-            return false;
+        if (method is
+            {
+                Name: ZeroLogFacts.MethodNames.Append,
+                ContainingType:
+                {
+                    Name: ZeroLogFacts.ShortTypeNames.LogMessage,
+                    ContainingType: null,
+                    ContainingNamespace: { Name: ZeroLogFacts.Namespace, ContainingNamespace.IsGlobalNamespace: true }
+                },
+                Parameters.Length: 1
+            })
+        {
+            linkType = ToLinkType(method.Parameters[0].Type);
+            return linkType is not AppendChain.LinkType.None;
+        }
 
-        if (method.Parameters.Length != 1)
-            return false;
-
-        linkType = ToLinkType(method.Parameters[0].Type);
-        return linkType is not AppendChain.LinkType.None;
+        return false;
     }
 
     private static AppendChain.LinkType ToLinkType(ITypeSymbol type)
@@ -157,16 +212,22 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
         };
     }
 
-    private readonly record struct AppendModel(
+    private readonly record struct LinkModel(
         AppendChain.LinkType LinkType,
         InterceptableLocation InterceptableLocation
+    );
+
+    private readonly record struct ChainLinkModel(
+        LinkModel Link,
+        LinkModel FirstChainLink,
+        int IndexInChain
     );
 
     private class Generator
     {
         private readonly CodeWriter _writer = new();
 
-        public string Generate(ImmutableArray<AppendModel> appends)
+        public string Generate(ImmutableArray<ChainLinkModel> chainLinks)
         {
             _writer.Clear();
 
@@ -175,7 +236,7 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
             using (_writer.WriteBlock($"namespace {ZeroLogFacts.Namespace}"))
             using (_writer.WriteBlock("file static class AppendChainsInterceptor"))
             {
-                GenerateInterceptors(appends);
+                GenerateInterceptors(chainLinks);
             }
 
             return _writer.ToString();
@@ -206,21 +267,30 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
             );
         }
 
-        private void GenerateInterceptors(ImmutableArray<AppendModel> appends)
+        private void GenerateInterceptors(ImmutableArray<ChainLinkModel> chainLinks)
         {
-            var counter = 0;
+            var chainCounter = 0; // TODO: Find something better
 
-            foreach (var append in appends)
+            foreach (var linksInChain in chainLinks.GroupBy(i => i.FirstChainLink))
             {
-                _writer.AppendLine(append.InterceptableLocation.GetInterceptsLocationAttributeSyntax());
+                _writer.AppendLine($"// Chain {chainCounter}").AppendLine();
 
-                _writer.AppendLine(
-                    $"""
-                        public static global::{ZeroLogFacts.FullTypeNames.LogMessage} ReplaceAppend{++counter}(this global::{ZeroLogFacts.FullTypeNames.LogMessage} log, {ToTypeName(append.LinkType)} value)
+                foreach (var chainLink in linksInChain.OrderBy(i => i.IndexInChain))
+                {
+                    var append = chainLink.Link;
+
+                    _writer.AppendLine(append.InterceptableLocation.GetInterceptsLocationAttributeSyntax());
+
+                    _writer.AppendLine(
+                        $"""
+                        public static global::{ZeroLogFacts.FullTypeNames.LogMessage} Append_{chainCounter}_{chainLink.IndexInChain}(this global::{ZeroLogFacts.FullTypeNames.LogMessage} log, {ToTypeName(append.LinkType)} value)
                             => log.Append(value);
 
                         """
-                );
+                    );
+                }
+
+                ++chainCounter;
             }
         }
     }

@@ -27,14 +27,14 @@ public class AppendChainsInterceptorGeneratorTests
 
             class Example
             {
-                static void Test(Log log)
-                {
-                    log.Info()
-                       .Append("Hello, the answer is ")
-                       .Append(42)
-                       .Append(", as usual.")
-                       .Log();
-                }
+                LogMessage Test(LogMessage log)
+                    => log.Append("The answer is ").Append(42).Append(", as expected.");
+
+                LogMessage Test(LogMessage log, string value)
+                    => log.Append("The answer is ").Append(value).Append(", as expected.");
+
+                LogMessage Single(LogMessage log)
+                    => log.Append("Hello!");
             }
             """
         );
