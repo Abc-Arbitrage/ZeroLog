@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace ZeroLog;
 
@@ -13,5 +14,18 @@ partial class LogMessage
     [EditorBrowsable(EditorBrowsableState.Never)]
     public static class InternalApi
     {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void StartChain(LogMessage message, string chain)
+            => message.InternalStartChain(chain);
     }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal partial void InternalStartChain(string chain);
+
+#if NETSTANDARD
+
+    internal partial void InternalStartChain(string chain)
+    { }
+
+#endif
 }

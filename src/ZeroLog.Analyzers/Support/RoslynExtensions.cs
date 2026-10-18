@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Operations;
 
 namespace ZeroLog.Analyzers.Support;
 
@@ -44,6 +45,20 @@ internal static class RoslynExtensions
             {
                 if (SymbolEqualityComparer.Default.Equals(attribute.AttributeClass, attributeType))
                     return attribute;
+            }
+
+            return null;
+        }
+    }
+
+    extension(IInvocationOperation invocation)
+    {
+        public IArgumentOperation? GetArgumentByParameterIndex(int index)
+        {
+            foreach (var argument in invocation.Arguments)
+            {
+                if (argument.Parameter?.Ordinal == index)
+                    return argument;
             }
 
             return null;

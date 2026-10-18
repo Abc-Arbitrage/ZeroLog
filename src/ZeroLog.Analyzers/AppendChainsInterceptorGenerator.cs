@@ -132,8 +132,21 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
         if (semanticModel.GetInterceptableLocation((InvocationExpressionSyntax)invocation.Syntax, cancellationToken) is not { } linkLocation)
             return false;
 
+        string? constantString;
+
+        if (linkType is AppendChain.LinkType.String && invocation.GetArgumentByParameterIndex(0)?.Value.ConstantValue.Value is string constantValue)
+        {
+            linkType = AppendChain.LinkType.ConstantString;
+            constantString = constantValue;
+        }
+        else
+        {
+            constantString = null!;
+        }
+
         link = new LinkModel(
             linkType,
+            constantString,
             linkLocation
         );
 
@@ -166,11 +179,32 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
     private static ImmutableArray<ChainModel> ToChains(ImmutableArray<ChainLinkModel> chainLinks, CancellationToken cancellationToken)
     {
         return chainLinks.GroupBy(static i => i.FirstChainLink)
-                         .Where(static i => i.Count() > 1)
+                         .Where(static i => i.Count() > 1 && i.Any(static i => i.Link.LinkType is AppendChain.LinkType.String or AppendChain.LinkType.ConstantString or AppendChain.LinkType.KeyString))
                          .Select(static i => new ChainModel(i.OrderBy(i => i.IndexInChain)
                                                              .Select(i => i.Link)
                                                              .ToImmutableArray()))
                          .ToImmutableArray();
+    }
+
+    private static string SerializeChain(ImmutableArray<LinkModel> links)
+    {
+        var serializer = new AppendChain.Serializer();
+
+        foreach (var link in links)
+        {
+            switch (link.LinkType)
+            {
+                case AppendChain.LinkType.ConstantString:
+                    if (serializer.TryAddConstantString(link.ConstantString))
+                        continue;
+
+                    break;
+            }
+
+            serializer.AddLink(link.LinkType);
+        }
+
+        return serializer.ToString();
     }
 
     private static AppendChain.LinkType ToLinkType(ITypeSymbol type)
@@ -206,26 +240,28 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
     {
         return linkType switch
         {
-            AppendChain.LinkType.String  => "string?",
-            AppendChain.LinkType.Char    => "char",
-            AppendChain.LinkType.Boolean => "bool",
-            AppendChain.LinkType.SByte   => "sbyte",
-            AppendChain.LinkType.Byte    => "byte",
-            AppendChain.LinkType.Int16   => "short",
-            AppendChain.LinkType.UInt16  => "ushort",
-            AppendChain.LinkType.Int32   => "int",
-            AppendChain.LinkType.UInt32  => "uint",
-            AppendChain.LinkType.Int64   => "long",
-            AppendChain.LinkType.UInt64  => "ulong",
-            AppendChain.LinkType.Single  => "float",
-            AppendChain.LinkType.Double  => "double",
-            AppendChain.LinkType.Decimal => "decimal",
-            _                            => null
+            AppendChain.LinkType.String         => "string?",
+            AppendChain.LinkType.ConstantString => "string?",
+            AppendChain.LinkType.Char           => "char",
+            AppendChain.LinkType.Boolean        => "bool",
+            AppendChain.LinkType.SByte          => "sbyte",
+            AppendChain.LinkType.Byte           => "byte",
+            AppendChain.LinkType.Int16          => "short",
+            AppendChain.LinkType.UInt16         => "ushort",
+            AppendChain.LinkType.Int32          => "int",
+            AppendChain.LinkType.UInt32         => "uint",
+            AppendChain.LinkType.Int64          => "long",
+            AppendChain.LinkType.UInt64         => "ulong",
+            AppendChain.LinkType.Single         => "float",
+            AppendChain.LinkType.Double         => "double",
+            AppendChain.LinkType.Decimal        => "decimal",
+            _                                   => null
         };
     }
 
     private readonly record struct LinkModel(
         AppendChain.LinkType LinkType,
+        string? ConstantString,
         InterceptableLocation InterceptableLocation
     );
 
@@ -235,10 +271,17 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
         int IndexInChain
     );
 
-    private readonly record struct ChainModel(
-        ImmutableArray<LinkModel> Links
-    )
+    private readonly record struct ChainModel
     {
+        public ImmutableArray<LinkModel> Links { get; init; }
+        public string SerializedChain { get; init; }
+
+        public ChainModel(ImmutableArray<LinkModel> links)
+        {
+            Links = links;
+            SerializedChain = SerializeChain(links);
+        }
+
         public bool Equals(ChainModel other)
             => ImmutableArrayEqualityComparer<LinkModel>.Default.Equals(Links, other.Links);
 
@@ -305,11 +348,29 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
                     _writer.AppendLine(
                         $"""
                         {link.InterceptableLocation.GetInterceptsLocationAttributeSyntax()}
+                        [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
                         public static global::{ZeroLogFacts.FullTypeNames.LogMessage} Append_{chainCounter}_{linkIndex}(this global::{ZeroLogFacts.FullTypeNames.LogMessage} log, {ToTypeName(link.LinkType)} value)
-                            => log.Append(value);
-
                         """
                     );
+
+                    if (linkIndex == 0)
+                    {
+                        using (_writer.WriteBlock())
+                        {
+                            _writer.AppendLine(
+                                $"""
+                                global::{ZeroLogFacts.FullTypeNames.LogMessage}.{ZeroLogFacts.ShortTypeNames.InternalApi}.{ZeroLogFacts.MethodNames.StartChain}(log, {SymbolDisplay.FormatLiteral(chain.SerializedChain, true)});
+                                return log.Append(value);
+                                """
+                            );
+                        }
+                    }
+                    else
+                    {
+                        _writer.AppendLine("    => log.Append(value);");
+                    }
+
+                    _writer.AppendLine();
                 }
 
                 ++chainCounter;

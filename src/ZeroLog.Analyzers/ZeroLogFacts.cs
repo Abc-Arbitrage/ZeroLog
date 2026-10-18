@@ -34,6 +34,7 @@ internal static class ZeroLogFacts
         public const string Append = "Append";
         public const string AppendEnum = "AppendEnum";
         public const string AppendKeyValue = "AppendKeyValue";
+        public const string StartChain = "StartChain";
         public const string WithException = "WithException";
         public const string GetLogger = "GetLogger";
         public const string Log = "Log";
