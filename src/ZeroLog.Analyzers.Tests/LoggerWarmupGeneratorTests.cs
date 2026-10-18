@@ -13,15 +13,6 @@ namespace ZeroLog.Analyzers.Tests;
 [TestFixture]
 public class LoggerWarmupGeneratorTests
 {
-    [OneTimeSetUp]
-    public async Task SetUp()
-    {
-        await Task.WhenAll(
-            ReferenceAssemblies.NetStandard.NetStandard20.ResolveAsync(null, CancellationToken.None),
-            ReferenceAssemblies.Net.Net100.ResolveAsync(null, CancellationToken.None)
-        );
-    }
-
     [Test]
     public async Task should_generate_initializer_for_all_overloads()
     {

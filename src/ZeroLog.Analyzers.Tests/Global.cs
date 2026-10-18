@@ -1,4 +1,7 @@
-﻿using DiffEngine;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using DiffEngine;
+using Microsoft.CodeAnalysis.Testing;
 using NUnit.Framework;
 
 namespace ZeroLog.Analyzers.Tests;
@@ -7,8 +10,13 @@ namespace ZeroLog.Analyzers.Tests;
 public static class Global
 {
     [OneTimeSetUp]
-    public static void GlobalSetup()
+    public static async Task GlobalSetup()
     {
         DiffRunner.Disabled = true;
+
+        await Task.WhenAll(
+            ReferenceAssemblies.NetStandard.NetStandard20.ResolveAsync(null, CancellationToken.None),
+            ReferenceAssemblies.Net.Net100.ResolveAsync(null, CancellationToken.None)
+        );
     }
 }

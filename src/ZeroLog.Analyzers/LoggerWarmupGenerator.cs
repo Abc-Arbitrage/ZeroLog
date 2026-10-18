@@ -68,17 +68,7 @@ public class LoggerWarmupGenerator : IIncrementalGenerator
     }
 
     private static bool SyntaxPredicate(SyntaxNode node, CancellationToken cancellationToken)
-    {
-        if (node is not InvocationExpressionSyntax invocation)
-            return false;
-
-        return invocation.Expression switch
-        {
-            MemberAccessExpressionSyntax i => i.Name.Identifier.ValueText == ZeroLogFacts.MethodNames.GetLogger,
-            SimpleNameSyntax i             => i.Identifier.ValueText == ZeroLogFacts.MethodNames.GetLogger,
-            _                              => false
-        };
-    }
+        => node.IsKind(SyntaxKind.InvocationExpression) && node is InvocationExpressionSyntax { InvokedMethodName: ZeroLogFacts.MethodNames.GetLogger };
 
     private static string? SyntaxTransform(GeneratorSyntaxContext context, CancellationToken cancellationToken)
     {
@@ -92,6 +82,7 @@ public class LoggerWarmupGenerator : IIncrementalGenerator
                 ContainingType:
                 {
                     Name: ZeroLogFacts.ShortTypeNames.LogManager,
+                    ContainingType: null,
                     ContainingNamespace: { Name: ZeroLogFacts.Namespace, ContainingNamespace.IsGlobalNamespace: true }
                 }
             } method)
@@ -211,6 +202,7 @@ public class LoggerWarmupGenerator : IIncrementalGenerator
             {
                 _writer.AppendLine(
                     """
+                    [global::System.Diagnostics.Conditional("ZEROLOG_GENERATED")]
                     [global::System.AttributeUsage(global::System.AttributeTargets.Method)]
                     file sealed class ModuleInitializerAttribute : global::System.Attribute
                     { }

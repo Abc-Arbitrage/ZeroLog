@@ -3,10 +3,14 @@
   <PropertyGroup>
     <ZeroLogSourceGenerators Condition="'$(ZeroLogSourceGenerators)' == ''">true</ZeroLogSourceGenerators>
     <ZeroLogGenerateLoggerWarmup Condition="'$(ZeroLogGenerateLoggerWarmup)' == '' and '$(ZeroLogSourceGenerators)' == 'true'">true</ZeroLogGenerateLoggerWarmup>
+    <ZeroLogGenerateAppendChains Condition="'$(ZeroLogGenerateAppendChains)' == '' and '$(ZeroLogSourceGenerators)' == 'true'">true</ZeroLogGenerateAppendChains>
 
     <ZeroLogEnabledGenerators />
     <ZeroLogEnabledGenerators Condition="'$(ZeroLogGenerateLoggerWarmup)' == 'true'">$(ZeroLogEnabledGenerators)LoggerWarmup,</ZeroLogEnabledGenerators>
+    <ZeroLogEnabledGenerators Condition="'$(ZeroLogGenerateAppendChains)' == 'true'">$(ZeroLogEnabledGenerators)AppendChains,</ZeroLogEnabledGenerators>
     <ZeroLogEnabledGenerators Condition="'$(ZeroLogSourceGenerators)' != 'true'" />
+
+    <InterceptorsNamespaces Condition="'$(ZeroLogGenerateAppendChains)' == 'true'">$(InterceptorsNamespaces);ZeroLog</InterceptorsNamespaces>
   </PropertyGroup>
 
   <ItemGroup>

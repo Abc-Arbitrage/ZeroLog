@@ -14,7 +14,9 @@ internal static class ZeroLogFacts
 
     public static class ShortTypeNames
     {
+        public const string Log = "Log";
         public const string LogManager = "LogManager";
+        public const string LogMessage = "LogMessage";
         public const string InternalApi = "InternalApi";
     }
 
@@ -31,6 +33,7 @@ internal static class ZeroLogFacts
     {
         public const string Append = "Append";
         public const string AppendEnum = "AppendEnum";
+        public const string AppendKeyValue = "AppendKeyValue";
         public const string WithException = "WithException";
         public const string GetLogger = "GetLogger";
         public const string Log = "Log";

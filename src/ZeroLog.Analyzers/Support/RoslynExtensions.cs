@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace ZeroLog.Analyzers.Support;
 
@@ -15,7 +16,18 @@ internal static class RoslynExtensions
         => source.Select(static (pair, _) => pair.isEnabled ? pair.items : ImmutableArray<T>.Empty);
 
     public static IncrementalValuesProvider<T> WhereNotNull<T>(this IncrementalValuesProvider<T?> source)
+        where T : class
         => source.Where(static value => value is not null)!;
+
+    extension(InvocationExpressionSyntax invocation)
+    {
+        public string? InvokedMethodName => invocation.Expression switch
+        {
+            MemberAccessExpressionSyntax i => i.Name.Identifier.ValueText,
+            SimpleNameSyntax i             => i.Identifier.ValueText,
+            _                              => null
+        };
+    }
 
     extension(ISymbol symbol)
     {
