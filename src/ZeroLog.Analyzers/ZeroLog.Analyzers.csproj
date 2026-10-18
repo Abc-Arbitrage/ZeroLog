@@ -7,6 +7,12 @@
     <NoWarn>$(NoWarn);RS2008</NoWarn>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(BuildingByReSharper)' != ''">
+    <!-- Rider doesn't handle TFM aliases correctly -->
+    <!--suppress MsbuildTargetFrameworkTagInspection -->
+    <TargetFrameworks>roslyn5.0</TargetFrameworks>
+  </PropertyGroup>
+
   <PropertyGroup Condition="'$(TargetFramework)' != ''">
     <TargetFrameworkIdentifier>.NETStandard</TargetFrameworkIdentifier>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>

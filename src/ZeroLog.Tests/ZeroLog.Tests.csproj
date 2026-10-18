@@ -7,7 +7,7 @@
     <NoWarn>$(NoWarn);CS8002;ZL0001</NoWarn>
   </PropertyGroup>
 
-  <PropertyGroup>
+  <PropertyGroup Condition="'$(BuildingByReSharper)' == ''">
     <TargetFrameworks>$(TargetFrameworks);</TargetFrameworks>
     <TargetFrameworks>$(TargetFrameworks)$(TargetFrameworks.Replace(';', '_gen;'))</TargetFrameworks>
     <TargetFrameworks>$([MSBuild]::Unescape('$(TargetFrameworks.TrimEnd(';'))'))</TargetFrameworks>
@@ -40,9 +40,6 @@
 
   <ItemGroup>
     <AssemblyMetadata Include="TargetFramework" Value="$(TargetFramework)" />
-
-    <!-- Don't show duplicate files in the IDE -->
-    <Compile Remove="@(Compile)" Condition="'$(DesignTimeBuild)' == 'true' and $(TargetFramework.EndsWith('_gen'))" />
   </ItemGroup>
 
   <ItemGroup>

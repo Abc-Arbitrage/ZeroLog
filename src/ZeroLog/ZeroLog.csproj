@@ -25,11 +25,15 @@
     <Compile Include="../ZeroLog.Impl.Full/**/*.cs" Exclude="../ZeroLog.Impl.Full/obj/**/*;../ZeroLog.Impl.Full/bin/**/*;../ZeroLog.Impl.Full/Properties/**/*" Visible="false" Condition="'$(TargetFramework)' != 'netstandard2.0'" />
   </ItemGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition="'$(BuildingByReSharper)' == ''">
     <ProjectReference Include="../ZeroLog.Analyzers/ZeroLog.Analyzers.csproj" ReferenceOutputAssembly="false" SetTargetFramework="TargetFramework=roslyn4.0" />
     <ProjectReference Include="../ZeroLog.Analyzers/ZeroLog.Analyzers.csproj" ReferenceOutputAssembly="false" SetTargetFramework="TargetFramework=roslyn5.0" />
+
     <None Include="../ZeroLog.Analyzers/bin/$(Configuration)/roslyn4.0/ZeroLog.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
     <None Include="../ZeroLog.Analyzers/bin/$(Configuration)/roslyn5.0/ZeroLog.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn5.0/cs" Visible="false" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="ZeroLog.targets" Pack="true" PackagePath="build" />
     <None Include="../NuGetReadme.md" Pack="true" PackagePath="/README.md" Visible="false" />
     <None Include="../../icon.png" Pack="true" PackagePath="/" Visible="false" />

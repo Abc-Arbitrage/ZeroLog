@@ -6,6 +6,12 @@
     <EnableNUnitRunner>true</EnableNUnitRunner>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(BuildingByReSharper)' != ''">
+    <!-- Rider doesn't handle TFM aliases correctly -->
+    <!--suppress MsbuildTargetFrameworkTagInspection -->
+    <TargetFrameworks>roslyn5.0</TargetFrameworks>
+  </PropertyGroup>
+
   <PropertyGroup Condition="'$(TargetFramework)' != ''">
     <TargetFrameworkIdentifier>.NETCoreApp</TargetFrameworkIdentifier>
     <TargetFrameworkVersion>v10.0</TargetFrameworkVersion>
