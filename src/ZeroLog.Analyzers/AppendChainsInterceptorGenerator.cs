@@ -18,18 +18,18 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
         var chains = context.SyntaxProvider
                             .CreateSyntaxProvider(SyntaxPredicate, SyntaxTransform)
                             .Where(static i => i.LinkType is not AppendChain.LinkType.None)
-                            .Collect();
-        // .Combine(context.IsGeneratorEnabled("AppendChains"))
-        // .EmptyIfFalse()
-        // .Combine(context.CompilationProvider.Select(SupportsGeneratedAppendChains))
-        // .EmptyIfFalse();
+                            .Collect()
+                            .Combine(context.IsGeneratorEnabled("AppendChains"))
+                            .EmptyIfFalse()
+                            .Combine(context.CompilationProvider.Select(SupportsGeneratedAppendChains))
+                            .EmptyIfFalse();
 
         context.RegisterImplementationSourceOutput(
             chains,
             static (context, chains) =>
             {
-                // if (chains.Length == 0)
-                //     return;
+                if (chains.Length == 0)
+                    return;
 
                 context.AddSource(
                     "AppendChainsInterceptor.g.cs",
@@ -217,7 +217,7 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
                 _writer.AppendLine(
                     $"""
                         public static global::{ZeroLogFacts.FullTypeNames.LogMessage} ReplaceAppend{++counter}(this global::{ZeroLogFacts.FullTypeNames.LogMessage} log, {ToTypeName(append.LinkType)} value)
-                            => throw new global::System.NotImplementedException("TODO :)");
+                            => log.Append(value);
 
                         """
                 );

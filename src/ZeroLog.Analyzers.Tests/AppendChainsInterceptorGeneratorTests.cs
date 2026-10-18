@@ -1,3 +1,5 @@
+#if ROSLYN5_0_OR_GREATER
+
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
@@ -83,3 +85,5 @@ public class AppendChainsInterceptorGeneratorTests
         outputCompilation.GetDiagnostics().ShouldBeEmpty();
     }
 }
+
+#endif

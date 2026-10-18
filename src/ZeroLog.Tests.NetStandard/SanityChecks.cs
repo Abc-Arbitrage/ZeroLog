@@ -38,7 +38,8 @@ public class SanityChecks
             "ZeroLog.LogManager+InternalApi",
             "ZeroLog.LogMessage",
             "ZeroLog.LogMessage+AppendInterpolatedStringHandler",
-            "ZeroLog.LogMessage+AppendOperation`1"
+            "ZeroLog.LogMessage+AppendOperation`1",
+            "ZeroLog.LogMessage+InternalApi"
         };
 
         typeof(LogManager).Assembly

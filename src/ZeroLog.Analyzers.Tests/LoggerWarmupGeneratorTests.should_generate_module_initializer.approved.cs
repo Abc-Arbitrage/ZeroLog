@@ -6,6 +6,7 @@
 
 namespace System.Runtime.CompilerServices
 {
+    [global::System.Diagnostics.Conditional("ZEROLOG_GENERATED")]
     [global::System.AttributeUsage(global::System.AttributeTargets.Method)]
     file sealed class ModuleInitializerAttribute : global::System.Attribute
     { }

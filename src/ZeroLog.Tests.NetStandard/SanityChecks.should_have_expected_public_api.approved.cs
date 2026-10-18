@@ -807,5 +807,6 @@ namespace ZeroLog
             public T Value { get; }
             public override string ToString() { }
         }
+        public static class InternalApi { }
     }
 }

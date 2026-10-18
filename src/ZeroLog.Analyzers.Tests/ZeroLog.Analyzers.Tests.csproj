@@ -19,6 +19,9 @@
     <RoslynVersion Condition="'$(TargetFramework)' == 'roslyn4.0'">4.14.0</RoslynVersion>
     <RoslynVersion Condition="'$(TargetFramework)' == 'roslyn5.0'">5.9.0</RoslynVersion>
     <RoslynTestingVersion>1.1.4</RoslynTestingVersion>
+
+    <DefineConstants Condition="$([MSBuild]::VersionGreaterThanOrEquals('$(RoslynVersion)', '4.0'))">$(DefineConstants);ROSLYN4_0_OR_GREATER</DefineConstants>
+    <DefineConstants Condition="$([MSBuild]::VersionGreaterThanOrEquals('$(RoslynVersion)', '5.0'))">$(DefineConstants);ROSLYN5_0_OR_GREATER</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>

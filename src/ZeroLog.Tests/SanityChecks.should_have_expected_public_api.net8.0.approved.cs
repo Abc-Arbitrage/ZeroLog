@@ -1133,6 +1133,7 @@ namespace ZeroLog
             public T Value { get; }
             public override string ToString() { }
         }
+        public static class InternalApi { }
     }
     public delegate bool UnmanagedFormatterDelegate<T>(ref T value, System.Span<char> destination, out int charsWritten, System.ReadOnlySpan<char> format);
 }
