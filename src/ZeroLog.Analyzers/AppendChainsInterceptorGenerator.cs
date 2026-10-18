@@ -25,7 +25,9 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
                             .Combine(context.IsGeneratorEnabled("AppendChains"))
                             .EmptyIfFalse()
                             .Combine(context.CompilationProvider.Select(SupportsGeneratedAppendChains))
-                            .EmptyIfFalse();
+                            .EmptyIfFalse()
+                            .SelectMany(ToChains)
+                            .Collect();
 
         context.RegisterImplementationSourceOutput(
             chains,
@@ -161,6 +163,16 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
         return false;
     }
 
+    private static ImmutableArray<ChainModel> ToChains(ImmutableArray<ChainLinkModel> chainLinks, CancellationToken cancellationToken)
+    {
+        return chainLinks.GroupBy(static i => i.FirstChainLink)
+                         .Where(static i => i.Count() > 1)
+                         .Select(static i => new ChainModel(i.OrderBy(i => i.IndexInChain)
+                                                             .Select(i => i.Link)
+                                                             .ToImmutableArray()))
+                         .ToImmutableArray();
+    }
+
     private static AppendChain.LinkType ToLinkType(ITypeSymbol type)
     {
         var specialType = type.SpecialType switch
@@ -223,11 +235,22 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
         int IndexInChain
     );
 
+    private readonly record struct ChainModel(
+        ImmutableArray<LinkModel> Links
+    )
+    {
+        public bool Equals(ChainModel other)
+            => ImmutableArrayEqualityComparer<LinkModel>.Default.Equals(Links, other.Links);
+
+        public override int GetHashCode()
+            => ImmutableArrayEqualityComparer<LinkModel>.Default.GetHashCode(Links);
+    }
+
     private class Generator
     {
         private readonly CodeWriter _writer = new();
 
-        public string Generate(ImmutableArray<ChainLinkModel> chainLinks)
+        public string Generate(ImmutableArray<ChainModel> chains)
         {
             _writer.Clear();
 
@@ -236,7 +259,7 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
             using (_writer.WriteBlock($"namespace {ZeroLogFacts.Namespace}"))
             using (_writer.WriteBlock("file static class AppendChainsInterceptor"))
             {
-                GenerateInterceptors(chainLinks);
+                GenerateInterceptors(chains);
             }
 
             return _writer.ToString();
@@ -267,23 +290,22 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
             );
         }
 
-        private void GenerateInterceptors(ImmutableArray<ChainLinkModel> chainLinks)
+        private void GenerateInterceptors(ImmutableArray<ChainModel> chains)
         {
             var chainCounter = 0; // TODO: Find something better
 
-            foreach (var linksInChain in chainLinks.GroupBy(i => i.FirstChainLink))
+            foreach (var chain in chains)
             {
                 _writer.AppendLine($"// Chain {chainCounter}").AppendLine();
 
-                foreach (var chainLink in linksInChain.OrderBy(i => i.IndexInChain))
+                for (var linkIndex = 0; linkIndex < chain.Links.Length; linkIndex++)
                 {
-                    var append = chainLink.Link;
-
-                    _writer.AppendLine(append.InterceptableLocation.GetInterceptsLocationAttributeSyntax());
+                    var link = chain.Links[linkIndex];
 
                     _writer.AppendLine(
                         $"""
-                        public static global::{ZeroLogFacts.FullTypeNames.LogMessage} Append_{chainCounter}_{chainLink.IndexInChain}(this global::{ZeroLogFacts.FullTypeNames.LogMessage} log, {ToTypeName(append.LinkType)} value)
+                        {link.InterceptableLocation.GetInterceptsLocationAttributeSyntax()}
+                        public static global::{ZeroLogFacts.FullTypeNames.LogMessage} Append_{chainCounter}_{linkIndex}(this global::{ZeroLogFacts.FullTypeNames.LogMessage} log, {ToTypeName(link.LinkType)} value)
                             => log.Append(value);
 
                         """
