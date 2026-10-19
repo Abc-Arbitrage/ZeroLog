@@ -134,10 +134,24 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
 
         string? constantString;
 
-        if (linkType is AppendChain.LinkType.String && invocation.GetArgumentByParameterIndex(0)?.Value.ConstantValue.Value is string constantValue)
+        if (linkType is AppendChain.LinkType.String && invocation.GetArgumentByParameterIndex(0)?.Value.ConstantValue is { HasValue: true } constantValue)
         {
-            linkType = AppendChain.LinkType.ConstantString;
-            constantString = constantValue;
+            switch (constantValue.Value)
+            {
+                case null:
+                    linkType = AppendChain.LinkType.Null;
+                    constantString = null;
+                    break;
+
+                case string value:
+                    linkType = AppendChain.LinkType.ConstantString;
+                    constantString = value;
+                    break;
+
+                default:
+                    constantString = null;
+                    break;
+            }
         }
         else
         {
@@ -179,11 +193,14 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
     private static ImmutableArray<ChainModel> ToChains(ImmutableArray<ChainLinkModel> chainLinks, CancellationToken cancellationToken)
     {
         return chainLinks.GroupBy(static i => i.FirstChainLink)
-                         .Where(static i => i.Count() > 1 && i.Any(static i => i.Link.LinkType is AppendChain.LinkType.String or AppendChain.LinkType.ConstantString or AppendChain.LinkType.KeyString))
+                         .Where(IsWorthIntercepting)
                          .Select(static i => new ChainModel(i.OrderBy(i => i.IndexInChain)
                                                              .Select(i => i.Link)
                                                              .ToImmutableArray()))
                          .ToImmutableArray();
+
+        static bool IsWorthIntercepting(IGrouping<LinkModel, ChainLinkModel> links)
+            => links.Count() > 1 && links.Any(static i => i.Link.LinkType is AppendChain.LinkType.ConstantString or AppendChain.LinkType.ConstantKeyString);
     }
 
     private static string SerializeChain(ImmutableArray<LinkModel> links)
@@ -195,16 +212,20 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
             switch (link.LinkType)
             {
                 case AppendChain.LinkType.ConstantString:
-                    if (serializer.TryAddConstantString(link.ConstantString))
-                        continue;
+                    serializer.AddConstantString(link.ConstantString);
+                    break;
 
+                case AppendChain.LinkType.ConstantKeyString:
+                    serializer.AddConstantKeyString(link.ConstantString);
+                    break;
+
+                default:
+                    serializer.AddFixedSizeLink(link.LinkType);
                     break;
             }
-
-            serializer.AddLink(link.LinkType);
         }
 
-        return serializer.ToString();
+        return serializer.ToSerializedResult();
     }
 
     private static AppendChain.LinkType ToLinkType(ITypeSymbol type)
@@ -240,22 +261,24 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
     {
         return linkType switch
         {
-            AppendChain.LinkType.String         => "string?",
-            AppendChain.LinkType.ConstantString => "string?",
-            AppendChain.LinkType.Char           => "char",
-            AppendChain.LinkType.Boolean        => "bool",
-            AppendChain.LinkType.SByte          => "sbyte",
-            AppendChain.LinkType.Byte           => "byte",
-            AppendChain.LinkType.Int16          => "short",
-            AppendChain.LinkType.UInt16         => "ushort",
-            AppendChain.LinkType.Int32          => "int",
-            AppendChain.LinkType.UInt32         => "uint",
-            AppendChain.LinkType.Int64          => "long",
-            AppendChain.LinkType.UInt64         => "ulong",
-            AppendChain.LinkType.Single         => "float",
-            AppendChain.LinkType.Double         => "double",
-            AppendChain.LinkType.Decimal        => "decimal",
-            _                                   => null
+            AppendChain.LinkType.String            => "string?",
+            AppendChain.LinkType.ConstantString    => "string?",
+            AppendChain.LinkType.ConstantKeyString => "string",
+            AppendChain.LinkType.VariableKeyString => "string",
+            AppendChain.LinkType.Char              => "char",
+            AppendChain.LinkType.Boolean           => "bool",
+            AppendChain.LinkType.SByte             => "sbyte",
+            AppendChain.LinkType.Byte              => "byte",
+            AppendChain.LinkType.Int16             => "short",
+            AppendChain.LinkType.UInt16            => "ushort",
+            AppendChain.LinkType.Int32             => "int",
+            AppendChain.LinkType.UInt32            => "uint",
+            AppendChain.LinkType.Int64             => "long",
+            AppendChain.LinkType.UInt64            => "ulong",
+            AppendChain.LinkType.Single            => "float",
+            AppendChain.LinkType.Double            => "double",
+            AppendChain.LinkType.Decimal           => "decimal",
+            _                                      => null
         };
     }
 

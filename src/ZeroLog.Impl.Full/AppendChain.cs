@@ -1,3 +1,5 @@
+using System;
+using System.Diagnostics;
 using System.Text;
 
 namespace ZeroLog;
@@ -15,7 +17,8 @@ internal static class AppendChain
         Null = 1,
         String = 2,
         ConstantString = 3,
-        KeyString = 4,
+        ConstantKeyString = 4,
+        VariableKeyString = 5,
 
         Boolean = 10,
         Char = 11,
@@ -32,27 +35,95 @@ internal static class AppendChain
         Double = 22
     }
 
-    public readonly struct Serializer()
+    extension(LinkType linkType)
     {
-        private readonly StringBuilder _sb = new StringBuilder().Append((char)Version);
+        public bool IsFixedSize => linkType is not (LinkType.ConstantString or LinkType.ConstantKeyString);
+    }
 
-        public bool TryAddConstantString(string? constantString)
+#if ZEROLOG_ANALYZERS
+
+    public readonly ref struct Serializer
+    {
+        private readonly StringBuilder _output = new();
+        private readonly StringBuilder _constantStringBuffer = new();
+
+        public Serializer()
         {
-            if (constantString is { Length: < ushort.MaxValue })
-            {
-                _sb.Append((char)LinkType.ConstantString);
-                _sb.Append((char)constantString.Length);
-                _sb.Append(constantString);
-                return true;
-            }
-
-            return false;
+            _output.Append((char)Version);
         }
 
-        public void AddLink(LinkType linkType)
-            => _sb.Append((char)linkType);
+        public void AddFixedSizeLink(LinkType linkType)
+        {
+            Debug.Assert(linkType.IsFixedSize);
 
-        public override string ToString()
-            => _sb.ToString();
+            FlushConstantString();
+            _output.Append((char)linkType);
+        }
+
+        public void AddConstantString(string? constantString)
+        {
+            if (constantString is null)
+            {
+                AddFixedSizeLink(LinkType.Null);
+                return;
+            }
+
+            _constantStringBuffer.Append(constantString);
+        }
+
+        public void AddConstantKeyString(string? constantString)
+        {
+            FlushConstantString();
+
+            _constantStringBuffer.Append(constantString ?? string.Empty);
+
+            if (_constantStringBuffer.Length > ushort.MaxValue)
+            {
+                AddFixedSizeLink(LinkType.None); // This is unreasonable anyway
+                return;
+            }
+
+            _output.Append((char)LinkType.ConstantKeyString)
+                   .Append((char)_constantStringBuffer.Length)
+                   .Append(_constantStringBuffer);
+
+            _constantStringBuffer.Clear();
+        }
+
+        private void FlushConstantString()
+        {
+            if (_constantStringBuffer.Length == 0)
+                return;
+
+            if (_constantStringBuffer.Length <= ushort.MaxValue)
+            {
+                _output.Append((char)LinkType.ConstantString)
+                       .Append((char)_constantStringBuffer.Length)
+                       .Append(_constantStringBuffer);
+            }
+            else
+            {
+                for (var position = 0; position < _constantStringBuffer.Length;)
+                {
+                    var length = Math.Min(ushort.MaxValue, _constantStringBuffer.Length - position);
+
+                    _output.Append((char)LinkType.ConstantString)
+                           .Append((char)length)
+                           .Append(_constantStringBuffer.ToString(position, length));
+
+                    position += length;
+                }
+            }
+
+            _constantStringBuffer.Clear();
+        }
+
+        public string ToSerializedResult()
+        {
+            FlushConstantString();
+            return _output.ToString();
+        }
     }
+
+#endif
 }

@@ -35,6 +35,12 @@ public class AppendChainsInterceptorGeneratorTests
 
                 LogMessage Single(LogMessage log)
                     => log.Append("Hello!");
+
+                LogMessage Mergeable(LogMessage log)
+                    => log.Append("Hello, ").Append("World!");
+
+                LogMessage Null(LogMessage log)
+                    => log.Append("Hello, ").Append((string)null);
             }
             """
         );
