@@ -809,7 +809,12 @@ namespace ZeroLog
         }
         public static class InternalApi
         {
-            public static void StartChain(ZeroLog.LogMessage message, string chain) { }
+            public static void AppendChain(ZeroLog.LogMessage message, string chain) { }
+            public static void AppendChainLinkValue(ZeroLog.LogMessage message, string? value) { }
+            public static void AppendChainLinkValue<T>(ZeroLog.LogMessage message, T value)
+                where T :  unmanaged { }
+            public static void AppendChainLinkValue<T>(ZeroLog.LogMessage message, T? value)
+                where T :  unmanaged { }
         }
     }
 }

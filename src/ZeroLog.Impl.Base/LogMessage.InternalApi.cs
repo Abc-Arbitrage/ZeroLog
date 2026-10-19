@@ -15,16 +15,52 @@ partial class LogMessage
     public static class InternalApi
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void StartChain(LogMessage message, string chain)
-            => message.InternalStartChain(chain);
+        public static void AppendChain(LogMessage message, string chain)
+            => message.InternalAppendChain(chain);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void AppendChainLinkValue(LogMessage message, string? value)
+            => message.InternalAppendChainLinkValue(value);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void AppendChainLinkValue<T>(LogMessage message, T value)
+            where T : unmanaged
+            => message.InternalAppendChainLinkValue(value);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void AppendChainLinkValue<T>(LogMessage message, T? value)
+            where T : unmanaged
+            => message.InternalAppendChainLinkValue(value);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal partial void InternalStartChain(string chain);
+    internal partial void InternalAppendChain(string chain);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal partial void InternalAppendChainLinkValue(string? value);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal partial void InternalAppendChainLinkValue<T>(T value)
+        where T : unmanaged;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal partial void InternalAppendChainLinkValue<T>(T? value)
+        where T : unmanaged;
 
 #if NETSTANDARD
 
-    internal partial void InternalStartChain(string chain)
+    internal partial void InternalAppendChain(string chain)
+    { }
+
+    internal partial void InternalAppendChainLinkValue(string? value)
+    { }
+
+    internal partial void InternalAppendChainLinkValue<T>(T value)
+        where T : unmanaged
+    { }
+
+    internal partial void InternalAppendChainLinkValue<T>(T? value)
+        where T : unmanaged
     { }
 
 #endif

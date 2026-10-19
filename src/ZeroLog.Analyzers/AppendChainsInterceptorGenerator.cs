@@ -139,7 +139,7 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
             switch (constantValue.Value)
             {
                 case null:
-                    linkType = AppendChain.LinkType.Null;
+                    linkType = AppendChain.LinkType.NullString;
                     constantString = null;
                     break;
 
@@ -220,7 +220,7 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
                     break;
 
                 default:
-                    serializer.AddFixedSizeLink(link.LinkType);
+                    serializer.AddLink(link.LinkType);
                     break;
             }
         }
@@ -230,38 +230,57 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
 
     private static AppendChain.LinkType ToLinkType(ITypeSymbol type)
     {
-        var specialType = type.SpecialType switch
+        if (type is not INamedTypeSymbol namedType)
+            return AppendChain.LinkType.None;
+
+        var isNullableValueType = namedType.OriginalDefinition.SpecialType == SpecialType.System_Nullable_T;
+        var nonNullableType = isNullableValueType ? namedType.TypeArguments[0] : namedType;
+
+        var specialType = nonNullableType.SpecialType switch
         {
-            SpecialType.System_String  => AppendChain.LinkType.String,
-            SpecialType.System_Char    => AppendChain.LinkType.Char,
-            SpecialType.System_Boolean => AppendChain.LinkType.Boolean,
-            SpecialType.System_SByte   => AppendChain.LinkType.SByte,
-            SpecialType.System_Byte    => AppendChain.LinkType.Byte,
-            SpecialType.System_Int16   => AppendChain.LinkType.Int16,
-            SpecialType.System_UInt16  => AppendChain.LinkType.UInt16,
-            SpecialType.System_Int32   => AppendChain.LinkType.Int32,
-            SpecialType.System_UInt32  => AppendChain.LinkType.UInt32,
-            SpecialType.System_Int64   => AppendChain.LinkType.Int64,
-            SpecialType.System_UInt64  => AppendChain.LinkType.UInt64,
-            SpecialType.System_Single  => AppendChain.LinkType.Single,
-            SpecialType.System_Double  => AppendChain.LinkType.Double,
-            SpecialType.System_Decimal => AppendChain.LinkType.Decimal,
-            _                          => AppendChain.LinkType.None
+            SpecialType.System_String   => AppendChain.LinkType.String,
+            SpecialType.System_Char     => AppendChain.LinkType.Char,
+            SpecialType.System_Boolean  => AppendChain.LinkType.Boolean,
+            SpecialType.System_SByte    => AppendChain.LinkType.SByte,
+            SpecialType.System_Byte     => AppendChain.LinkType.Byte,
+            SpecialType.System_Int16    => AppendChain.LinkType.Int16,
+            SpecialType.System_UInt16   => AppendChain.LinkType.UInt16,
+            SpecialType.System_Int32    => AppendChain.LinkType.Int32,
+            SpecialType.System_UInt32   => AppendChain.LinkType.UInt32,
+            SpecialType.System_Int64    => AppendChain.LinkType.Int64,
+            SpecialType.System_UInt64   => AppendChain.LinkType.UInt64,
+            SpecialType.System_Single   => AppendChain.LinkType.Single,
+            SpecialType.System_Double   => AppendChain.LinkType.Double,
+            SpecialType.System_Decimal  => AppendChain.LinkType.Decimal,
+            SpecialType.System_DateTime => AppendChain.LinkType.DateTime,
+            _                           => AppendChain.LinkType.None
         };
 
-        if (specialType != AppendChain.LinkType.None)
-            return specialType;
+        if (specialType is not AppendChain.LinkType.None)
+            return isNullableValueType ? specialType.ToNullableValueType() : specialType;
 
-        // TODO: Handle other types
+        var nonSpecialType = nonNullableType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) switch
+        {
+            "global::System.Guid"           => AppendChain.LinkType.Guid,
+            "global::System.TimeSpan"       => AppendChain.LinkType.TimeSpan,
+            "global::System.DateTimeOffset" => AppendChain.LinkType.DateTimeOffset,
+            "global::System.DateOnly"       => AppendChain.LinkType.DateOnly,
+            "global::System.TimeOnly"       => AppendChain.LinkType.TimeOnly,
+            _                               => AppendChain.LinkType.None
+        };
+
+        if (nonSpecialType is not AppendChain.LinkType.None)
+            return isNullableValueType ? nonSpecialType.ToNullableValueType() : nonSpecialType;
 
         return AppendChain.LinkType.None;
     }
 
     private static string? ToTypeName(AppendChain.LinkType linkType)
     {
-        return linkType switch
+        var nonNullableType = linkType.ToNonNullableValueType() switch
         {
             AppendChain.LinkType.String            => "string?",
+            AppendChain.LinkType.NullString        => "string?",
             AppendChain.LinkType.ConstantString    => "string?",
             AppendChain.LinkType.ConstantKeyString => "string",
             AppendChain.LinkType.VariableKeyString => "string",
@@ -278,8 +297,18 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
             AppendChain.LinkType.Single            => "float",
             AppendChain.LinkType.Double            => "double",
             AppendChain.LinkType.Decimal           => "decimal",
+            AppendChain.LinkType.Guid              => "global::System.Guid",
+            AppendChain.LinkType.DateTime          => "global::System.DateTime",
+            AppendChain.LinkType.TimeSpan          => "global::System.TimeSpan",
+            AppendChain.LinkType.DateTimeOffset    => "global::System.DateTimeOffset",
+            AppendChain.LinkType.DateOnly          => "global::System.DateOnly",
+            AppendChain.LinkType.TimeOnly          => "global::System.TimeOnly",
             _                                      => null
         };
+
+        return nonNullableType is not null && linkType.IsNullableValueType
+            ? nonNullableType + "?"
+            : nonNullableType;
     }
 
     private readonly record struct LinkModel(
@@ -376,21 +405,15 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
                         """
                     );
 
-                    if (linkIndex == 0)
+                    using (_writer.WriteBlock())
                     {
-                        using (_writer.WriteBlock())
-                        {
-                            _writer.AppendLine(
-                                $"""
-                                global::{ZeroLogFacts.FullTypeNames.LogMessage}.{ZeroLogFacts.ShortTypeNames.InternalApi}.{ZeroLogFacts.MethodNames.StartChain}(log, {SymbolDisplay.FormatLiteral(chain.SerializedChain, true)});
-                                return log.Append(value);
-                                """
-                            );
-                        }
-                    }
-                    else
-                    {
-                        _writer.AppendLine("    => log.Append(value);");
+                        if (linkIndex == 0)
+                            _writer.AppendLine($"global::{ZeroLogFacts.FullTypeNames.LogMessage}.{ZeroLogFacts.ShortTypeNames.InternalApi}.{ZeroLogFacts.MethodNames.AppendChain}(log, {SymbolDisplay.FormatLiteral(chain.SerializedChain, true)});");
+
+                        if (!link.LinkType.IsEmbedded)
+                            _writer.AppendLine($"global::{ZeroLogFacts.FullTypeNames.LogMessage}.{ZeroLogFacts.ShortTypeNames.InternalApi}.{ZeroLogFacts.MethodNames.AppendChainLinkValue}(log, value);");
+
+                        _writer.AppendLine("return log;");
                     }
 
                     _writer.AppendLine();

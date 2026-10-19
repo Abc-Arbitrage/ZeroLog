@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using NUnit.Framework;
 using Shouldly;
 
@@ -27,7 +28,11 @@ partial class LogMessageTests
                        .Append("bar")
                        .Append(20)
                        .ToString()
-                       .ShouldBe("foo10 [TRUNCATED]");
+                       .ShouldBe(
+                           ZeroLogTests.SourceGeneratorsEnabled
+                               ? "foo10bar20"
+                               : "foo10 [TRUNCATED]"
+                       );
         }
 
         [Test]

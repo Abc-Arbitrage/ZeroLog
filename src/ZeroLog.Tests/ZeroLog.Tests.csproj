@@ -20,6 +20,8 @@
 
     <ZeroLogSourceGenerators>false</ZeroLogSourceGenerators>
     <ZeroLogSourceGenerators Condition="$(TargetFramework.EndsWith('_gen'))">true</ZeroLogSourceGenerators>
+
+    <DefineConstants Condition="'$(ZeroLogSourceGenerators)' == 'true'">$(DefineConstants);ZEROLOG_SOURCE_GENERATORS</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>

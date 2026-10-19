@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using System.Text;
 
 namespace ZeroLog;
@@ -8,6 +7,7 @@ internal static class AppendChain
 {
     public const ushort Version = 1;
 
+    [Flags]
     public enum LinkType : ushort
     {
         // /!\ These values MUST remain consistent between versions
@@ -16,9 +16,10 @@ internal static class AppendChain
 
         Null = 1,
         String = 2,
-        ConstantString = 3,
-        ConstantKeyString = 4,
-        VariableKeyString = 5,
+        NullString = 3,
+        ConstantString = 4,
+        ConstantKeyString = 5,
+        VariableKeyString = 6,
 
         Boolean = 10,
         Char = 11,
@@ -32,12 +33,29 @@ internal static class AppendChain
         UInt64 = 19,
         Decimal = 20,
         Single = 21,
-        Double = 22
+        Double = 22,
+
+        Guid = 30,
+        DateTime = 31,
+        TimeSpan = 32,
+        DateTimeOffset = 33,
+        DateOnly = 34,
+        TimeOnly = 35,
+
+        NullableValueType = 1 << sizeof(ushort) * 8 - 1
     }
 
     extension(LinkType linkType)
     {
-        public bool IsFixedSize => linkType is not (LinkType.ConstantString or LinkType.ConstantKeyString);
+        public bool IsEmbedded => linkType is LinkType.NullString or LinkType.ConstantString or LinkType.ConstantKeyString;
+
+        public bool IsNullableValueType => (linkType & LinkType.NullableValueType) != 0;
+
+        public LinkType ToNonNullableValueType()
+            => linkType & ~LinkType.NullableValueType;
+
+        public LinkType ToNullableValueType()
+            => linkType | LinkType.NullableValueType;
     }
 
 #if ZEROLOG_ANALYZERS
@@ -52,10 +70,8 @@ internal static class AppendChain
             _output.Append((char)Version);
         }
 
-        public void AddFixedSizeLink(LinkType linkType)
+        public void AddLink(LinkType linkType)
         {
-            Debug.Assert(linkType.IsFixedSize);
-
             FlushConstantString();
             _output.Append((char)linkType);
         }
@@ -64,7 +80,7 @@ internal static class AppendChain
         {
             if (constantString is null)
             {
-                AddFixedSizeLink(LinkType.Null);
+                AddLink(LinkType.NullString);
                 return;
             }
 
@@ -79,7 +95,7 @@ internal static class AppendChain
 
             if (_constantStringBuffer.Length > ushort.MaxValue)
             {
-                AddFixedSizeLink(LinkType.None); // This is unreasonable anyway
+                AddLink(LinkType.None); // This is unreasonable anyway
                 return;
             }
 

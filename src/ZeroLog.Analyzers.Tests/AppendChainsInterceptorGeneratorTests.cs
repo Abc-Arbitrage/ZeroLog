@@ -27,13 +27,13 @@ public class AppendChainsInterceptorGeneratorTests
 
             class Example
             {
-                LogMessage Test(LogMessage log)
+                LogMessage ChainWithInt(LogMessage log)
                     => log.Append("The answer is ").Append(42).Append(", as expected.");
 
-                LogMessage Test(LogMessage log, string value)
+                LogMessage ChainWithString(LogMessage log, string value)
                     => log.Append("The answer is ").Append(value).Append(", as expected.");
 
-                LogMessage Single(LogMessage log)
+                LogMessage SingleAppend(LogMessage log)
                     => log.Append("Hello!");
 
                 LogMessage Mergeable(LogMessage log)
@@ -41,6 +41,12 @@ public class AppendChainsInterceptorGeneratorTests
 
                 LogMessage Null(LogMessage log)
                     => log.Append("Hello, ").Append((string)null);
+
+                LogMessage Nullables(LogMessage log, int a, int? b)
+                    => log.Append("Hello, ").Append(a).Append(", ").Append(b);
+
+                LogMessage StartsWithInt(LogMessage log, int a, int? b)
+                    => log.Append(a).Append("Hello, ").Append(a).Append(", ").Append(b);
             }
             """
         );

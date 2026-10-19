@@ -60,7 +60,12 @@ unsafe partial class LogMessageTests
                        .Append("5,")
                        .Append("6");
 
-            _logMessage.ToString().ShouldBe("1,2,3,4, [TRUNCATED]");
+            _logMessage.ToString()
+                       .ShouldBe(
+                           ZeroLogTests.SourceGeneratorsEnabled
+                               ? "1,2,3,4,5,6"
+                               : "1,2,3,4, [TRUNCATED]"
+                       );
         }
 
         [Test]
