@@ -77,7 +77,7 @@ public sealed class LoggedMessage
         try
         {
 #if DEBUG
-            _messageBuffer.AsSpan().Fill((char)0);
+            _messageBuffer.AsSpan().Fill((char)0xDEAD);
 #endif
 
             _messageLength = _message.WriteTo(_messageBuffer, _config, LogMessage.FormatType.Formatted, KeyValues);
