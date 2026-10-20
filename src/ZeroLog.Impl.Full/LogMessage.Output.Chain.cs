@@ -10,9 +10,9 @@ unsafe partial class LogMessage
                                ref byte* dataPointer,
                                Span<char> outputBuffer,
                                ZeroLogConfiguration config,
-                               out int charsWrittenTotal)
+                               out int charsWritten)
     {
-        charsWrittenTotal = 0;
+        charsWritten = 0;
 
         if (string.IsNullOrEmpty(chain))
             return false;
@@ -28,12 +28,12 @@ unsafe partial class LogMessage
                 chain,
                 ref chainIndex,
                 ref dataPointer,
-                outputBuffer.Slice(charsWrittenTotal),
+                outputBuffer.Slice(charsWritten),
                 config,
-                out var charsWritten
+                out var linkCharsWritten
             );
 
-            charsWrittenTotal += charsWritten;
+            charsWritten += linkCharsWritten;
 
             if (!linkWritten)
                 return false;
@@ -49,11 +49,27 @@ unsafe partial class LogMessage
                                    ZeroLogConfiguration config,
                                    out int charsWritten)
     {
-        var linkType = (AppendChain.LinkType)chain[chainIndex++];
+        var linkType = (AppendChain.LinkType)chain[chainIndex];
+        ++chainIndex;
 
-        var underlyingType = linkType.ToNonNullableValueType();
+        var underlyingType = linkType.ToBaseType();
         var endOfData = _dataPointer;
-        var format = string.Empty; // TODO: Support format for chain links
+        var format = ReadOnlySpan<char>.Empty;
+
+        if (linkType.HasFormatString)
+        {
+            if (chainIndex >= chain.Length)
+                goto truncate;
+
+            var lengthInChars = (int)chain[chainIndex];
+            ++chainIndex;
+
+            if (chainIndex + lengthInChars > chain.Length)
+                goto truncate;
+
+            format = chain.AsSpan(chainIndex, lengthInChars);
+            chainIndex += lengthInChars;
+        }
 
         if (linkType.IsNullableValueType)
         {
@@ -74,7 +90,8 @@ unsafe partial class LogMessage
                 if (chainIndex >= chain.Length)
                     goto truncate;
 
-                var lengthInChars = (int)chain[chainIndex++];
+                var lengthInChars = (int)chain[chainIndex];
+                ++chainIndex;
 
                 if (chainIndex + lengthInChars > chain.Length)
                     goto truncate;

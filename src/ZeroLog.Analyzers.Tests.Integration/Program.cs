@@ -8,6 +8,8 @@ public static class Program
 {
     private static readonly Log _logger = LogManager.GetLogger(typeof(Program));
 
+    private static int Answer => 42;
+
     private static void Main()
     {
         using var logs = InitLogger();
@@ -35,6 +37,19 @@ public static class Program
                .Append("World!")
                .WithException(new Exception("Oops"))
                .Log();
+
+        // Append chains tests
+
+        _logger.Info()
+               .Append("The answer is ")
+               .Append(Answer)
+               .Append(", as expected.")
+               .Append(" 0x")
+               .Append(Answer, "X")
+               .Append(" is also correct.")
+               .Log();
+
+        // -----
 
         Trivia();
         LoggerWarmup();

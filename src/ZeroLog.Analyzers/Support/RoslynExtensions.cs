@@ -65,6 +65,21 @@ internal static class RoslynExtensions
         }
     }
 
+    extension(IArgumentOperation argument)
+    {
+        public bool TryGetConstantString(out string? value)
+        {
+            if (argument.Value.ConstantValue is { HasValue: true, Value: var valueOrNull })
+            {
+                value = valueOrNull as string;
+                return true;
+            }
+
+            value = null;
+            return false;
+        }
+    }
+
     private sealed class LambdaComparer<T>(Func<T, T, bool> equals, Func<T, int> getHashCode) : IEqualityComparer<T>
     {
         public bool Equals(T? x, T? y)

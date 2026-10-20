@@ -6,6 +6,7 @@ namespace ZeroLog;
 internal static class AppendChain
 {
     public const ushort Version = 1;
+    private const ushort _flagBase = 1 << 8;
 
     [Flags]
     public enum LinkType : ushort
@@ -42,24 +43,22 @@ internal static class AppendChain
         DateOnly = 34,
         TimeOnly = 35,
 
-        NullableValueType = 1 << sizeof(ushort) * 8 - 1
+        NullableFlag = _flagBase << 0,
+        FormatFlag = _flagBase << 1
     }
 
     extension(LinkType linkType)
     {
         public bool IsEmbedded => linkType is LinkType.NullString or LinkType.ConstantString or LinkType.ConstantKeyString;
 
-        public bool IsNullableValueType => (linkType & LinkType.NullableValueType) != 0;
+        public bool IsNullableValueType => (linkType & LinkType.NullableFlag) != 0;
+        public bool HasFormatString => (linkType & LinkType.FormatFlag) != 0;
 
-        public LinkType ToNonNullableValueType()
-            => linkType & ~LinkType.NullableValueType;
-
-        public LinkType ToNullableValueType()
-            => linkType | LinkType.NullableValueType;
+        public LinkType ToBaseType()
+            => linkType & ~(LinkType)(byte.MaxValue << 8);
     }
 
 #if ZEROLOG_ANALYZERS
-
     public readonly ref struct Serializer
     {
         private readonly StringBuilder _output = new();
@@ -70,17 +69,20 @@ internal static class AppendChain
             _output.Append((char)Version);
         }
 
-        public void AddLink(LinkType linkType)
+        public void AddLink(LinkType linkType, string? formatString)
         {
             FlushConstantString();
             _output.Append((char)linkType);
+
+            if (linkType.HasFormatString)
+                AddFormatString(formatString);
         }
 
         public void AddConstantString(string? constantString)
         {
             if (constantString is null)
             {
-                AddLink(LinkType.NullString);
+                AddLink(LinkType.NullString, null);
                 return;
             }
 
@@ -95,7 +97,7 @@ internal static class AppendChain
 
             if (_constantStringBuffer.Length > ushort.MaxValue)
             {
-                AddLink(LinkType.None); // This is unreasonable anyway
+                AddLink(LinkType.None, null); // This is unreasonable anyway
                 return;
             }
 
@@ -104,6 +106,20 @@ internal static class AppendChain
                    .Append(_constantStringBuffer);
 
             _constantStringBuffer.Clear();
+        }
+
+        private void AddFormatString(string? format)
+        {
+            FlushConstantString();
+
+            if (format is null || format.Length > ushort.MaxValue)
+            {
+                _output.Append((char)0);
+                return;
+            }
+
+            _output.Append((char)format.Length)
+                   .Append(format);
         }
 
         private void FlushConstantString()
