@@ -47,6 +47,9 @@ public class AppendChainsInterceptorGeneratorTests
 
                 LogMessage StartsWithInt(LogMessage log, int a, int? b)
                     => log.Append(a).Append("Hello, ").Append(a).Append(", ").Append(b);
+
+                LogMessage Format(LogMessage log, int a)
+                    => log.Append("Hello, ").Append(a, "X");
             }
             """
         );

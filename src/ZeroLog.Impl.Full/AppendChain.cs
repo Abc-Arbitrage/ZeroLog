@@ -54,8 +54,7 @@ internal static class AppendChain
         public bool IsNullableValueType => (linkType & LinkType.NullableFlag) != 0;
         public bool HasFormatString => (linkType & LinkType.FormatFlag) != 0;
 
-        public LinkType ToBaseType()
-            => linkType & ~(LinkType)(byte.MaxValue << 8);
+        public LinkType UnderlyingType => linkType & ~(LinkType)(byte.MaxValue << 8);
     }
 
 #if ZEROLOG_ANALYZERS
@@ -110,8 +109,6 @@ internal static class AppendChain
 
         private void AddFormatString(string? format)
         {
-            FlushConstantString();
-
             if (format is null || format.Length > ushort.MaxValue)
             {
                 _output.Append((char)0);

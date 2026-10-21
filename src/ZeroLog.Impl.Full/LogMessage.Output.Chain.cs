@@ -52,7 +52,7 @@ unsafe partial class LogMessage
         var linkType = (AppendChain.LinkType)chain[chainIndex];
         ++chainIndex;
 
-        var underlyingType = linkType.ToBaseType();
+        var underlyingType = linkType.UnderlyingType;
         var endOfData = _dataPointer;
         var format = ReadOnlySpan<char>.Empty;
 

@@ -263,7 +263,7 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
 
     private static string? ToTypeName(AppendChain.LinkType linkType)
     {
-        var nonNullableType = linkType.ToBaseType() switch
+        var underlyingType = linkType.UnderlyingType switch
         {
             AppendChain.LinkType.String            => "string?",
             AppendChain.LinkType.NullString        => "string?",
@@ -292,9 +292,9 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
             _                                      => null
         };
 
-        return nonNullableType is not null && linkType.IsNullableValueType
-            ? nonNullableType + "?"
-            : nonNullableType;
+        return underlyingType is not null && linkType.IsNullableValueType
+            ? underlyingType + "?"
+            : underlyingType;
     }
 
     private static ImmutableArray<ChainModel> ToChains(ImmutableArray<ChainLinkModel> chainLinks, CancellationToken cancellationToken)
@@ -310,7 +310,38 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
             => links.Count() > 1 && links.Any(static i => i.Link.LinkType is AppendChain.LinkType.ConstantString or AppendChain.LinkType.ConstantKeyString);
     }
 
-    private static string SerializeChain(ImmutableArray<LinkModel> links)
+    private static ImmutableArray<RenderLinkModel> OptimizeChain(ImmutableArray<LinkModel> links)
+    {
+        var result = new RenderLinkModel[links.Length];
+        //var mergeableConstantStringIndex = -1;
+
+        for (var i = 0; i < links.Length; ++i)
+        {
+            var link = links[i];
+            result[i] = RenderLinkModel.From(link);
+
+            // if (link.LinkType is AppendChain.LinkType.ConstantString)
+            // {
+            //     if (mergeableConstantStringIndex < 0)
+            //     {
+            //         mergeableConstantStringIndex = i;
+            //     }
+            //     else
+            //     {
+            //         result[mergeableConstantStringIndex].ConstantString += link.ConstantString;
+            //         result[i].AppendValue = false;
+            //     }
+            // }
+            // else
+            // {
+            //     mergeableConstantStringIndex = -1;
+            // }
+        }
+
+        return result.ToImmutableArray();
+    }
+
+    private static string SerializeChain(ImmutableArray<RenderLinkModel> links)
     {
         var serializer = new AppendChain.Serializer();
 
@@ -350,12 +381,10 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
     private readonly record struct ChainModel
     {
         public ImmutableArray<LinkModel> Links { get; init; }
-        public string SerializedChain { get; init; }
 
         public ChainModel(ImmutableArray<LinkModel> links)
         {
             Links = links;
-            SerializedChain = SerializeChain(links);
         }
 
         public bool Equals(ChainModel other)
@@ -363,6 +392,17 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
 
         public override int GetHashCode()
             => ImmutableArrayEqualityComparer<LinkModel>.Default.GetHashCode(Links);
+    }
+
+    private record struct RenderLinkModel(
+        AppendChain.LinkType LinkType,
+        string? ConstantString,
+        InterceptableLocation InterceptableLocation,
+        bool AppendValue
+    )
+    {
+        public static RenderLinkModel From(LinkModel link)
+            => new(link.LinkType, link.ConstantString, link.InterceptableLocation, !link.LinkType.IsEmbedded);
     }
 
     private class Generator
@@ -413,13 +453,16 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
         {
             var chainCounter = 0; // TODO: Find something better
 
-            foreach (var chain in chains)
+            foreach (var inputChain in chains)
             {
                 _writer.AppendLine($"// Chain {chainCounter}").AppendLine();
 
-                for (var linkIndex = 0; linkIndex < chain.Links.Length; linkIndex++)
+                var chain = OptimizeChain(inputChain.Links);
+                var serializedChain = SerializeChain(chain);
+
+                for (var linkIndex = 0; linkIndex < chain.Length; linkIndex++)
                 {
-                    var link = chain.Links[linkIndex];
+                    var link = chain[linkIndex];
 
                     _writer.AppendLine(
                         $"""
@@ -432,9 +475,9 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
                     using (_writer.WriteBlock())
                     {
                         if (linkIndex == 0)
-                            _writer.AppendLine($"global::{ZeroLogFacts.FullTypeNames.LogMessage}.{ZeroLogFacts.ShortTypeNames.InternalApi}.{ZeroLogFacts.MethodNames.AppendChain}(log, {SymbolDisplay.FormatLiteral(chain.SerializedChain, true)});");
+                            _writer.AppendLine($"global::{ZeroLogFacts.FullTypeNames.LogMessage}.{ZeroLogFacts.ShortTypeNames.InternalApi}.{ZeroLogFacts.MethodNames.AppendChain}(log, {SymbolDisplay.FormatLiteral(serializedChain, true)});");
 
-                        if (!link.LinkType.IsEmbedded)
+                        if (link.AppendValue)
                             _writer.AppendLine($"global::{ZeroLogFacts.FullTypeNames.LogMessage}.{ZeroLogFacts.ShortTypeNames.InternalApi}.{ZeroLogFacts.MethodNames.AppendChainLinkValue}(log, value);");
 
                         _writer.AppendLine("return log;");
