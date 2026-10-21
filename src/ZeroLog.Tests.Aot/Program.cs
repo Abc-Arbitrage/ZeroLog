@@ -254,6 +254,17 @@ internal static class Program
         UseSpanOverloadWithTextWriter(new StreamWriter(new MemoryStream()));
 
         _log.Info("-----");
+
+        _log.Info()
+            .Append("The answer is ")
+            .Append(42)
+            .Append(", as expected.")
+            .Append(" 0x")
+            //.Append(42, "X")
+            .Append(" is also correct.")
+            .Log();
+
+        _log.Info("-----");
         _log.Info("Goodbye!");
 
         return;

@@ -398,29 +398,31 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
                 _writer.AppendLine($"public static readonly Chain{chainIndex} Instance = new();")
                        .AppendLine();
 
-                using (_writer.WriteBlock("protected override void Execute(global::ZeroLog.LogMessage.InternalApi.ChainExecutionContext context)"))
+                using (_writer.WriteBlock("protected override void Execute(ref global::ZeroLog.LogMessage.InternalApi.ChainExecutionContext context)"))
                 {
                     foreach (var call in chain.Calls)
                     {
                         switch (call.Type)
                         {
                             case AppendedType.Null:
-                                _writer.AppendLine("context.ConsumeString(null);");
+                                _writer.AppendLine("context.OutputString(null);");
                                 continue;
 
                             case AppendedType.String:
-                                _writer.AppendLine("context.ConsumeString();");
+                                _writer.AppendLine("context.OutputString();");
                                 continue;
 
                             case AppendedType.ConstantString:
-                                _writer.AppendLine($"context.ConsumeString({SymbolDisplay.FormatLiteral(call.ConstantString ?? string.Empty, true)});");
+                                _writer.AppendLine($"context.OutputString({SymbolDisplay.FormatLiteral(call.ConstantString ?? string.Empty, true)});");
                                 continue;
 
                             case AppendedType.ValueType:
                                 if (call.IsNullableType)
-                                    _writer.AppendLine("context.SetNullable();");
+                                {
+                                    // TODO
+                                }
 
-                                _writer.AppendLine($"context.ConsumeValueType<{call.UnderlyingTypeName}>();");
+                                _writer.AppendLine($"context.OutputValueType<{call.UnderlyingTypeName}>();");
                                 break;
                         }
                     }
@@ -442,7 +444,7 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
 
                     _writer.AppendLine(
                         $"""
-                            // {call.InterceptableLocation.GetInterceptsLocationAttributeSyntax()}
+                            {call.InterceptableLocation.GetInterceptsLocationAttributeSyntax()}
                             [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
                             public static global::{ZeroLogFacts.FullTypeNames.LogMessage} Append_{chainIndex}_{callIndex}(this global::{ZeroLogFacts.FullTypeNames.LogMessage} log, {call.UnderlyingTypeName}{(call.IsNullableType ? "?" : "")} value{(call.FormatStringType is not FormatStringType.None ? ", string format" : "")})
                             """

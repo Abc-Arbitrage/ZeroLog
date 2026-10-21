@@ -53,6 +53,8 @@ public static class Program
 
         Trivia();
         LoggerWarmup();
+
+        _logger.Info("END");
     }
 
     private static void Trivia()

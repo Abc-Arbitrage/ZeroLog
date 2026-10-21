@@ -37,7 +37,7 @@ unsafe partial class LogMessage
             }
             else
             {
-                *_dataPointer = 0;
+                *_dataPointer = 0; // The chain occupies one slot, so 0 is safe to use to mean null
                 ++_dataPointer;
             }
         }
@@ -83,27 +83,6 @@ unsafe partial class LogMessage
         else
         {
             _isTruncated = true;
-        }
-    }
-
-    partial class InternalApi
-    {
-        partial class Chain;
-
-        public sealed partial class ChainExecutionContext
-        {
-            public partial void ConsumeString()
-            { }
-
-            public partial void ConsumeString(string? value)
-            { }
-
-            public partial void ConsumeValueType<T>()
-                where T : unmanaged
-            { }
-
-            public partial void SetNullable()
-            { }
         }
     }
 }

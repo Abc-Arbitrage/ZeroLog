@@ -32,7 +32,6 @@
   <ItemGroup>
     <Compile Include="../ZeroLog/Properties/AssemblyData.cs" Link="Properties/AssemblyData.cs" />
     <Compile Include="../ZeroLog.Impl.Base/LogLevel.cs" Link="Library/%(Filename)%(Extension)" />
-    <Compile Include="../ZeroLog.Impl.Full/AppendChain.cs" Link="Library/%(Filename)%(Extension)" />
     <Compile Include="../ZeroLog.Impl.Full/Formatting/AnsiColorCodes.cs" Link="Library/%(Filename)%(Extension)" />
     <Compile Include="../ZeroLog.Impl.Full/Formatting/PatternWriter.cs" Link="Library/%(Filename)%(Extension)" />
   </ItemGroup>

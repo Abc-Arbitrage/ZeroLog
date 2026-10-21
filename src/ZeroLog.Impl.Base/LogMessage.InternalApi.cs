@@ -35,18 +35,19 @@ partial class LogMessage
         [EditorBrowsable(EditorBrowsableState.Never)]
         public abstract partial class Chain
         {
-            protected abstract void Execute(ChainExecutionContext context);
+            protected abstract void Execute(ref ChainExecutionContext context);
+
+            internal void CallExecute(ref ChainExecutionContext context)
+                => Execute(ref context);
         }
 
-        public sealed partial class ChainExecutionContext
+        public ref partial struct ChainExecutionContext
         {
-            public partial void ConsumeString();
-            public partial void ConsumeString(string? value);
+            public partial void OutputString();
+            public partial void OutputString(string? value);
 
-            public partial void ConsumeValueType<T>()
+            public partial void OutputValueType<T>()
                 where T : unmanaged;
-
-            public partial void SetNullable();
         }
     }
 
@@ -84,19 +85,16 @@ partial class LogMessage
     {
         partial class Chain;
 
-        public sealed partial class ChainExecutionContext
+        ref partial struct ChainExecutionContext
         {
-            public partial void ConsumeString()
+            public partial void OutputString()
             { }
 
-            public partial void ConsumeString(string? value)
+            public partial void OutputString(string? value)
             { }
 
-            public partial void ConsumeValueType<T>()
+            public partial void OutputValueType<T>()
                 where T : unmanaged
-            { }
-
-            public partial void SetNullable()
             { }
         }
     }

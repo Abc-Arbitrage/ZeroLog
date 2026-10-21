@@ -450,7 +450,7 @@ unsafe partial class LogMessage
                 ++dataPointer;
 
                 return TryWriteChain(
-                    _objects[stringIndex] as string ?? string.Empty,
+                    _objects[stringIndex] as InternalApi.Chain,
                     ref dataPointer,
                     outputBuffer,
                     config,
@@ -465,7 +465,7 @@ unsafe partial class LogMessage
             }
 
             default:
-                throw new ArgumentOutOfRangeException();
+                throw new InvalidOperationException($"Unexpected argument type: {argType}");
         }
     }
 
