@@ -11,17 +11,17 @@ unsafe partial class LogMessage
     {
         if (value is not null)
         {
-            if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) <= _endOfBuffer && _stringIndex < _strings.Length)
+            if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) <= _endOfBuffer && _objectIndex < _objects.Length)
             {
                 *(ArgumentType*)_dataPointer = ArgumentType.String;
                 _dataPointer += sizeof(ArgumentType);
 
-                _strings[_stringIndex] = value;
+                _objects[_objectIndex] = value;
 
-                *_dataPointer = _stringIndex;
+                *_dataPointer = _objectIndex;
                 ++_dataPointer;
 
-                ++_stringIndex;
+                ++_objectIndex;
             }
             else
             {
@@ -76,17 +76,17 @@ unsafe partial class LogMessage
     internal partial void InternalAppendValueType<T>(T value, string format, ArgumentType argType)
         where T : unmanaged
     {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(T) <= _endOfBuffer && _stringIndex < _strings.Length)
+        if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(T) <= _endOfBuffer && _objectIndex < _objects.Length)
         {
             *(ArgumentType*)_dataPointer = argType | ArgumentType.FormatFlag;
             _dataPointer += sizeof(ArgumentType);
 
-            _strings[_stringIndex] = format;
+            _objects[_objectIndex] = format;
 
-            *_dataPointer = _stringIndex;
+            *_dataPointer = _objectIndex;
             ++_dataPointer;
 
-            ++_stringIndex;
+            ++_objectIndex;
 
             *(T*)_dataPointer = value;
             _dataPointer += sizeof(T);

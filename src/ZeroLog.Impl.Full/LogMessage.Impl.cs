@@ -14,10 +14,10 @@ unsafe partial class LogMessage
 
     private readonly byte* _startOfBuffer;
     private readonly byte* _endOfBuffer;
-    private readonly string?[] _strings;
+    private readonly object?[] _objects;
 
     private byte* _dataPointer;
-    private byte _stringIndex;
+    private byte _objectIndex;
     private bool _isTruncated;
 
     internal Log? Logger { get; private set; }
@@ -29,13 +29,13 @@ unsafe partial class LogMessage
     internal LogMessage(string message)
     {
         ConstantMessage = message;
-        _strings = [];
+        _objects = [];
     }
 
     internal LogMessage(BufferSegment bufferSegment, int stringCapacity)
     {
         stringCapacity = Math.Min(stringCapacity, byte.MaxValue);
-        _strings = stringCapacity > 0 ? new string[stringCapacity] : [];
+        _objects = stringCapacity > 0 ? new object[stringCapacity] : [];
 
         _startOfBuffer = bufferSegment.Data;
         _dataPointer = bufferSegment.Data;
@@ -60,12 +60,12 @@ unsafe partial class LogMessage
         Logger = log;
 
         _dataPointer = _startOfBuffer;
-        _stringIndex = 0;
+        _objectIndex = 0;
         _isTruncated = false;
 
 #if DEBUG
         new Span<byte>(_startOfBuffer, (int)(_endOfBuffer - _startOfBuffer)).Fill(0);
-        _strings.AsSpan().Fill(null);
+        _objects.AsSpan().Fill(null);
 #endif
     }
 

@@ -12,56 +12,94 @@ partial class LogMessage
     /// It may cause breaking changes or be removed in future versions without notice.
     /// </summary>
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public static class InternalApi
+    public static partial class InternalApi
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void AppendChain(LogMessage message, string chain)
+        public static void AppendChain(LogMessage message, Chain chain)
             => message.InternalAppendChain(chain);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void AppendChainLinkValue(LogMessage message, string? value)
-            => message.InternalAppendChainLinkValue(value);
+        public static void AppendChainItem(LogMessage message, string? value)
+            => message.InternalAppendChainItem(value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void AppendChainLinkValue<T>(LogMessage message, T value)
+        public static void AppendChainItem<T>(LogMessage message, T value)
             where T : unmanaged
-            => message.InternalAppendChainLinkValue(value);
+            => message.InternalAppendChainItem(value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void AppendChainLinkValue<T>(LogMessage message, T? value)
+        public static void AppendChainItem<T>(LogMessage message, T? value)
             where T : unmanaged
-            => message.InternalAppendChainLinkValue(value);
+            => message.InternalAppendChainItem(value);
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public abstract partial class Chain
+        {
+            protected abstract void Execute(ChainExecutionContext context);
+        }
+
+        public sealed partial class ChainExecutionContext
+        {
+            public partial void ConsumeString();
+            public partial void ConsumeString(string? value);
+
+            public partial void ConsumeValueType<T>()
+                where T : unmanaged;
+
+            public partial void SetNullable();
+        }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal partial void InternalAppendChain(string chain);
+    internal partial void InternalAppendChain(InternalApi.Chain chain);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal partial void InternalAppendChainLinkValue(string? value);
+    internal partial void InternalAppendChainItem(string? value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal partial void InternalAppendChainLinkValue<T>(T value)
+    internal partial void InternalAppendChainItem<T>(T value)
         where T : unmanaged;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal partial void InternalAppendChainLinkValue<T>(T? value)
+    internal partial void InternalAppendChainItem<T>(T? value)
         where T : unmanaged;
 
 #if NETSTANDARD
 
-    internal partial void InternalAppendChain(string chain)
+    internal partial void InternalAppendChain(InternalApi.Chain chain)
     { }
 
-    internal partial void InternalAppendChainLinkValue(string? value)
+    internal partial void InternalAppendChainItem(string? value)
     { }
 
-    internal partial void InternalAppendChainLinkValue<T>(T value)
+    internal partial void InternalAppendChainItem<T>(T value)
         where T : unmanaged
     { }
 
-    internal partial void InternalAppendChainLinkValue<T>(T? value)
+    internal partial void InternalAppendChainItem<T>(T? value)
         where T : unmanaged
     { }
+
+    partial class InternalApi
+    {
+        partial class Chain;
+
+        public sealed partial class ChainExecutionContext
+        {
+            public partial void ConsumeString()
+            { }
+
+            public partial void ConsumeString(string? value)
+            { }
+
+            public partial void ConsumeValueType<T>()
+                where T : unmanaged
+            { }
+
+            public partial void SetNullable()
+            { }
+        }
+    }
 
 #endif
 }

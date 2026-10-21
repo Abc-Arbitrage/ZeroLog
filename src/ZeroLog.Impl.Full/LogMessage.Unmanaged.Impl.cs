@@ -27,17 +27,17 @@ unsafe partial class LogMessage
         }
         else
         {
-            if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(UnmanagedArgHeader) + sizeof(T) <= _endOfBuffer && _stringIndex < _strings.Length)
+            if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) + sizeof(UnmanagedArgHeader) + sizeof(T) <= _endOfBuffer && _objectIndex < _objects.Length)
             {
                 *(ArgumentType*)_dataPointer = ArgumentType.Unmanaged | ArgumentType.FormatFlag;
                 _dataPointer += sizeof(ArgumentType);
 
-                _strings[_stringIndex] = format;
+                _objects[_objectIndex] = format;
 
-                *_dataPointer = _stringIndex;
+                *_dataPointer = _objectIndex;
                 ++_dataPointer;
 
-                ++_stringIndex;
+                ++_objectIndex;
 
                 *(UnmanagedArgHeader*)_dataPointer = new UnmanagedArgHeader(TypeUtil<T>.TypeHandle, sizeof(T));
                 _dataPointer += sizeof(UnmanagedArgHeader);

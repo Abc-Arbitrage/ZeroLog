@@ -1135,12 +1135,26 @@ namespace ZeroLog
         }
         public static class InternalApi
         {
-            public static void AppendChain(ZeroLog.LogMessage message, string chain) { }
-            public static void AppendChainLinkValue(ZeroLog.LogMessage message, string? value) { }
-            public static void AppendChainLinkValue<T>(ZeroLog.LogMessage message, T value)
+            public static void AppendChain(ZeroLog.LogMessage message, ZeroLog.LogMessage.InternalApi.Chain chain) { }
+            public static void AppendChainItem(ZeroLog.LogMessage message, string? value) { }
+            public static void AppendChainItem<T>(ZeroLog.LogMessage message, T value)
                 where T :  unmanaged { }
-            public static void AppendChainLinkValue<T>(ZeroLog.LogMessage message, T? value)
+            public static void AppendChainItem<T>(ZeroLog.LogMessage message, T? value)
                 where T :  unmanaged { }
+            public abstract class Chain
+            {
+                protected Chain() { }
+                protected abstract void Execute(ZeroLog.LogMessage.InternalApi.ChainExecutionContext context);
+            }
+            public sealed class ChainExecutionContext
+            {
+                public ChainExecutionContext() { }
+                public void ConsumeString() { }
+                public void ConsumeString(string? value) { }
+                public void ConsumeValueType<T>()
+                    where T :  unmanaged { }
+                public void SetNullable() { }
+            }
         }
     }
     public delegate bool UnmanagedFormatterDelegate<T>(ref T value, System.Span<char> destination, out int charsWritten, System.ReadOnlySpan<char> format);

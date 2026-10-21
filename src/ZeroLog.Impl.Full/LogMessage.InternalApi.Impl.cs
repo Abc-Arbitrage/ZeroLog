@@ -2,38 +2,38 @@ namespace ZeroLog;
 
 unsafe partial class LogMessage
 {
-    internal partial void InternalAppendChain(string chain)
+    internal partial void InternalAppendChain(InternalApi.Chain chain)
     {
-        if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) <= _endOfBuffer && _stringIndex < _strings.Length)
+        if (_dataPointer + sizeof(ArgumentType) + sizeof(byte) <= _endOfBuffer && _objectIndex < _objects.Length)
         {
             *(ArgumentType*)_dataPointer = ArgumentType.Chain;
             _dataPointer += sizeof(ArgumentType);
 
-            _strings[_stringIndex] = chain;
+            _objects[_objectIndex] = chain;
 
-            *_dataPointer = _stringIndex;
+            *_dataPointer = _objectIndex;
             ++_dataPointer;
 
-            ++_stringIndex;
+            ++_objectIndex;
         }
         else
         {
-            _isTruncated = true; // TODO: _truncatedAt
+            _isTruncated = true;
         }
     }
 
-    internal partial void InternalAppendChainLinkValue(string? value)
+    internal partial void InternalAppendChainItem(string? value)
     {
-        if (_dataPointer + sizeof(byte) <= _endOfBuffer && _stringIndex < _strings.Length)
+        if (_dataPointer + sizeof(byte) <= _endOfBuffer && _objectIndex < _objects.Length)
         {
             if (value is not null)
             {
-                _strings[_stringIndex] = value;
+                _objects[_objectIndex] = value;
 
-                *_dataPointer = _stringIndex;
+                *_dataPointer = _objectIndex;
                 ++_dataPointer;
 
-                ++_stringIndex;
+                ++_objectIndex;
             }
             else
             {
@@ -47,7 +47,7 @@ unsafe partial class LogMessage
         }
     }
 
-    internal partial void InternalAppendChainLinkValue<T>(T value)
+    internal partial void InternalAppendChainItem<T>(T value)
         where T : unmanaged
     {
         if (_dataPointer + sizeof(T) <= _endOfBuffer)
@@ -61,7 +61,7 @@ unsafe partial class LogMessage
         }
     }
 
-    internal partial void InternalAppendChainLinkValue<T>(T? value)
+    internal partial void InternalAppendChainItem<T>(T? value)
         where T : unmanaged
     {
         if (_dataPointer + 1 + sizeof(T) <= _endOfBuffer)
@@ -83,6 +83,27 @@ unsafe partial class LogMessage
         else
         {
             _isTruncated = true;
+        }
+    }
+
+    partial class InternalApi
+    {
+        partial class Chain;
+
+        public sealed partial class ChainExecutionContext
+        {
+            public partial void ConsumeString()
+            { }
+
+            public partial void ConsumeString(string? value)
+            { }
+
+            public partial void ConsumeValueType<T>()
+                where T : unmanaged
+            { }
+
+            public partial void SetNullable()
+            { }
         }
     }
 }

@@ -18,6 +18,7 @@ internal static class ZeroLogFacts
         public const string LogManager = "LogManager";
         public const string LogMessage = "LogMessage";
         public const string InternalApi = "InternalApi";
+        public const string Chain = "Chain";
     }
 
     public static class FullTypeNames
@@ -35,7 +36,7 @@ internal static class ZeroLogFacts
         public const string AppendEnum = "AppendEnum";
         public const string AppendKeyValue = "AppendKeyValue";
         public const string AppendChain = "AppendChain";
-        public const string AppendChainLinkValue = "AppendChainLinkValue";
+        public const string AppendChainItem = "AppendChainItem";
         public const string WithException = "WithException";
         public const string GetLogger = "GetLogger";
         public const string Log = "Log";

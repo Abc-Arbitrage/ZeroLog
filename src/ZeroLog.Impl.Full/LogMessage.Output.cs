@@ -90,7 +90,7 @@ unsafe partial class LogMessage
         var keyIndex = *dataPointer;
         ++dataPointer;
 
-        var key = _strings[keyIndex] ?? string.Empty;
+        var key = _objects[keyIndex] as string ?? string.Empty;
 
         if (dataPointer >= _dataPointer)
             return false;
@@ -123,7 +123,7 @@ unsafe partial class LogMessage
             ++dataPointer;
 
             if (formatType == FormatType.Formatted)
-                format = _strings[stringIndex];
+                format = _objects[stringIndex] as string;
         }
 
         if (formatType == FormatType.KeyValue)
@@ -152,7 +152,7 @@ unsafe partial class LogMessage
                 var stringIndex = *dataPointer;
                 ++dataPointer;
 
-                var value = _strings[stringIndex] ?? string.Empty;
+                var value = _objects[stringIndex] as string ?? string.Empty;
 
                 if (value.Length <= outputBuffer.Length)
                 {
@@ -450,7 +450,7 @@ unsafe partial class LogMessage
                 ++dataPointer;
 
                 return TryWriteChain(
-                    _strings[stringIndex] ?? string.Empty,
+                    _objects[stringIndex] as string ?? string.Empty,
                     ref dataPointer,
                     outputBuffer,
                     config,

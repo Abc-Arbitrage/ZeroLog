@@ -76,6 +76,8 @@ public class SanityChecks
             "ZeroLog.LogMessage+AppendInterpolatedStringHandler",
             "ZeroLog.LogMessage+AppendOperation`1",
             "ZeroLog.LogMessage+InternalApi",
+            "ZeroLog.LogMessage+InternalApi+Chain",
+            "ZeroLog.LogMessage+InternalApi+ChainExecutionContext",
             "ZeroLog.UnmanagedFormatterDelegate`1"
         };
 

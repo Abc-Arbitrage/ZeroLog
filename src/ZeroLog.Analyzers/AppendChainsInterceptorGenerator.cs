@@ -19,8 +19,8 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
     {
         var chains = context.SyntaxProvider
                             .CreateSyntaxProvider(SyntaxPredicate, SyntaxTransform)
-                            .Where(static i => i.Link.LinkType is not AppendChain.LinkType.None)
-                            .WithLambdaComparer(static (a, b) => a.Link.Equals(b.Link), static i => i.Link.GetHashCode())
+                            .Where(static i => i.AppendCall.Type is not AppendedType.None)
+                            .WithLambdaComparer(static (a, b) => a.AppendCall.Equals(b.AppendCall), static i => i.AppendCall.GetHashCode())
                             .Collect()
                             .Combine(context.IsGeneratorEnabled("AppendChains"))
                             .EmptyIfFalse()
@@ -37,7 +37,7 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
                     return;
 
                 context.AddSource(
-                    "AppendChainsInterceptor.g.cs",
+                    "AppendChains.g.cs",
                     new Generator().Generate(chains)
                 );
             }
@@ -60,7 +60,7 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
             InvokedMethodName: ZeroLogFacts.MethodNames.Append // TODO: Enums and key/values
         };
 
-    private static ChainLinkModel SyntaxTransform(GeneratorSyntaxContext context, CancellationToken cancellationToken)
+    private static ChainedAppendsModel SyntaxTransform(GeneratorSyntaxContext context, CancellationToken cancellationToken)
     {
         if (context.Node is InvocationExpressionSyntax invocationSyntax
             && context.SemanticModel.GetOperation(invocationSyntax, cancellationToken) is IInvocationOperation
@@ -76,107 +76,114 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
                     }
                 }
             } invocation
-            && TryGetChainLink(invocation, context.SemanticModel, out var chainLink, cancellationToken)
+            && TryGetChainedAppends(invocation, context.SemanticModel, out var chainedAppends, cancellationToken)
            )
         {
-            return chainLink;
+            return chainedAppends;
         }
 
         return default;
     }
 
-    private static bool TryGetChainLink(IInvocationOperation invocation,
-                                        SemanticModel semanticModel,
-                                        out ChainLinkModel chainLink,
-                                        CancellationToken cancellationToken)
+    private static bool TryGetChainedAppends(IInvocationOperation invocation,
+                                             SemanticModel semanticModel,
+                                             out ChainedAppendsModel chainedAppends,
+                                             CancellationToken cancellationToken)
     {
-        chainLink = default;
+        chainedAppends = default;
 
-        if (!TryGetLink(invocation, semanticModel, out var link, cancellationToken))
+        if (!TryGetAppendCall(invocation, semanticModel, out var call, cancellationToken))
             return false;
 
         var currentInvocation = invocation;
         var chainPosition = 0;
 
-        var parentLink = default(LinkModel);
+        var previousCall = default(AppendCallModel);
 
-        while (TryGetLink(currentInvocation, semanticModel, out var currentLink, cancellationToken))
+        while (TryGetAppendCall(currentInvocation, semanticModel, out var currentCall, cancellationToken))
         {
-            parentLink = currentLink;
+            previousCall = currentCall;
             ++chainPosition;
             currentInvocation = currentInvocation.Instance as IInvocationOperation;
         }
 
-        chainLink = new ChainLinkModel(
-            link,
-            parentLink,
+        chainedAppends = new ChainedAppendsModel(
+            call,
+            previousCall,
             chainPosition - 1
         );
 
         return true;
     }
 
-    private static bool TryGetLink([NotNullWhen(true)] IInvocationOperation? invocation,
-                                   SemanticModel semanticModel,
-                                   out LinkModel link,
-                                   CancellationToken cancellationToken)
+    private static bool TryGetAppendCall([NotNullWhen(true)] IInvocationOperation? invocation,
+                                         SemanticModel semanticModel,
+                                         out AppendCallModel appendCall,
+                                         CancellationToken cancellationToken)
     {
-        link = default;
+        appendCall = default;
 
         if (invocation is null)
             return false;
 
-        if (!IsChainable(invocation, out var linkType, out var formatString))
+        if (!IsChainableInvocation(
+                invocation,
+                out var appendedType,
+                out var underlyingTypeName,
+                out var isNullableValueType,
+                out var formatString
+            ))
+        {
+            return false;
+        }
+
+        if (semanticModel.GetInterceptableLocation((InvocationExpressionSyntax)invocation.Syntax, cancellationToken) is not { } appendCallLocation)
             return false;
 
-        if (semanticModel.GetInterceptableLocation((InvocationExpressionSyntax)invocation.Syntax, cancellationToken) is not { } linkLocation)
-            return false;
+        var constantString = default(string?);
 
-        string? constantString;
-
-        if (linkType is AppendChain.LinkType.String && invocation.GetArgumentByParameterIndex(0)?.Value.ConstantValue is { HasValue: true } constantValue)
+        if (appendedType is AppendedType.String && invocation.GetArgumentByParameterIndex(0)?.Value.ConstantValue is { HasValue: true } constantValue)
         {
             switch (constantValue.Value)
             {
                 case null:
-                    linkType = AppendChain.LinkType.NullString;
+                    appendedType = AppendedType.Null;
                     constantString = null;
                     break;
 
                 case string value:
-                    linkType = AppendChain.LinkType.ConstantString;
+                    appendedType = AppendedType.ConstantString;
                     constantString = value;
                     break;
-
-                default:
-                    constantString = null;
-                    break;
             }
-        }
-        else
-        {
-            constantString = null;
         }
 
         // Consistency checks
         if (constantString is not null && formatString is not null)
             return false;
 
-        if (linkType.HasFormatString && formatString is null)
-            return false;
-
-        link = new LinkModel(
-            linkType,
-            constantString ?? formatString,
-            linkLocation
+        appendCall = new AppendCallModel(
+            appendedType,
+            isNullableValueType,
+            underlyingTypeName,
+            constantString,
+            FormatStringType.None,
+            formatString,
+            appendCallLocation
         );
 
         return true;
     }
 
-    private static bool IsChainable(IInvocationOperation invocation, out AppendChain.LinkType linkType, out string? formatString)
+    private static bool IsChainableInvocation(IInvocationOperation invocation,
+                                              out AppendedType appendedType,
+                                              [NotNullWhen(true)] out string? underlyingTypeName,
+                                              out bool isNullableType,
+                                              out string? formatString)
     {
-        linkType = default;
+        appendedType = AppendedType.None;
+        isNullableType = false;
+        underlyingTypeName = null;
         formatString = null;
 
         if (invocation.TargetMethod is
@@ -188,221 +195,142 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
                     ContainingType: null,
                     ContainingNamespace: { Name: ZeroLogFacts.Namespace, ContainingNamespace.IsGlobalNamespace: true }
                 },
-                Parameters.Length: 1 or 2
+                Parameters.Length: 1
             } method)
         {
             if (method.Parameters[0].Type is not { } valueParameterType)
                 return false;
 
-            linkType = ToLinkType(valueParameterType);
-
-            if (linkType is AppendChain.LinkType.None)
-                return false;
-
-            if (method.Parameters.Length == 2)
-            {
-                if (invocation.GetArgumentByParameterIndex(1)?.TryGetConstantString(out formatString) is true)
-                    linkType |= AppendChain.LinkType.FormatFlag;
-                else
-                    return false;
-            }
-
-            return true;
+            underlyingTypeName = GetSupportedTypeName(valueParameterType, out appendedType, out isNullableType);
+            return underlyingTypeName is not null;
         }
 
         return false;
     }
 
-    private static AppendChain.LinkType ToLinkType(ITypeSymbol type)
+    private static string? GetSupportedTypeName(ITypeSymbol type,
+                                                out AppendedType appendedType,
+                                                out bool isNullableType)
     {
         if (type is not INamedTypeSymbol namedType)
-            return AppendChain.LinkType.None;
-
-        var isNullableValueType = namedType.OriginalDefinition.SpecialType == SpecialType.System_Nullable_T;
-        var nonNullableType = isNullableValueType ? namedType.TypeArguments[0] : namedType;
-        var additionalFlags = isNullableValueType ? AppendChain.LinkType.NullableFlag : AppendChain.LinkType.None;
-
-        var specialType = nonNullableType.SpecialType switch
         {
-            SpecialType.System_String   => AppendChain.LinkType.String,
-            SpecialType.System_Char     => AppendChain.LinkType.Char,
-            SpecialType.System_Boolean  => AppendChain.LinkType.Boolean,
-            SpecialType.System_SByte    => AppendChain.LinkType.SByte,
-            SpecialType.System_Byte     => AppendChain.LinkType.Byte,
-            SpecialType.System_Int16    => AppendChain.LinkType.Int16,
-            SpecialType.System_UInt16   => AppendChain.LinkType.UInt16,
-            SpecialType.System_Int32    => AppendChain.LinkType.Int32,
-            SpecialType.System_UInt32   => AppendChain.LinkType.UInt32,
-            SpecialType.System_Int64    => AppendChain.LinkType.Int64,
-            SpecialType.System_UInt64   => AppendChain.LinkType.UInt64,
-            SpecialType.System_Single   => AppendChain.LinkType.Single,
-            SpecialType.System_Double   => AppendChain.LinkType.Double,
-            SpecialType.System_Decimal  => AppendChain.LinkType.Decimal,
-            SpecialType.System_DateTime => AppendChain.LinkType.DateTime,
-            _                           => AppendChain.LinkType.None
+            appendedType = AppendedType.None;
+            isNullableType = false;
+            return null;
+        }
+
+        var isNullableValueType = namedType.OriginalDefinition.SpecialType is SpecialType.System_Nullable_T;
+        var underlyingType = isNullableValueType ? namedType.TypeArguments[0] : namedType;
+        isNullableType = isNullableValueType || namedType.IsReferenceType;
+
+        if (underlyingType.SpecialType is SpecialType.System_String)
+        {
+            appendedType = AppendedType.String;
+            return "string";
+        }
+
+        var fromSpecialType = underlyingType.SpecialType switch
+        {
+            SpecialType.System_Char     => "char",
+            SpecialType.System_Boolean  => "bool",
+            SpecialType.System_SByte    => "sbyte",
+            SpecialType.System_Byte     => "byte",
+            SpecialType.System_Int16    => "short",
+            SpecialType.System_UInt16   => "ushort",
+            SpecialType.System_Int32    => "int",
+            SpecialType.System_UInt32   => "uint",
+            SpecialType.System_Int64    => "long",
+            SpecialType.System_UInt64   => "ulong",
+            SpecialType.System_Single   => "float",
+            SpecialType.System_Double   => "double",
+            SpecialType.System_Decimal  => "decimal",
+            SpecialType.System_DateTime => "global::System.DateTime",
+            _                           => null
         };
 
-        if (specialType is not AppendChain.LinkType.None)
-            return specialType | additionalFlags;
-
-        var nonSpecialType = nonNullableType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) switch
+        if (fromSpecialType is not null)
         {
-            "global::System.Guid"           => AppendChain.LinkType.Guid,
-            "global::System.TimeSpan"       => AppendChain.LinkType.TimeSpan,
-            "global::System.DateTimeOffset" => AppendChain.LinkType.DateTimeOffset,
-            "global::System.DateOnly"       => AppendChain.LinkType.DateOnly,
-            "global::System.TimeOnly"       => AppendChain.LinkType.TimeOnly,
-            _                               => AppendChain.LinkType.None
-        };
+            appendedType = AppendedType.ValueType;
+            return fromSpecialType;
+        }
 
-        if (nonSpecialType is not AppendChain.LinkType.None)
-            return nonSpecialType | additionalFlags;
+        var fullNameType = underlyingType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
 
-        return AppendChain.LinkType.None;
+        switch (fullNameType)
+        {
+            case "global::System.Guid":
+            case "global::System.TimeSpan":
+            case "global::System.DateTimeOffset":
+            case "global::System.DateOnly":
+            case "global::System.TimeOnly":
+                appendedType = AppendedType.ValueType;
+                return fullNameType;
+
+            default:
+                appendedType = AppendedType.None;
+                return null;
+        }
     }
 
-    private static string? ToTypeName(AppendChain.LinkType linkType)
+    private static ImmutableArray<ChainModel> ToChains(ImmutableArray<ChainedAppendsModel> chainItems, CancellationToken cancellationToken)
     {
-        var underlyingType = linkType.UnderlyingType switch
-        {
-            AppendChain.LinkType.String            => "string?",
-            AppendChain.LinkType.NullString        => "string?",
-            AppendChain.LinkType.ConstantString    => "string?",
-            AppendChain.LinkType.ConstantKeyString => "string",
-            AppendChain.LinkType.VariableKeyString => "string",
-            AppendChain.LinkType.Char              => "char",
-            AppendChain.LinkType.Boolean           => "bool",
-            AppendChain.LinkType.SByte             => "sbyte",
-            AppendChain.LinkType.Byte              => "byte",
-            AppendChain.LinkType.Int16             => "short",
-            AppendChain.LinkType.UInt16            => "ushort",
-            AppendChain.LinkType.Int32             => "int",
-            AppendChain.LinkType.UInt32            => "uint",
-            AppendChain.LinkType.Int64             => "long",
-            AppendChain.LinkType.UInt64            => "ulong",
-            AppendChain.LinkType.Single            => "float",
-            AppendChain.LinkType.Double            => "double",
-            AppendChain.LinkType.Decimal           => "decimal",
-            AppendChain.LinkType.Guid              => "global::System.Guid",
-            AppendChain.LinkType.DateTime          => "global::System.DateTime",
-            AppendChain.LinkType.TimeSpan          => "global::System.TimeSpan",
-            AppendChain.LinkType.DateTimeOffset    => "global::System.DateTimeOffset",
-            AppendChain.LinkType.DateOnly          => "global::System.DateOnly",
-            AppendChain.LinkType.TimeOnly          => "global::System.TimeOnly",
-            _                                      => null
-        };
-
-        return underlyingType is not null && linkType.IsNullableValueType
-            ? underlyingType + "?"
-            : underlyingType;
-    }
-
-    private static ImmutableArray<ChainModel> ToChains(ImmutableArray<ChainLinkModel> chainLinks, CancellationToken cancellationToken)
-    {
-        return chainLinks.GroupBy(static i => i.FirstChainLink)
+        return chainItems.GroupBy(static i => i.FirstAppendCall)
                          .Where(IsWorthIntercepting)
                          .Select(static i => new ChainModel(i.OrderBy(i => i.IndexInChain)
-                                                             .Select(i => i.Link)
+                                                             .Select(i => i.AppendCall)
                                                              .ToImmutableArray()))
                          .ToImmutableArray();
 
-        static bool IsWorthIntercepting(IGrouping<LinkModel, ChainLinkModel> links)
-            => links.Count() > 1 && links.Any(static i => i.Link.LinkType is AppendChain.LinkType.ConstantString or AppendChain.LinkType.ConstantKeyString);
+        static bool IsWorthIntercepting(IGrouping<AppendCallModel, ChainedAppendsModel> call)
+            => call.Count() > 1 && call.Any(static i => i.AppendCall.Type is AppendedType.ConstantString);
     }
 
-    private static ImmutableArray<RenderLinkModel> OptimizeChain(ImmutableArray<LinkModel> links)
+    private enum AppendedType
     {
-        var result = new RenderLinkModel[links.Length];
-        //var mergeableConstantStringIndex = -1;
-
-        for (var i = 0; i < links.Length; ++i)
-        {
-            var link = links[i];
-            result[i] = RenderLinkModel.From(link);
-
-            // if (link.LinkType is AppendChain.LinkType.ConstantString)
-            // {
-            //     if (mergeableConstantStringIndex < 0)
-            //     {
-            //         mergeableConstantStringIndex = i;
-            //     }
-            //     else
-            //     {
-            //         result[mergeableConstantStringIndex].ConstantString += link.ConstantString;
-            //         result[i].AppendValue = false;
-            //     }
-            // }
-            // else
-            // {
-            //     mergeableConstantStringIndex = -1;
-            // }
-        }
-
-        return result.ToImmutableArray();
+        None,
+        Null,
+        String,
+        ConstantString,
+        ValueType
     }
 
-    private static string SerializeChain(ImmutableArray<RenderLinkModel> links)
+    private enum FormatStringType
     {
-        var serializer = new AppendChain.Serializer();
-
-        foreach (var link in links)
-        {
-            switch (link.LinkType)
-            {
-                case AppendChain.LinkType.ConstantString:
-                    serializer.AddConstantString(link.ConstantString);
-                    break;
-
-                case AppendChain.LinkType.ConstantKeyString:
-                    serializer.AddConstantKeyString(link.ConstantString);
-                    break;
-
-                default:
-                    serializer.AddLink(link.LinkType, link.ConstantString);
-                    break;
-            }
-        }
-
-        return serializer.ToSerializedResult();
+        None,
+        Constant,
+        Variable
     }
 
-    private readonly record struct LinkModel(
-        AppendChain.LinkType LinkType,
+    private readonly record struct AppendCallModel(
+        AppendedType Type,
+        bool IsNullableType,
+        string UnderlyingTypeName,
         string? ConstantString,
+        FormatStringType FormatStringType,
+        string? ConstantFormatString,
         InterceptableLocation InterceptableLocation
     );
 
-    private readonly record struct ChainLinkModel(
-        LinkModel Link,
-        LinkModel FirstChainLink,
+    private readonly record struct ChainedAppendsModel(
+        AppendCallModel AppendCall,
+        AppendCallModel FirstAppendCall,
         int IndexInChain
     );
 
     private readonly record struct ChainModel
     {
-        public ImmutableArray<LinkModel> Links { get; init; }
+        public ImmutableArray<AppendCallModel> Calls { get; }
 
-        public ChainModel(ImmutableArray<LinkModel> links)
+        public ChainModel(ImmutableArray<AppendCallModel> calls)
         {
-            Links = links;
+            Calls = calls;
         }
 
         public bool Equals(ChainModel other)
-            => ImmutableArrayEqualityComparer<LinkModel>.Default.Equals(Links, other.Links);
+            => ImmutableArrayEqualityComparer<AppendCallModel>.Default.Equals(Calls, other.Calls);
 
         public override int GetHashCode()
-            => ImmutableArrayEqualityComparer<LinkModel>.Default.GetHashCode(Links);
-    }
-
-    private record struct RenderLinkModel(
-        AppendChain.LinkType LinkType,
-        string? ConstantString,
-        InterceptableLocation InterceptableLocation,
-        bool AppendValue
-    )
-    {
-        public static RenderLinkModel From(LinkModel link)
-            => new(link.LinkType, link.ConstantString, link.InterceptableLocation, !link.LinkType.IsEmbedded);
+            => ImmutableArrayEqualityComparer<AppendCallModel>.Default.GetHashCode(Calls);
     }
 
     private class Generator
@@ -416,9 +344,17 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
             AppendHeader();
 
             using (_writer.WriteBlock($"namespace {ZeroLogFacts.Namespace}"))
-            using (_writer.WriteBlock("file static class AppendChainsInterceptor"))
             {
-                GenerateInterceptors(chains);
+                for (var i = 0; i < chains.Length; ++i)
+                {
+                    GenerateChainClass(chains[i], i);
+                    _writer.AppendLine();
+                }
+
+                using (_writer.WriteBlock("file static class ChainsInterceptor"))
+                {
+                    GenerateInterceptors(chains);
+                }
             }
 
             return _writer.ToString();
@@ -449,36 +385,76 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
             );
         }
 
+        private void GenerateChainClass(ChainModel chain, int chainIndex)
+        {
+            _writer.AppendLine(
+                $"""
+                file sealed class Chain{chainIndex} : global::ZeroLog.LogMessage.InternalApi.Chain
+                """
+            );
+
+            using (_writer.WriteBlock())
+            {
+                _writer.AppendLine($"public static readonly Chain{chainIndex} Instance = new();")
+                       .AppendLine();
+
+                using (_writer.WriteBlock("protected override void Execute(global::ZeroLog.LogMessage.InternalApi.ChainExecutionContext context)"))
+                {
+                    foreach (var call in chain.Calls)
+                    {
+                        switch (call.Type)
+                        {
+                            case AppendedType.Null:
+                                _writer.AppendLine("context.ConsumeString(null);");
+                                continue;
+
+                            case AppendedType.String:
+                                _writer.AppendLine("context.ConsumeString();");
+                                continue;
+
+                            case AppendedType.ConstantString:
+                                _writer.AppendLine($"context.ConsumeString({SymbolDisplay.FormatLiteral(call.ConstantString ?? string.Empty, true)});");
+                                continue;
+
+                            case AppendedType.ValueType:
+                                if (call.IsNullableType)
+                                    _writer.AppendLine("context.SetNullable();");
+
+                                _writer.AppendLine($"context.ConsumeValueType<{call.UnderlyingTypeName}>();");
+                                break;
+                        }
+                    }
+                }
+            }
+        }
+
         private void GenerateInterceptors(ImmutableArray<ChainModel> chains)
         {
-            var chainCounter = 0; // TODO: Find something better
+            var chainIndex = 0;
 
-            foreach (var inputChain in chains)
+            foreach (var chain in chains)
             {
-                _writer.AppendLine($"// Chain {chainCounter}").AppendLine();
+                _writer.AppendLine($"// Chain {chainIndex}").AppendLine();
 
-                var chain = OptimizeChain(inputChain.Links);
-                var serializedChain = SerializeChain(chain);
-
-                for (var linkIndex = 0; linkIndex < chain.Length; linkIndex++)
+                for (var callIndex = 0; callIndex < chain.Calls.Length; callIndex++)
                 {
-                    var link = chain[linkIndex];
+                    var call = chain.Calls[callIndex];
 
                     _writer.AppendLine(
                         $"""
-                        {link.InterceptableLocation.GetInterceptsLocationAttributeSyntax()}
-                        [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-                        public static global::{ZeroLogFacts.FullTypeNames.LogMessage} Append_{chainCounter}_{linkIndex}(this global::{ZeroLogFacts.FullTypeNames.LogMessage} log, {ToTypeName(link.LinkType)} value{(link.LinkType.HasFormatString ? ", string format" : "")})
-                        """
+                            // {call.InterceptableLocation.GetInterceptsLocationAttributeSyntax()}
+                            [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+                            public static global::{ZeroLogFacts.FullTypeNames.LogMessage} Append_{chainIndex}_{callIndex}(this global::{ZeroLogFacts.FullTypeNames.LogMessage} log, {call.UnderlyingTypeName}{(call.IsNullableType ? "?" : "")} value{(call.FormatStringType is not FormatStringType.None ? ", string format" : "")})
+                            """
                     );
 
                     using (_writer.WriteBlock())
                     {
-                        if (linkIndex == 0)
-                            _writer.AppendLine($"global::{ZeroLogFacts.FullTypeNames.LogMessage}.{ZeroLogFacts.ShortTypeNames.InternalApi}.{ZeroLogFacts.MethodNames.AppendChain}(log, {SymbolDisplay.FormatLiteral(serializedChain, true)});");
+                        if (callIndex == 0)
+                            _writer.AppendLine($"global::{ZeroLogFacts.FullTypeNames.LogMessage}.{ZeroLogFacts.ShortTypeNames.InternalApi}.{ZeroLogFacts.MethodNames.AppendChain}(log, Chain{chainIndex}.Instance);");
 
-                        if (link.AppendValue)
-                            _writer.AppendLine($"global::{ZeroLogFacts.FullTypeNames.LogMessage}.{ZeroLogFacts.ShortTypeNames.InternalApi}.{ZeroLogFacts.MethodNames.AppendChainLinkValue}(log, value);");
+                        if (call.Type is AppendedType.String or AppendedType.ValueType)
+                            _writer.AppendLine($"global::{ZeroLogFacts.FullTypeNames.LogMessage}.{ZeroLogFacts.ShortTypeNames.InternalApi}.{ZeroLogFacts.MethodNames.AppendChainItem}(log, value);");
 
                         _writer.AppendLine("return log;");
                     }
@@ -486,7 +462,8 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
                     _writer.AppendLine();
                 }
 
-                ++chainCounter;
+                ++chainIndex;
+                _writer.AppendLine();
             }
         }
     }
