@@ -96,7 +96,10 @@ partial class LogManager : IDisposable
             throw new InvalidOperationException("LogManager is already initialized.");
 
         _staticLogManager = new LogManager(configuration);
+
+        LogMessage.Warmup();
         InternalApi.OnInitialized();
+
         return _staticLogManager;
     }
 

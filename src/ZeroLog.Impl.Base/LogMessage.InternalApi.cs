@@ -50,6 +50,9 @@ partial class LogMessage
 
             public partial void OutputValueType<T>(bool nullable)
                 where T : unmanaged;
+
+            public partial void SetFormatString(string? format);
+            public partial void ReadFormatString();
         }
     }
 
@@ -87,15 +90,12 @@ partial class LogMessage
     {
         ref partial struct ChainExecutionContext
         {
-            public partial void OutputString()
-            { }
+            public partial void OutputString() { }
+            public partial void OutputString(string? value) { }
+            public partial void OutputValueType<T>(bool nullable) where T : unmanaged { }
 
-            public partial void OutputString(string? value)
-            { }
-
-            public partial void OutputValueType<T>(bool nullable)
-                where T : unmanaged
-            { }
+            public partial void SetFormatString(string? format) { }
+            public partial void ReadFormatString() { }
         }
     }
 

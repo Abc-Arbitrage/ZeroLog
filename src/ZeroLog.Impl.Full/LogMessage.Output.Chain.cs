@@ -11,13 +11,14 @@ unsafe partial class LogMessage
                                ref byte* dataPointer,
                                Span<char> outputBuffer,
                                ZeroLogConfiguration config,
+                               FormatType formatType,
                                out int charsWritten)
     {
         if (chain is null)
             goto truncate;
 
         var inputData = new ReadOnlySpan<byte>(dataPointer, (int)(_dataPointer - dataPointer));
-        var context = new InternalApi.ChainExecutionContext(this, inputData, outputBuffer, config);
+        var context = new InternalApi.ChainExecutionContext(this, inputData, outputBuffer, formatType, config);
 
         chain.CallExecute(ref context);
 
@@ -44,6 +45,7 @@ unsafe partial class LogMessage
         {
             private readonly LogMessage _logMessage;
             private readonly ZeroLogConfiguration _config;
+            private readonly FormatType _formatType;
 
             internal ReadOnlySpan<byte> InputData;
             internal Span<char> OutputBuffer;
@@ -53,10 +55,12 @@ unsafe partial class LogMessage
             internal ChainExecutionContext(LogMessage logMessage,
                                            ReadOnlySpan<byte> inputData,
                                            Span<char> outputBuffer,
+                                           FormatType formatType,
                                            ZeroLogConfiguration config)
             {
                 _logMessage = logMessage;
                 _config = config;
+                _formatType = formatType;
 
                 InputData = inputData;
                 OutputBuffer = outputBuffer;
@@ -192,6 +196,93 @@ unsafe partial class LogMessage
                     return false;
                 }
             }
+
+            public partial void SetFormatString(string? format)
+            {
+                _format = _formatType is FormatType.Formatted
+                    ? format
+                    : ReadOnlySpan<char>.Empty;
+            }
+
+            public partial void ReadFormatString()
+            {
+                if (Truncated)
+                    return;
+
+                if (InputData.Length < sizeof(byte))
+                    goto truncate;
+
+                var stringIndex = InputData[0];
+                InputData = InputData.Slice(sizeof(byte));
+
+                if (stringIndex >= _logMessage._objects.Length)
+                    goto truncate;
+
+                _format = _formatType is FormatType.Formatted
+                    ? _logMessage._objects[stringIndex] as string
+                    : ReadOnlySpan<char>.Empty;
+
+                return;
+
+                truncate:
+                Truncated = true;
+            }
+        }
+    }
+
+    internal static void Warmup()
+        => WarmupChain.PerformWarmup();
+
+    private class WarmupChain : InternalApi.Chain
+    {
+        public static void PerformWarmup()
+        {
+            var logMessage = new LogMessage("");
+            var config = new ZeroLogConfiguration();
+
+            ReadOnlySpan<byte> input = stackalloc byte[128];
+            Span<char> output = stackalloc char[128];
+
+            var context = new InternalApi.ChainExecutionContext(
+                logMessage,
+                input,
+                output,
+                default,
+                config
+            );
+
+            var chain = new WarmupChain();
+            chain.CallExecute(ref context);
+        }
+
+        protected override void Execute(ref InternalApi.ChainExecutionContext context)
+        {
+            // Pre-JIT these
+
+            context.OutputValueType<bool>(false);
+            context.OutputValueType<byte>(false);
+            context.OutputValueType<sbyte>(false);
+            context.OutputValueType<short>(false);
+            context.OutputValueType<ushort>(false);
+            context.OutputValueType<int>(false);
+            context.OutputValueType<uint>(false);
+            context.OutputValueType<long>(false);
+            context.OutputValueType<ulong>(false);
+            context.OutputValueType<nint>(false);
+            context.OutputValueType<nuint>(false);
+            context.OutputValueType<float>(false);
+            context.OutputValueType<double>(false);
+            context.OutputValueType<decimal>(false);
+            context.OutputValueType<Guid>(false);
+            context.OutputValueType<DateTime>(false);
+            context.OutputValueType<TimeSpan>(false);
+            context.OutputValueType<DateOnly>(false);
+            context.OutputValueType<TimeOnly>(false);
+            context.OutputValueType<DateTimeOffset>(false);
+            context.OutputValueType<char>(false);
+
+            context.OutputString();
+            context.OutputString("");
         }
     }
 }

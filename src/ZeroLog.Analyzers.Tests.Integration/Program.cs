@@ -9,6 +9,7 @@ public static class Program
     private static readonly Log _logger = LogManager.GetLogger(typeof(Program));
 
     private static int Answer => 42;
+    private static string HexFormatString => "X";
 
     private static void Main()
     {
@@ -44,9 +45,20 @@ public static class Program
                .Append("The answer is ")
                .Append(Answer)
                .Append(", as expected.")
-               .Append(" 0x")
+               .Append(" Also, here are other forms: ")
+               .Append(Answer.ToString())
+               .Append(", ")
+               .Append((int?)Answer)
+               .Append(", ")
+               .Append((double)Answer)
+               .Append(", ")
+               .Append((double?)Answer)
+               .Append(", ")
+               .Append("0x")
                .Append(Answer, "X")
-               .Append(" is also correct.")
+               .Append(" and 0x")
+               .Append(Answer, HexFormatString)
+               .Append(" are also correct.")
                .Log();
 
         // -----

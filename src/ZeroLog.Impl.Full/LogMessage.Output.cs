@@ -454,6 +454,7 @@ unsafe partial class LogMessage
                     ref dataPointer,
                     outputBuffer,
                     config,
+                    formatType,
                     out charsWritten
                 );
             }

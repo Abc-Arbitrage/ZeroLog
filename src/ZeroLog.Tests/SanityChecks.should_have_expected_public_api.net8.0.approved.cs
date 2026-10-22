@@ -1144,16 +1144,16 @@ namespace ZeroLog
             public abstract class Chain
             {
                 protected Chain() { }
-                protected abstract void Execute(ZeroLog.LogMessage.InternalApi.ChainExecutionContext context);
+                protected abstract void Execute(ref ZeroLog.LogMessage.InternalApi.ChainExecutionContext context);
             }
-            public sealed class ChainExecutionContext
+            public ref struct ChainExecutionContext
             {
-                public ChainExecutionContext() { }
-                public void ConsumeString() { }
-                public void ConsumeString(string? value) { }
-                public void ConsumeValueType<T>()
+                public void OutputString() { }
+                public void OutputString(string? value) { }
+                public void OutputValueType<T>(bool nullable)
                     where T :  unmanaged { }
-                public void SetNullable() { }
+                public void ReadFormatString() { }
+                public void SetFormatString(string? format) { }
             }
         }
     }
