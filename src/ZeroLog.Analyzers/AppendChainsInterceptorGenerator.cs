@@ -417,12 +417,7 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
                                 continue;
 
                             case AppendedType.ValueType:
-                                if (call.IsNullableType)
-                                {
-                                    // TODO
-                                }
-
-                                _writer.AppendLine($"context.OutputValueType<{call.UnderlyingTypeName}>();");
+                                _writer.AppendLine($"context.OutputValueType<{call.UnderlyingTypeName}>({(call.IsNullableType ? "true" : "false")});");
                                 break;
                         }
                     }

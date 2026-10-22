@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
 namespace ZeroLog;
@@ -12,6 +13,7 @@ partial class LogMessage
     /// It may cause breaking changes or be removed in future versions without notice.
     /// </summary>
     [EditorBrowsable(EditorBrowsableState.Never)]
+    [SuppressMessage("ReSharper", "UnusedMember.Global")]
     public static partial class InternalApi
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -33,7 +35,7 @@ partial class LogMessage
             => message.InternalAppendChainItem(value);
 
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public abstract partial class Chain
+        public abstract class Chain
         {
             protected abstract void Execute(ref ChainExecutionContext context);
 
@@ -46,7 +48,7 @@ partial class LogMessage
             public partial void OutputString();
             public partial void OutputString(string? value);
 
-            public partial void OutputValueType<T>()
+            public partial void OutputValueType<T>(bool nullable)
                 where T : unmanaged;
         }
     }
@@ -83,8 +85,6 @@ partial class LogMessage
 
     partial class InternalApi
     {
-        partial class Chain;
-
         ref partial struct ChainExecutionContext
         {
             public partial void OutputString()
@@ -93,7 +93,7 @@ partial class LogMessage
             public partial void OutputString(string? value)
             { }
 
-            public partial void OutputValueType<T>()
+            public partial void OutputValueType<T>(bool nullable)
                 where T : unmanaged
             { }
         }
