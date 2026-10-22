@@ -17,7 +17,7 @@ unsafe partial class LogMessage
             goto truncate;
 
         var inputData = new ReadOnlySpan<byte>(dataPointer, (int)(_dataPointer - dataPointer));
-        var context = new InternalApi.ChainExecutionContext(inputData, outputBuffer, config);
+        var context = new InternalApi.ChainExecutionContext(this, inputData, outputBuffer, config);
 
         chain.CallExecute(ref context);
 
@@ -42,61 +42,103 @@ unsafe partial class LogMessage
     {
         ref partial struct ChainExecutionContext
         {
+            private readonly LogMessage _logMessage;
             private readonly ZeroLogConfiguration _config;
+
             internal ReadOnlySpan<byte> InputData;
             internal Span<char> OutputBuffer;
             internal bool Truncated = false;
             private ReadOnlySpan<char> _format;
 
-            internal ChainExecutionContext(ReadOnlySpan<byte> inputData, Span<char> outputBuffer, ZeroLogConfiguration config)
+            internal ChainExecutionContext(LogMessage logMessage,
+                                           ReadOnlySpan<byte> inputData,
+                                           Span<char> outputBuffer,
+                                           ZeroLogConfiguration config)
             {
+                _logMessage = logMessage;
+                _config = config;
+
                 InputData = inputData;
                 OutputBuffer = outputBuffer;
-                _config = config;
+            }
+
+            private void ResetStatus()
+            {
+                _format = ReadOnlySpan<char>.Empty;
             }
 
             public partial void OutputString()
             {
-                _ = Truncated;
-                _format = "";
+                if (Truncated)
+                    return;
+
+                if (InputData.Length < sizeof(byte))
+                    goto truncate;
+
+                var stringIndex = InputData[0];
+                InputData = InputData.Slice(sizeof(byte));
+
+                if (stringIndex >= _logMessage._objects.Length)
+                    goto truncate;
+
+                OutputString(_logMessage._objects[stringIndex] as string);
+                return;
+
+                truncate:
+                Truncated = true;
             }
 
             public partial void OutputString(string? value)
             {
+                if (Truncated)
+                    return;
+
                 value ??= _config.NullDisplayString ?? string.Empty;
 
-                var charsToCopy = Math.Min(value.Length, OutputBuffer.Length);
-                value.AsSpan().CopyTo(OutputBuffer.Slice(0, charsToCopy));
+                if (value.Length > 0)
+                {
+                    var charsToCopy = Math.Min(value.Length, OutputBuffer.Length);
+                    value.AsSpan().CopyTo(OutputBuffer.Slice(0, charsToCopy));
 
-                OutputBuffer = OutputBuffer.Slice(charsToCopy);
+                    OutputBuffer = OutputBuffer.Slice(charsToCopy);
 
-                if (charsToCopy < value.Length)
-                    Truncated = true;
+                    if (charsToCopy < value.Length)
+                        Truncated = true;
+                }
+
+                ResetStatus();
             }
 
             public partial void OutputValueType<T>(bool nullable)
                 where T : unmanaged
             {
+                if (Truncated)
+                    return;
+
                 if (nullable)
                 {
                     if (InputData.Length < sizeof(byte))
-                    {
-                        Truncated = true;
-                        return;
-                    }
+                        goto truncate;
 
-                    var hasValue = InputData[0] != 0;
+                    var hasValue = InputData[0];
                     InputData = InputData.Slice(sizeof(byte));
 
-                    if (!hasValue)
-                        return;
+                    switch (hasValue)
+                    {
+                        case 0:
+                            OutputString(null);
+                            return;
+
+                        case 1:
+                            break;
+
+                        default:
+                            goto truncate;
+                    }
                 }
 
                 if (InputData.Length < sizeof(T))
-                {
-                    Truncated = true;
-                    return;
-                }
+                    goto truncate;
 
                 // ref readonly var value = ref Unsafe.As<byte, T>(ref MemoryMarshal.GetReference(InputData));
 
@@ -124,12 +166,17 @@ unsafe partial class LogMessage
                 {
                     InputData = InputData.Slice(sizeof(T));
                     OutputBuffer = OutputBuffer.Slice(charsWritten);
-                }
-                else
-                {
-                    Truncated = true;
+                    goto success;
                 }
 
+                goto truncate;
+
+                success:
+                ResetStatus();
+                return;
+
+                truncate:
+                Truncated = true;
                 return;
 
                 static bool TryFormatChar(Span<char> outputBuffer, char value, out int charsWritten)
