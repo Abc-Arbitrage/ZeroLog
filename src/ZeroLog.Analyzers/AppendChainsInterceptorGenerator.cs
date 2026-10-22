@@ -1,5 +1,6 @@
 #if ROSLYN5_0_OR_GREATER
 
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -333,15 +334,8 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
         int IndexInChain
     );
 
-    private readonly record struct ChainModel
+    private readonly record struct ChainModel(ImmutableArray<AppendCallModel> Calls)
     {
-        public ImmutableArray<AppendCallModel> Calls { get; }
-
-        public ChainModel(ImmutableArray<AppendCallModel> calls)
-        {
-            Calls = calls;
-        }
-
         public bool Equals(ChainModel other)
             => ImmutableArrayEqualityComparer<AppendCallModel>.Default.Equals(Calls, other.Calls);
 
@@ -416,7 +410,9 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
 
                 using (_writer.WriteBlock("protected override void Execute(ref global::ZeroLog.LogMessage.InternalApi.ChainExecutionContext context)"))
                 {
-                    foreach (var call in chain.Calls)
+                    var optimizedChain = ConcatConstants(chain);
+
+                    foreach (var call in optimizedChain.Calls)
                     {
                         switch (call.FormatStringType)
                         {
@@ -449,6 +445,35 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
                         }
                     }
                 }
+            }
+
+            return;
+
+            static ChainModel ConcatConstants(ChainModel chain)
+            {
+                var calls = new List<AppendCallModel>();
+
+                foreach (var call in chain.Calls)
+                {
+                    if (call.Type is AppendedType.ConstantString && calls.Count > 0)
+                    {
+                        var lastCall = calls[calls.Count - 1];
+
+                        if (lastCall.Type is AppendedType.ConstantString)
+                        {
+                            calls[calls.Count - 1] = lastCall with
+                            {
+                                ConstantString = lastCall.ConstantString + call.ConstantString
+                            };
+
+                            continue;
+                        }
+                    }
+
+                    calls.Add(call);
+                }
+
+                return new ChainModel(calls.ToImmutableArray());
             }
         }
 
