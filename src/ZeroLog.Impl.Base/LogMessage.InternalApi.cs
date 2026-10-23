@@ -51,8 +51,8 @@ partial class LogMessage
             public partial void OutputValueType<T>(bool nullable)
                 where T : unmanaged;
 
+            public partial void SetFormatString();
             public partial void SetFormatString(string? format);
-            public partial void ReadFormatString();
         }
     }
 
@@ -94,8 +94,8 @@ partial class LogMessage
             public partial void OutputString(string? value) { }
             public partial void OutputValueType<T>(bool nullable) where T : unmanaged { }
 
+            public partial void SetFormatString() { }
             public partial void SetFormatString(string? format) { }
-            public partial void ReadFormatString() { }
         }
     }
 

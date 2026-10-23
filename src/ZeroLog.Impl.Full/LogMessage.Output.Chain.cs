@@ -204,7 +204,7 @@ unsafe partial class LogMessage
                     : ReadOnlySpan<char>.Empty;
             }
 
-            public partial void ReadFormatString()
+            public partial void SetFormatString()
             {
                 if (Truncated)
                     return;

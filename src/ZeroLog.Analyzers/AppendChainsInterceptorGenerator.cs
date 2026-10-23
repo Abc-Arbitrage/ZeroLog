@@ -421,7 +421,7 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
                                 break;
 
                             case FormatStringType.Variable:
-                                _writer.AppendLine("context.ReadFormatString();");
+                                _writer.AppendLine("context.SetFormatString();");
                                 break;
                         }
 

@@ -826,7 +826,7 @@ namespace ZeroLog
                 public void OutputString(string? value) { }
                 public void OutputValueType<T>(bool nullable)
                     where T :  unmanaged { }
-                public void ReadFormatString() { }
+                public void SetFormatString() { }
                 public void SetFormatString(string? format) { }
             }
         }
