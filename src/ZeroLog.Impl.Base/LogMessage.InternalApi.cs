@@ -53,6 +53,9 @@ partial class LogMessage
 
             public partial void SetFormatString();
             public partial void SetFormatString(string? format);
+
+            public partial void SetKeyString();
+            public partial void SetKeyString(string? key);
         }
     }
 
@@ -96,6 +99,9 @@ partial class LogMessage
 
             public partial void SetFormatString() { }
             public partial void SetFormatString(string? format) { }
+
+            public partial void SetKeyString() { }
+            public partial void SetKeyString(string? key) { }
         }
     }
 

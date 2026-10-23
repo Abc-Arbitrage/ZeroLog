@@ -43,7 +43,14 @@ unsafe partial class LogMessage
                 }
             }
 
-            var isTruncated = !TryWriteArg(ref dataPointer, outputBuffer.Slice(bufferIndex), out var charsWritten, formatType, config);
+            var isTruncated = !TryWriteArg(
+                ref dataPointer,
+                outputBuffer.Slice(bufferIndex),
+                out var charsWritten,
+                formatType, config,
+                keyValueList
+            );
+
             bufferIndex += charsWritten;
 
             if (isTruncated)
@@ -97,7 +104,7 @@ unsafe partial class LogMessage
 
         var valuePtr = dataPointer;
 
-        if (!TryWriteArg(ref dataPointer, keyValueList.GetRemainingBuffer(), out var valueLength, FormatType.KeyValue, config))
+        if (!TryWriteArg(ref dataPointer, keyValueList.GetRemainingBuffer(), out var valueLength, FormatType.KeyValue, config, keyValueList))
             return false;
 
         keyValueList.Add(key, valueLength, valuePtr, (int)(dataPointer - valuePtr));
@@ -108,7 +115,8 @@ unsafe partial class LogMessage
                              Span<char> outputBuffer,
                              out int charsWritten,
                              FormatType formatType,
-                             ZeroLogConfiguration config)
+                             ZeroLogConfiguration config,
+                             KeyValueList? keyValueList)
     {
         var argType = *(ArgumentType*)dataPointer;
         dataPointer += sizeof(ArgumentType);
@@ -130,11 +138,11 @@ unsafe partial class LogMessage
         {
             format = argType switch
             {
-                ArgumentType.DateTime       => "yyyy-MM-dd HH:mm:ss",
-                ArgumentType.TimeSpan       => @"hh\:mm\:ss\.fffffff",
-                ArgumentType.DateOnly       => @"yyyy-MM-dd",
-                ArgumentType.TimeOnly       => @"HH\:mm\:ss\.fffffff",
-                ArgumentType.DateTimeOffset => @"yyyy-MM-dd HH:mm:ss zzz",
+                ArgumentType.DateTime       => KeyValueFormatStrings.DateTime,
+                ArgumentType.TimeSpan       => KeyValueFormatStrings.TimeSpan,
+                ArgumentType.DateOnly       => KeyValueFormatStrings.DateOnly,
+                ArgumentType.TimeOnly       => KeyValueFormatStrings.TimeOnly,
+                ArgumentType.DateTimeOffset => KeyValueFormatStrings.DateTimeOffset,
                 _                           => null
             };
         }
@@ -455,6 +463,7 @@ unsafe partial class LogMessage
                     outputBuffer,
                     config,
                     formatType,
+                    keyValueList,
                     out charsWritten
                 );
             }
@@ -697,5 +706,14 @@ unsafe partial class LogMessage
         Formatted,
         Unformatted,
         KeyValue
+    }
+
+    internal static class KeyValueFormatStrings
+    {
+        public const string DateTime = "yyyy-MM-dd HH:mm:ss";
+        public const string TimeSpan = @"hh\:mm\:ss\.fffffff";
+        public const string DateOnly = "yyyy-MM-dd";
+        public const string TimeOnly = @"HH\:mm\:ss\.fffffff";
+        public const string DateTimeOffset = "yyyy-MM-dd HH:mm:ss zzz";
     }
 }
