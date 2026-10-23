@@ -2,6 +2,7 @@ using System;
 using System.Globalization;
 using System.Runtime.InteropServices;
 using ZeroLog.Configuration;
+using ZeroLog.Formatting;
 
 namespace ZeroLog;
 
@@ -12,13 +13,22 @@ unsafe partial class LogMessage
                                Span<char> outputBuffer,
                                ZeroLogConfiguration config,
                                FormatType formatType,
+                               KeyValueList? keyValueList,
                                out int charsWritten)
     {
         if (chain is null)
             goto truncate;
 
         var inputData = new ReadOnlySpan<byte>(dataPointer, (int)(_dataPointer - dataPointer));
-        var context = new InternalApi.ChainExecutionContext(this, inputData, outputBuffer, formatType, config);
+
+        var context = new InternalApi.ChainExecutionContext(
+            this,
+            inputData,
+            outputBuffer,
+            formatType,
+            config,
+            keyValueList
+        );
 
         chain.CallExecute(ref context);
 
@@ -46,21 +56,25 @@ unsafe partial class LogMessage
             private readonly LogMessage _logMessage;
             private readonly ZeroLogConfiguration _config;
             private readonly FormatType _formatType;
+            private readonly KeyValueList? _keyValueList;
 
             internal ReadOnlySpan<byte> InputData;
             internal Span<char> OutputBuffer;
             internal bool Truncated = false;
             private ReadOnlySpan<char> _format;
+            private string? _key;
 
             internal ChainExecutionContext(LogMessage logMessage,
                                            ReadOnlySpan<byte> inputData,
                                            Span<char> outputBuffer,
                                            FormatType formatType,
-                                           ZeroLogConfiguration config)
+                                           ZeroLogConfiguration config,
+                                           KeyValueList? keyValueList)
             {
                 _logMessage = logMessage;
                 _config = config;
                 _formatType = formatType;
+                _keyValueList = keyValueList;
 
                 InputData = inputData;
                 OutputBuffer = outputBuffer;
@@ -69,27 +83,13 @@ unsafe partial class LogMessage
             private void ResetStatus()
             {
                 _format = ReadOnlySpan<char>.Empty;
+                _key = null;
             }
 
             public partial void OutputString()
             {
-                if (Truncated)
-                    return;
-
-                if (InputData.Length < sizeof(byte))
-                    goto truncate;
-
-                var stringIndex = InputData[0];
-                InputData = InputData.Slice(sizeof(byte));
-
-                if (stringIndex >= _logMessage._objects.Length)
-                    goto truncate;
-
-                OutputString(_logMessage._objects[stringIndex] as string);
-                return;
-
-                truncate:
-                Truncated = true;
+                if (TryReadVariableString(out var value))
+                    OutputString(value);
             }
 
             public partial void OutputString(string? value)
@@ -97,16 +97,26 @@ unsafe partial class LogMessage
                 if (Truncated)
                     return;
 
-                value ??= _config.NullDisplayString ?? string.Empty;
-
-                if (value.Length > 0)
+                if (_key is null)
                 {
-                    var charsToCopy = Math.Min(value.Length, OutputBuffer.Length);
-                    value.AsSpan().CopyTo(OutputBuffer.Slice(0, charsToCopy));
+                    value ??= _config.NullDisplayString ?? string.Empty;
+                    var outputBuffer = OutputBuffer;
 
-                    OutputBuffer = OutputBuffer.Slice(charsToCopy);
+                    if (value.Length > 0)
+                    {
+                        var charsToCopy = Math.Min(value.Length, outputBuffer.Length);
+                        value.AsSpan().CopyTo(outputBuffer.Slice(0, charsToCopy));
 
-                    if (charsToCopy < value.Length)
+                        if (_key is null)
+                            OutputBuffer = outputBuffer.Slice(charsToCopy);
+
+                        if (charsToCopy < value.Length)
+                            Truncated = true;
+                    }
+                }
+                else if (_keyValueList is not null)
+                {
+                    if (!_keyValueList.Add(_key, value))
                         Truncated = true;
                 }
 
@@ -144,32 +154,56 @@ unsafe partial class LogMessage
                 if (InputData.Length < sizeof(T))
                     goto truncate;
 
-                // ref readonly var value = ref Unsafe.As<byte, T>(ref MemoryMarshal.GetReference(InputData));
+                var outputBuffer = _key is null
+                    ? OutputBuffer
+                    : _keyValueList is not null
+                        ? _keyValueList.GetRemainingBuffer()
+                        : Span<char>.Empty;
 
-                if (typeof(T) == typeof(bool) ? MemoryMarshal.Read<bool>(InputData).TryFormat(OutputBuffer, out var charsWritten)
-                    : typeof(T) == typeof(byte) ? MemoryMarshal.Read<byte>(InputData).TryFormat(OutputBuffer, out charsWritten, _format, CultureInfo.InvariantCulture)
-                    : typeof(T) == typeof(sbyte) ? MemoryMarshal.Read<sbyte>(InputData).TryFormat(OutputBuffer, out charsWritten, _format, CultureInfo.InvariantCulture)
-                    : typeof(T) == typeof(short) ? MemoryMarshal.Read<short>(InputData).TryFormat(OutputBuffer, out charsWritten, _format, CultureInfo.InvariantCulture)
-                    : typeof(T) == typeof(ushort) ? MemoryMarshal.Read<ushort>(InputData).TryFormat(OutputBuffer, out charsWritten, _format, CultureInfo.InvariantCulture)
-                    : typeof(T) == typeof(int) ? MemoryMarshal.Read<int>(InputData).TryFormat(OutputBuffer, out charsWritten, _format, CultureInfo.InvariantCulture)
-                    : typeof(T) == typeof(uint) ? MemoryMarshal.Read<uint>(InputData).TryFormat(OutputBuffer, out charsWritten, _format, CultureInfo.InvariantCulture)
-                    : typeof(T) == typeof(long) ? MemoryMarshal.Read<long>(InputData).TryFormat(OutputBuffer, out charsWritten, _format, CultureInfo.InvariantCulture)
-                    : typeof(T) == typeof(ulong) ? MemoryMarshal.Read<ulong>(InputData).TryFormat(OutputBuffer, out charsWritten, _format, CultureInfo.InvariantCulture)
-                    : typeof(T) == typeof(nint) ? MemoryMarshal.Read<nint>(InputData).TryFormat(OutputBuffer, out charsWritten, _format, CultureInfo.InvariantCulture)
-                    : typeof(T) == typeof(nuint) ? MemoryMarshal.Read<nuint>(InputData).TryFormat(OutputBuffer, out charsWritten, _format, CultureInfo.InvariantCulture)
-                    : typeof(T) == typeof(float) ? MemoryMarshal.Read<float>(InputData).TryFormat(OutputBuffer, out charsWritten, _format, CultureInfo.InvariantCulture)
-                    : typeof(T) == typeof(double) ? MemoryMarshal.Read<double>(InputData).TryFormat(OutputBuffer, out charsWritten, _format, CultureInfo.InvariantCulture)
-                    : typeof(T) == typeof(decimal) ? MemoryMarshal.Read<decimal>(InputData).TryFormat(OutputBuffer, out charsWritten, _format, CultureInfo.InvariantCulture)
-                    : typeof(T) == typeof(Guid) ? MemoryMarshal.Read<Guid>(InputData).TryFormat(OutputBuffer, out charsWritten, _format)
-                    : typeof(T) == typeof(DateTime) ? MemoryMarshal.Read<DateTime>(InputData).TryFormat(OutputBuffer, out charsWritten, _format, CultureInfo.InvariantCulture)
-                    : typeof(T) == typeof(TimeSpan) ? MemoryMarshal.Read<TimeSpan>(InputData).TryFormat(OutputBuffer, out charsWritten, _format, CultureInfo.InvariantCulture)
-                    : typeof(T) == typeof(DateOnly) ? MemoryMarshal.Read<DateOnly>(InputData).TryFormat(OutputBuffer, out charsWritten, _format, CultureInfo.InvariantCulture)
-                    : typeof(T) == typeof(TimeOnly) ? MemoryMarshal.Read<TimeOnly>(InputData).TryFormat(OutputBuffer, out charsWritten, _format, CultureInfo.InvariantCulture)
-                    : typeof(T) == typeof(DateTimeOffset) ? MemoryMarshal.Read<DateTimeOffset>(InputData).TryFormat(OutputBuffer, out charsWritten, _format, CultureInfo.InvariantCulture)
-                    : typeof(T) == typeof(char) && TryFormatChar(OutputBuffer, MemoryMarshal.Read<char>(InputData), out charsWritten))
+                if (_key is not null)
                 {
+                    _format = typeof(T) == typeof(DateTime) ? KeyValueFormatStrings.DateTime
+                        : typeof(T) == typeof(TimeSpan) ? KeyValueFormatStrings.TimeSpan
+                        : typeof(T) == typeof(DateOnly) ? KeyValueFormatStrings.DateOnly
+                        : typeof(T) == typeof(TimeOnly) ? KeyValueFormatStrings.TimeOnly
+                        : typeof(T) == typeof(DateTimeOffset) ? KeyValueFormatStrings.DateTimeOffset
+                        : ReadOnlySpan<char>.Empty;
+                }
+
+                if (typeof(T) == typeof(bool) ? MemoryMarshal.Read<bool>(InputData).TryFormat(outputBuffer, out var charsWritten)
+                    : typeof(T) == typeof(byte) ? MemoryMarshal.Read<byte>(InputData).TryFormat(outputBuffer, out charsWritten, _format, CultureInfo.InvariantCulture)
+                    : typeof(T) == typeof(sbyte) ? MemoryMarshal.Read<sbyte>(InputData).TryFormat(outputBuffer, out charsWritten, _format, CultureInfo.InvariantCulture)
+                    : typeof(T) == typeof(short) ? MemoryMarshal.Read<short>(InputData).TryFormat(outputBuffer, out charsWritten, _format, CultureInfo.InvariantCulture)
+                    : typeof(T) == typeof(ushort) ? MemoryMarshal.Read<ushort>(InputData).TryFormat(outputBuffer, out charsWritten, _format, CultureInfo.InvariantCulture)
+                    : typeof(T) == typeof(int) ? MemoryMarshal.Read<int>(InputData).TryFormat(outputBuffer, out charsWritten, _format, CultureInfo.InvariantCulture)
+                    : typeof(T) == typeof(uint) ? MemoryMarshal.Read<uint>(InputData).TryFormat(outputBuffer, out charsWritten, _format, CultureInfo.InvariantCulture)
+                    : typeof(T) == typeof(long) ? MemoryMarshal.Read<long>(InputData).TryFormat(outputBuffer, out charsWritten, _format, CultureInfo.InvariantCulture)
+                    : typeof(T) == typeof(ulong) ? MemoryMarshal.Read<ulong>(InputData).TryFormat(outputBuffer, out charsWritten, _format, CultureInfo.InvariantCulture)
+                    : typeof(T) == typeof(nint) ? MemoryMarshal.Read<nint>(InputData).TryFormat(outputBuffer, out charsWritten, _format, CultureInfo.InvariantCulture)
+                    : typeof(T) == typeof(nuint) ? MemoryMarshal.Read<nuint>(InputData).TryFormat(outputBuffer, out charsWritten, _format, CultureInfo.InvariantCulture)
+                    : typeof(T) == typeof(float) ? MemoryMarshal.Read<float>(InputData).TryFormat(outputBuffer, out charsWritten, _format, CultureInfo.InvariantCulture)
+                    : typeof(T) == typeof(double) ? MemoryMarshal.Read<double>(InputData).TryFormat(outputBuffer, out charsWritten, _format, CultureInfo.InvariantCulture)
+                    : typeof(T) == typeof(decimal) ? MemoryMarshal.Read<decimal>(InputData).TryFormat(outputBuffer, out charsWritten, _format, CultureInfo.InvariantCulture)
+                    : typeof(T) == typeof(Guid) ? MemoryMarshal.Read<Guid>(InputData).TryFormat(outputBuffer, out charsWritten, _format)
+                    : typeof(T) == typeof(DateTime) ? MemoryMarshal.Read<DateTime>(InputData).TryFormat(outputBuffer, out charsWritten, _format, CultureInfo.InvariantCulture)
+                    : typeof(T) == typeof(TimeSpan) ? MemoryMarshal.Read<TimeSpan>(InputData).TryFormat(outputBuffer, out charsWritten, _format, CultureInfo.InvariantCulture)
+                    : typeof(T) == typeof(DateOnly) ? MemoryMarshal.Read<DateOnly>(InputData).TryFormat(outputBuffer, out charsWritten, _format, CultureInfo.InvariantCulture)
+                    : typeof(T) == typeof(TimeOnly) ? MemoryMarshal.Read<TimeOnly>(InputData).TryFormat(outputBuffer, out charsWritten, _format, CultureInfo.InvariantCulture)
+                    : typeof(T) == typeof(DateTimeOffset) ? MemoryMarshal.Read<DateTimeOffset>(InputData).TryFormat(outputBuffer, out charsWritten, _format, CultureInfo.InvariantCulture)
+                    : typeof(T) == typeof(char) && TryFormatChar(outputBuffer, MemoryMarshal.Read<char>(InputData), out charsWritten))
+                {
+                    var rawData = InputData.Slice(0, sizeof(T));
                     InputData = InputData.Slice(sizeof(T));
-                    OutputBuffer = OutputBuffer.Slice(charsWritten);
+
+                    if (_key is null)
+                    {
+                        OutputBuffer = OutputBuffer.Slice(charsWritten);
+                    }
+                    else
+                    {
+                        _keyValueList?.Add(_key, ArgumentType.FromValueType<T>(), charsWritten, rawData);
+                    }
+
                     goto success;
                 }
 
@@ -197,6 +231,12 @@ unsafe partial class LogMessage
                 }
             }
 
+            public partial void SetFormatString()
+            {
+                if (TryReadVariableString(out var format))
+                    SetFormatString(format);
+            }
+
             public partial void SetFormatString(string? format)
             {
                 _format = _formatType is FormatType.Formatted
@@ -204,10 +244,24 @@ unsafe partial class LogMessage
                     : ReadOnlySpan<char>.Empty;
             }
 
-            public partial void SetFormatString()
+            public partial void SetKeyString()
             {
+                if (TryReadVariableString(out var key))
+                    SetKeyString(key);
+            }
+
+            public partial void SetKeyString(string? key)
+            {
+                // This is only called from an AppendKeyValue call, so we always set _key to a non-null instance
+                _key = key ?? string.Empty;
+            }
+
+            private bool TryReadVariableString(out string? value)
+            {
+                value = null;
+
                 if (Truncated)
-                    return;
+                    return false;
 
                 if (InputData.Length < sizeof(byte))
                     goto truncate;
@@ -218,14 +272,14 @@ unsafe partial class LogMessage
                 if (stringIndex >= _logMessage._objects.Length)
                     goto truncate;
 
-                _format = _formatType is FormatType.Formatted
-                    ? _logMessage._objects[stringIndex] as string
-                    : ReadOnlySpan<char>.Empty;
+                value = _logMessage._objects[stringIndex] as string;
 
-                return;
+                if (value is not null)
+                    return true;
 
                 truncate:
                 Truncated = true;
+                return false;
             }
         }
     }
@@ -248,11 +302,14 @@ unsafe partial class LogMessage
                 input,
                 output,
                 default,
-                config
+                config,
+                null
             );
 
+#if !DEBUG
             var chain = new WarmupChain();
             chain.CallExecute(ref context);
+#endif
         }
 
         protected override void Execute(ref InternalApi.ChainExecutionContext context)

@@ -56,29 +56,16 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
     }
 
     private static bool SyntaxPredicate(SyntaxNode node, CancellationToken cancellationToken)
-        => node.IsKind(SyntaxKind.InvocationExpression) && node is InvocationExpressionSyntax
-        {
-            InvokedMethodName: ZeroLogFacts.MethodNames.Append // TODO: Enums and key/values
-        };
+        => node.IsKind(SyntaxKind.InvocationExpression)
+           && node is InvocationExpressionSyntax { InvokedMethodName: { } methodName }
+           && IsPotentiallyChainableMethodName(methodName);
 
     private static ChainedAppendsModel SyntaxTransform(GeneratorSyntaxContext context, CancellationToken cancellationToken)
     {
         if (context.Node is InvocationExpressionSyntax invocationSyntax
-            && context.SemanticModel.GetOperation(invocationSyntax, cancellationToken) is IInvocationOperation
-            {
-                TargetMethod:
-                {
-                    Name: ZeroLogFacts.MethodNames.Append,
-                    ContainingType:
-                    {
-                        Name: ZeroLogFacts.ShortTypeNames.LogMessage,
-                        ContainingType: null,
-                        ContainingNamespace: { Name: ZeroLogFacts.Namespace, ContainingNamespace.IsGlobalNamespace: true }
-                    }
-                }
-            } invocation
-            && TryGetChainedAppends(invocation, context.SemanticModel, out var chainedAppends, cancellationToken)
-           )
+            && context.SemanticModel.GetOperation(invocationSyntax, cancellationToken) is IInvocationOperation invocation
+            && IsPotentiallyChainableMethod(invocation.TargetMethod)
+            && TryGetChainedAppends(invocation, context.SemanticModel, out var chainedAppends, cancellationToken))
         {
             return chainedAppends;
         }
@@ -132,6 +119,8 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
                 out var appendedType,
                 out var underlyingTypeName,
                 out var isNullableValueType,
+                out var keyStringType,
+                out var keyString,
                 out var formatStringType,
                 out var formatString
             ))
@@ -143,8 +132,9 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
             return false;
 
         var constantString = default(string?);
+        var valueParameterIndex = keyString is null ? 0 : 1;
 
-        if (appendedType is AppendedType.String && invocation.GetArgumentByParameterIndex(0)?.Value.ConstantValue is { HasValue: true } constantValue)
+        if (appendedType is AppendedType.String && invocation.GetArgumentByParameterIndex(valueParameterIndex)?.Value.ConstantValue is { HasValue: true } constantValue)
         {
             switch (constantValue.Value)
             {
@@ -169,6 +159,8 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
             isNullableValueType,
             underlyingTypeName,
             constantString,
+            keyStringType,
+            keyString,
             formatStringType,
             formatString,
             appendCallLocation
@@ -177,49 +169,84 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
         return true;
     }
 
+    private static bool IsPotentiallyChainableMethod(IMethodSymbol method)
+        => IsPotentiallyChainableMethodName(method.Name)
+           && IsLogMessageType(method.ContainingType);
+
+    private static bool IsPotentiallyChainableMethodName(string methodName)
+        => methodName is ZeroLogFacts.MethodNames.Append or ZeroLogFacts.MethodNames.AppendKeyValue;
+
+    private static bool IsLogMessageType(ITypeSymbol type)
+        => type is
+        {
+            Name: ZeroLogFacts.ShortTypeNames.LogMessage,
+            ContainingType: null,
+            ContainingNamespace: { Name: ZeroLogFacts.Namespace, ContainingNamespace.IsGlobalNamespace: true }
+        };
+
     private static bool IsChainableInvocation(IInvocationOperation invocation,
                                               out AppendedType appendedType,
                                               [NotNullWhen(true)] out string? underlyingTypeName,
                                               out bool isNullableType,
-                                              out FormatStringType formatStringType,
+                                              out ProvidedStringType keyStringType,
+                                              out string? keyString,
+                                              out ProvidedStringType formatStringType,
                                               out string? formatString)
     {
         appendedType = AppendedType.None;
         isNullableType = false;
         underlyingTypeName = null;
-        formatStringType = FormatStringType.None;
+        keyStringType = ProvidedStringType.None;
+        keyString = null;
+        formatStringType = ProvidedStringType.None;
         formatString = null;
 
-        if (invocation.TargetMethod is
-            {
-                Name: ZeroLogFacts.MethodNames.Append,
-                ContainingType:
-                {
-                    Name: ZeroLogFacts.ShortTypeNames.LogMessage,
-                    ContainingType: null,
-                    ContainingNamespace: { Name: ZeroLogFacts.Namespace, ContainingNamespace.IsGlobalNamespace: true }
-                },
-                Parameters.Length: 1 or 2
-            } method)
+        var method = invocation.TargetMethod;
+        if (!IsPotentiallyChainableMethod(method))
+            return false;
+
+        switch (method.Name)
         {
-            if (method.Parameters[0].Type is not { } valueParameterType)
-                return false;
-
-            underlyingTypeName = GetSupportedTypeName(valueParameterType, out appendedType, out isNullableType);
-            if (underlyingTypeName is null)
-                return false;
-
-            if (method.Parameters.Length == 2)
+            case ZeroLogFacts.MethodNames.Append when method.Parameters.Length is 1 or 2:
             {
-                if (method.Parameters[1].Type.SpecialType != SpecialType.System_String)
+                if (method.Parameters[0].Type is not { } valueParameterType)
                     return false;
 
-                formatStringType = invocation.GetArgumentByParameterIndex(1)?.TryGetConstantString(out formatString) is true
-                    ? FormatStringType.Constant
-                    : FormatStringType.Variable;
+                underlyingTypeName = GetSupportedTypeName(valueParameterType, out appendedType, out isNullableType);
+                if (underlyingTypeName is null)
+                    return false;
+
+                if (method.Parameters.Length == 2)
+                {
+                    if (method.Parameters[1].Type.SpecialType != SpecialType.System_String)
+                        return false;
+
+                    formatStringType = invocation.GetArgumentByParameterIndex(1)?.TryGetConstantString(out formatString) is true
+                        ? ProvidedStringType.Constant
+                        : ProvidedStringType.Variable;
+                }
+
+                return true;
             }
 
-            return true;
+            case ZeroLogFacts.MethodNames.AppendKeyValue when method.Parameters.Length is 2:
+            {
+                if (method.Parameters[0].Type.SpecialType is not SpecialType.System_String)
+                    return false;
+
+                if (method.Parameters[1].Type is not { } valueParameterType)
+                    return false;
+
+                underlyingTypeName = GetSupportedTypeName(valueParameterType, out appendedType, out isNullableType);
+                if (underlyingTypeName is null)
+                    return false;
+
+                keyStringType = invocation.GetArgumentByParameterIndex(0)?.TryGetConstantString(out keyString) is true
+                    ? ProvidedStringType.Constant
+                    : ProvidedStringType.Variable;
+
+                return true;
+            }
         }
 
         return false;
@@ -311,7 +338,7 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
         ValueType
     }
 
-    private enum FormatStringType
+    private enum ProvidedStringType
     {
         None,
         Constant,
@@ -323,7 +350,9 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
         bool IsNullableType,
         string UnderlyingTypeName,
         string? ConstantString,
-        FormatStringType FormatStringType,
+        ProvidedStringType KeyStringType,
+        string? ConstantKeyString,
+        ProvidedStringType FormatStringType,
         string? ConstantFormatString,
         InterceptableLocation InterceptableLocation
     );
@@ -414,13 +443,24 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
 
                     foreach (var call in optimizedChain.Calls)
                     {
+                        switch (call.KeyStringType)
+                        {
+                            case ProvidedStringType.Constant:
+                                _writer.AppendLine($"context.SetKeyString({SymbolDisplay.FormatLiteral(call.ConstantKeyString ?? string.Empty, true)});");
+                                break;
+
+                            case ProvidedStringType.Variable:
+                                _writer.AppendLine("context.SetKeyString();");
+                                break;
+                        }
+
                         switch (call.FormatStringType)
                         {
-                            case FormatStringType.Constant:
+                            case ProvidedStringType.Constant:
                                 _writer.AppendLine($"context.SetFormatString({SymbolDisplay.FormatLiteral(call.ConstantFormatString ?? string.Empty, true)});");
                                 break;
 
-                            case FormatStringType.Variable:
+                            case ProvidedStringType.Variable:
                                 _writer.AppendLine("context.SetFormatString();");
                                 break;
                         }
@@ -455,11 +495,11 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
 
                 foreach (var call in chain.Calls)
                 {
-                    if (call.Type is AppendedType.ConstantString && calls.Count > 0)
+                    if (CanConcat(call) && calls.Count > 0)
                     {
                         var lastCall = calls[calls.Count - 1];
 
-                        if (lastCall.Type is AppendedType.ConstantString)
+                        if (CanConcat(lastCall))
                         {
                             calls[calls.Count - 1] = lastCall with
                             {
@@ -475,6 +515,11 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
 
                 return new ChainModel(calls.ToImmutableArray());
             }
+
+            static bool CanConcat(AppendCallModel call)
+                => call.Type is AppendedType.ConstantString
+                   && call.KeyStringType is ProvidedStringType.None
+                   && call.FormatStringType is ProvidedStringType.None;
         }
 
         private void GenerateInterceptors(ImmutableArray<ChainModel> chains)
@@ -489,20 +534,40 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
                 {
                     var call = chain.Calls[callIndex];
 
-                    _writer.AppendLine(
+                    _writer.Append(
                         $"""
-                            {call.InterceptableLocation.GetInterceptsLocationAttributeSyntax()}
-                            [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-                            public static global::{ZeroLogFacts.FullTypeNames.LogMessage} Append_{chainIndex}_{callIndex}(this global::{ZeroLogFacts.FullTypeNames.LogMessage} log, {call.UnderlyingTypeName}{(call.IsNullableType ? "?" : "")} value{(call.FormatStringType is not FormatStringType.None ? ", string format" : "")})
-                            """
+                        {call.InterceptableLocation.GetInterceptsLocationAttributeSyntax()}
+                        [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+                        public static global::{ZeroLogFacts.FullTypeNames.LogMessage} Append_{chainIndex}_{callIndex}
+                        """
                     );
+
+                    _writer.Append($"(this global::{ZeroLogFacts.FullTypeNames.LogMessage} log, ");
+
+                    if (call.KeyStringType is not ProvidedStringType.None)
+                        _writer.Append("string key, ");
+
+                    _writer.Append(call.UnderlyingTypeName);
+
+                    if (call.IsNullableType)
+                        _writer.Append("?");
+
+                    _writer.Append(" value");
+
+                    if (call.FormatStringType is not ProvidedStringType.None)
+                        _writer.Append(", string format");
+
+                    _writer.AppendLine(")");
 
                     using (_writer.WriteBlock())
                     {
                         if (callIndex == 0)
                             _writer.AppendLine($"global::{ZeroLogFacts.FullTypeNames.LogMessage}.{ZeroLogFacts.ShortTypeNames.InternalApi}.{ZeroLogFacts.MethodNames.AppendChain}(log, Chain{chainIndex}.Instance);");
 
-                        if (call.FormatStringType is FormatStringType.Variable)
+                        if (call.KeyStringType is ProvidedStringType.Variable)
+                            _writer.AppendLine($"global::{ZeroLogFacts.FullTypeNames.LogMessage}.{ZeroLogFacts.ShortTypeNames.InternalApi}.{ZeroLogFacts.MethodNames.AppendChainItem}(log, key);");
+
+                        if (call.FormatStringType is ProvidedStringType.Variable)
                             _writer.AppendLine($"global::{ZeroLogFacts.FullTypeNames.LogMessage}.{ZeroLogFacts.ShortTypeNames.InternalApi}.{ZeroLogFacts.MethodNames.AppendChainItem}(log, format);");
 
                         if (call.Type is AppendedType.String or AppendedType.ValueType)

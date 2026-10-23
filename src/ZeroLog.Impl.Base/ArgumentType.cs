@@ -46,6 +46,38 @@ internal enum ArgumentType : byte
 
 internal static class ArgumentTypeExtensions
 {
+    extension(ArgumentType)
+    {
+        public static ArgumentType FromValueType<T>()
+            where T : unmanaged
+        {
+            return typeof(T) == typeof(bool) ? ArgumentType.Boolean
+                : typeof(T) == typeof(byte) ? ArgumentType.Byte
+                : typeof(T) == typeof(sbyte) ? ArgumentType.SByte
+                : typeof(T) == typeof(short) ? ArgumentType.Int16
+                : typeof(T) == typeof(ushort) ? ArgumentType.UInt16
+                : typeof(T) == typeof(int) ? ArgumentType.Int32
+                : typeof(T) == typeof(uint) ? ArgumentType.UInt32
+                : typeof(T) == typeof(long) ? ArgumentType.Int64
+                : typeof(T) == typeof(ulong) ? ArgumentType.UInt64
+                : typeof(T) == typeof(nint) ? ArgumentType.IntPtr
+                : typeof(T) == typeof(nuint) ? ArgumentType.UIntPtr
+                : typeof(T) == typeof(float) ? ArgumentType.Single
+                : typeof(T) == typeof(double) ? ArgumentType.Double
+                : typeof(T) == typeof(decimal) ? ArgumentType.Decimal
+                : typeof(T) == typeof(Guid) ? ArgumentType.Guid
+                : typeof(T) == typeof(DateTime) ? ArgumentType.DateTime
+                : typeof(T) == typeof(TimeSpan) ? ArgumentType.TimeSpan
+#if NET
+                : typeof(T) == typeof(DateOnly) ? ArgumentType.DateOnly
+                : typeof(T) == typeof(TimeOnly) ? ArgumentType.TimeOnly
+#endif
+                : typeof(T) == typeof(DateTimeOffset) ? ArgumentType.DateTimeOffset
+                : typeof(T) == typeof(char) ? ArgumentType.Char
+                : ArgumentType.None;
+        }
+    }
+
     public static bool IsNumeric(this ArgumentType argType)
     {
         switch (argType)

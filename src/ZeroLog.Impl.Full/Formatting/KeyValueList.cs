@@ -1,20 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
 
 namespace ZeroLog.Formatting;
 
 /// <summary>
 /// A list of log message metadata as key/value pairs.
 /// </summary>
-public sealed unsafe class KeyValueList
+public sealed class KeyValueList
 {
     private readonly List<InternalItem> _items;
 
     private readonly char[] _buffer;
-    private readonly byte[]? _rawDataBuffer;
+    private readonly byte[] _rawDataBuffer;
     private int _position;
+    private int _rawDataPosition;
 
     /// <summary>
     /// The number of items contained in the list.
@@ -25,31 +24,21 @@ public sealed unsafe class KeyValueList
     {
         _items = new(byte.MaxValue);
         _buffer = GC.AllocateUninitializedArray<char>(bufferSize);
+        _rawDataBuffer = GC.AllocateUninitializedArray<byte>(bufferSize);
     }
 
     internal KeyValueList(KeyValueList other)
     {
         _buffer = GC.AllocateUninitializedArray<char>(other._position);
+        _rawDataBuffer = GC.AllocateUninitializedArray<byte>(other._rawDataPosition);
+
         other._buffer.AsSpan(0, other._position).CopyTo(_buffer);
+        other._rawDataBuffer.AsSpan(0, other._rawDataPosition).CopyTo(_rawDataBuffer);
+
         _position = other._position;
+        _rawDataPosition = other._rawDataPosition;
+
         _items = new(other._items);
-
-        if (other._rawDataBuffer is null)
-        {
-            _rawDataBuffer = GC.AllocateUninitializedArray<byte>(_items.Sum(item => item.RawDataLength));
-            var offset = 0;
-
-            foreach (ref var item in CollectionsMarshal.AsSpan(_items))
-            {
-                new Span<byte>((void*)item.RawDataPointerOrOffset, item.RawDataLength).CopyTo(_rawDataBuffer.AsSpan(offset, item.RawDataLength));
-                item.RawDataPointerOrOffset = (nuint)offset;
-                offset += item.RawDataLength;
-            }
-        }
-        else
-        {
-            _rawDataBuffer = other._rawDataBuffer;
-        }
     }
 
     /// <summary>
@@ -64,10 +53,9 @@ public sealed unsafe class KeyValueList
 
             return new LoggedKeyValue(
                 item.Key,
+                item.ArgumentType,
                 _buffer.AsSpan(item.StringValueOffset, item.StringValueLength),
-                _rawDataBuffer is null
-                    ? new ReadOnlySpan<byte>((void*)item.RawDataPointerOrOffset, item.RawDataLength)
-                    : _rawDataBuffer.AsSpan((int)item.RawDataPointerOrOffset, item.RawDataLength)
+                _rawDataBuffer.AsSpan(item.RawDataOffset, item.RawDataLength)
             );
         }
     }
@@ -75,16 +63,43 @@ public sealed unsafe class KeyValueList
     internal void Clear()
     {
         _position = 0;
+        _rawDataPosition = 0;
         _items.Clear();
     }
 
     internal Span<char> GetRemainingBuffer()
         => _buffer.AsSpan(_position);
 
-    internal void Add(string key, int stringValueLength, byte* rawDataPointer, int rawDataLength)
+    internal bool Add(string key, string? value)
     {
-        _items.Add(new InternalItem(key, _position, stringValueLength, (nuint)rawDataPointer, rawDataLength));
+        if (value is null)
+        {
+            _items.Add(new InternalItem(key, ArgumentType.Null, 0, 0, 0, 0));
+            return true;
+        }
+
+        var outputBuffer = GetRemainingBuffer();
+        var charsToCopy = Math.Min(value.Length, outputBuffer.Length);
+        value.AsSpan(0, charsToCopy).CopyTo(outputBuffer);
+
+        _items.Add(new InternalItem(key, ArgumentType.String, _position, charsToCopy, 0, 0));
+        _position += charsToCopy;
+
+        return charsToCopy == value.Length;
+    }
+
+    internal bool Add(string key, ArgumentType argumentType, int stringValueLength, ReadOnlySpan<byte> rawData)
+    {
+        if (_rawDataPosition + rawData.Length > _rawDataBuffer.Length)
+            return false;
+
+        rawData.CopyTo(_rawDataBuffer.AsSpan(_rawDataPosition));
+        _items.Add(new InternalItem(key, argumentType, _position, stringValueLength, _rawDataPosition, rawData.Length));
+
         _position += stringValueLength;
+        _rawDataPosition += rawData.Length;
+
+        return true;
     }
 
     /// <summary>
@@ -95,9 +110,10 @@ public sealed unsafe class KeyValueList
 
     private record struct InternalItem(
         string Key,
+        ArgumentType ArgumentType,
         int StringValueOffset,
         int StringValueLength,
-        nuint RawDataPointerOrOffset,
+        int RawDataOffset,
         int RawDataLength
     );
 

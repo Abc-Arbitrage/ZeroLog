@@ -1154,6 +1154,8 @@ namespace ZeroLog
                     where T :  unmanaged { }
                 public void SetFormatString() { }
                 public void SetFormatString(string? format) { }
+                public void SetKeyString() { }
+                public void SetKeyString(string? key) { }
             }
         }
     }

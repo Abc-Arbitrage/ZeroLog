@@ -17,9 +17,11 @@ public readonly unsafe ref struct LoggedKeyValue
     public string Key { get; }
 
     /// <summary>
-    /// The item value.
+    /// The item formatted value.
     /// </summary>
     public ReadOnlySpan<char> Value { get; }
+
+    internal ArgumentType ArgumentType { get; }
 
     /// <summary>
     /// Indicates whether the value is null.
@@ -36,11 +38,12 @@ public readonly unsafe ref struct LoggedKeyValue
     /// </summary>
     public bool IsNumeric => ArgumentType.IsNumeric();
 
-    internal LoggedKeyValue(string key, ReadOnlySpan<char> value, ReadOnlySpan<byte> rawData)
+    internal LoggedKeyValue(string key, ArgumentType argumentType, ReadOnlySpan<char> value, ReadOnlySpan<byte> rawData)
     {
         _rawData = rawData;
         Key = key;
         Value = value;
+        ArgumentType = argumentType;
     }
 
     /// <summary>
@@ -57,8 +60,6 @@ public readonly unsafe ref struct LoggedKeyValue
     /// </summary>
     public override string ToString()
         => $"{Key} = {Value}";
-
-    internal ArgumentType ArgumentType => MemoryMarshal.Read<ArgumentType>(_rawData);
 
     /// <summary>
     /// The type of the item value.
@@ -90,8 +91,8 @@ public readonly unsafe ref struct LoggedKeyValue
         ArgumentType.String         => typeof(string),
         ArgumentType.StringSpan     => typeof(string),
         ArgumentType.Utf8StringSpan => typeof(string),
-        ArgumentType.Enum           => MemoryMarshal.Read<EnumArg>(_rawData[sizeof(ArgumentType)..]).Type,
-        ArgumentType.Unmanaged      => MemoryMarshal.Read<UnmanagedArgHeader>(_rawData[sizeof(ArgumentType)..]).Type,
+        ArgumentType.Enum           => MemoryMarshal.Read<EnumArg>(_rawData).Type,
+        ArgumentType.Unmanaged      => MemoryMarshal.Read<UnmanagedArgHeader>(_rawData).Type,
         _                           => null
     };
 
@@ -111,11 +112,9 @@ public readonly unsafe ref struct LoggedKeyValue
             return false;
         }
 
-        ref var rawDataRef = ref MemoryMarshal.GetReference(_rawData);
-        var valueType = (ArgumentType)rawDataRef; // There is no FormatFlag in this context
-        ref var dataRef = ref Unsafe.Add(ref rawDataRef, sizeof(ArgumentType));
+        ref var dataRef = ref MemoryMarshal.GetReference(_rawData);
 
-        switch (valueType)
+        switch (ArgumentType) // There is no FormatFlag in this context
         {
             case ArgumentType.Char when typeof(T) == typeof(char):
             case ArgumentType.Boolean when typeof(T) == typeof(bool):

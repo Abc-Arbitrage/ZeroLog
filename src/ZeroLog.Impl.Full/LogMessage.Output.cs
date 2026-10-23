@@ -31,9 +31,11 @@ unsafe partial class LogMessage
 
         while (dataPointer < endOfData)
         {
+            var argType = *(ArgumentType*)dataPointer;
+            ++dataPointer;
+
             if (keyValueList != null)
             {
-                var argType = *(ArgumentType*)dataPointer;
                 if (argType == ArgumentType.KeyString) // KeyString never has a format flag
                 {
                     if (!TryWriteKeyValue(ref dataPointer, keyValueList, config))
@@ -43,7 +45,16 @@ unsafe partial class LogMessage
                 }
             }
 
-            var isTruncated = !TryWriteArg(ref dataPointer, outputBuffer.Slice(bufferIndex), out var charsWritten, formatType, config);
+            var isTruncated = !TryWriteArg(
+                argType,
+                ref dataPointer,
+                outputBuffer.Slice(bufferIndex),
+                out var charsWritten,
+                formatType,
+                config,
+                keyValueList
+            );
+
             bufferIndex += charsWritten;
 
             if (isTruncated)
@@ -85,8 +96,6 @@ unsafe partial class LogMessage
 
     private bool TryWriteKeyValue(ref byte* dataPointer, KeyValueList keyValueList, ZeroLogConfiguration config)
     {
-        dataPointer += sizeof(ArgumentType);
-
         var keyIndex = *dataPointer;
         ++dataPointer;
 
@@ -95,24 +104,28 @@ unsafe partial class LogMessage
         if (dataPointer >= _dataPointer)
             return false;
 
-        var valuePtr = dataPointer;
-
-        if (!TryWriteArg(ref dataPointer, keyValueList.GetRemainingBuffer(), out var valueLength, FormatType.KeyValue, config))
-            return false;
-
-        keyValueList.Add(key, valueLength, valuePtr, (int)(dataPointer - valuePtr));
-        return true;
-    }
-
-    private bool TryWriteArg(ref byte* dataPointer,
-                             Span<char> outputBuffer,
-                             out int charsWritten,
-                             FormatType formatType,
-                             ZeroLogConfiguration config)
-    {
         var argType = *(ArgumentType*)dataPointer;
         dataPointer += sizeof(ArgumentType);
 
+        var valuePtr = dataPointer;
+
+        if (!TryWriteArg(argType, ref dataPointer, keyValueList.GetRemainingBuffer(), out var valueLength, FormatType.KeyValue, config, keyValueList))
+            return false;
+
+        if (!keyValueList.Add(key, argType, valueLength, new ReadOnlySpan<byte>(valuePtr, (int)(dataPointer - valuePtr))))
+            return false;
+
+        return true;
+    }
+
+    private bool TryWriteArg(ArgumentType argType,
+                             ref byte* dataPointer,
+                             Span<char> outputBuffer,
+                             out int charsWritten,
+                             FormatType formatType,
+                             ZeroLogConfiguration config,
+                             KeyValueList? keyValueList)
+    {
         var format = default(string);
 
         if ((argType & ArgumentType.FormatFlag) != 0)
@@ -130,11 +143,11 @@ unsafe partial class LogMessage
         {
             format = argType switch
             {
-                ArgumentType.DateTime       => "yyyy-MM-dd HH:mm:ss",
-                ArgumentType.TimeSpan       => @"hh\:mm\:ss\.fffffff",
-                ArgumentType.DateOnly       => @"yyyy-MM-dd",
-                ArgumentType.TimeOnly       => @"HH\:mm\:ss\.fffffff",
-                ArgumentType.DateTimeOffset => @"yyyy-MM-dd HH:mm:ss zzz",
+                ArgumentType.DateTime       => KeyValueFormatStrings.DateTime,
+                ArgumentType.TimeSpan       => KeyValueFormatStrings.TimeSpan,
+                ArgumentType.DateOnly       => KeyValueFormatStrings.DateOnly,
+                ArgumentType.TimeOnly       => KeyValueFormatStrings.TimeOnly,
+                ArgumentType.DateTimeOffset => KeyValueFormatStrings.DateTimeOffset,
                 _                           => null
             };
         }
@@ -446,15 +459,16 @@ unsafe partial class LogMessage
 
             case ArgumentType.Chain:
             {
-                var stringIndex = *dataPointer;
+                var objectIndex = *dataPointer;
                 ++dataPointer;
 
                 return TryWriteChain(
-                    _objects[stringIndex] as InternalApi.Chain,
+                    _objects[objectIndex] as InternalApi.Chain,
                     ref dataPointer,
                     outputBuffer,
                     config,
                     formatType,
+                    keyValueList,
                     out charsWritten
                 );
             }
@@ -697,5 +711,14 @@ unsafe partial class LogMessage
         Formatted,
         Unformatted,
         KeyValue
+    }
+
+    internal static class KeyValueFormatStrings
+    {
+        public const string DateTime = "yyyy-MM-dd HH:mm:ss";
+        public const string TimeSpan = @"hh\:mm\:ss\.fffffff";
+        public const string DateOnly = "yyyy-MM-dd";
+        public const string TimeOnly = @"HH\:mm\:ss\.fffffff";
+        public const string DateTimeOffset = "yyyy-MM-dd HH:mm:ss zzz";
     }
 }

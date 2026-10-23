@@ -60,6 +60,12 @@ public static class Program
                .Append(" and 0x")
                .Append(Answer, HexFormatString)
                .Append(" are also correct.")
+               .AppendKeyValue("Answer", Answer)
+               .AppendKeyValue("NullableAnswer", (int?)Answer)
+               .AppendKeyValue("ConstAnswer", 42)
+               .AppendKeyValue("ConstNullableAnswer", (int?)42)
+               .AppendKeyValue("StringAnswer", Answer.ToString())
+               .AppendKeyValue("ConstStringAnswer", "42")
                .Log();
 
         // -----
