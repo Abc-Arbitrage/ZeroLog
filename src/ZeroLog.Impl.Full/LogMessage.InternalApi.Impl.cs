@@ -1,3 +1,6 @@
+using System;
+using ZeroLog.Support;
+
 namespace ZeroLog;
 
 unsafe partial class LogMessage
@@ -66,13 +69,52 @@ unsafe partial class LogMessage
     {
         if (_dataPointer + 1 + sizeof(T) <= _endOfBuffer)
         {
-            if (value.HasValue)
+            if (value is not null)
             {
                 *_dataPointer = 1;
                 ++_dataPointer;
 
                 *(T*)_dataPointer = value.GetValueOrDefault();
                 _dataPointer += sizeof(T);
+            }
+            else
+            {
+                *_dataPointer = 0;
+                ++_dataPointer;
+            }
+        }
+        else
+        {
+            _isTruncated = true;
+        }
+    }
+
+    internal partial void InternalAppendChainEnumItem<T>(T value)
+        where T : struct, Enum
+    {
+        if (_dataPointer + sizeof(EnumArg) <= _endOfBuffer)
+        {
+            *(EnumArg*)_dataPointer = new EnumArg(TypeUtil<T>.TypeHandle, EnumCache.ToUInt64(value));
+            _dataPointer += sizeof(EnumArg);
+        }
+        else
+        {
+            _isTruncated = true;
+        }
+    }
+
+    internal partial void InternalAppendChainEnumItem<T>(T? value)
+        where T : struct, Enum
+    {
+        if (_dataPointer + 1 + sizeof(EnumArg) <= _endOfBuffer)
+        {
+            if (value is not null)
+            {
+                *_dataPointer = 1;
+                ++_dataPointer;
+
+                *(EnumArg*)_dataPointer = new EnumArg(TypeUtil<T>.TypeHandle, EnumCache.ToUInt64(value.GetValueOrDefault()));
+                _dataPointer += sizeof(EnumArg);
             }
             else
             {

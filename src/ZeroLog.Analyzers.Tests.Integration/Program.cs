@@ -10,6 +10,7 @@ public static class Program
 
     private static int Answer => 42;
     private static string HexFormatString => "X";
+    private static SomeEnum EnumAnswer => SomeEnum.FortyTwo;
 
     private static void Main()
     {
@@ -45,7 +46,7 @@ public static class Program
                .Append("The answer is ")
                .Append(Answer)
                .Append(", as expected.")
-               .Append(" Also, here are other forms:")
+               .Append(" Other forms:")
                .Append(' ')
                .Append(Answer.ToString())
                .Append(", ")
@@ -57,15 +58,28 @@ public static class Program
                .Append(", ")
                .Append("0x")
                .Append(Answer, "X")
-               .Append(" and 0x")
+               .Append(", 0x")
                .Append(Answer, HexFormatString)
-               .Append(" are also correct.")
+               .Append(", enums: ")
+               .AppendEnum(SomeEnum.FortyTwo)
+               .Append(", ")
+               .AppendEnum((SomeEnum?)SomeEnum.FortyTwo)
+               .Append(", ")
+               .AppendEnum(EnumAnswer)
+               .Append(", ")
+               .AppendEnum((SomeEnum?)EnumAnswer)
+               .Append(". A non-answer is: ")
+               .Append(default(string))
                .AppendKeyValue("Answer", Answer)
                .AppendKeyValue("NullableAnswer", (int?)Answer)
                .AppendKeyValue("ConstAnswer", 42)
                .AppendKeyValue("ConstNullableAnswer", (int?)42)
                .AppendKeyValue("StringAnswer", Answer.ToString())
                .AppendKeyValue("ConstStringAnswer", "42")
+               .AppendKeyValue("EnumAnswer", EnumAnswer)
+               .AppendKeyValue("NullableEnumAnswer", (SomeEnum?)EnumAnswer)
+               .AppendKeyValue("ConstEnumAnswer", SomeEnum.FortyTwo)
+               .AppendKeyValue("ConstNullableEnumAnswer", (SomeEnum?)SomeEnum.FortyTwo)
                .Log();
 
         // -----
@@ -117,8 +131,12 @@ public static class Program
 
     private static IDisposable InitLogger()
     {
+        LogManager.RegisterEnum<SomeEnum>();
+
         return LogManager.Initialize(new ZeroLogConfiguration
         {
+            LogMessageStringCapacity = 256,
+            LogMessageBufferSize = 4096,
             RootLogger = { Appenders = { new ConsoleAppender { ColorOutput = false } } }
         });
     }
@@ -126,5 +144,11 @@ public static class Program
     private class NestedType
     {
         public class DeeperNestedType;
+    }
+
+    internal enum SomeEnum
+    {
+        None,
+        FortyTwo = 42
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
@@ -37,6 +38,16 @@ partial class LogMessage
                 where T : unmanaged
                 => message.InternalAppendChainItem(value);
 
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static void AppendChainEnumItem<T>(LogMessage message, T value)
+                where T : struct, Enum
+                => message.InternalAppendChainEnumItem(value);
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static void AppendChainEnumItem<T>(LogMessage message, T? value)
+                where T : struct, Enum
+                => message.InternalAppendChainEnumItem(value);
+
             protected abstract void Execute(ref ChainExecutionContext context);
 
             internal void CallExecute(ref ChainExecutionContext context)
@@ -49,6 +60,9 @@ partial class LogMessage
 
                 public partial void OutputValueType<T>(bool nullable)
                     where T : unmanaged;
+
+                public partial void OutputEnum<T>(bool nullable)
+                    where T : struct, Enum;
 
                 public partial void SetFormatString();
                 public partial void SetFormatString(string? format);
@@ -73,6 +87,14 @@ partial class LogMessage
     internal partial void InternalAppendChainItem<T>(T? value)
         where T : unmanaged;
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal partial void InternalAppendChainEnumItem<T>(T value)
+        where T : struct, Enum;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal partial void InternalAppendChainEnumItem<T>(T? value)
+        where T : struct, Enum;
+
 #if NETSTANDARD
 
     internal partial void InternalAppendChain(InternalApi.Chain chain)
@@ -89,6 +111,14 @@ partial class LogMessage
         where T : unmanaged
     { }
 
+    internal partial void InternalAppendChainEnumItem<T>(T value)
+        where T : struct, Enum
+    { }
+
+    internal partial void InternalAppendChainEnumItem<T>(T? value)
+        where T : struct, Enum
+    { }
+
     partial class InternalApi
     {
         partial class Chain
@@ -98,6 +128,7 @@ partial class LogMessage
                 public partial void OutputString() { }
                 public partial void OutputString(string? value) { }
                 public partial void OutputValueType<T>(bool nullable) where T : unmanaged { }
+                public partial void OutputEnum<T>(bool nullable) where T : struct, Enum { }
 
                 public partial void SetFormatString() { }
                 public partial void SetFormatString(string? format) { }

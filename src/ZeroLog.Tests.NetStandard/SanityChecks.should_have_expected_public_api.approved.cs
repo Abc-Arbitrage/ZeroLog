@@ -814,6 +814,10 @@ namespace ZeroLog
                 protected Chain() { }
                 protected abstract void Execute(ref ZeroLog.LogMessage.InternalApi.Chain.ChainExecutionContext context);
                 public static void AppendChain(ZeroLog.LogMessage message, ZeroLog.LogMessage.InternalApi.Chain chain) { }
+                public static void AppendChainEnumItem<T>(ZeroLog.LogMessage message, T value)
+                    where T :  struct, System.Enum { }
+                public static void AppendChainEnumItem<T>(ZeroLog.LogMessage message, T? value)
+                    where T :  struct, System.Enum { }
                 public static void AppendChainItem(ZeroLog.LogMessage message, string? value) { }
                 public static void AppendChainItem<T>(ZeroLog.LogMessage message, T value)
                     where T :  unmanaged { }
@@ -821,6 +825,8 @@ namespace ZeroLog
                     where T :  unmanaged { }
                 public ref struct ChainExecutionContext
                 {
+                    public void OutputEnum<T>(bool nullable)
+                        where T :  struct, System.Enum { }
                     public void OutputString() { }
                     public void OutputString(string? value) { }
                     public void OutputValueType<T>(bool nullable)

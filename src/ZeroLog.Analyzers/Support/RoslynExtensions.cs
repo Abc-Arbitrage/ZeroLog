@@ -51,6 +51,24 @@ internal static class RoslynExtensions
         }
     }
 
+    extension(INamedTypeSymbol type)
+    {
+        public bool HasAssemblyAccessibility(Compilation compilation)
+        {
+            for (var currentType = type; currentType is not null; currentType = currentType.ContainingType)
+            {
+#if ROSLYN5_0_OR_GREATER
+                if (currentType.IsFileLocal)
+                    return false;
+#endif
+                if (!compilation.IsSymbolAccessibleWithin(currentType, compilation.Assembly))
+                    return false;
+            }
+
+            return true;
+        }
+    }
+
     extension(IInvocationOperation invocation)
     {
         public IArgumentOperation? GetArgumentByParameterIndex(int index)

@@ -1,5 +1,6 @@
 using System;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using ZeroLog.Configuration;
 using ZeroLog.Formatting;
@@ -231,6 +232,67 @@ unsafe partial class LogMessage
                         charsWritten = 0;
                         return false;
                     }
+                }
+
+                public partial void OutputEnum<T>(bool nullable)
+                    where T : struct, Enum
+                {
+                    if (Truncated)
+                        return;
+
+                    if (nullable)
+                    {
+                        if (InputData.Length < sizeof(byte))
+                            goto truncate;
+
+                        var hasValue = InputData[0];
+                        InputData = InputData.Slice(sizeof(byte));
+
+                        switch (hasValue)
+                        {
+                            case 0:
+                                OutputString(null);
+                                return;
+
+                            case 1:
+                                break;
+
+                            default:
+                                goto truncate;
+                        }
+                    }
+
+                    if (InputData.Length < sizeof(EnumArg))
+                        goto truncate;
+
+                    var outputBuffer = _key is null
+                        ? OutputBuffer
+                        : _keyValueList is not null
+                            ? _keyValueList.GetRemainingBuffer()
+                            : Span<char>.Empty;
+
+                    ref readonly var enumArg = ref Unsafe.As<byte, EnumArg>(ref MemoryMarshal.GetReference(InputData));
+
+                    if (!enumArg.TryFormat(outputBuffer, out var charsWritten, _config))
+                        goto truncate;
+
+                    var rawData = InputData.Slice(0, sizeof(EnumArg));
+                    InputData = InputData.Slice(sizeof(EnumArg));
+
+                    if (_key is null)
+                    {
+                        OutputBuffer = OutputBuffer.Slice(charsWritten);
+                    }
+                    else
+                    {
+                        _keyValueList?.Add(_key, ArgumentType.Enum, charsWritten, rawData);
+                    }
+
+                    ResetStatus();
+                    return;
+
+                    truncate:
+                    Truncated = true;
                 }
 
                 public partial void SetFormatString()

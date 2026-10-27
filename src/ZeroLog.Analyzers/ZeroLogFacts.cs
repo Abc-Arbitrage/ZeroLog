@@ -24,6 +24,8 @@ internal static class ZeroLogFacts
         public const string Log = "ZeroLog.Log";
         public const string LogManager = "ZeroLog.LogManager";
         public const string LogMessage = "ZeroLog.LogMessage";
+
+        // InternalApi
         public const string Chain = "ZeroLog.LogMessage.InternalApi.Chain";
         public const string ChainExecutionContext = "ZeroLog.LogMessage.InternalApi.Chain.ChainExecutionContext";
     }
@@ -33,11 +35,14 @@ internal static class ZeroLogFacts
         public const string Append = "Append";
         public const string AppendEnum = "AppendEnum";
         public const string AppendKeyValue = "AppendKeyValue";
-        public const string AppendChain = "AppendChain";
-        public const string AppendChainItem = "AppendChainItem";
         public const string WithException = "WithException";
         public const string GetLogger = "GetLogger";
         public const string Log = "Log";
+
+        // InternalApi
+        public const string AppendChain = "AppendChain";
+        public const string AppendChainItem = "AppendChainItem";
+        public const string AppendChainEnumItem = "AppendChainEnumItem";
     }
 
     public static class ParameterNames

@@ -50,7 +50,7 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
         // C# 11 is required for file-scoped types
         return compilation is CSharpCompilation { LanguageVersion: >= (LanguageVersion)1100 }
                && compilation.GetTypeByMetadataName(ZeroLogFacts.FullTypeNames.LogMessage) is { } logMessage
-               && logMessage.GetTypeMembers(ZeroLogFacts.ShortTypeNames.InternalApi) is [{ } internalApiType];
+               && logMessage.GetTypeMembers(ZeroLogFacts.ShortTypeNames.InternalApi) is [{ }];
 
         // TODO: Finish
     }
@@ -116,6 +116,7 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
 
         if (!IsChainableInvocation(
                 invocation,
+                semanticModel,
                 out var appendedType,
                 out var underlyingTypeName,
                 out var isNullableValueType,
@@ -132,7 +133,7 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
             return false;
 
         var constantString = default(string?);
-        var valueParameterIndex = keyString is null ? 0 : 1;
+        var valueParameterIndex = keyStringType is ProvidedStringType.None ? 0 : 1;
 
         if (appendedType is AppendedType.String && invocation.GetArgumentByParameterIndex(valueParameterIndex)?.Value.ConstantValue is { HasValue: true } constantValue)
         {
@@ -174,7 +175,7 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
            && IsLogMessageType(method.ContainingType);
 
     private static bool IsPotentiallyChainableMethodName(string methodName)
-        => methodName is ZeroLogFacts.MethodNames.Append or ZeroLogFacts.MethodNames.AppendKeyValue;
+        => methodName is ZeroLogFacts.MethodNames.Append or ZeroLogFacts.MethodNames.AppendEnum or ZeroLogFacts.MethodNames.AppendKeyValue;
 
     private static bool IsLogMessageType(ITypeSymbol type)
         => type is
@@ -185,6 +186,7 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
         };
 
     private static bool IsChainableInvocation(IInvocationOperation invocation,
+                                              SemanticModel semanticModel,
                                               out AppendedType appendedType,
                                               [NotNullWhen(true)] out string? underlyingTypeName,
                                               out bool isNullableType,
@@ -202,6 +204,7 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
         formatString = null;
 
         var method = invocation.TargetMethod;
+
         if (!IsPotentiallyChainableMethod(method))
             return false;
 
@@ -212,7 +215,13 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
                 if (method.Parameters[0].Type is not { } valueParameterType)
                     return false;
 
-                underlyingTypeName = GetSupportedTypeName(valueParameterType, out appendedType, out isNullableType);
+                underlyingTypeName = GetSupportedTypeName(
+                    valueParameterType,
+                    semanticModel.Compilation,
+                    out appendedType,
+                    out isNullableType
+                );
+
                 if (underlyingTypeName is null)
                     return false;
 
@@ -229,6 +238,21 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
                 return true;
             }
 
+            case ZeroLogFacts.MethodNames.AppendEnum when method.Parameters.Length is 1:
+            {
+                if (method.Parameters[0].Type is not { } valueParameterType)
+                    return false;
+
+                underlyingTypeName = GetSupportedTypeName(
+                    valueParameterType,
+                    semanticModel.Compilation,
+                    out appendedType,
+                    out isNullableType
+                );
+
+                return underlyingTypeName is not null;
+            }
+
             case ZeroLogFacts.MethodNames.AppendKeyValue when method.Parameters.Length is 2:
             {
                 if (method.Parameters[0].Type.SpecialType is not SpecialType.System_String)
@@ -237,7 +261,13 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
                 if (method.Parameters[1].Type is not { } valueParameterType)
                     return false;
 
-                underlyingTypeName = GetSupportedTypeName(valueParameterType, out appendedType, out isNullableType);
+                underlyingTypeName = GetSupportedTypeName(
+                    valueParameterType,
+                    semanticModel.Compilation,
+                    out appendedType,
+                    out isNullableType
+                );
+
                 if (underlyingTypeName is null)
                     return false;
 
@@ -253,6 +283,7 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
     }
 
     private static string? GetSupportedTypeName(ITypeSymbol type,
+                                                Compilation compilation,
                                                 out AppendedType appendedType,
                                                 out bool isNullableType)
     {
@@ -309,11 +340,16 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
             case "global::System.TimeOnly":
                 appendedType = AppendedType.ValueType;
                 return fullNameType;
-
-            default:
-                appendedType = AppendedType.None;
-                return null;
         }
+
+        if (underlyingType is INamedTypeSymbol { TypeKind: TypeKind.Enum } enumType && enumType.HasAssemblyAccessibility(compilation))
+        {
+            appendedType = AppendedType.Enum;
+            return fullNameType;
+        }
+
+        appendedType = AppendedType.None;
+        return null;
     }
 
     private static ImmutableArray<ChainModel> ToChains(ImmutableArray<ChainedAppendsModel> chainItems, CancellationToken cancellationToken)
@@ -335,7 +371,8 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
         Null,
         String,
         ConstantString,
-        ValueType
+        ValueType,
+        Enum
     }
 
     private enum ProvidedStringType
@@ -480,7 +517,11 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
                                 continue;
 
                             case AppendedType.ValueType:
-                                _writer.AppendLine($"context.OutputValueType<{call.UnderlyingTypeName}>({(call.IsNullableType ? "true" : "false")});");
+                                _writer.AppendLine($"context.OutputValueType<{call.UnderlyingTypeName}>(nullable: {(call.IsNullableType ? "true" : "false")});");
+                                break;
+
+                            case AppendedType.Enum:
+                                _writer.AppendLine($"context.OutputEnum<{call.UnderlyingTypeName}>(nullable: {(call.IsNullableType ? "true" : "false")});");
                                 break;
                         }
                     }
@@ -572,6 +613,9 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
 
                         if (call.Type is AppendedType.String or AppendedType.ValueType)
                             _writer.AppendLine($"global::{ZeroLogFacts.FullTypeNames.Chain}.{ZeroLogFacts.MethodNames.AppendChainItem}(log, value);");
+
+                        if (call.Type is AppendedType.Enum)
+                            _writer.AppendLine($"global::{ZeroLogFacts.FullTypeNames.Chain}.{ZeroLogFacts.MethodNames.AppendChainEnumItem}(log, value);");
 
                         _writer.AppendLine("return log;");
                     }
