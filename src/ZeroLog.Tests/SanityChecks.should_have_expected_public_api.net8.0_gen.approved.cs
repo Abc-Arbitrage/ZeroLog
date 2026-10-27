@@ -1135,27 +1135,27 @@ namespace ZeroLog
         }
         public static class InternalApi
         {
-            public static void AppendChain(ZeroLog.LogMessage message, ZeroLog.LogMessage.InternalApi.Chain chain) { }
-            public static void AppendChainItem(ZeroLog.LogMessage message, string? value) { }
-            public static void AppendChainItem<T>(ZeroLog.LogMessage message, T value)
-                where T :  unmanaged { }
-            public static void AppendChainItem<T>(ZeroLog.LogMessage message, T? value)
-                where T :  unmanaged { }
             public abstract class Chain
             {
                 protected Chain() { }
-                protected abstract void Execute(ref ZeroLog.LogMessage.InternalApi.ChainExecutionContext context);
-            }
-            public ref struct ChainExecutionContext
-            {
-                public void OutputString() { }
-                public void OutputString(string? value) { }
-                public void OutputValueType<T>(bool nullable)
+                protected abstract void Execute(ref ZeroLog.LogMessage.InternalApi.Chain.ChainExecutionContext context);
+                public static void AppendChain(ZeroLog.LogMessage message, ZeroLog.LogMessage.InternalApi.Chain chain) { }
+                public static void AppendChainItem(ZeroLog.LogMessage message, string? value) { }
+                public static void AppendChainItem<T>(ZeroLog.LogMessage message, T value)
                     where T :  unmanaged { }
-                public void SetFormatString() { }
-                public void SetFormatString(string? format) { }
-                public void SetKeyString() { }
-                public void SetKeyString(string? key) { }
+                public static void AppendChainItem<T>(ZeroLog.LogMessage message, T? value)
+                    where T :  unmanaged { }
+                public ref struct ChainExecutionContext
+                {
+                    public void OutputString() { }
+                    public void OutputString(string? value) { }
+                    public void OutputValueType<T>(bool nullable)
+                        where T :  unmanaged { }
+                    public void SetFormatString() { }
+                    public void SetFormatString(string? format) { }
+                    public void SetKeyString() { }
+                    public void SetKeyString(string? key) { }
+                }
             }
         }
     }

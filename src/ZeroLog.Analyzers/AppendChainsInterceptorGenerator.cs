@@ -428,7 +428,7 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
         {
             _writer.AppendLine(
                 $"""
-                file sealed class Chain{chainIndex} : global::ZeroLog.LogMessage.InternalApi.Chain
+                file sealed class Chain{chainIndex} : global::{ZeroLogFacts.FullTypeNames.Chain}
                 """
             );
 
@@ -437,7 +437,7 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
                 _writer.AppendLine($"public static readonly Chain{chainIndex} Instance = new();")
                        .AppendLine();
 
-                using (_writer.WriteBlock("protected override void Execute(ref global::ZeroLog.LogMessage.InternalApi.ChainExecutionContext context)"))
+                using (_writer.WriteBlock($"protected override void Execute(ref global::{ZeroLogFacts.FullTypeNames.ChainExecutionContext} context)"))
                 {
                     var optimizedChain = ConcatConstants(chain);
 
@@ -562,16 +562,16 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
                     using (_writer.WriteBlock())
                     {
                         if (callIndex == 0)
-                            _writer.AppendLine($"global::{ZeroLogFacts.FullTypeNames.LogMessage}.{ZeroLogFacts.ShortTypeNames.InternalApi}.{ZeroLogFacts.MethodNames.AppendChain}(log, Chain{chainIndex}.Instance);");
+                            _writer.AppendLine($"global::{ZeroLogFacts.FullTypeNames.Chain}.{ZeroLogFacts.MethodNames.AppendChain}(log, Chain{chainIndex}.Instance);");
 
                         if (call.KeyStringType is ProvidedStringType.Variable)
-                            _writer.AppendLine($"global::{ZeroLogFacts.FullTypeNames.LogMessage}.{ZeroLogFacts.ShortTypeNames.InternalApi}.{ZeroLogFacts.MethodNames.AppendChainItem}(log, key);");
+                            _writer.AppendLine($"global::{ZeroLogFacts.FullTypeNames.Chain}.{ZeroLogFacts.MethodNames.AppendChainItem}(log, key);");
 
                         if (call.FormatStringType is ProvidedStringType.Variable)
-                            _writer.AppendLine($"global::{ZeroLogFacts.FullTypeNames.LogMessage}.{ZeroLogFacts.ShortTypeNames.InternalApi}.{ZeroLogFacts.MethodNames.AppendChainItem}(log, format);");
+                            _writer.AppendLine($"global::{ZeroLogFacts.FullTypeNames.Chain}.{ZeroLogFacts.MethodNames.AppendChainItem}(log, format);");
 
                         if (call.Type is AppendedType.String or AppendedType.ValueType)
-                            _writer.AppendLine($"global::{ZeroLogFacts.FullTypeNames.LogMessage}.{ZeroLogFacts.ShortTypeNames.InternalApi}.{ZeroLogFacts.MethodNames.AppendChainItem}(log, value);");
+                            _writer.AppendLine($"global::{ZeroLogFacts.FullTypeNames.Chain}.{ZeroLogFacts.MethodNames.AppendChainItem}(log, value);");
 
                         _writer.AppendLine("return log;");
                     }

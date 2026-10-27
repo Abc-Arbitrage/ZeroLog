@@ -41,7 +41,7 @@ public class SanityChecks
             "ZeroLog.LogMessage+AppendOperation`1",
             "ZeroLog.LogMessage+InternalApi",
             "ZeroLog.LogMessage+InternalApi+Chain",
-            "ZeroLog.LogMessage+InternalApi+ChainExecutionContext"
+            "ZeroLog.LogMessage+InternalApi+Chain+ChainExecutionContext"
         };
 
         typeof(LogManager).Assembly

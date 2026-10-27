@@ -16,46 +16,46 @@ partial class LogMessage
     [SuppressMessage("ReSharper", "UnusedMember.Global")]
     public static partial class InternalApi
     {
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void AppendChain(LogMessage message, Chain chain)
-            => message.InternalAppendChain(chain);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void AppendChainItem(LogMessage message, string? value)
-            => message.InternalAppendChainItem(value);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void AppendChainItem<T>(LogMessage message, T value)
-            where T : unmanaged
-            => message.InternalAppendChainItem(value);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void AppendChainItem<T>(LogMessage message, T? value)
-            where T : unmanaged
-            => message.InternalAppendChainItem(value);
-
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public abstract class Chain
+        public abstract partial class Chain
         {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static void AppendChain(LogMessage message, Chain chain)
+                => message.InternalAppendChain(chain);
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static void AppendChainItem(LogMessage message, string? value)
+                => message.InternalAppendChainItem(value);
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static void AppendChainItem<T>(LogMessage message, T value)
+                where T : unmanaged
+                => message.InternalAppendChainItem(value);
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static void AppendChainItem<T>(LogMessage message, T? value)
+                where T : unmanaged
+                => message.InternalAppendChainItem(value);
+
             protected abstract void Execute(ref ChainExecutionContext context);
 
             internal void CallExecute(ref ChainExecutionContext context)
                 => Execute(ref context);
-        }
 
-        public ref partial struct ChainExecutionContext
-        {
-            public partial void OutputString();
-            public partial void OutputString(string? value);
+            public ref partial struct ChainExecutionContext
+            {
+                public partial void OutputString();
+                public partial void OutputString(string? value);
 
-            public partial void OutputValueType<T>(bool nullable)
-                where T : unmanaged;
+                public partial void OutputValueType<T>(bool nullable)
+                    where T : unmanaged;
 
-            public partial void SetFormatString();
-            public partial void SetFormatString(string? format);
+                public partial void SetFormatString();
+                public partial void SetFormatString(string? format);
 
-            public partial void SetKeyString();
-            public partial void SetKeyString(string? key);
+                public partial void SetKeyString();
+                public partial void SetKeyString(string? key);
+            }
         }
     }
 
@@ -91,17 +91,20 @@ partial class LogMessage
 
     partial class InternalApi
     {
-        ref partial struct ChainExecutionContext
+        partial class Chain
         {
-            public partial void OutputString() { }
-            public partial void OutputString(string? value) { }
-            public partial void OutputValueType<T>(bool nullable) where T : unmanaged { }
+            ref partial struct ChainExecutionContext
+            {
+                public partial void OutputString() { }
+                public partial void OutputString(string? value) { }
+                public partial void OutputValueType<T>(bool nullable) where T : unmanaged { }
 
-            public partial void SetFormatString() { }
-            public partial void SetFormatString(string? format) { }
+                public partial void SetFormatString() { }
+                public partial void SetFormatString(string? format) { }
 
-            public partial void SetKeyString() { }
-            public partial void SetKeyString(string? key) { }
+                public partial void SetKeyString() { }
+                public partial void SetKeyString(string? key) { }
+            }
         }
     }
 

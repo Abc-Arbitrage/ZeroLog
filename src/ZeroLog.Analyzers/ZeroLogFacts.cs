@@ -14,11 +14,9 @@ internal static class ZeroLogFacts
 
     public static class ShortTypeNames
     {
-        public const string Log = "Log";
         public const string LogManager = "LogManager";
         public const string LogMessage = "LogMessage";
         public const string InternalApi = "InternalApi";
-        public const string Chain = "Chain";
     }
 
     public static class FullTypeNames
@@ -26,8 +24,8 @@ internal static class ZeroLogFacts
         public const string Log = "ZeroLog.Log";
         public const string LogManager = "ZeroLog.LogManager";
         public const string LogMessage = "ZeroLog.LogMessage";
-        public const string PatternWriter = "ZeroLog.Formatting.PatternWriter";
-        public const string DefaultFormatter = "ZeroLog.Formatting.DefaultFormatter";
+        public const string Chain = "ZeroLog.LogMessage.InternalApi.Chain";
+        public const string ChainExecutionContext = "ZeroLog.LogMessage.InternalApi.Chain.ChainExecutionContext";
     }
 
     public static class MethodNames
@@ -45,11 +43,6 @@ internal static class ZeroLogFacts
     public static class ParameterNames
     {
         public const string FormatString = "format";
-    }
-
-    public static class PropertyNames
-    {
-        public const string PrefixPattern = "PrefixPattern";
     }
 
     public static class EventNames
