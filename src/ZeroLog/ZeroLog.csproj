@@ -29,7 +29,7 @@
     <ProjectReference Include="../ZeroLog.Analyzers/ZeroLog.Analyzers.csproj" ReferenceOutputAssembly="false" SetTargetFramework="TargetFramework=roslyn4.0" />
     <ProjectReference Include="../ZeroLog.Analyzers/ZeroLog.Analyzers.csproj" ReferenceOutputAssembly="false" SetTargetFramework="TargetFramework=roslyn5.0" />
 
-    <None Include="../ZeroLog.Analyzers/bin/$(Configuration)/roslyn4.0/ZeroLog.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    <None Include="../ZeroLog.Analyzers/bin/$(Configuration)/roslyn4.0/ZeroLog.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.0/cs" Visible="false" />
     <None Include="../ZeroLog.Analyzers/bin/$(Configuration)/roslyn5.0/ZeroLog.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn5.0/cs" Visible="false" />
   </ItemGroup>
 
