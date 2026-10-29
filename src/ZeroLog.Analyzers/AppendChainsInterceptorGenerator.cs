@@ -20,7 +20,7 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
     {
         var chains = context.SyntaxProvider
                             .CreateSyntaxProvider(SyntaxPredicate, SyntaxTransform)
-                            .Where(static i => i.AppendCall.Type is not AppendedType.None)
+                            .Where(static i => i.AppendCall.AppendedType is not AppendedType.None)
                             .WithLambdaComparer(static (a, b) => a.AppendCall.Equals(b.AppendCall), static i => i.AppendCall.GetHashCode())
                             .Collect()
                             .Combine(context.IsGeneratorEnabled("AppendChains"))
@@ -48,7 +48,7 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
     private static bool SupportsGeneratedAppendChains(Compilation compilation, CancellationToken cancellationToken)
     {
         // C# 11 is required for file-scoped types
-        return compilation is CSharpCompilation { LanguageVersion: >= (LanguageVersion)1100 }
+        return compilation is CSharpCompilation { LanguageVersion: >= LanguageVersion.CSharp11 }
                && compilation.GetTypeByMetadataName(ZeroLogFacts.FullTypeNames.LogMessage) is { } logMessage
                && logMessage.GetTypeMembers(ZeroLogFacts.ShortTypeNames.InternalApi) is [{ }];
 
@@ -122,6 +122,8 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
                 out var isNullableValueType,
                 out var keyStringType,
                 out var keyString,
+                out var valueStringType,
+                out var valueString,
                 out var formatStringType,
                 out var formatString
             ))
@@ -132,36 +134,14 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
         if (semanticModel.GetInterceptableLocation((InvocationExpressionSyntax)invocation.Syntax, cancellationToken) is not { } appendCallLocation)
             return false;
 
-        var constantString = default(string?);
-        var valueParameterIndex = keyStringType is ProvidedStringType.None ? 0 : 1;
-
-        if (appendedType is AppendedType.String && invocation.GetArgumentByParameterIndex(valueParameterIndex)?.Value.ConstantValue is { HasValue: true } constantValue)
-        {
-            switch (constantValue.Value)
-            {
-                case null:
-                    appendedType = AppendedType.Null;
-                    constantString = null;
-                    break;
-
-                case string value:
-                    appendedType = AppendedType.ConstantString;
-                    constantString = value;
-                    break;
-            }
-        }
-
-        // Consistency checks
-        if (constantString is not null && formatString is not null)
-            return false;
-
         appendCall = new AppendCallModel(
             appendedType,
             isNullableValueType,
             underlyingTypeName,
-            constantString,
             keyStringType,
             keyString,
+            valueStringType,
+            valueString,
             formatStringType,
             formatString,
             appendCallLocation
@@ -192,6 +172,8 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
                                               out bool isNullableType,
                                               out ProvidedStringType keyStringType,
                                               out string? keyString,
+                                              out ProvidedStringType valueStringType,
+                                              out string? valueString,
                                               out ProvidedStringType formatStringType,
                                               out string? formatString)
     {
@@ -200,6 +182,8 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
         underlyingTypeName = null;
         keyStringType = ProvidedStringType.None;
         keyString = null;
+        valueStringType = ProvidedStringType.None;
+        valueString = null;
         formatStringType = ProvidedStringType.None;
         formatString = null;
 
@@ -224,6 +208,13 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
 
                 if (underlyingTypeName is null)
                     return false;
+
+                if (appendedType is AppendedType.String)
+                {
+                    valueStringType = invocation.GetArgumentByParameterIndex(0)?.TryGetConstantString(out valueString) is true
+                        ? ProvidedStringType.Constant
+                        : ProvidedStringType.Variable;
+                }
 
                 if (method.Parameters.Length == 2)
                 {
@@ -274,6 +265,13 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
                 keyStringType = invocation.GetArgumentByParameterIndex(0)?.TryGetConstantString(out keyString) is true
                     ? ProvidedStringType.Constant
                     : ProvidedStringType.Variable;
+
+                if (appendedType is AppendedType.String)
+                {
+                    valueStringType = invocation.GetArgumentByParameterIndex(1)?.TryGetConstantString(out valueString) is true
+                        ? ProvidedStringType.Constant
+                        : ProvidedStringType.Variable;
+                }
 
                 return true;
             }
@@ -362,20 +360,23 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
                          .ToImmutableArray();
 
         static bool IsWorthIntercepting(IGrouping<AppendCallModel, ChainedAppendsModel> call)
-            => call.Count() > 1 && call.Any(static i => i.AppendCall.Type is AppendedType.ConstantString);
+            => call.Count() > 1 && call.Any(static i => IncludesConstantString(i.AppendCall));
+
+        static bool IncludesConstantString(AppendCallModel appendCall)
+            => appendCall.KeyStringType is ProvidedStringType.Constant
+               || appendCall.ValueStringType is ProvidedStringType.Constant
+               || appendCall.FormatStringType is ProvidedStringType.Constant;
     }
 
-    private enum AppendedType
+    private enum AppendedType : byte
     {
         None,
-        Null,
         String,
-        ConstantString,
         ValueType,
         Enum
     }
 
-    private enum ProvidedStringType
+    private enum ProvidedStringType : byte
     {
         None,
         Constant,
@@ -383,12 +384,13 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
     }
 
     private readonly record struct AppendCallModel(
-        AppendedType Type,
+        AppendedType AppendedType,
         bool IsNullableType,
         string UnderlyingTypeName,
-        string? ConstantString,
         ProvidedStringType KeyStringType,
         string? ConstantKeyString,
+        ProvidedStringType ValueStringType,
+        string? ConstantValueString,
         ProvidedStringType FormatStringType,
         string? ConstantFormatString,
         InterceptableLocation InterceptableLocation
@@ -483,7 +485,7 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
                         switch (call.KeyStringType)
                         {
                             case ProvidedStringType.Constant:
-                                _writer.AppendLine($"context.SetKeyString({SymbolDisplay.FormatLiteral(call.ConstantKeyString ?? string.Empty, true)});");
+                                _writer.AppendLine($"context.SetKeyString({FormatString(call.ConstantKeyString)});");
                                 break;
 
                             case ProvidedStringType.Variable:
@@ -494,7 +496,7 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
                         switch (call.FormatStringType)
                         {
                             case ProvidedStringType.Constant:
-                                _writer.AppendLine($"context.SetFormatString({SymbolDisplay.FormatLiteral(call.ConstantFormatString ?? string.Empty, true)});");
+                                _writer.AppendLine($"context.SetFormatString({FormatString(call.ConstantFormatString)});");
                                 break;
 
                             case ProvidedStringType.Variable:
@@ -502,19 +504,15 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
                                 break;
                         }
 
-                        switch (call.Type)
+                        switch (call.AppendedType)
                         {
-                            case AppendedType.Null:
-                                _writer.AppendLine("context.OutputString(null);");
-                                continue;
+                            case AppendedType.String when call.ValueStringType is ProvidedStringType.Constant:
+                                _writer.AppendLine($"context.OutputString({FormatString(call.ConstantValueString)});");
+                                break;
 
-                            case AppendedType.String:
+                            case AppendedType.String when call.ValueStringType is ProvidedStringType.Variable:
                                 _writer.AppendLine("context.OutputString();");
-                                continue;
-
-                            case AppendedType.ConstantString:
-                                _writer.AppendLine($"context.OutputString({SymbolDisplay.FormatLiteral(call.ConstantString ?? string.Empty, true)});");
-                                continue;
+                                break;
 
                             case AppendedType.ValueType:
                                 _writer.AppendLine($"context.OutputValueType<{call.UnderlyingTypeName}>(nullable: {(call.IsNullableType ? "true" : "false")});");
@@ -530,6 +528,9 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
 
             return;
 
+            static string FormatString(string? value)
+                => value is null ? "null" : SymbolDisplay.FormatLiteral(value, true);
+
             static ChainModel ConcatConstants(ChainModel chain)
             {
                 var calls = new List<AppendCallModel>();
@@ -544,7 +545,7 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
                         {
                             calls[calls.Count - 1] = lastCall with
                             {
-                                ConstantString = lastCall.ConstantString + call.ConstantString
+                                ConstantValueString = lastCall.ConstantValueString + call.ConstantValueString
                             };
 
                             continue;
@@ -558,7 +559,7 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
             }
 
             static bool CanConcat(AppendCallModel call)
-                => call.Type is AppendedType.ConstantString
+                => call.ValueStringType is ProvidedStringType.Constant
                    && call.KeyStringType is ProvidedStringType.None
                    && call.FormatStringType is ProvidedStringType.None;
         }
@@ -608,13 +609,16 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
                         if (call.KeyStringType is ProvidedStringType.Variable)
                             _writer.AppendLine($"global::{ZeroLogFacts.FullTypeNames.Chain}.{ZeroLogFacts.MethodNames.AppendChainItem}(log, key);");
 
+                        if (call.ValueStringType is ProvidedStringType.Variable)
+                            _writer.AppendLine($"global::{ZeroLogFacts.FullTypeNames.Chain}.{ZeroLogFacts.MethodNames.AppendChainItem}(log, value);");
+
                         if (call.FormatStringType is ProvidedStringType.Variable)
                             _writer.AppendLine($"global::{ZeroLogFacts.FullTypeNames.Chain}.{ZeroLogFacts.MethodNames.AppendChainItem}(log, format);");
 
-                        if (call.Type is AppendedType.String or AppendedType.ValueType)
+                        if (call.AppendedType is AppendedType.ValueType)
                             _writer.AppendLine($"global::{ZeroLogFacts.FullTypeNames.Chain}.{ZeroLogFacts.MethodNames.AppendChainItem}(log, value);");
 
-                        if (call.Type is AppendedType.Enum)
+                        if (call.AppendedType is AppendedType.Enum)
                             _writer.AppendLine($"global::{ZeroLogFacts.FullTypeNames.Chain}.{ZeroLogFacts.MethodNames.AppendChainEnumItem}(log, value);");
 
                         _writer.AppendLine("return log;");
