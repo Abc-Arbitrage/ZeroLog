@@ -1,5 +1,6 @@
 #if ROSLYN5_0_OR_GREATER
 
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
@@ -137,12 +138,12 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
         appendCall = new AppendCallModel(
             appendedType,
             isNullableValueType,
-            underlyingTypeName,
             keyStringType,
-            keyString,
             valueStringType,
-            valueString,
             formatStringType,
+            underlyingTypeName,
+            keyString,
+            valueString,
             formatString,
             appendCallLocation
         );
@@ -352,11 +353,14 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
 
     private static ImmutableArray<ChainModel> ToChains(ImmutableArray<ChainedAppendsModel> chainItems, CancellationToken cancellationToken)
     {
-        return chainItems.GroupBy(static i => i.FirstAppendCall)
+        return chainItems.GroupBy(static item => item.FirstAppendCall)
                          .Where(IsWorthIntercepting)
-                         .Select(static i => new ChainModel(i.OrderBy(i => i.IndexInChain)
-                                                             .Select(i => i.AppendCall)
-                                                             .ToImmutableArray()))
+                         .Select(
+                             static item => new ChainModel(
+                                 item.OrderBy(i => i.IndexInChain)
+                                     .Select(i => i.AppendCall)
+                                     .ToImmutableArray())
+                         )
                          .ToImmutableArray();
 
         static bool IsWorthIntercepting(IGrouping<AppendCallModel, ChainedAppendsModel> call)
@@ -366,6 +370,46 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
             => appendCall.KeyStringType is ProvidedStringType.Constant
                || appendCall.ValueStringType is ProvidedStringType.Constant
                || appendCall.FormatStringType is ProvidedStringType.Constant;
+    }
+
+    private static ImmutableArray<InterceptsGroup> GroupIntercepts(ImmutableArray<ChainModel> chains)
+    {
+        var groupedIntercepts = new Dictionary<InterceptsGroupKey, List<InterceptableLocation>>();
+
+        for (var chainIndex = 0; chainIndex < chains.Length; ++chainIndex)
+        {
+            var chain = chains[chainIndex];
+
+            for (var callIndex = 0; callIndex < chain.Calls.Length; ++callIndex)
+            {
+                var call = chain.Calls[callIndex];
+
+                var key = new InterceptsGroupKey(
+                    callIndex == 0 ? chainIndex : null,
+                    call.AppendedType,
+                    call.IsNullableType,
+                    call.KeyStringType,
+                    call.ValueStringType,
+                    call.FormatStringType,
+                    call.UnderlyingTypeName
+                );
+
+                if (groupedIntercepts.TryGetValue(key, out var callLocations))
+                    callLocations.Add(call.InterceptableLocation);
+                else
+                    groupedIntercepts.Add(key, [call.InterceptableLocation]);
+            }
+        }
+
+        return groupedIntercepts.OrderBy(i => i.Key)
+                                .Select(kvp => new InterceptsGroup(
+                                            kvp.Key,
+                                            kvp.Value
+                                               .OrderBy(i => i.Data, StringComparer.Ordinal)
+                                               .ToImmutableArray()
+                                        )
+                                )
+                                .ToImmutableArray();
     }
 
     private enum AppendedType : byte
@@ -386,12 +430,12 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
     private readonly record struct AppendCallModel(
         AppendedType AppendedType,
         bool IsNullableType,
-        string UnderlyingTypeName,
         ProvidedStringType KeyStringType,
-        string? ConstantKeyString,
         ProvidedStringType ValueStringType,
-        string? ConstantValueString,
         ProvidedStringType FormatStringType,
+        string UnderlyingTypeName,
+        string? ConstantKeyString,
+        string? ConstantValueString,
         string? ConstantFormatString,
         InterceptableLocation InterceptableLocation
     );
@@ -410,6 +454,31 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
         public override int GetHashCode()
             => ImmutableArrayEqualityComparer<AppendCallModel>.Default.GetHashCode(Calls);
     }
+
+    private readonly record struct InterceptsGroupKey(
+        int? ChainIndex,
+        AppendedType AppendedType,
+        bool IsNullableType,
+        ProvidedStringType KeyStringType,
+        ProvidedStringType ValueStringType,
+        ProvidedStringType FormatStringType,
+        string UnderlyingTypeName
+    ) : IComparable<InterceptsGroupKey>
+    {
+        public int CompareTo(InterceptsGroupKey other)
+        {
+            var a = (ChainIndex ?? int.MaxValue, AppendedType, IsNullableType, KeyStringType, ValueStringType, FormatStringType);
+            var b = (other.ChainIndex ?? int.MaxValue, other.AppendedType, other.IsNullableType, other.KeyStringType, other.ValueStringType, other.FormatStringType);
+
+            var tupleComparison = a.CompareTo(b);
+            return tupleComparison != 0 ? tupleComparison : StringComparer.Ordinal.Compare(UnderlyingTypeName, other.UnderlyingTypeName);
+        }
+    }
+
+    private readonly record struct InterceptsGroup(
+        InterceptsGroupKey Key,
+        ImmutableArray<InterceptableLocation> Locations
+    );
 
     private class Generator
     {
@@ -431,7 +500,7 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
 
                 using (_writer.WriteBlock("file static class ChainsInterceptor"))
                 {
-                    GenerateInterceptors(chains);
+                    GenerateInterceptors(GroupIntercepts(chains));
                 }
             }
 
@@ -564,72 +633,67 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
                    && call.FormatStringType is ProvidedStringType.None;
         }
 
-        private void GenerateInterceptors(ImmutableArray<ChainModel> chains)
+        private void GenerateInterceptors(ImmutableArray<InterceptsGroup> groups)
         {
-            var chainIndex = 0;
+            var interceptIndex = 0;
 
-            foreach (var chain in chains)
+            foreach (var (call, locations) in groups)
             {
-                _writer.AppendLine($"// Chain {chainIndex}").AppendLine();
+                foreach (var location in locations)
+                    _writer.AppendLine(location.GetInterceptsLocationAttributeSyntax());
 
-                for (var callIndex = 0; callIndex < chain.Calls.Length; callIndex++)
+                _writer.Append(
+                    $"""
+                    [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+                    public static global::{ZeroLogFacts.FullTypeNames.LogMessage} Intercept{interceptIndex}
+                    """
+                );
+
+                _writer.Append($"(this global::{ZeroLogFacts.FullTypeNames.LogMessage} log, ");
+
+                if (call.KeyStringType is not ProvidedStringType.None)
+                    _writer.Append("string key, ");
+
+                _writer.Append(call.UnderlyingTypeName);
+
+                if (call.IsNullableType)
+                    _writer.Append("?");
+
+                _writer.Append(" value");
+
+                if (call.FormatStringType is not ProvidedStringType.None)
+                    _writer.Append(", string format");
+
+                _writer.AppendLine(")");
+
+                using (_writer.WriteBlock())
                 {
-                    var call = chain.Calls[callIndex];
+                    if (call.ChainIndex is { } chainIndex)
+                        _writer.AppendLine($"global::{ZeroLogFacts.FullTypeNames.Chain}.{ZeroLogFacts.MethodNames.AppendChain}(log, Chain{chainIndex}.Instance);");
 
-                    _writer.Append(
-                        $"""
-                        {call.InterceptableLocation.GetInterceptsLocationAttributeSyntax()}
-                        [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-                        public static global::{ZeroLogFacts.FullTypeNames.LogMessage} Append_{chainIndex}_{callIndex}
-                        """
-                    );
+                    if (call.KeyStringType is ProvidedStringType.Variable)
+                        _writer.AppendLine($"global::{ZeroLogFacts.FullTypeNames.Chain}.{ZeroLogFacts.MethodNames.AppendChainItem}(log, key);");
 
-                    _writer.Append($"(this global::{ZeroLogFacts.FullTypeNames.LogMessage} log, ");
+                    if (call.ValueStringType is ProvidedStringType.Variable)
+                        _writer.AppendLine($"global::{ZeroLogFacts.FullTypeNames.Chain}.{ZeroLogFacts.MethodNames.AppendChainItem}(log, value);");
 
-                    if (call.KeyStringType is not ProvidedStringType.None)
-                        _writer.Append("string key, ");
+                    if (call.FormatStringType is ProvidedStringType.Variable)
+                        _writer.AppendLine($"global::{ZeroLogFacts.FullTypeNames.Chain}.{ZeroLogFacts.MethodNames.AppendChainItem}(log, format);");
 
-                    _writer.Append(call.UnderlyingTypeName);
+                    if (call.AppendedType is AppendedType.ValueType)
+                        _writer.AppendLine($"global::{ZeroLogFacts.FullTypeNames.Chain}.{ZeroLogFacts.MethodNames.AppendChainItem}(log, value);");
 
-                    if (call.IsNullableType)
-                        _writer.Append("?");
+                    if (call.AppendedType is AppendedType.Enum)
+                        _writer.AppendLine($"global::{ZeroLogFacts.FullTypeNames.Chain}.{ZeroLogFacts.MethodNames.AppendChainEnumItem}(log, value);");
 
-                    _writer.Append(" value");
-
-                    if (call.FormatStringType is not ProvidedStringType.None)
-                        _writer.Append(", string format");
-
-                    _writer.AppendLine(")");
-
-                    using (_writer.WriteBlock())
-                    {
-                        if (callIndex == 0)
-                            _writer.AppendLine($"global::{ZeroLogFacts.FullTypeNames.Chain}.{ZeroLogFacts.MethodNames.AppendChain}(log, Chain{chainIndex}.Instance);");
-
-                        if (call.KeyStringType is ProvidedStringType.Variable)
-                            _writer.AppendLine($"global::{ZeroLogFacts.FullTypeNames.Chain}.{ZeroLogFacts.MethodNames.AppendChainItem}(log, key);");
-
-                        if (call.ValueStringType is ProvidedStringType.Variable)
-                            _writer.AppendLine($"global::{ZeroLogFacts.FullTypeNames.Chain}.{ZeroLogFacts.MethodNames.AppendChainItem}(log, value);");
-
-                        if (call.FormatStringType is ProvidedStringType.Variable)
-                            _writer.AppendLine($"global::{ZeroLogFacts.FullTypeNames.Chain}.{ZeroLogFacts.MethodNames.AppendChainItem}(log, format);");
-
-                        if (call.AppendedType is AppendedType.ValueType)
-                            _writer.AppendLine($"global::{ZeroLogFacts.FullTypeNames.Chain}.{ZeroLogFacts.MethodNames.AppendChainItem}(log, value);");
-
-                        if (call.AppendedType is AppendedType.Enum)
-                            _writer.AppendLine($"global::{ZeroLogFacts.FullTypeNames.Chain}.{ZeroLogFacts.MethodNames.AppendChainEnumItem}(log, value);");
-
-                        _writer.AppendLine("return log;");
-                    }
-
-                    _writer.AppendLine();
+                    _writer.AppendLine("return log;");
                 }
 
-                ++chainIndex;
+                ++interceptIndex;
                 _writer.AppendLine();
             }
+
+            _writer.AppendLine();
         }
     }
 }
