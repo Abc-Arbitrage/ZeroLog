@@ -21,7 +21,7 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
     {
         var chains = context.SyntaxProvider
                             .CreateSyntaxProvider(SyntaxPredicate, SyntaxTransform)
-                            .Where(static i => i.AppendCall.AppendedType is not AppendedType.None)
+                            .Where(static i => i.AppendCall.Call.AppendedType is not AppendedType.None)
                             .WithLambdaComparer(static (a, b) => a.AppendCall.Equals(b.AppendCall), static i => i.AppendCall.GetHashCode())
                             .Collect()
                             .Combine(context.IsGeneratorEnabled("AppendChains"))
@@ -61,14 +61,14 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
            && node is InvocationExpressionSyntax { InvokedMethodName: { } methodName }
            && IsPotentiallyChainableMethodName(methodName);
 
-    private static ChainedAppendsModel SyntaxTransform(GeneratorSyntaxContext context, CancellationToken cancellationToken)
+    private static DetectedAppendCallModel SyntaxTransform(GeneratorSyntaxContext context, CancellationToken cancellationToken)
     {
         if (context.Node is InvocationExpressionSyntax invocationSyntax
             && context.SemanticModel.GetOperation(invocationSyntax, cancellationToken) is IInvocationOperation invocation
             && IsPotentiallyChainableMethod(invocation.TargetMethod)
-            && TryGetChainedAppends(invocation, context.SemanticModel, out var chainedAppends, cancellationToken))
+            && TryGetChainedAppends(invocation, context.SemanticModel, out var detectedAppendCall, cancellationToken))
         {
-            return chainedAppends;
+            return detectedAppendCall;
         }
 
         return default;
@@ -76,10 +76,10 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
 
     private static bool TryGetChainedAppends(IInvocationOperation invocation,
                                              SemanticModel semanticModel,
-                                             out ChainedAppendsModel chainedAppends,
+                                             out DetectedAppendCallModel detectedAppendCall,
                                              CancellationToken cancellationToken)
     {
-        chainedAppends = default;
+        detectedAppendCall = default;
 
         if (!TryGetAppendCall(invocation, semanticModel, out var call, cancellationToken))
             return false;
@@ -87,7 +87,7 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
         var currentInvocation = invocation;
         var chainPosition = 0;
 
-        var previousCall = default(AppendCallModel);
+        var previousCall = default(LocatedAppendCallModel);
 
         while (TryGetAppendCall(currentInvocation, semanticModel, out var currentCall, cancellationToken))
         {
@@ -96,7 +96,7 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
             currentInvocation = currentInvocation.Instance as IInvocationOperation;
         }
 
-        chainedAppends = new ChainedAppendsModel(
+        detectedAppendCall = new DetectedAppendCallModel(
             call,
             previousCall,
             chainPosition - 1
@@ -107,7 +107,7 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
 
     private static bool TryGetAppendCall([NotNullWhen(true)] IInvocationOperation? invocation,
                                          SemanticModel semanticModel,
-                                         out AppendCallModel appendCall,
+                                         out LocatedAppendCallModel appendCall,
                                          CancellationToken cancellationToken)
     {
         appendCall = default;
@@ -135,16 +135,18 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
         if (semanticModel.GetInterceptableLocation((InvocationExpressionSyntax)invocation.Syntax, cancellationToken) is not { } appendCallLocation)
             return false;
 
-        appendCall = new AppendCallModel(
-            appendedType,
-            isNullableValueType,
-            keyStringType,
-            valueStringType,
-            formatStringType,
-            underlyingTypeName,
-            keyString,
-            valueString,
-            formatString,
+        appendCall = new LocatedAppendCallModel(
+            new AppendCallModel(
+                appendedType,
+                isNullableValueType,
+                keyStringType,
+                valueStringType,
+                formatStringType,
+                underlyingTypeName,
+                keyString,
+                valueString,
+                formatString
+            ),
             appendCallLocation
         );
 
@@ -351,10 +353,10 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
         return null;
     }
 
-    private static ImmutableArray<ChainModel> ToChains(ImmutableArray<ChainedAppendsModel> chainItems, CancellationToken cancellationToken)
+    private static ImmutableArray<ChainModel> ToChains(ImmutableArray<DetectedAppendCallModel> chainItems, CancellationToken cancellationToken)
     {
         return chainItems.GroupBy(static item => item.FirstAppendCall)
-                         .Where(IsWorthIntercepting)
+                         .Where(ShouldIntercept)
                          .Select(
                              static item => new ChainModel(
                                  item.OrderBy(i => i.IndexInChain)
@@ -363,22 +365,33 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
                          )
                          .ToImmutableArray();
 
-        static bool IsWorthIntercepting(IGrouping<AppendCallModel, ChainedAppendsModel> call)
-            => call.Count() > 1 && call.Any(static i => IncludesConstantString(i.AppendCall));
+        static bool ShouldIntercept(IGrouping<LocatedAppendCallModel, DetectedAppendCallModel> call)
+            => call.Count() > 1 && call.Any(static i => IncludesConstantString(i.AppendCall.Call));
 
-        static bool IncludesConstantString(AppendCallModel appendCall)
-            => appendCall.KeyStringType is ProvidedStringType.Constant
-               || appendCall.ValueStringType is ProvidedStringType.Constant
-               || appendCall.FormatStringType is ProvidedStringType.Constant;
+        static bool IncludesConstantString(AppendCallModel call)
+            => call.KeyStringType is ProvidedStringType.Constant
+               || call.ValueStringType is ProvidedStringType.Constant
+               || call.FormatStringType is ProvidedStringType.Constant;
     }
 
-    private static ImmutableArray<InterceptsGroup> GroupIntercepts(ImmutableArray<ChainModel> chains)
+    private static void Regroup(ImmutableArray<ChainModel> chains,
+                                out ImmutableArray<ChainClassModel> chainClasses,
+                                out ImmutableArray<InterceptsGroup> interceptors)
     {
-        var groupedIntercepts = new Dictionary<InterceptsGroupKey, List<InterceptableLocation>>();
+        var chainIndexByType = new Dictionary<ChainTypeModel, int>(chains.Length);
+        var interceptLocationsByKey = new Dictionary<InterceptsGroupKey, List<InterceptableLocation>>(chains.Length);
 
-        for (var chainIndex = 0; chainIndex < chains.Length; ++chainIndex)
+        foreach (var chain in chains)
         {
-            var chain = chains[chainIndex];
+            var chainType = chain.ToChainType();
+
+            if (!chainIndexByType.TryGetValue(chainType, out var chainIndex))
+            {
+                chainIndex = chainIndexByType.Count;
+                chainIndexByType.Add(chainType, chainIndex);
+            }
+
+            // ---
 
             for (var callIndex = 0; callIndex < chain.Calls.Length; ++callIndex)
             {
@@ -386,30 +399,34 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
 
                 var key = new InterceptsGroupKey(
                     callIndex == 0 ? chainIndex : null,
-                    call.AppendedType,
-                    call.IsNullableType,
-                    call.KeyStringType,
-                    call.ValueStringType,
-                    call.FormatStringType,
-                    call.UnderlyingTypeName
+                    call.Call.AppendedType,
+                    call.Call.IsNullableType,
+                    call.Call.KeyStringType,
+                    call.Call.ValueStringType,
+                    call.Call.FormatStringType,
+                    call.Call.UnderlyingTypeName
                 );
 
-                if (groupedIntercepts.TryGetValue(key, out var callLocations))
-                    callLocations.Add(call.InterceptableLocation);
+                if (interceptLocationsByKey.TryGetValue(key, out var callLocations))
+                    callLocations.Add(call.Location);
                 else
-                    groupedIntercepts.Add(key, [call.InterceptableLocation]);
+                    interceptLocationsByKey.Add(key, [call.Location]);
             }
         }
 
-        return groupedIntercepts.OrderBy(i => i.Key)
-                                .Select(kvp => new InterceptsGroup(
-                                            kvp.Key,
-                                            kvp.Value
-                                               .OrderBy(i => i.Data, StringComparer.Ordinal)
-                                               .ToImmutableArray()
-                                        )
-                                )
-                                .ToImmutableArray();
+        chainClasses = chainIndexByType.Select(i => new ChainClassModel(i.Value, i.Key))
+                                       .OrderBy(i => i.Index)
+                                       .ToImmutableArray();
+
+        interceptors = interceptLocationsByKey.OrderBy(i => i.Key)
+                                              .Select(kvp => new InterceptsGroup(
+                                                          kvp.Key,
+                                                          kvp.Value
+                                                             .OrderBy(i => i.Data, StringComparer.Ordinal)
+                                                             .ToImmutableArray()
+                                                      )
+                                              )
+                                              .ToImmutableArray();
     }
 
     private enum AppendedType : byte
@@ -436,27 +453,45 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
         string UnderlyingTypeName,
         string? ConstantKeyString,
         string? ConstantValueString,
-        string? ConstantFormatString,
-        InterceptableLocation InterceptableLocation
+        string? ConstantFormatString
     );
 
-    private readonly record struct ChainedAppendsModel(
-        AppendCallModel AppendCall,
-        AppendCallModel FirstAppendCall,
+    private readonly record struct LocatedAppendCallModel(
+        AppendCallModel Call,
+        InterceptableLocation Location
+    );
+
+    private readonly record struct DetectedAppendCallModel(
+        LocatedAppendCallModel AppendCall,
+        LocatedAppendCallModel FirstAppendCall,
         int IndexInChain
     );
 
-    private readonly record struct ChainModel(ImmutableArray<AppendCallModel> Calls)
+    private readonly record struct ChainModel(ImmutableArray<LocatedAppendCallModel> Calls)
     {
         public bool Equals(ChainModel other)
-            => ImmutableArrayEqualityComparer<AppendCallModel>.Default.Equals(Calls, other.Calls);
+            => ImmutableArrayEqualityComparer<LocatedAppendCallModel>.Default.Equals(Calls, other.Calls);
 
         public override int GetHashCode()
-            => ImmutableArrayEqualityComparer<AppendCallModel>.Default.GetHashCode(Calls);
+            => ImmutableArrayEqualityComparer<LocatedAppendCallModel>.Default.GetHashCode(Calls);
+
+        public ChainTypeModel ToChainType()
+            => new(Calls.Select(static i => i.Call).ToImmutableArray());
+    }
+
+    private readonly record struct ChainClassModel(int Index, ChainTypeModel Type);
+
+    private readonly record struct ChainTypeModel(ImmutableArray<AppendCallModel> CallSignatures)
+    {
+        public bool Equals(ChainTypeModel other)
+            => ImmutableArrayEqualityComparer<AppendCallModel>.Default.Equals(CallSignatures, other.CallSignatures);
+
+        public override int GetHashCode()
+            => ImmutableArrayEqualityComparer<AppendCallModel>.Default.GetHashCode(CallSignatures);
     }
 
     private readonly record struct InterceptsGroupKey(
-        int? ChainIndex,
+        int? ChainDefinitionIndex,
         AppendedType AppendedType,
         bool IsNullableType,
         ProvidedStringType KeyStringType,
@@ -467,8 +502,8 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
     {
         public int CompareTo(InterceptsGroupKey other)
         {
-            var a = (ChainIndex ?? int.MaxValue, AppendedType, IsNullableType, KeyStringType, ValueStringType, FormatStringType);
-            var b = (other.ChainIndex ?? int.MaxValue, other.AppendedType, other.IsNullableType, other.KeyStringType, other.ValueStringType, other.FormatStringType);
+            var a = (ChainDefinitionIndex ?? int.MaxValue, AppendedType, IsNullableType, KeyStringType, ValueStringType, FormatStringType);
+            var b = (other.ChainDefinitionIndex ?? int.MaxValue, other.AppendedType, other.IsNullableType, other.KeyStringType, other.ValueStringType, other.FormatStringType);
 
             var tupleComparison = a.CompareTo(b);
             return tupleComparison != 0 ? tupleComparison : StringComparer.Ordinal.Compare(UnderlyingTypeName, other.UnderlyingTypeName);
@@ -492,15 +527,17 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
 
             using (_writer.WriteBlock($"namespace {ZeroLogFacts.Namespace}"))
             {
-                for (var i = 0; i < chains.Length; ++i)
+                Regroup(chains, out var chainClasses, out var interceptors);
+
+                foreach (var chainClass in chainClasses)
                 {
-                    GenerateChainClass(chains[i], i);
+                    GenerateChainClass(chainClass);
                     _writer.AppendLine();
                 }
 
                 using (_writer.WriteBlock("file static class ChainsInterceptor"))
                 {
-                    GenerateInterceptors(GroupIntercepts(chains));
+                    GenerateInterceptors(interceptors);
                 }
             }
 
@@ -532,24 +569,20 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
             );
         }
 
-        private void GenerateChainClass(ChainModel chain, int chainIndex)
+        private void GenerateChainClass(ChainClassModel chainClass)
         {
-            _writer.AppendLine(
-                $"""
-                file sealed class Chain{chainIndex} : global::{ZeroLogFacts.FullTypeNames.Chain}
-                """
-            );
+            _writer.AppendLine($"file sealed class Chain{chainClass.Index} : global::{ZeroLogFacts.FullTypeNames.Chain}");
 
             using (_writer.WriteBlock())
             {
-                _writer.AppendLine($"public static readonly Chain{chainIndex} Instance = new();")
+                _writer.AppendLine($"public static readonly Chain{chainClass.Index} Instance = new();")
                        .AppendLine();
 
                 using (_writer.WriteBlock($"protected override void Execute(ref global::{ZeroLogFacts.FullTypeNames.ChainExecutionContext} context)"))
                 {
-                    var optimizedChain = ConcatConstants(chain);
+                    var optimizedChain = ConcatConstants(chainClass);
 
-                    foreach (var call in optimizedChain.Calls)
+                    foreach (var call in optimizedChain.Type.CallSignatures)
                     {
                         switch (call.KeyStringType)
                         {
@@ -600,11 +633,11 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
             static string FormatString(string? value)
                 => value is null ? "null" : SymbolDisplay.FormatLiteral(value, true);
 
-            static ChainModel ConcatConstants(ChainModel chain)
+            static ChainClassModel ConcatConstants(ChainClassModel chain)
             {
                 var calls = new List<AppendCallModel>();
 
-                foreach (var call in chain.Calls)
+                foreach (var call in chain.Type.CallSignatures)
                 {
                     if (CanConcat(call) && calls.Count > 0)
                     {
@@ -624,7 +657,7 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
                     calls.Add(call);
                 }
 
-                return new ChainModel(calls.ToImmutableArray());
+                return chain with { Type = new ChainTypeModel(calls.ToImmutableArray()) };
             }
 
             static bool CanConcat(AppendCallModel call)
@@ -668,7 +701,7 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
 
                 using (_writer.WriteBlock())
                 {
-                    if (call.ChainIndex is { } chainIndex)
+                    if (call.ChainDefinitionIndex is { } chainIndex)
                         _writer.AppendLine($"global::{ZeroLogFacts.FullTypeNames.Chain}.{ZeroLogFacts.MethodNames.AppendChain}(log, Chain{chainIndex}.Instance);");
 
                     if (call.KeyStringType is ProvidedStringType.Variable)
