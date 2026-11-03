@@ -1151,11 +1151,15 @@ namespace ZeroLog
                     where T :  unmanaged { }
                 public ref struct ChainExecutionContext
                 {
-                    public void OutputEnum<T>(bool nullable)
+                    public void OutputEnum<T>()
                         where T :  struct, System.Enum { }
+                    public void OutputNullableEnum<T>()
+                        where T :  struct, System.Enum { }
+                    public void OutputNullableValueType<T>()
+                        where T :  unmanaged { }
                     public void OutputString() { }
                     public void OutputString(string? value) { }
-                    public void OutputValueType<T>(bool nullable)
+                    public void OutputValueType<T>()
                         where T :  unmanaged { }
                     public void SetFormatString() { }
                     public void SetFormatString(string? format) { }

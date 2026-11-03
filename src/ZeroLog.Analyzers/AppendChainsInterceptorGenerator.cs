@@ -209,7 +209,7 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
                 if (underlyingTypeName is null)
                     return false;
 
-                if (appendedType.BaseType is AppendedType.String)
+                if (appendedType is AppendedType.String)
                 {
                     valueStringType = invocation.GetArgumentByParameterIndex(0)?.TryGetConstantString(out valueString) is true
                         ? ProvidedStringType.Constant
@@ -264,7 +264,7 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
                     ? ProvidedStringType.Constant
                     : ProvidedStringType.Variable;
 
-                if (appendedType.BaseType is AppendedType.String)
+                if (appendedType is AppendedType.String)
                 {
                     valueStringType = invocation.GetArgumentByParameterIndex(1)?.TryGetConstantString(out valueString) is true
                         ? ProvidedStringType.Constant
@@ -290,12 +290,10 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
 
         var isNullableValueType = namedType.OriginalDefinition.SpecialType is SpecialType.System_Nullable_T;
         var underlyingType = isNullableValueType ? namedType.TypeArguments[0] : namedType;
-        var isNullableType = isNullableValueType || namedType.IsReferenceType;
-        var appendedTypeFlags = isNullableType ? AppendedType.NullableFlag : AppendedType.None;
 
         if (underlyingType.SpecialType is SpecialType.System_String)
         {
-            appendedType = AppendedType.String | appendedTypeFlags;
+            appendedType = AppendedType.String;
             return "string";
         }
 
@@ -320,7 +318,7 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
 
         if (fromSpecialType is not null)
         {
-            appendedType = AppendedType.ValueType | appendedTypeFlags;
+            appendedType = isNullableValueType ? AppendedType.NullableValueType : AppendedType.ValueType;
             return fromSpecialType;
         }
 
@@ -333,13 +331,13 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
             case "global::System.DateTimeOffset":
             case "global::System.DateOnly":
             case "global::System.TimeOnly":
-                appendedType = AppendedType.ValueType | appendedTypeFlags;
+                appendedType = isNullableValueType ? AppendedType.NullableValueType : AppendedType.ValueType;
                 return fullNameType;
         }
 
         if (underlyingType is INamedTypeSymbol { TypeKind: TypeKind.Enum } enumType && enumType.HasAssemblyAccessibility(compilation))
         {
-            appendedType = AppendedType.Enum | appendedTypeFlags;
+            appendedType = isNullableValueType ? AppendedType.NullableEnum : AppendedType.Enum;
             return fullNameType;
         }
 
@@ -457,15 +455,17 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
     }
 
     [Flags]
-    internal enum AppendedType : byte
+    private enum AppendedType : byte
     {
         None,
 
         String,
-        ValueType,
-        Enum,
 
-        NullableFlag = 1 << 7
+        ValueType,
+        NullableValueType,
+
+        Enum,
+        NullableEnum
     }
 
     private enum ProvidedStringType : byte
@@ -643,7 +643,7 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
                                 break;
                         }
 
-                        switch (call.AppendedType.BaseType)
+                        switch (call.AppendedType)
                         {
                             case AppendedType.String when call.ValueStringType is ProvidedStringType.Constant:
                                 _writer.AppendLine($"context.OutputString({FormatStringLiteral(call.ConstantValueString)});");
@@ -654,11 +654,19 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
                                 break;
 
                             case AppendedType.ValueType:
-                                _writer.AppendLine($"context.OutputValueType<{call.UnderlyingTypeName}>(nullable: {(call.AppendedType.IsNullable ? "true" : "false")});");
+                                _writer.AppendLine($"context.OutputValueType<{call.UnderlyingTypeName}>();");
+                                break;
+
+                            case AppendedType.NullableValueType:
+                                _writer.AppendLine($"context.OutputNullableValueType<{call.UnderlyingTypeName}>();");
                                 break;
 
                             case AppendedType.Enum:
-                                _writer.AppendLine($"context.OutputEnum<{call.UnderlyingTypeName}>(nullable: {(call.AppendedType.IsNullable ? "true" : "false")});");
+                                _writer.AppendLine($"context.OutputEnum<{call.UnderlyingTypeName}>();");
+                                break;
+
+                            case AppendedType.NullableEnum:
+                                _writer.AppendLine($"context.OutputNullableEnum<{call.UnderlyingTypeName}>();");
                                 break;
                         }
                     }
@@ -694,7 +702,7 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
 
                 _writer.Append(call.UnderlyingTypeName);
 
-                if (call.AppendedType.IsNullable)
+                if (call.AppendedType is AppendedType.NullableValueType or AppendedType.NullableEnum or AppendedType.String)
                     _writer.Append("?");
 
                 _writer.Append(" value");
@@ -718,11 +726,17 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
                     if (call.FormatStringType is ProvidedStringType.Variable)
                         _writer.AppendLine($"global::{ZeroLogFacts.FullTypeNames.Chain}.{ZeroLogFacts.MethodNames.AppendChainItem}(log, format);");
 
-                    if (call.AppendedType.BaseType is AppendedType.ValueType)
-                        _writer.AppendLine($"global::{ZeroLogFacts.FullTypeNames.Chain}.{ZeroLogFacts.MethodNames.AppendChainItem}(log, value);");
+                    var methodName = call.AppendedType switch
+                    {
+                        AppendedType.ValueType         => ZeroLogFacts.MethodNames.AppendChainItem,
+                        AppendedType.NullableValueType => ZeroLogFacts.MethodNames.AppendChainItem,
+                        AppendedType.Enum              => ZeroLogFacts.MethodNames.AppendChainEnumItem,
+                        AppendedType.NullableEnum      => ZeroLogFacts.MethodNames.AppendChainEnumItem,
+                        _                              => null
+                    };
 
-                    if (call.AppendedType.BaseType is AppendedType.Enum)
-                        _writer.AppendLine($"global::{ZeroLogFacts.FullTypeNames.Chain}.{ZeroLogFacts.MethodNames.AppendChainEnumItem}(log, value);");
+                    if (methodName is not null)
+                        _writer.AppendLine($"global::{ZeroLogFacts.FullTypeNames.Chain}.{methodName}(log, value);");
 
                     _writer.AppendLine("return log;");
                 }
@@ -733,15 +747,6 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
 
             _writer.AppendLine();
         }
-    }
-}
-
-internal static class InterceptableLocationExtensions
-{
-    extension(AppendChainsInterceptorGenerator.AppendedType type)
-    {
-        public AppendChainsInterceptorGenerator.AppendedType BaseType => type & ~AppendChainsInterceptorGenerator.AppendedType.NullableFlag;
-        public bool IsNullable => (type & AppendChainsInterceptorGenerator.AppendedType.NullableFlag) != 0;
     }
 }
 

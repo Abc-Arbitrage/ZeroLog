@@ -126,35 +126,39 @@ unsafe partial class LogMessage
                     ResetStatus();
                 }
 
-                public partial void OutputValueType<T>(bool nullable)
+                public partial void OutputNullableValueType<T>()
                     where T : unmanaged
                 {
-                    if (Truncated)
-                        return;
+                    if (Truncated || InputData.Length < sizeof(byte))
+                        goto truncate;
 
-                    if (nullable)
+                    var hasValue = InputData[0];
+                    InputData = InputData.Slice(sizeof(byte));
+
+                    switch (hasValue)
                     {
-                        if (InputData.Length < sizeof(byte))
+                        case 0:
+                            OutputString(null);
+                            return;
+
+                        case 1:
+                            break;
+
+                        default:
                             goto truncate;
-
-                        var hasValue = InputData[0];
-                        InputData = InputData.Slice(sizeof(byte));
-
-                        switch (hasValue)
-                        {
-                            case 0:
-                                OutputString(null);
-                                return;
-
-                            case 1:
-                                break;
-
-                            default:
-                                goto truncate;
-                        }
                     }
 
-                    if (InputData.Length < sizeof(T))
+                    OutputValueType<T>();
+                    return;
+
+                    truncate:
+                    Truncated = true;
+                }
+
+                public partial void OutputValueType<T>()
+                    where T : unmanaged
+                {
+                    if (Truncated || InputData.Length < sizeof(T))
                         goto truncate;
 
                     var outputBuffer = _key is null
@@ -234,35 +238,39 @@ unsafe partial class LogMessage
                     }
                 }
 
-                public partial void OutputEnum<T>(bool nullable)
+                public partial void OutputNullableEnum<T>()
                     where T : struct, Enum
                 {
-                    if (Truncated)
-                        return;
+                    if (Truncated || InputData.Length < sizeof(byte))
+                        goto truncate;
 
-                    if (nullable)
+                    var hasValue = InputData[0];
+                    InputData = InputData.Slice(sizeof(byte));
+
+                    switch (hasValue)
                     {
-                        if (InputData.Length < sizeof(byte))
+                        case 0:
+                            OutputString(null);
+                            return;
+
+                        case 1:
+                            break;
+
+                        default:
                             goto truncate;
-
-                        var hasValue = InputData[0];
-                        InputData = InputData.Slice(sizeof(byte));
-
-                        switch (hasValue)
-                        {
-                            case 0:
-                                OutputString(null);
-                                return;
-
-                            case 1:
-                                break;
-
-                            default:
-                                goto truncate;
-                        }
                     }
 
-                    if (InputData.Length < sizeof(EnumArg))
+                    OutputEnum<T>();
+                    return;
+
+                    truncate:
+                    Truncated = true;
+                }
+
+                public partial void OutputEnum<T>()
+                    where T : struct, Enum
+                {
+                    if (Truncated || InputData.Length < sizeof(EnumArg))
                         goto truncate;
 
                     var outputBuffer = _key is null
@@ -379,27 +387,49 @@ unsafe partial class LogMessage
         {
             // Pre-JIT these
 
-            context.OutputValueType<bool>(false);
-            context.OutputValueType<byte>(false);
-            context.OutputValueType<sbyte>(false);
-            context.OutputValueType<short>(false);
-            context.OutputValueType<ushort>(false);
-            context.OutputValueType<int>(false);
-            context.OutputValueType<uint>(false);
-            context.OutputValueType<long>(false);
-            context.OutputValueType<ulong>(false);
-            context.OutputValueType<nint>(false);
-            context.OutputValueType<nuint>(false);
-            context.OutputValueType<float>(false);
-            context.OutputValueType<double>(false);
-            context.OutputValueType<decimal>(false);
-            context.OutputValueType<Guid>(false);
-            context.OutputValueType<DateTime>(false);
-            context.OutputValueType<TimeSpan>(false);
-            context.OutputValueType<DateOnly>(false);
-            context.OutputValueType<TimeOnly>(false);
-            context.OutputValueType<DateTimeOffset>(false);
-            context.OutputValueType<char>(false);
+            context.OutputValueType<char>();
+            context.OutputValueType<bool>();
+            context.OutputValueType<byte>();
+            context.OutputValueType<sbyte>();
+            context.OutputValueType<short>();
+            context.OutputValueType<ushort>();
+            context.OutputValueType<int>();
+            context.OutputValueType<uint>();
+            context.OutputValueType<long>();
+            context.OutputValueType<ulong>();
+            context.OutputValueType<nint>();
+            context.OutputValueType<nuint>();
+            context.OutputValueType<float>();
+            context.OutputValueType<double>();
+            context.OutputValueType<decimal>();
+            context.OutputValueType<Guid>();
+            context.OutputValueType<DateTime>();
+            context.OutputValueType<TimeSpan>();
+            context.OutputValueType<DateOnly>();
+            context.OutputValueType<TimeOnly>();
+            context.OutputValueType<DateTimeOffset>();
+
+            context.OutputNullableValueType<char>();
+            context.OutputNullableValueType<bool>();
+            context.OutputNullableValueType<byte>();
+            context.OutputNullableValueType<sbyte>();
+            context.OutputNullableValueType<short>();
+            context.OutputNullableValueType<ushort>();
+            context.OutputNullableValueType<int>();
+            context.OutputNullableValueType<uint>();
+            context.OutputNullableValueType<long>();
+            context.OutputNullableValueType<ulong>();
+            context.OutputNullableValueType<nint>();
+            context.OutputNullableValueType<nuint>();
+            context.OutputNullableValueType<float>();
+            context.OutputNullableValueType<double>();
+            context.OutputNullableValueType<decimal>();
+            context.OutputNullableValueType<Guid>();
+            context.OutputNullableValueType<DateTime>();
+            context.OutputNullableValueType<TimeSpan>();
+            context.OutputNullableValueType<DateOnly>();
+            context.OutputNullableValueType<TimeOnly>();
+            context.OutputNullableValueType<DateTimeOffset>();
 
             context.OutputString();
             context.OutputString("");
