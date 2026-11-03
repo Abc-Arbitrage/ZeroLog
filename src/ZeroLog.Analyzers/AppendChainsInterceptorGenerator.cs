@@ -122,7 +122,6 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
                 semanticModel,
                 out var appendedType,
                 out var underlyingTypeName,
-                out var isNullableType,
                 out var keyStringType,
                 out var keyString,
                 out var valueStringType,
@@ -140,7 +139,6 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
         appendCallSite = new AppendCallSite(
             new AppendCallDescriptor(
                 appendedType,
-                isNullableType,
                 keyStringType,
                 valueStringType,
                 formatStringType,
@@ -174,7 +172,6 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
                                               SemanticModel semanticModel,
                                               out AppendedType appendedType,
                                               [NotNullWhen(true)] out string? underlyingTypeName,
-                                              out bool isNullableType,
                                               out ProvidedStringType keyStringType,
                                               out string? keyString,
                                               out ProvidedStringType valueStringType,
@@ -183,7 +180,6 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
                                               out string? formatString)
     {
         appendedType = AppendedType.None;
-        isNullableType = false;
         underlyingTypeName = null;
         keyStringType = ProvidedStringType.None;
         keyString = null;
@@ -207,14 +203,13 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
                 underlyingTypeName = GetSupportedTypeName(
                     valueParameterType,
                     semanticModel.Compilation,
-                    out appendedType,
-                    out isNullableType
+                    out appendedType
                 );
 
                 if (underlyingTypeName is null)
                     return false;
 
-                if (appendedType is AppendedType.String)
+                if (appendedType.BaseType is AppendedType.String)
                 {
                     valueStringType = invocation.GetArgumentByParameterIndex(0)?.TryGetConstantString(out valueString) is true
                         ? ProvidedStringType.Constant
@@ -242,8 +237,7 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
                 underlyingTypeName = GetSupportedTypeName(
                     valueParameterType,
                     semanticModel.Compilation,
-                    out appendedType,
-                    out isNullableType
+                    out appendedType
                 );
 
                 return underlyingTypeName is not null;
@@ -260,8 +254,7 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
                 underlyingTypeName = GetSupportedTypeName(
                     valueParameterType,
                     semanticModel.Compilation,
-                    out appendedType,
-                    out isNullableType
+                    out appendedType
                 );
 
                 if (underlyingTypeName is null)
@@ -271,7 +264,7 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
                     ? ProvidedStringType.Constant
                     : ProvidedStringType.Variable;
 
-                if (appendedType is AppendedType.String)
+                if (appendedType.BaseType is AppendedType.String)
                 {
                     valueStringType = invocation.GetArgumentByParameterIndex(1)?.TryGetConstantString(out valueString) is true
                         ? ProvidedStringType.Constant
@@ -287,23 +280,22 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
 
     private static string? GetSupportedTypeName(ITypeSymbol type,
                                                 Compilation compilation,
-                                                out AppendedType appendedType,
-                                                out bool isNullableType)
+                                                out AppendedType appendedType)
     {
         if (type is not INamedTypeSymbol namedType)
         {
             appendedType = AppendedType.None;
-            isNullableType = false;
             return null;
         }
 
         var isNullableValueType = namedType.OriginalDefinition.SpecialType is SpecialType.System_Nullable_T;
         var underlyingType = isNullableValueType ? namedType.TypeArguments[0] : namedType;
-        isNullableType = isNullableValueType || namedType.IsReferenceType;
+        var isNullableType = isNullableValueType || namedType.IsReferenceType;
+        var appendedTypeFlags = isNullableType ? AppendedType.NullableFlag : AppendedType.None;
 
         if (underlyingType.SpecialType is SpecialType.System_String)
         {
-            appendedType = AppendedType.String;
+            appendedType = AppendedType.String | appendedTypeFlags;
             return "string";
         }
 
@@ -328,7 +320,7 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
 
         if (fromSpecialType is not null)
         {
-            appendedType = AppendedType.ValueType;
+            appendedType = AppendedType.ValueType | appendedTypeFlags;
             return fromSpecialType;
         }
 
@@ -341,13 +333,13 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
             case "global::System.DateTimeOffset":
             case "global::System.DateOnly":
             case "global::System.TimeOnly":
-                appendedType = AppendedType.ValueType;
+                appendedType = AppendedType.ValueType | appendedTypeFlags;
                 return fullNameType;
         }
 
         if (underlyingType is INamedTypeSymbol { TypeKind: TypeKind.Enum } enumType && enumType.HasAssemblyAccessibility(compilation))
         {
-            appendedType = AppendedType.Enum;
+            appendedType = AppendedType.Enum | appendedTypeFlags;
             return fullNameType;
         }
 
@@ -401,7 +393,6 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
                 var interceptorDescriptor = new InterceptorDescriptor(
                     callIndex == 0 ? new ChainIdentifier(chainIndex) : null,
                     callDescriptor.AppendedType,
-                    callDescriptor.IsNullableType,
                     callDescriptor.KeyStringType,
                     callDescriptor.ValueStringType,
                     callDescriptor.FormatStringType,
@@ -465,12 +456,16 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
                && call.FormatStringType is ProvidedStringType.None;
     }
 
-    private enum AppendedType : byte
+    [Flags]
+    internal enum AppendedType : byte
     {
         None,
+
         String,
         ValueType,
-        Enum
+        Enum,
+
+        NullableFlag = 1 << 7
     }
 
     private enum ProvidedStringType : byte
@@ -482,7 +477,6 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
 
     private readonly record struct AppendCallDescriptor(
         AppendedType AppendedType,
-        bool IsNullableType,
         ProvidedStringType KeyStringType,
         ProvidedStringType ValueStringType,
         ProvidedStringType FormatStringType,
@@ -538,7 +532,6 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
     private readonly record struct InterceptorDescriptor(
         ChainIdentifier? ChainId,
         AppendedType AppendedType,
-        bool IsNullableType,
         ProvidedStringType KeyStringType,
         ProvidedStringType ValueStringType,
         ProvidedStringType FormatStringType,
@@ -547,8 +540,8 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
     {
         public int CompareTo(InterceptorDescriptor other)
         {
-            var a = (ChainId?.Index ?? int.MaxValue, AppendedType, IsNullableType, KeyStringType, ValueStringType, FormatStringType);
-            var b = (other.ChainId?.Index ?? int.MaxValue, other.AppendedType, other.IsNullableType, other.KeyStringType, other.ValueStringType, other.FormatStringType);
+            var a = (ChainId?.Index ?? int.MaxValue, AppendedType, KeyStringType, ValueStringType, FormatStringType);
+            var b = (other.ChainId?.Index ?? int.MaxValue, other.AppendedType, other.KeyStringType, other.ValueStringType, other.FormatStringType);
 
             var tupleComparison = a.CompareTo(b);
             return tupleComparison != 0 ? tupleComparison : StringComparer.Ordinal.Compare(UnderlyingTypeName, other.UnderlyingTypeName);
@@ -650,7 +643,7 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
                                 break;
                         }
 
-                        switch (call.AppendedType)
+                        switch (call.AppendedType.BaseType)
                         {
                             case AppendedType.String when call.ValueStringType is ProvidedStringType.Constant:
                                 _writer.AppendLine($"context.OutputString({FormatStringLiteral(call.ConstantValueString)});");
@@ -661,11 +654,11 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
                                 break;
 
                             case AppendedType.ValueType:
-                                _writer.AppendLine($"context.OutputValueType<{call.UnderlyingTypeName}>(nullable: {(call.IsNullableType ? "true" : "false")});");
+                                _writer.AppendLine($"context.OutputValueType<{call.UnderlyingTypeName}>(nullable: {(call.AppendedType.IsNullable ? "true" : "false")});");
                                 break;
 
                             case AppendedType.Enum:
-                                _writer.AppendLine($"context.OutputEnum<{call.UnderlyingTypeName}>(nullable: {(call.IsNullableType ? "true" : "false")});");
+                                _writer.AppendLine($"context.OutputEnum<{call.UnderlyingTypeName}>(nullable: {(call.AppendedType.IsNullable ? "true" : "false")});");
                                 break;
                         }
                     }
@@ -701,7 +694,7 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
 
                 _writer.Append(call.UnderlyingTypeName);
 
-                if (call.IsNullableType)
+                if (call.AppendedType.IsNullable)
                     _writer.Append("?");
 
                 _writer.Append(" value");
@@ -725,10 +718,10 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
                     if (call.FormatStringType is ProvidedStringType.Variable)
                         _writer.AppendLine($"global::{ZeroLogFacts.FullTypeNames.Chain}.{ZeroLogFacts.MethodNames.AppendChainItem}(log, format);");
 
-                    if (call.AppendedType is AppendedType.ValueType)
+                    if (call.AppendedType.BaseType is AppendedType.ValueType)
                         _writer.AppendLine($"global::{ZeroLogFacts.FullTypeNames.Chain}.{ZeroLogFacts.MethodNames.AppendChainItem}(log, value);");
 
-                    if (call.AppendedType is AppendedType.Enum)
+                    if (call.AppendedType.BaseType is AppendedType.Enum)
                         _writer.AppendLine($"global::{ZeroLogFacts.FullTypeNames.Chain}.{ZeroLogFacts.MethodNames.AppendChainEnumItem}(log, value);");
 
                     _writer.AppendLine("return log;");
@@ -740,6 +733,15 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
 
             _writer.AppendLine();
         }
+    }
+}
+
+internal static class InterceptableLocationExtensions
+{
+    extension(AppendChainsInterceptorGenerator.AppendedType type)
+    {
+        public AppendChainsInterceptorGenerator.AppendedType BaseType => type & ~AppendChainsInterceptorGenerator.AppendedType.NullableFlag;
+        public bool IsNullable => (type & AppendChainsInterceptorGenerator.AppendedType.NullableFlag) != 0;
     }
 }
 
