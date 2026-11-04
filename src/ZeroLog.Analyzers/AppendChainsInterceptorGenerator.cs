@@ -662,11 +662,11 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
                                 break;
 
                             case AppendedType.Enum:
-                                _writer.AppendLine($"context.OutputEnum<{call.UnderlyingTypeName}>();");
+                                _writer.AppendLine("context.OutputEnum();");
                                 break;
 
                             case AppendedType.NullableEnum:
-                                _writer.AppendLine($"context.OutputNullableEnum<{call.UnderlyingTypeName}>();");
+                                _writer.AppendLine("context.OutputNullableEnum();");
                                 break;
                         }
                     }

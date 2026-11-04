@@ -64,11 +64,8 @@ partial class LogMessage
                 public partial void OutputNullableValueType<T>()
                     where T : unmanaged;
 
-                public partial void OutputEnum<T>()
-                    where T : struct, Enum;
-
-                public partial void OutputNullableEnum<T>()
-                    where T : struct, Enum;
+                public partial void OutputEnum();
+                public partial void OutputNullableEnum();
 
                 public partial void SetFormatString();
                 public partial void SetFormatString(string? format);
@@ -135,8 +132,8 @@ partial class LogMessage
                 public partial void OutputString(string? value) { }
                 public partial void OutputValueType<T>() where T : unmanaged { }
                 public partial void OutputNullableValueType<T>() where T : unmanaged { }
-                public partial void OutputEnum<T>() where T : struct, Enum { }
-                public partial void OutputNullableEnum<T>() where T : struct, Enum { }
+                public partial void OutputEnum() { }
+                public partial void OutputNullableEnum() { }
 
                 public partial void SetFormatString() { }
                 public partial void SetFormatString(string? format) { }

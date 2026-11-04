@@ -669,16 +669,10 @@ unsafe partial class LogMessage
                 return;
             }
 
-            case ArgumentType.KeyString: // Should not happen
-            {
-                ++dataPointer;
-                SkipArg(ref dataPointer);
-                return;
-            }
-
+            // Should not happen
+            case ArgumentType.KeyString:
             case ArgumentType.Chain:
             {
-                SkipChain(ref dataPointer);
                 return;
             }
 
@@ -688,7 +682,9 @@ unsafe partial class LogMessage
             }
 
             default:
+            {
                 throw new ArgumentOutOfRangeException();
+            }
         }
     }
 
