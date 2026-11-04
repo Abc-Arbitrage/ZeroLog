@@ -15,16 +15,19 @@ using ZeroLog.Analyzers.Support;
 namespace ZeroLog.Analyzers;
 
 [Generator(LanguageNames.CSharp)]
-public class AppendChainsInterceptorGenerator : IIncrementalGenerator
+public sealed class AppendChainsInterceptorGenerator : SourceGeneratorBase
 {
-    public void Initialize(IncrementalGeneratorInitializationContext context)
+    private const string _generatorName = "AppendChains";
+    private const int _apiVersion = 1;
+
+    public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
         var chains = context.SyntaxProvider
                             .CreateSyntaxProvider(SyntaxPredicate, SyntaxTransform)
                             .Where(static i => i.CallSite.Descriptor.AppendedType is not AppendedType.None)
                             .WithLambdaComparer(static (a, b) => a.CallSite.Equals(b.CallSite), static i => i.CallSite.GetHashCode())
                             .Collect()
-                            .Combine(context.IsGeneratorEnabled("AppendChains"))
+                            .Combine(context.IsGeneratorEnabled(_generatorName))
                             .EmptyIfFalse()
                             .Combine(context.CompilationProvider.Select(SupportsGeneratedAppendChains))
                             .EmptyIfFalse()
@@ -52,10 +55,8 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
     {
         // C# 11 is required for file-scoped types
         return compilation is CSharpCompilation { LanguageVersion: >= LanguageVersion.CSharp11 }
-               && compilation.GetTypeByMetadataName(ZeroLogFacts.FullTypeNames.LogMessage) is { } logMessage
-               && logMessage.GetTypeMembers(ZeroLogFacts.ShortTypeNames.InternalApi) is [{ }];
-
-        // TODO: Finish
+               && compilation.GetTypeByMetadataName($"{ZeroLogFacts.MetadataNames.LogMessageInternalApiChain}") is { } chainType
+               && chainType.GetMembers(ZeroLogFacts.FieldNames.Version) is [IFieldSymbol { IsConst: true, ConstantValue: _apiVersion }];
     }
 
     private static bool SyntaxPredicate(SyntaxNode node, CancellationToken cancellationToken)
@@ -165,7 +166,7 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
         {
             Name: ZeroLogFacts.ShortTypeNames.LogMessage,
             ContainingType: null,
-            ContainingNamespace: { Name: ZeroLogFacts.Namespace, ContainingNamespace.IsGlobalNamespace: true }
+            ContainingNamespace: { Name: ZeroLogFacts.Namespaces.ZeroLog, ContainingNamespace.IsGlobalNamespace: true }
         };
 
     private static bool IsChainableInvocation(IInvocationOperation invocation,
@@ -423,7 +424,7 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
 
         static ChainDefinition ConcatConstants(ChainDefinition chain)
         {
-            var calls = new List<AppendCallDescriptor>();
+            var calls = ImmutableArray.CreateBuilder<AppendCallDescriptor>(chain.Body.Calls.Length);
 
             foreach (var call in chain.Body.Calls)
             {
@@ -445,7 +446,7 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
                 calls.Add(call);
             }
 
-            return chain with { Body = new ChainBody(calls.ToImmutableArray()) };
+            return chain with { Body = new ChainBody(calls.ToImmutable()) };
         }
 
         static bool CanConcat(AppendCallDescriptor call)
@@ -553,10 +554,8 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
         ImmutableArray<InterceptableLocation> Locations
     );
 
-    private class Generator
+    private sealed class Generator : GeneratorBase
     {
-        private readonly CodeWriter _writer = new();
-
         public string Generate(ImmutableArray<ChainDefinition> chainDefinitions,
                                ImmutableArray<InterceptorDefinition> interceptorDefinitions)
         {
@@ -564,7 +563,7 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
 
             AppendHeader();
 
-            using (_writer.WriteBlock($"namespace {ZeroLogFacts.Namespace}"))
+            using (_writer.WriteBlock($"namespace {ZeroLogFacts.Namespaces.Generated}"))
             {
                 foreach (var chainDefinition in chainDefinitions)
                 {
@@ -572,7 +571,7 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
                     _writer.AppendLine();
                 }
 
-                using (_writer.WriteBlock("file static class ChainsInterceptor"))
+                using (_writer.WriteBlock("file static class AppendChainInterceptors"))
                 {
                     GenerateInterceptors(interceptorDefinitions);
                 }
@@ -583,14 +582,10 @@ public class AppendChainsInterceptorGenerator : IIncrementalGenerator
 
         private void AppendHeader()
         {
+            AppendCommonHeader(_generatorName);
+
             _writer.AppendLine(
                 """
-                // <auto-generated>
-                //   This file was generated by ZeroLog to provide additional optimizations.
-                // </auto-generated>
-
-                #nullable enable
-
                 namespace System.Runtime.CompilerServices
                 {
                     [global::System.Diagnostics.Conditional("ZEROLOG_GENERATED")]

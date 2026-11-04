@@ -59,7 +59,7 @@ public class AppendChainsInterceptorGeneratorTests
     {
         var parseOptions = CSharpParseOptions.Default
                                              .WithLanguageVersion(LanguageVersion.CSharp11)
-                                             .WithFeatures([new("InterceptorsNamespaces", "ZeroLog")]);
+                                             .WithFeatures([new("InterceptorsNamespaces", ZeroLogFacts.Namespaces.Generated)]);
 
         var compilation = CSharpCompilation.Create(
             "TestAssembly",

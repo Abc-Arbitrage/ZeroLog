@@ -2,8 +2,6 @@
 
 internal static class ZeroLogFacts
 {
-    public const string Namespace = "ZeroLog";
-
     public static bool IsLogLevelName(string? value)
         => value is nameof(LogLevel.Trace)
             or nameof(LogLevel.Debug)
@@ -12,22 +10,35 @@ internal static class ZeroLogFacts
             or nameof(LogLevel.Error)
             or nameof(LogLevel.Fatal);
 
+    public static class Namespaces
+    {
+        public const string ZeroLog = "ZeroLog";
+        public const string Generated = "ZeroLog.Generated";
+    }
+
     public static class ShortTypeNames
     {
         public const string LogManager = "LogManager";
         public const string LogMessage = "LogMessage";
         public const string InternalApi = "InternalApi";
+        public const string Chain = "Chain";
     }
 
     public static class FullTypeNames
     {
-        public const string Log = "ZeroLog.Log";
-        public const string LogManager = "ZeroLog.LogManager";
-        public const string LogMessage = "ZeroLog.LogMessage";
+        public const string Log = $"{Namespaces.ZeroLog}.Log";
+        public const string LogManager = $"{Namespaces.ZeroLog}.LogManager";
+        public const string LogMessage = $"{Namespaces.ZeroLog}.LogMessage";
 
         // InternalApi
-        public const string Chain = "ZeroLog.LogMessage.InternalApi.Chain";
-        public const string ChainExecutionContext = "ZeroLog.LogMessage.InternalApi.Chain.ChainExecutionContext";
+        public const string Chain = $"{LogMessage}.{ShortTypeNames.InternalApi}.{ShortTypeNames.Chain}";
+        public const string ChainExecutionContext = $"{Chain}.ChainExecutionContext";
+    }
+
+    public static class MetadataNames
+    {
+        public const string LogManagerInternalApi = $"{FullTypeNames.LogManager}+{ShortTypeNames.InternalApi}";
+        public const string LogMessageInternalApiChain = $"{FullTypeNames.LogMessage}+{ShortTypeNames.InternalApi}+{ShortTypeNames.Chain}";
     }
 
     public static class MethodNames
@@ -53,5 +64,10 @@ internal static class ZeroLogFacts
     public static class EventNames
     {
         public const string Initialized = "Initialized";
+    }
+
+    public static class FieldNames
+    {
+        public const string Version = "Version";
     }
 }

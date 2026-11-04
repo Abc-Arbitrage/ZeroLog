@@ -20,6 +20,8 @@ partial class LogMessage
         [EditorBrowsable(EditorBrowsableState.Never)]
         public abstract partial class Chain
         {
+            public const int Version = 1;
+
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static void AppendChain(LogMessage message, Chain chain)
                 => message.InternalAppendChain(chain);
@@ -99,7 +101,6 @@ partial class LogMessage
         where T : struct, Enum;
 
 #if NETSTANDARD
-
     internal partial void InternalAppendChain(InternalApi.Chain chain)
     { }
 

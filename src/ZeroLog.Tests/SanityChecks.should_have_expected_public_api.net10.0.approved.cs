@@ -1137,6 +1137,7 @@ namespace ZeroLog
         {
             public abstract class Chain
             {
+                public const int Version = 1;
                 protected Chain() { }
                 protected abstract void Execute(ref ZeroLog.LogMessage.InternalApi.Chain.ChainExecutionContext context);
                 public static void AppendChain(ZeroLog.LogMessage message, ZeroLog.LogMessage.InternalApi.Chain chain) { }
