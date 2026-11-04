@@ -25,7 +25,7 @@ unsafe partial class LogMessage
         }
     }
 
-    internal partial void InternalAppendChainItem(string? value)
+    internal partial void InternalAppendChainValue(string? value)
     {
         if (_dataPointer + sizeof(byte) <= _endOfBuffer && _objectIndex < _objects.Length)
         {
@@ -50,7 +50,7 @@ unsafe partial class LogMessage
         }
     }
 
-    internal partial void InternalAppendChainItem<T>(T value)
+    internal partial void InternalAppendChainValue<T>(T value)
         where T : unmanaged
     {
         if (_dataPointer + sizeof(T) <= _endOfBuffer)
@@ -64,7 +64,7 @@ unsafe partial class LogMessage
         }
     }
 
-    internal partial void InternalAppendChainItem<T>(T? value)
+    internal partial void InternalAppendChainValue<T>(T? value)
         where T : unmanaged
     {
         if (_dataPointer + 1 + sizeof(T) <= _endOfBuffer)
@@ -89,7 +89,7 @@ unsafe partial class LogMessage
         }
     }
 
-    internal partial void InternalAppendChainEnumItem<T>(T value)
+    internal partial void InternalAppendChainEnumValue<T>(T value)
         where T : struct, Enum
     {
         if (_dataPointer + sizeof(EnumArg) <= _endOfBuffer)
@@ -103,7 +103,7 @@ unsafe partial class LogMessage
         }
     }
 
-    internal partial void InternalAppendChainEnumItem<T>(T? value)
+    internal partial void InternalAppendChainEnumValue<T>(T? value)
         where T : struct, Enum
     {
         if (_dataPointer + 1 + sizeof(EnumArg) <= _endOfBuffer)

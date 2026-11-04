@@ -27,28 +27,28 @@ partial class LogMessage
                 => message.InternalAppendChain(chain);
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public static void AppendChainItem(LogMessage message, string? value)
-                => message.InternalAppendChainItem(value);
+            public static void AppendValue(LogMessage message, string? value)
+                => message.InternalAppendChainValue(value);
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public static void AppendChainItem<T>(LogMessage message, T value)
+            public static void AppendValue<T>(LogMessage message, T value)
                 where T : unmanaged
-                => message.InternalAppendChainItem(value);
+                => message.InternalAppendChainValue(value);
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public static void AppendChainItem<T>(LogMessage message, T? value)
+            public static void AppendValue<T>(LogMessage message, T? value)
                 where T : unmanaged
-                => message.InternalAppendChainItem(value);
+                => message.InternalAppendChainValue(value);
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public static void AppendChainEnumItem<T>(LogMessage message, T value)
+            public static void AppendEnumValue<T>(LogMessage message, T value)
                 where T : struct, Enum
-                => message.InternalAppendChainEnumItem(value);
+                => message.InternalAppendChainEnumValue(value);
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public static void AppendChainEnumItem<T>(LogMessage message, T? value)
+            public static void AppendEnumValue<T>(LogMessage message, T? value)
                 where T : struct, Enum
-                => message.InternalAppendChainEnumItem(value);
+                => message.InternalAppendChainEnumValue(value);
 
             protected abstract void Execute(ref ChainExecutionContext context);
 
@@ -82,44 +82,44 @@ partial class LogMessage
     internal partial void InternalAppendChain(InternalApi.Chain chain);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal partial void InternalAppendChainItem(string? value);
+    internal partial void InternalAppendChainValue(string? value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal partial void InternalAppendChainItem<T>(T value)
+    internal partial void InternalAppendChainValue<T>(T value)
         where T : unmanaged;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal partial void InternalAppendChainItem<T>(T? value)
+    internal partial void InternalAppendChainValue<T>(T? value)
         where T : unmanaged;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal partial void InternalAppendChainEnumItem<T>(T value)
+    internal partial void InternalAppendChainEnumValue<T>(T value)
         where T : struct, Enum;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal partial void InternalAppendChainEnumItem<T>(T? value)
+    internal partial void InternalAppendChainEnumValue<T>(T? value)
         where T : struct, Enum;
 
 #if NETSTANDARD
     internal partial void InternalAppendChain(InternalApi.Chain chain)
     { }
 
-    internal partial void InternalAppendChainItem(string? value)
+    internal partial void InternalAppendChainValue(string? value)
     { }
 
-    internal partial void InternalAppendChainItem<T>(T value)
+    internal partial void InternalAppendChainValue<T>(T value)
         where T : unmanaged
     { }
 
-    internal partial void InternalAppendChainItem<T>(T? value)
+    internal partial void InternalAppendChainValue<T>(T? value)
         where T : unmanaged
     { }
 
-    internal partial void InternalAppendChainEnumItem<T>(T value)
+    internal partial void InternalAppendChainEnumValue<T>(T value)
         where T : struct, Enum
     { }
 
-    internal partial void InternalAppendChainEnumItem<T>(T? value)
+    internal partial void InternalAppendChainEnumValue<T>(T? value)
         where T : struct, Enum
     { }
 

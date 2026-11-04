@@ -605,14 +605,14 @@ public sealed class AppendChainsInterceptorGenerator : SourceGeneratorBase
         {
             var (chainId, body) = chainDefinition;
 
-            _writer.AppendLine($"file sealed class {chainId} : global::{ZeroLogFacts.FullTypeNames.Chain}");
+            _writer.AppendLine($"file sealed class {chainId} : global::{ZeroLogFacts.FullTypeNames.InternalApi.Chain}");
 
             using (_writer.WriteBlock())
             {
                 _writer.AppendLine($"public static readonly {chainId} Instance = new();")
                        .AppendLine();
 
-                using (_writer.WriteBlock($"protected override void Execute(ref global::{ZeroLogFacts.FullTypeNames.ChainExecutionContext} context)"))
+                using (_writer.WriteBlock($"protected override void Execute(ref global::{ZeroLogFacts.FullTypeNames.InternalApi.ChainExecutionContext} context)"))
                 {
                     foreach (var call in body.Calls)
                     {
@@ -710,28 +710,28 @@ public sealed class AppendChainsInterceptorGenerator : SourceGeneratorBase
                 using (_writer.WriteBlock())
                 {
                     if (call.ChainId is { } chainId)
-                        _writer.AppendLine($"global::{ZeroLogFacts.FullTypeNames.Chain}.{ZeroLogFacts.MethodNames.AppendChain}(log, {chainId}.Instance);");
+                        _writer.AppendLine($"global::{ZeroLogFacts.FullTypeNames.InternalApi.Chain}.{ZeroLogFacts.MethodNames.InternalApi.AppendChain}(log, {chainId}.Instance);");
 
                     if (call.KeyStringType is ProvidedStringType.Variable)
-                        _writer.AppendLine($"global::{ZeroLogFacts.FullTypeNames.Chain}.{ZeroLogFacts.MethodNames.AppendChainItem}(log, key);");
+                        _writer.AppendLine($"global::{ZeroLogFacts.FullTypeNames.InternalApi.Chain}.{ZeroLogFacts.MethodNames.InternalApi.AppendValue}(log, key);");
 
                     if (call.ValueStringType is ProvidedStringType.Variable)
-                        _writer.AppendLine($"global::{ZeroLogFacts.FullTypeNames.Chain}.{ZeroLogFacts.MethodNames.AppendChainItem}(log, value);");
+                        _writer.AppendLine($"global::{ZeroLogFacts.FullTypeNames.InternalApi.Chain}.{ZeroLogFacts.MethodNames.InternalApi.AppendValue}(log, value);");
 
                     if (call.FormatStringType is ProvidedStringType.Variable)
-                        _writer.AppendLine($"global::{ZeroLogFacts.FullTypeNames.Chain}.{ZeroLogFacts.MethodNames.AppendChainItem}(log, format);");
+                        _writer.AppendLine($"global::{ZeroLogFacts.FullTypeNames.InternalApi.Chain}.{ZeroLogFacts.MethodNames.InternalApi.AppendValue}(log, format);");
 
                     var methodName = call.AppendedType switch
                     {
-                        AppendedType.ValueType         => ZeroLogFacts.MethodNames.AppendChainItem,
-                        AppendedType.NullableValueType => ZeroLogFacts.MethodNames.AppendChainItem,
-                        AppendedType.Enum              => ZeroLogFacts.MethodNames.AppendChainEnumItem,
-                        AppendedType.NullableEnum      => ZeroLogFacts.MethodNames.AppendChainEnumItem,
+                        AppendedType.ValueType         => ZeroLogFacts.MethodNames.InternalApi.AppendValue,
+                        AppendedType.NullableValueType => ZeroLogFacts.MethodNames.InternalApi.AppendValue,
+                        AppendedType.Enum              => ZeroLogFacts.MethodNames.InternalApi.AppendEnumValue,
+                        AppendedType.NullableEnum      => ZeroLogFacts.MethodNames.InternalApi.AppendEnumValue,
                         _                              => null
                     };
 
                     if (methodName is not null)
-                        _writer.AppendLine($"global::{ZeroLogFacts.FullTypeNames.Chain}.{methodName}(log, value);");
+                        _writer.AppendLine($"global::{ZeroLogFacts.FullTypeNames.InternalApi.Chain}.{methodName}(log, value);");
 
                     _writer.AppendLine("return log;");
                 }

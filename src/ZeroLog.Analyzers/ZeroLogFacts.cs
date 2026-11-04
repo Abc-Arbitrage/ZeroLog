@@ -30,9 +30,11 @@ internal static class ZeroLogFacts
         public const string LogManager = $"{Namespaces.ZeroLog}.LogManager";
         public const string LogMessage = $"{Namespaces.ZeroLog}.LogMessage";
 
-        // InternalApi
-        public const string Chain = $"{LogMessage}.{ShortTypeNames.InternalApi}.{ShortTypeNames.Chain}";
-        public const string ChainExecutionContext = $"{Chain}.ChainExecutionContext";
+        public static class InternalApi
+        {
+            public const string Chain = $"{LogMessage}.{ShortTypeNames.InternalApi}.{ShortTypeNames.Chain}";
+            public const string ChainExecutionContext = $"{Chain}.ChainExecutionContext";
+        }
     }
 
     public static class MetadataNames
@@ -50,10 +52,12 @@ internal static class ZeroLogFacts
         public const string GetLogger = "GetLogger";
         public const string Log = "Log";
 
-        // InternalApi
-        public const string AppendChain = "AppendChain";
-        public const string AppendChainItem = "AppendChainItem";
-        public const string AppendChainEnumItem = "AppendChainEnumItem";
+        public static class InternalApi
+        {
+            public const string AppendChain = "AppendChain";
+            public const string AppendValue = "AppendValue";
+            public const string AppendEnumValue = "AppendEnumValue";
+        }
     }
 
     public static class ParameterNames
