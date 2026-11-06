@@ -310,6 +310,8 @@ public sealed class AppendChainsInterceptorGenerator : SourceGeneratorBase
             SpecialType.System_UInt32   => "uint",
             SpecialType.System_Int64    => "long",
             SpecialType.System_UInt64   => "ulong",
+            SpecialType.System_IntPtr   => "nint",
+            SpecialType.System_UIntPtr  => "nuint",
             SpecialType.System_Single   => "float",
             SpecialType.System_Double   => "double",
             SpecialType.System_Decimal  => "decimal",
@@ -451,11 +453,11 @@ public sealed class AppendChainsInterceptorGenerator : SourceGeneratorBase
 
         static bool CanConcat(AppendCallDescriptor call)
             => call.ValueStringType is ProvidedStringType.Constant
+               && call.ConstantValueString is not null
                && call.KeyStringType is ProvidedStringType.None
                && call.FormatStringType is ProvidedStringType.None;
     }
 
-    [Flags]
     private enum AppendedType : byte
     {
         None,
