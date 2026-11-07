@@ -47,6 +47,9 @@ unsafe partial class LogMessage
     {
         partial class Chain
         {
+            // Index 0 is safe to use to designate a null string, since the chain object itself needs to occupy at least one slot.
+            internal const byte NullStringIndex = 0;
+
             ref partial struct ChainExecutionContext
             {
                 private readonly LogMessage _logMessage;
@@ -210,9 +213,17 @@ unsafe partial class LogMessage
                         }
                         else
                         {
-                            _keyValueList?.Add(_key, ArgumentType.FromValueType<T>(), charsWritten, rawData);
+                            if (_keyValueList?.Add(_key, ArgumentType.FromValueType<T>(), charsWritten, rawData) is false)
+                                _isTruncated = true;
                         }
 
+                        ResetStatus();
+                        return;
+                    }
+
+                    if (_keyValueList is null && _key is not null)
+                    {
+                        _inputData = _inputData.Slice(sizeof(T));
                         ResetStatus();
                         return;
                     }
@@ -271,23 +282,31 @@ unsafe partial class LogMessage
 
                     ref readonly var enumArg = ref Unsafe.As<byte, EnumArg>(ref MemoryMarshal.GetReference(_inputData));
 
-                    if (!enumArg.TryFormat(outputBuffer, out var charsWritten, _config))
-                        goto truncate;
-
-                    var rawData = _inputData.Slice(0, sizeof(EnumArg));
-                    _inputData = _inputData.Slice(sizeof(EnumArg));
-
-                    if (_key is null)
+                    if (enumArg.TryFormat(outputBuffer, out var charsWritten, _config))
                     {
-                        _outputBuffer = _outputBuffer.Slice(charsWritten);
-                    }
-                    else
-                    {
-                        _keyValueList?.Add(_key, ArgumentType.Enum, charsWritten, rawData);
+                        var rawData = _inputData.Slice(0, sizeof(EnumArg));
+                        _inputData = _inputData.Slice(sizeof(EnumArg));
+
+                        if (_key is null)
+                        {
+                            _outputBuffer = _outputBuffer.Slice(charsWritten);
+                        }
+                        else
+                        {
+                            if (_keyValueList?.Add(_key, ArgumentType.Enum, charsWritten, rawData) is false)
+                                _isTruncated = true;
+                        }
+
+                        ResetStatus();
+                        return;
                     }
 
-                    ResetStatus();
-                    return;
+                    if (_keyValueList is null && _key is not null)
+                    {
+                        _inputData = _inputData.Slice(sizeof(EnumArg));
+                        ResetStatus();
+                        return;
+                    }
 
                     truncate:
                     _isTruncated = true;
@@ -328,6 +347,9 @@ unsafe partial class LogMessage
                     var stringIndex = _inputData[0];
                     _inputData = _inputData.Slice(sizeof(byte));
 
+                    if (stringIndex == NullStringIndex)
+                        return true;
+
                     if (stringIndex >= _logMessage._objects.Length)
                         goto truncate;
 
@@ -354,8 +376,10 @@ unsafe partial class LogMessage
             var logMessage = new LogMessage("");
             var config = new ZeroLogConfiguration();
 
-            ReadOnlySpan<byte> input = stackalloc byte[128];
-            Span<char> output = stackalloc char[128];
+            Span<byte> input = stackalloc byte[512];
+            Span<char> output = stackalloc char[512];
+
+            input.Clear();
 
             var context = new ChainExecutionContext(
                 logMessage,

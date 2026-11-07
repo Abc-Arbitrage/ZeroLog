@@ -25,7 +25,6 @@ public sealed class AppendChainsInterceptorGenerator : SourceGeneratorBase
         var chains = context.SyntaxProvider
                             .CreateSyntaxProvider(SyntaxPredicate, SyntaxTransform)
                             .Where(static i => i.CallSite.Descriptor.AppendedType is not AppendedType.None)
-                            .WithLambdaComparer(static (a, b) => a.CallSite.Equals(b.CallSite), static i => i.CallSite.GetHashCode())
                             .Collect()
                             .Combine(context.IsGeneratorEnabled(_generatorName))
                             .EmptyIfFalse()
