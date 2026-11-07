@@ -13,15 +13,15 @@ unsafe partial class LogMessage
     private readonly byte[]? _underlyingBuffer;
 
     private readonly byte* _startOfBuffer;
-    private readonly byte* _endOfBuffer;
+    private readonly int _bufferLength;
     private readonly object?[] _objects;
 
     private byte* _dataPointer;
+    private byte* _endOfBuffer;
     private byte _objectIndex;
-    private bool _isTruncated;
 
     internal Log? Logger { get; private set; }
-    internal bool IsTruncated => _isTruncated;
+    internal bool IsTruncated { get; private set; }
 
     internal string? ConstantMessage { get; }
     internal bool ReturnToPool { get; set; }
@@ -38,9 +38,11 @@ unsafe partial class LogMessage
         _objects = stringCapacity > 0 ? new object[stringCapacity] : [];
 
         _startOfBuffer = bufferSegment.Data;
-        _dataPointer = bufferSegment.Data;
-        _endOfBuffer = bufferSegment.Data + bufferSegment.Length;
+        _bufferLength = bufferSegment.Length;
         _underlyingBuffer = bufferSegment.UnderlyingBuffer;
+
+        _dataPointer = _startOfBuffer;
+        _endOfBuffer = _startOfBuffer + bufferSegment.Length;
     }
 
     internal void Initialize(Log? log, LogLevel level)
@@ -60,11 +62,12 @@ unsafe partial class LogMessage
         Logger = log;
 
         _dataPointer = _startOfBuffer;
+        _endOfBuffer = _startOfBuffer + _bufferLength;
         _objectIndex = 0;
-        _isTruncated = false;
+        IsTruncated = false;
 
 #if DEBUG
-        new Span<byte>(_startOfBuffer, (int)(_endOfBuffer - _startOfBuffer)).Fill(0);
+        new Span<byte>(_startOfBuffer, _bufferLength).Fill(0xCC);
         _objects.AsSpan().Fill(null);
 #endif
     }
@@ -111,7 +114,7 @@ unsafe partial class LogMessage
             Thread = Thread,
             Exception = Exception,
             Logger = Logger,
-            _isTruncated = _isTruncated
+            IsTruncated = IsTruncated
         };
     }
 }

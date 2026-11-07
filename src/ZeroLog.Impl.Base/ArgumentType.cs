@@ -39,7 +39,6 @@ internal enum ArgumentType : byte
 
     KeyString,
     Chain,
-    EndOfTruncatedMessage,
 
     FormatFlag = 1 << 7
 }

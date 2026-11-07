@@ -27,9 +27,6 @@ unsafe partial class LogMessage
 
     internal partial void InternalAppendChainValue(string? value)
     {
-        if (_isTruncated)
-            return;
-
         if (_dataPointer + sizeof(byte) <= _endOfBuffer)
         {
             if (value is not null)
@@ -45,7 +42,7 @@ unsafe partial class LogMessage
                 }
                 else
                 {
-                    _isTruncated = true;
+                    TruncateMessage();
                 }
             }
             else
@@ -56,16 +53,13 @@ unsafe partial class LogMessage
         }
         else
         {
-            _isTruncated = true;
+            TruncateMessage();
         }
     }
 
     internal partial void InternalAppendChainValue<T>(T value)
         where T : unmanaged
     {
-        if (_isTruncated)
-            return;
-
         if (_dataPointer + sizeof(T) <= _endOfBuffer)
         {
             *(T*)_dataPointer = value;
@@ -73,16 +67,13 @@ unsafe partial class LogMessage
         }
         else
         {
-            _isTruncated = true;
+            TruncateMessage();
         }
     }
 
     internal partial void InternalAppendChainValue<T>(T? value)
         where T : unmanaged
     {
-        if (_isTruncated)
-            return;
-
         if (_dataPointer + 1 + sizeof(T) <= _endOfBuffer)
         {
             if (value is not null)
@@ -101,16 +92,13 @@ unsafe partial class LogMessage
         }
         else
         {
-            _isTruncated = true;
+            TruncateMessage();
         }
     }
 
     internal partial void InternalAppendChainEnumValue<T>(T value)
         where T : struct, Enum
     {
-        if (_isTruncated)
-            return;
-
         if (_dataPointer + sizeof(EnumArg) <= _endOfBuffer)
         {
             *(EnumArg*)_dataPointer = new EnumArg(TypeUtil<T>.TypeHandle, EnumCache.ToUInt64(value));
@@ -118,16 +106,13 @@ unsafe partial class LogMessage
         }
         else
         {
-            _isTruncated = true;
+            TruncateMessage();
         }
     }
 
     internal partial void InternalAppendChainEnumValue<T>(T? value)
         where T : struct, Enum
     {
-        if (_isTruncated)
-            return;
-
         if (_dataPointer + 1 + sizeof(EnumArg) <= _endOfBuffer)
         {
             if (value is not null)
@@ -146,7 +131,7 @@ unsafe partial class LogMessage
         }
         else
         {
-            _isTruncated = true;
+            TruncateMessage();
         }
     }
 }

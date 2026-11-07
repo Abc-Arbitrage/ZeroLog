@@ -61,7 +61,7 @@ unsafe partial class LogMessage
                 goto outputTruncated;
         }
 
-        if (_isTruncated)
+        if (IsTruncated)
             goto outputTruncated;
 
         return bufferIndex;
@@ -473,12 +473,6 @@ unsafe partial class LogMessage
                 );
             }
 
-            case ArgumentType.EndOfTruncatedMessage:
-            {
-                charsWritten = 0;
-                return false;
-            }
-
             default:
                 throw new InvalidOperationException($"Unexpected argument type: {argType}");
         }
@@ -672,11 +666,6 @@ unsafe partial class LogMessage
             // Should not happen
             case ArgumentType.KeyString:
             case ArgumentType.Chain:
-            {
-                return;
-            }
-
-            case ArgumentType.EndOfTruncatedMessage:
             {
                 return;
             }

@@ -1,5 +1,6 @@
 using System;
 using NUnit.Framework;
+using ObjectLayoutInspector;
 using ZeroLog.Configuration;
 using ZeroLog.Formatting;
 using ZeroLog.Tests.Support;
@@ -32,5 +33,11 @@ public abstract partial class LogMessageTests
             },
             () => _logMessage.Initialize(null, LogLevel.Info)
         );
+    }
+
+    // [Test, Explicit] // MTP complains about explicit tests
+    public void show_layout()
+    {
+        TypeLayout.PrintLayout<LogMessage>(false);
     }
 }

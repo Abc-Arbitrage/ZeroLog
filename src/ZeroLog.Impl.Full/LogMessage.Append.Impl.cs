@@ -152,8 +152,6 @@ unsafe partial class LogMessage
                         TruncateMessage();
                         return;
                     }
-
-                    _isTruncated = true;
                 }
 
                 *(ArgumentType*)_dataPointer = ArgumentType.StringSpan;
@@ -164,6 +162,9 @@ unsafe partial class LogMessage
 
                 value.Slice(0, lengthInChars).CopyTo(new Span<char>(_dataPointer, lengthInChars));
                 _dataPointer += lengthInChars * sizeof(char);
+
+                if (value.Length * sizeof(char) > remainingBytes)
+                    TruncateMessage();
             }
             else
             {
@@ -181,13 +182,7 @@ unsafe partial class LogMessage
 
             if (remainingBytes > 0)
             {
-                var lengthInBytes = value.Length;
-
-                if (lengthInBytes > remainingBytes)
-                {
-                    _isTruncated = true;
-                    lengthInBytes = remainingBytes;
-                }
+                var lengthInBytes = Math.Min(value.Length, remainingBytes);
 
                 *(ArgumentType*)_dataPointer = ArgumentType.Utf8StringSpan;
                 _dataPointer += sizeof(ArgumentType);
@@ -197,6 +192,9 @@ unsafe partial class LogMessage
 
                 value.Slice(0, lengthInBytes).CopyTo(new Span<byte>(_dataPointer, lengthInBytes));
                 _dataPointer += lengthInBytes;
+
+                if (value.Length > remainingBytes)
+                    TruncateMessage();
             }
             else
             {
@@ -208,15 +206,7 @@ unsafe partial class LogMessage
     [MethodImpl(MethodImplOptions.NoInlining)]
     private void TruncateMessage()
     {
-        if (_isTruncated)
-            return;
-
-        _isTruncated = true;
-
-        if (_dataPointer + sizeof(ArgumentType) <= _endOfBuffer)
-        {
-            *(ArgumentType*)_dataPointer = ArgumentType.EndOfTruncatedMessage;
-            _dataPointer += sizeof(ArgumentType);
-        }
+        IsTruncated = true;
+        _endOfBuffer = _dataPointer;
     }
 }
