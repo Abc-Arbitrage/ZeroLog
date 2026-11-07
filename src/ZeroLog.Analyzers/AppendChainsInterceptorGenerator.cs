@@ -82,28 +82,14 @@ public sealed class AppendChainsInterceptorGenerator : SourceGeneratorBase
                                          out AppendChainEntry chainEntry,
                                          CancellationToken cancellationToken)
     {
-        chainEntry = default;
-
         if (!TryGetAppendCallSite(invocation, semanticModel, out var callSite, cancellationToken))
-            return false;
-
-        var currentInvocation = invocation;
-        var chainPosition = 0;
-
-        var previousCallSite = default(AppendCallSite);
-
-        while (TryGetAppendCallSite(currentInvocation, semanticModel, out var currentCallSite, cancellationToken))
         {
-            previousCallSite = currentCallSite;
-            ++chainPosition;
-            currentInvocation = currentInvocation.Instance as IInvocationOperation;
+            chainEntry = default;
+            return false;
         }
 
-        chainEntry = new AppendChainEntry(
-            callSite,
-            previousCallSite,
-            chainPosition - 1
-        );
+        TryGetAppendCallSite(invocation.Instance as IInvocationOperation, semanticModel, out var previousCallSite, cancellationToken);
+        chainEntry = new AppendChainEntry(callSite, previousCallSite);
 
         return true;
     }
@@ -351,18 +337,28 @@ public sealed class AppendChainsInterceptorGenerator : SourceGeneratorBase
     private static ImmutableArray<AppendChain> ToAppendChains(ImmutableArray<AppendChainEntry> chainEntries,
                                                               CancellationToken cancellationToken)
     {
-        return chainEntries.GroupBy(static item => item.FirstCallSite)
-                           .Where(ShouldIntercept)
-                           .Select(
-                               static item => new AppendChain(
-                                   item.OrderBy(i => i.IndexInChain)
-                                       .Select(i => i.CallSite)
-                                       .ToImmutableArray())
-                           )
-                           .ToImmutableArray();
+        var chains = chainEntries.Where(static i => i.PreviousCallSite.Descriptor.AppendedType is AppendedType.None)
+                                 .Select(static i => new List<AppendCallSite> { i.CallSite })
+                                 .ToImmutableArray();
 
-        static bool ShouldIntercept(IGrouping<AppendCallSite, AppendChainEntry> call)
-            => call.Count() > 1 && call.Any(static i => IncludesConstantString(i.CallSite.Descriptor));
+        var callsByPreviousCallSite = chainEntries.Where(static i => i.PreviousCallSite.Descriptor.AppendedType is not AppendedType.None)
+                                                  .GroupBy(static i => i.PreviousCallSite)
+                                                  .Select(static i => (Previous: i.Key, Next: i.UniqueOrDefault().CallSite))
+                                                  .Where(static i => i.Next.Descriptor.AppendedType is not AppendedType.None)
+                                                  .ToDictionary(static i => i.Previous, static i => i.Next);
+
+        foreach (var chain in chains)
+        {
+            for (var current = chain[0]; callsByPreviousCallSite.TryGetValue(current, out var next); current = next)
+                chain.Add(next);
+        }
+
+        return chains.Where(ShouldIntercept)
+                     .Select(static i => new AppendChain(i.ToImmutableArray()))
+                     .ToImmutableArray();
+
+        static bool ShouldIntercept(List<AppendCallSite> callSites)
+            => callSites.Count > 1 && callSites.Any(static i => IncludesConstantString(i.Descriptor));
 
         static bool IncludesConstantString(AppendCallDescriptor call)
             => call.KeyStringType is ProvidedStringType.Constant
@@ -496,8 +492,7 @@ public sealed class AppendChainsInterceptorGenerator : SourceGeneratorBase
 
     private readonly record struct AppendChainEntry(
         AppendCallSite CallSite,
-        AppendCallSite FirstCallSite,
-        int IndexInChain
+        AppendCallSite PreviousCallSite
     );
 
     private readonly record struct AppendChain(ImmutableArray<AppendCallSite> CallSites)
