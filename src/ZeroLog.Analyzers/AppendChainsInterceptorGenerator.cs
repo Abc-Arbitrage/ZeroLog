@@ -103,36 +103,14 @@ public sealed class AppendChainsInterceptorGenerator : SourceGeneratorBase
         if (invocation is null)
             return false;
 
-        if (!IsChainableInvocation(
-                invocation,
-                semanticModel,
-                out var appendedType,
-                out var underlyingTypeName,
-                out var keyStringType,
-                out var keyString,
-                out var valueStringType,
-                out var valueString,
-                out var formatStringType,
-                out var formatString
-            ))
-        {
+        if (!TryGetAppendCallDescriptor(invocation, semanticModel, out var appendCallDescriptor))
             return false;
-        }
 
         if (semanticModel.GetInterceptableLocation((InvocationExpressionSyntax)invocation.Syntax, cancellationToken) is not { } appendCallLocation)
             return false;
 
         appendCallSite = new AppendCallSite(
-            new AppendCallDescriptor(
-                appendedType,
-                keyStringType,
-                valueStringType,
-                formatStringType,
-                underlyingTypeName,
-                keyString,
-                valueString,
-                formatString
-            ),
+            appendCallDescriptor,
             appendCallLocation
         );
 
@@ -154,63 +132,41 @@ public sealed class AppendChainsInterceptorGenerator : SourceGeneratorBase
             ContainingNamespace: { Name: ZeroLogFacts.Namespaces.ZeroLog, ContainingNamespace.IsGlobalNamespace: true }
         };
 
-    private static bool IsChainableInvocation(IInvocationOperation invocation,
-                                              SemanticModel semanticModel,
-                                              out AppendedType appendedType,
-                                              [NotNullWhen(true)] out string? underlyingTypeName,
-                                              out ProvidedStringType keyStringType,
-                                              out string? keyString,
-                                              out ProvidedStringType valueStringType,
-                                              out string? valueString,
-                                              out ProvidedStringType formatStringType,
-                                              out string? formatString)
+    private static bool TryGetAppendCallDescriptor(IInvocationOperation invocation,
+                                                   SemanticModel semanticModel,
+                                                   out AppendCallDescriptor descriptor)
     {
-        appendedType = AppendedType.None;
-        underlyingTypeName = null;
-        keyStringType = ProvidedStringType.None;
-        keyString = null;
-        valueStringType = ProvidedStringType.None;
-        valueString = null;
-        formatStringType = ProvidedStringType.None;
-        formatString = null;
-
         var method = invocation.TargetMethod;
 
         if (!IsPotentiallyChainableMethod(method))
-            return false;
+            goto noMatch;
 
         switch (method.Name)
         {
             case ZeroLogFacts.MethodNames.Append when method.Parameters.Length is 1 or 2:
             {
                 if (method.Parameters[0].Type is not { } valueParameterType)
-                    return false;
+                    goto noMatch;
 
-                underlyingTypeName = GetSupportedTypeName(
-                    valueParameterType,
-                    semanticModel.Compilation,
-                    out appendedType
+                if (method.Parameters.Length == 2 && method.Parameters[1].Type.SpecialType != SpecialType.System_String)
+                    goto noMatch;
+
+                if (GetSupportedTypeName(valueParameterType, semanticModel.Compilation, out var appendedType) is not { } underlyingTypeName)
+                    goto noMatch;
+
+                var valueString = appendedType is AppendedType.String
+                    ? GetStringArgument(invocation.GetArgumentByParameterIndex(0))
+                    : StringArgument.None;
+
+                var formatString = GetStringArgument(invocation.GetArgumentByParameterIndex(1));
+
+                descriptor = new AppendCallDescriptor(
+                    appendedType,
+                    underlyingTypeName,
+                    StringArgument.None,
+                    valueString,
+                    formatString
                 );
-
-                if (underlyingTypeName is null)
-                    return false;
-
-                if (appendedType is AppendedType.String)
-                {
-                    valueStringType = invocation.GetArgumentByParameterIndex(0)?.TryGetConstantString(out valueString) is true
-                        ? ProvidedStringType.Constant
-                        : ProvidedStringType.Variable;
-                }
-
-                if (method.Parameters.Length == 2)
-                {
-                    if (method.Parameters[1].Type.SpecialType != SpecialType.System_String)
-                        return false;
-
-                    formatStringType = invocation.GetArgumentByParameterIndex(1)?.TryGetConstantString(out formatString) is true
-                        ? ProvidedStringType.Constant
-                        : ProvidedStringType.Variable;
-                }
 
                 return true;
             }
@@ -218,50 +174,61 @@ public sealed class AppendChainsInterceptorGenerator : SourceGeneratorBase
             case ZeroLogFacts.MethodNames.AppendEnum when method.Parameters.Length is 1:
             {
                 if (method.Parameters[0].Type is not { } valueParameterType)
-                    return false;
+                    goto noMatch;
 
-                underlyingTypeName = GetSupportedTypeName(
-                    valueParameterType,
-                    semanticModel.Compilation,
-                    out appendedType
+                if (GetSupportedTypeName(valueParameterType, semanticModel.Compilation, out var appendedType) is not { } underlyingTypeName)
+                    goto noMatch;
+
+                descriptor = new AppendCallDescriptor(
+                    appendedType,
+                    underlyingTypeName,
+                    StringArgument.None,
+                    StringArgument.None,
+                    StringArgument.None
                 );
 
-                return underlyingTypeName is not null;
+                return true;
             }
 
             case ZeroLogFacts.MethodNames.AppendKeyValue when method.Parameters.Length is 2:
             {
                 if (method.Parameters[0].Type.SpecialType is not SpecialType.System_String)
-                    return false;
+                    goto noMatch;
 
                 if (method.Parameters[1].Type is not { } valueParameterType)
-                    return false;
+                    goto noMatch;
 
-                underlyingTypeName = GetSupportedTypeName(
-                    valueParameterType,
-                    semanticModel.Compilation,
-                    out appendedType
+                if (GetSupportedTypeName(valueParameterType, semanticModel.Compilation, out var appendedType) is not { } underlyingTypeName)
+                    goto noMatch;
+
+                var keyString = GetStringArgument(invocation.GetArgumentByParameterIndex(0));
+
+                var valueString = appendedType is AppendedType.String
+                    ? GetStringArgument(invocation.GetArgumentByParameterIndex(1))
+                    : StringArgument.None;
+
+                descriptor = new AppendCallDescriptor(
+                    appendedType,
+                    underlyingTypeName,
+                    keyString,
+                    valueString,
+                    StringArgument.None
                 );
-
-                if (underlyingTypeName is null)
-                    return false;
-
-                keyStringType = invocation.GetArgumentByParameterIndex(0)?.TryGetConstantString(out keyString) is true
-                    ? ProvidedStringType.Constant
-                    : ProvidedStringType.Variable;
-
-                if (appendedType is AppendedType.String)
-                {
-                    valueStringType = invocation.GetArgumentByParameterIndex(1)?.TryGetConstantString(out valueString) is true
-                        ? ProvidedStringType.Constant
-                        : ProvidedStringType.Variable;
-                }
 
                 return true;
             }
         }
 
+        noMatch:
+        descriptor = default;
         return false;
+
+        static StringArgument GetStringArgument(IArgumentOperation? argument)
+            => argument is null
+                ? StringArgument.None
+                : argument.TryGetConstantString(out var value)
+                    ? StringArgument.Constant(value)
+                    : StringArgument.Variable;
     }
 
     private static string? GetSupportedTypeName(ITypeSymbol type,
@@ -360,9 +327,9 @@ public sealed class AppendChainsInterceptorGenerator : SourceGeneratorBase
             => callSites.Count > 1 && callSites.Any(static i => IncludesConstantString(i.Descriptor));
 
         static bool IncludesConstantString(AppendCallDescriptor call)
-            => call.KeyStringType is ProvidedStringType.Constant
-               || call.ValueStringType is ProvidedStringType.Constant
-               || call.FormatStringType is ProvidedStringType.Constant;
+            => call.KeyString.Kind is StringArgumentKind.Constant
+               || call.ValueString.Kind is StringArgumentKind.Constant
+               || call.FormatString.Kind is StringArgumentKind.Constant;
     }
 
     private static void BuildDefinitions(ImmutableArray<AppendChain> appendChains,
@@ -389,9 +356,9 @@ public sealed class AppendChainsInterceptorGenerator : SourceGeneratorBase
                 var interceptorDescriptor = new InterceptorDescriptor(
                     callIndex == 0 ? new ChainIdentifier(chainIndex) : null,
                     callDescriptor.AppendedType,
-                    callDescriptor.KeyStringType,
-                    callDescriptor.ValueStringType,
-                    callDescriptor.FormatStringType,
+                    callDescriptor.KeyString.Kind,
+                    callDescriptor.ValueString.Kind,
+                    callDescriptor.FormatString.Kind,
                     callDescriptor.UnderlyingTypeName
                 );
 
@@ -433,7 +400,7 @@ public sealed class AppendChainsInterceptorGenerator : SourceGeneratorBase
                     {
                         calls[calls.Count - 1] = lastCall with
                         {
-                            ConstantValueString = lastCall.ConstantValueString + call.ConstantValueString
+                            ValueString = StringArgument.Constant(lastCall.ValueString.Value + call.ValueString.Value)
                         };
 
                         continue;
@@ -447,10 +414,9 @@ public sealed class AppendChainsInterceptorGenerator : SourceGeneratorBase
         }
 
         static bool CanConcat(AppendCallDescriptor call)
-            => call.ValueStringType is ProvidedStringType.Constant
-               && call.ConstantValueString is not null
-               && call.KeyStringType is ProvidedStringType.None
-               && call.FormatStringType is ProvidedStringType.None;
+            => call.ValueString is { Kind: StringArgumentKind.Constant, Value: not null }
+               && call.KeyString.Kind is StringArgumentKind.None
+               && call.FormatString.Kind is StringArgumentKind.None;
     }
 
     private enum AppendedType : byte
@@ -466,22 +432,60 @@ public sealed class AppendChainsInterceptorGenerator : SourceGeneratorBase
         NullableEnum
     }
 
-    private enum ProvidedStringType : byte
+    private enum StringArgumentKind : byte
     {
         None,
         Constant,
         Variable
     }
 
+    private readonly struct StringArgument : IEquatable<StringArgument>
+    {
+        private static readonly string _variableInstance = new('V', 1);
+        private static readonly string _nullInstance = new('N', 1);
+
+        private readonly string? _value;
+
+        public static StringArgument None => default;
+        public static StringArgument Variable => new(_variableInstance);
+        public static StringArgument Constant(string? value) => new(value ?? _nullInstance);
+
+        public StringArgumentKind Kind => _value is null
+            ? StringArgumentKind.None
+            : ReferenceEquals(_value, _variableInstance)
+                ? StringArgumentKind.Variable
+                : StringArgumentKind.Constant;
+
+        public string? Value => ReferenceEquals(_value, _variableInstance) || ReferenceEquals(_value, _nullInstance) ? null : _value;
+
+        private StringArgument(string? value)
+            => _value = value;
+
+        public override bool Equals(object? obj)
+            => obj is StringArgument other && Equals(other);
+
+        public bool Equals(StringArgument other)
+            => Kind == other.Kind && string.Equals(Value, other.Value, StringComparison.Ordinal);
+
+        public override int GetHashCode()
+            => _value?.GetHashCode() ?? 0;
+
+        public override string ToString()
+            => Kind switch
+            {
+                StringArgumentKind.None     => "<none>",
+                StringArgumentKind.Variable => "<variable>",
+                StringArgumentKind.Constant => Value is null ? "<constant null>" : $"<constant \"{Value}\">",
+                _                           => "<unknown>"
+            };
+    }
+
     private readonly record struct AppendCallDescriptor(
         AppendedType AppendedType,
-        ProvidedStringType KeyStringType,
-        ProvidedStringType ValueStringType,
-        ProvidedStringType FormatStringType,
         string UnderlyingTypeName,
-        string? ConstantKeyString,
-        string? ConstantValueString,
-        string? ConstantFormatString
+        StringArgument KeyString,
+        StringArgument ValueString,
+        StringArgument FormatString
     );
 
     private readonly record struct AppendCallSite(
@@ -529,16 +533,16 @@ public sealed class AppendChainsInterceptorGenerator : SourceGeneratorBase
     private readonly record struct InterceptorDescriptor(
         ChainIdentifier? ChainId,
         AppendedType AppendedType,
-        ProvidedStringType KeyStringType,
-        ProvidedStringType ValueStringType,
-        ProvidedStringType FormatStringType,
+        StringArgumentKind KeyStringKind,
+        StringArgumentKind ValueStringKind,
+        StringArgumentKind FormatStringKind,
         string UnderlyingTypeName
     ) : IComparable<InterceptorDescriptor>
     {
         public int CompareTo(InterceptorDescriptor other)
         {
-            var a = (ChainId?.Index ?? int.MaxValue, AppendedType, KeyStringType, ValueStringType, FormatStringType);
-            var b = (other.ChainId?.Index ?? int.MaxValue, other.AppendedType, other.KeyStringType, other.ValueStringType, other.FormatStringType);
+            var a = (ChainId?.Index ?? int.MaxValue, AppendedType, KeyStringKind, ValueStringKind, FormatStringKind);
+            var b = (other.ChainId?.Index ?? int.MaxValue, other.AppendedType, other.KeyStringKind, other.ValueStringKind, other.FormatStringKind);
 
             var tupleComparison = a.CompareTo(b);
             return tupleComparison != 0 ? tupleComparison : StringComparer.Ordinal.Compare(UnderlyingTypeName, other.UnderlyingTypeName);
@@ -612,35 +616,35 @@ public sealed class AppendChainsInterceptorGenerator : SourceGeneratorBase
                 {
                     foreach (var call in body.Calls)
                     {
-                        switch (call.KeyStringType)
+                        switch (call.KeyString.Kind)
                         {
-                            case ProvidedStringType.Constant:
-                                _writer.AppendLine($"context.SetKeyString({FormatStringLiteral(call.ConstantKeyString)});");
+                            case StringArgumentKind.Constant:
+                                _writer.AppendLine($"context.SetKeyString({FormatStringLiteral(call.KeyString.Value)});");
                                 break;
 
-                            case ProvidedStringType.Variable:
+                            case StringArgumentKind.Variable:
                                 _writer.AppendLine("context.SetKeyString();");
                                 break;
                         }
 
-                        switch (call.FormatStringType)
+                        switch (call.FormatString.Kind)
                         {
-                            case ProvidedStringType.Constant:
-                                _writer.AppendLine($"context.SetFormatString({FormatStringLiteral(call.ConstantFormatString)});");
+                            case StringArgumentKind.Constant:
+                                _writer.AppendLine($"context.SetFormatString({FormatStringLiteral(call.FormatString.Value)});");
                                 break;
 
-                            case ProvidedStringType.Variable:
+                            case StringArgumentKind.Variable:
                                 _writer.AppendLine("context.SetFormatString();");
                                 break;
                         }
 
                         switch (call.AppendedType)
                         {
-                            case AppendedType.String when call.ValueStringType is ProvidedStringType.Constant:
-                                _writer.AppendLine($"context.OutputString({FormatStringLiteral(call.ConstantValueString)});");
+                            case AppendedType.String when call.ValueString.Kind is StringArgumentKind.Constant:
+                                _writer.AppendLine($"context.OutputString({FormatStringLiteral(call.ValueString.Value)});");
                                 break;
 
-                            case AppendedType.String when call.ValueStringType is ProvidedStringType.Variable:
+                            case AppendedType.String when call.ValueString.Kind is StringArgumentKind.Variable:
                                 _writer.AppendLine("context.OutputString();");
                                 break;
 
@@ -688,7 +692,7 @@ public sealed class AppendChainsInterceptorGenerator : SourceGeneratorBase
 
                 _writer.Append($"(this global::{ZeroLogFacts.FullTypeNames.LogMessage} log, ");
 
-                if (call.KeyStringType is not ProvidedStringType.None)
+                if (call.KeyStringKind is not StringArgumentKind.None)
                     _writer.Append("string key, ");
 
                 _writer.Append(call.UnderlyingTypeName);
@@ -698,7 +702,7 @@ public sealed class AppendChainsInterceptorGenerator : SourceGeneratorBase
 
                 _writer.Append(" value");
 
-                if (call.FormatStringType is not ProvidedStringType.None)
+                if (call.FormatStringKind is not StringArgumentKind.None)
                     _writer.Append(", string format");
 
                 _writer.AppendLine(")");
@@ -708,13 +712,13 @@ public sealed class AppendChainsInterceptorGenerator : SourceGeneratorBase
                     if (call.ChainId is { } chainId)
                         _writer.AppendLine($"global::{ZeroLogFacts.FullTypeNames.InternalApi.Chain}.{ZeroLogFacts.MethodNames.InternalApi.AppendChain}(log, {chainId}.Instance);");
 
-                    if (call.KeyStringType is ProvidedStringType.Variable)
+                    if (call.KeyStringKind is StringArgumentKind.Variable)
                         _writer.AppendLine($"global::{ZeroLogFacts.FullTypeNames.InternalApi.Chain}.{ZeroLogFacts.MethodNames.InternalApi.AppendValue}(log, key);");
 
-                    if (call.ValueStringType is ProvidedStringType.Variable)
+                    if (call.ValueStringKind is StringArgumentKind.Variable)
                         _writer.AppendLine($"global::{ZeroLogFacts.FullTypeNames.InternalApi.Chain}.{ZeroLogFacts.MethodNames.InternalApi.AppendValue}(log, value);");
 
-                    if (call.FormatStringType is ProvidedStringType.Variable)
+                    if (call.FormatStringKind is StringArgumentKind.Variable)
                         _writer.AppendLine($"global::{ZeroLogFacts.FullTypeNames.InternalApi.Chain}.{ZeroLogFacts.MethodNames.InternalApi.AppendValue}(log, format);");
 
                     var methodName = call.AppendedType switch
