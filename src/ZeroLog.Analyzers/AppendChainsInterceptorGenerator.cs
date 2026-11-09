@@ -24,7 +24,7 @@ public sealed class AppendChainsInterceptorGenerator : SourceGeneratorBase
     {
         var chains = context.SyntaxProvider
                             .CreateSyntaxProvider(SyntaxPredicate, SyntaxTransform)
-                            .Where(static i => i.CallSite.Descriptor.AppendedType is not AppendedType.None)
+                            .Where(static i => i.CallSite.IsDefined())
                             .Collect()
                             .Combine(context.IsGeneratorEnabled(_generatorName))
                             .EmptyIfFalse()
@@ -122,7 +122,9 @@ public sealed class AppendChainsInterceptorGenerator : SourceGeneratorBase
            && IsLogMessageType(method.ContainingType);
 
     private static bool IsPotentiallyChainableMethodName(string methodName)
-        => methodName is ZeroLogFacts.MethodNames.Append or ZeroLogFacts.MethodNames.AppendEnum or ZeroLogFacts.MethodNames.AppendKeyValue;
+        => methodName is ZeroLogFacts.MethodNames.Append
+            or ZeroLogFacts.MethodNames.AppendEnum
+            or ZeroLogFacts.MethodNames.AppendKeyValue;
 
     private static bool IsLogMessageType(ITypeSymbol type)
         => type is
@@ -250,7 +252,7 @@ public sealed class AppendChainsInterceptorGenerator : SourceGeneratorBase
             return "string";
         }
 
-        var fromSpecialType = underlyingType.SpecialType switch
+        var specialValueTypeName = underlyingType.SpecialType switch
         {
             SpecialType.System_Char     => "char",
             SpecialType.System_Boolean  => "bool",
@@ -271,15 +273,15 @@ public sealed class AppendChainsInterceptorGenerator : SourceGeneratorBase
             _                           => null
         };
 
-        if (fromSpecialType is not null)
+        if (specialValueTypeName is not null)
         {
             appendedType = isNullableValueType ? AppendedType.NullableValueType : AppendedType.ValueType;
-            return fromSpecialType;
+            return specialValueTypeName;
         }
 
-        var fullNameType = underlyingType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+        var fullTypeName = underlyingType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
 
-        switch (fullNameType)
+        switch (fullTypeName)
         {
             case "global::System.Guid":
             case "global::System.TimeSpan":
@@ -287,35 +289,34 @@ public sealed class AppendChainsInterceptorGenerator : SourceGeneratorBase
             case "global::System.DateOnly":
             case "global::System.TimeOnly":
                 appendedType = isNullableValueType ? AppendedType.NullableValueType : AppendedType.ValueType;
-                return fullNameType;
+                return fullTypeName;
         }
 
         if (underlyingType is INamedTypeSymbol { TypeKind: TypeKind.Enum } enumType && enumType.HasAssemblyAccessibility(compilation))
         {
             appendedType = isNullableValueType ? AppendedType.NullableEnum : AppendedType.Enum;
-            return fullNameType;
+            return fullTypeName;
         }
 
         appendedType = AppendedType.None;
         return null;
     }
 
-    private static ImmutableArray<AppendChain> ToAppendChains(ImmutableArray<AppendChainEntry> chainEntries,
-                                                              CancellationToken cancellationToken)
+    private static ImmutableArray<AppendChain> ToAppendChains(ImmutableArray<AppendChainEntry> chainEntries, CancellationToken cancellationToken)
     {
-        var chains = chainEntries.Where(static i => i.PreviousCallSite.Descriptor.AppendedType is AppendedType.None)
+        var chains = chainEntries.Where(static i => IsFirstCallSite(i))
                                  .Select(static i => new List<AppendCallSite> { i.CallSite })
                                  .ToImmutableArray();
 
-        var callsByPreviousCallSite = chainEntries.Where(static i => i.PreviousCallSite.Descriptor.AppendedType is not AppendedType.None)
-                                                  .GroupBy(static i => i.PreviousCallSite)
-                                                  .Select(static i => (Previous: i.Key, Next: i.UniqueOrDefault().CallSite))
-                                                  .Where(static i => i.Next.Descriptor.AppendedType is not AppendedType.None)
-                                                  .ToDictionary(static i => i.Previous, static i => i.Next);
+        var previousToNext = chainEntries.Where(static i => !IsFirstCallSite(i))
+                                         .GroupBy(static i => i.PreviousCallSite)
+                                         .Select(static i => (Previous: i.Key, Next: i.UniqueOrDefault().CallSite))
+                                         .Where(static i => i.Next.IsDefined())
+                                         .ToDictionary(static i => i.Previous, static i => i.Next);
 
         foreach (var chain in chains)
         {
-            for (var current = chain[0]; callsByPreviousCallSite.TryGetValue(current, out var next); current = next)
+            for (var current = chain[0]; previousToNext.TryGetValue(current, out var next); current = next)
                 chain.Add(next);
         }
 
@@ -323,10 +324,13 @@ public sealed class AppendChainsInterceptorGenerator : SourceGeneratorBase
                      .Select(static i => new AppendChain(i.ToImmutableArray()))
                      .ToImmutableArray();
 
+        static bool IsFirstCallSite(in AppendChainEntry entry)
+            => !entry.PreviousCallSite.IsDefined();
+
         static bool ShouldIntercept(List<AppendCallSite> callSites)
             => callSites.Count > 1 && callSites.Any(static i => IncludesConstantString(i.Descriptor));
 
-        static bool IncludesConstantString(AppendCallDescriptor call)
+        static bool IncludesConstantString(in AppendCallDescriptor call)
             => call.KeyString.Kind is StringArgumentKind.Constant
                || call.ValueString.Kind is StringArgumentKind.Constant
                || call.FormatString.Kind is StringArgumentKind.Constant;
@@ -413,7 +417,7 @@ public sealed class AppendChainsInterceptorGenerator : SourceGeneratorBase
             return chain with { Body = new ChainBody(calls.ToImmutable()) };
         }
 
-        static bool CanConcat(AppendCallDescriptor call)
+        static bool CanConcat(in AppendCallDescriptor call)
             => call.ValueString is { Kind: StringArgumentKind.Constant, Value: not null }
                && call.KeyString.Kind is StringArgumentKind.None
                && call.FormatString.Kind is StringArgumentKind.None;
@@ -491,7 +495,10 @@ public sealed class AppendChainsInterceptorGenerator : SourceGeneratorBase
     private readonly record struct AppendCallSite(
         AppendCallDescriptor Descriptor,
         InterceptableLocation Location
-    );
+    )
+    {
+        public bool IsDefined() => Descriptor.AppendedType is not AppendedType.None;
+    }
 
     private readonly record struct AppendChainEntry(
         AppendCallSite CallSite,
@@ -501,10 +508,10 @@ public sealed class AppendChainsInterceptorGenerator : SourceGeneratorBase
     private readonly record struct AppendChain(ImmutableArray<AppendCallSite> CallSites)
     {
         public bool Equals(AppendChain other)
-            => ImmutableArrayEqualityComparer<AppendCallSite>.Default.Equals(CallSites, other.CallSites);
+            => CallSites.HasEqualValues(other.CallSites);
 
         public override int GetHashCode()
-            => ImmutableArrayEqualityComparer<AppendCallSite>.Default.GetHashCode(CallSites);
+            => CallSites.GetValuesHashCode();
 
         public ChainBody GetChainBody()
             => new(CallSites.Select(static i => i.Descriptor).ToImmutableArray());
@@ -524,10 +531,10 @@ public sealed class AppendChainsInterceptorGenerator : SourceGeneratorBase
     private readonly record struct ChainBody(ImmutableArray<AppendCallDescriptor> Calls)
     {
         public bool Equals(ChainBody other)
-            => ImmutableArrayEqualityComparer<AppendCallDescriptor>.Default.Equals(Calls, other.Calls);
+            => Calls.HasEqualValues(other.Calls);
 
         public override int GetHashCode()
-            => ImmutableArrayEqualityComparer<AppendCallDescriptor>.Default.GetHashCode(Calls);
+            => Calls.GetValuesHashCode();
     }
 
     private readonly record struct InterceptorDescriptor(
@@ -601,7 +608,7 @@ public sealed class AppendChainsInterceptorGenerator : SourceGeneratorBase
             );
         }
 
-        private void GenerateChainClass(ChainDefinition chainDefinition)
+        private void GenerateChainClass(in ChainDefinition chainDefinition)
         {
             var (chainId, body) = chainDefinition;
 
