@@ -17,16 +17,6 @@ partial class LogManager
         public static event Action? Initialized;
 
         internal static void OnInitialized()
-        {
-            try
-            {
-                Initialized?.Invoke();
-            }
-            catch
-            {
-                // Ignore initialization exceptions to avoid breaking the application.
-                // LogManager should not throw exceptions during initialization.
-            }
-        }
+            => Initialized?.Invoke();
     }
 }

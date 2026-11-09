@@ -2,7 +2,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using ZeroLog.Configuration;
 using ZeroLog.Support;
@@ -97,7 +96,6 @@ partial class LogManager : IDisposable
 
         _staticLogManager = new LogManager(configuration);
 
-        LogMessage.Warmup();
         InternalApi.OnInitialized();
 
         return _staticLogManager;

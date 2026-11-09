@@ -127,13 +127,15 @@ public class SanityChecks
     {
         const string loggerName = "Test if using _gen TFM";
 
-        var shouldBeAutoRegistered = typeof(SanityChecks).Assembly
-                                                         .GetMetadataValue("TargetFramework")
-                                                         .ShouldNotBeNull()
-                                                         .Contains("_gen");
+        var isCompiledWithSourceGenerators = typeof(SanityChecks).Assembly
+                                                                 .GetMetadataValue("TargetFramework")
+                                                                 .ShouldNotBeNull()
+                                                                 .Contains("_gen");
+
+        ZeroLogTests.SourceGeneratorsEnabled.ShouldBe(isCompiledWithSourceGenerators);
 
         LogManager.IsLoggerRegistered(loggerName)
-                  .ShouldBe(shouldBeAutoRegistered);
+                  .ShouldBe(isCompiledWithSourceGenerators);
 
         if (Guid.NewGuid() == Guid.Empty)
             LogManager.GetLogger(loggerName);

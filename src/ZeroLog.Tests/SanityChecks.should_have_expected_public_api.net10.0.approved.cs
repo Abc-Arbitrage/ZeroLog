@@ -1140,6 +1140,7 @@ namespace ZeroLog
                 public const int Version = 1;
                 protected Chain() { }
                 protected abstract void Execute(ref ZeroLog.LogMessage.InternalApi.Chain.ChainExecutionContext context);
+                public void Initialize() { }
                 public static void AppendChain(ZeroLog.LogMessage message, ZeroLog.LogMessage.InternalApi.Chain chain) { }
                 public static void AppendEnumValue<T>(ZeroLog.LogMessage message, T value)
                     where T :  struct, System.Enum { }

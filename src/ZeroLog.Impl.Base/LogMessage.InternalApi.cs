@@ -22,6 +22,9 @@ partial class LogMessage
         {
             public const int Version = 1;
 
+            [MethodImpl(MethodImplOptions.NoInlining)]
+            public partial void Initialize();
+
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static void AppendChain(LogMessage message, Chain chain)
                 => message.InternalAppendChain(chain);
@@ -127,6 +130,8 @@ partial class LogMessage
     {
         partial class Chain
         {
+            public partial void Initialize() { }
+
             ref partial struct ChainExecutionContext
             {
                 public partial void OutputString() { }

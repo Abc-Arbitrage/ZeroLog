@@ -581,6 +581,7 @@ public sealed class AppendChainsInterceptorGenerator : SourceGeneratorBase
                 using (_writer.WriteBlock("file static class AppendChainInterceptors"))
                 {
                     GenerateInterceptors(interceptorDefinitions);
+                    GenerateInitialization(chainDefinitions);
                 }
             }
 
@@ -602,6 +603,11 @@ public sealed class AppendChainsInterceptorGenerator : SourceGeneratorBase
                         public InterceptsLocationAttribute(int version, string data)
                         { }
                     }
+
+                    [global::System.Diagnostics.Conditional("ZEROLOG_GENERATED")]
+                    [global::System.AttributeUsage(global::System.AttributeTargets.Method)]
+                    file sealed class ModuleInitializerAttribute : global::System.Attribute
+                    { }
                 }
 
                 """
@@ -717,7 +723,7 @@ public sealed class AppendChainsInterceptorGenerator : SourceGeneratorBase
                 using (_writer.WriteBlock())
                 {
                     if (call.ChainId is { } chainId)
-                        _writer.AppendLine($"global::{ZeroLogFacts.FullTypeNames.InternalApi.Chain}.{ZeroLogFacts.MethodNames.InternalApi.AppendChain}(log, {chainId}.Instance);");
+                        _writer.AppendLine($"global::{ZeroLogFacts.FullTypeNames.InternalApi.Chain}.{ZeroLogFacts.MethodNames.InternalApi.AppendChain}(log, global::{ZeroLogFacts.Namespaces.Generated}.{chainId}.Instance);");
 
                     if (call.KeyStringKind is StringArgumentKind.Variable)
                         _writer.AppendLine($"global::{ZeroLogFacts.FullTypeNames.InternalApi.Chain}.{ZeroLogFacts.MethodNames.InternalApi.AppendValue}(log, key);");
@@ -746,8 +752,42 @@ public sealed class AppendChainsInterceptorGenerator : SourceGeneratorBase
                 ++interceptorIndex;
                 _writer.AppendLine();
             }
+        }
 
-            _writer.AppendLine();
+        private void GenerateInitialization(ImmutableArray<ChainDefinition> chainDefinitions)
+        {
+            _writer.AppendLine(
+                $$"""
+                [global::System.Runtime.CompilerServices.ModuleInitializer]
+                public static void ModuleInitializer()
+                {
+                    try
+                    {
+                        AttachEventHandler();
+                    }
+                    catch
+                    {
+                        // Ignore exceptions during module initialization.
+                    }
+
+                    return;
+
+                    [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+                    static void AttachEventHandler()
+                        => global::{{ZeroLogFacts.FullTypeNames.LogManager}}.{{ZeroLogFacts.ShortTypeNames.InternalApi}}.{{ZeroLogFacts.EventNames.Initialized}} += OnInitialized;
+                }
+
+                """
+            );
+
+            using (_writer.WriteBlock("public static void OnInitialized()"))
+            {
+                // Don't ignore exceptions at ZeroLog initialization. If anything goes wrong here,
+                // chains used at runtime will also throw, so we want to know about it as early as possible.
+
+                foreach (var chainDefinition in chainDefinitions)
+                    _writer.AppendLine($"global::{ZeroLogFacts.Namespaces.Generated}.{chainDefinition.ChainId}.Instance.{ZeroLogFacts.MethodNames.InternalApi.Initialize}();");
+            }
         }
     }
 }

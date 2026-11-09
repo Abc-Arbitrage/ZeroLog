@@ -57,6 +57,7 @@ internal static class ZeroLogFacts
             public const string AppendChain = "AppendChain";
             public const string AppendValue = "AppendValue";
             public const string AppendEnumValue = "AppendEnumValue";
+            public const string Initialize = "Initialize";
         }
     }
 

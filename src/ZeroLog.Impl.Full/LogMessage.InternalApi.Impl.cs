@@ -1,4 +1,7 @@
 using System;
+using System.Buffers;
+using ZeroLog.Configuration;
+using ZeroLog.Formatting;
 using ZeroLog.Support;
 
 namespace ZeroLog;
@@ -132,6 +135,79 @@ unsafe partial class LogMessage
         else
         {
             TruncateMessage();
+        }
+    }
+
+    partial class InternalApi
+    {
+        partial class Chain
+        {
+            public partial void Initialize()
+            {
+                // This makes sure the object is instantiated and the Execute method is JITted.
+
+                lock (InitializationData.Lock) // Shouldn't be necessary, but future-proof
+                {
+                    using var data = InitializationData.Get();
+
+                    var context = new ChainExecutionContext(
+                        data.Message,
+                        data.InputBuffer,
+                        data.OutputBuffer,
+                        FormatType.Unformatted,
+                        ZeroLogConfiguration.Default,
+                        data.KeyValueList
+                    );
+
+                    Execute(ref context);
+                }
+            }
+
+            private sealed class InitializationData : IDisposable
+            {
+                public static readonly Lock Lock = new();
+                private static readonly WeakReference<InitializationData> _weakInstance = new(null!);
+
+                private byte[]? _inputBuffer;
+                private char[]? _outputBuffer;
+
+                public LogMessage Message { get; } = CreateTestMessage(LogLevel.Info, 1024, 32);
+                public byte[] InputBuffer => _inputBuffer ??= ArrayPool<byte>.Shared.Rent(1024);
+                public char[] OutputBuffer => _outputBuffer ??= ArrayPool<char>.Shared.Rent(1024);
+                public KeyValueList KeyValueList { get; } = new(1024);
+
+                private InitializationData() { }
+
+                public static InitializationData Get()
+                {
+                    if (!_weakInstance.TryGetTarget(out var instance))
+                    {
+                        instance = new InitializationData();
+                        _weakInstance.SetTarget(instance);
+                    }
+
+                    instance.Message.Initialize(null, LogLevel.Info);
+                    instance.InputBuffer.AsSpan().Clear();
+                    instance.KeyValueList.Clear();
+
+                    return instance;
+                }
+
+                public void Dispose()
+                {
+                    if (_inputBuffer is { } inputBuffer)
+                    {
+                        _inputBuffer = null;
+                        ArrayPool<byte>.Shared.Return(inputBuffer);
+                    }
+
+                    if (_outputBuffer is { } outputBuffer)
+                    {
+                        _outputBuffer = null;
+                        ArrayPool<char>.Shared.Return(outputBuffer);
+                    }
+                }
+            }
         }
     }
 }
