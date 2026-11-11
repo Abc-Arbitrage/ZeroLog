@@ -1133,6 +1133,41 @@ namespace ZeroLog
             public T Value { get; }
             public override string ToString() { }
         }
+        public static class InternalApi
+        {
+            public abstract class Chain
+            {
+                public const int Version = 1;
+                protected Chain() { }
+                protected abstract void Execute(ref ZeroLog.LogMessage.InternalApi.Chain.ChainExecutionContext context);
+                public void Initialize() { }
+                public static void AppendChain(ZeroLog.LogMessage message, ZeroLog.LogMessage.InternalApi.Chain chain) { }
+                public static void AppendEnumValue<T>(ZeroLog.LogMessage message, T value)
+                    where T :  struct, System.Enum { }
+                public static void AppendEnumValue<T>(ZeroLog.LogMessage message, T? value)
+                    where T :  struct, System.Enum { }
+                public static void AppendValue(ZeroLog.LogMessage message, string? value) { }
+                public static void AppendValue<T>(ZeroLog.LogMessage message, T value)
+                    where T :  unmanaged { }
+                public static void AppendValue<T>(ZeroLog.LogMessage message, T? value)
+                    where T :  unmanaged { }
+                public ref struct ChainExecutionContext
+                {
+                    public void OutputEnum() { }
+                    public void OutputNullableEnum() { }
+                    public void OutputNullableValueType<T>()
+                        where T :  unmanaged { }
+                    public void OutputString() { }
+                    public void OutputString(string? value) { }
+                    public void OutputValueType<T>()
+                        where T :  unmanaged { }
+                    public void SetFormatString() { }
+                    public void SetFormatString(string? format) { }
+                    public void SetKeyString() { }
+                    public void SetKeyString(string? key) { }
+                }
+            }
+        }
     }
     public delegate bool UnmanagedFormatterDelegate<T>(ref T value, System.Span<char> destination, out int charsWritten, System.ReadOnlySpan<char> format);
 }
