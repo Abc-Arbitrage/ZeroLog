@@ -4,8 +4,8 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <LangVersion>14.0</LangVersion>
-    <AnalysisLevel>10.0</AnalysisLevel>
+    <LangVersion>15.0</LangVersion>
+    <AnalysisLevel>11.0</AnalysisLevel>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>

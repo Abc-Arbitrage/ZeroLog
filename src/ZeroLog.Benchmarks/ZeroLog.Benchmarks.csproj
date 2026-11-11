@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFramework>net11.0</TargetFramework>
     <OutputType>Exe</OutputType>
     <NoWarn>$(NoWarn);CS8002</NoWarn>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
@@ -18,9 +18,9 @@
     <PackageReference Include="Fody" PrivateAssets="all" />
     <PackageReference Include="InlineIL.Fody" PrivateAssets="all" />
     <PackageReference Include="log4net" VersionOverride="3.5.0" />
-    <PackageReference Include="NLog" VersionOverride="6.2.1" />
+    <PackageReference Include="NLog" VersionOverride="6.2.2" />
     <PackageReference Include="Serilog" VersionOverride="4.4.0" />
-    <PackageReference Include="ZLogger" VersionOverride="2.5.10" />
+    <PackageReference Include="ZLogger" VersionOverride="2.6.2" />
     <PackageReference Include="JetBrains.Annotations" PrivateAssets="all" />
   </ItemGroup>
 
