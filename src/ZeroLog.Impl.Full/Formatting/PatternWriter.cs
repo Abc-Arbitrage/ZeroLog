@@ -390,7 +390,7 @@ public sealed partial class PatternWriter
         var builder = new CharBufferBuilder(destination);
         var visibleLength = 0; // Used for the %column placeholder
 
-        foreach (ref readonly var part in _parts.AsSpan())
+        loop: foreach (ref readonly var part in _parts.AsSpan())
         {
             var partStartOffset = builder.Length;
             var partVisibleStartOffset = visibleLength;
@@ -400,7 +400,7 @@ public sealed partial class PatternWriter
                 case PatternPartType.String:
                 {
                     if (!builder.TryAppendPartial(part.Format))
-                        goto endOfLoop;
+                        break loop;
 
                     visibleLength += part.FormatInt.GetValueOrDefault();
                     continue;
@@ -409,7 +409,7 @@ public sealed partial class PatternWriter
                 case PatternPartType.Date:
                 {
                     if (!builder.TryAppend(message.Timestamp, part.Format))
-                        goto endOfLoop;
+                        break loop;
 
                     break;
                 }
@@ -417,7 +417,7 @@ public sealed partial class PatternWriter
                 case PatternPartType.LocalDate:
                 {
                     if (!builder.TryAppend(ToLocalDate(message.Timestamp), part.Format))
-                        goto endOfLoop;
+                        break loop;
 
                     break;
                 }
@@ -425,7 +425,7 @@ public sealed partial class PatternWriter
                 case PatternPartType.Time:
                 {
                     if (!builder.TryAppend(message.Timestamp.TimeOfDay, part.Format))
-                        goto endOfLoop;
+                        break loop;
 
                     break;
                 }
@@ -433,7 +433,7 @@ public sealed partial class PatternWriter
                 case PatternPartType.LocalTime:
                 {
                     if (!builder.TryAppend(ToLocalDate(message.Timestamp).TimeOfDay, part.Format))
-                        goto endOfLoop;
+                        break loop;
 
                     break;
                 }
@@ -447,18 +447,18 @@ public sealed partial class PatternWriter
                         if (thread.Name != null)
                         {
                             if (!builder.TryAppendPartial(thread.Name))
-                                goto endOfLoop;
+                                break loop;
                         }
                         else
                         {
                             if (!builder.TryAppend(thread.ManagedThreadId))
-                                goto endOfLoop;
+                                break loop;
                         }
                     }
                     else
                     {
                         if (!builder.TryAppend('0'))
-                            goto endOfLoop;
+                            break loop;
                     }
 
                     break;
@@ -467,7 +467,7 @@ public sealed partial class PatternWriter
                 case PatternPartType.ThreadId:
                 {
                     if (!builder.TryAppend(message.Thread?.ManagedThreadId ?? 0))
-                        goto endOfLoop;
+                        break loop;
 
                     break;
                 }
@@ -477,7 +477,7 @@ public sealed partial class PatternWriter
                     if (message.Thread?.Name is { } threadName)
                     {
                         if (!builder.TryAppendPartial(threadName))
-                            goto endOfLoop;
+                            break loop;
                     }
 
                     break;
@@ -486,7 +486,7 @@ public sealed partial class PatternWriter
                 case PatternPartType.Level:
                 {
                     if (!TryWriteLevel(message.Level, _levelNames, ref builder, ref visibleLength))
-                        goto endOfLoop;
+                        break loop;
 
                     break;
                 }
@@ -494,7 +494,7 @@ public sealed partial class PatternWriter
                 case PatternPartType.LevelColor:
                 {
                     if (!TryWriteLevel(message.Level, _levelColors.Values, ref builder, ref visibleLength))
-                        goto endOfLoop;
+                        break loop;
 
                     break;
                 }
@@ -502,7 +502,7 @@ public sealed partial class PatternWriter
                 case PatternPartType.LevelPadded:
                 {
                     if (!TryWriteLevel(message.Level, _levelNamesWithPadding, ref builder, ref visibleLength))
-                        goto endOfLoop;
+                        break loop;
 
                     break;
                 }
@@ -510,7 +510,7 @@ public sealed partial class PatternWriter
                 case PatternPartType.Logger:
                 {
                     if (!builder.TryAppendPartial(message.LoggerName))
-                        goto endOfLoop;
+                        break loop;
 
                     break;
                 }
@@ -518,7 +518,7 @@ public sealed partial class PatternWriter
                 case PatternPartType.LoggerCompact:
                 {
                     if (!builder.TryAppendPartial(message.LoggerCompactName))
-                        goto endOfLoop;
+                        break loop;
 
                     break;
                 }
@@ -526,7 +526,7 @@ public sealed partial class PatternWriter
                 case PatternPartType.Message:
                 {
                     if (!builder.TryAppendPartial(message.Message))
-                        goto endOfLoop;
+                        break loop;
 
                     break;
                 }
@@ -536,7 +536,7 @@ public sealed partial class PatternWriter
                     if (message.Exception?.Message is { } exceptionMessage)
                     {
                         if (!builder.TryAppendPartial(exceptionMessage))
-                            goto endOfLoop;
+                            break loop;
                     }
 
                     break;
@@ -547,7 +547,7 @@ public sealed partial class PatternWriter
                     if (message.Exception is { } exception)
                     {
                         if (!builder.TryAppendPartial(exception.GetType().Name))
-                            goto endOfLoop;
+                            break loop;
                     }
 
                     break;
@@ -570,8 +570,6 @@ public sealed partial class PatternWriter
             if (part.FormatInt is { } fieldLength && fieldLength > visiblePartLength)
                 visibleLength += builder.TryAppendPartial(' ', fieldLength - visiblePartLength);
         }
-
-        endOfLoop:
 
         charsWritten = builder.Length;
         return;

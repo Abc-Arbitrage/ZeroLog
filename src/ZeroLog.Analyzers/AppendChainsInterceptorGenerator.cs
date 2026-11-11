@@ -141,20 +141,23 @@ public sealed class AppendChainsInterceptorGenerator : SourceGeneratorBase
         var method = invocation.TargetMethod;
 
         if (!IsPotentiallyChainableMethod(method))
-            goto noMatch;
+        {
+            descriptor = default;
+            return false;
+        }
 
         switch (method.Name)
         {
             case ZeroLogFacts.MethodNames.Append when method.Parameters.Length is 1 or 2:
             {
                 if (method.Parameters[0].Type is not { } valueParameterType)
-                    goto noMatch;
+                    break;
 
                 if (method.Parameters.Length == 2 && method.Parameters[1].Type.SpecialType != SpecialType.System_String)
-                    goto noMatch;
+                    break;
 
                 if (GetSupportedTypeName(valueParameterType, semanticModel.Compilation, out var appendedType) is not { } underlyingTypeName)
-                    goto noMatch;
+                    break;
 
                 var valueString = appendedType is AppendedType.String
                     ? GetStringArgument(invocation.GetArgumentByParameterIndex(0))
@@ -176,10 +179,10 @@ public sealed class AppendChainsInterceptorGenerator : SourceGeneratorBase
             case ZeroLogFacts.MethodNames.AppendEnum when method.Parameters.Length is 1:
             {
                 if (method.Parameters[0].Type is not { } valueParameterType)
-                    goto noMatch;
+                    break;
 
                 if (GetSupportedTypeName(valueParameterType, semanticModel.Compilation, out var appendedType) is not { } underlyingTypeName)
-                    goto noMatch;
+                    break;
 
                 descriptor = new AppendCallDescriptor(
                     appendedType,
@@ -195,13 +198,13 @@ public sealed class AppendChainsInterceptorGenerator : SourceGeneratorBase
             case ZeroLogFacts.MethodNames.AppendKeyValue when method.Parameters.Length is 2:
             {
                 if (method.Parameters[0].Type.SpecialType is not SpecialType.System_String)
-                    goto noMatch;
+                    break;
 
                 if (method.Parameters[1].Type is not { } valueParameterType)
-                    goto noMatch;
+                    break;
 
                 if (GetSupportedTypeName(valueParameterType, semanticModel.Compilation, out var appendedType) is not { } underlyingTypeName)
-                    goto noMatch;
+                    break;
 
                 var keyString = GetStringArgument(invocation.GetArgumentByParameterIndex(0));
 
@@ -221,7 +224,6 @@ public sealed class AppendChainsInterceptorGenerator : SourceGeneratorBase
             }
         }
 
-        noMatch:
         descriptor = default;
         return false;
 
