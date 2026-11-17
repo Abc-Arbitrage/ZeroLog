@@ -8,10 +8,12 @@ using ZeroLog.Configuration;
 
 namespace ZeroLog.Benchmarks.CrossVersion;
 
+#nullable enable
+
 [Config(typeof(Config))]
 public class CrossVersionBenchmarks
 {
-    private const int _iterationsPerInvoke = 128 * 1024;
+    private const int _iterationsPerInvoke = 256 * 1024;
 
     private static readonly Log _logger = LogManager.GetLogger("Log");
 
@@ -25,7 +27,7 @@ public class CrossVersionBenchmarks
 
         LogManager.Initialize(new ZeroLogConfiguration
         {
-            LogMessagePoolSize = _iterationsPerInvoke,
+            LogMessagePoolSize = _iterationsPerInvoke * 4,
             RootLogger =
             {
                 Level = LogLevel.Debug,
@@ -44,7 +46,7 @@ public class CrossVersionBenchmarks
         => LogManager.Shutdown();
 
     [Benchmark(OperationsPerInvoke = _iterationsPerInvoke)]
-    public void Benchmark()
+    public void LogChain()
     {
         for (var i = 0; i < _iterationsPerInvoke; ++i)
         {
@@ -68,15 +70,20 @@ public class CrossVersionBenchmarks
         {
             var nuGetVersion = NuGetTools.GetNuGetVersion();
 
+            // Options |= ConfigOptions.KeepBenchmarkFiles;
+
             var jobConfig = Job.Default;
 
+            if (AffinityHelper.GetPhysicalPCoreMask() is { } affinity)
+                jobConfig = jobConfig.WithAffinity(affinity);
+
             AddJob(
-                jobConfig.WithId("Current-Default")
+                jobConfig.WithId("Current-Gen")
                          .WithMsBuildArguments("-p:ZeroLogSourceGenerators=true")
             );
 
             AddJob(
-                jobConfig.WithId("Current-Plain")
+                jobConfig.WithId("Current-NoGen")
                          .WithMsBuildArguments("-p:ZeroLogSourceGenerators=false")
             );
 
