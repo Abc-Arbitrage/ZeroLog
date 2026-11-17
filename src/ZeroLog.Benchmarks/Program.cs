@@ -56,6 +56,7 @@ public class Program
         while (Console.KeyAvailable)
             Console.ReadKey(true);
 
+        Console.WriteLine();
         Console.WriteLine("Press enter to exit");
         Console.ReadLine();
     }

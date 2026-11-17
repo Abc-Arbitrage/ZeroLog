@@ -32,8 +32,8 @@ public static class EnumBenchmarksRunner
     }
 }
 
+[SimpleJob]
 [MemoryDiagnoser]
-[SimpleJob(RuntimeMoniker.Net10_0)]
 public unsafe class EnumBenchmarks
 {
     [Benchmark(Baseline = true)]
